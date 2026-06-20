@@ -564,14 +564,7 @@
 
             document.getElementById('modal-start-btn').addEventListener('click', () => {
                 if (!currentPlan) return;
-                const user = firebase.auth().currentUser;
-                if (user) {
-                    // Redirect to Min Side and start enrollment
-                    window.location.href = `/minside/index.html#reading-plans?start=${currentPlan.id}`;
-                } else {
-                    // Redirect to login
-                    window.location.href = `/minside/login.html?redirect=leseplaner&start=${currentPlan.id}`;
-                }
+                window.location.href = `/bibel.html?plan=${currentPlan.id}`;
             });
 
             // Search

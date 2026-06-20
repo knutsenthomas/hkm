@@ -3,8 +3,19 @@ import { firebaseService } from './firebase-service.js';
 
 class BibleReader {
     getFirestore() {
+        if (firebaseService) {
+            if (!firebaseService.isInitialized) {
+                firebaseService.tryAutoInit();
+            }
+            if (firebaseService.isInitialized && firebaseService.db) {
+                return firebaseService.db;
+            }
+        }
         if (window.firebase && typeof firebase.firestore === 'function') {
             try {
+                if (!firebase.apps.length && window.firebaseConfig) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
                 return firebase.firestore();
             } catch (e) {
                 console.warn("[BibleReader] firebase.firestore() threw:", e);
@@ -100,6 +111,9 @@ class BibleReader {
     }
 
     async init() {
+        if (firebaseService) {
+            firebaseService.tryAutoInit();
+        }
         this.setupDOMElements();
         this.applySettings();
         this.bindEvents();
@@ -109,10 +123,16 @@ class BibleReader {
         let authInitialized = false;
         if (window.firebase && typeof firebase.auth === 'function') {
             try {
+                if (!firebase.apps.length && window.firebaseConfig) {
+                    firebase.initializeApp(window.firebaseConfig);
+                }
                 firebase.auth().onAuthStateChanged(user => {
                     this.currentUser = user;
                     this.loadNotes();
                     this.loadReadingPlan();
+                    if (this.activePlanMode && this.activePlanId) {
+                        this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+                    }
                 });
                 authInitialized = true;
             } catch (e) {
@@ -133,6 +153,8 @@ class BibleReader {
         const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
         const transParam = urlParams.get('trans'); // e.g. "DNB"
         const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
+        const planParam = urlParams.get('plan');
+        const dayParam = urlParams.get('day');
 
         if (transParam) {
             this.selectedBibleId = transParam;
@@ -143,7 +165,9 @@ class BibleReader {
 
         await this.loadBooks();
 
-        if (refParam) {
+        if (planParam) {
+            await this.initReadingPlanMode(planParam, dayParam);
+        } else if (refParam) {
             await this.parseAndNavigateToReference(refParam);
         } else {
             // Load default (John 1 or first book)
@@ -2143,7 +2167,7 @@ class BibleReader {
         const container = this.dom.readingPlanContent;
         if (!container) return;
 
-        const currentDayNum = userPlan.currentDay || 1;
+        const currentDayNum = this.activePlanMode ? this.activePlanDay : (userPlan.currentDay || 1);
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
         
         const currentDayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
@@ -2158,6 +2182,38 @@ class BibleReader {
         const t_openDevotional = this.getTranslation('open_devotional', 'Åpne dagens andakt');
         const t_daysOutline = this.getTranslation('days_outline', 'Oversikt over dager');
         
+        if (this.activePlanMode) {
+            // Render only checklist of days for clean 3rd column
+            container.innerHTML = `
+                <div style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.05em;">Leseplan: Dager</span>
+                        <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.location.href='/leseplaner.html'">Bytt plan</button>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        ${globalPlan.days.map(d => {
+                            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d.dayNumber);
+                            const isActive = d.dayNumber === currentDayNum;
+                            return `
+                            <div class="hkm-rp-day-item ${isActive ? 'active' : ''}" onclick="window.bibleReader.selectReadingPlanDay(${d.dayNumber})">
+                                <div style="flex: 1; min-width: 0; padding-right: 8px;">
+                                    <div style="font-size: 12px; font-weight: 700; color: ${isActive ? '#bd4f2a' : '#475569'};">Dag ${d.dayNumber}</div>
+                                    <div style="font-size: 13px; color: ${isActive ? '#1B4965' : '#0f172a'}; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.verses}</div>
+                                </div>
+                                <div class="hkm-rp-day-checkbox ${isCompleted ? 'completed' : ''}">
+                                    ${isCompleted ? '<span class="material-symbols-outlined">check</span>' : ''}
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Default layout (if not in active workspace mode, e.g. normal Bible sidebar mode)
         container.innerHTML = `
             <div style="padding: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -2222,6 +2278,12 @@ class BibleReader {
                 </div>
             </div>
         `;
+    }
+
+    selectReadingPlanDay(dayNumber) {
+        this.activePlanDay = dayNumber;
+        this.updateUrlParams();
+        this.setupReadingPlanUI();
     }
 
     renderAvailablePlansList(plans) {
@@ -2374,7 +2436,7 @@ class BibleReader {
                 reflections: {}
             }, { merge: true });
             
-            await this.loadReadingPlan();
+            window.location.href = window.location.pathname + '?plan=' + planId;
         } catch (err) {
             console.error("Enrollment failed:", err);
             alert("Feil under påmelding: " + err.message);
@@ -2393,6 +2455,709 @@ class BibleReader {
             if (sidebar) sidebar.classList.remove('active');
             const navRight = document.getElementById('bible-nav-right');
             if (navRight) navRight.classList.remove('active');
+        }
+    }
+
+    async initReadingPlanMode(planId, dayNumFromUrl) {
+        this.activePlanMode = true;
+        this.activePlanId = planId;
+        
+        // Inject styles dynamically
+        this.injectReadingPlanStyles();
+
+        const db = this.getFirestore();
+        if (!db) {
+            console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
+            return;
+        }
+
+        try {
+            // Fetch global plan data
+            const planDoc = await db.collection('reading_plans').doc(planId).get();
+            if (!planDoc.exists) {
+                console.error("[BibleReader] Plan does not exist:", planId);
+                return;
+            }
+            this.activePlanData = { id: planDoc.id, ...planDoc.data() };
+
+            // Determine active day
+            let activeDayNum = parseInt(dayNumFromUrl, 10) || null;
+            
+            // Check user progress if logged in
+            if (this.currentUser) {
+                const userPlanDoc = await db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .doc(planId)
+                    .get();
+
+                if (userPlanDoc.exists) {
+                    this.userPlanProgress = userPlanDoc.data();
+                    if (!activeDayNum) {
+                        activeDayNum = this.userPlanProgress.currentDay || 1;
+                    }
+                } else {
+                    this.userPlanProgress = {
+                        planId: planId,
+                        currentDay: 1,
+                        completedDays: [],
+                        reflections: {}
+                    };
+                    if (!activeDayNum) activeDayNum = 1;
+                }
+            } else {
+                // Guest progress from localStorage
+                const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                if (localProgress) {
+                    this.userPlanProgress = JSON.parse(localProgress);
+                } else {
+                    this.userPlanProgress = {
+                        planId: planId,
+                        currentDay: 1,
+                        completedDays: [],
+                        reflections: {}
+                    };
+                }
+                if (!activeDayNum) {
+                    activeDayNum = this.userPlanProgress.currentDay || 1;
+                }
+            }
+
+            this.activePlanDay = activeDayNum;
+
+            // Render reading plan UI
+            await this.setupReadingPlanUI();
+        } catch (e) {
+            console.error("[BibleReader] Error in initReadingPlanMode:", e);
+        }
+    }
+
+    injectReadingPlanStyles() {
+        if (document.getElementById('hkm-rp-workspace-styles')) return;
+
+        const style = document.createElement('style');
+        style.id = 'hkm-rp-workspace-styles';
+        style.innerHTML = `
+            .hkm-rp-header-card {
+                background: #ffffff;
+                border: 1px solid var(--border-color, #e2e8f0);
+                border-radius: 16px;
+                padding: 24px;
+                margin: 16px;
+                box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
+            }
+            .bible-theme-dark .hkm-rp-header-card {
+                background: #242424;
+                border-color: #333333;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+            .hkm-rp-header-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 24px;
+                margin-bottom: 20px;
+            }
+            @media (max-width: 768px) {
+                .hkm-rp-header-top {
+                    flex-direction: column;
+                    gap: 16px;
+                }
+            }
+            .hkm-rp-header-info {
+                flex: 1;
+            }
+            .hkm-rp-badge {
+                display: inline-block;
+                font-size: 11px;
+                font-weight: 700;
+                color: #bd4f2a;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 8px;
+            }
+            .hkm-rp-title {
+                font-size: 24px;
+                font-weight: 800;
+                color: #1B4965;
+                margin: 0 0 8px 0 !important;
+                line-height: 1.2;
+            }
+            .bible-theme-dark .hkm-rp-title {
+                color: #e2e8f0;
+            }
+            .hkm-rp-desc {
+                font-size: 14px;
+                color: var(--text-muted, #64748b);
+                margin: 0;
+                line-height: 1.5;
+            }
+            .hkm-rp-day-navigator {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                background: rgba(27, 73, 101, 0.03);
+                padding: 8px 16px;
+                border-radius: 12px;
+                border: 1px solid rgba(27, 73, 101, 0.06);
+            }
+            .bible-theme-dark .hkm-rp-day-navigator {
+                background: rgba(255, 255, 255, 0.02);
+                border-color: rgba(255, 255, 255, 0.05);
+            }
+            .hkm-nav-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #1B4965;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                font-weight: 600;
+                font-size: 13px;
+                padding: 6px 12px;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+            }
+            .bible-theme-dark .hkm-nav-btn {
+                color: #94a3b8;
+            }
+            .hkm-nav-btn:hover:not(:disabled) {
+                background: rgba(27, 73, 101, 0.08);
+                color: #bd4f2a;
+            }
+            .hkm-nav-btn:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+            .hkm-nav-day-label {
+                font-size: 14px;
+                font-weight: 700;
+                color: #1B4965;
+                white-space: nowrap;
+            }
+            .bible-theme-dark .hkm-nav-day-label {
+                color: #cbd5e1;
+            }
+            .hkm-rp-progress-section {
+                margin-bottom: 20px;
+            }
+            .hkm-rp-progress-text {
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                font-weight: 600;
+                color: #475569;
+                margin-bottom: 8px;
+            }
+            .bible-theme-dark .hkm-rp-progress-text {
+                color: #94a3b8;
+            }
+            .hkm-rp-progress-bar {
+                height: 8px;
+                background: #e2e8f0;
+                border-radius: 99px;
+                overflow: hidden;
+            }
+            .bible-theme-dark .hkm-rp-progress-bar {
+                background: #333333;
+            }
+            .hkm-rp-progress-fill {
+                height: 100%;
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+                border-radius: 99px;
+                transition: width 0.4s ease;
+            }
+            .hkm-rp-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 16px;
+                border-top: 1px solid var(--border-color, #e2e8f0);
+                padding-top: 16px;
+            }
+            .bible-theme-dark .hkm-rp-actions {
+                border-top-color: #333333;
+            }
+            .hkm-btn-complete {
+                background: linear-gradient(135deg, #d17d39, #bd4f2a);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                padding: 12px 24px;
+                font-weight: 700;
+                cursor: pointer;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+                transition: all 0.2s ease;
+            }
+            .hkm-btn-complete:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
+            }
+            .hkm-btn-complete.completed {
+                background: #10b981;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            }
+            .hkm-btn-complete.completed:hover {
+                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+            }
+            .hkm-rp-sidebar-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                padding-bottom: 40px;
+            }
+            .hkm-rp-sidebar-card {
+                background: #ffffff;
+                border: 1px solid var(--border-color, #e2e8f0);
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+                display: block;
+                transform: translateZ(0) !important;
+                backface-visibility: hidden !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card {
+                background: #242424;
+                border-color: #333333;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .hkm-rp-sidebar-card .card-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 12px;
+                border-bottom: 1px solid rgba(27, 73, 101, 0.05);
+                padding-bottom: 8px;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card .card-header {
+                border-bottom-color: rgba(255,255,255,0.05);
+            }
+            .hkm-rp-sidebar-card .card-header .icon {
+                color: #d17d39;
+                font-size: 22px;
+            }
+            .hkm-rp-sidebar-card .card-header h3 {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1B4965;
+                margin: 0;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card .card-header h3 {
+                color: #cbd5e1;
+            }
+            .hkm-rp-sidebar-card p {
+                font-size: 14px;
+                line-height: 1.6;
+                color: #334155;
+                margin: 0;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card p {
+                color: #94a3b8;
+            }
+            .hkm-rp-sidebar-card .resources-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .hkm-rp-resource-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 12px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1B4965;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+            .bible-theme-dark .hkm-rp-resource-item {
+                background: #1e1e1e;
+                border-color: #333333;
+                color: #cbd5e1;
+            }
+            .hkm-rp-resource-item:hover {
+                background: rgba(27, 73, 101, 0.05);
+                border-color: #1B4965;
+                transform: translateX(2px);
+            }
+            .hkm-rp-sidebar-card textarea {
+                display: block !important;
+                width: 100% !important;
+                min-height: 100px !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+                border: 1px solid #cbd5e1 !important;
+                outline: none !important;
+                font-size: 13px !important;
+                line-height: 1.5 !important;
+                margin-bottom: 12px !important;
+                resize: vertical !important;
+                background: #ffffff !important;
+                color: #1e293b !important;
+                transform: translateZ(0) !important;
+                backface-visibility: hidden !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card textarea {
+                background: #1e1e1e !important;
+                border-color: #333333 !important;
+                color: #e2e8f0 !important;
+            }
+            .hkm-rp-sidebar-card textarea:focus {
+                border-color: #d17d39 !important;
+            }
+            .save-status {
+                font-size: 11px;
+                color: #64748b;
+                margin-top: 6px;
+                text-align: right;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    async setupReadingPlanUI() {
+        const globalPlan = this.activePlanData;
+        const userPlan = this.userPlanProgress;
+        const currentDayNum = this.activePlanDay;
+        const dayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
+
+        // 1. Hide books list and search in left sidebar
+        const booksListWrapper = document.querySelector('.books-list-wrapper');
+        if (booksListWrapper) booksListWrapper.style.display = 'none';
+
+        const searchContainer = document.querySelector('.sidebar-header .search-container');
+        if (searchContainer) searchContainer.style.display = 'none';
+
+        const mobileControls = document.getElementById('sidebar-mobile-controls');
+        if (mobileControls) mobileControls.style.display = 'none';
+
+        // Modify Left Sidebar Header title and add toggle
+        const titleRow = document.querySelector('.sidebar-mobile-title-row');
+        let rpToggleBtn = document.getElementById('rp-sidebar-toggle-mode');
+        if (!rpToggleBtn) {
+            rpToggleBtn = document.createElement('button');
+            rpToggleBtn.id = 'rp-sidebar-toggle-mode';
+            rpToggleBtn.className = 'hkm-btn-secondary';
+            rpToggleBtn.style.cssText = 'height: 28px !important; padding: 2px 8px !important; font-size: 11px !important; border-radius: 6px !important; margin-left: auto; border: 1px solid var(--bible-primary) !important; color: var(--bible-primary) !important; display: inline-flex; align-items: center; justify-content: center;';
+            rpToggleBtn.innerText = 'Vis bøker';
+            rpToggleBtn.onclick = () => this.toggleLeftSidebarMode();
+
+            if (titleRow) {
+                titleRow.appendChild(rpToggleBtn);
+            }
+        }
+        rpToggleBtn.style.display = 'inline-flex';
+
+        const titleSpan = titleRow ? titleRow.querySelector('span') : null;
+        if (titleSpan) {
+            titleSpan.innerText = 'Dagens andakt';
+        }
+
+        // 2. Render left sidebar content (devotional details)
+        let planSidebar = document.getElementById('reading-plan-sidebar-content');
+        if (!planSidebar) {
+            planSidebar = document.createElement('div');
+            planSidebar.id = 'reading-plan-sidebar-content';
+            planSidebar.style.cssText = 'padding: 16px; overflow-y: auto; height: calc(100% - 60px);';
+            this.dom.sidebar.appendChild(planSidebar);
+        }
+        planSidebar.style.display = 'block';
+
+        this.renderLeftSidebarDevotional(planSidebar, dayConfig);
+
+        // 3. Render top header panel in central column
+        let planHeader = document.getElementById('reading-plan-header-panel');
+        if (!planHeader) {
+            planHeader = document.createElement('div');
+            planHeader.id = 'reading-plan-header-panel';
+            
+            const contentPane = document.querySelector('.bible-content-pane');
+            if (contentPane) {
+                contentPane.insertBefore(planHeader, contentPane.firstChild);
+            }
+        }
+        planHeader.style.display = 'block';
+        this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
+
+        // 4. Force Leseplan tab active in right sidebar
+        const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+        if (rpTabBtn) {
+            rpTabBtn.click();
+        }
+        
+        // Force open right sidebar on desktop/tablet for side-by-side
+        if (window.innerWidth > 1024) {
+            if (this.dom.navRight) {
+                this.dom.navRight.classList.add('active');
+            }
+        }
+
+        // 5. Load day's verses in the center reading pane
+        if (dayConfig && dayConfig.verses) {
+            this.showDayVerses(dayConfig.verses);
+        }
+    }
+
+    toggleLeftSidebarMode() {
+        const booksListWrapper = document.querySelector('.books-list-wrapper');
+        const searchContainer = document.querySelector('.sidebar-header .search-container');
+        const planSidebar = document.getElementById('reading-plan-sidebar-content');
+        const rpToggleBtn = document.getElementById('rp-sidebar-toggle-mode');
+        const titleRow = document.querySelector('.sidebar-mobile-title-row');
+        const titleSpan = titleRow ? titleRow.querySelector('span') : null;
+
+        if (booksListWrapper && booksListWrapper.style.display === 'none') {
+            booksListWrapper.style.display = 'block';
+            if (searchContainer) searchContainer.style.display = 'flex';
+            if (planSidebar) planSidebar.style.display = 'none';
+            if (rpToggleBtn) rpToggleBtn.innerText = 'Vis andakt';
+            if (titleSpan) titleSpan.innerText = 'Bibelbøker';
+        } else {
+            if (booksListWrapper) booksListWrapper.style.display = 'none';
+            if (searchContainer) searchContainer.style.display = 'none';
+            if (planSidebar) planSidebar.style.display = 'block';
+            if (rpToggleBtn) rpToggleBtn.innerText = 'Vis bøker';
+            if (titleSpan) titleSpan.innerText = 'Dagens andakt';
+        }
+    }
+
+    renderLeftSidebarDevotional(container, dayConfig) {
+        container.innerHTML = '';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'hkm-rp-sidebar-wrapper';
+        container.appendChild(wrapper);
+
+        // Prayer Focus Card
+        const prayerCard = document.createElement('div');
+        prayerCard.className = 'hkm-rp-sidebar-card';
+        prayerCard.innerHTML = `
+            <div class="card-header">
+                <span class="material-symbols-outlined icon">favorite</span>
+                <h3>Bønnefokus</h3>
+            </div>
+            <p>${dayConfig.prayerFocus || 'Be over skriftstedene du leser i dag.'}</p>
+        `;
+        wrapper.appendChild(prayerCard);
+
+        // Resources Card
+        if (dayConfig.resources && dayConfig.resources.length > 0) {
+            const resourcesCard = document.createElement('div');
+            resourcesCard.className = 'hkm-rp-sidebar-card';
+            
+            let resourcesListHtml = '';
+            dayConfig.resources.forEach(res => {
+                let iconName = 'article';
+                if (res.type === 'video') iconName = 'play_circle';
+                else if (res.type === 'podcast') iconName = 'podcasts';
+
+                resourcesListHtml += `
+                    <a href="${res.url || '#'}" target="_blank" class="hkm-rp-resource-item">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">${iconName}</span>
+                        <span>${res.title}</span>
+                    </a>
+                `;
+            });
+
+            resourcesCard.innerHTML = `
+                <div class="card-header">
+                    <span class="material-symbols-outlined icon">link</span>
+                    <h3>Ressurser</h3>
+                </div>
+                <div class="resources-list">
+                    ${resourcesListHtml}
+                </div>
+            `;
+            wrapper.appendChild(resourcesCard);
+        }
+
+        // Reflection Notepad Card
+        const reflectionCard = document.createElement('div');
+        reflectionCard.className = 'hkm-rp-sidebar-card';
+        
+        const currentReflection = (this.userPlanProgress.reflections && this.userPlanProgress.reflections[this.activePlanDay]) || '';
+        
+        reflectionCard.innerHTML = `
+            <div class="card-header">
+                <span class="material-symbols-outlined icon">edit_note</span>
+                <h3>Dine refleksjoner</h3>
+            </div>
+            <textarea id="rp-reflection-input" placeholder="Skriv ned hva Gud talte til deg i dag...">${currentReflection}</textarea>
+            <button id="rp-save-reflection-btn" class="hkm-btn-complete" style="width: 100%; display: flex; justify-content: center; height: 38px !important; padding: 0 !important; font-size: 13px !important; border-radius: 8px !important;">
+                <span>Lagre refleksjoner</span>
+            </button>
+            <div id="rp-save-status" class="save-status"></div>
+        `;
+        wrapper.appendChild(reflectionCard);
+
+        const textarea = reflectionCard.querySelector('#rp-reflection-input');
+        const saveBtn = reflectionCard.querySelector('#rp-save-reflection-btn');
+        const saveStatus = reflectionCard.querySelector('#rp-save-status');
+
+        if (!this.currentUser) {
+            textarea.placeholder = "Logg inn på Min Side for å skrive og lagre refleksjoner permanent.";
+            textarea.disabled = true;
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.5';
+            saveStatus.innerText = "Gjestemodus - Refleksjoner er deaktivert.";
+        } else {
+            saveBtn.onclick = async () => {
+                saveBtn.disabled = true;
+                saveStatus.innerText = "Lagrer...";
+                
+                try {
+                    const text = textarea.value.trim();
+                    this.userPlanProgress.reflections = this.userPlanProgress.reflections || {};
+                    this.userPlanProgress.reflections[this.activePlanDay] = text;
+                    
+                    await this.saveProgress();
+
+                    // Also save to generic personal notes
+                    const db = this.getFirestore();
+                    if (db) {
+                        await db.collection('personal_notes').add({
+                            userId: this.currentUser.uid,
+                            title: `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`,
+                            text: text,
+                            createdAt: this.getServerTimestamp(),
+                            isReadingPlanNote: true,
+                            readingPlanId: this.activePlanId,
+                            dayNumber: this.activePlanDay
+                        });
+                    }
+
+                    saveStatus.innerText = "Lagret i dine notater!";
+                    setTimeout(() => { saveStatus.innerText = ''; }, 3000);
+                } catch (err) {
+                    console.error("Failed to save reflection:", err);
+                    saveStatus.innerText = "Kunne ikke lagre: " + err.message;
+                } finally {
+                    saveBtn.disabled = false;
+                }
+            };
+        }
+    }
+
+    renderTopHeaderPanel(container, globalPlan, userPlan, currentDayNum, dayConfig) {
+        const totalDays = globalPlan.durationDays || globalPlan.days.length;
+        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
+        const progressPct = Math.round((completedDaysCount / totalDays) * 100);
+        const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
+
+        container.className = 'hkm-rp-header-card';
+        container.innerHTML = `
+            <div class="hkm-rp-header-top">
+                <div class="hkm-rp-header-info">
+                    <span class="hkm-rp-badge">Aktiv Leseplan</span>
+                    <h1 class="hkm-rp-title">${globalPlan.title}</h1>
+                    <p class="hkm-rp-desc">${globalPlan.description || ''}</p>
+                </div>
+                <div class="hkm-rp-day-navigator">
+                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                        <span>Forrige</span>
+                    </button>
+                    <div class="hkm-nav-day-label">Dag ${currentDayNum} av ${totalDays}</div>
+                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
+                        <span>Neste</span>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="hkm-rp-progress-section">
+                <div class="hkm-rp-progress-text">
+                    <span>Din fremgang</span>
+                    <span>${progressPct}% (${completedDaysCount} av ${totalDays} dager fullført)</span>
+                </div>
+                <div class="hkm-rp-progress-bar">
+                    <div class="hkm-rp-progress-fill" style="width: ${progressPct}%;"></div>
+                </div>
+            </div>
+
+            <div class="hkm-rp-actions">
+                <a href="/leseplaner.html" class="hkm-nav-btn" style="padding-left: 0;">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Tilbake til oversikten</span>
+                </a>
+                <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>${isCurrentDayCompleted ? 'Dag fullført!' : 'Merk dag som fullført'}</span>
+                </button>
+            </div>
+        `;
+
+        // Wire up buttons
+        container.querySelector('#rp-prev-day-btn').onclick = () => {
+            this.activePlanDay = Math.max(1, currentDayNum - 1);
+            this.updateUrlParams();
+            this.setupReadingPlanUI();
+        };
+
+        container.querySelector('#rp-next-day-btn').onclick = () => {
+            this.activePlanDay = Math.min(totalDays, currentDayNum + 1);
+            this.updateUrlParams();
+            this.setupReadingPlanUI();
+        };
+
+        const completeBtn = container.querySelector('#rp-complete-day-btn');
+        completeBtn.onclick = async () => {
+            userPlan.completedDays = userPlan.completedDays || [];
+            if (isCurrentDayCompleted) {
+                userPlan.completedDays = userPlan.completedDays.filter(d => d !== currentDayNum);
+            } else {
+                if (!userPlan.completedDays.includes(currentDayNum)) {
+                    userPlan.completedDays.push(currentDayNum);
+                }
+                
+                if (currentDayNum < totalDays) {
+                    let nextDay = currentDayNum + 1;
+                    while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
+                        nextDay++;
+                    }
+                    if (nextDay <= totalDays) {
+                        userPlan.currentDay = nextDay;
+                    }
+                } else {
+                    userPlan.completed = true;
+                }
+            }
+
+            userPlan.lastActiveAt = this.getServerTimestamp();
+            await this.saveProgress();
+            
+            this.setupReadingPlanUI();
+            this.loadReadingPlan();
+        };
+    }
+
+    updateUrlParams() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('plan', this.activePlanId);
+        url.searchParams.set('day', this.activePlanDay);
+        window.history.pushState({}, '', url.toString());
+    }
+
+    async saveProgress() {
+        if (this.currentUser) {
+            const db = this.getFirestore();
+            if (db) {
+                const ref = db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .doc(this.activePlanId);
+                await ref.set(this.userPlanProgress, { merge: true });
+            }
+        } else {
+            localStorage.setItem('hkm_reading_plan_progress_' + this.activePlanId, JSON.stringify(this.userPlanProgress));
         }
     }
 
