@@ -2965,12 +2965,17 @@ class BibleReader {
             rpToggleBtn = document.createElement('button');
             rpToggleBtn.id = 'rp-sidebar-toggle-mode';
             rpToggleBtn.className = 'hkm-btn-secondary';
-            rpToggleBtn.style.cssText = 'height: 28px !important; padding: 2px 8px !important; font-size: 11px !important; border-radius: 6px !important; margin-left: auto; border: 1px solid var(--bible-primary) !important; color: var(--bible-primary) !important; display: inline-flex; align-items: center; justify-content: center;';
+            rpToggleBtn.style.cssText = 'height: 28px !important; padding: 2px 8px !important; font-size: 11px !important; border-radius: 6px !important; margin-left: auto; margin-right: 8px !important; border: 1px solid var(--bible-primary) !important; color: var(--bible-primary) !important; display: inline-flex; align-items: center; justify-content: center;';
             rpToggleBtn.innerText = 'Vis bøker';
             rpToggleBtn.onclick = () => this.toggleLeftSidebarMode();
 
             if (titleRow) {
-                titleRow.appendChild(rpToggleBtn);
+                const closeBtn = titleRow.querySelector('.close-sidebar-mobile-btn');
+                if (closeBtn) {
+                    titleRow.insertBefore(rpToggleBtn, closeBtn);
+                } else {
+                    titleRow.appendChild(rpToggleBtn);
+                }
             }
         }
         rpToggleBtn.style.display = 'inline-flex';
