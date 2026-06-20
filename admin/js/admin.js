@@ -6942,8 +6942,8 @@ class AdminManager {
                             </div>
                         </div>
                         <!-- Results Area -->
-                        <div id="yt-results-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding: 4px 0;">
-                            <div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">
+                        <div id="yt-results-container" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 0;">
+                            <div style="text-align: center; color: #94a3b8; padding: 40px;">
                                 <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">play_circle</span>
                                 <p style="margin-top: 8px; font-size: 14px;">Søk etter en video for å se resultater her.</p>
                             </div>
@@ -6990,24 +6990,28 @@ class AdminManager {
             </div>
             <style>
                 .yt-video-card {
+                    display: flex;
+                    gap: 16px;
+                    padding: 12px;
                     border: 1px solid #e2e8f0;
                     border-radius: 8px;
-                    overflow: hidden;
                     background: #ffffff;
                     cursor: pointer;
                     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-                    display: flex;
-                    flex-direction: column;
                 }
                 .yt-video-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
                     border-color: #1B4965;
                 }
                 .yt-video-card-img {
-                    position: relative;
-                    padding-bottom: 56.25%; /* 16:9 */
+                    width: 180px;
+                    flex-shrink: 0;
+                    aspect-ratio: 16/9;
                     background: #000;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    position: relative;
                 }
                 .yt-video-card-img img {
                     position: absolute;
@@ -7018,26 +7022,49 @@ class AdminManager {
                     object-fit: cover;
                 }
                 .yt-video-card-info {
-                    padding: 12px;
                     flex: 1;
                     display: flex;
                     flex-direction: column;
-                    justify-content: space-between;
+                    gap: 4px;
+                    justify-content: flex-start;
+                    text-align: left;
                 }
                 .yt-video-card-title {
-                    font-size: 13px;
+                    font-size: 14px;
                     font-weight: 600;
                     color: #1e293b;
-                    margin-bottom: 6px;
+                    margin: 0;
                     line-height: 1.4;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
                     overflow: hidden;
                 }
-                .yt-video-card-channel {
-                    font-size: 11px;
+                .yt-video-card-meta {
+                    font-size: 12px;
                     color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .yt-video-card-desc {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    line-height: 1.4;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    margin-top: 4px;
+                }
+                @media (max-width: 600px) {
+                    .yt-video-card {
+                        flex-direction: column;
+                        gap: 12px;
+                    }
+                    .yt-video-card-img {
+                        width: 100%;
+                    }
                 }
                 .close-modal-btn:hover {
                     color: #1e293b !important;
@@ -7110,14 +7137,19 @@ class AdminManager {
             }
             
             ytResultsContainer.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <div style="text-align: center; padding: 40px;">
                     <div class="spinner" style="margin: 0 auto 12px;"></div>
                     <p style="color: #64748b; font-size: 14px;">Søker på YouTube...</p>
                 </div>
             `;
             
             try {
-                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+                const ytMatch = query.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+                if (ytMatch) {
+                    url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${ytMatch[1]}&key=${apiKey}`;
+                }
+
                 const res = await fetch(url);
                 if (!res.ok) {
                     const errData = await res.json().catch(() => ({}));
@@ -7130,7 +7162,7 @@ class AdminManager {
                 ytResultsContainer.innerHTML = '';
                 if (items.length === 0) {
                     ytResultsContainer.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">
+                        <div style="text-align: center; padding: 40px; color: #64748b;">
                             <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">search_off</span>
                             <p style="margin-top: 8px; font-size: 14px;">Ingen videoer funnet for "${query}".</p>
                         </div>
@@ -7138,12 +7170,33 @@ class AdminManager {
                     return;
                 }
                 
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '';
+                    try {
+                        const date = new Date(dateStr);
+                        const now = new Date();
+                        const diffMs = now - date;
+                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                        if (diffDays === 0) return 'I dag';
+                        if (diffDays === 1) return 'I går';
+                        if (diffDays < 30) return `for ${diffDays} dager siden`;
+                        const diffMonths = Math.floor(diffDays / 30);
+                        if (diffMonths < 12) return `for ${diffMonths} ${diffMonths === 1 ? 'måned' : 'måneder'} siden`;
+                        const diffYears = Math.floor(diffMonths / 12);
+                        return `for ${diffYears} ${diffYears === 1 ? 'år' : 'år'} siden`;
+                    } catch (e) {
+                        return '';
+                    }
+                };
+
                 items.forEach(item => {
-                    const videoId = item.id?.videoId;
+                    const videoId = item.id?.videoId || (typeof item.id === 'string' ? item.id : undefined);
                     if (!videoId) return;
                     const snippet = item.snippet || {};
                     const title = snippet.title || '';
                     const channel = snippet.channelTitle || '';
+                    const description = snippet.description || '';
+                    const publishedAt = snippet.publishedAt || '';
                     const thumbUrl = snippet.thumbnails?.medium?.url || snippet.thumbnails?.high?.url || '';
                     
                     // Escape HTML entities to prevent rendering issues
@@ -7154,6 +7207,7 @@ class AdminManager {
                         .replace(/&lt;/g, '<')
                         .replace(/&gt;/g, '>');
                     
+                    const dateFormatted = formatDate(publishedAt);
                     const card = document.createElement('div');
                     card.className = 'yt-video-card';
                     card.innerHTML = `
@@ -7162,7 +7216,11 @@ class AdminManager {
                         </div>
                         <div class="yt-video-card-info">
                             <div class="yt-video-card-title" title="${cleanTitle}">${cleanTitle}</div>
-                            <div class="yt-video-card-channel">${channel}</div>
+                            <div class="yt-video-card-meta">
+                                <span>${channel}</span>
+                                ${dateFormatted ? `<span style="color: #cbd5e1; margin: 0 4px;">•</span><span>${dateFormatted}</span>` : ''}
+                            </div>
+                            <div class="yt-video-card-desc" title="${description}">${description}</div>
                         </div>
                     `;
                     card.onclick = () => {
