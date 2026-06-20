@@ -639,7 +639,7 @@
 
         /* Sidebar Right (Bookmarks & History) */
         .bible-nav-right {
-            width: 300px;
+            width: 320px;
             background: var(--bg-sidebar);
             border-left: 1px solid var(--border-color);
             display: flex;
@@ -654,14 +654,15 @@
 
         .tab-btn {
             flex: 1;
-            padding: 14px;
+            padding: 12px 2px;
             text-align: center;
-            font-size: 13px;
+            font-size: 11.5px;
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -844,9 +845,9 @@
         .btn-bible-go:active {
             transform: scale(0.97);
         }
-        
-        /* Mobile menu toggle */
-        .btn-mobile-sidebar {
+                /* Mobile menu toggle */
+        .btn-mobile-sidebar,
+        .btn-mobile-nav-right {
             background: var(--bg-card);
             display: flex;
             align-items: center;
@@ -859,20 +860,38 @@
             height: 40px !important;
             transition: all 0.25s ease;
             box-sizing: border-box;
+            color: var(--text-base);
         }
         
-        .btn-mobile-sidebar:hover {
+        .btn-mobile-sidebar:hover,
+        .btn-mobile-nav-right:hover {
             border-color: var(--bible-primary);
             color: var(--bible-primary);
             transform: scale(1.05);
         }
         
-        .btn-mobile-sidebar:active {
+        .btn-mobile-sidebar:active,
+        .btn-mobile-nav-right:active {
             transform: scale(0.95);
+        }
+
+        /* Show mobile toggles only on screens under 900px */
+        #mobile-sidebar-toggle,
+        #mobile-nav-right-toggle {
+            display: none !important;
         }
 
         /* Mobile Adjustments */
         @media (max-width: 900px) {
+            #mobile-sidebar-toggle,
+            #mobile-nav-right-toggle {
+                display: flex !important;
+            }
+
+            .sidebar-mobile-title-row {
+                display: flex !important;
+            }
+
             .bible-app-container {
                 margin-top: var(--hkm-header-height, 70px);
                 height: calc(100vh - var(--hkm-header-height, 70px));
@@ -891,21 +910,117 @@
             }
 
             .bible-nav-right {
-                display: none;
+                position: absolute;
+                right: -320px;
+                top: 0;
+                height: 100%;
+                width: 320px;
+                box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+                z-index: 99;
+                transition: right 0.3s ease;
+                display: flex;
+                border-left: 1px solid var(--border-color);
+            }
+
+            .bible-nav-right.active {
+                right: 0;
             }
         }
 
         @media (max-width: 600px) {
-            .controls-right {
-                width: 100%;
-                justify-content: flex-end;
+            .chapter-selector-overlay {
+                left: 16px !important;
+                right: 16px !important;
+                width: auto !important;
+                max-width: calc(100vw - 32px) !important;
+            }
+            .settings-dropdown {
+                left: 16px !important;
+                right: 16px !important;
+                width: auto !important;
+                max-width: calc(100vw - 32px) !important;
             }
             .bible-controls {
-                padding: 12px 16px;
+                padding: 8px 12px !important;
+                gap: 8px !important;
+            }
+            .controls-left {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            .controls-right {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            .select-wrapper {
+                flex: 1 !important;
+                max-width: none !important;
+                min-width: 80px !important;
+            }
+            #bible-quick-search-form {
+                flex: 1 !important;
+            }
+            .bible-control-input {
+                width: 100% !important;
+                flex: 1 !important;
             }
             .bible-content-pane {
                 padding: 24px 16px;
             }
+        }
+
+        @media (max-width: 480px) {
+            .bible-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+            }
+            .bible-sidebar.active {
+                left: 0 !important;
+            }
+            .bible-nav-right {
+                width: 100% !important;
+                right: -100% !important;
+            }
+            .bible-nav-right.active {
+                right: 0 !important;
+            }
+            .dictionary-drawer {
+                width: 100% !important;
+                right: -100% !important;
+            }
+            .dictionary-drawer.active {
+                right: 0 !important;
+            }
+            
+            /* Simplify buttons on very small screens to fit */
+            #trigger-book-chapter span:not(.material-symbols-outlined) {
+                display: none;
+            }
+            #trigger-book-chapter {
+                width: 40px !important;
+                height: 40px !important;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .navigation-triggers .nav-btn span:not(.material-symbols-outlined) {
+                display: none;
+            }
+            .navigation-triggers .nav-btn {
+                width: 48px !important;
+                height: 48px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
         .dict-related-box {
             display: flex;
             flex-direction: column;
@@ -1111,6 +1226,12 @@
         <!-- Left Sidebar: Books Selection -->
         <aside class="bible-sidebar" id="bible-sidebar">
             <div class="sidebar-header">
+                <div class="sidebar-mobile-title-row" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Bibelbøker</span>
+                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
                 <div class="search-container">
                     <span class="material-symbols-outlined icon">search</span>
                     <input type="text" id="book-search" placeholder="Søk etter bibelbok...">
@@ -1137,7 +1258,7 @@
             <div class="bible-controls">
                 <div class="controls-left">
                     <!-- Sidebar trigger (Mobile Only) -->
-                    <button class="md:hidden btn-mobile-sidebar" id="mobile-sidebar-toggle">
+                    <button class="btn-mobile-sidebar" id="mobile-sidebar-toggle">
                         <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
                     </button>
 
@@ -1174,9 +1295,19 @@
                     </form>
 
                     <!-- Settings Trigger -->
-                    <div class="settings-popover-trigger" onclick="document.getElementById('settings-dropdown').classList.toggle('active')">
+                    <div class="settings-popover-trigger" onclick="document.getElementById('settings-dropdown').classList.toggle('active')" title="Tekst-innstillinger">
                         <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
                     </div>
+
+                    <!-- Bibeleksikon Manual Trigger -->
+                    <div class="settings-popover-trigger" id="dict-manual-trigger" title="Åpne Bibeleksikon">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
+                    </div>
+
+                    <!-- Right Sidebar Toggle Button (Mobile/Tablet Only) -->
+                    <button class="btn-mobile-nav-right" id="mobile-nav-right-toggle">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">bookmarks</span>
+                    </button>
 
                     <!-- Settings Popover -->
                     <div class="settings-dropdown" id="settings-dropdown">
@@ -1247,16 +1378,29 @@
             <!-- Fly-out Dictionary Drawer -->
             <aside class="dictionary-drawer" id="dictionary-drawer">
                 <div class="dict-header">
-                    <h3>Teologisk Ordbok</h3>
+                    <h3>Bibeleksikon</h3>
                     <button class="close-dict-btn" id="close-dict-btn">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
                 <div class="dict-body">
+                    <!-- Search Input inside Drawer -->
+                    <div class="dict-search-container" style="margin-bottom: 20px; display: flex; gap: 8px;">
+                        <input type="text" id="dict-search-input" placeholder="Søk på ord eller spørsmål..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
+                        <button id="dict-search-submit-btn" style="background: var(--bible-primary); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Søk</button>
+                    </div>
+
+                    <!-- Welcome / Info state when nothing is searched yet -->
+                    <div id="dict-welcome-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 10px; color: var(--text-muted);">
+                        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--bible-primary); margin-bottom: 12px; opacity: 0.8;">menu_book</span>
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Velkommen til Bibeleksikon</h4>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.</p>
+                    </div>
+
                     <!-- Spinner loading -->
-                    <div id="dict-spinner" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted);">
+                    <div id="dict-spinner" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: var(--text-muted);">
                         <div class="spinner" style="margin-bottom: 12px;"></div>
-                        <p style="font-size: 13px;">Slår opp ordet med AI...</p>
+                        <p style="font-size: 13px;">Slår opp med AI...</p>
                     </div>
                     
                     <div id="dict-content-wrap" style="display: none;">
@@ -1283,7 +1427,13 @@
         </main>
 
         <!-- Right Sidebar: Bookmarks & History -->
-        <aside class="bible-nav-right">
+        <aside class="bible-nav-right" id="bible-nav-right">
+            <div class="right-sidebar-mobile-header">
+                <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Min side & Verktøy</span>
+                <button onclick="document.getElementById('bible-nav-right').classList.remove('active')" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                </button>
+            </div>
             <div class="tabs-header">
                 <div class="tab-btn active" id="tab-btn-bookmarks" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));

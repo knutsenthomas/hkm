@@ -99,6 +99,8 @@ class BibleReader {
             // Navigation trigger/mobile
             mobileSidebarToggle: document.getElementById('mobile-sidebar-toggle'),
             sidebar: document.getElementById('bible-sidebar'),
+            navRight: document.getElementById('bible-nav-right'),
+            mobileNavRightToggle: document.getElementById('mobile-nav-right-toggle'),
             
             // Search / Jump reference
             quickSearchInput: document.getElementById('bible-quick-search'),
@@ -113,6 +115,10 @@ class BibleReader {
             closeDictBtn: document.getElementById('close-dict-btn'),
             dictSpinner: document.getElementById('dict-spinner'),
             dictContentWrap: document.getElementById('dict-content-wrap'),
+            dictManualTrigger: document.getElementById('dict-manual-trigger'),
+            dictSearchInput: document.getElementById('dict-search-input'),
+            dictSearchSubmitBtn: document.getElementById('dict-search-submit-btn'),
+            dictWelcomeState: document.getElementById('dict-welcome-state'),
             
             // Bookmarks / History sidebar
             bookmarksList: document.getElementById('bookmarks-list'),
@@ -175,18 +181,30 @@ class BibleReader {
             });
         });
 
-        // Mobile sidebar toggle
+        // Mobile sidebar toggle (Left)
         if (this.dom.mobileSidebarToggle) {
             this.dom.mobileSidebarToggle.addEventListener('click', () => {
                 this.dom.sidebar.classList.toggle('active');
             });
         }
 
-        // Close sidebar when clicking on a book on mobile
+        // Mobile sidebar toggle (Right)
+        if (this.dom.mobileNavRightToggle) {
+            this.dom.mobileNavRightToggle.addEventListener('click', () => {
+                this.dom.navRight.classList.toggle('active');
+            });
+        }
+
+        // Close sidebars when clicking outside on mobile
         document.addEventListener('click', (e) => {
             if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
-                if (!this.dom.sidebar.contains(e.target) && e.target !== this.dom.mobileSidebarToggle) {
+                if (!this.dom.sidebar.contains(e.target) && e.target !== this.dom.mobileSidebarToggle && !e.target.closest('#mobile-sidebar-toggle')) {
                     this.dom.sidebar.classList.remove('active');
+                }
+            }
+            if (this.dom.navRight && this.dom.navRight.classList.contains('active')) {
+                if (!this.dom.navRight.contains(e.target) && e.target !== this.dom.mobileNavRightToggle && !e.target.closest('#mobile-nav-right-toggle')) {
+                    this.dom.navRight.classList.remove('active');
                 }
             }
         });
@@ -214,6 +232,36 @@ class BibleReader {
         if (this.dom.closeDictBtn) {
             this.dom.closeDictBtn.addEventListener('click', () => {
                 this.dom.dictDrawer.classList.remove('active');
+            });
+        }
+
+        // Dictionary Manual Trigger
+        if (this.dom.dictManualTrigger) {
+            this.dom.dictManualTrigger.addEventListener('click', () => {
+                this.dom.dictDrawer.classList.add('active');
+                if (this.dom.dictContentWrap.style.display === 'none' && this.dom.dictSpinner.style.display === 'none') {
+                    if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'flex';
+                }
+            });
+        }
+
+        // Dictionary direct search input and button
+        if (this.dom.dictSearchInput) {
+            this.dom.dictSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = this.dom.dictSearchInput.value.trim();
+                    if (query) {
+                        this.lookupWord(query);
+                    }
+                }
+            });
+        }
+        if (this.dom.dictSearchSubmitBtn) {
+            this.dom.dictSearchSubmitBtn.addEventListener('click', () => {
+                const query = this.dom.dictSearchInput.value.trim();
+                if (query) {
+                    this.lookupWord(query);
+                }
             });
         }
 
@@ -632,9 +680,11 @@ class BibleReader {
 
     async lookupWord(word, contextText, refText) {
         this.dom.dictDrawer.classList.add('active');
+        if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'none';
         this.dom.dictSpinner.style.display = 'flex';
         this.dom.dictContentWrap.style.display = 'none';
         
+        if (this.dom.dictSearchInput) this.dom.dictSearchInput.value = word;
         this.dom.dictWordTitle.innerText = word;
 
         const dictRelatedBox = document.getElementById('dict-related-resources');
@@ -787,6 +837,10 @@ class BibleReader {
                 await this.selectBook(item.dataset.bookId);
                 await this.selectChapter(item.dataset.chapterId);
                 this.scrollToVerse(item.dataset.verse);
+
+                if (this.dom.navRight && this.dom.navRight.classList.contains('active')) {
+                    this.dom.navRight.classList.remove('active');
+                }
             });
         });
     }
@@ -818,6 +872,10 @@ class BibleReader {
                 }
                 await this.selectBook(item.dataset.bookId);
                 await this.selectChapter(item.dataset.chapterId);
+
+                if (this.dom.navRight && this.dom.navRight.classList.contains('active')) {
+                    this.dom.navRight.classList.remove('active');
+                }
             });
         });
     }
