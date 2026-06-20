@@ -117,16 +117,16 @@
 }
 
 .filter-btn.active {
-    background: var(--primary-blue);
+    background: var(--primary-orange);
     color: #ffffff;
-    border-color: var(--primary-blue);
-    box-shadow: 0 10px 15px -3px rgba(27, 73, 101, 0.2);
+    border-color: var(--primary-orange);
+    box-shadow: 0 10px 15px -3px rgba(209, 125, 57, 0.2);
 }
 
 .filter-btn.active:hover {
-    background: var(--primary-blue-hover);
+    background: var(--primary-orange-hover);
     color: #ffffff;
-    border-color: var(--primary-blue-hover);
+    border-color: var(--primary-orange-hover);
 }
 
 /* ==========================================
@@ -630,12 +630,12 @@
 }
 
 .view-btn:hover {
-    color: var(--primary-blue);
+    color: var(--primary-orange);
     background: #f1f5f9;
 }
 
 .view-btn.active {
-    background: var(--primary-blue);
+    background: var(--primary-orange);
     color: #ffffff;
 }
 
