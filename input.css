@@ -1397,8 +1397,7 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bibl
 }
 
 .header-search-btn,
-#global-search-opener,
-.header-bible-btn {
+#global-search-opener {
     border: none;
     background: transparent;
     cursor: pointer;
@@ -1408,6 +1407,24 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bibl
     font-size: 18px;
     color: white;
     padding: 6px;
+}
+
+.header-bible-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    padding: 6px;
+}
+
+@media (min-width: 768px) {
+    .header-bible-btn {
+        display: flex;
+    }
 }
 
 .header.scrolled .header-search-btn,
