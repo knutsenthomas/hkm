@@ -43,6 +43,8 @@ export default function ReadingPlansAdmin() {
     const handleCreateNew = () => {
         const newPlan = {
             title: '',
+            subtitle: '',
+            imageUrl: '',
             description: '',
             durationDays: 1,
             days: [
@@ -182,6 +184,8 @@ export default function ReadingPlansAdmin() {
         try {
             const dataToSave = {
                 title: currentPlan.title,
+                subtitle: currentPlan.subtitle || '',
+                imageUrl: currentPlan.imageUrl || '',
                 description: currentPlan.description || '',
                 durationDays: currentPlan.durationDays,
                 days: currentPlan.days,
@@ -241,6 +245,27 @@ export default function ReadingPlansAdmin() {
                                 required
                                 style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '15px' }}
                             />
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                            <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Undertittel (valgfri)</label>
+                            <input
+                                type="text"
+                                value={currentPlan.subtitle || ''}
+                                onChange={(e) => setCurrentPlan({ ...currentPlan, subtitle: e.target.value })}
+                                placeholder="F.eks: Oppdag styrke og mot i vanskelige tider"
+                                style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '15px' }}
+                            />
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                            <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Bilde-URL (valgfri)</label>
+                            <input
+                                type="text"
+                                value={currentPlan.imageUrl || ''}
+                                onChange={(e) => setCurrentPlan({ ...currentPlan, imageUrl: e.target.value })}
+                                placeholder="F.eks: https://images.unsplash.com/photo-..."
+                                style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '15px' }}
+                            />
+                            <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>Tips: Kopier en bilde-adresse fra Unsplash.com for fine, gratis bibel- eller naturmotiver.</span>
                         </div>
                         <div style={{ gridColumn: 'span 2' }}>
                             <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Beskrivelse</label>

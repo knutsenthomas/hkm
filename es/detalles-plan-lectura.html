@@ -250,6 +250,13 @@
                 position: static;
             }
         }
+
+        .resource-link:hover {
+            background-color: var(--primary-orange) !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+        }
     </style>
 </head>
 
@@ -341,6 +348,7 @@
         style="background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1504052442567-82d3fe047e35?auto=format&fit=crop&w=1920&q=80') !important; background-size: cover !important; background-position: center center !important; background-repeat: no-repeat !important;">
         <div class="container">
             <h1 class="page-hero-title" id="plan-hero-title">Detalles del plan de lectura</h1>
+            <p class="page-hero-subtitle" id="plan-hero-subtitle" style="display: none; font-size: 1.15rem; opacity: 0.9; margin-top: 8px; font-weight: 500;"></p>
             <nav class="hero-breadcrumbs">
                 <a href="/es/">Inicio</a>
                 <span class="separator">/</span>
@@ -356,6 +364,11 @@
         <div class="details-container" id="details-view" style="display: none;">
             <!-- Left Side: Content -->
             <div class="left-content">
+                <!-- Blog cover image -->
+                <div class="card" id="plan-image-card" style="display: none; padding: 0; overflow: hidden; border: none; margin-bottom: 24px;">
+                    <img id="plan-cover-image" src="" alt="Cubierta de plan de lectura" style="width: 100%; height: auto; max-height: 480px; object-fit: cover; display: block; border-radius: 16px;">
+                </div>
+
                 <!-- Description -->
                 <div class="card">
                     <h2 class="card-title">
@@ -529,6 +542,30 @@
                 document.getElementById('sidebar-plan-title').textContent = plan.title;
                 document.getElementById('plan-duration-badge').textContent = `${plan.durationDays} días`;
 
+                // Subtitle
+                if (plan.subtitle) {
+                    const subtitleEl = document.getElementById('plan-hero-subtitle');
+                    if (subtitleEl) {
+                        subtitleEl.textContent = plan.subtitle;
+                        subtitleEl.style.display = 'block';
+                    }
+                }
+
+                // Hero background image & Blog cover image
+                if (plan.imageUrl) {
+                    const heroSection = document.querySelector('.page-hero');
+                    if (heroSection) {
+                        heroSection.style.setProperty('background-image', `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('${plan.imageUrl}')`, 'important');
+                    }
+                    
+                    const imgCard = document.getElementById('plan-image-card');
+                    const imgEl = document.getElementById('plan-cover-image');
+                    if (imgCard && imgEl) {
+                        imgEl.src = plan.imageUrl;
+                        imgCard.style.display = 'block';
+                    }
+                }
+
                 // Render day list
                 const daysList = plan.days || [];
                 daysList.sort((a, b) => a.dayNumber - b.dayNumber);
@@ -537,15 +574,19 @@
                 if (daysList.length === 0) {
                     container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">No se han configurado días para este plan de lectura todavía.</p>`;
                 } else {
-                    container.innerHTML = daysList.map(day => `
-                        <div class="day-item">
-                            <div class="day-header-info">
-                                <span class="day-badge-num">Día ${day.dayNumber}</span>
-                                <span class="day-verses">${escapeHtml(day.verses || 'Reflexión')}</span>
+                    container.innerHTML = daysList.map(day => {
+                        const resourcesHtml = renderResources(day.resources);
+                        return `
+                            <div class="day-item">
+                                <div class="day-header-info">
+                                    <span class="day-badge-num">Día ${day.dayNumber}</span>
+                                    <span class="day-verses">${escapeHtml(day.verses || 'Reflexión')}</span>
+                                </div>
+                                ${day.prayerFocus ? `<div class="day-prayer"><strong>Enfoque:</strong> ${escapeHtml(day.prayerFocus)}</div>` : ''}
+                                ${resourcesHtml}
                             </div>
-                            ${day.prayerFocus ? `<div class="day-prayer"><strong>Enfoque:</strong> ${escapeHtml(day.prayerFocus)}</div>` : ''}
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
                 // Add button click routing to Bible reader
@@ -556,6 +597,31 @@
                 // Toggle views
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('details-view').style.display = 'grid';
+            }
+
+            function renderResources(resources) {
+                if (!resources || resources.length === 0) return '';
+                
+                const items = resources.map(res => {
+                    let icon = 'fa-link';
+                    if (res.type === 'article') icon = 'fa-file-alt';
+                    else if (res.type === 'video') icon = 'fa-video';
+                    else if (res.type === 'podcast') icon = 'fa-microphone';
+
+                    const title = res.title || 'Recurso';
+                    return `
+                        <a href="${res.url}" target="_blank" class="resource-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; color: var(--primary-orange); background: #fff7ed; border: 1px solid rgba(209,125,57,0.15); padding: 6px 14px; border-radius: 20px; text-decoration: none; transition: all 0.2s ease;">
+                            <i class="fas ${icon}"></i> ${escapeHtml(title)}
+                        </a>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="day-resources" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px;">Recursos:</span>
+                        ${items}
+                    </div>
+                `;
             }
 
             function showErrorState() {
