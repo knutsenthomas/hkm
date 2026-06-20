@@ -793,14 +793,22 @@
             display: flex;
             background: var(--bg-sidebar);
             padding: 8px 16px 16px 16px;
-            gap: 4px;
+            gap: 8px;
             border-bottom: 1px solid var(--border-color);
             box-sizing: border-box;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs-header::-webkit-scrollbar {
+            display: none;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 8px 2px;
+            flex-shrink: 0;
+            padding: 8px 12px;
             text-align: center;
             font-size: 12px;
             font-weight: 500;
