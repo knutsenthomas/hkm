@@ -11,6 +11,7 @@
     { "source": "/butikk.html", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/api/bible/:path*", "destination": "/api/bible.js" },
     { "source": "/en/blog", "destination": "/en/blog.html" },
     { "source": "/en/blog-post", "destination": "/en/blog-post.html" },
     { "source": "/es/blog", "destination": "/es/blog.html" },
