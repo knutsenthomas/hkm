@@ -123,7 +123,20 @@ class BibleReader {
             // Bookmarks / History sidebar
             bookmarksList: document.getElementById('bookmarks-list'),
             historyList: document.getElementById('history-list'),
-            notesList: document.getElementById('notes-list')
+            notesList: document.getElementById('notes-list'),
+
+            // Verse Context Toolbar & Chapter Lookup
+            verseToolbar: document.getElementById('verse-context-toolbar'),
+            toolbarBtnBookmark: document.getElementById('toolbar-btn-bookmark'),
+            toolbarBtnLookup: document.getElementById('toolbar-btn-lookup'),
+            toolbarBookmarkText: document.getElementById('toolbar-bookmark-text'),
+            btnLookupChapter: document.getElementById('btn-lookup-chapter'),
+
+            // Cross references
+            dictCrossRefsSection: document.getElementById('dict-cross-refs-section'),
+            dictCrossRefsList: document.getElementById('dict-cross-references'),
+            chapterCrossRefsSection: document.getElementById('chapter-cross-references-section'),
+            chapterCrossRefsList: document.getElementById('chapter-cross-references')
         };
     }
 
@@ -209,6 +222,21 @@ class BibleReader {
             }
         });
 
+        // Reading Mode Toggle
+        const toggleReadingModeBtn = document.getElementById('btn-toggle-reading-mode');
+        if (toggleReadingModeBtn) {
+            toggleReadingModeBtn.addEventListener('click', () => {
+                const isActive = document.body.classList.toggle('reading-mode-active');
+                
+                // Update button icon & tooltip
+                const icon = toggleReadingModeBtn.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
+                }
+                toggleReadingModeBtn.title = isActive ? 'Avslutt lesemodus' : 'Aktiver lesemodus';
+            });
+        }
+
         // Prev/Next Chapter Navigation
         if (this.dom.prevChapterBtn) {
             this.dom.prevChapterBtn.addEventListener('click', () => this.navigateChapter(-1));
@@ -265,6 +293,64 @@ class BibleReader {
             });
         }
 
+        // Chapter lookup in Bibeleksikon
+        if (this.dom.btnLookupChapter) {
+            this.dom.btnLookupChapter.addEventListener('click', () => {
+                const ref = this.getCurrentReferenceText();
+                this.lookupWord(ref, "", ref);
+            });
+        }
+
+        // Verse Context Toolbar actions
+        if (this.dom.toolbarBtnBookmark) {
+            this.dom.toolbarBtnBookmark.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.activeContextVerse) {
+                    this.toggleVerseHighlight(this.activeContextVerse.paragraph, this.activeContextVerse.verseNum);
+                    if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                }
+            });
+        }
+
+        if (this.dom.toolbarBtnLookup) {
+            this.dom.toolbarBtnLookup.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.activeContextVerse) {
+                    const ref = this.getCurrentReferenceText();
+                    const fullRef = `${ref}:${this.activeContextVerse.verseNum}`;
+                    // Strip HTML and leading verse numbers to get clean verse text
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = this.activeContextVerse.paragraph.innerHTML;
+                    // Remove <sup> tags
+                    const sups = tempDiv.querySelectorAll('sup');
+                    sups.forEach(s => s.remove());
+                    const verseText = tempDiv.innerText || tempDiv.textContent || '';
+                    
+                    this.lookupWord(fullRef, verseText.trim(), fullRef);
+                    if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                }
+            });
+        }
+
+        // Hide toolbar on scroll in content pane
+        const mainContentPane = document.querySelector('.bible-content-pane');
+        if (mainContentPane) {
+            mainContentPane.addEventListener('scroll', () => {
+                if (this.dom.verseToolbar) {
+                    this.dom.verseToolbar.style.display = 'none';
+                }
+            });
+        }
+
+        // Hide toolbar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.dom.verseToolbar && this.dom.verseToolbar.style.display === 'flex') {
+                if (!this.dom.verseToolbar.contains(e.target) && (!this.dom.readingPane || !this.dom.readingPane.contains(e.target))) {
+                    this.dom.verseToolbar.style.display = 'none';
+                }
+            }
+        });
+
         // Reading pane click events (double-click word definition, or select verse)
         if (this.dom.readingPane) {
             this.dom.readingPane.addEventListener('dblclick', (e) => {
@@ -274,15 +360,47 @@ class BibleReader {
                 }
             });
 
-            // Highlight / Select verse click
+            // Highlight / Select verse click: show floating toolbar
             this.dom.readingPane.addEventListener('click', (e) => {
                 const paragraph = e.target.closest('p');
                 if (paragraph) {
                     const verseSup = paragraph.querySelector('sup.v');
                     if (verseSup) {
+                        e.stopPropagation();
                         const verseNum = verseSup.innerText.trim();
-                        this.toggleVerseHighlight(paragraph, verseNum);
+                        this.activeContextVerse = { paragraph, verseNum };
+                        
+                        // Check if already bookmarked
+                        const ref = this.getCurrentReferenceText();
+                        const fullRef = `${ref}:${verseNum}`;
+                        const isBookmarked = this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+                        
+                        if (this.dom.toolbarBookmarkText) {
+                            this.dom.toolbarBookmarkText.innerText = isBookmarked ? 'Fjern bokmerke' : 'Bokmerk';
+                        }
+                        const bookmarkIcon = this.dom.toolbarBtnBookmark ? this.dom.toolbarBtnBookmark.querySelector('.material-symbols-outlined') : null;
+                        if (bookmarkIcon) {
+                            bookmarkIcon.innerText = isBookmarked ? 'bookmark_remove' : 'bookmark';
+                        }
+
+                        // Position and show toolbar
+                        if (this.dom.verseToolbar) {
+                            this.dom.verseToolbar.style.display = 'flex';
+                            
+                            // Align at horizontal center of the paragraph and top of it
+                            const x = paragraph.offsetLeft + (paragraph.offsetWidth / 2);
+                            const y = paragraph.offsetTop;
+                            
+                            this.dom.verseToolbar.style.left = `${x}px`;
+                            this.dom.verseToolbar.style.top = `${y}px`;
+                        }
+                        return;
                     }
+                }
+                
+                // Clicked outside a verse paragraph, hide toolbar
+                if (this.dom.verseToolbar) {
+                    this.dom.verseToolbar.style.display = 'none';
                 }
             });
         }
@@ -478,8 +596,14 @@ class BibleReader {
                 item.classList.add('active');
                 await this.selectChapter(item.dataset.id);
                 
-                // Hide mobile sidebar if active
-                if (this.dom.sidebar.classList.contains('active')) {
+                // Hide chapter selector overlay
+                const overlay = document.getElementById('chapter-selector-overlay');
+                if (overlay) {
+                    overlay.classList.remove('active');
+                }
+                
+                // Hide mobile/reading-mode sidebar if active
+                if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
                     this.dom.sidebar.classList.remove('active');
                 }
             });
@@ -517,6 +641,7 @@ class BibleReader {
                 this.updateNavigationButtons();
                 this.addToHistory();
                 this.updateRelatedResources();
+                this.loadChapterCrossReferences();
             } else {
                 throw new Error("Empty chapter data");
             }
@@ -532,6 +657,57 @@ class BibleReader {
                     </div>
                 `;
             }
+        }
+    }
+
+    async loadChapterCrossReferences() {
+        if (!this.dom.chapterCrossRefsSection || !this.dom.chapterCrossRefsList) return;
+
+        this.dom.chapterCrossRefsSection.style.display = 'none';
+        this.dom.chapterCrossRefsList.innerHTML = '';
+
+        try {
+            const currentRef = this.getCurrentReferenceText();
+            const res = await fetch(`/api/bible/cross-references?chapterName=${encodeURIComponent(currentRef)}`);
+            if (!res.ok) throw new Error("Failed to fetch cross references");
+            const crossRefs = await res.json();
+
+            if (crossRefs && crossRefs.length > 0) {
+                this.dom.chapterCrossRefsList.innerHTML = crossRefs.map(item => `
+                    <div class="cross-ref-item" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; cursor: pointer; box-sizing: border-box; width: 100%;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--bible-primary); font-size: 14px;">
+                            <span>${item.ref}</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-base); line-height: 1.4;">${item.explanation}</div>
+                    </div>
+                `).join('');
+
+                const items = this.dom.chapterCrossRefsList.querySelectorAll('.cross-ref-item');
+                items.forEach((element, index) => {
+                    element.addEventListener('click', () => {
+                        this.parseAndNavigateToReference(crossRefs[index].ref);
+                    });
+                    
+                    element.addEventListener('mouseenter', () => {
+                        element.style.borderColor = 'var(--bible-primary)';
+                        element.style.transform = 'translateY(-1px)';
+                        element.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                    });
+                    element.addEventListener('mouseleave', () => {
+                        element.style.borderColor = 'var(--border-color)';
+                        element.style.transform = 'none';
+                        element.style.boxShadow = 'none';
+                    });
+                });
+
+                this.dom.chapterCrossRefsSection.style.display = 'block';
+            } else {
+                this.dom.chapterCrossRefsSection.style.display = 'none';
+            }
+        } catch (e) {
+            console.error("Error loading chapter cross references:", e);
+            this.dom.chapterCrossRefsSection.style.display = 'none';
         }
     }
 
@@ -711,6 +887,43 @@ class BibleReader {
             this.dom.dictDefinition.innerText = dictRes.definition || '';
             this.dom.dictContextualNote.innerText = dictRes.contextualNote || '';
 
+            // Render cross references in dictionary drawer
+            if (this.dom.dictCrossRefsSection && this.dom.dictCrossRefsList) {
+                if (dictRes.crossReferences && dictRes.crossReferences.length > 0) {
+                    this.dom.dictCrossRefsList.innerHTML = dictRes.crossReferences.map(c => `
+                        <div class="dict-cross-ref-item" style="padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; box-sizing: border-box; width: 100%;">
+                            <div style="font-weight: 700; color: var(--bible-primary); display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+                                <span>${c.ref}</span>
+                                <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-base); line-height: 1.4;">${c.text}</div>
+                        </div>
+                    `).join('');
+
+                    const cItems = this.dom.dictCrossRefsList.querySelectorAll('.dict-cross-ref-item');
+                    cItems.forEach((element, index) => {
+                        element.addEventListener('click', () => {
+                            this.parseAndNavigateToReference(dictRes.crossReferences[index].ref);
+                        });
+                        
+                        element.addEventListener('mouseenter', () => {
+                            element.style.borderColor = 'var(--bible-primary)';
+                            element.style.transform = 'translateY(-1px)';
+                            element.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                        });
+                        element.addEventListener('mouseleave', () => {
+                            element.style.borderColor = 'var(--border-color)';
+                            element.style.transform = 'none';
+                            element.style.boxShadow = 'none';
+                        });
+                    });
+
+                    this.dom.dictCrossRefsSection.style.display = 'block';
+                } else {
+                    this.dom.dictCrossRefsSection.style.display = 'none';
+                }
+            }
+
             // Render related resources
             if (dictRelatedBox) {
                 if (resources.length === 0) {
@@ -721,6 +934,9 @@ class BibleReader {
             }
         } catch (e) {
             console.error("Error looking up word:", e);
+            if (this.dom.dictCrossRefsSection) {
+                this.dom.dictCrossRefsSection.style.display = 'none';
+            }
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';
             this.dom.dictCategory.innerText = 'Feil';
@@ -971,7 +1187,7 @@ class BibleReader {
         }
 
         const newNoteBtnHtml = `
-            <button id="btn-new-note" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; border-radius: 8px; padding: 10px 16px; font-size: 14px; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+            <button id="btn-new-note" style="width: 100% !important; margin-bottom: 16px !important; border-radius: 8px !important; padding: 10px 16px !important; font-size: 14px !important; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s !important; box-sizing: border-box !important; height: 40px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">
                 <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">add</span>Nytt notat
             </button>
         `;
@@ -1062,8 +1278,8 @@ class BibleReader {
                 </div>
                 
                 <div style="display: flex; gap: 8px;">
-                    <button id="btn-save-note" class="btn btn-primary" style="flex: 1; border-radius: 8px; padding: 8px 12px; font-size: 13px; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600; border: none; cursor: pointer;">Lagre</button>
-                    <button id="btn-cancel-note" class="btn btn-secondary" style="flex: 1; border-radius: 8px; padding: 8px 12px; font-size: 13px; background: var(--bg-base) !important; color: var(--text-base) !important; border: 1px solid var(--border-color) !important; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button id="btn-save-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">Lagre</button>
+                    <button id="btn-cancel-note" style="flex: 1 !important; border-radius: 8px !important; padding: 8px 12px !important; font-size: 13px !important; background: var(--bg-base) !important; color: var(--text-base) !important; border: 1px solid var(--border-color) !important; font-weight: 600 !important; cursor: pointer !important; height: 38px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">Avbryt</button>
                 </div>
             </div>
         `;

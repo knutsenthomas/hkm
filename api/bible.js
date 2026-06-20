@@ -261,7 +261,13 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   "word": "${word}",
   "definition": "En definisjon eller forklaring her...",
   "category": "Kategori her...",
-  "contextualNote": "Kort oppsummering..."
+  "contextualNote": "Kort oppsummering...",
+  "crossReferences": [
+    {
+      "ref": "Standard bibelreferanse (f.eks. Johannes 3:16)",
+      "text": "Vers-tekst eller en kort forklaring på sammenhengen..."
+    }
+  ]
 }`;
 
           const response = await ai.models.generateContent({
@@ -275,9 +281,20 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                   word: { type: Type.STRING },
                   definition: { type: Type.STRING },
                   category: { type: Type.STRING },
-                  contextualNote: { type: Type.STRING }
+                  contextualNote: { type: Type.STRING },
+                  crossReferences: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        ref: { type: Type.STRING },
+                        text: { type: Type.STRING }
+                      },
+                      required: ["ref", "text"]
+                    }
+                  }
                 },
-                required: ["word", "definition", "category", "contextualNote"]
+                required: ["word", "definition", "category", "contextualNote", "crossReferences"]
               }
             }
           });
@@ -295,7 +312,11 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
           word,
           definition: entry.definition,
           category: entry.category,
-          contextualNote: entry.contextualNote
+          contextualNote: entry.contextualNote,
+          crossReferences: [
+            { ref: "Johannes 3:16", text: "Et sentralt vers om Guds nåde og kjærlighet." },
+            { ref: "Romerne 3:24", text: "Rettferdiggjort ufortjent av hans nåde." }
+          ]
         });
       }
 
@@ -303,8 +324,71 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         word,
         definition: `Ingen forhåndsdefinert forklaring funnet for "${word}". Legg til en Gemini API-nøkkel på serveren for å aktivere full AI-ordbok.`,
         category: "Ordbok",
-        contextualNote: "Søk uten treff."
+        contextualNote: "Søk uten treff.",
+        crossReferences: []
       });
+    }
+
+    // 2b. GET /api/bible/cross-references
+    if (pathname === '/api/bible/cross-references') {
+      const chapterName = urlObj.searchParams.get('chapterName');
+      if (!chapterName) {
+        return res.status(400).json({ error: "chapterName query parameter is required" });
+      }
+
+      const geminiApiKey = process.env.GEMINI_API_KEY;
+      if (geminiApiKey) {
+        try {
+          const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+          const prompt = `Du er en ekspert på bibelstudier og teologi.
+Finn 4 til 6 svært relevante kryssreferanser (andre bibelvers eller kapitler i Bibelen) som handler om det samme, utfyller eller har en klar sammenheng med kapittelet eller skriftstedet "${chapterName}".
+For hver kryssreferanse skal du oppgi:
+1. Bibelreferansen (f.eks. "Johannes 3:16" eller "Salmene 23:1") i et 'ref'-felt.
+2. En kort, lærerik forklaring på norsk om hvorfor dette verset/kapittelet har sammenheng med "${chapterName}" i et 'explanation'-felt.
+
+Sørg for at referansen skrives på et standard format som kan tolkes av en søkemotor (f.eks. "Johannes 3:16", "1. Mosebok 1:1", "Salmene 23:3", "Romerne 8:28").
+
+Returner nøyaktig JSON i henhold til dette skjemaet:
+[
+  {
+    "ref": "Referanse (f.eks. Salmene 23:1)",
+    "explanation": "Kort teologisk begrunnelse for hvorfor det henger sammen..."
+  }
+]`;
+
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    ref: { type: Type.STRING },
+                    explanation: { type: Type.STRING }
+                  },
+                  required: ["ref", "explanation"]
+                }
+              }
+            }
+          });
+
+          if (response.text) {
+            return res.status(200).json(JSON.parse(response.text));
+          }
+        } catch (aiErr) {
+          console.error("Gemini cross-references lookup failed:", aiErr);
+        }
+      }
+
+      // Fallback static cross-references
+      return res.status(200).json([
+        { ref: "Johannes 3:16", explanation: "Guds kjærlighet og frelsesplan for menneskeheten." },
+        { ref: "Salmene 23:1", explanation: "Herren som vår hyrde og beskytter i alle livets faser." },
+        { ref: "Romerne 8:28", explanation: "Guds overordnede plan der alt samvirker til det gode." }
+      ]);
     }
 
     // 3. GET /api/bible/bibles/:bibleId/books

@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="styles.css?v=2026.06.20.2">
     <link rel="stylesheet" href="css/cookie-consent.css">
     
     <!-- Firebase Config & Service -->
@@ -435,6 +435,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
 
         .bible-text-container {
@@ -875,9 +876,10 @@
             transform: scale(0.95);
         }
 
-        /* Show mobile toggles only on screens under 900px */
+        /* Show mobile toggles and headers only on screens under 900px */
         #mobile-sidebar-toggle,
-        #mobile-nav-right-toggle {
+        #mobile-nav-right-toggle,
+        .right-sidebar-mobile-header {
             display: none !important;
         }
 
@@ -890,6 +892,17 @@
 
             .sidebar-mobile-title-row {
                 display: flex !important;
+            }
+
+            .right-sidebar-mobile-header {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--border-color);
+                background: var(--bg-sidebar);
+                width: 100%;
+                box-sizing: border-box;
             }
 
             .bible-app-container {
@@ -1129,6 +1142,45 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* Reading Mode (Lesemodus) Overrides */
+        body.reading-mode-active #header {
+            display: none !important;
+        }
+        body.reading-mode-active .bible-sidebar {
+            position: absolute !important;
+            left: -280px !important;
+            top: 0 !important;
+            height: 100% !important;
+            z-index: 150 !important;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15) !important;
+            transition: left 0.3s ease !important;
+            display: flex !important;
+        }
+        body.reading-mode-active .bible-sidebar.active {
+            left: 0 !important;
+        }
+        body.reading-mode-active .bible-nav-right {
+            display: none !important;
+        }
+        body.reading-mode-active .bible-app-container {
+            margin-top: 0 !important;
+            height: 100vh !important;
+        }
+        body.reading-mode-active footer.footer {
+            display: none !important;
+        }
+        body.reading-mode-active #mobile-sidebar-toggle {
+            display: flex !important;
+        }
+        body.reading-mode-active #mobile-nav-right-toggle {
+            display: none !important;
+        }
+        body.reading-mode-active #btn-toggle-reading-mode {
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary) !important;
+        }
     </style>
 </head>
 
@@ -1226,9 +1278,9 @@
         <!-- Left Sidebar: Books Selection -->
         <aside class="bible-sidebar" id="bible-sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-mobile-title-row" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Bibelbøker</span>
-                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+                <div class="sidebar-mobile-title-row" style="display: none !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important; flex-wrap: nowrap !important; width: 100% !important;">
+                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Bibelbøker</span>
+                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-muted) !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
@@ -1304,6 +1356,11 @@
                         <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
                     </div>
 
+                    <!-- Reading Mode Trigger -->
+                    <div class="settings-popover-trigger" id="btn-toggle-reading-mode" title="Aktiver lesemodus">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chrome_reader_mode</span>
+                    </div>
+
                     <!-- Right Sidebar Toggle Button (Mobile/Tablet Only) -->
                     <button class="btn-mobile-nav-right" id="mobile-nav-right-toggle">
                         <span class="material-symbols-outlined" style="font-size: 20px;">bookmarks</span>
@@ -1350,10 +1407,14 @@
             <!-- Reading Content Area -->
             <div class="bible-content-pane">
                 <div class="bible-text-container">
-                    <div class="reference-header">
+                    <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                         <div class="book-badge" id="current-book-badge">MATTEUS</div>
                         <h1 class="chapter-number" id="current-chapter-number">1</h1>
                         <span class="translation-badge" id="current-translation-abbr" style="display: none;">OTB-NB</span>
+                        <button id="btn-lookup-chapter" class="nav-btn" style="margin-top: 4px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>Forklar kapittelet i Bibeleksikon</span>
+                        </button>
                     </div>
 
                     <!-- The Actual Bible Text -->
@@ -1372,6 +1433,30 @@
                             <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
                         </button>
                     </div>
+
+                    <!-- Bottom Chapter Cross References -->
+                    <div id="chapter-cross-references-section" style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border-color); display: none; width: 100%;">
+                        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; justify-content: center; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">link</span>
+                            <span>Relaterte vers & kryssreferanser</span>
+                        </h4>
+                        <div id="chapter-cross-references" style="display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto;">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verse Context Actions Toolbar -->
+                <div id="verse-context-toolbar" style="position: absolute; display: none; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); padding: 6px 12px; z-index: 1000; align-items: center; gap: 8px; box-sizing: border-box; transform: translate(-50%, -100%); margin-top: -8px;">
+                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 12px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">bookmark</span>
+                        <span id="toolbar-bookmark-text">Bokmerk</span>
+                    </button>
+                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 12px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                        <span>Forklar verset i Bibeleksikon</span>
+                    </button>
                 </div>
             </div>
 
@@ -1417,6 +1502,14 @@
                             Dette er notatet...
                         </div>
 
+                        <!-- Bibeleksikon Cross References -->
+                        <div id="dict-cross-refs-section" style="display: none; margin-top: 20px;">
+                            <div class="dict-section-title">Kryssreferanser (Relaterte vers)</div>
+                            <div id="dict-cross-references" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
                         <div class="dict-section-title" style="margin-top: 24px;">Relaterte ressurser fra nettsiden</div>
                         <div id="dict-related-resources" class="dict-related-box">
                             <!-- Loaded dynamically -->
@@ -1428,9 +1521,9 @@
 
         <!-- Right Sidebar: Bookmarks & History -->
         <aside class="bible-nav-right" id="bible-nav-right">
-            <div class="right-sidebar-mobile-header">
-                <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Min side & Verktøy</span>
-                <button onclick="document.getElementById('bible-nav-right').classList.remove('active')" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+            <div class="right-sidebar-mobile-header" style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; box-sizing: border-box !important; flex-wrap: nowrap !important;">
+                <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Min side & Verktøy</span>
+                <button onclick="document.getElementById('bible-nav-right').classList.remove('active')" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-muted) !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
                     <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                 </button>
             </div>
@@ -1580,7 +1673,7 @@
     <!-- JavaScript -->
     <script type="module" src="script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.06.20.2"></script>
     <script type="module" src="js/i18n.js"></script>
 </body>
 
