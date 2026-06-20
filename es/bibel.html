@@ -1802,44 +1802,108 @@
         </div>
     </header>
 
-    <!-- Mega Menu Overlay -->
-    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu" id="mega-menu" aria-hidden="true">
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/es/../index" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/../en/index"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1 -->
+                    <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.engage.title">Involúcrate</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/donaciones">Apoya la obra</a></li>
-                            <li><a href="/es/donantes-regulares">Hazte donante mensual</a></li>
-                            <li><a href="/es/para-iglesias">Para iglesias</a></li>
-                            <li><a href="/es/para-empresas">Para empresas</a></li>
+                            <li><a href="/es/donaciones" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Apoya la obra</a></li>
+                            <li><a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a></li>
+                            <li><a href="/es/para-iglesias" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">Para iglesias</a></li>
+                            <li><a href="/es/para-empresas" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">Para empresas</a></li>
+                            <li><a href="/es/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 2 -->
+                    <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.about.title">Conócenos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/sobre-nosotros">Sobre nosotros</a></li>
-                            <li><a href="/es/contacto">Contáctanos</a></li>
+                            <li><a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Sobre nosotros</a></li>
+                            <li><a href="/es/contacto" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contáctanos</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3 -->
+                    <!-- Column 3: Recursos & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.resources.title">Recursos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/bibel">Biblia</a></li>
-                            <li><a href="/es/../butikk">Tienda</a></li>
-                            <li><a href="/es/eventos">Eventos</a></li>
-                            <li><a href="/es/media">Media & Podcast</a></li>
-                            <li><a href="/es/blog">Noticias y Blog</a></li>
-                            <li><a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a></li>
                             <li><a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a></li>
-                            <li><a href="/es/../minside/index">Mi página</a></li>
+                            <li><a href="/es/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Tienda</a></li>
+                            <li><a href="/es/eventos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Eventos</a></li>
+                            <li><a href="/es/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/es/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Noticias y Blog</a></li>
+                            <li><a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/es/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Mi página</a></li>
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
