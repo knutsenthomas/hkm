@@ -34,6 +34,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -252,10 +254,22 @@
         <div class="blog-filter-section">
             <div class="container">
                 <div class="blog-search-filter-wrapper">
-                    <!-- Search Input -->
-                    <div class="blog-search-box">
-                        <span class="material-symbols-outlined search-icon">search</span>
-                        <input type="text" id="blog-search-input" placeholder="Buscar artículos...">
+                    <!-- Search & View Toggle Group -->
+                    <div class="blog-search-view-wrapper">
+                        <!-- Search Input -->
+                        <div class="blog-search-box">
+                            <span class="material-symbols-outlined search-icon">search</span>
+                            <input type="text" id="blog-search-input" placeholder="Buscar artículos...">
+                        </div>
+                        <!-- View Toggle -->
+                        <div class="blog-view-toggle" id="blog-view-toggle">
+                            <button id="view-grid-btn" class="view-btn active" aria-label="Vista de cuadrícula">
+                                <span class="material-symbols-outlined">grid_view</span>
+                            </button>
+                            <button id="view-list-btn" class="view-btn" aria-label="Vista de lista">
+                                <span class="material-symbols-outlined">view_list</span>
+                            </button>
+                        </div>
                     </div>
                     <!-- Categories (populated dynamically) -->
                     <div class="blog-category-filters" id="blog-filters-container">

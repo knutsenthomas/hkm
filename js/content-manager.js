@@ -3329,6 +3329,47 @@ class ContentManager {
             });
             searchInput.dataset.initialized = 'true';
         }
+
+        // Setup View Toggle
+        const viewToggle = document.getElementById('blog-view-toggle');
+        if (viewToggle && !viewToggle.dataset.initialized) {
+            const gridBtn = document.getElementById('view-grid-btn');
+            const listBtn = document.getElementById('view-list-btn');
+
+            this._activeView = localStorage.getItem('hkm_blog_view') || 'grid';
+
+            const updateToggleState = () => {
+                const gridContainer = document.querySelector(selector);
+                if (this._activeView === 'list') {
+                    if (gridBtn) gridBtn.classList.remove('active');
+                    if (listBtn) listBtn.classList.add('active');
+                    if (gridContainer) gridContainer.classList.add('list-view');
+                } else {
+                    if (listBtn) listBtn.classList.remove('active');
+                    if (gridBtn) gridBtn.classList.add('active');
+                    if (gridContainer) gridContainer.classList.remove('list-view');
+                }
+            };
+
+            if (gridBtn) {
+                gridBtn.addEventListener('click', () => {
+                    this._activeView = 'grid';
+                    localStorage.setItem('hkm_blog_view', 'grid');
+                    updateToggleState();
+                });
+            }
+
+            if (listBtn) {
+                listBtn.addEventListener('click', () => {
+                    this._activeView = 'list';
+                    localStorage.setItem('hkm_blog_view', 'list');
+                    updateToggleState();
+                });
+            }
+
+            updateToggleState();
+            viewToggle.dataset.initialized = 'true';
+        }
     }
 
     applyBlogFiltering(posts, selector) {
@@ -3389,6 +3430,14 @@ class ContentManager {
 
             this.setHTMLIfChanged(gridContainer, emptyMarkup, `blog-filtered-empty:${selector}`);
             return;
+        }
+
+        // Apply View Preference Class
+        this._activeView = localStorage.getItem('hkm_blog_view') || 'grid';
+        if (this._activeView === 'list') {
+            gridContainer.classList.add('list-view');
+        } else {
+            gridContainer.classList.remove('list-view');
         }
 
         // 2. Separate featured post and grid posts
@@ -3483,13 +3532,20 @@ class ContentManager {
 
     estimateReadTime(content) {
         if (!content) return '1 ' + (this.getTranslation('reading_time') || 'min');
-        const text = content.replace(/<[^>]*>/g, '');
-        const words = text.trim().split(/\s+/).length;
+        let html = '';
+        if (typeof content === 'string') {
+            html = content;
+        } else {
+            html = this.parseBlocks(content) || '';
+        }
+        const text = this.stripHtml(html) || '';
+        const words = text.trim().split(/\s+/).filter(Boolean).length;
         const wordsPerMinute = 200;
-        const minutes = Math.ceil(words / wordsPerMinute);
+        const minutes = Math.ceil(words / wordsPerMinute) || 1;
         const timeLabel = this.getTranslation('reading_time') || 'min';
         return `${minutes} ${timeLabel}`;
     }
+
 
 
     /**

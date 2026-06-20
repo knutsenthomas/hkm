@@ -594,3 +594,88 @@
     }
 }
 
+/* ==========================================
+   Grid / List View Toggle
+   ========================================== */
+.blog-search-view-wrapper {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    max-width: 480px;
+    align-items: center;
+}
+
+.blog-view-toggle {
+    display: flex;
+    gap: 4px;
+    border: 1px solid #e2e8f0;
+    padding: 4px;
+    border-radius: 30px;
+    background: var(--bg-card);
+    flex-shrink: 0;
+}
+
+.view-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+    color: var(--primary-blue);
+    background: #f1f5f9;
+}
+
+.view-btn.active {
+    background: var(--primary-blue);
+    color: #ffffff;
+}
+
+/* ==========================================
+   List View Layout Overrides
+   ========================================== */
+.blog-grid.list-view {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+}
+
+.blog-grid.list-view .blog-card {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .blog-grid.list-view .blog-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.blog-grid.list-view .blog-image {
+    width: 300px;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .blog-grid.list-view .blog-image {
+        width: 100%;
+        height: 240px;
+    }
+}
+
+.blog-grid.list-view .blog-content {
+    padding: 32px;
+}
+
+
