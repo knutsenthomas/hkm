@@ -5459,6 +5459,39 @@ ol.block-list {
     }
 }
 
+/* For screens with comfortable height (e.g. height >= 800px), make it more spacious & premium */
+@media (min-width: 769px) and (min-height: 800px) {
+    #mega-menu>div {
+        padding-top: 120px !important;
+        padding-bottom: 40px !important;
+    }
+    .mega-menu-grid {
+        gap: 40px !important;
+    }
+    .menu-section-title {
+        margin-bottom: 16px !important;
+    }
+    .mega-nav-list li {
+        margin-bottom: 8px !important;
+    }
+    .mega-nav-list a {
+        font-size: 1.25rem !important;
+    }
+    .mega-menu-footer {
+        margin-top: 40px !important;
+        padding-top: 30px !important;
+        gap: 16px !important;
+    }
+    .mega-menu-footer .btn-large {
+        padding: 12px 48px !important;
+        font-size: 1.05rem !important;
+        min-width: 260px !important;
+    }
+    .menu-footer-links {
+        gap: 20px !important;
+    }
+}
+
 @media (max-width: 768px) {
     #mega-menu>div {
         padding-top: 132px !important;
