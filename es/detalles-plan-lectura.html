@@ -117,6 +117,189 @@
             margin: 0;
         }
 
+        /* Stats Grid inside the card */
+        .plan-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        @media (max-width: 768px) {
+            .plan-stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        .other-plans-section {
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            padding-top: 48px;
+        }
+
+        .section-title-premium {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0 0 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-premium {
+            color: var(--primary-orange);
+            font-size: 2rem;
+        }
+
+        .other-plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .other-plan-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px -6px rgba(27, 73, 101, 0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .other-plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 32px -8px rgba(27, 73, 101, 0.12);
+            border-color: rgba(209, 125, 57, 0.3);
+        }
+
+        .other-plan-image-wrapper {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        .other-plan-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .other-plan-card:hover .other-plan-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .other-plan-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            color: var(--primary-orange);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 2;
+        }
+
+        .other-plan-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .other-plan-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .other-plan-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .other-plan-footer {
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .other-plan-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* Day Outline List */
         .day-list {
             display: flex;
@@ -515,6 +698,31 @@
                         <span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> Acerca del plan de lectura
                     </h2>
                     <p class="plan-description" id="plan-description-text">No hay descripción disponible.</p>
+
+                    <!-- Stats Grid -->
+                    <div class="plan-stats-grid">
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">schedule</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Duración</span>
+                                <span class="stat-value" id="stat-duration">0 días</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">menu_book</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Alcance</span>
+                                <span class="stat-value" id="stat-scope">Plan de lectura</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">speed</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Ritmo diario</span>
+                                <span class="stat-value" id="stat-pace">~10 min</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Day outline list -->
@@ -554,6 +762,16 @@
                     </button>
                 </div>
             </aside>
+
+            <!-- Other Plans Section -->
+            <div class="other-plans-section" style="grid-column: 1 / -1; margin-top: 48px;">
+                <h2 class="section-title-premium">
+                    <span class="material-symbols-outlined icon-premium">explore</span> Explorar otros planes de lectura
+                </h2>
+                <div class="other-plans-grid" id="other-plans-grid">
+                    <!-- Hydrated by Javascript -->
+                </div>
+            </div>
         </div>
 
         <!-- Loading State -->
@@ -722,6 +940,15 @@
 
                 const plan = { id: planId, ...planData };
                 renderPlanDetails(plan);
+
+                // Load other reading plans to show at the bottom
+                try {
+                    const plans = await service.getCollection('reading_plans');
+                    const otherPlans = plans.filter(p => p.id !== planId).slice(0, 3);
+                    renderOtherPlans(otherPlans);
+                } catch (collErr) {
+                    console.error("Error loading other plans:", collErr);
+                }
             } catch (err) {
                 console.error("Error loading plan details:", err);
                 showErrorState();
@@ -734,6 +961,42 @@
                 document.getElementById('plan-description-text').textContent = plan.description || 'No hay descripción disponible.';
                 document.getElementById('sidebar-plan-title').textContent = plan.title;
                 document.getElementById('plan-duration-badge').textContent = `${plan.durationDays} días`;
+
+                // Populate stats grid
+                const durationEl = document.getElementById('stat-duration');
+                if (durationEl) durationEl.textContent = `${plan.durationDays} días`;
+
+                const scopeEl = document.getElementById('stat-scope');
+                if (scopeEl) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('historisk') || titleLower.includes('sprint') || titleLower.includes('balansert') || titleLower.includes('chronological')) {
+                        scopeEl.textContent = 'Toda la Biblia';
+                    } else if (titleLower.includes('johannes') || titleLower.includes('john')) {
+                        scopeEl.textContent = 'Evangelio de Juan';
+                    } else if (titleLower.includes('romer') || titleLower.includes('roman')) {
+                        scopeEl.textContent = 'Romanos';
+                    } else if (titleLower.includes('apostlene') || titleLower.includes('acts')) {
+                        scopeEl.textContent = 'Hechos';
+                    } else if (titleLower.includes('ordspråk') || titleLower.includes('proverb')) {
+                        scopeEl.textContent = 'Proverbios';
+                    } else if (titleLower.includes('rut') || titleLower.includes('ester') || titleLower.includes('ruth') || titleLower.includes('esther')) {
+                        scopeEl.textContent = 'Rut y Ester';
+                    } else {
+                        scopeEl.textContent = 'Escrituras seleccionadas';
+                    }
+                }
+
+                const paceEl = document.getElementById('stat-pace');
+                if (paceEl) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('sprint')) {
+                        paceEl.textContent = '~30-40 min';
+                    } else if (titleLower.includes('historisk') || titleLower.includes('balansert') || titleLower.includes('chronological')) {
+                        paceEl.textContent = '~15-20 min';
+                    } else {
+                        paceEl.textContent = '~5-10 min';
+                    }
+                }
                 const infoDur = document.getElementById('info-duration-text');
                 if (infoDur) infoDur.textContent = `${plan.durationDays} días`;
 
@@ -834,6 +1097,33 @@
                         ${items}
                     </div>
                 `;
+            }
+
+            function renderOtherPlans(otherPlans) {
+                const otherPlansContainer = document.getElementById('other-plans-grid');
+                if (!otherPlansContainer) return;
+
+                if (!otherPlans || otherPlans.length === 0) {
+                    const sect = document.querySelector('.other-plans-section');
+                    if (sect) sect.style.display = 'none';
+                    return;
+                }
+
+                otherPlansContainer.innerHTML = otherPlans.map(plan => `
+                    <a href="/es/detalles-plan-lectura.html?id=${plan.id}" class="other-plan-card">
+                        <div class="other-plan-image-wrapper">
+                            <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}">
+                            <span class="other-plan-badge">${plan.durationDays} días</span>
+                        </div>
+                        <div class="other-plan-content">
+                            <h3 class="other-plan-title">${escapeHtml(plan.title)}</h3>
+                            <p class="other-plan-desc">${escapeHtml(plan.description || 'No hay descripción disponible.')}</p>
+                        </div>
+                        <div class="other-plan-footer">
+                            <span class="other-plan-link">Ver detalles <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+                        </div>
+                    </a>
+                `).join('');
             }
 
             function showErrorState() {

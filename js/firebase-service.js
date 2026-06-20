@@ -308,6 +308,50 @@ class FirebaseService {
         }
     }
 
+    async _fetchCollectionViaRest(collectionId) {
+        if (typeof fetch !== 'function') return undefined;
+
+        const safeCollectionId = typeof collectionId === 'string' ? collectionId.trim() : '';
+        if (!safeCollectionId) return undefined;
+
+        const cfg = this._getReadableConfig();
+        if (!this._isValidFirebaseConfig(cfg)) return undefined;
+
+        const projectId = encodeURIComponent(cfg.projectId);
+        const apiKey = encodeURIComponent(cfg.apiKey);
+        const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${safeCollectionId}?key=${apiKey}`;
+
+        const responseRes = await this._withTimeout(fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+        }), this._retryReadTimeoutMs);
+
+        if (responseRes.timedOut) {
+            throw new Error(`REST fetch timeout for collection ${safeCollectionId}`);
+        }
+
+        const response = responseRes.value;
+        if (!response) return undefined;
+
+        if (!response.ok) {
+            if (response.status === 404) return [];
+            const errorText = await response.text().catch(() => '');
+            throw new Error(`REST fetch failed for collection ${safeCollectionId}: ${response.status}${errorText ? ` ${errorText}` : ''}`);
+        }
+
+        const payload = await response.json();
+        if (!payload || !Array.isArray(payload.documents)) return [];
+        return payload.documents.map(doc => {
+            const nameParts = doc.name.split('/');
+            const id = nameParts[nameParts.length - 1];
+            return {
+                id,
+                ...this._decodeFirestoreRestFields(doc.fields || {})
+            };
+        });
+    }
+
     async ensureAuthPersistence() {
         if (!this.auth || typeof firebase === 'undefined') return false;
         if (this._authPersistencePromise) return this._authPersistencePromise;
@@ -509,6 +553,40 @@ class FirebaseService {
             }
             console.error(`Error fetching document ${collectionId}/${docId}:`, error);
             return null;
+        }
+    }
+
+    async getCollection(collectionId, queryBuilder, options = {}) {
+        if (!collectionId) return [];
+
+        try {
+            if (this._shouldPreferRestPublicReads()) {
+                const restData = await this._fetchCollectionViaRest(collectionId);
+                return restData ?? [];
+            }
+
+            if (!this.isInitialized) {
+                await this.waitForInitialization();
+            }
+            if (!this.isInitialized) return [];
+
+            const colRef = this.db.collection(collectionId);
+            const query = queryBuilder ? queryBuilder(colRef) : colRef;
+            const fetchRes = await this._readWithRetry(() => query.get(), `collection:${collectionId}`);
+            if (fetchRes.timedOut) {
+                throw new Error(`Fetch timeout for collection ${collectionId}`);
+            }
+            const snap = fetchRes.value;
+            return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            try {
+                const restFallback = await this._fetchCollectionViaRest(collectionId);
+                if (restFallback) return restFallback;
+            } catch (fallbackError) {
+                console.error(`Error during REST collection fallback for ${collectionId}:`, fallbackError);
+            }
+            console.error(`Error fetching collection ${collectionId}:`, error);
+            return [];
         }
     }
 
