@@ -515,13 +515,18 @@
         }
 
         .bible-reading-pane sup.v {
-            font-size: 0.65em;
-            font-weight: 600;
+            font-size: 0.6em !important;
+            font-weight: 700;
             color: var(--text-muted);
             margin-right: 4px;
             margin-left: 6px;
-            vertical-align: super;
+            vertical-align: baseline;
+            position: relative;
+            top: -0.35em;
+            line-height: 0;
             user-select: none;
+            padding: 0 !important;
+            cursor: default;
         }
 
         .verse-temp-highlight {
