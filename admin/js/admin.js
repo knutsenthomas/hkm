@@ -6924,7 +6924,7 @@ class AdminManager {
                         <div class="search-bar-wrap" style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
                             <div class="search-input-container" style="position: relative; flex: 1;">
                                 <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px;">search</span>
-                                <input type="text" id="yt-search-query" class="admin-input" placeholder="Søk etter videoer på YouTube..." style="padding-left: 40px; width: 100%; height: 42px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; transition: border-color 0.2s;">
+                                <input type="text" id="yt-search-query" class="admin-input" placeholder="Søk etter videoer på YouTube..." style="padding-left: 40px !important; padding-right: 12px !important; padding-top: 10px !important; padding-bottom: 10px !important; width: 100%; height: 42px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; transition: border-color 0.2s;">
                             </div>
                             <button id="yt-search-btn" class="btn-primary" style="height: 42px; padding: 0 24px; font-weight: 600; border-radius: 8px; background: #1B4965; color: white; border: none; cursor: pointer; transition: background-color 0.2s;">Søk</button>
                         </div>
@@ -7115,7 +7115,9 @@ class AdminManager {
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
                 const res = await fetch(url);
                 if (!res.ok) {
-                    throw new Error(`YouTube API returned status ${res.status}`);
+                    const errData = await res.json().catch(() => ({}));
+                    const errMsg = errData.error?.message || `YouTube API returned status ${res.status}`;
+                    throw new Error(errMsg);
                 }
                 const data = await res.json();
                 const items = data.items || [];
@@ -7170,9 +7172,11 @@ class AdminManager {
             } catch (err) {
                 console.error('YouTube Search error:', err);
                 ytResultsContainer.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">
-                        <span class="material-symbols-outlined" style="font-size: 48px;">error</span>
-                        <p style="margin-top: 8px; font-size: 14px;">Feil under YouTube-søk. Sjekk integrasjonsinnstillingene.</p>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444; max-width: 500px; margin: 0 auto;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444; margin-bottom: 8px;">error</span>
+                        <p style="margin-top: 8px; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Feil under YouTube-søk:</p>
+                        <p style="font-size: 12px; color: #64748b; line-height: 1.5; background: #fef2f2; padding: 10px; border-radius: 6px; border: 1px solid #fee2e2; word-break: break-word; text-align: left;">${err.message}</p>
+                        <p style="font-size: 12px; color: #475569; margin-top: 12px; line-height: 1.4;">Sjekk integrasjonsinnstillingene under Innstillinger -> Integrasjoner, og at YouTube Data API v3 er aktivert for API-nøkkelen i Google Cloud Console.</p>
                     </div>
                 `;
             }
