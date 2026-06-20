@@ -1675,6 +1675,12 @@ body.admin-body .btn-full,
     line-height: 1.6;
 }
 
+.notes-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0;
+}
+
 /* Personal notes (brukerens egne notater) */
 .personal-note-card {
     background: var(--card-bg);

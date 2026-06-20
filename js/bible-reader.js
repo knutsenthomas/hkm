@@ -12,6 +12,7 @@ class BibleReader {
         this.activeChapterData = null;
         this.bookmarks = JSON.parse(localStorage.getItem('hkm_bible_bookmarks')) || [];
         this.history = JSON.parse(localStorage.getItem('hkm_bible_history')) || [];
+        this.selectedVerses = [];
 
         // UI Settings
         this.settings = JSON.parse(localStorage.getItem('hkm_bible_settings')) || {
@@ -136,6 +137,10 @@ class BibleReader {
             verseToolbar: document.getElementById('verse-context-toolbar'),
             toolbarBtnBookmark: document.getElementById('toolbar-btn-bookmark'),
             toolbarBtnLookup: document.getElementById('toolbar-btn-lookup'),
+            toolbarBtnShare: document.getElementById('toolbar-btn-share'),
+            toolbarBtnDownload: document.getElementById('toolbar-btn-download'),
+            toolbarBtnSaveUser: document.getElementById('toolbar-btn-save-user'),
+            toolbarBtnClear: document.getElementById('toolbar-btn-clear'),
             toolbarBookmarkText: document.getElementById('toolbar-bookmark-text'),
             btnLookupChapter: document.getElementById('btn-lookup-chapter'),
 
@@ -312,9 +317,39 @@ class BibleReader {
         if (this.dom.toolbarBtnBookmark) {
             this.dom.toolbarBtnBookmark.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (this.activeContextVerse) {
-                    this.toggleVerseHighlight(this.activeContextVerse.paragraph, this.activeContextVerse.verseNum);
-                    if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const ref = this.getCurrentReferenceText();
+                    const unbookmarked = this.selectedVerses.filter(v => {
+                        const fullRef = `${ref}:${v.verseNum}`;
+                        return !this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+                    });
+
+                    if (unbookmarked.length > 0) {
+                        // Bookmark all selected verses
+                        unbookmarked.forEach(v => {
+                            const fullRef = `${ref}:${v.verseNum}`;
+                            this.bookmarks.push({
+                                id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                                ref: fullRef,
+                                bookId: this.selectedBookId,
+                                chapterId: this.selectedChapterId,
+                                verse: v.verseNum,
+                                bibleId: this.selectedBibleId,
+                                createdAt: new Date().toISOString()
+                            });
+                        });
+                    } else {
+                        // Unbookmark all selected verses
+                        this.selectedVerses.forEach(v => {
+                            const fullRef = `${ref}:${v.verseNum}`;
+                            this.bookmarks = this.bookmarks.filter(b => !(b.ref === fullRef && b.bibleId === this.selectedBibleId));
+                        });
+                    }
+
+                    localStorage.setItem('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
+                    this.renderBookmarksList();
+                    this.restoreHighlights();
+                    this.clearSelection();
                 }
             });
         }
@@ -322,20 +357,138 @@ class BibleReader {
         if (this.dom.toolbarBtnLookup) {
             this.dom.toolbarBtnLookup.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (this.activeContextVerse) {
-                    const ref = this.getCurrentReferenceText();
-                    const fullRef = `${ref}:${this.activeContextVerse.verseNum}`;
-                    // Strip HTML and leading verse numbers to get clean verse text
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = this.activeContextVerse.paragraph.innerHTML;
-                    // Remove <sup> tags
-                    const sups = tempDiv.querySelectorAll('sup');
-                    sups.forEach(s => s.remove());
-                    const verseText = tempDiv.innerText || tempDiv.textContent || '';
-                    
-                    this.lookupWord(fullRef, verseText.trim(), fullRef);
-                    if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                    const combinedText = sorted.map(v => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = v.paragraph.innerHTML;
+                        tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                        return `[v. ${v.verseNum}] ${tempDiv.innerText.trim()}`;
+                    }).join(' ');
+
+                    const refRange = this.getSelectedVersesReference();
+                    this.lookupWord(refRange, combinedText, refRange);
+                    this.clearSelection();
                 }
+            });
+        }
+
+        if (this.dom.toolbarBtnShare) {
+            this.dom.toolbarBtnShare.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
+                    const refRange = this.getSelectedVersesReference();
+                    
+                    const combinedText = sorted.map(v => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = v.paragraph.innerHTML;
+                        tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                        return tempDiv.innerText.trim();
+                    }).join(' ');
+
+                    const shareText = `«${combinedText}»\n— ${refRange} ${translation ? `(${translation})` : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
+
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Bibelvers fra HKM',
+                            text: shareText
+                        }).catch(err => console.log(err));
+                    } else {
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            if (typeof window.showToast === 'function') {
+                                window.showToast('Bibelversene er kopiert til utklippstavlen!', 'success');
+                            } else {
+                                alert('Kopiert til utklippstavlen!');
+                            }
+                        });
+                    }
+                    this.clearSelection();
+                }
+            });
+        }
+
+        if (this.dom.toolbarBtnDownload) {
+            this.dom.toolbarBtnDownload.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
+                    const refRange = this.getSelectedVersesReference();
+                    
+                    const combinedText = sorted.map(v => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = v.paragraph.innerHTML;
+                        tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                        return `[Vers ${v.verseNum}] ${tempDiv.innerText.trim()}`;
+                    }).join('\n');
+
+                    const fileText = `Bibelvers fra His Kingdom Ministry\nReferanse: ${refRange}\nOversettelse: ${translation}\nDato: ${new Date().toLocaleDateString()}\n\n${combinedText}\n`;
+
+                    const blob = new Blob([fileText], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `HKM_Bibel_${refRange.replace(/[\s:]/g, '_')}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.clearSelection();
+                }
+            });
+        }
+
+        if (this.dom.toolbarBtnSaveUser) {
+            this.dom.toolbarBtnSaveUser.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!this.currentUser) {
+                    alert('Du må være logget inn for å lagre notater på brukeren din. Du kan fortsatt laste ned som fil!');
+                    return;
+                }
+                
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
+                    const refRange = this.getSelectedVersesReference();
+                    
+                    const combinedHtmlText = sorted.map(v => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = v.paragraph.innerHTML;
+                        tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                        return `<p><sup>${v.verseNum}</sup> ${tempDiv.innerText.trim()}</p>`;
+                    }).join('');
+
+                    const fullNoteHtml = `<blockquote>${combinedHtmlText}</blockquote><p><em>— Lagret vers fra ${refRange} (${translation})</em></p>`;
+
+                    try {
+                        await firebase.firestore().collection('personal_notes').add({
+                            userId: this.currentUser.uid,
+                            title: refRange,
+                            text: fullNoteHtml,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('Versene ble lagret i dine notater på Min Side!', 'success');
+                        } else {
+                            alert('Lagret på din bruker! Du finner det under notater på Min Side.');
+                        }
+                        this.loadNotes();
+                    } catch (err) {
+                        console.error(err);
+                        alert('Feil under lagring: ' + err.message);
+                    }
+                    
+                    this.clearSelection();
+                }
+            });
+        }
+
+        if (this.dom.toolbarBtnClear) {
+            this.dom.toolbarBtnClear.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.clearSelection();
             });
         }
 
@@ -353,7 +506,7 @@ class BibleReader {
         document.addEventListener('click', (e) => {
             if (this.dom.verseToolbar && this.dom.verseToolbar.style.display === 'flex') {
                 if (!this.dom.verseToolbar.contains(e.target) && (!this.dom.readingPane || !this.dom.readingPane.contains(e.target))) {
-                    this.dom.verseToolbar.style.display = 'none';
+                    this.clearSelection();
                 }
             }
         });
@@ -375,19 +528,37 @@ class BibleReader {
                     if (verseSup) {
                         e.stopPropagation();
                         const verseNum = verseSup.innerText.trim();
+                        
+                        // Toggle selected state
+                        const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
+                        if (existingIdx >= 0) {
+                            this.selectedVerses.splice(existingIdx, 1);
+                            paragraph.classList.remove('selected-verse');
+                        } else {
+                            this.selectedVerses.push({ paragraph, verseNum });
+                            paragraph.classList.add('selected-verse');
+                        }
+
+                        if (this.selectedVerses.length === 0) {
+                            if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                            return;
+                        }
+
                         this.activeContextVerse = { paragraph, verseNum };
                         
-                        // Check if already bookmarked
+                        // Check if all selected are already bookmarked
                         const ref = this.getCurrentReferenceText();
-                        const fullRef = `${ref}:${verseNum}`;
-                        const isBookmarked = this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+                        const allBookmarked = this.selectedVerses.every(v => {
+                            const fullRef = `${ref}:${v.verseNum}`;
+                            return this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+                        });
                         
                         if (this.dom.toolbarBookmarkText) {
-                            this.dom.toolbarBookmarkText.innerText = isBookmarked ? 'Fjern bokmerke' : 'Bokmerk';
+                            this.dom.toolbarBookmarkText.innerText = allBookmarked ? 'Fjern bokmerke' : 'Bokmerk';
                         }
                         const bookmarkIcon = this.dom.toolbarBtnBookmark ? this.dom.toolbarBtnBookmark.querySelector('.material-symbols-outlined') : null;
                         if (bookmarkIcon) {
-                            bookmarkIcon.innerText = isBookmarked ? 'bookmark_remove' : 'bookmark';
+                            bookmarkIcon.innerText = allBookmarked ? 'bookmark_remove' : 'bookmark';
                         }
 
                         // Position and show toolbar
@@ -405,12 +576,49 @@ class BibleReader {
                     }
                 }
                 
-                // Clicked outside a verse paragraph, hide toolbar
-                if (this.dom.verseToolbar) {
-                    this.dom.verseToolbar.style.display = 'none';
-                }
+                // Clicked outside a verse paragraph, hide toolbar & clear selection
+                this.clearSelection();
             });
         }
+    }
+
+    clearSelection() {
+        if (this.selectedVerses) {
+            this.selectedVerses.forEach(v => v.paragraph.classList.remove('selected-verse'));
+            this.selectedVerses = [];
+        }
+        if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+    }
+
+    getSelectedVersesReference() {
+        if (!this.selectedVerses || this.selectedVerses.length === 0) return '';
+        const ref = this.getCurrentReferenceText();
+        
+        // Sort selected verses numerically
+        const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+        
+        // Group consecutive verses, e.g. "Johannes 3:16-18" or "Johannes 3:16, 18"
+        const numbers = sorted.map(v => parseInt(v.verseNum, 10));
+        const ranges = [];
+        let start = numbers[0];
+        let prev = numbers[0];
+        
+        for (let i = 1; i <= numbers.length; i++) {
+            const current = numbers[i];
+            if (current === prev + 1) {
+                prev = current;
+            } else {
+                if (start === prev) {
+                    ranges.push(String(start));
+                } else {
+                    ranges.push(`${start}-${prev}`);
+                }
+                start = current;
+                prev = current;
+            }
+        }
+        
+        return `${ref}:${ranges.join(', ')}`;
     }
 
     applySettings() {
@@ -618,6 +826,7 @@ class BibleReader {
     }
 
     async selectChapter(chapterId) {
+        this.clearSelection();
         this.selectedChapterId = chapterId;
         
         // Highlight in grid

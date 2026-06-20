@@ -3262,7 +3262,7 @@ class MinSideManager {
         </div>`;
 
         container.innerHTML = `
-        <div class="ms-full-width">
+        <div class="notes-container">
 
             <!-- Header row -->
             <div class="ms-section-header-row ms-section-header-lg">
@@ -3405,16 +3405,87 @@ class MinSideManager {
                 const id = btn.dataset.id;
                 const note = personalNotes.find(n => n.id === id);
                 if (!note) return;
-                this._openNoteEditModal(note, async (newTitle, newText) => {
+
+                const card = container.querySelector(`.personal-note-card[data-id="${id}"]`);
+                if (!card) return;
+
+                // Save the original innerHTML to restore on cancel
+                const originalContent = card.innerHTML;
+
+                // Replace card contents with inline edit form (matching create note form layout)
+                card.innerHTML = `
+                <div class="new-note-form inline-edit-form" id="edit-note-form-${note.id}" style="border: none; padding: 0; margin: 0; box-shadow: none; display: block;">
+                    <div class="form-group">
+                        <label>${t('notes.title')}</label>
+                        <input id="edit-note-title-${note.id}" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off" style="width: 100%;">
+                    </div>
+                    <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
+                        <label>${t('notes.content')}</label>
+                        <div class="rte-wrapper">
+                            <div class="rte-toolbar" id="rte-toolbar-edit-${note.id}">
+                                <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                                <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                                <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                                <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                                <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
+                            </div>
+                            <div class="rte-editor" id="edit-note-body-${note.id}" contenteditable="true" style="min-height: 120px;"></div>
+                        </div>
+                    </div>
+                    <div class="ms-actions-row-end" style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px;">
+                        <button class="btn btn-ghost btn-sm" id="cancel-edit-btn-${note.id}">${t('common.cancel')}</button>
+                        <button class="btn btn-primary btn-sm" id="save-edit-btn-${note.id}">
+                            <span class="material-symbols-outlined">save</span>
+                            ${t('notes.save')}
+                        </button>
+                    </div>
+                </div>`;
+
+                // Set initial content in editor
+                const editor = card.querySelector(`#edit-note-body-${note.id}`);
+                if (editor) editor.innerHTML = note.text || '';
+
+                // Wire up RTE toolbar
+                this._wireRteToolbar(`rte-toolbar-edit-${note.id}`, `edit-note-body-${note.id}`);
+                card.querySelector(`#edit-note-title-${note.id}`)?.focus();
+
+                // Cancel button listener
+                card.querySelector(`#cancel-edit-btn-${note.id}`)?.addEventListener('click', () => {
+                    card.innerHTML = originalContent;
+                    this._renderNotesUI(container, personalNotes, hkmNotes);
+                });
+
+                // Save button listener
+                card.querySelector(`#save-edit-btn-${note.id}`)?.addEventListener('click', async () => {
+                    const newTitle = card.querySelector(`#edit-note-title-${note.id}`).value.trim() || t('notes.untitled');
+                    const newText = editor?.innerHTML?.trim() || '';
+                    const plain = editor?.innerText?.trim() || '';
+                    if (!plain) { editor?.focus(); return; }
+
+                    const saveBtn = card.querySelector(`#save-edit-btn-${note.id}`);
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = t('notes.saving');
+
                     try {
                         await firebase.firestore().collection('personal_notes').doc(id).update({
                             title: newTitle,
                             text: newText,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         });
-                        note.title = newTitle; note.text = newText;
+                        note.title = newTitle;
+                        note.text = newText;
                         this._renderNotesUI(container, personalNotes, hkmNotes);
-                    } catch (e) { alert(t('notes.updateError') + ': ' + e.message); }
+                    } catch (e) {
+                        alert(t('notes.updateError') + ': ' + e.message);
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('notes.save')}`;
+                    }
                 });
             });
         });
@@ -3431,80 +3502,6 @@ class MinSideManager {
                     })
                     .catch(e => alert(t('notes.error') + ': ' + e.message));
             });
-        });
-    }
-
-    _openNoteEditModal(note, onSave) {
-        const existing = document.getElementById('note-edit-modal');
-        if (existing) existing.remove();
-
-        const modal = document.createElement('div');
-        modal.id = 'note-edit-modal';
-        modal.className = 'hkm-modal-overlay';
-        modal.innerHTML = `
-        <div class="hkm-modal-container ms-note-modal-wide">
-            <div class="ms-note-modal-header">
-                <div class="hkm-modal-title ms-note-modal-title">${t('notes.editNote')}</div>
-                <button id="close-note-modal" class="ms-icon-button">
-                    <span class="material-symbols-outlined ms-icon-button-icon">close</span>
-                </button>
-            </div>
-            <div class="form-group">
-                <label>${t('notes.title')}</label>
-                <input id="edit-note-title" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off">
-            </div>
-            <div class="form-group ms-form-group-gap-12">
-                <label>${t('notes.content')}</label>
-                <div class="rte-wrapper">
-                    <div class="rte-toolbar" id="rte-toolbar-edit">
-                        <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
-                        <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
-                        <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
-                        <div class="rte-divider"></div>
-                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
-                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
-                        <div class="rte-divider"></div>
-                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
-                    </div>
-                    <div class="rte-editor" id="edit-note-body" contenteditable="true"></div>
-                </div>
-            </div>
-            <div class="hkm-modal-actions ms-modal-actions-top">
-                <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">${t('common.cancel')}</button>
-                <button class="btn btn-primary hkm-modal-btn" id="save-note-modal">
-                    <span class="material-symbols-outlined">save</span> ${t('notes.save')}
-                </button>
-            </div>
-        </div>`;
-
-        document.body.appendChild(modal);
-        requestAnimationFrame(() => modal.classList.add('active'));
-
-        // Set existing content into editor
-        const editEditor = document.getElementById('edit-note-body');
-        if (editEditor) editEditor.innerHTML = note.text || '';
-
-        this._wireRteToolbar('rte-toolbar-edit', 'edit-note-body');
-        document.getElementById('edit-note-title').focus();
-
-        const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 300); };
-
-        document.getElementById('close-note-modal').addEventListener('click', close);
-        document.getElementById('cancel-note-modal').addEventListener('click', close);
-        modal.addEventListener('click', e => { if (e.target === modal) close(); });
-
-        document.getElementById('save-note-modal').addEventListener('click', async () => {
-            const btn = document.getElementById('save-note-modal');
-            const title = document.getElementById('edit-note-title').value.trim();
-            const editor = document.getElementById('edit-note-body');
-            const text = editor?.innerHTML?.trim() || '';
-            const plain = editor?.innerText?.trim() || '';
-            if (!plain) { editor?.focus(); return; }
-            btn.disabled = true; btn.textContent = t('common.saving');
-            await onSave(title || t('notes.untitled'), text);
-            close();
         });
     }
 

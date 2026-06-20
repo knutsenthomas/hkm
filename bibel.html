@@ -158,6 +158,10 @@
             gap: 12px;
         }
 
+        .sidebar-mobile-title-row {
+            display: none;
+        }
+
         .search-container {
             position: relative;
         }
@@ -1241,6 +1245,113 @@
             color: #ffffff !important;
             border-color: var(--bible-primary) !important;
         }
+
+        /* Multi-verse selection styling */
+        .bible-reading-pane p.selected-verse {
+            background: rgba(27, 73, 101, 0.12) !important;
+            border-bottom: 2px dashed var(--bible-accent, #1B4965) !important;
+            border-radius: 0 !important;
+        }
+
+        /* Mobile adjustment for floating verse toolbar */
+        @media (max-width: 768px) {
+            .toolbar-btn-text {
+                display: none !important;
+            }
+            #verse-context-toolbar {
+                gap: 4px !important;
+                padding: 4px 8px !important;
+            }
+        }
+
+        /* Scrollable controls toolbar and layout adjustments under 768px */
+        @media (max-width: 768px) {
+            .bible-controls {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 8px 12px !important;
+                gap: 8px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                justify-content: flex-start !important;
+                scrollbar-width: none !important; /* Firefox */
+                -ms-overflow-style: none !important; /* IE/Edge */
+            }
+            .bible-controls::-webkit-scrollbar {
+                display: none !important; /* Chrome, Safari, Opera */
+            }
+            .controls-left, .controls-right {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+                width: auto !important;
+                gap: 8px !important;
+                justify-content: flex-start !important;
+                flex-wrap: nowrap !important;
+            }
+            .select-wrapper {
+                flex-shrink: 0 !important;
+                width: 130px !important;
+                max-width: none !important;
+                min-width: 0 !important;
+            }
+            #bible-translation-select {
+                width: 100% !important;
+            }
+            #bible-quick-search-form {
+                flex-shrink: 0 !important;
+                width: 150px !important;
+                display: flex !important;
+                gap: 4px !important;
+            }
+            .bible-control-input {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+        }
+
+        /* Unified Mobile/Tablet Sidebar Overrides (under 768px) to fix clipping/overlapping */
+        @media (max-width: 768px) {
+            .bible-sidebar,
+            body.reading-mode-active .bible-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+                position: absolute !important;
+                height: 100% !important;
+                z-index: 200 !important;
+                transition: left 0.3s ease !important;
+            }
+            .bible-sidebar.active,
+            body.reading-mode-active .bible-sidebar.active {
+                left: 0 !important;
+            }
+            .bible-nav-right,
+            body.reading-mode-active .bible-nav-right {
+                width: 100% !important;
+                right: -100% !important;
+                position: absolute !important;
+                height: 100% !important;
+                z-index: 200 !important;
+                transition: right 0.3s ease !important;
+                display: flex !important;
+            }
+            .bible-nav-right.active,
+            body.reading-mode-active .bible-nav-right.active {
+                right: 0 !important;
+            }
+            .dictionary-drawer {
+                width: 100% !important;
+                right: -100% !important;
+                z-index: 200 !important;
+                transition: right 0.3s ease !important;
+            }
+            .dictionary-drawer.active {
+                right: 0 !important;
+            }
+        }
     </style>
 </head>
 
@@ -1338,7 +1449,7 @@
         <!-- Left Sidebar: Books Selection -->
         <aside class="bible-sidebar" id="bible-sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-mobile-title-row" style="display: none !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important; flex-wrap: nowrap !important; width: 100% !important;">
+                <div class="sidebar-mobile-title-row" style="justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: nowrap; width: 100%;">
                     <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Bibelbøker</span>
                     <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-muted) !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
@@ -1507,15 +1618,35 @@
                 </div>
 
                 <!-- Verse Context Actions Toolbar -->
-                <div id="verse-context-toolbar" style="position: absolute; display: none; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); padding: 6px 12px; z-index: 1000; align-items: center; gap: 8px; box-sizing: border-box; transform: translate(-50%, -100%); margin-top: -8px;">
-                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 12px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
+                <div id="verse-context-toolbar" style="position: absolute; display: none; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); padding: 6px 12px; z-index: 1000; align-items: center; gap: 6px; box-sizing: border-box; transform: translate(-50%, -100%); margin-top: -8px; white-space: nowrap !important; width: max-content !important; flex-wrap: nowrap !important; flex-direction: row !important;">
+                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Bokmerk">
                         <span class="material-symbols-outlined" style="font-size: 16px;">bookmark</span>
-                        <span id="toolbar-bookmark-text">Bokmerk</span>
+                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Bokmerk</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 12px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
+                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Forklar i Bibeleksikon">
                         <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                        <span>Forklar verset i Bibeleksikon</span>
+                        <span class="toolbar-btn-text">Forklar i Bibeleksikon</span>
+                    </button>
+                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+                    <button id="toolbar-btn-share" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Del vers">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">share</span>
+                        <span class="toolbar-btn-text">Del</span>
+                    </button>
+                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+                    <button id="toolbar-btn-download" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Lagre på din maskin">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
+                        <span class="toolbar-btn-text">Lagre på maskin</span>
+                    </button>
+                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+                    <button id="toolbar-btn-save-user" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Lagre på brukeren (Min Side)">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">edit_note</span>
+                        <span class="toolbar-btn-text">Lagre på brukeren</span>
+                    </button>
+                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+                    <button id="toolbar-btn-clear" style="background: none !important; border: none !important; cursor: pointer !important; color: #dc2626 !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Nullstill valg">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                        <span class="toolbar-btn-text">Fjern</span>
                     </button>
                 </div>
             </div>
