@@ -28,6 +28,11 @@ class BibleReader {
             chapters: {}
         };
 
+        // Touch gesture tracking for scrolling/swipe jitter prevention
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchMoved = false;
+
         this.init();
     }
 
@@ -59,6 +64,8 @@ class BibleReader {
         if (transParam) {
             this.selectedBibleId = transParam;
             if (this.dom.translationSelect) this.dom.translationSelect.value = transParam;
+            const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+            if (mobileTransSelect) mobileTransSelect.value = transParam;
         }
 
         await this.loadBooks();
@@ -158,6 +165,24 @@ class BibleReader {
             this.dom.translationSelect.addEventListener('change', async (e) => {
                 this.selectedBibleId = e.target.value;
                 localStorage.setItem('hkm_bible_translation', this.selectedBibleId);
+                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
+                await this.loadBooks();
+                // Re-navigate to current book/chapter if possible
+                const activeBookId = this.selectedBookId;
+                const activeChapterNum = this.selectedChapterId.split('_')[1] || '1';
+                await this.selectBook(activeBookId);
+                await this.selectChapter(`${activeBookId}_${activeChapterNum}`);
+            });
+        }
+
+        // Mobile translation change
+        const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+        if (mobileTransSelect) {
+            mobileTransSelect.addEventListener('change', async (e) => {
+                this.selectedBibleId = e.target.value;
+                localStorage.setItem('hkm_bible_translation', this.selectedBibleId);
+                if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
                 await this.loadBooks();
                 // Re-navigate to current book/chapter if possible
                 const activeBookId = this.selectedBookId;
@@ -246,6 +271,90 @@ class BibleReader {
                     icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
                 }
                 toggleReadingModeBtn.title = isActive ? 'Avslutt lesemodus' : 'Aktiver lesemodus';
+            });
+        }
+
+        // Mobile-only Quick Search
+        const mobileSearchForm = document.getElementById('bible-quick-search-form-mobile');
+        const mobileSearchInput = document.getElementById('bible-quick-search-mobile');
+        if (mobileSearchForm && mobileSearchInput) {
+            mobileSearchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const refStr = mobileSearchInput.value.trim();
+                if (refStr) {
+                    await this.jumpToReference(refStr);
+                    // Close the left sidebar on mobile after navigating
+                    if (this.dom.sidebar) this.dom.sidebar.classList.remove('active');
+                }
+            });
+        }
+
+        // Mobile Text Settings Collapsible Panel Toggle
+        const mobileTextSettingsBtn = document.getElementById('mobile-text-settings-btn');
+        const mobileSettingsPanel = document.getElementById('mobile-settings-panel');
+        if (mobileTextSettingsBtn && mobileSettingsPanel) {
+            mobileTextSettingsBtn.addEventListener('click', () => {
+                const isHidden = mobileSettingsPanel.style.display === 'none' || mobileSettingsPanel.style.display === '';
+                mobileSettingsPanel.style.display = isHidden ? 'flex' : 'none';
+                mobileTextSettingsBtn.classList.toggle('active', isHidden);
+            });
+        }
+
+        // Mobile dictionary manual trigger
+        const mobileDictBtn = document.getElementById('mobile-dict-btn');
+        if (mobileDictBtn) {
+            mobileDictBtn.addEventListener('click', () => {
+                if (this.dom.dictDrawer) {
+                    this.dom.dictDrawer.classList.add('active');
+                }
+                // Close sidebar on mobile
+                if (this.dom.sidebar) {
+                    this.dom.sidebar.classList.remove('active');
+                }
+            });
+        }
+
+        // Mobile Reading Mode Toggle
+        const mobileReadingModeBtn = document.getElementById('mobile-reading-mode-btn');
+        if (mobileReadingModeBtn) {
+            mobileReadingModeBtn.addEventListener('click', () => {
+                const isActive = document.body.classList.toggle('reading-mode-active');
+                // Sync desktop reading mode button icon
+                const icon = document.getElementById('btn-toggle-reading-mode')?.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
+                }
+                // Close sidebar on mobile
+                if (this.dom.sidebar) {
+                    this.dom.sidebar.classList.remove('active');
+                }
+            });
+        }
+
+        // Mobile Font settings
+        const decFontMobile = document.getElementById('btn-decrease-font-mobile');
+        if (decFontMobile) {
+            decFontMobile.addEventListener('click', () => {
+                if (this.settings.fontSize > 12) {
+                    this.settings.fontSize -= 2;
+                    this.applySettings();
+                }
+            });
+        }
+        const incFontMobile = document.getElementById('btn-increase-font-mobile');
+        if (incFontMobile) {
+            incFontMobile.addEventListener('click', () => {
+                if (this.settings.fontSize < 32) {
+                    this.settings.fontSize += 2;
+                    this.applySettings();
+                }
+            });
+        }
+        const fontFamilySelectMobile = document.getElementById('settings-font-family-mobile');
+        if (fontFamilySelectMobile) {
+            fontFamilySelectMobile.addEventListener('change', (e) => {
+                this.settings.fontFamily = e.target.value;
+                this.applySettings();
             });
         }
 
@@ -513,6 +622,25 @@ class BibleReader {
 
         // Reading pane click events (double-click word definition, or select verse)
         if (this.dom.readingPane) {
+            // Touch jitter prevention for vertical scroll / swipe
+            this.dom.readingPane.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches[0]) {
+                    this.touchStartX = e.touches[0].clientX;
+                    this.touchStartY = e.touches[0].clientY;
+                    this.touchMoved = false;
+                }
+            }, { passive: true });
+
+            this.dom.readingPane.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    const diffX = Math.abs(e.touches[0].clientX - this.touchStartX);
+                    const diffY = Math.abs(e.touches[0].clientY - this.touchStartY);
+                    if (diffX > 10 || diffY > 10) {
+                        this.touchMoved = true;
+                    }
+                }
+            }, { passive: true });
+
             this.dom.readingPane.addEventListener('dblclick', (e) => {
                 const selection = window.getSelection().toString().trim();
                 if (selection && selection.length > 1 && selection.length < 30) {
@@ -522,6 +650,10 @@ class BibleReader {
 
             // Highlight / Select verse click: show floating toolbar
             this.dom.readingPane.addEventListener('click', (e) => {
+                if (this.touchMoved) {
+                    this.touchMoved = false;
+                    return;
+                }
                 const paragraph = e.target.closest('p');
                 if (paragraph) {
                     const verseSup = paragraph.querySelector('sup.v');
@@ -626,6 +758,9 @@ class BibleReader {
         
         // Font Size
         if (this.dom.fontSizeDisplay) this.dom.fontSizeDisplay.innerText = `${this.settings.fontSize}px`;
+        const fontSizeDispMobile = document.getElementById('font-size-display-mobile');
+        if (fontSizeDispMobile) fontSizeDispMobile.innerText = `${this.settings.fontSize}px`;
+
         if (this.dom.readingPane) {
             this.dom.readingPane.style.setProperty('--bible-font-size', `${this.settings.fontSize}px`);
             this.dom.readingPane.style.fontSize = `${this.settings.fontSize}px`;
@@ -640,6 +775,8 @@ class BibleReader {
         }
 
         if (this.dom.fontFamilySelect) this.dom.fontFamilySelect.value = this.settings.fontFamily;
+        const fontFamilySelectMobile = document.getElementById('settings-font-family-mobile');
+        if (fontFamilySelectMobile) fontFamilySelectMobile.value = this.settings.fontFamily;
 
         // Theme classes
         document.body.classList.remove('bible-theme-light', 'bible-theme-cream', 'bible-theme-dark');
@@ -660,11 +797,19 @@ class BibleReader {
             const payload = await res.json();
             this.bibles = payload.data || [];
             
+            const optionsHtml = this.bibles.map(t => 
+                `<option value="${t.id}">${t.name} (${t.abbreviation})</option>`
+            ).join('');
+
             if (this.dom.translationSelect) {
-                this.dom.translationSelect.innerHTML = this.bibles.map(t => 
-                    `<option value="${t.id}">${t.name} (${t.abbreviation})</option>`
-                ).join('');
+                this.dom.translationSelect.innerHTML = optionsHtml;
                 this.dom.translationSelect.value = this.selectedBibleId;
+            }
+
+            const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+            if (mobileTransSelect) {
+                mobileTransSelect.innerHTML = optionsHtml;
+                mobileTransSelect.value = this.selectedBibleId;
             }
         } catch (e) {
             console.error("Error loading translations:", e);
@@ -1263,6 +1408,8 @@ class BibleReader {
                 if (trans !== this.selectedBibleId) {
                     this.selectedBibleId = trans;
                     if (this.dom.translationSelect) this.dom.translationSelect.value = trans;
+                    const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                    if (mobileTransSelect) mobileTransSelect.value = trans;
                     await this.loadBooks();
                 }
                 
@@ -1300,6 +1447,8 @@ class BibleReader {
                 if (trans !== this.selectedBibleId) {
                     this.selectedBibleId = trans;
                     if (this.dom.translationSelect) this.dom.translationSelect.value = trans;
+                    const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                    if (mobileTransSelect) mobileTransSelect.value = trans;
                     await this.loadBooks();
                 }
                 await this.selectBook(item.dataset.bookId);
@@ -1313,39 +1462,7 @@ class BibleReader {
     }
 
     setupSwipeGestures() {
-        if (!this.dom.readingPane) return;
-
-        let touchstartX = 0;
-        let touchstartY = 0;
-        let touchendX = 0;
-        let touchendY = 0;
-
-        const checkDirection = () => {
-            const diffX = touchendX - touchstartX;
-            const diffY = touchendY - touchstartY;
-
-            // Ensure horizontal swipe is dominant and above threshold of 60px
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
-                if (diffX > 0) {
-                    // Swipe right -> Previous chapter
-                    this.navigateChapter(-1);
-                } else {
-                    // Swipe left -> Next chapter
-                    this.navigateChapter(1);
-                }
-            }
-        };
-
-        this.dom.readingPane.addEventListener('touchstart', (e) => {
-            touchstartX = e.changedTouches[0].screenX;
-            touchstartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        this.dom.readingPane.addEventListener('touchend', (e) => {
-            touchendX = e.changedTouches[0].screenX;
-            touchendY = e.changedTouches[0].screenY;
-            checkDirection();
-        }, { passive: true });
+        // Swipe gestures disabled to prevent accidental chapter navigation or toolbar triggers
     }
 
     async loadNotes() {
