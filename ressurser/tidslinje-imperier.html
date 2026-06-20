@@ -825,6 +825,23 @@
                 });
             };
             
+            // Handle clicking on nav pills to scroll the target section to the center of the viewport
+            navPills.forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = pill.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Update active state immediately
+                        navPills.forEach(p => p.classList.remove('active'));
+                        pill.classList.add('active');
+                        // Update browser hash without jumping
+                        history.pushState(null, null, targetId);
+                    }
+                });
+            });
+            
             window.addEventListener('scroll', handleScroll);
             handleScroll(); // Initial check
         });
