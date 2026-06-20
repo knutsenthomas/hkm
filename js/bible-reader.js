@@ -53,6 +53,7 @@ class BibleReader {
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
         const transParam = urlParams.get('trans'); // e.g. "DNB"
+        const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
 
         if (transParam) {
             this.selectedBibleId = transParam;
@@ -70,6 +71,12 @@ class BibleReader {
                 await this.selectBook(defaultBook.id);
                 await this.selectChapter(`${defaultBook.id}_1`);
             }
+        }
+
+        if (lexParam) {
+            setTimeout(() => {
+                this.lookupWord(lexParam);
+            }, 500);
         }
     }
 
