@@ -18737,14 +18737,14 @@ class AdminManager {
 
     async editHeroSlide(index = -1) {
         const isNew = index === -1;
-        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', youtubeId: '', btnText: '', btnLink: '', duration: 4 } : this.heroSlides[index];
+        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', youtubeId: '', btnText: '', btnLink: '', duration: 8 } : this.heroSlides[index];
         const safeSlideImage = this.escapeHtml(slide.imageUrl || '');
         const safeSlideYoutubeId = this.escapeHtml(slide.youtubeId || '');
         const safeSlideTitle = this.escapeHtml(slide.title || '');
         const safeSlideSubtitle = this.escapeHtml(slide.subtitle || '');
         const safeSlideBtnText = this.escapeHtml(slide.btnText || '');
         const safeSlideBtnLink = this.escapeHtml(slide.btnLink || '');
-        const slideDuration = slide.duration || 4;
+        const slideDuration = slide.duration || 8;
 
         const modal = document.createElement('div');
         modal.className = 'dashboard-modal';
@@ -18800,7 +18800,7 @@ class AdminManager {
                         <div class="form-group">
                             <label>Visningstid i sekunder</label>
                             <input type="number" id="hero-duration" class="form-control" value="${slideDuration}" min="1" step="1">
-                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Hvor lenge denne sliden skal vises før den bytter automatisk (Standard er 4 sekunder). Hvis det er en video, kan du sette den høyere (f.eks. 15 eller 30).</p>
+                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Hvor lenge denne sliden skal vises før den bytter automatisk (Standard er 8 sekunder). Hvis det er en video, kan du sette den høyere (f.eks. 15 eller 30).</p>
                         </div>
                         <div class="form-group">
                             <label>Knapptekst</label>
@@ -18970,7 +18970,7 @@ class AdminManager {
                 subtitle: modal.querySelector('#hero-subtitle').value,
                 btnText: modal.querySelector('#hero-btn-text').value,
                 btnLink: modal.querySelector('#hero-btn-link').value,
-                duration: parseFloat(modal.querySelector('#hero-duration').value) || 4
+                duration: parseFloat(modal.querySelector('#hero-duration').value) || 8
             };
 
             if (isNew) {

@@ -539,7 +539,7 @@ class HeroSlider {
 
     startAutoPlay() {
         this.stopAutoPlay();
-        let duration = 4000; // Default 4 seconds
+        let duration = 8000; // Default 8 seconds
         if (this.slides.length > 0 && this.slides[this.currentIndex]) {
             const slideDuration = this.slides[this.currentIndex].getAttribute('data-duration');
             if (slideDuration) {

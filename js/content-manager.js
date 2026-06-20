@@ -3179,7 +3179,7 @@ class ContentManager {
                     const hasYoutube = !!youtubeId;
                     const hasVideo = !!videoUrl && !hasYoutube;
 
-                    const duration = slide.duration || 4;
+                    const duration = slide.duration || 8;
 
                     return `
                     <div class="hero-slide ${index === 0 ? 'active' : ''}" data-duration="${duration}">
