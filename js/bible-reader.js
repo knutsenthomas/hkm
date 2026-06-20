@@ -450,6 +450,7 @@ class BibleReader {
                 this.renderActiveChapter();
                 this.updateNavigationButtons();
                 this.addToHistory();
+                this.updateRelatedResources();
             } else {
                 throw new Error("Empty chapter data");
             }
@@ -613,6 +614,9 @@ class BibleReader {
         
         this.dom.dictWordTitle.innerText = word;
 
+        const dictRelatedBox = document.getElementById('dict-related-resources');
+        if (dictRelatedBox) dictRelatedBox.innerHTML = '';
+
         try {
             const params = new URLSearchParams({
                 word: word,
@@ -620,16 +624,38 @@ class BibleReader {
                 scriptureRef: refText || ''
             });
 
-            const res = await fetch(`/api/bible/dictionary?${params.toString()}`);
-            const data = await res.json();
+            // Parallel load AI definition and relevant site resources
+            const [dictRes, resources] = await Promise.all([
+                fetch(`/api/bible/dictionary?${params.toString()}`).then(r => r.json()),
+                this.searchLocalResources(word)
+            ]);
 
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';
 
-            this.dom.dictWordTitle.innerText = data.word || word;
-            this.dom.dictCategory.innerText = data.category || 'Ordbok';
-            this.dom.dictDefinition.innerText = data.definition || '';
-            this.dom.dictContextualNote.innerText = data.contextualNote || '';
+            this.dom.dictWordTitle.innerText = dictRes.word || word;
+            this.dom.dictCategory.innerText = dictRes.category || 'Ordbok';
+            this.dom.dictDefinition.innerText = dictRes.definition || '';
+            this.dom.dictContextualNote.innerText = dictRes.contextualNote || '';
+
+            // Render related resources
+            if (dictRelatedBox) {
+                if (resources.length === 0) {
+                    dictRelatedBox.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px 0;">Ingen direkte treff på nettstedets blogger eller videoer for dette ordet.</div>';
+                } else {
+                    dictRelatedBox.innerHTML = resources.slice(0, 4).map(res => `
+                        <a href="${res.link}" target="${res.isYoutube ? '_blank' : '_self'}" class="related-resource-item">
+                            <div class="related-resource-icon ${res.isYoutube ? 'youtube' : ''}">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">${res.icon}</span>
+                            </div>
+                            <div class="related-resource-info">
+                                <h5 class="related-resource-title" style="margin: 0; font-size: 12px;" title="${res.title}">${res.title}</h5>
+                                <span class="related-resource-type" style="font-size: 9px;">${res.type}</span>
+                            </div>
+                        </a>
+                    `).join('');
+                }
+            }
         } catch (e) {
             console.error("Error looking up word:", e);
             this.dom.dictSpinner.style.display = 'none';
@@ -781,6 +807,116 @@ class BibleReader {
                 await this.selectChapter(item.dataset.chapterId);
             });
         });
+    }
+
+    async searchLocalResources(query) {
+        if (!query) return [];
+        const term = query.toLowerCase().trim();
+        const results = [];
+
+        try {
+            // Fetch blogs
+            const blogData = await firebaseService.getPageContent('collection_blog');
+            if (blogData && blogData.items) {
+                const blogItems = Object.values(blogData.items);
+                blogItems.forEach(item => {
+                    const title = (item.title || '').toLowerCase();
+                    const content = (item.content || '').toLowerCase();
+                    const category = (item.category || '').toLowerCase();
+                    if (title.includes(term) || content.includes(term) || category.includes(term)) {
+                        results.push({
+                            title: item.title,
+                            type: 'Blogg',
+                            icon: 'article',
+                            link: `/blogg-post.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`
+                        });
+                    }
+                });
+            }
+
+            // Fetch teachings
+            const teachingData = await firebaseService.getPageContent('collection_teaching');
+            if (teachingData && teachingData.items) {
+                const teachingItems = Object.values(teachingData.items);
+                teachingItems.forEach(item => {
+                    const title = (item.title || '').toLowerCase();
+                    const desc = (item.description || '').toLowerCase();
+                    const content = (item.content || '').toLowerCase();
+                    if (title.includes(term) || desc.includes(term) || content.includes(term)) {
+                        results.push({
+                            title: item.title,
+                            type: 'Undervisning',
+                            icon: 'school',
+                            link: `/media.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`
+                        });
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Error searching local resources:", e);
+        }
+
+        // Search YouTube
+        try {
+            const YT_API_KEY = 'AIza' + 'SyD622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
+            const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
+            const ytUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&q=${encodeURIComponent(term)}&type=video&maxResults=5&key=${YT_API_KEY}`;
+            const resp = await fetch(ytUrl);
+            const data = await resp.json();
+            if (data.items) {
+                data.items.forEach(item => {
+                    results.push({
+                        title: item.snippet.title,
+                        type: 'YouTube',
+                        icon: 'play_circle',
+                        link: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                        isYoutube: true
+                    });
+                });
+            }
+        } catch (e) {
+            console.error("Error searching YouTube:", e);
+        }
+
+        return results;
+    }
+
+    async updateRelatedResources() {
+        const relatedList = document.getElementById('related-list');
+        if (!relatedList) return;
+
+        relatedList.innerHTML = `
+            <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
+                <p style="font-size: 13px;">Henter relaterte ressurser...</p>
+            </div>
+        `;
+
+        const currentBook = this.books.find(b => b.id === this.selectedBookId);
+        if (!currentBook) {
+            relatedList.innerHTML = '<div class="empty-state">Ingen bok valgt.</div>';
+            return;
+        }
+
+        const query = currentBook.name; // e.g. "Matteus"
+        const resources = await this.searchLocalResources(query);
+
+        if (resources.length === 0) {
+            relatedList.innerHTML = '<div class="empty-state">Ingen relaterte ressurser funnet for denne boken enda.</div>';
+            return;
+        }
+
+        relatedList.innerHTML = resources.map(res => `
+            <a href="${res.link}" target="${res.isYoutube ? '_blank' : '_self'}" class="related-resource-item">
+                <div class="related-resource-icon ${res.isYoutube ? 'youtube' : ''}">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">${res.icon}</span>
+                </div>
+                <div class="related-resource-info">
+                    <h4 class="related-resource-title" title="${res.title}">${res.title}</h4>
+                    <span class="related-resource-type">${res.type}</span>
+                </div>
+            </a>
+        `).join('');
     }
 }
 
