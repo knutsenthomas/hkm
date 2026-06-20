@@ -36,21 +36,19 @@
             --primary-blue: #1B4965;
             --text-dark: #1e293b;
             --text-muted: #64748b;
-            --border: #e2e8f0;
+            --border: #f1f5f9;
             --bg-light: #f8fafc;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
-            background-color: var(--bg-light);
+            background: radial-gradient(circle at 10% 20%, rgba(27, 73, 101, 0.02) 0%, rgba(255, 255, 255, 0) 90%), var(--bg-light);
             margin: 0;
         }
 
-        /* Layout Grid */
         .details-layout {
-            padding: 64px 0 96px;
-            background: var(--bg-light);
+            padding: 80px 0 120px;
         }
 
         .details-container {
@@ -59,33 +57,62 @@
             padding: 0 24px;
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 32px;
+            gap: 40px;
         }
 
         /* Card styles */
         .card {
             background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border: 1px solid var(--border);
-            margin-bottom: 24px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px -10px rgba(27, 73, 101, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-blue), rgba(27, 73, 101, 0.3));
+        }
+        
+        .card.no-stripe::before {
+            display: none;
         }
 
         .card-title {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: var(--primary-blue);
-            margin: 0 0 16px 0;
+            margin: 0 0 24px 0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
+        }
+
+        .card-title-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(27, 73, 101, 0.06);
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
         /* About Section */
         .plan-description {
-            font-size: 1.05rem;
-            line-height: 1.6;
+            font-size: 1.1rem;
+            line-height: 1.7;
             color: #334155;
             margin: 0;
         }
@@ -94,24 +121,25 @@
         .day-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .day-item {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            padding: 20px 24px;
-            background: var(--bg-light);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
+            gap: 12px;
+            padding: 24px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.015);
         }
 
         .day-item:hover {
-            border-color: rgba(209, 125, 57, 0.3);
-            background: white;
-            transform: translateX(4px);
+            border-color: rgba(209, 125, 57, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(209, 125, 57, 0.12), 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .day-header-info {
@@ -121,52 +149,55 @@
         }
 
         .day-badge-num {
-            background: #fff7ed;
-            color: var(--primary-orange);
+            background: linear-gradient(135deg, rgba(209, 125, 57, 0.1), rgba(189, 79, 42, 0.1));
+            color: var(--primary-red);
             font-weight: 800;
-            font-size: 0.9rem;
-            padding: 4px 14px;
+            font-size: 0.85rem;
+            padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(209, 125, 57, 0.1);
+            border: 1px solid rgba(209, 125, 57, 0.15);
             white-space: nowrap;
+            letter-spacing: 0.03em;
         }
 
         .day-verses {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--primary-blue);
         }
 
         .day-prayer {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            font-size: 0.95rem;
+            color: #475569;
             margin-left: 0;
-            font-style: italic;
-            border-top: 1px dashed var(--border);
-            padding-top: 8px;
-            margin-top: 4px;
+            border-left: 3px solid var(--primary-orange);
+            background: #faf8f5;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.6;
         }
 
         /* Sidebar Sticky Card */
         .sidebar-card {
             position: sticky;
-            top: 100px;
+            top: 120px;
             background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 40px -15px rgba(27, 73, 101, 0.08), 0 1px 3px rgba(0, 0, 0, 0.01);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 28px;
         }
 
         .sidebar-title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--primary-blue);
             margin: 0;
+            line-height: 1.3;
         }
 
         .sidebar-duration-badge {
@@ -180,34 +211,63 @@
             border-radius: 30px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            border: 1px solid rgba(209, 125, 57, 0.15);
         }
 
         .btn-start-plan {
             background: linear-gradient(135deg, var(--primary-orange), var(--primary-red));
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 16px 32px;
+            border-radius: 14px;
+            padding: 18px 32px;
             font-weight: 800;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25);
-            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             text-decoration: none;
-            text-align: center;
             box-sizing: border-box;
         }
 
         .btn-start-plan:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(209, 125, 57, 0.35);
+            box-shadow: 0 10px 28px rgba(209, 125, 57, 0.45);
             filter: brightness(1.05);
         }
 
         .btn-start-plan:active {
             transform: scale(0.98);
+        }
+
+        /* Sidebar info list */
+        .sidebar-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 24px;
+            margin-top: 8px;
+        }
+
+        .sidebar-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-info-item i {
+            color: var(--primary-blue);
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
         }
 
         /* Error/Loading State */
@@ -252,10 +312,11 @@
         }
 
         .resource-link:hover {
-            background-color: var(--primary-orange) !important;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)) !important;
             color: white !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+            border-color: transparent !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
         }
     </style>
 </head>
@@ -386,11 +447,9 @@
             <!-- Left Side: Content -->
             <div class="left-content">
                 <!-- Description -->
-
-                <!-- Description -->
                 <div class="card">
                     <h2 class="card-title">
-                        <span class="material-symbols-outlined">info</span> Om leseplanen
+                        <span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> Om leseplanen
                     </h2>
                     <p class="plan-description" id="plan-description-text">Ingen beskrivelse tilgjengelig.</p>
                 </div>
@@ -398,7 +457,7 @@
                 <!-- Day outline list -->
                 <div class="card">
                     <h2 class="card-title">
-                        <span class="material-symbols-outlined">menu_book</span> Leseplanens innhold
+                        <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> Leseplanens innhold
                     </h2>
                     <div class="day-list" id="days-list-container">
                         <!-- Hydrated by Javascript -->
@@ -408,10 +467,28 @@
 
             <!-- Right Side: Sidebar -->
             <aside class="right-sidebar">
-                <div class="sidebar-card">
+                <div class="sidebar-card no-stripe">
                     <h3 class="sidebar-title" id="sidebar-plan-title">Leseplan</h3>
                     <div class="sidebar-duration-badge" id="plan-duration-badge">0 dager</div>
-                    <button class="btn-start-plan" id="start-plan-btn">Start denne leseplanen</button>
+                    
+                    <div class="sidebar-info-list">
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span><strong>Varighet:</strong> <span id="info-duration-text">0 dager</span></span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span><strong>Kategori:</strong> Bibeleseplan</span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span><strong>Nivå:</strong> Tilgjengelig for alle</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-start-plan" id="start-plan-btn">
+                        Start denne leseplanen <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </button>
                 </div>
             </aside>
         </div>
@@ -559,6 +636,8 @@
                 document.getElementById('plan-description-text').textContent = plan.description || 'Ingen beskrivelse tilgjengelig.';
                 document.getElementById('sidebar-plan-title').textContent = plan.title;
                 document.getElementById('plan-duration-badge').textContent = `${plan.durationDays} dager`;
+                const infoDur = document.getElementById('info-duration-text');
+                if (infoDur) infoDur.textContent = `${plan.durationDays} dager`;
 
                 // Subtitle
                 if (plan.subtitle) {
