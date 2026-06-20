@@ -1270,7 +1270,18 @@ class BibleReader {
     }
 
     async parseAndNavigateToReference(query) {
-        const input = query.trim().toLowerCase();
+        if (!query) return;
+
+        // Split by conjunctions to get the first reference (e.g. "Salomos ordspråk 5-8 & Filipperne 4" -> "Salomos ordspråk 5-8")
+        const parts = query.split(/\s+&\s+|\s+og\s+|\s+and\s+|\s+y\s+|,/i);
+        let firstRef = parts[0].trim();
+
+        // Strip ranges (e.g. "1. Mosebok 1-2" -> "1. Mosebok 1", "Johannes 3:16-18" -> "Johannes 3:16")
+        if (firstRef.match(/-|–/)) {
+            firstRef = firstRef.split(/-|–/)[0].trim();
+        }
+
+        const input = firstRef.toLowerCase();
         
         // Regex match, e.g. "1. Johannes 3:16", "Johannes 3:16", "Salmene 23"
         const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+))?$/i;
@@ -2016,7 +2027,8 @@ class BibleReader {
                 all_plans: 'Tilgjengelige leseplaner',
                 start_plan_btn: 'Start denne planen',
                 log_in_to_save: 'Logg inn på Min Side for å lagre din fremgang.',
-                login_btn: 'Logg inn'
+                login_btn: 'Logg inn',
+                days: 'dager'
             },
             en: {
                 loading_plan: 'Loading reading plan...',
@@ -2030,7 +2042,8 @@ class BibleReader {
                 all_plans: 'Available Reading Plans',
                 start_plan_btn: 'Start this plan',
                 log_in_to_save: 'Log in to save your progress.',
-                login_btn: 'Log in'
+                login_btn: 'Log in',
+                days: 'days'
             },
             es: {
                 loading_plan: 'Cargando plan de lectura...',
@@ -2044,7 +2057,8 @@ class BibleReader {
                 all_plans: 'Planes de Lectura Disponibles',
                 start_plan_btn: 'Comenzar este plan',
                 log_in_to_save: 'Inicia sesión para guardar tu progreso.',
-                login_btn: 'Iniciar sesión'
+                login_btn: 'Iniciar sesión',
+                days: 'días'
             }
         };
         return dict[lang]?.[key] || dict['no']?.[key] || fallback;
@@ -2329,8 +2343,8 @@ class BibleReader {
                         return `
                         <div class="hkm-rp-card" id="plan-card-${p.id}">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;">${p.title}</h4>
-                                <span style="font-size: 11px; font-weight: 700; background: rgba(27, 73, 101, 0.1); color: #1B4965; padding: 2px 8px; border-radius: 99px;">${totalDays} dager</span>
+                                <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; flex-grow: 1;">${p.title}</h4>
+                                <span style="font-size: 11px; font-weight: 700; background: #fff7ed; color: #d17d39; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
                             </div>
                             <p style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
                             
