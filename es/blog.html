@@ -41,6 +41,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles.css?v=2026.04.22.09.36">
     <link rel="stylesheet" href="../css/cookie-consent.css">
+    <link rel="stylesheet" href="../css/blogg.css?v=2026.06.20">
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="../js/firebase-config.js"></script>
@@ -247,6 +248,23 @@
             </div>
         </section>
 
+        <!-- Search & Filter Bar -->
+        <div class="blog-filter-section">
+            <div class="container">
+                <div class="blog-search-filter-wrapper">
+                    <!-- Search Input -->
+                    <div class="blog-search-box">
+                        <span class="material-symbols-outlined search-icon">search</span>
+                        <input type="text" id="blog-search-input" placeholder="Buscar artículos...">
+                    </div>
+                    <!-- Categories (populated dynamically) -->
+                    <div class="blog-category-filters" id="blog-filters-container">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Lista de Publicaciones del Blog -->
         <section class="blog-page section">
             <div class="container">
@@ -258,11 +276,40 @@
                         tanto a nivel nacional como internacional.</p>
                 </div>
 
+                <!-- Dynamic Featured Post Container -->
+                <div class="blog-featured-container" id="blog-featured-container" style="display: none;"></div>
+
                 <div class="blog-grid">
-                    <!-- Las publicaciones del blog se cargarán aquí dinámicamente desde Firestore -->
-                    <div class="loading-spinner" style="text-align: center; grid-column: 1/-1; padding: 40px;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: var(--primary-orange);"></i>
-                        <p>Cargando publicaciones...</p>
+                    <!-- Skeleton loaders shown while content loads -->
+                    <div class="skeleton-card">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-text title"></div>
+                            <div class="skeleton-text meta"></div>
+                            <div class="skeleton-text excerpt-1"></div>
+                            <div class="skeleton-text excerpt-2"></div>
+                            <div class="skeleton-text link"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-text title"></div>
+                            <div class="skeleton-text meta"></div>
+                            <div class="skeleton-text excerpt-1"></div>
+                            <div class="skeleton-text excerpt-2"></div>
+                            <div class="skeleton-text link"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-text title"></div>
+                            <div class="skeleton-text meta"></div>
+                            <div class="skeleton-text excerpt-1"></div>
+                            <div class="skeleton-text excerpt-2"></div>
+                            <div class="skeleton-text link"></div>
+                        </div>
                     </div>
                 </div>
 

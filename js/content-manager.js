@@ -3261,7 +3261,13 @@ class ContentManager {
             return;
         }
 
-        if (renderPosts.length > 0) {
+        const isMainBlogPage = selector.includes('.blog-page');
+
+        if (isMainBlogPage) {
+            this.setupBlogFiltersAndSearch(renderPosts, selector);
+            this.applyBlogFiltering(renderPosts, selector);
+        } else {
+            // Standard render for home page / sidebar
             const html = renderPosts.map(post => {
                 const stableId = post.__stableId || this.getContentItemStableId(post);
                 const postImage = this.getContentItemImage(post) || 'https://via.placeholder.com/600x400?text=Ingen+bilde';
@@ -3287,6 +3293,204 @@ class ContentManager {
             this.setHTMLIfChanged(container, html, `blog:${selector}`);
         }
     }
+
+    setupBlogFiltersAndSearch(posts, selector) {
+        const filtersContainer = document.getElementById('blog-filters-container');
+        const searchInput = document.getElementById('blog-search-input');
+        const lang = this.getCurrentLanguage();
+        const allLabel = lang === 'en' ? 'All' : (lang === 'es' ? 'Todos' : 'Alle');
+
+        const categories = Array.from(new Set(posts.map(p => p.category).filter(Boolean))).sort();
+        const categoriesSignature = [allLabel, ...categories].join(',');
+
+        if (filtersContainer && filtersContainer.dataset.sig !== categoriesSignature) {
+            filtersContainer.innerHTML = [allLabel, ...categories].map(cat => {
+                const isActive = cat === (this._activeCategory || allLabel);
+                return `<button class="filter-btn ${isActive ? 'active' : ''}" data-category="${cat}">${cat}</button>`;
+            }).join('');
+
+            filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filtersContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this._activeCategory = btn.getAttribute('data-category');
+                    this.applyBlogFiltering(posts, selector);
+                });
+            });
+
+            filtersContainer.dataset.sig = categoriesSignature;
+        }
+
+        if (searchInput && !searchInput.dataset.initialized) {
+            this._searchQuery = '';
+            searchInput.addEventListener('input', (e) => {
+                this._searchQuery = e.target.value.toLowerCase().trim();
+                this.applyBlogFiltering(posts, selector);
+            });
+            searchInput.dataset.initialized = 'true';
+        }
+    }
+
+    applyBlogFiltering(posts, selector) {
+        const lang = this.getCurrentLanguage();
+        const allLabel = lang === 'en' ? 'All' : (lang === 'es' ? 'Todos' : 'Alle');
+        const activeCat = this._activeCategory || allLabel;
+        const query = this._searchQuery || '';
+
+        let filtered = posts;
+
+        if (activeCat !== allLabel) {
+            filtered = filtered.filter(post => post.category === activeCat);
+        }
+
+        if (query) {
+            filtered = filtered.filter(post => {
+                const title = (post.title || '').toLowerCase();
+                const content = (post.content || '').toLowerCase();
+                const author = (post.author || '').toLowerCase();
+                const category = (post.category || '').toLowerCase();
+                const excerpt = (this.generateExcerpt(post.content, post.title) || '').toLowerCase();
+                return title.includes(query) || content.includes(query) || author.includes(query) || category.includes(query) || excerpt.includes(query);
+            });
+        }
+
+        this.renderFilteredBlogPosts(filtered, selector);
+    }
+
+    renderFilteredBlogPosts(posts, selector) {
+        const gridContainer = document.querySelector(selector);
+        const featuredContainer = document.getElementById('blog-featured-container');
+        if (!gridContainer) return;
+
+        const lang = this.getCurrentLanguage();
+
+        // 1. Handle Empty State
+        if (posts.length === 0) {
+            if (featuredContainer) {
+                featuredContainer.style.display = 'none';
+            }
+
+            const noResultsTitle = lang === 'en' ? 'No articles found' : (lang === 'es' ? 'No se encontraron artículos' : 'Ingen artikler funnet');
+            const noResultsDesc = lang === 'en'
+                ? "We couldn't find any articles matching your search. Try adjusting your filters or search terms."
+                : (lang === 'es'
+                    ? 'No pudimos encontrar ningún artículo que coincida con tu búsqueda. Intenta ajustar tus filtros o términos de búsqueda.'
+                    : 'Vi fant ingen artikler som passet til søket ditt. Prøv å justere filteret eller søkeordene.');
+
+            const emptyMarkup = `
+                <div class="blog-empty-card">
+                    <div class="empty-icon">
+                        <span class="material-symbols-outlined">search_off</span>
+                    </div>
+                    <h3>${noResultsTitle}</h3>
+                    <p>${noResultsDesc}</p>
+                </div>
+            `;
+
+            this.setHTMLIfChanged(gridContainer, emptyMarkup, `blog-filtered-empty:${selector}`);
+            return;
+        }
+
+        // 2. Separate featured post and grid posts
+        const featuredPost = posts[0];
+        const gridPosts = posts.slice(1);
+
+        // Render Featured Post
+        if (featuredContainer) {
+            if (featuredPost) {
+                featuredContainer.style.display = 'block';
+                const stableId = featuredPost.__stableId || this.getContentItemStableId(featuredPost);
+                const postImage = this.getContentItemImage(featuredPost) || 'https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3';
+
+                const categoryBadge = featuredPost.category
+                    ? `<span class="featured-badge">${featuredPost.category}</span>`
+                    : '';
+
+                const readMoreText = this.getTranslation('read_more');
+                const dateStr = featuredPost.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(featuredPost.date)}</span>` : '';
+                const authorStr = `<span><i class="fas fa-user"></i> ${featuredPost.author || 'Admin'}</span>`;
+                const readTimeStr = `<span><i class="fas fa-clock"></i> ${this.estimateReadTime(featuredPost.content)}</span>`;
+
+                const featuredMarkup = `
+                    <article class="featured-post-card">
+                        <div class="featured-image">
+                            <img src="${postImage}" alt="${featuredPost.title}">
+                            ${categoryBadge}
+                        </div>
+                        <div class="featured-content">
+                            <div class="featured-meta">
+                                ${dateStr}
+                                ${authorStr}
+                                ${readTimeStr}
+                            </div>
+                            <h2 class="featured-title">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}">${featuredPost.title}</a>
+                            </h2>
+                            <p class="featured-excerpt">${this.generateExcerpt(featuredPost.content, featuredPost.title)}...</p>
+                            <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="featured-link">
+                                ${readMoreText} <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                `;
+                this.setHTMLIfChanged(featuredContainer, featuredMarkup, `blog-featured:${selector}`);
+            } else {
+                featuredContainer.style.display = 'none';
+            }
+        }
+
+        // Render Grid Posts
+        const gridHtml = gridPosts.map((post, idx) => {
+            const stableId = post.__stableId || this.getContentItemStableId(post);
+            const postImage = this.getContentItemImage(post) || 'https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3';
+
+            const categoryBadge = post.category
+                ? `<span class="blog-category">${post.category}</span>`
+                : '';
+
+            const dateStr = post.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(post.date)}</span>` : '';
+            const authorStr = `<span><i class="fas fa-user"></i> ${post.author || 'Admin'}</span>`;
+            const readTimeStr = `<span><i class="fas fa-clock"></i> ${this.estimateReadTime(post.content)}</span>`;
+            const readMoreText = this.getTranslation('read_more');
+
+            // Apply a staggered animation delay to grid cards
+            const delay = (idx * 0.1).toFixed(1);
+
+            return `
+                <article class="blog-card" style="opacity: 0; transform: translateY(20px); animation: fadeInUp 0.5s ${delay}s forwards;">
+                    <div class="blog-image">
+                        <img src="${postImage}" alt="${post.title}">
+                        ${categoryBadge}
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            ${dateStr}
+                            ${authorStr}
+                            ${readTimeStr}
+                        </div>
+                        <h3 class="blog-title">${post.title}</h3>
+                        <p class="blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link">
+                            ${readMoreText} <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        this.setHTMLIfChanged(gridContainer, gridHtml, `blog-grid:${selector}`);
+    }
+
+    estimateReadTime(content) {
+        if (!content) return '1 ' + (this.getTranslation('reading_time') || 'min');
+        const text = content.replace(/<[^>]*>/g, '');
+        const words = text.trim().split(/\s+/).length;
+        const wordsPerMinute = 200;
+        const minutes = Math.ceil(words / wordsPerMinute);
+        const timeLabel = this.getTranslation('reading_time') || 'min';
+        return `${minutes} ${timeLabel}`;
+    }
+
 
     /**
      * Dynamically render Teaching Series
