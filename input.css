@@ -1218,7 +1218,8 @@ section {
 .header-dark-start .header:not(.scrolled):not(.menu-open) .lang-btn,
 .header-dark-start .header:not(.scrolled):not(.menu-open) .header-search-btn,
 .header-dark-start .header:not(.scrolled):not(.menu-open) #global-search-opener,
-.header-dark-start .header:not(.scrolled):not(.menu-open) .header-bible-btn {
+.header-dark-start .header:not(.scrolled):not(.menu-open) .header-bible-btn,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .header-reading-plans-btn {
     color: white !important;
 }
 
@@ -1234,7 +1235,8 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .nav-link,
 body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .lang-btn,
 body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-search-btn,
 body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) #global-search-opener,
-body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bible-btn {
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bible-btn,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-reading-plans-btn {
     color: var(--text-dark) !important;
 }
 
@@ -1351,12 +1353,14 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bibl
 .header.scrolled .header-search-btn,
 .header.scrolled #global-search-opener,
 .header.scrolled .header-bible-btn,
+.header.scrolled .header-reading-plans-btn,
 .header.menu-open .logo,
 .header.menu-open .nav-link,
 .header.menu-open .lang-btn,
 .header.menu-open .header-search-btn,
 .header.menu-open #global-search-opener,
-.header.menu-open .header-bible-btn {
+.header.menu-open .header-bible-btn,
+.header.menu-open .header-reading-plans-btn {
     color: var(--text-dark) !important;
 }
 
@@ -1409,7 +1413,8 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bibl
     padding: 6px;
 }
 
-.header-bible-btn {
+.header-bible-btn,
+.header-reading-plans-btn {
     border: none;
     background: transparent;
     cursor: pointer;
@@ -1422,19 +1427,22 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-bibl
 }
 
 @media (min-width: 768px) {
-    .header-bible-btn {
+    .header-bible-btn,
+    .header-reading-plans-btn {
         display: flex;
     }
 }
 
 .header.scrolled .header-search-btn,
 .header.scrolled #global-search-opener,
-.header.scrolled .header-bible-btn {
+.header.scrolled .header-bible-btn,
+.header.scrolled .header-reading-plans-btn {
     color: var(--text-dark);
 }
 
 #global-search-opener:hover,
-.header-bible-btn:hover {
+.header-bible-btn:hover,
+.header-reading-plans-btn:hover {
     color: var(--primary-orange) !important;
 }
 
