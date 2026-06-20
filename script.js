@@ -46,6 +46,7 @@ const bodyScrollLocks = new Set();
 function lockBodyScroll(key) {
     bodyScrollLocks.add(key);
     document.body.classList.add('body-locked');
+    document.documentElement.classList.add('body-locked');
     const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
 
     if (!document.body.dataset.hkmScrollLockPaddingRight) {
@@ -61,6 +62,7 @@ function unlockBodyScroll(key) {
     bodyScrollLocks.delete(key);
     if (bodyScrollLocks.size === 0) {
         document.body.classList.remove('body-locked');
+        document.documentElement.classList.remove('body-locked');
         document.body.style.paddingRight = document.body.dataset.hkmScrollLockPaddingRight || '';
         delete document.body.dataset.hkmScrollLockPaddingRight;
         document.documentElement.style.removeProperty('--hkm-scrollbar-comp');
