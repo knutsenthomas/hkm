@@ -1760,6 +1760,9 @@
                 <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
+                <a href="/es/bibel" class="hidden md:flex items-center text-white hover:text-primary-orange transition-colors" aria-label="Leer la Biblia" title="Leer la Biblia">
+                    <span class="material-symbols-outlined text-2xl">menu_book</span>
+                </a>
 
                 <div class="lang-switcher relative group">
                     <button
@@ -1864,13 +1867,16 @@
             <!-- Mobile-only controls in the sidebar -->
             <div class="sidebar-mobile-controls" id="sidebar-mobile-controls" style="display: none; padding: 16px; border-bottom: 1px solid var(--border-color); flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
                 <!-- Section Title -->
-                <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
-                    <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7;">settings</span>
-                    <span>Herramientas y Ajustes</span>
+                <div id="mobile-settings-header" style="display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7;">settings</span>
+                        <span>Herramientas y Ajustes</span>
+                    </div>
+                    <span class="material-symbols-outlined" id="mobile-settings-chevron" style="font-size: 16px;">expand_more</span>
                 </div>
                 
                 <!-- Unified Settings Card -->
-                <div style="background: rgba(27, 73, 101, 0.03); border: 1px solid rgba(27, 73, 101, 0.06); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                <div id="mobile-settings-card" style="background: rgba(27, 73, 101, 0.03); border: 1px solid rgba(27, 73, 101, 0.06); border-radius: 12px; padding: 12px; display: none; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
                     
                     <!-- Translation Selection -->
                     <div class="select-wrapper" style="width: 100%; position: relative; display: flex; align-items: center;">

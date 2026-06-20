@@ -299,6 +299,23 @@ class BibleReader {
             });
         }
 
+        // Mobile settings collapsible toggle
+        const settingsHeader = document.getElementById('mobile-settings-header');
+        const settingsCard = document.getElementById('mobile-settings-card');
+        const settingsChevron = document.getElementById('mobile-settings-chevron');
+        if (settingsHeader && settingsCard) {
+            settingsHeader.addEventListener('click', () => {
+                const isCollapsed = settingsCard.style.display === 'none';
+                if (isCollapsed) {
+                    settingsCard.style.display = 'flex';
+                    if (settingsChevron) settingsChevron.innerText = 'expand_less';
+                } else {
+                    settingsCard.style.display = 'none';
+                    if (settingsChevron) settingsChevron.innerText = 'expand_more';
+                }
+            });
+        }
+
         // Font settings
         if (this.dom.decreaseFontBtn) {
             this.dom.decreaseFontBtn.addEventListener('click', () => {
@@ -1272,63 +1289,151 @@ class BibleReader {
     async parseAndNavigateToReference(query) {
         if (!query) return;
 
-        // Split by conjunctions to get the first reference (e.g. "Salomos ordspråk 5-8 & Filipperne 4" -> "Salomos ordspråk 5-8")
-        const parts = query.split(/\s+&\s+|\s+og\s+|\s+and\s+|\s+y\s+|,/i);
-        let firstRef = parts[0].trim();
+        try {
+            // Split by conjunctions to get the first reference (e.g. "Salomos ordspråk 5-8 & Filipperne 4" -> "Salomos ordspråk 5-8")
+            const parts = query.split(/\s+&\s+|\s+og\s+|\s+and\s+|\s+y\s+|,/i);
+            let firstRef = parts[0].trim();
 
-        // Strip ranges (e.g. "1. Mosebok 1-2" -> "1. Mosebok 1", "Johannes 3:16-18" -> "Johannes 3:16")
-        if (firstRef.match(/-|–/)) {
-            firstRef = firstRef.split(/-|–/)[0].trim();
-        }
+            // Strip ranges (e.g. "1. Mosebok 1-2" -> "1. Mosebok 1", "Johannes 3:16-18" -> "Johannes 3:16")
+            if (firstRef.match(/-|–/)) {
+                firstRef = firstRef.split(/-|–/)[0].trim();
+            }
 
-        const input = firstRef.toLowerCase();
-        
-        // Regex match, e.g. "1. Johannes 3:16", "Johannes 3:16", "Salmene 23"
-        const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+))?$/i;
-        const match = input.match(regex);
+            const input = firstRef.toLowerCase().trim();
+            
+            // Regex match, e.g. "1. Johannes 3:16", "Johannes 3:16", "Salmene 23", "Génesis 1:1"
+            // Extended regex to allow Spanish accents and common character set, and optional comma separator
+            const regex = /^(\d+)?\s*\.?\s*([a-zæøåáéíóúüñ\s]+)\s*(\d+)(?:\s*[\:\.\s,]\s*(\d+))?$/i;
+            const match = input.match(regex);
 
-        if (!match) {
-            alert("Ugyldig bibelreferanse. Prøv f.eks. 'Johannes 3:16', '1 Mos 1:1' eller 'Salmene 23'.");
-            return;
-        }
+            if (!match) {
+                console.warn("[BibleReader] Invalid reference format:", query);
+                alert("Ugyldig bibelreferanse. Prøv f.eks. 'Johannes 3:16', '1 Mos 1:1' eller 'Salmene 23'.");
+                return;
+            }
 
-        const prefixNum = match[1] || '';
-        const bookNameQuery = match[2].trim();
-        const chapterNum = match[3];
-        const verseNum = match[4];
+            const prefixNum = match[1] || '';
+            const bookNameQuery = match[2].trim();
+            const chapterNum = match[3];
+            const verseNum = match[4];
 
-        // Format search query to match book name, e.g., "1 mosebok", "johannes"
-        let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+            // Format search query to match book name, e.g., "1 mosebok", "johannes"
+            let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+            const lookupName = fullBookSearchName.toLowerCase().trim();
 
-        // Translate Norwegian abbreviations
-        if (fullBookSearchName === 'apg') {
-            fullBookSearchName = 'apostlenes';
-        }
+            // Norwegian book name/abbreviation translation table to numeric book IDs (1-66)
+            const norwegianBookToId = {
+                // Gamle testamentet
+                "1 mosebok": 1, "1. mosebok": 1, "1mos": 1, "1. mos": 1, "1 mose": 1, "1. mose": 1,
+                "2 mosebok": 2, "2. mosebok": 2, "2mos": 2, "2. mos": 2, "2 mose": 2, "2. mose": 2,
+                "3 mosebok": 3, "3. mosebok": 3, "3mos": 3, "3. mos": 3, "3 mose": 3, "3. mose": 3,
+                "4 mosebok": 4, "4. mosebok": 4, "4mos": 4, "4. mos": 4, "4 mose": 4, "4. mose": 4,
+                "5 mosebok": 5, "5. mosebok": 5, "5mos": 5, "5. mos": 5, "5 mose": 5, "5. mose": 5,
+                "josva": 6, "jos": 6,
+                "dommerne": 7, "dom": 7,
+                "rut": 8, "ru": 8, "ruth": 8,
+                "1 samuelsbok": 9, "1. samuelsbok": 9, "1sam": 9, "1. sam": 9, "1 samuel": 9, "1. samuel": 9,
+                "2 samuelsbok": 10, "2. samuelsbok": 10, "2sam": 10, "2. sam": 10, "2 samuel": 10, "2. samuel": 10,
+                "1 kongebok": 11, "1. kongebok": 11, "1kong": 11, "1. kong": 11, "1 konge": 11, "1. konge": 11,
+                "2 kongebok": 12, "2. kongebok": 12, "2kong": 12, "2. kong": 12, "2 konge": 12, "2. konge": 12,
+                "1 krønikebok": 13, "1. krønikebok": 13, "1krøn": 13, "1. krøn": 13,
+                "2 krønikebok": 14, "2. krønikebok": 14, "2krøn": 14, "2. krøn": 14,
+                "esra": 15, "esr": 15,
+                "nehemja": 16, "neh": 16, "nehe": 16,
+                "ester": 17, "est": 17,
+                "job": 18,
+                "salmene": 19, "sal": 19, "salme": 19,
+                "salomos ordspråk": 20, "ordspråkene": 20, "ordspr": 20, "ords": 20, "ordspråk": 20,
+                "forkynneren": 21, "fork": 21,
+                "høysangen": 22, "høys": 22,
+                "jesaja": 23, "jes": 23,
+                "jeremia": 24, "jer": 24,
+                "klagesangene": 25, "klag": 25,
+                "esekiel": 26, "ese": 26, "esek": 26,
+                "daniel": 27, "dan": 27,
+                "hosea": 28, "hos": 28,
+                "joel": 29, "joe": 29,
+                "amos": 30, "am": 30,
+                "obadja": 31, "oba": 31,
+                "jona": 32, "jon": 32,
+                "mika": 33, "mik": 33,
+                "nahum": 34, "nah": 34,
+                "habakkuk": 35, "hab": 35,
+                "sefanja": 36, "sef": 36,
+                "haggai": 37, "hag": 37,
+                "sakarja": 38, "sak": 38,
+                "malaki": 39, "mal": 39,
+                // Nye testamentet
+                "matteus": 40, "matt": 40, "mat": 40,
+                "markus": 41, "mark": 41, "mar": 41,
+                "lukas": 42, "luk": 42,
+                "johannes": 43, "joh": 43,
+                "apostlenes gjerninger": 44, "apg": 44, "apostlenes": 44,
+                "romerne": 45, "rom": 45,
+                "1 korinter": 46, "1. korinter": 46, "1kor": 46, "1. kor": 46, "1 kor": 46,
+                "2 korinter": 47, "2. korinter": 47, "2kor": 47, "2. kor": 47, "2 kor": 47,
+                "galaterne": 48, "gal": 48,
+                "efeserne": 49, "ef": 49,
+                "filipperne": 50, "fil": 50,
+                "kolosserne": 51, "kol": 51,
+                "1 tessaloniker": 52, "1. tessaloniker": 52, "1tess": 52, "1. tess": 52, "1 tess": 52,
+                "2 tessaloniker": 53, "2. tessaloniker": 53, "2tess": 53, "2. tess": 53, "2 tess": 53,
+                "1 timoteus": 54, "1. timoteus": 54, "1tim": 54, "1. tim": 54, "1 tim": 54,
+                "2 timoteus": 55, "2. timoteus": 55, "2tim": 55, "2. tim": 55, "2 tim": 55,
+                "titus": 56, "tit": 56,
+                "filemon": 57, "filem": 57, "phm": 57,
+                "hebreerne": 58, "heb": 58,
+                "jakob": 59, "jak": 59,
+                "1 peter": 60, "1. peter": 60, "1pet": 60, "1. pet": 60, "1 pet": 60,
+                "2 peter": 61, "2. peter": 61, "2pet": 61, "2. pet": 61, "2 pet": 61,
+                "1 johannes": 62, "1. johannes": 62, "1joh": 62, "1. joh": 62, "1 joh": 62,
+                "2 johannes": 63, "2. johannes": 63, "2joh": 63, "2. joh": 63, "2 joh": 63,
+                "3 johannes": 64, "3. johannes": 64, "3joh": 64, "3. joh": 64, "3 joh": 64,
+                "judas": 65, "jud": 65,
+                "åpenbaringen": 66, "åp": 66
+            };
 
-        const matchedBook = this.books.find(b => {
-            const bName = b.name.toLowerCase();
-            return bName === fullBookSearchName || bName.startsWith(fullBookSearchName) || bName.includes(fullBookSearchName);
-        });
+            const bookIdFromLookup = norwegianBookToId[lookupName];
+            let matchedBook = null;
 
-        if (!matchedBook) {
-            alert(`Kunne ikke finne boken "${fullBookSearchName}". Sjekk stavemåte.`);
-            return;
-        }
+            if (bookIdFromLookup) {
+                matchedBook = this.books.find(b => String(b.id) === String(bookIdFromLookup));
+            }
 
-        await this.selectBook(matchedBook.id);
-        
-        const targetChapterId = `${matchedBook.id}_${chapterNum}`;
-        const chapExists = this.chapters.some(c => c.id === targetChapterId);
+            // Fallback: search by name in this.books
+            if (!matchedBook) {
+                matchedBook = this.books.find(b => {
+                    const bName = b.name.toLowerCase();
+                    const normalizedBName = bName.replace(/[\.\s]/g, '');
+                    const normalizedSearch = lookupName.replace(/[\.\s]/g, '');
+                    return normalizedBName === normalizedSearch || normalizedBName.startsWith(normalizedSearch) || normalizedBName.includes(normalizedSearch);
+                });
+            }
 
-        if (!chapExists) {
-            alert(`Fant boken ${matchedBook.name}, men kapittel ${chapterNum} finnes ikke.`);
-            return;
-        }
+            if (!matchedBook) {
+                console.warn("[BibleReader] Book not found:", lookupName);
+                alert(`Kunne ikke finne boken "${fullBookSearchName}". Sjekk stavemåte.`);
+                return;
+            }
 
-        await this.selectChapter(targetChapterId);
+            await this.selectBook(matchedBook.id);
+            
+            const targetChapterId = `${matchedBook.id}_${chapterNum}`;
+            const chapExists = this.chapters.some(c => c.id === targetChapterId);
 
-        if (verseNum) {
-            this.scrollToVerse(verseNum);
+            if (!chapExists) {
+                alert(`Fant boken ${matchedBook.name}, men kapittel ${chapterNum} finnes ikke.`);
+                return;
+            }
+
+            await this.selectChapter(targetChapterId);
+
+            if (verseNum) {
+                this.scrollToVerse(verseNum);
+            }
+        } catch (error) {
+            console.error("[BibleReader] Error in parseAndNavigateToReference:", error);
+            alert("Det oppstod en feil under navigering til referansen.");
         }
     }
 
