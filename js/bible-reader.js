@@ -2085,17 +2085,17 @@ class BibleReader {
                 .hkm-rp-subtitle { font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
                 .hkm-rp-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; transition: all 0.2s ease; }
                 .hkm-rp-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05); }
-                .hkm-btn-primary { background: #1B4965 !important; color: #ffffff !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
-                .hkm-btn-primary:hover { background: #225c80 !important; }
+                .hkm-btn-primary { background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: #ffffff !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
+                .hkm-btn-primary:hover { background: #bd4f2a !important; filter: brightness(1.05) !important; }
                 .hkm-btn-primary:active { transform: scale(0.98) !important; }
-                .hkm-btn-secondary { background: transparent !important; border: 1px solid #1B4965 !important; color: #1B4965 !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
-                .hkm-btn-secondary:hover { background: rgba(27, 73, 101, 0.05) !important; }
+                .hkm-btn-secondary { background: transparent !important; border: 1px solid #d17d39 !important; color: #d17d39 !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
+                .hkm-btn-secondary:hover { background: rgba(209, 125, 57, 0.05) !important; border-color: #bd4f2a !important; color: #bd4f2a !important; }
                 .hkm-btn-secondary:active { transform: scale(0.98) !important; }
                 .hkm-rp-progress-bar { height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin: 12px 0 16px 0; }
                 .hkm-rp-progress-fill { height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; transition: width 0.4s ease; }
                 .hkm-rp-day-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; margin-bottom: 8px; }
                 .hkm-rp-day-item:hover { background: #f8fafc; border-color: #e2e8f0; }
-                .hkm-rp-day-item.active { background: rgba(27, 73, 101, 0.05); border-color: rgba(27, 73, 101, 0.1); }
+                .hkm-rp-day-item.active { background: rgba(209, 125, 57, 0.08); border-color: rgba(209, 125, 57, 0.2); }
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
@@ -2213,7 +2213,7 @@ class BibleReader {
                             <div class="hkm-rp-day-item ${isActive ? 'active' : ''}" onclick="window.bibleReader.selectReadingPlanDay(${d.dayNumber})">
                                 <div style="flex: 1; min-width: 0; padding-right: 8px;">
                                     <div style="font-size: 12px; font-weight: 700; color: ${isActive ? '#bd4f2a' : '#475569'};">Dag ${d.dayNumber}</div>
-                                    <div style="font-size: 13px; color: ${isActive ? '#1B4965' : '#0f172a'}; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.verses}</div>
+                                    <div style="font-size: 13px; color: ${isActive ? '#d17d39' : '#0f172a'}; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.verses}</div>
                                 </div>
                                 <div class="hkm-rp-day-checkbox ${isCompleted ? 'completed' : ''}">
                                     ${isCompleted ? '<span class="material-symbols-outlined">check</span>' : ''}
@@ -2250,8 +2250,8 @@ class BibleReader {
 
                 <!-- Current Day Panel -->
                 ${currentDayConfig ? `
-                <div class="hkm-rp-card" style="border-left: 4px solid #1B4965;">
-                    <div style="font-size: 12px; font-weight: 700; color: #1B4965; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="hkm-rp-card" style="border-left: 4px solid #d17d39;">
+                    <div style="font-size: 12px; font-weight: 700; color: #d17d39; text-transform: uppercase; margin-bottom: 4px;">
                         ${t_day} ${currentDayNum}
                     </div>
                     <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 12px;">
@@ -2344,7 +2344,7 @@ class BibleReader {
                         <div class="hkm-rp-card" id="plan-card-${p.id}">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                                 <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; flex-grow: 1;">${p.title}</h4>
-                                <span style="font-size: 11px; font-weight: 700; background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
+                                <span style="font-size: 11px; font-weight: 700; background: rgba(209, 125, 57, 0.1); color: #d17d39; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
                             </div>
                             <p style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
                             
@@ -2364,7 +2364,7 @@ class BibleReader {
                                 ${p.days.map(d => `
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; cursor: pointer;" onclick="window.bibleReader.showDayVerses('${d.verses.replace(/'/g, "\\'")}')">
                                     <span style="font-weight: 600; color: #475569;">Dag ${d.dayNumber}:</span>
-                                    <span style="color: #1B4965; text-decoration: underline;">${d.verses}</span>
+                                    <span style="color: #d17d39; text-decoration: underline;">${d.verses}</span>
                                 </div>
                                 `).join('')}
                             </div>
