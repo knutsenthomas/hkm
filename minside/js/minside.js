@@ -25,6 +25,7 @@ const minsideTranslations = {
         'sidebar.mittMedlemskap': 'MITT MEDLEMSKAP',
         'sidebar.profil': 'Profil',
         'sidebar.kurs': 'Kurs & Undervisning',
+        'sidebar.readingPlans': 'Leseplaner & Andakt',
         'sidebar.gaver': 'Gaver & Betalinger',
         'sidebar.aktivitet': 'AKTIVITET',
         'sidebar.varslinger': 'Varslinger',
@@ -62,6 +63,8 @@ const minsideTranslations = {
         'view.notifications': 'Varslinger',
         'view.giving': 'Gaver & Betalinger',
         'view.courses': 'Kurs & Undervisning',
+        'view.readingPlans': 'Leseplaner & Andakt',
+        'overview.btnReadingPlansLabel': 'Leseplaner',
         'view.notes': 'Notater',
 
         // Overview
@@ -271,6 +274,7 @@ const minsideTranslations = {
         'sidebar.mittMedlemskap': 'MY MEMBERSHIP',
         'sidebar.profil': 'Profile',
         'sidebar.kurs': 'Courses & Teaching',
+        'sidebar.readingPlans': 'Reading Plans',
         'sidebar.gaver': 'Giving & Payments',
         'sidebar.aktivitet': 'ACTIVITY',
         'sidebar.varslinger': 'Notifications',
@@ -308,6 +312,8 @@ const minsideTranslations = {
         'view.notifications': 'Notifications',
         'view.giving': 'Giving & Payments',
         'view.courses': 'Courses & Teaching',
+        'view.readingPlans': 'Reading Plans',
+        'overview.btnReadingPlansLabel': 'Reading Plans',
         'view.notes': 'Notes',
 
         // Overview
@@ -517,6 +523,7 @@ const minsideTranslations = {
         'sidebar.mittMedlemskap': 'MI MEMBRESÍA',
         'sidebar.profil': 'Perfil',
         'sidebar.kurs': 'Cursos y Enseñanza',
+        'sidebar.readingPlans': 'Planes de Lectura',
         'sidebar.gaver': 'Ofrendas y Pagos',
         'sidebar.aktivitet': 'ACTIVIDAD',
         'sidebar.varslinger': 'Notificaciones',
@@ -554,6 +561,8 @@ const minsideTranslations = {
         'view.notifications': 'Notificaciones',
         'view.giving': 'Ofrendas y Pagos',
         'view.courses': 'Cursos y Enseñanza',
+        'view.readingPlans': 'Planes de Lectura',
+        'overview.btnReadingPlansLabel': 'Planes de Lectura',
         'view.notes': 'Notas',
 
         // Overview
@@ -790,6 +799,7 @@ class MinSideManager {
             giving: this.renderGiving,
             courses: this.renderCourses,
             notes: this.renderNotes,
+            'reading-plans': this.renderReadingPlans,
         };
 
 
@@ -912,6 +922,7 @@ class MinSideManager {
             giving: { title: t('view.giving'), icon: 'volunteer_activism' },
             courses: { title: t('view.courses'), icon: 'school' },
             notes: { title: t('view.notes'), icon: 'notes' },
+            'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
         };
 
         // Update Header Title and Icon (Admin Style)
@@ -3203,6 +3214,778 @@ class MinSideManager {
                 </div>
             </div>`).join('')}
         </div>`;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // READING PLANS & DAILY DEVOTIONAL
+    // ──────────────────────────────────────────────────────────
+
+    async renderReadingPlans(container) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Logg inn</h3>
+                    <p>Du må være logget inn for å se dine leseplaner.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="ms-full-width">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        `;
+
+        // Check if there is a start parameter in hash
+        const hash = window.location.hash;
+        let startPlanId = null;
+        if (hash.includes('?')) {
+            const queryPart = hash.split('?')[1];
+            const params = new URLSearchParams(queryPart);
+            startPlanId = params.get('start');
+        }
+
+        if (startPlanId) {
+            try {
+                // Auto enroll user
+                const ref = firebase.firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .collection('reading_plans')
+                    .doc(startPlanId);
+                
+                await ref.set({
+                    planId: startPlanId,
+                    currentDay: 1,
+                    completedDays: [],
+                    startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    completed: false,
+                    reflections: {}
+                }, { merge: true });
+                
+                // Clear query params from hash
+                window.location.hash = 'reading-plans';
+            } catch (err) {
+                console.error("Auto enrollment failed:", err);
+            }
+        }
+
+        // Fetch user active reading plan
+        let activeUserPlan = null;
+        let activeGlobalPlan = null;
+        
+        try {
+            const snap = await firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .where('completed', '==', false)
+                .orderBy('lastActiveAt', 'desc')
+                .limit(1)
+                .get();
+
+            if (!snap.empty) {
+                activeUserPlan = snap.docs[0].data();
+                
+                const globalSnap = await firebase.firestore()
+                    .collection('reading_plans')
+                    .doc(activeUserPlan.planId)
+                    .get();
+                
+                if (globalSnap.exists) {
+                    activeGlobalPlan = globalSnap.data();
+                }
+            }
+        } catch (e) {
+            console.error("Error fetching user active plan:", e);
+        }
+
+        // If user has an active plan, render progress view
+        if (activeUserPlan && activeGlobalPlan) {
+            this.renderActivePlanProgress(container, activeUserPlan, activeGlobalPlan);
+            return;
+        }
+
+        // Otherwise render list of available plans
+        this.renderAllAvailablePlans(container);
+    }
+
+    renderActivePlanProgress(container, userPlan, globalPlan) {
+        const currentDayNum = userPlan.currentDay || 1;
+        const totalDays = globalPlan.durationDays || globalPlan.days.length;
+        const completedDays = userPlan.completedDays || [];
+        const progressPct = Math.round((completedDays.length / totalDays) * 100);
+
+        const currentDayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
+
+        container.innerHTML = `
+            <div class="ms-reading-plan-dashboard">
+                <!-- Plan Header & Progress Card -->
+                <div class="ms-rp-card-header" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <h2 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 8px 0;">${globalPlan.title}</h2>
+                            <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; max-width: 600px;">${globalPlan.description || ''}</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="btn-change-plan">Bytt leseplan</button>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div style="margin-top: 24px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">
+                            <span>Din Fremdrift</span>
+                            <span>${progressPct}% fullført (${completedDays.length}/${totalDays} dager)</span>
+                        </div>
+                        <div style="height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                            <div style="height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; width: ${progressPct}%; transition: width 0.4s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Layout Grid: Left Panel (Active Day), Right Panel (Days Checklist) -->
+                <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start;" class="ms-rp-grid">
+                    <!-- Left Column: Dagens Andakt / Active Day details -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                                <span class="material-symbols-outlined" style="color: #bd4f2a; font-size: 20px;">event</span>
+                                <span style="font-size: 12px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">Dagens Andakt</span>
+                            </div>
+                            
+                            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0;">Dag ${currentDayNum}: ${currentDayConfig?.verses}</h3>
+                            
+                            <!-- Action Row -->
+                            <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+                                <a href="/bibel?ref=${encodeURIComponent(currentDayConfig?.verses)}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+                                    <span class="material-symbols-outlined">menu_book</span>
+                                    Les i Bibelen
+                                </a>
+                                <button class="btn btn-primary" id="btn-start-devotional" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; background: #1B4965; border-color: #1B4965; color: #ffffff;">
+                                    <span class="material-symbols-outlined">auto_stories</span>
+                                    Start Dagens Andakt
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Prayer & Resources Preview -->
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
+                            <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Bønnefokus & Fordypning</h3>
+                            
+                            <div style="background: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: #475569;">
+                                "${currentDayConfig?.prayerFocus || 'Be over ordene du har lest i dag.'}"
+                            </div>
+                            
+                            <h4 style="font-size: 13px; font-weight: 700; color: #475569; margin: 0 0 12px 0;">Ressurser for dagen:</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                ${currentDayConfig?.resources && currentDayConfig.resources.length > 0 ? 
+                                    currentDayConfig.resources.map(res => `
+                                    <a href="${res.url || '#'}" target="_blank" style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #f1f5f9; border-radius: 10px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'" onmouseout="this.style.borderColor='#f1f5f9'">
+                                        <span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 20px;">
+                                            ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
+                                        </span>
+                                        <div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${res.title}</div>
+                                            <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-top: 1px;">${res.type}</div>
+                                        </div>
+                                    </a>
+                                    `).join('') : `
+                                    <p style="font-size: 13px; color: #94a3b8; font-style: italic; margin: 0;">Ingen tilknyttede ressurser.</p>
+                                    `
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Checklist of days -->
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02); max-height: 80vh; overflow-y: auto;">
+                        <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Alle dager</h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${globalPlan.days.map(d => {
+                                const isCompleted = completedDays.includes(d.dayNumber);
+                                const isActive = d.dayNumber === currentDayNum;
+                                return `
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#1B4965' : '#f1f5f9'}; background: ${isActive ? 'rgba(27, 73, 101, 0.02)' : '#ffffff'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#1B4965' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex; align-items: center; justify-content: center; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0;">
+                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight:bold;">check</span>' : `<span style="font-size: 11px; font-weight:700; color: ${isActive ? '#1B4965' : '#475569'}">${d.dayNumber}</span>`}
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${d.verses}</div>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined" style="color: #94a3b8; font-size: 18px;">chevron_right</span>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Bind events
+        container.querySelector('#btn-change-plan').onclick = () => {
+            this.renderAllAvailablePlans(container);
+        };
+
+        container.querySelector('#btn-start-devotional').onclick = () => {
+            this.openDevotionalWizard(globalPlan, currentDayNum);
+        };
+    }
+
+    async renderAllAvailablePlans(container) {
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+        
+        let plans = [];
+        try {
+            const snap = await firebase.firestore()
+                .collection('reading_plans')
+                .orderBy('createdAt', 'desc')
+                .get();
+            snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
+        } catch (e) {
+            console.error("Error loading plans:", e);
+        }
+
+        if (plans.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                    <h3>Ingen leseplaner</h3>
+                    <p>Det er ingen tilgjengelige leseplaner for øyeblikket.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="padding: 8px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin-bottom: 20px;">Velg en leseplan</h3>
+                <div class="courses-grid">
+                    ${plans.map(p => {
+                        const totalDays = p.durationDays || p.days.length;
+                        return `
+                        <div class="course-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                            <div class="course-body">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <span class="course-badge" style="background: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700;">${totalDays} dager</span>
+                                </div>
+                                <div class="course-title" style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${p.title}</div>
+                                <div class="course-desc" style="font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
+                            </div>
+                            <div style="display: flex; gap: 8px; padding: 0 16px 16px 16px;">
+                                <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
+                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.enrollInPlan('${p.id}')" style="flex: 1; background: #1B4965; border-color: #1B4965;">Start plan</button>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    async previewPlanDetails(planId) {
+        const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
+        if (!snap.exists) return;
+        const plan = snap.data();
+        
+        let modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
+                <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${plan.title}</h3>
+                    <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
+                </div>
+                <div style="max-height: 350px; overflow-y: auto; padding-right: 6px;">
+                    ${plan.days.map(d => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
+                        <span style="font-weight: 600; color: #475569;">Dag ${d.dayNumber}</span>
+                        <a href="/bibel?ref=${encodeURIComponent(d.verses)}" target="_blank" style="color: #1B4965; text-decoration: underline; font-weight: 500;">${d.verses}</a>
+                    </div>
+                    `).join('')}
+                </div>
+                <div style="display:flex; gap:12px; margin-top:20px; justify-content:flex-end;">
+                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Lukk</button>
+                    <button class="btn btn-primary" onclick="window.minSideManager.enrollInPlan('${planId}'); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Start plan</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async selectDayPreview(planId, dayNumber) {
+        const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
+        if (!snap.exists) return;
+        const plan = snap.data();
+        const dayConfig = plan.days.find(d => d.dayNumber === dayNumber);
+        if (!dayConfig) return;
+
+        let modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
+                <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <h3 style="font-size: 16px; font-weight: 700; color: #1B4965; margin:0;">Dag ${dayNumber}: Detaljer</h3>
+                    <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 4px;">Skriftsted</div>
+                    <div style="font-size: 14px; font-weight: 600; color: #0f172a;">${dayConfig.verses}</div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 4px;">Bønnefokus</div>
+                    <div style="font-size: 13px; font-style: italic; color: #475569; background:#f8fafc; padding: 12px; border-radius: 8px; line-height: 1.5;">
+                        "${dayConfig.prayerFocus || 'Ingen spesifikt bønnefokus konfigurert.'}"
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 6px;">Ressurser</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${dayConfig.resources && dayConfig.resources.length > 0 ? 
+                            dayConfig.resources.map(res => `
+                            <a href="${res.url || '#'}" target="_blank" style="display:flex; align-items:center; gap:8px; font-size: 12px; color: #1B4965; text-decoration: underline;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">launch</span>
+                                ${res.title} (${res.type})
+                            </a>
+                            `).join('') : '<span style="font-size:12px; color:#cbd5e1; font-style:italic;">Ingen ressurser</span>'
+                        }
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px; justify-content:flex-end;">
+                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Lukk</button>
+                    <button class="btn btn-primary" onclick="window.minSideManager.openDevotionalWizardDirect('${planId}', ${dayNumber}); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Åpne andakt</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async openDevotionalWizardDirect(planId, dayNumber) {
+        const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
+        if (!snap.exists) return;
+        const plan = snap.data();
+        this.openDevotionalWizard(plan, dayNumber);
+    }
+
+    async openDevotionalWizard(plan, dayNumber) {
+        const dayConfig = plan.days.find(d => d.dayNumber === dayNumber);
+        if (!dayConfig) return;
+
+        let modal = document.getElementById('hkm-devotional-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-devotional-modal';
+        modal.className = 'hkm-devotional-overlay';
+
+        document.body.appendChild(modal);
+
+        let scriptureHtml = '<p style="text-align: center; color: #64748b;">Henter bibeltekst...</p>';
+        try {
+            scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
+        } catch (e) {
+            console.error("Failed to fetch scripture text for devotional:", e);
+            scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
+        }
+
+        this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
+    }
+
+    async fetchAndFilterVersesText(versesText) {
+        const input = versesText.trim().toLowerCase();
+        const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+)(?:\-(\d+))?)?$/i;
+        const match = input.match(regex);
+
+        if (!match) {
+            throw new Error("Invalid reference format");
+        }
+
+        const prefixNum = match[1] || '';
+        const bookNameQuery = match[2].trim();
+        const chapterNum = match[3];
+        const startVerse = match[4] ? parseInt(match[4], 10) : null;
+        const endVerse = match[5] ? parseInt(match[5], 10) : (startVerse || null);
+
+        let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+        if (fullBookSearchName === 'apg') {
+            fullBookSearchName = 'apostlenes';
+        }
+
+        // Available Bibles based on language
+        const activeLang = document.documentElement.lang || 'no';
+        let selectedBibleId = 'OPENBIBLE_NB';
+        if (activeLang === 'en') selectedBibleId = 'WEB';
+        else if (activeLang === 'es') selectedBibleId = 'RVR1960';
+
+        // Load books to match local name
+        const resBooks = await fetch(`/api/bible/bibles/${selectedBibleId}/books`);
+        const payloadBooks = await resBooks.json();
+        const books = payloadBooks.data || [];
+
+        const matchedBook = books.find(b => {
+            const bName = b.name.toLowerCase();
+            return bName === fullBookSearchName || bName.startsWith(fullBookSearchName) || bName.includes(fullBookSearchName);
+        });
+
+        if (!matchedBook) {
+            throw new Error(`Book not found: ${fullBookSearchName}`);
+        }
+
+        const chapterId = `${matchedBook.id}_${chapterNum}`;
+        const res = await fetch(`/api/bible/bibles/${selectedBibleId}/chapters/${chapterId}`);
+        const payload = await res.json();
+        
+        if (!payload.data || !payload.data.content) {
+            throw new Error("Failed to load chapter content");
+        }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(payload.data.content, 'text/html');
+        const paragraphs = doc.querySelectorAll('p');
+
+        let filteredHtml = '';
+        let foundAny = false;
+
+        for (const p of paragraphs) {
+            const sups = p.querySelectorAll('sup.v');
+            if (sups.length > 0) {
+                let keepParagraph = false;
+                for (const sup of sups) {
+                    const vNum = parseInt(sup.innerText.trim(), 10);
+                    if (!startVerse || (vNum >= startVerse && vNum <= endVerse)) {
+                        keepParagraph = true;
+                        foundAny = true;
+                    }
+                }
+                if (keepParagraph) {
+                    filteredHtml += p.outerHTML;
+                }
+            } else if (!startVerse) {
+                filteredHtml += p.outerHTML;
+            }
+        }
+
+        if (!foundAny && startVerse) {
+            return payload.data.content;
+        }
+
+        return filteredHtml;
+    }
+
+    renderDevotionalStep(modal, plan, dayNumber, dayConfig, step, scriptureHtml) {
+        modal.innerHTML = '';
+        
+        const stepContainer = document.createElement('div');
+        stepContainer.className = 'hkm-devotional-content';
+        modal.appendChild(stepContainer);
+
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justify = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '20px';
+        header.innerHTML = `
+            <div style="font-size: 11px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">
+                ${plan.title} &bull; Steg ${step} av 5
+            </div>
+            <button style="background: none; border: none; cursor: pointer; color: #64748b; display: flex; align-items: center;" onclick="document.getElementById('hkm-devotional-modal').remove()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        `;
+        stepContainer.appendChild(header);
+
+        if (step === 1) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = `1. Les skriftstedet (${dayConfig.verses})`;
+            stepContainer.appendChild(title);
+
+            const scriptureBox = document.createElement('div');
+            scriptureBox.className = 'hkm-devotional-text-serif';
+            scriptureBox.innerHTML = scriptureHtml;
+            stepContainer.appendChild(scriptureBox);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'flex-end';
+            actions.innerHTML = `
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Bønn
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
+            };
+
+        } else if (step === 2) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '2. Dagens Bønnefokus';
+            stepContainer.appendChild(title);
+
+            const prayerBox = document.createElement('div');
+            prayerBox.className = 'hkm-devotional-prayer-box';
+            prayerBox.innerText = dayConfig.prayerFocus || 'Be i dag over ordene du har lest, og be om visdom og veiledning for dagen.';
+            stepContainer.appendChild(prayerBox);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Ressurser
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
+            };
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+            };
+
+        } else if (step === 3) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '3. Dypere Dykk & Ressurser';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.style.fontSize = '14px';
+            desc.style.color = '#64748b';
+            desc.style.marginBottom = '20px';
+            desc.style.lineHeight = '1.5';
+            desc.innerText = 'Bruk disse ressursene til å gå dypere i dagens tema:';
+            stepContainer.appendChild(desc);
+
+            const resourcesList = document.createElement('div');
+            resourcesList.style.display = 'flex';
+            resourcesList.style.flexDirection = 'column';
+            resourcesList.style.gap = '12px';
+            resourcesList.style.marginBottom = '24px';
+            
+            if (dayConfig.resources && dayConfig.resources.length > 0) {
+                dayConfig.resources.forEach(res => {
+                    const card = document.createElement('a');
+                    card.href = res.url || '#';
+                    card.target = '_blank';
+                    card.className = 'hkm-rp-card';
+                    card.style.textDecoration = 'none';
+                    card.style.display = 'block';
+                    card.style.margin = '0';
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="material-symbols-outlined" style="color: #d17d39; font-size: 24px;">
+                                ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
+                            </span>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">${res.title}</div>
+                                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94a3b8;">${res.type}</div>
+                            </div>
+                        </div>
+                    `;
+                    resourcesList.appendChild(card);
+                });
+            } else {
+                resourcesList.innerHTML = `
+                    <p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px 0;">
+                        Ingen ekstra ressurser tilknyttet denne dagen.
+                    </p>
+                `;
+            }
+            stepContainer.appendChild(resourcesList);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Refleksjon
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
+            };
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 4, scriptureHtml);
+            };
+
+        } else if (step === 4) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '4. Skriv dine refleksjoner';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.style.fontSize = '14px';
+            desc.style.color = '#64748b';
+            desc.style.marginBottom = '16px';
+            desc.style.lineHeight = '1.5';
+            desc.innerText = 'Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.';
+            stepContainer.appendChild(desc);
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'hkm-devotional-reflection-textarea';
+            textarea.placeholder = 'Skriv dine tanker her... (Dette lagres også i dine notater på Min Side)';
+            stepContainer.appendChild(textarea);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-save">
+                    Fullfør og Lagre
+                    <span class="material-symbols-outlined">check</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+            };
+            
+            actions.querySelector('#btn-devotional-save').onclick = async () => {
+                const text = textarea.value.trim();
+                const saveBtn = actions.querySelector('#btn-devotional-save');
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'Lagrer...';
+
+                try {
+                    await this.completeDevotionalDay(plan, dayNumber, text);
+                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 5, scriptureHtml);
+                } catch (e) {
+                    console.error("Failed to complete devotional day:", e);
+                    alert("Kunne ikke lagre andakt: " + e.message);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = `Fullfør og Lagre <span class="material-symbols-outlined">check</span>`;
+                }
+            };
+
+        } else if (step === 5) {
+            const confetti = document.createElement('div');
+            confetti.style.fontSize = '64px';
+            confetti.style.textAlign = 'center';
+            confetti.style.marginBottom = '16px';
+            confetti.innerHTML = '🎉';
+            stepContainer.appendChild(confetti);
+
+            const title = document.createElement('h3');
+            title.className = 'hkm-celebration-title';
+            title.innerText = 'Andakt fullført!';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.className = 'hkm-celebration-desc';
+            desc.innerText = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".`;
+            stepContainer.appendChild(desc);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'center';
+            actions.innerHTML = `
+                <button class="hkm-btn-primary" id="btn-devotional-close" style="min-width: 150px;">
+                    Lukk
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-close').onclick = () => {
+                modal.remove();
+                this.loadView('reading-plans');
+            };
+        }
+    }
+
+    async completeDevotionalDay(plan, dayNumber, reflectionText) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        
+        const planId = plan.id;
+        const ref = firebase.firestore()
+            .collection('users')
+            .doc(uid)
+            .collection('reading_plans')
+            .doc(planId);
+            
+        const snap = await ref.get();
+        let userPlan = snap.exists ? snap.data() : {
+            planId: planId,
+            currentDay: 1,
+            completedDays: [],
+            reflections: {}
+        };
+        
+        userPlan.reflections = userPlan.reflections || {};
+        if (reflectionText) {
+            userPlan.reflections[dayNumber] = reflectionText;
+        }
+        
+        userPlan.completedDays = userPlan.completedDays || [];
+        if (!userPlan.completedDays.includes(dayNumber)) {
+            userPlan.completedDays.push(dayNumber);
+        }
+        
+        const totalDays = plan.durationDays || plan.days.length;
+        if (userPlan.completedDays.length >= totalDays) {
+            userPlan.completed = true;
+        } else {
+            let nextDay = dayNumber + 1;
+            while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
+                nextDay++;
+            }
+            if (nextDay <= totalDays) {
+                userPlan.currentDay = nextDay;
+            } else {
+                userPlan.completed = true;
+            }
+        }
+        
+        userPlan.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
+        await ref.set(userPlan, { merge: true });
+        
+        if (reflectionText) {
+            await firebase.firestore()
+                .collection('personal_notes')
+                .add({
+                    userId: uid,
+                    title: `Leseplan: ${plan.title} - Dag ${dayNumber}`,
+                    text: reflectionText,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isReadingPlanNote: true,
+                    readingPlanId: planId,
+                    dayNumber: dayNumber
+                });
+        }
     }
 
     // ══════════════════════════════════════════════════════════

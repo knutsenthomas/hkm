@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leseplaner | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Utforsk leseplaner og andaktsløp fra His Kingdom Ministry. Styrk din tro og følg din daglige fremgang i Guds ord.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css?v=2026.05.05.15">
+    <link rel="stylesheet" href="css/subpage-hero.css">
+    <link rel="stylesheet" href="css/cookie-consent.css">
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
+
+    <style>
+        :root {
+            --primary-orange: #d17d39;
+            --primary-red: #b54d2b;
+            --primary-blue: #1B4965;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            background-color: var(--bg-light);
+        }
+
+        /* Hero */
+        .plans-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #1B4965 50%, #0f172a 100%);
+            padding: 150px 24px 96px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plans-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(209, 125, 57, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 80%, rgba(181, 77, 43, 0.1) 0%, transparent 50%);
+        }
+
+        .plans-hero>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .plans-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: white;
+            margin: 0 auto 20px;
+            max-width: 980px;
+            line-height: 1.15;
+        }
+
+        .plans-hero h1 span {
+            background: linear-gradient(135deg, #d17d39, #b54d2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .plans-hero p {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            max-width: 760px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        /* Controls */
+        .plans-controls {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .plans-controls-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        /* Grid */
+        .plans-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+        }
+
+        /* Card */
+        .plan-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            gap: 12px;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border-color: rgba(209, 125, 57, 0.2);
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .plan-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .duration-badge {
+            background: #fff7ed;
+            color: var(--primary-orange);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .plan-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .plan-actions {
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .plan-link {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.open .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .day-outline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .day-row-num {
+            color: var(--primary-orange);
+            font-weight: 800;
+        }
+
+        .day-row-ref {
+            flex-grow: 1;
+            color: var(--text-dark);
+        }
+
+        .modal-footer {
+            padding: 20px 32px;
+            background: var(--bg-light);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-modal-start {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-red));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 28px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(209,125,57,0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-modal-start:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-orange);
+            opacity: 0.5;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header code will be synced, but let's include a robust default header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <div class="header-actions">
+                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
+                    <span class="material-symbols-outlined text-2xl">search</span>
+                </button>
+
+                <div class="lang-switcher relative group">
+                    <button class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="/donasjoner" class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    <span>Gi gave</span> <i class="fas fa-heart heart text-sm btn-heart-icon"></i>
+                </a>
+
+                <button class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative" id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu" id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <div class="mega-menu-body">
+                <div class="mega-menu-grid">
+                    <!-- Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="/donasjoner">Støtt arbeidet</a></li>
+                            <li><a href="/bli-fast-giver">Bli fast giver</a></li>
+                            <li><a href="/for-menigheter">For menigheter</a></li>
+                            <li><a href="/for-bedrifter">For bedrifter</a></li>
+                            <li><a href="/bnn">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="/om-oss">Om oss</a></li>
+                            <li><a href="/kontakt">Kontakt oss</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Ressurser -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="/bibel">Les Bibelen</a></li>
+                            <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Butikk</a></li>
+                            <li><a href="/arrangementer">Arrangementer</a></li>
+                            <li><a href="/media">Media & Podcast</a></li>
+                            <li><a href="/blogg">Nyheter & Blogg</a></li>
+                            <li><a href="/kurs">Kurs</a></li>
+                            <li><a href="/leseplaner.html">Leseplaner</a></li>
+                            <li><a href="/minside/index.html">Min Side</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="plans-hero">
+        <div class="container">
+            <h1><span>Leseplaner & Andakter</span></h1>
+            <p>Fordyp deg i Guds ord gjennom tilpassede leseplaner og daglige andaktsløp. Start i dag for å strukturere din bibellesing og styrke din tro.</p>
+        </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="plans-controls">
+        <div class="plans-controls-inner">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="plans-search" placeholder="Søk etter leseplaner...">
+            </div>
+        </div>
+    </section>
+
+    <!-- Main List -->
+    <section class="plans-main">
+        <div class="plans-grid" id="plans-grid">
+            <div class="empty-state" id="loading-state">
+                <div class="loader" style="margin: 0 auto 16px;"></div>
+                <p>Henter leseplaner...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan Detail Modal -->
+    <div class="modal-overlay" id="plan-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modal-title">Leseplan Detaljer</h3>
+                <button class="modal-close" id="modal-close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-desc" style="color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;"></p>
+                <h4 style="font-weight: 700; margin-bottom: 12px; color: var(--primary-blue);">Leseplanens innhold:</h4>
+                <div class="day-outline" id="modal-days-list">
+                    <!-- Days loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-start" id="modal-start-btn">Start denne leseplanen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Logic -->
+    <script type="module">
+        (async function () {
+            // Wait for firebase init
+            await new Promise(resolve => {
+                const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
+                check();
+            });
+
+            const db = firebase.firestore();
+            let allPlans = [];
+            let currentPlan = null;
+
+            // Load from Firestore
+            async function loadPlans() {
+                try {
+                    const snap = await db.collection('reading_plans').orderBy('createdAt', 'desc').get();
+                    allPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderPlans(allPlans);
+                } catch (err) {
+                    console.error("Error loading plans:", err);
+                    document.getElementById('plans-grid').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                            <h3>Kunne ikke laste leseplaner</h3>
+                            <p>Noe gikk galt under innlasting. Vennligst prøv igjen.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            function renderPlans(plansList) {
+                const grid = document.getElementById('plans-grid');
+                if (plansList.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <h3>Ingen leseplaner funnet</h3>
+                            <p>Det er ingen aktive leseplaner tilgjengelig for øyeblikket.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = plansList.map(plan => `
+                    <div class="plan-card" data-id="${plan.id}">
+                        <div class="plan-header">
+                            <h3 class="plan-title">${escapeHtml(plan.title)}</h3>
+                            <span class="duration-badge">${plan.durationDays} dager</span>
+                        </div>
+                        <p class="plan-desc">${escapeHtml(plan.description || 'Ingen beskrivelse tilgjengelig.')}</p>
+                        <div class="plan-actions">
+                            <span class="plan-link">Se innhold <i class="fas fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click listeners
+                grid.querySelectorAll('.plan-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.getAttribute('data-id');
+                        const plan = allPlans.find(p => p.id === id);
+                        if (plan) openPlanModal(plan);
+                    });
+                });
+            }
+
+            function openPlanModal(plan) {
+                currentPlan = plan;
+                document.getElementById('modal-title').textContent = plan.title;
+                document.getElementById('modal-desc').textContent = plan.description || 'Ingen beskrivelse tilgjengelig.';
+                
+                const listEl = document.getElementById('modal-days-list');
+                const daysList = plan.days || [];
+                daysList.sort((a,b) => a.dayNumber - b.dayNumber);
+
+                listEl.innerHTML = daysList.map(day => `
+                    <div class="day-row">
+                        <span class="day-row-num">Dag ${day.dayNumber}:</span>
+                        <span class="day-row-ref">${day.verses || 'Refleksjon'}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('plan-modal').classList.add('open');
+            }
+
+            function closePlanModal() {
+                document.getElementById('plan-modal').classList.remove('open');
+                currentPlan = null;
+            }
+
+            document.getElementById('modal-close-btn').addEventListener('click', closePlanModal);
+            document.getElementById('plan-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'plan-modal') closePlanModal();
+            });
+
+            document.getElementById('modal-start-btn').addEventListener('click', () => {
+                if (!currentPlan) return;
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    // Redirect to Min Side and start enrollment
+                    window.location.href = `/minside/index.html#reading-plans?start=${currentPlan.id}`;
+                } else {
+                    // Redirect to login
+                    window.location.href = `/minside/login.html?redirect=leseplaner&start=${currentPlan.id}`;
+                }
+            });
+
+            // Search
+            document.getElementById('plans-search').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const filtered = allPlans.filter(p => 
+                    p.title.toLowerCase().includes(query) || 
+                    (p.description || '').toLowerCase().includes(query)
+                );
+                renderPlans(filtered);
+            });
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // Init load
+            loadPlans();
+        })();
+    </script>
+    <script type="module" src="js/cookie-consent.js"></script>
+</body>
+
+</html>

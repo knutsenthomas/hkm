@@ -1812,7 +1812,8 @@
                             <li><a href="/es/eventos">Eventos</a></li>
                             <li><a href="/es/media">Media & Podcast</a></li>
                             <li><a href="/es/blog">Noticias y Blog</a></li>
-                            <li><a href="/es/ensenanza">Cursos</a></li>
+                            <li><a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a></li>
                             <li><a href="/es/../minside/index">Mi página</a></li>
                         </ul>
                     </div>
@@ -2195,6 +2196,7 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Favoritos</div>
                 <div class="tab-btn" id="tab-btn-history" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2203,6 +2205,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Historial</div>
                 <div class="tab-btn" id="tab-btn-related" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2211,6 +2214,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Recursos</div>
                 <div class="tab-btn" id="tab-btn-notes" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2219,7 +2223,17 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Notas</div>
+                <div class="tab-btn" id="tab-btn-reading-plan" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-reading-plan').classList.add('active');
+                    document.getElementById('tab-reading-plan-content').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                ">Plan de Lectura</div>
             </div>
 
             <div class="tabs-content">
@@ -2237,6 +2251,10 @@
                 </div>
                 <!-- Notes List -->
                 <div id="notes-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Leseplan Content -->
+                <div id="tab-reading-plan-content" style="display: none;">
                     <!-- Loaded dynamically -->
                 </div>
             </div>

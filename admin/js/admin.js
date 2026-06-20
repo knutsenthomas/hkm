@@ -2420,6 +2420,7 @@ class AdminManager {
             'hero': 'hero/',
             'courses': 'editor/courses/',
             'automation': 'editor/automation/',
+            'reading-plans': 'editor/reading-plans/',
             'content': 'editor/index/' // Default for static content
         };
         
@@ -2524,6 +2525,9 @@ class AdminManager {
                     break;
                 case 'kommunikasjon':
                     this.renderKommunikasjonSection();
+                    break;
+                case 'reading-plans':
+                    this.renderReadingPlansManager();
                     break;
             }
         }
@@ -19577,6 +19581,13 @@ class AdminManager {
     }
 
 
+
+    async renderReadingPlansManager() {
+        const section = document.getElementById('reading-plans-section');
+        if (section) {
+            section.setAttribute('data-rendered', 'true');
+        }
+    }
 
     async renderCoursesManager() {
         const section = document.getElementById('courses-section');

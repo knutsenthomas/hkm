@@ -212,7 +212,18 @@ service cloud.firestore {
          selfUidFieldAligned(userId));
 
       allow delete: if isAdmin() || isSelf(userId);
+
+      match /reading_plans/{planId} {
+        allow read, write: if isSelf(userId) || isAdmin();
+      }
     }
+
+    // Reading Plans root collection
+    match /reading_plans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
 
     // Contact form messages (public submit, admin process)
     match /contactMessages/{messageId} {

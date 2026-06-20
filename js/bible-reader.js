@@ -2,6 +2,28 @@
 import { firebaseService } from './firebase-service.js';
 
 class BibleReader {
+    getFirestore() {
+        if (window.firebase && typeof firebase.firestore === 'function') {
+            try {
+                return firebase.firestore();
+            } catch (e) {
+                console.warn("[BibleReader] firebase.firestore() threw:", e);
+            }
+        }
+        return null;
+    }
+
+    getServerTimestamp() {
+        if (window.firebase && typeof firebase.firestore === 'function' && firebase.firestore.FieldValue) {
+            try {
+                return firebase.firestore.FieldValue.serverTimestamp();
+            } catch (e) {
+                console.warn("[BibleReader] serverTimestamp failed, using local Date:", e);
+            }
+        }
+        return new Date();
+    }
+
     constructor() {
         this.bibles = [];
         this.books = [];
@@ -84,14 +106,24 @@ class BibleReader {
         this.setupSwipeGestures();
         
         // Listen to Firebase auth state for synchronizing notes
-        if (window.firebase) {
-            firebase.auth().onAuthStateChanged(user => {
-                this.currentUser = user;
-                this.loadNotes();
-            });
-        } else {
+        let authInitialized = false;
+        if (window.firebase && typeof firebase.auth === 'function') {
+            try {
+                firebase.auth().onAuthStateChanged(user => {
+                    this.currentUser = user;
+                    this.loadNotes();
+                    this.loadReadingPlan();
+                });
+                authInitialized = true;
+            } catch (e) {
+                console.warn("[BibleReader] firebase.auth setup failed:", e);
+            }
+        }
+        
+        if (!authInitialized) {
             this.currentUser = null;
             this.loadNotes();
+            this.loadReadingPlan();
         }
         
         await this.loadTranslations();
@@ -180,6 +212,7 @@ class BibleReader {
             bookmarksList: document.getElementById('bookmarks-list'),
             historyList: document.getElementById('history-list'),
             notesList: document.getElementById('notes-list'),
+            readingPlanContent: document.getElementById('tab-reading-plan-content'),
 
             // Verse Context Toolbar & Chapter Lookup
             verseToolbar: document.getElementById('verse-context-toolbar'),
@@ -623,20 +656,25 @@ class BibleReader {
                     const fullNoteHtml = `<blockquote>${combinedHtmlText}</blockquote><p><em>— Lagret vers fra ${refRange} (${translation})</em></p>`;
 
                     try {
-                        await firebase.firestore().collection('personal_notes').add({
-                            userId: this.currentUser.uid,
-                            title: refRange,
-                            text: fullNoteHtml,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        
-                        if (typeof window.showToast === 'function') {
-                            window.showToast('Versene ble lagret i dine notater på Min Side!', 'success');
+                        const db = this.getFirestore();
+                        if (db) {
+                            await db.collection('personal_notes').add({
+                                userId: this.currentUser.uid,
+                                title: refRange,
+                                text: fullNoteHtml,
+                                createdAt: this.getServerTimestamp(),
+                                updatedAt: this.getServerTimestamp()
+                            });
+                            
+                            if (typeof window.showToast === 'function') {
+                                window.showToast('Versene ble lagret i dine notater på Min Side!', 'success');
+                            } else {
+                                alert('Lagret på din bruker! Du finner det under notater på Min Side.');
+                            }
+                            this.loadNotes();
                         } else {
-                            alert('Lagret på din bruker! Du finner det under notater på Min Side.');
+                            throw new Error("Database utilgjengelig");
                         }
-                        this.loadNotes();
                     } catch (err) {
                         console.error(err);
                         alert('Feil under lagring: ' + err.message);
@@ -1561,11 +1599,11 @@ class BibleReader {
     async loadNotes() {
         if (!this.dom.notesList) return;
         
-        if (this.currentUser) {
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
             this.dom.notesList.innerHTML = `<div class="loading-state" style="padding: 20px; text-align: center;"><div class="spinner" style="margin: 0 auto 10px auto;"></div>Laster notater...</div>`;
             try {
-                const snap = await firebase.firestore()
-                    .collection('personal_notes')
+                const snap = await db.collection('personal_notes')
                     .where('userId', '==', this.currentUser.uid)
                     .get();
                 
@@ -1739,21 +1777,22 @@ class BibleReader {
             saveBtn.disabled = true;
             saveBtn.innerText = 'Lagrer...';
 
-            if (this.currentUser) {
+            const db = this.getFirestore();
+            if (this.currentUser && db) {
                 try {
                     if (isEdit) {
-                        await firebase.firestore().collection('personal_notes').doc(note.id).update({
+                        await db.collection('personal_notes').doc(note.id).update({
                             title: title,
                             text: htmlText,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            updatedAt: this.getServerTimestamp()
                         });
                     } else {
-                        await firebase.firestore().collection('personal_notes').add({
+                        await db.collection('personal_notes').add({
                             userId: this.currentUser.uid,
                             title: title,
                             text: htmlText,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            createdAt: this.getServerTimestamp(),
+                            updatedAt: this.getServerTimestamp()
                         });
                     }
                 } catch (e) {
@@ -1789,9 +1828,10 @@ class BibleReader {
     async deleteNote(noteId) {
         if (!confirm('Vil du slette dette notatet?')) return;
 
-        if (this.currentUser) {
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
             try {
-                await firebase.firestore().collection('personal_notes').doc(noteId).delete();
+                await db.collection('personal_notes').doc(noteId).delete();
             } catch (e) {
                 console.error('Error deleting note:', e);
                 alert('Feil ved sletting: ' + e.message);
@@ -1931,6 +1971,851 @@ class BibleReader {
         }
 
         relatedList.innerHTML = resources.map(res => this.renderResourceCard(res)).join('');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // READING PLAN INTEGRATION
+    // ──────────────────────────────────────────────────────────
+
+    getTranslation(key, fallback) {
+        const lang = document.documentElement.lang || 'no';
+        const dict = {
+            no: {
+                loading_plan: 'Laster leseplan...',
+                active_plan: 'Aktiv leseplan',
+                progress: 'Fremgang',
+                day: 'Dag',
+                show_verses: 'Vis dagens vers',
+                open_devotional: 'Åpne dagens andakt',
+                days_outline: 'Oversikt over dager',
+                completed: 'Fullført',
+                all_plans: 'Tilgjengelige leseplaner',
+                start_plan_btn: 'Start denne planen',
+                log_in_to_save: 'Logg inn på Min Side for å lagre din fremgang.',
+                login_btn: 'Logg inn'
+            },
+            en: {
+                loading_plan: 'Loading reading plan...',
+                active_plan: 'Active Reading Plan',
+                progress: 'Progress',
+                day: 'Day',
+                show_verses: "Show today's verses",
+                open_devotional: "Open today's devotional",
+                days_outline: 'Days Outline',
+                completed: 'Completed',
+                all_plans: 'Available Reading Plans',
+                start_plan_btn: 'Start this plan',
+                log_in_to_save: 'Log in to save your progress.',
+                login_btn: 'Log in'
+            },
+            es: {
+                loading_plan: 'Cargando plan de lectura...',
+                active_plan: 'Plan de Lectura Activo',
+                progress: 'Progreso',
+                day: 'Día',
+                show_verses: 'Ver versículos de hoy',
+                open_devotional: 'Abrir devocional de hoy',
+                days_outline: 'Resumen de los días',
+                completed: 'Completado',
+                all_plans: 'Planes de Lectura Disponibles',
+                start_plan_btn: 'Comenzar este plan',
+                log_in_to_save: 'Inicia sesión para guardar tu progreso.',
+                login_btn: 'Iniciar sesión'
+            }
+        };
+        return dict[lang]?.[key] || dict['no']?.[key] || fallback;
+    }
+
+    async loadReadingPlan() {
+        const container = this.dom.readingPlanContent;
+        if (!container) return;
+
+        // Display spinner
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
+                <p style="font-size: 13px;">${this.getTranslation('loading_plan', 'Laster leseplan...')}</p>
+            </div>
+        `;
+
+        // Inject Styles dynamically if not already injected
+        if (!document.getElementById('hkm-reading-plan-styles')) {
+            const style = document.createElement('style');
+            style.id = 'hkm-reading-plan-styles';
+            style.innerHTML = `
+                .hkm-rp-title { font-size: 16px; font-weight: 700; color: #1B4965; margin-bottom: 8px; }
+                .hkm-rp-subtitle { font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+                .hkm-rp-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; transition: all 0.2s ease; }
+                .hkm-rp-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05); }
+                .hkm-btn-primary { background: #1B4965 !important; color: #ffffff !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
+                .hkm-btn-primary:hover { background: #225c80 !important; }
+                .hkm-btn-primary:active { transform: scale(0.98) !important; }
+                .hkm-btn-secondary { background: transparent !important; border: 1px solid #1B4965 !important; color: #1B4965 !important; padding: 10px 16px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; transition: all 0.3s ease !important; height: 40px !important; text-decoration: none !important; }
+                .hkm-btn-secondary:hover { background: rgba(27, 73, 101, 0.05) !important; }
+                .hkm-btn-secondary:active { transform: scale(0.98) !important; }
+                .hkm-rp-progress-bar { height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin: 12px 0 16px 0; }
+                .hkm-rp-progress-fill { height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; transition: width 0.4s ease; }
+                .hkm-rp-day-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; margin-bottom: 8px; }
+                .hkm-rp-day-item:hover { background: #f8fafc; border-color: #e2e8f0; }
+                .hkm-rp-day-item.active { background: rgba(27, 73, 101, 0.05); border-color: rgba(27, 73, 101, 0.1); }
+                .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
+                .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
+                .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-content { background: #ffffff !important; width: 90% !important; max-width: 600px !important; border-radius: 24px !important; padding: 32px !important; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important; display: block !important; position: relative !important; animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-step-title { font-size: 20px; font-weight: 700; color: #1B4965; margin-bottom: 16px; }
+                .hkm-devotional-text-serif { font-family: 'Georgia', serif; font-size: 18px; line-height: 1.7; color: #1e293b; margin-bottom: 24px; overflow-y: auto; max-height: 40vh; padding-right: 8px; }
+                .hkm-devotional-prayer-box { background: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; font-style: italic; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 24px; }
+                .hkm-devotional-reflection-textarea { display: block !important; width: 100% !important; min-height: 120px !important; padding: 16px !important; border-radius: 12px !important; border: 1px solid #cbd5e1 !important; outline: none !important; font-size: 14px !important; line-height: 1.5 !important; margin-bottom: 24px !important; resize: vertical !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-celebration-title { font-size: 24px; font-weight: 700; color: #1B4965; text-align: center; margin-top: 16px; margin-bottom: 8px; }
+                .hkm-celebration-desc { font-size: 15px; color: #64748b; text-align: center; margin-bottom: 24px; }
+                @keyframes hkmFadeIn {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Load active plan from Firestore if user is logged in
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
+            try {
+                const snap = await db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .where('completed', '==', false)
+                    .orderBy('lastActiveAt', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (!snap.empty) {
+                    const userPlanDoc = snap.docs[0];
+                    const userPlan = userPlanDoc.data();
+                    
+                    // Fetch matching global plan
+                    const globalPlanSnap = await db.collection('reading_plans')
+                        .doc(userPlan.planId)
+                        .get();
+
+                    if (globalPlanSnap.exists) {
+                        const globalPlan = globalPlanSnap.data();
+                        this.renderUserActivePlan(userPlan, globalPlan);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Error checking user reading plans:", err);
+            }
+        }
+
+        // Fetch available global plans
+        if (db) {
+            try {
+                const snap = await db.collection('reading_plans')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const plans = [];
+                snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
+
+                this.renderAvailablePlansList(plans);
+            } catch (err) {
+                console.error("Error fetching available plans:", err);
+                container.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ef4444;">
+                        <span class="material-symbols-outlined" style="font-size: 32px;">error</span>
+                        <p style="margin-top: 8px; font-weight: 600;">Kunne ikke hente leseplaner.</p>
+                    </div>
+                `;
+            }
+        } else {
+            container.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #64748b;">
+                    <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 8px;">cloud_off</span>
+                    <p style="margin: 0;">Leseplaner er midlertidig utilgjengelig (frakoblet modus).</p>
+                </div>
+            `;
+        }
+    }
+
+    renderUserActivePlan(userPlan, globalPlan) {
+        const container = this.dom.readingPlanContent;
+        if (!container) return;
+
+        const currentDayNum = userPlan.currentDay || 1;
+        const totalDays = globalPlan.durationDays || globalPlan.days.length;
+        
+        const currentDayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
+        
+        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
+        const progressPct = Math.round((completedDaysCount / totalDays) * 100);
+
+        const t_activePlan = this.getTranslation('active_plan', 'Aktiv leseplan');
+        const t_progress = this.getTranslation('progress', 'Fremgang');
+        const t_day = this.getTranslation('day', 'Dag');
+        const t_showVerses = this.getTranslation('show_verses', 'Vis dagens vers');
+        const t_openDevotional = this.getTranslation('open_devotional', 'Åpne dagens andakt');
+        const t_daysOutline = this.getTranslation('days_outline', 'Oversikt over dager');
+        
+        container.innerHTML = `
+            <div style="padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">${t_activePlan}</span>
+                    <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.bibleReader.showAvailablePlans()">Bytt plan</button>
+                </div>
+                <h3 class="hkm-rp-title">${globalPlan.title}</h3>
+                <p class="hkm-rp-subtitle">${globalPlan.description || ''}</p>
+
+                <!-- Progress -->
+                <div style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: #475569;">
+                        <span>${t_progress}</span>
+                        <span>${progressPct}% (${completedDaysCount}/${totalDays})</span>
+                    </div>
+                    <div class="hkm-rp-progress-bar">
+                        <div class="hkm-rp-progress-fill" style="width: ${progressPct}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Current Day Panel -->
+                ${currentDayConfig ? `
+                <div class="hkm-rp-card" style="border-left: 4px solid #1B4965;">
+                    <div style="font-size: 12px; font-weight: 700; color: #1B4965; text-transform: uppercase; margin-bottom: 4px;">
+                        ${t_day} ${currentDayNum}
+                    </div>
+                    <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 12px;">
+                        ${currentDayConfig.verses}
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button class="hkm-btn-primary" onclick="window.bibleReader.showDayVerses('${currentDayConfig.verses.replace(/'/g, "\\'")}')">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+                            ${t_showVerses}
+                        </button>
+                        <button class="hkm-btn-secondary" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
+                            ${t_openDevotional}
+                        </button>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Days Outline List -->
+                <h4 style="font-size: 13px; font-weight: 700; color: #475569; margin: 24px 0 12px 0;">${t_daysOutline}</h4>
+                <div style="display: flex; flex-direction: column;">
+                    ${globalPlan.days.map(d => {
+                        const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d.dayNumber);
+                        const isActive = d.dayNumber === currentDayNum;
+                        return `
+                        <div class="hkm-rp-day-item ${isActive ? 'active' : ''}" onclick="window.bibleReader.showDayVerses('${d.verses.replace(/'/g, "\\'")}')">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 700; color: #475569;">${t_day} ${d.dayNumber}</div>
+                                <div style="font-size: 13px; color: #0f172a; font-weight: 500;">${d.verses}</div>
+                            </div>
+                            <div class="hkm-rp-day-checkbox ${isCompleted ? 'completed' : ''}">
+                                ${isCompleted ? '<span class="material-symbols-outlined">check</span>' : ''}
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    renderAvailablePlansList(plans) {
+        const container = this.dom.readingPlanContent;
+        if (!container) return;
+
+        const t_browsePlans = this.getTranslation('all_plans', 'Leseplaner');
+        const t_startPlan = this.getTranslation('start_plan_btn', 'Start leseplan');
+        const t_logInToSave = this.getTranslation('log_in_to_save', 'Logg inn på Min Side for å lagre din fremgang.');
+        const t_loginBtn = this.getTranslation('login_btn', 'Logg inn');
+
+        let loginNotice = '';
+        if (!this.currentUser) {
+            loginNotice = `
+                <div style="background: rgba(209, 125, 57, 0.1); border: 1px solid rgba(209, 125, 57, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: #7f8c8d; line-height: 1.4;">
+                    <p style="margin-bottom: 8px;">${t_logInToSave}</p>
+                    <a href="/minside/login.html" class="hkm-btn-primary" style="height: 30px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;">${t_loginBtn}</a>
+                </div>
+            `;
+        }
+
+        if (plans.length === 0) {
+            container.innerHTML = `
+                <div style="padding: 16px;">
+                    ${loginNotice}
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                        <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 8px;">auto_stories</span>
+                        <p style="font-size: 14px;">Ingen leseplaner er opprettet ennå.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="padding: 16px;">
+                ${loginNotice}
+                <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin-bottom: 16px;">${t_browsePlans}</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    ${plans.map(p => {
+                        const totalDays = p.durationDays || p.days.length;
+                        return `
+                        <div class="hkm-rp-card" id="plan-card-${p.id}">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0;">${p.title}</h4>
+                                <span style="font-size: 11px; font-weight: 700; background: rgba(27, 73, 101, 0.1); color: #1B4965; padding: 2px 8px; border-radius: 99px;">${totalDays} dager</span>
+                            </div>
+                            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button class="hkm-btn-secondary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.togglePlanPreview('${p.id}')">
+                                    Vis dager
+                                </button>
+                                ${this.currentUser ? `
+                                <button class="hkm-btn-primary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.enrollInPlan('${p.id}')">
+                                    ${t_startPlan}
+                                </button>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Plan Preview Days -->
+                            <div id="plan-preview-${p.id}" style="display: none; margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 12px; max-height: 200px; overflow-y: auto;">
+                                ${p.days.map(d => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; cursor: pointer;" onclick="window.bibleReader.showDayVerses('${d.verses.replace(/'/g, "\\'")}')">
+                                    <span style="font-weight: 600; color: #475569;">Dag ${d.dayNumber}:</span>
+                                    <span style="color: #1B4965; text-decoration: underline;">${d.verses}</span>
+                                </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    togglePlanPreview(planId) {
+        const preview = document.getElementById(`plan-preview-${planId}`);
+        if (preview) {
+            preview.style.display = preview.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    async showAvailablePlans() {
+        const container = this.dom.readingPlanContent;
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
+                <p style="font-size: 13px;">${this.getTranslation('loading_plan', 'Laster leseplan...')}</p>
+            </div>
+        `;
+        
+        const db = this.getFirestore();
+        if (!db) {
+            container.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #64748b;">
+                    <span class="material-symbols-outlined" style="font-size: 32px; margin-bottom: 8px;">cloud_off</span>
+                    <p style="margin: 0;">Leseplaner er midlertidig utilgjengelig (frakoblet modus).</p>
+                </div>
+            `;
+            return;
+        }
+
+        try {
+            const snap = await db.collection('reading_plans')
+                .orderBy('createdAt', 'desc')
+                .get();
+
+            const plans = [];
+            snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
+
+            this.renderAvailablePlansList(plans);
+        } catch (err) {
+            console.error("Error loading plans:", err);
+        }
+    }
+
+    async enrollInPlan(planId) {
+        if (!this.currentUser) return;
+        
+        const loader = document.getElementById(`plan-card-${planId}`);
+        if (loader) {
+            loader.style.opacity = '0.5';
+            loader.style.pointerEvents = 'none';
+        }
+        
+        const db = this.getFirestore();
+        if (!db) {
+            alert("Database utilgjengelig. Prøv igjen senere.");
+            return;
+        }
+
+        try {
+            const ref = db.collection('users')
+                .doc(this.currentUser.uid)
+                .collection('reading_plans')
+                .doc(planId);
+                
+            await ref.set({
+                planId: planId,
+                currentDay: 1,
+                completedDays: [],
+                startedAt: this.getServerTimestamp(),
+                lastActiveAt: this.getServerTimestamp(),
+                completed: false,
+                reflections: {}
+            }, { merge: true });
+            
+            await this.loadReadingPlan();
+        } catch (err) {
+            console.error("Enrollment failed:", err);
+            alert("Feil under påmelding: " + err.message);
+            if (loader) {
+                loader.style.opacity = '1';
+                loader.style.pointerEvents = 'auto';
+            }
+        }
+    }
+
+    async showDayVerses(verses) {
+        if (!verses) return;
+        await this.parseAndNavigateToReference(verses);
+        if (window.innerWidth <= 1024) {
+            const sidebar = document.getElementById('bible-sidebar');
+            if (sidebar) sidebar.classList.remove('active');
+            const navRight = document.getElementById('bible-nav-right');
+            if (navRight) navRight.classList.remove('active');
+        }
+    }
+
+    async openDevotionalWizard(planId, dayNumber) {
+        if (!this.currentUser) return;
+
+        const db = this.getFirestore();
+        if (!db) {
+            alert("Database utilgjengelig. Prøv igjen senere.");
+            return;
+        }
+
+        const globalPlanSnap = await db.collection('reading_plans')
+            .doc(planId)
+            .get();
+
+        if (!globalPlanSnap.exists) {
+            alert("Leseplanen finnes ikke.");
+            return;
+        }
+
+        const globalPlan = globalPlanSnap.data();
+        const dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
+        if (!dayConfig) {
+            alert("Dagens andakt er ikke konfigurert.");
+            return;
+        }
+
+        let modal = document.getElementById('hkm-devotional-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-devotional-modal';
+        modal.className = 'hkm-devotional-overlay';
+        
+        document.body.appendChild(modal);
+
+        let scriptureHtml = '<p style="text-align: center; color: #64748b;">Henter bibeltekst...</p>';
+        try {
+            scriptureHtml = await this.fetchAndFilterVersesText(dayConfig.verses);
+        } catch (e) {
+            console.error("Failed to fetch scripture text for devotional:", e);
+            scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
+        }
+
+        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, 1, scriptureHtml);
+    }
+
+    async fetchAndFilterVersesText(versesText) {
+        const input = versesText.trim().toLowerCase();
+        const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+)(?:\-(\d+))?)?$/i;
+        const match = input.match(regex);
+
+        if (!match) {
+            throw new Error("Invalid reference format");
+        }
+
+        const prefixNum = match[1] || '';
+        const bookNameQuery = match[2].trim();
+        const chapterNum = match[3];
+        const startVerse = match[4] ? parseInt(match[4], 10) : null;
+        const endVerse = match[5] ? parseInt(match[5], 10) : (startVerse || null);
+
+        let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+        if (fullBookSearchName === 'apg') {
+            fullBookSearchName = 'apostlenes';
+        }
+
+        const matchedBook = this.books.find(b => {
+            const bName = b.name.toLowerCase();
+            return bName === fullBookSearchName || bName.startsWith(fullBookSearchName) || bName.includes(fullBookSearchName);
+        });
+
+        if (!matchedBook) {
+            throw new Error(`Book not found: ${fullBookSearchName}`);
+        }
+
+        const chapterId = `${matchedBook.id}_${chapterNum}`;
+        const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+        const payload = await res.json();
+        
+        if (!payload.data || !payload.data.content) {
+            throw new Error("Failed to load chapter content");
+        }
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(payload.data.content, 'text/html');
+        const paragraphs = doc.querySelectorAll('p');
+
+        let filteredHtml = '';
+        let foundAny = false;
+
+        for (const p of paragraphs) {
+            const sups = p.querySelectorAll('sup.v');
+            if (sups.length > 0) {
+                let keepParagraph = false;
+                for (const sup of sups) {
+                    const vNum = parseInt(sup.innerText.trim(), 10);
+                    if (!startVerse || (vNum >= startVerse && vNum <= endVerse)) {
+                        keepParagraph = true;
+                        foundAny = true;
+                    }
+                }
+                if (keepParagraph) {
+                    filteredHtml += p.outerHTML;
+                }
+            } else if (!startVerse) {
+                filteredHtml += p.outerHTML;
+            }
+        }
+
+        if (!foundAny && startVerse) {
+            return payload.data.content;
+        }
+
+        return filteredHtml;
+    }
+
+    renderDevotionalStep(modal, plan, dayNumber, dayConfig, step, scriptureHtml) {
+        modal.innerHTML = '';
+        
+        const stepContainer = document.createElement('div');
+        stepContainer.className = 'hkm-devotional-content';
+        modal.appendChild(stepContainer);
+
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justify = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '20px';
+        header.innerHTML = `
+            <div style="font-size: 11px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">
+                ${plan.title} &bull; Steg ${step} av 5
+            </div>
+            <button style="background: none; border: none; cursor: pointer; color: #64748b; display: flex; align-items: center;" onclick="document.getElementById('hkm-devotional-modal').remove()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        `;
+        stepContainer.appendChild(header);
+
+        if (step === 1) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = `1. Les skriftstedet (${dayConfig.verses})`;
+            stepContainer.appendChild(title);
+
+            const scriptureBox = document.createElement('div');
+            scriptureBox.className = 'hkm-devotional-text-serif';
+            scriptureBox.innerHTML = scriptureHtml;
+            stepContainer.appendChild(scriptureBox);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'flex-end';
+            actions.innerHTML = `
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Bønn
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
+            };
+
+        } else if (step === 2) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '2. Dagens Bønnefokus';
+            stepContainer.appendChild(title);
+
+            const prayerBox = document.createElement('div');
+            prayerBox.className = 'hkm-devotional-prayer-box';
+            prayerBox.innerText = dayConfig.prayerFocus || 'Be i dag over ordene du har lest, og be om visdom og veiledning for dagen.';
+            stepContainer.appendChild(prayerBox);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Ressurser
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
+            };
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+            };
+
+        } else if (step === 3) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '3. Dypere Dykk & Ressurser';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.style.fontSize = '14px';
+            desc.style.color = '#64748b';
+            desc.style.marginBottom = '20px';
+            desc.style.lineHeight = '1.5';
+            desc.innerText = 'Bruk disse ressursene til å gå dypere i dagens tema:';
+            stepContainer.appendChild(desc);
+
+            const resourcesList = document.createElement('div');
+            resourcesList.style.display = 'flex';
+            resourcesList.style.flexDirection = 'column';
+            resourcesList.style.gap = '12px';
+            resourcesList.style.marginBottom = '24px';
+            
+            if (dayConfig.resources && dayConfig.resources.length > 0) {
+                dayConfig.resources.forEach(res => {
+                    const card = document.createElement('a');
+                    card.href = res.url || '#';
+                    card.target = '_blank';
+                    card.className = 'hkm-rp-card';
+                    card.style.textDecoration = 'none';
+                    card.style.display = 'block';
+                    card.style.margin = '0';
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="material-symbols-outlined" style="color: #d17d39; font-size: 24px;">
+                                ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
+                            </span>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">${res.title}</div>
+                                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94a3b8;">${res.type}</div>
+                            </div>
+                        </div>
+                    `;
+                    resourcesList.appendChild(card);
+                });
+            } else {
+                resourcesList.innerHTML = `
+                    <p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px 0;">
+                        Ingen ekstra ressurser tilknyttet denne dagen.
+                    </p>
+                `;
+            }
+            stepContainer.appendChild(resourcesList);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-next">
+                    Neste: Refleksjon
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
+            };
+            actions.querySelector('#btn-devotional-next').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 4, scriptureHtml);
+            };
+
+        } else if (step === 4) {
+            const title = document.createElement('h3');
+            title.className = 'hkm-devotional-step-title';
+            title.innerText = '4. Skriv dine refleksjoner';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.style.fontSize = '14px';
+            desc.style.color = '#64748b';
+            desc.style.marginBottom = '16px';
+            desc.style.lineHeight = '1.5';
+            desc.innerText = 'Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.';
+            stepContainer.appendChild(desc);
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'hkm-devotional-reflection-textarea';
+            textarea.placeholder = 'Skriv dine tanker her... (Dette lagres også i dine notater på Min Side)';
+            stepContainer.appendChild(textarea);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'space-between';
+            actions.innerHTML = `
+                <button class="hkm-btn-secondary" id="btn-devotional-back">
+                    Tilbake
+                </button>
+                <button class="hkm-btn-primary" id="btn-devotional-save">
+                    Fullfør og Lagre
+                    <span class="material-symbols-outlined">check</span>
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-back').onclick = () => {
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+            };
+            
+            actions.querySelector('#btn-devotional-save').onclick = async () => {
+                const text = textarea.value.trim();
+                const saveBtn = actions.querySelector('#btn-devotional-save');
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'Lagrer...';
+
+                try {
+                    await this.completeDevotionalDay(plan, dayNumber, text);
+                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 5, scriptureHtml);
+                } catch (e) {
+                    console.error("Failed to complete devotional day:", e);
+                    alert("Kunne ikke lagre andakt: " + e.message);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = `Fullfør og Lagre <span class="material-symbols-outlined">check</span>`;
+                }
+            };
+
+        } else if (step === 5) {
+            const confetti = document.createElement('div');
+            confetti.style.fontSize = '64px';
+            confetti.style.textAlign = 'center';
+            confetti.style.marginBottom = '16px';
+            confetti.innerHTML = '🎉';
+            stepContainer.appendChild(confetti);
+
+            const title = document.createElement('h3');
+            title.className = 'hkm-celebration-title';
+            title.innerText = 'Andakt fullført!';
+            stepContainer.appendChild(title);
+
+            const desc = document.createElement('p');
+            desc.className = 'hkm-celebration-desc';
+            desc.innerText = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".`;
+            stepContainer.appendChild(desc);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.justify = 'center';
+            actions.innerHTML = `
+                <button class="hkm-btn-primary" id="btn-devotional-close" style="min-width: 150px;">
+                    Lukk
+                </button>
+            `;
+            stepContainer.appendChild(actions);
+
+            actions.querySelector('#btn-devotional-close').onclick = () => {
+                modal.remove();
+                this.loadReadingPlan();
+            };
+        }
+    }
+
+    async completeDevotionalDay(plan, dayNumber, reflectionText) {
+        if (!this.currentUser) return;
+        
+        const db = this.getFirestore();
+        if (!db) {
+            throw new Error("Database utilgjengelig.");
+        }
+
+        const uid = this.currentUser.uid;
+        const planId = plan.id;
+        
+        const ref = db.collection('users')
+            .doc(uid)
+            .collection('reading_plans')
+            .doc(planId);
+            
+        const snap = await ref.get();
+        let userPlan = snap.exists ? snap.data() : {
+            planId: planId,
+            currentDay: 1,
+            completedDays: [],
+            reflections: {}
+        };
+        
+        userPlan.reflections = userPlan.reflections || {};
+        if (reflectionText) {
+            userPlan.reflections[dayNumber] = reflectionText;
+        }
+        
+        userPlan.completedDays = userPlan.completedDays || [];
+        if (!userPlan.completedDays.includes(dayNumber)) {
+            userPlan.completedDays.push(dayNumber);
+        }
+        
+        const totalDays = plan.durationDays || plan.days.length;
+        if (userPlan.completedDays.length >= totalDays) {
+            userPlan.completed = true;
+        } else {
+            let nextDay = dayNumber + 1;
+            while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
+                nextDay++;
+            }
+            if (nextDay <= totalDays) {
+                userPlan.currentDay = nextDay;
+            } else {
+                userPlan.completed = true;
+            }
+        }
+        
+        userPlan.lastActiveAt = this.getServerTimestamp();
+        await ref.set(userPlan, { merge: true });
+        
+        if (reflectionText) {
+            await db.collection('personal_notes')
+                .add({
+                    userId: uid,
+                    title: `Leseplan: ${plan.title} - Dag ${dayNumber}`,
+                    text: reflectionText,
+                    createdAt: this.getServerTimestamp(),
+                    isReadingPlanNote: true,
+                    readingPlanId: planId,
+                    dayNumber: dayNumber
+                });
+        }
     }
 }
 

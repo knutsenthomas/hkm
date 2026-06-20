@@ -1812,7 +1812,8 @@
                             <li><a href="/en/events">Events</a></li>
                             <li><a href="/en/media">Media & Podcast</a></li>
                             <li><a href="/en/blog">News & Blog</a></li>
-                            <li><a href="/en/teaching">Courses</a></li>
+                            <li><a href="/en/teaching" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Courses</a></li>
+                            <li><a href="/en/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Reading Plans</a></li>
                             <li><a href="/en/../minside/index">My Page</a></li>
                         </ul>
                     </div>
@@ -2195,6 +2196,7 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Favorites</div>
                 <div class="tab-btn" id="tab-btn-history" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2203,6 +2205,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">History</div>
                 <div class="tab-btn" id="tab-btn-related" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2211,6 +2214,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Resources</div>
                 <div class="tab-btn" id="tab-btn-notes" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2219,7 +2223,17 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
                 ">Notes</div>
+                <div class="tab-btn" id="tab-btn-reading-plan" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-reading-plan').classList.add('active');
+                    document.getElementById('tab-reading-plan-content').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                ">Reading Plan</div>
             </div>
 
             <div class="tabs-content">
@@ -2237,6 +2251,10 @@
                 </div>
                 <!-- Notes List -->
                 <div id="notes-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Leseplan Content -->
+                <div id="tab-reading-plan-content" style="display: none;">
                     <!-- Loaded dynamically -->
                 </div>
             </div>
