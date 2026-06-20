@@ -66,6 +66,7 @@ class ContentManager {
         if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
         if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
         if (p('arrangement-detaljer') || p('event-details') || p('detalles-evento')) return 'arrangement-detaljer';
+        if (p('leseplan-detaljer') || p('reading-plan-details') || p('detalles-plan-lectura')) return 'leseplan-detaljer';
         if (p('blogg-post') || p('blog-post') || p('post-blog')) return 'blogg-post';
         if (p('blogg') || p('blog')) return 'blogg';
         if (p('butikk') || p('shop')) return 'butikk';

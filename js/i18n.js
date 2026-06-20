@@ -15,7 +15,7 @@ const i18nManager = {
             'blog', 'bnn', 'calendar', 'contact', 'donations',
             'event-details', 'events', 'for-businesses', 'for-churches',
             'index', 'media', 'podcast', 'privacy',
-            'regular-donors', 'teaching', 'youtube'
+            'regular-donors', 'teaching', 'youtube', 'reading-plan-details'
         ]),
         es: new Set([
             'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
@@ -24,7 +24,7 @@ const i18nManager = {
             'detalles-evento', 'donaciones', 'donantes-regulares',
             'ensenanza', 'eventos', 'index', 'media',
             'para-empresas', 'para-iglesias', 'podcast',
-            'privacidad', 'sobre-nosotros', 'youtube'
+            'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura'
         ])
     },
 
@@ -252,7 +252,8 @@ const i18nManager = {
                 'blogg-post-2': 'blog-post-2',
                 'blogg-post-3': 'blog-post-3',
                 'blogg-post-4': 'blog-post-4',
-                'blogg-post-5': 'blog-post-5'
+                'blogg-post-5': 'blog-post-5',
+                'leseplan-detaljer': 'reading-plan-details'
             },
             'es': {
                 'index': 'index',
@@ -283,7 +284,8 @@ const i18nManager = {
                 'blogg-post-2': 'blog-post-2',
                 'blogg-post-3': 'blog-post-3',
                 'blogg-post-4': 'blog-post-4',
-                'blogg-post-5': 'blog-post-5'
+                'blogg-post-5': 'blog-post-5',
+                'leseplan-detaljer': 'detalles-plan-lectura'
             }
         };
 

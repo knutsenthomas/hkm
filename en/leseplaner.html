@@ -443,25 +443,7 @@
         </div>
     </section>
 
-    <!-- Plan Detail Modal -->
-    <div class="modal-overlay" id="plan-modal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 id="modal-title">Reading Plan Details</h3>
-                <button class="modal-close" id="modal-close-btn">✕</button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-desc" style="color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;"></p>
-                <h4 style="font-weight: 700; margin-bottom: 12px; color: var(--primary-blue);">Plan Content:</h4>
-                <div class="day-outline" id="modal-days-list">
-                    <!-- Days loaded here -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal-start" id="modal-start-btn">Start this reading plan</button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -479,7 +461,6 @@
 
             const db = firebase.firestore();
             let allPlans = [];
-            let currentPlan = null;
 
             // Load from Firestore
             async function loadPlans() {
@@ -529,45 +510,10 @@
                 grid.querySelectorAll('.plan-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const id = card.getAttribute('data-id');
-                        const plan = allPlans.find(p => p.id === id);
-                        if (plan) openPlanModal(plan);
+                        window.location.href = `/en/reading-plan-details?id=${id}`;
                     });
                 });
             }
-
-            function openPlanModal(plan) {
-                currentPlan = plan;
-                document.getElementById('modal-title').textContent = plan.title;
-                document.getElementById('modal-desc').textContent = plan.description || 'No description available.';
-                
-                const listEl = document.getElementById('modal-days-list');
-                const daysList = plan.days || [];
-                daysList.sort((a,b) => a.dayNumber - b.dayNumber);
-
-                listEl.innerHTML = daysList.map(day => `
-                    <div class="day-row">
-                        <span class="day-row-num">Day ${day.dayNumber}:</span>
-                        <span class="day-row-ref">${day.verses || 'Reflection'}</span>
-                    </div>
-                `).join('');
-
-                document.getElementById('plan-modal').classList.add('open');
-            }
-
-            function closePlanModal() {
-                document.getElementById('plan-modal').classList.remove('open');
-                currentPlan = null;
-            }
-
-            document.getElementById('modal-close-btn').addEventListener('click', closePlanModal);
-            document.getElementById('plan-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'plan-modal') closePlanModal();
-            });
-
-            document.getElementById('modal-start-btn').addEventListener('click', () => {
-                if (!currentPlan) return;
-                window.location.href = `/en/bibel.html?plan=${currentPlan.id}`;
-            });
 
             // Search
             document.getElementById('plans-search').addEventListener('input', (e) => {
