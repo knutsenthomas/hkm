@@ -7182,10 +7182,33 @@ class AdminManager {
             }
         };
 
-        ytSearchBtn.onclick = performYtSearch;
+        let debounceTimer;
+        ytSearchInput.oninput = () => {
+            clearTimeout(debounceTimer);
+            const query = ytSearchInput.value.trim();
+            if (!query) {
+                ytResultsContainer.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">play_circle</span>
+                        <p style="margin-top: 8px; font-size: 14px;">Søk etter en video for å se resultater her.</p>
+                    </div>
+                `;
+                return;
+            }
+            debounceTimer = setTimeout(() => {
+                performYtSearch();
+            }, 400);
+        };
+
+        ytSearchBtn.onclick = () => {
+            clearTimeout(debounceTimer);
+            performYtSearch();
+        };
+
         ytSearchInput.onkeydown = (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
+                clearTimeout(debounceTimer);
                 performYtSearch();
             }
         };
