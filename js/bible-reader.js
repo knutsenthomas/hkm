@@ -6,7 +6,11 @@ class BibleReader {
         this.bibles = [];
         this.books = [];
         this.chapters = [];
-        this.selectedBibleId = localStorage.getItem('hkm_bible_translation') || 'OPENBIBLE_NB';
+        const activeLang = document.documentElement.lang || 'no';
+        let defaultBible = 'OPENBIBLE_NB';
+        if (activeLang === 'en') defaultBible = 'WEB';
+        else if (activeLang === 'es') defaultBible = 'RVR1960';
+        this.selectedBibleId = localStorage.getItem('hkm_bible_translation') || defaultBible;
         this.selectedBookId = '';
         this.selectedChapterId = '';
         this.activeChapterData = null;
@@ -34,6 +38,43 @@ class BibleReader {
         this.touchMoved = false;
 
         this.init();
+    }
+
+    t(key) {
+        const lang = document.documentElement.lang || 'no';
+        const translations = {
+            'no': {
+                'empty_bookmarks': 'Ingen lagrede vers ennå. Klikk på et vers i teksten for å lagre det.',
+                'empty_history': 'Ingen historikk ennå.',
+                'empty_notes': 'Ingen notater ennå. Skriv dine refleksjoner her!',
+                'no_book_selected': 'Ingen bok valgt.',
+                'no_resources_found': 'Ingen relaterte ressurser funnet for denne boken enda.',
+                'new_note': 'Nytt notat',
+                'fetching_resources': 'Henter relaterte ressurser...',
+                'dictionary': 'Ordbok'
+            },
+            'en': {
+                'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
+                'empty_history': 'No history yet.',
+                'empty_notes': 'No notes yet. Write your reflections here!',
+                'no_book_selected': 'No book selected.',
+                'no_resources_found': 'No related resources found for this book yet.',
+                'new_note': 'New Note',
+                'fetching_resources': 'Fetching related resources...',
+                'dictionary': 'Lexicon'
+            },
+            'es': {
+                'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
+                'empty_history': 'Aún no hay historial.',
+                'empty_notes': 'Aún no hay notas. ¡Escribe tus reflexiones aquí!',
+                'no_book_selected': 'Ningún libro seleccionado.',
+                'no_resources_found': 'Aún no se han encontrado recursos relacionados para este libro.',
+                'new_note': 'Nueva Nota',
+                'fetching_resources': 'Obteniendo recursos relacionados...',
+                'dictionary': 'Diccionario'
+            }
+        };
+        return (translations[lang] || translations['no'])[key] || key;
     }
 
     async init() {
@@ -1255,7 +1296,8 @@ class BibleReader {
             const params = new URLSearchParams({
                 word: word,
                 context: contextText || '',
-                scriptureRef: refText || ''
+                scriptureRef: refText || '',
+                lang: document.documentElement.lang || 'no'
             });
 
             // Parallel load AI definition and relevant site resources
@@ -1268,7 +1310,7 @@ class BibleReader {
             this.dom.dictContentWrap.style.display = 'block';
 
             this.dom.dictWordTitle.innerText = dictRes.word || word;
-            this.dom.dictCategory.innerText = dictRes.category || 'Ordbok';
+            this.dom.dictCategory.innerText = dictRes.category || this.t('dictionary');
             this.dom.dictDefinition.innerHTML = dictRes.definition || '';
             this.dom.dictContextualNote.innerHTML = dictRes.contextualNote || '';
 
@@ -1428,7 +1470,7 @@ class BibleReader {
     renderBookmarksList() {
         if (!this.dom.bookmarksList) return;
         if (this.bookmarks.length === 0) {
-            this.dom.bookmarksList.innerHTML = `<p class="empty-state">Ingen lagrede vers ennå. Klikk på et vers i teksten for å lagre det.</p>`;
+            this.dom.bookmarksList.innerHTML = `<p class="empty-state">${this.t('empty_bookmarks')}</p>`;
             return;
         }
 
@@ -1478,7 +1520,7 @@ class BibleReader {
     renderHistoryList() {
         if (!this.dom.historyList) return;
         if (this.history.length === 0) {
-            this.dom.historyList.innerHTML = `<p class="empty-state">Ingen historikk ennå.</p>`;
+            this.dom.historyList.innerHTML = `<p class="empty-state">${this.t('empty_history')}</p>`;
             return;
         }
 
@@ -1572,7 +1614,7 @@ class BibleReader {
 
         const newNoteBtnHtml = `
             <button id="btn-new-note" style="width: 100% !important; margin-bottom: 16px !important; border-radius: 8px !important; padding: 10px 16px !important; font-size: 14px !important; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s !important; box-sizing: border-box !important; height: 40px !important; line-height: 1.2 !important; text-transform: none !important; box-shadow: none !important;">
-                <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">add</span>Nytt notat
+                <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">add</span>${this.t('new_note')}
             </button>
         `;
 
@@ -1580,11 +1622,13 @@ class BibleReader {
             this.dom.notesList.innerHTML = `
                 ${syncBadge}
                 ${newNoteBtnHtml}
-                <p class="empty-state" style="padding: 20px 0; text-align: center; color: #94a3b8; font-size: 13px;">Ingen notater ennå. Skriv dine refleksjoner her!</p>
+                <p class="empty-state" style="padding: 20px 0; text-align: center; color: #94a3b8; font-size: 13px;">${this.t('empty_notes')}</p>
             `;
         } else {
             const listHtml = this.notes.map(n => {
-                const dateStr = n.createdAt.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const activeLang = document.documentElement.lang || 'no';
+                const locale = activeLang === 'no' ? 'no-NO' : activeLang === 'es' ? 'es-ES' : 'en-US';
+                const dateStr = n.createdAt.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = n.text;
                 const plainText = tempDiv.innerText || tempDiv.textContent || '';
@@ -1868,13 +1912,13 @@ class BibleReader {
         relatedList.innerHTML = `
             <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
                 <div class="spinner" style="margin: 0 auto 12px; width: 24px; height: 24px;"></div>
-                <p style="font-size: 13px;">Henter relaterte ressurser...</p>
+                <p style="font-size: 13px;">${this.t('fetching_resources')}</p>
             </div>
         `;
 
         const currentBook = this.books.find(b => b.id === this.selectedBookId);
         if (!currentBook) {
-            relatedList.innerHTML = '<div class="empty-state">Ingen bok valgt.</div>';
+            relatedList.innerHTML = `<div class="empty-state">${this.t('no_book_selected')}</div>`;
             return;
         }
 
@@ -1882,7 +1926,7 @@ class BibleReader {
         const resources = await this.searchLocalResources(query);
 
         if (resources.length === 0) {
-            relatedList.innerHTML = '<div class="empty-state">Ingen relaterte ressurser funnet for denne boken enda.</div>';
+            relatedList.innerHTML = `<div class="empty-state">${this.t('no_resources_found')}</div>`;
             return;
         }
 

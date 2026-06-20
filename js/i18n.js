@@ -10,7 +10,7 @@ const i18nManager = {
     storageKey: 'hkm_preferred_lang',
     knownFiles: {
         en: new Set([
-            'about', 'accessibility', 'blog-post-1', 'blog-post-2',
+            'about', 'accessibility', 'bibel', 'blog-post-1', 'blog-post-2',
             'blog-post-3', 'blog-post-4', 'blog-post-5', 'blog-post',
             'blog', 'bnn', 'calendar', 'contact', 'donations',
             'event-details', 'events', 'for-businesses', 'for-churches',
@@ -18,7 +18,7 @@ const i18nManager = {
             'regular-donors', 'teaching', 'youtube'
         ]),
         es: new Set([
-            'accesibilidad', 'blog-post-1', 'blog-post-2',
+            'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
             'blog-post-3', 'blog-post-4', 'blog-post-5', 'blog-post',
             'blog', 'bnn', 'calendario', 'contacto',
             'detalles-evento', 'donaciones', 'donantes-regulares',

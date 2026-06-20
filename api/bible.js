@@ -141,6 +141,18 @@ export default async function handler(req, res) {
             name: "King James Version (KJV)",
             abbreviation: "KJV",
             language: { id: "eng", name: "English" }
+          },
+          {
+            id: "RVR1960",
+            name: "Reina Valera 1960",
+            abbreviation: "RVR1960",
+            language: { id: "spa", name: "Español" }
+          },
+          {
+            id: "NVI",
+            name: "Nueva Versión Internacional",
+            abbreviation: "NVI",
+            language: { id: "spa", name: "Español" }
           }
         ]
       });
@@ -151,6 +163,7 @@ export default async function handler(req, res) {
       const word = urlObj.searchParams.get('word');
       const context = urlObj.searchParams.get('context') || '';
       const scriptureRef = urlObj.searchParams.get('scriptureRef') || '';
+      const lang = urlObj.searchParams.get('lang') || 'no';
 
       if (!word) {
         return res.status(400).json({ error: "Word query parameter is required" });
@@ -239,20 +252,39 @@ export default async function handler(req, res) {
 
       if (geminiApiKey) {
         try {
+          let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
+          let rejectCategory = "Ikke bibelrelatert";
+          let rejectDefinition = "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie.";
+          let rejectNote = "Søk avvist pga. manglende teologisk eller bibelsk relevans.";
+
+          if (lang === 'en') {
+            responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
+            rejectCategory = "Not Bible-related";
+            rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
+            rejectNote = "Search rejected due to lack of theological or biblical relevance.";
+          } else if (lang === 'es') {
+            responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
+            rejectCategory = "No relacionado con la Biblia";
+            rejectDefinition = "La búsqueda se desvía de los temas relacionados con la Biblia. Este diccionario de IA está reservado para el estudio de la Biblia y solo permite búsquedas de conceptos o palabras relacionadas con la Biblia, la teología cristiana, la fe, la historia de la iglesia o la geografía/historia bíblica.";
+            rejectNote = "Búsqueda rechazada debido a la falta de relevancia teológica o bíblica.";
+          }
+
           const ai = new GoogleGenAI({ apiKey: geminiApiKey });
           const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
+${responseLangInstruction}
+
 Vurder først ekstremt nøye om søkeordet eller emnet "${word}" har relevans til Bibelen, kristen teologi, kristendom, kirkehistorie, bibelhistorie, religiøse retninger, bønner eller jødisk-kristne bibelske kontekster/historier.
 
 Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning til Bibelen, kristendom, teologi, kirkehistorie, jødisk-kristen tro eller bibelske emner (for eksempel hvis brukeren søker etter sekulære, dagligdagse ting eller ting som 'iPhone', 'fotball', 'pizza', 'programmering', 'hvordan fjerne snø', 'katt' etc.), skal du nekte å definere eller belyse begrepet, og i stedet gi følgende faste avvisningssvar:
-- Sett 'category' til: "Ikke bibelrelatert"
-- Sett 'definition' til: "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie."
-- Sett 'contextualNote' til: "Søk avvist pga. manglende teologisk eller bibelsk relevans."
+- Sett 'category' til: "${rejectCategory}"
+- Sett 'definition' til: "${rejectDefinition}"
+- Sett 'contextualNote' til: "${rejectNote}"
 
 Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte:
-1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
+1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer to hvert vers eller samlet.
 2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
-3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis på flytende og varmt norsk, tilpasset bibelstudium.
-4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte norske betydning.
+3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium.
+4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte betydning på det valgte språket (norsk/engelsk/spansk).
 5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
 
 ${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}

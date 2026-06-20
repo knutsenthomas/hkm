@@ -1,24 +1,11 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bibelen | His Kingdom Ministry</title>
+    <title>Biblia | His Kingdom Ministry</title>
     
-    <!-- Preferred Language Redirect Guard -->
-    <script>
-        (function() {
-            const prefLang = localStorage.getItem('hkm_preferred_lang');
-            if (prefLang && prefLang !== 'no') {
-                const path = window.location.pathname;
-                if (path === '/bibel' || path === '/bibel.html') {
-                    window.location.replace('/' + prefLang + '/bibel' + window.location.search);
-                }
-            }
-        })();
-    </script>
-
     <!-- Google Fonts: Inter for hele siden -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,13 +17,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css?v=2026.06.20.2">
-    <link rel="stylesheet" href="css/cookie-consent.css">
+    <link rel="stylesheet" href="../styles.css?v=2026.06.20.2">
+    <link rel="stylesheet" href="../css/cookie-consent.css">
     
     <!-- Firebase Config & Service -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
-    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
     
     <!-- Loader Safety Net -->
     <script>
@@ -1750,9 +1737,9 @@
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300 scrolled" id="header">
         <div class="header-content" id="header-container">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
                         data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
                 </div>
                 <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom Ministry</span>
@@ -1760,14 +1747,14 @@
 
             <!-- Right Actions -->
             <div class="header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
+                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Buscar en el sitio web">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
 
                 <div class="lang-switcher relative group">
                     <button class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
                         <i class="fas fa-globe text-lg"></i> 
-                        <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                        <span data-content-doc="settings_global" data-content-key="header.currentLanguage">ES</span>
                     </button>
                     <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
                         <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
@@ -1776,14 +1763,14 @@
                     </div>
                 </div>
                 
-                <a href="/donasjoner" class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span> 
+                <a href="/es/donaciones" class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Donar</span> 
                     <i class="fas fa-heart heart text-sm btn-heart-icon"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
                 <button class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false">
+                    id="menu-toggle" aria-label="Toggle menu" aria-controls="mega-menu" aria-expanded="false">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -1798,34 +1785,35 @@
                 <div class="mega-menu-grid">
                     <!-- Column 1 -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.engage.title">Involúcrate</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/donasjoner">Støtt arbeidet</a></li>
-                            <li><a href="/bli-fast-giver">Bli fast giver</a></li>
-                            <li><a href="/for-menigheter">For menigheter</a></li>
-                            <li><a href="/for-bedrifter">For bedrifter</a></li>
+                            <li><a href="/es/donaciones">Apoya la obra</a></li>
+                            <li><a href="/es/donantes-regulares">Hazte donante mensual</a></li>
+                            <li><a href="/es/para-iglesias">Para iglesias</a></li>
+                            <li><a href="/es/para-empresas">Para empresas</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2 -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/om-oss">Om oss</a></li>
-                            <li><a href="/kontakt">Kontakt oss</a></li>
+                            <li><a href="/es/sobre-nosotros">Sobre nosotros</a></li>
+                            <li><a href="/es/contacto">Contáctanos</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 3 -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.resources.title">Ressurser</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/butikk">Butikk</a></li>
-                            <li><a href="/arrangementer">Arrangementer</a></li>
-                            <li><a href="/media">Media & Podcast</a></li>
-                            <li><a href="/blogg">Nyheter & Blogg</a></li>
-                            <li><a href="/kurs">Kurs</a></li>
-                            <li><a href="/minside/index.html">Min Side</a></li>
+                            <li><a href="/bibel">Biblia</a></li>
+                            <li><a href="/es/../butikk">Tienda</a></li>
+                            <li><a href="/es/eventos">Eventos</a></li>
+                            <li><a href="/es/media">Media & Podcast</a></li>
+                            <li><a href="/es/blog">Noticias y Blog</a></li>
+                            <li><a href="/es/ensenanza">Cursos</a></li>
+                            <li><a href="/es/../minside/index">Mi página</a></li>
                         </ul>
                     </div>
                 </div>
@@ -1840,14 +1828,14 @@
         <aside class="bible-sidebar" id="bible-sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-mobile-title-row" style="justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: nowrap; width: 100%;">
-                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Bibelbøker</span>
+                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Libros de la Biblia</span>
                     <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
                 <div class="search-container">
                     <span class="material-symbols-outlined icon">search</span>
-                    <input type="text" id="book-search" placeholder="Søk etter bibelbok...">
+                    <input type="text" id="book-search" placeholder="Buscar libro...">
                 </div>
             </div>
             
@@ -1856,7 +1844,7 @@
                 <!-- Section Title -->
                 <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
                     <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7;">settings</span>
-                    <span>Verktøy & Innstillinger</span>
+                    <span>Herramientas y Ajustes</span>
                 </div>
                 
                 <!-- Unified Settings Card -->
@@ -1873,8 +1861,8 @@
                     <!-- Quick Reference Search -->
                     <form id="bible-quick-search-form-mobile" style="margin: 0; display: flex; gap: 8px; align-items: center; width: 100%; position: relative;">
                         <span class="material-symbols-outlined" style="position: absolute; left: 10px; font-size: 16px; color: var(--text-muted); pointer-events: none; z-index: 10;">search</span>
-                        <input type="text" id="bible-quick-search-mobile" placeholder="Gå til vers (f.eks. Johannes 3:16)" class="bible-control-input" style="flex: 1; min-width: 0; height: 38px !important; padding: 0 12px 0 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; transition: all 0.2s;">
-                        <button type="submit" class="btn-bible-go" style="height: 38px !important; background: var(--bible-primary); color: white; border: none; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">Gå</button>
+                        <input type="text" id="bible-quick-search-mobile" placeholder="Ir al versículo (ej. Juan 3:16)" class="bible-control-input" style="flex: 1; min-width: 0; height: 38px !important; padding: 0 12px 0 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; transition: all 0.2s;">
+                        <button type="submit" class="btn-bible-go" style="height: 38px !important; background: var(--bible-primary); color: white; border: none; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">Ir</button>
                     </form>
 
                     <!-- Buttons Row (Bibeleksikon, Lesemodus, Tekstinnstillinger) -->
@@ -1882,19 +1870,19 @@
                         <!-- Settings Trigger -->
                         <button type="button" class="nav-btn" id="mobile-text-settings-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">text_fields</span>
-                            <span>Tekst</span>
+                            <span>Texto</span>
                         </button>
                         
                         <!-- Bibeleksikon Trigger -->
                         <button type="button" class="nav-btn" id="mobile-dict-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                            <span>Leksikon</span>
+                            <span>Lexicón</span>
                         </button>
                         
                         <!-- Reading Mode Toggle -->
                         <button type="button" class="nav-btn" id="mobile-reading-mode-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">chrome_reader_mode</span>
-                            <span>Lese</span>
+                            <span>Lectura</span>
                         </button>
                     </div>
 
@@ -1902,7 +1890,7 @@
                     <div id="mobile-settings-panel" style="display: none; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
                         <!-- Font Size -->
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Størrelse</span>
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tamaño</span>
                             <div class="btn-setting-group" style="display: flex; align-items: center;">
                                 <button type="button" id="btn-decrease-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px 0 0 6px; padding: 0; box-shadow: none !important; font-size: 13px; font-weight: bold; border-right: none;">A-</button>
                                 <button type="button" id="font-size-display-mobile" disabled style="border: 1px solid var(--border-color); background: var(--bg-sidebar); color: var(--text-base); height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: default; font-weight: 600; border-radius: 0; box-shadow: none !important;">18px</button>
@@ -1911,11 +1899,11 @@
                         </div>
                         <!-- Font Family -->
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Skrifttype</span>
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tipografía</span>
                             <div class="select-wrapper">
                                 <select id="settings-font-family-mobile" style="padding: 0 24px 0 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px; outline: none; cursor: pointer;">
-                                    <option value="serif">Serif (Klassisk)</option>
-                                    <option value="sans">Sans-Serif (Moderne)</option>
+                                    <option value="serif">Serif (Clásica)</option>
+                                    <option value="sans">Sans-Serif (Moderna)</option>
                                 </select>
                             </div>
                         </div>
@@ -1923,9 +1911,9 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tema</span>
                             <div class="theme-selectors" style="margin: 0; display: flex; gap: 8px;">
-                                <div class="theme-option" data-theme="cream" title="Kremgul" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #fdf6e3; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
-                                <div class="theme-option" data-theme="light" title="Lys" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #ffffff; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
-                                <div class="theme-option" data-theme="dark" title="Mørk" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #1a1a1a; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="cream" title="Crema" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #fdf6e3; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="light" title="Claro" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #ffffff; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="dark" title="Oscuro" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #1a1a1a; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
                             </div>
                         </div>
                     </div>
@@ -1933,12 +1921,12 @@
             </div>
 
             <div class="books-list-wrapper">
-                <div class="books-section-title" id="header-gt">Det gamle testamentet</div>
+                <div class="books-section-title" id="header-gt">Antiguo Testamento</div>
                 <div id="books-list-gt">
                     <!-- Loaded dynamically -->
                 </div>
                 
-                <div class="books-section-title" id="header-nt">Det nye testamentet</div>
+                <div class="books-section-title" id="header-nt">Nuevo Testamento</div>
                 <div id="books-list-nt">
                     <!-- Loaded dynamically -->
                 </div>
@@ -1966,13 +1954,13 @@
                     <!-- Book / Chapter triggers for quick overlay select -->
                     <button class="nav-btn" id="trigger-book-chapter" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
                         <span class="material-symbols-outlined" style="font-size: 18px;">grid_view</span>
-                        <span>Kapittel</span>
+                        <span>Capítulo</span>
                     </button>
 
                     <!-- Chapter Grid Overlay -->
                     <div class="chapter-selector-overlay" id="chapter-selector-overlay">
                         <div style="font-weight: 700; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                            <span>Velg kapittel</span>
+                            <span>Seleccionar capítulo</span>
                             <span class="material-symbols-outlined" style="cursor: pointer; font-size: 18px;" onclick="document.getElementById('chapter-selector-overlay').classList.remove('active')">close</span>
                         </div>
                         <div class="chapter-grid" id="chapter-grid">
@@ -1984,22 +1972,22 @@
                 <div class="controls-right">
                     <!-- Quick Reference Search -->
                     <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 8px; align-items: center;">
-                        <input type="text" id="bible-quick-search" placeholder="f.eks. Johannes 3:16" class="bible-control-input">
-                        <button type="submit" class="btn-bible-go">Gå</button>
+                        <input type="text" id="bible-quick-search" placeholder="ej. Juan 3:16" class="bible-control-input">
+                        <button type="submit" class="btn-bible-go">Ir</button>
                     </form>
 
                     <!-- Settings Trigger -->
-                    <div class="settings-popover-trigger" onclick="document.getElementById('settings-dropdown').classList.toggle('active')" title="Tekst-innstillinger">
+                    <div class="settings-popover-trigger" onclick="document.getElementById('settings-dropdown').classList.toggle('active')" title="Ajustes de texto">
                         <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
                     </div>
 
                     <!-- Bibeleksikon Manual Trigger -->
-                    <div class="settings-popover-trigger" id="dict-manual-trigger" title="Åpne Bibeleksikon">
+                    <div class="settings-popover-trigger" id="dict-manual-trigger" title="Abrir Lexicón">
                         <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
                     </div>
 
                     <!-- Reading Mode Trigger -->
-                    <div class="settings-popover-trigger" id="btn-toggle-reading-mode" title="Aktiver lesemodus">
+                    <div class="settings-popover-trigger" id="btn-toggle-reading-mode" title="Activar modo lectura">
                         <span class="material-symbols-outlined" style="font-size: 20px;">chrome_reader_mode</span>
                     </div>
 
@@ -2010,11 +1998,11 @@
 
                     <!-- Settings Popover -->
                     <div class="settings-dropdown" id="settings-dropdown">
-                        <div style="font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">Tekst-innstillinger</div>
+                        <div style="font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">Ajustes de texto</div>
                         
                         <!-- Font Size -->
                         <div class="settings-row">
-                            <span class="settings-label">Skriftstørrelse</span>
+                            <span class="settings-label">Tamaño de letra</span>
                             <div class="btn-setting-group">
                                 <button id="btn-decrease-font">A-</button>
                                 <button id="font-size-display" disabled style="cursor: default;">18px</button>
@@ -2024,11 +2012,11 @@
 
                         <!-- Font Family -->
                         <div class="settings-row">
-                            <span class="settings-label">Skrifttype</span>
+                            <span class="settings-label">Tipografía</span>
                             <div class="select-wrapper">
                                 <select id="settings-font-family" style="padding: 4px 24px 4px 8px; font-size: 12px;">
-                                    <option value="serif">Serif (Klassisk)</option>
-                                    <option value="sans">Sans-Serif (Moderne)</option>
+                                    <option value="serif">Serif (Clásica)</option>
+                                    <option value="sans">Sans-Serif (Moderna)</option>
                                 </select>
                             </div>
                         </div>
@@ -2037,9 +2025,9 @@
                         <div class="settings-row">
                             <span class="settings-label">Tema</span>
                             <div class="theme-selectors">
-                                <div class="theme-option active" data-theme="cream" title="Kremgul"></div>
-                                <div class="theme-option" data-theme="light" title="Lys"></div>
-                                <div class="theme-option" data-theme="dark" title="Mørk"></div>
+                                <div class="theme-option active" data-theme="cream" title="Crema"></div>
+                                <div class="theme-option" data-theme="light" title="Claro"></div>
+                                <div class="theme-option" data-theme="dark" title="Oscuro"></div>
                             </div>
                         </div>
                     </div>
@@ -2050,12 +2038,12 @@
             <div class="bible-content-pane">
                 <div class="bible-text-container">
                     <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                        <div class="book-badge" id="current-book-badge">MATTEUS</div>
+                        <div class="book-badge" id="current-book-badge">MATEO</div>
                         <h1 class="chapter-number" id="current-chapter-number">1</h1>
                         <span class="translation-badge" id="current-translation-abbr" style="display: none;">OTB-NB</span>
                         <button id="btn-lookup-chapter" class="nav-btn" style="margin-top: 4px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                            <span>Forklar kapittelet i Bibeleksikon</span>
+                            <span>Explicar capítulo en el Lexicón</span>
                         </button>
                     </div>
 
@@ -2068,7 +2056,7 @@
                     <div id="chapter-cross-references-section" style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border-color); display: none; width: 100%;">
                         <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; justify-content: center; text-transform: uppercase; letter-spacing: 0.05em;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">link</span>
-                            <span>Relaterte vers & kryssreferanser</span>
+                            <span>Versículos relacionados y referencias cruzadas</span>
                         </h4>
                         <div id="chapter-cross-references" style="display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto;">
                             <!-- Loaded dynamically -->
@@ -2078,34 +2066,34 @@
 
                 <!-- Verse Context Actions Toolbar -->
                 <div id="verse-context-toolbar" style="position: absolute; display: none; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); padding: 6px 12px; z-index: 1000; align-items: center; gap: 6px; box-sizing: border-box; transform: translate(-50%, -100%); margin-top: -8px; white-space: nowrap !important; width: max-content !important; flex-wrap: nowrap !important; flex-direction: row !important;">
-                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Bokmerk">
+                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Favorito">
                         <span class="material-symbols-outlined" style="font-size: 16px;">bookmark</span>
-                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Bokmerk</span>
+                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Favorito</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Forklar i Bibeleksikon">
+                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Explicar en el Lexicón">
                         <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                        <span class="toolbar-btn-text">Forklar i Bibeleksikon</span>
+                        <span class="toolbar-btn-text">Explicar en el Lexicón</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-share" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Del vers">
+                    <button id="toolbar-btn-share" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Compartir versículo">
                         <span class="material-symbols-outlined" style="font-size: 16px;">share</span>
-                        <span class="toolbar-btn-text">Del</span>
+                        <span class="toolbar-btn-text">Compartir</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-download" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Lagre på din maskin">
+                    <button id="toolbar-btn-download" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Guardar en tu dispositivo">
                         <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
-                        <span class="toolbar-btn-text">Lagre på maskin</span>
+                        <span class="toolbar-btn-text">Descargar</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-save-user" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Lagre på brukeren (Min Side)">
+                    <button id="toolbar-btn-save-user" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Guardar en tu perfil (Mi página)">
                         <span class="material-symbols-outlined" style="font-size: 16px;">edit_note</span>
-                        <span class="toolbar-btn-text">Lagre på brukeren</span>
+                        <span class="toolbar-btn-text">Guardar en perfil</span>
                     </button>
                     <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-clear" style="background: none !important; border: none !important; cursor: pointer !important; color: #dc2626 !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Nullstill valg">
+                    <button id="toolbar-btn-clear" style="background: none !important; border: none !important; cursor: pointer !important; color: #dc2626 !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Limpiar selección">
                         <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-                        <span class="toolbar-btn-text">Fjern</span>
+                        <span class="toolbar-btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>
@@ -2113,7 +2101,7 @@
             <!-- Fly-out Dictionary Drawer -->
             <aside class="dictionary-drawer" id="dictionary-drawer">
                 <div class="dict-header">
-                    <h3>Bibeleksikon</h3>
+                    <h3>Lexicon</h3>
                     <button class="close-dict-btn" id="close-dict-btn">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -2121,54 +2109,54 @@
                 <div class="dict-body">
                     <!-- Search Input inside Drawer -->
                     <div class="dict-search-container" style="margin-bottom: 20px; display: flex; gap: 8px;">
-                        <input type="text" id="dict-search-input" placeholder="Søk på ord eller spørsmål..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
-                        <button id="dict-search-submit-btn" style="background: var(--bible-primary); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Søk</button>
+                        <input type="text" id="dict-search-input" placeholder="Buscar palabra o hacer pregunta..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
+                        <button id="dict-search-submit-btn" style="background: var(--bible-primary); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Buscar</button>
                     </div>
 
                     <!-- Welcome / Info state when nothing is searched yet -->
                     <div id="dict-welcome-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 10px; color: var(--text-muted);">
                         <span class="material-symbols-outlined" style="font-size: 40px; color: var(--bible-primary); margin-bottom: 12px; opacity: 0.8;">menu_book</span>
-                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Velkommen til Bibeleksikon</h4>
-                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.</p>
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Bienvenido al Lexicón</h4>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Busca términos teológicos, personajes, eventos o haz preguntas sobre la Biblia directamente aquí.</p>
                     </div>
 
                     <!-- Spinner loading -->
                     <div id="dict-spinner" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: var(--text-muted);">
                         <div class="spinner" style="margin-bottom: 12px;"></div>
-                        <p style="font-size: 13px;">Slår opp med AI...</p>
+                        <p style="font-size: 13px;">Buscando con IA...</p>
                     </div>
                     
                     <div id="dict-content-wrap" style="display: none;">
-                        <h4 class="dict-word-title" id="dict-word-title">Nåde</h4>
-                        <div class="dict-category-badge" id="dict-category">Teologisk begrep</div>
+                        <h4 class="dict-word-title" id="dict-word-title">Gracia</h4>
+                        <div class="dict-category-badge" id="dict-category">Término teológico</div>
                         
-                        <div class="dict-section-title">Definisjon / Belysning</div>
+                        <div class="dict-section-title">Definición / Explicación</div>
                         <div class="dict-definition-text" id="dict-definition">
-                            Dette er definisjonen...
+                            Esta es la definición...
                         </div>
 
                         <!-- Grunntekst (Originalspråk) Section -->
                         <div id="dict-original-words-section" style="display: none; margin-top: 20px; margin-bottom: 24px;">
-                            <div class="dict-section-title">Grunntekst (Originalspråk)</div>
+                            <div class="dict-section-title">Texto original (Griego/Hebreo)</div>
                             <div id="dict-original-words-list" style="display: flex; flex-direction: column; gap: 10px;">
                                 <!-- Loaded dynamically -->
                             </div>
                         </div>
 
-                        <div class="dict-section-title">Kontekst</div>
+                        <div class="dict-section-title">Contexto</div>
                         <div class="dict-note-box" id="dict-contextual-note">
-                            Dette er notatet...
+                            Esta es la nota...
                         </div>
 
                         <!-- Bibeleksikon Cross References -->
                         <div id="dict-cross-refs-section" style="display: none; margin-top: 20px;">
-                            <div class="dict-section-title">Kryssreferanser (Relaterte vers)</div>
+                            <div class="dict-section-title">Referencias cruzadas (Versículos relacionados)</div>
                             <div id="dict-cross-references" style="display: flex; flex-direction: column; gap: 8px;">
                                 <!-- Loaded dynamically -->
                             </div>
                         </div>
 
-                        <div class="dict-section-title" style="margin-top: 24px;">Relaterte ressurser fra nettsiden</div>
+                        <div class="dict-section-title" style="margin-top: 24px;">Recursos relacionados del sitio web</div>
                         <div id="dict-related-resources" class="dict-related-box">
                             <!-- Loaded dynamically -->
                         </div>
@@ -2178,14 +2166,14 @@
 
             <!-- Central Reading Area Bottom Floating Navigation -->
             <div class="floating-bible-nav" id="floating-bible-nav">
-                <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
+                <button class="floating-nav-btn" id="floating-prev-btn" title="Capítulo anterior">
                     <span class="material-symbols-outlined">chevron_left</span>
                 </button>
                 <div class="floating-nav-info">
-                    <span id="floating-nav-book">JOHANNES</span>
+                    <span id="floating-nav-book">JUAN</span>
                     <span id="floating-nav-chapter">1</span>
                 </div>
-                <button class="floating-nav-btn" id="floating-next-btn" title="Neste kapittel">
+                <button class="floating-nav-btn" id="floating-next-btn" title="Siguiente capítulo">
                     <span class="material-symbols-outlined">chevron_right</span>
                 </button>
             </div>
@@ -2194,7 +2182,7 @@
         <!-- Right Sidebar: Bookmarks & History -->
         <aside class="bible-nav-right" id="bible-nav-right">
             <div class="sidebar-right-header">
-                <span class="sidebar-right-title">Min side & Verktøy</span>
+                <span class="sidebar-right-title">Mi página y Herramientas</span>
                 <button class="close-sidebar-btn" onclick="document.getElementById('bible-nav-right').classList.remove('active')">
                     <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                 </button>
@@ -2207,7 +2195,7 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
-                ">Favoritter</div>
+                ">Favoritos</div>
                 <div class="tab-btn" id="tab-btn-history" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-history').classList.add('active');
@@ -2215,7 +2203,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
-                ">Historikk</div>
+                ">Historial</div>
                 <div class="tab-btn" id="tab-btn-related" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-related').classList.add('active');
@@ -2223,7 +2211,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
-                ">Ressurser</div>
+                ">Recursos</div>
                 <div class="tab-btn" id="tab-btn-notes" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-notes').classList.add('active');
@@ -2231,7 +2219,7 @@
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
-                ">Notater</div>
+                ">Notas</div>
             </div>
 
             <div class="tabs-content">
@@ -2257,49 +2245,49 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer" id="kontakt">
+    <footer class="footer" id="contacto">
         <div class="container">
             <div class="footer-layout-v2">
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <a href="/" class="logo">
+                        <a href="/es/" class="logo">
                             <div class="logo-icon">
-                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros.</p>
                     </div>
 
                     <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Om oss</h4>
+                            <h4>Sobre nosotros</h4>
                             <ul>
-                                <li><a href="/">Hjem</a></li>
-                                <li><a href="/om-oss">Om oss</a></li>
-                                <li><a href="/kontakt">Kontakt oss</a></li>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Ressurser</h4>
+                            <h4>Recursos</h4>
                             <ul>
-                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
-                                <li><a href="/bibel">Les Bibelen</a></li>
-                                <li><a href="/bibelstudier">Bibelstudier</a></li>
-                                <li><a href="/media">Undervisning</a></li>
-                                <li><a href="/arrangementer">Arrangementer</a></li>
-                                <li><a href="/blogg">Nyheter & blogg</a></li>
+                                <li><a href="/bibel">Biblia</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="/media">Podcast</a></li>
-                                <li><a href="/media">Videoer</a></li>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a></li>
                             </ul>
                         </div>
@@ -2309,29 +2297,30 @@
                 <!-- Right Section: Cards -->
                 <div class="footer-right">
                     <div class="footer-card">
-                        <h3>Følg oss</h3>
+                        <h3>Síguenos</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i class="fab fa-facebook-f"></i></a>
                             <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i class="fab fa-instagram"></i></a>
                             <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <div class="footer-card contact-card">
-                        <h3>Kontakt oss</h3>
-                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+                        <h3>Contáctanos</h3>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
                         <div class="contact-details">
-                            <div class="detail-item"><strong>E-post:</strong><p>post@hiskingdomministry.no</p></div>
-                            <div class="detail-item"><strong>Telefon:</strong><p>+47 930 94 615</p></div>
+                            <div class="detail-item"><strong>Email:</strong><p>post@hiskingdomministry.no</p></div>
+                            <div class="detail-item"><strong>Teléfono:</strong><p>+47 930 94 615</p></div>
                             <div class="detail-item"><strong>Vipps:</strong><p>938361</p></div>
+                            <div class="detail-item"><strong>Nº de cuenta:</strong><p>3000.66.08759</p></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
-                <a href="/admin/login.html" class="admin-link">Admin</a>
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Todos los derechos reservados.</p>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -2343,10 +2332,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- JavaScript -->
-    <script type="module" src="script.js?v=2026.04.26.12.00"></script>
-    <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.06.20.2"></script>
-    <script type="module" src="js/i18n.js"></script>
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.06.20.2"></script>
+    <script type="module" src="../js/i18n.js"></script>
 </body>
 
 </html>
