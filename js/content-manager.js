@@ -88,6 +88,7 @@ class ContentManager {
         if (p('personvern') || p('privacy') || p('privacidad')) return 'personvern';
         if (p('tilgjengelighet') || p('accessibility') || p('accesibilidad')) return 'tilgjengelighet';
         if (p('betingelser')) return 'betingelser';
+        if (p('tidslinje-imperier')) return 'tidslinje-imperier';
         return '';
     }
 
@@ -684,20 +685,22 @@ class ContentManager {
             }
 
             // 1. Parallel Initial Load (Firestore defaults to cache if enabled)
-            const docIds = [this.pageId, 'settings_design', 'settings_seo', 'settings_global'];
+            const docIds = [this.pageId, 'settings_design', 'settings_seo', 'settings_global'].filter(Boolean);
             if (this.pageId === 'index') {
                 docIds.push('settings_facebook_feed');
             }
             const docs = service && (service.isInitialized || canReadPublicContent())
                 ? await this.getContentDocs(docIds)
                 : {};
-            const content = docs[this.pageId] ?? null;
+            const content = this.pageId ? (docs[this.pageId] ?? null) : null;
             const globalSettings = docs.settings_design ?? null;
             const seoSettings = docs.settings_seo ?? null;
             const globalContent = docs.settings_global ?? null;
             const facebookFeedSettings = docs.settings_facebook_feed ?? null;
 
-            this.cacheLocalJson(`hkm_cache_page_${this.pageId}`, content);
+            if (this.pageId) {
+                this.cacheLocalJson(`hkm_cache_page_${this.pageId}`, content);
+            }
             this.cacheLocalJson('hkm_cache_settings_design', globalSettings);
             this.cacheLocalJson('hkm_cache_settings_seo', seoSettings);
             this.cacheLocalJson('hkm_cache_settings_global', globalContent);
