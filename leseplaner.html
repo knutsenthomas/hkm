@@ -129,8 +129,8 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            padding: 24px;
-            gap: 12px;
+            padding: 0;
+            gap: 0;
         }
 
         .plan-card:hover {
@@ -139,11 +139,46 @@
             border-color: rgba(209, 125, 57, 0.2);
         }
 
-        .plan-header {
+        .plan-image-wrapper {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background-color: #f1f5f9;
+        }
+
+        .plan-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .plan-card:hover .plan-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .plan-image-wrapper .duration-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            color: var(--primary-orange);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 2;
+        }
+
+        .plan-content-wrapper {
+            padding: 24px;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-direction: column;
             gap: 12px;
+            flex-grow: 1;
         }
 
         .plan-title {
@@ -152,16 +187,6 @@
             color: var(--primary-blue);
             margin: 0;
             line-height: 1.3;
-        }
-
-        .duration-badge {
-            background: #fff7ed;
-            color: var(--primary-orange);
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 20px;
-            white-space: nowrap;
         }
 
         .plan-desc {
@@ -495,13 +520,16 @@
 
                 grid.innerHTML = plansList.map(plan => `
                     <div class="plan-card" data-id="${plan.id}">
-                        <div class="plan-header">
-                            <h3 class="plan-title">${escapeHtml(plan.title)}</h3>
+                        <div class="plan-image-wrapper">
+                            <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}">
                             <span class="duration-badge">${plan.durationDays} dager</span>
                         </div>
-                        <p class="plan-desc">${escapeHtml(plan.description || 'Ingen beskrivelse tilgjengelig.')}</p>
-                        <div class="plan-actions">
-                            <span class="plan-link">Se innhold <i class="fas fa-arrow-right"></i></span>
+                        <div class="plan-content-wrapper">
+                            <h3 class="plan-title">${escapeHtml(plan.title)}</h3>
+                            <p class="plan-desc">${escapeHtml(plan.description || 'Ingen beskrivelse tilgjengelig.')}</p>
+                            <div class="plan-actions">
+                                <span class="plan-link">Se innhold <i class="fas fa-arrow-right"></i></span>
+                            </div>
                         </div>
                     </div>
                 `).join('');
