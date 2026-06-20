@@ -52,6 +52,10 @@
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
         
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
+    <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
 </head>
 
 <body class="cms-loading">
@@ -473,6 +477,31 @@
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="js/cookie-consent.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
 </body>
 
 </html>

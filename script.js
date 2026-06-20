@@ -745,7 +745,11 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     }
     resultsEl.classList.remove('hidden');
 
-    if (!window.firebaseService || !window.firebaseService.isInitialized) {
+    const isServiceReady = window.firebaseService && (
+        window.firebaseService.isInitialized || 
+        (typeof window.firebaseService.canReadPublicContent === 'function' && window.firebaseService.canReadPublicContent())
+    );
+    if (!isServiceReady) {
         resultsEl.innerHTML = '<p class="site-search-helper">Innhold kan ikke søkes akkurat nå.</p>';
         return;
     }
