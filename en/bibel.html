@@ -119,6 +119,7 @@
             display: flex;
             position: relative;
             height: calc(100vh - var(--hkm-header-height, 80px));
+            height: calc(100dvh - var(--hkm-header-height, 80px));
             margin-top: var(--hkm-header-height, 80px);
             overflow: hidden;
             background: var(--bg-base);
@@ -136,6 +137,7 @@
             .bible-app-container {
                 margin-top: var(--hkm-header-height, 70px);
                 height: calc(100vh - var(--hkm-header-height, 70px));
+                height: calc(100dvh - var(--hkm-header-height, 70px));
             }
         }
 
@@ -436,7 +438,7 @@
         .bible-content-pane {
             flex: 1;
             overflow-y: auto;
-            padding: 40px 24px;
+            padding: 40px 24px 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1103,6 +1105,7 @@
             .bible-app-container {
                 margin-top: var(--hkm-header-height, 70px);
                 height: calc(100vh - var(--hkm-header-height, 70px));
+                height: calc(100dvh - var(--hkm-header-height, 70px));
             }
 
             .bible-sidebar {
@@ -1175,7 +1178,7 @@
                 flex: 1 !important;
             }
             .bible-content-pane {
-                padding: 24px 16px;
+                padding: 24px 16px 80px;
             }
         }
 
