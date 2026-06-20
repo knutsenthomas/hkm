@@ -513,7 +513,36 @@
             }
 
             /* Skjul alt unødvendig */
-            header, footer, aside, .other-plans-section, #site-search-modal, .cookie-consent, #global-search-opener, .hkm-chat-widget, .search-overlay, .page-hero, section.page-hero, .subpage-hero, #expand-days-container {
+            header, footer, aside, .other-plans-section, #site-search-modal, .cookie-consent, #global-search-opener, .hkm-chat-widget, .search-overlay, #expand-days-container {
+                display: none !important;
+            }
+
+            /* Stil for hero-banner på print */
+            .page-hero, section.page-hero, .subpage-hero {
+                display: flex !important;
+                min-height: 220px !important;
+                height: 220px !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 24px !important;
+                border-radius: 12px !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-repeat: no-repeat !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .page-hero-title, .hero-title {
+                font-size: 20pt !important;
+                color: white !important;
+                font-weight: 800 !important;
+                margin: 0 !important;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+            }
+
+            .hero-breadcrumbs {
                 display: none !important;
             }
 
@@ -871,15 +900,9 @@
         <div class="details-container" id="details-view" style="display: none;">
             <!-- Print Only Header -->
             <div class="print-only-header">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1B4965; padding-bottom: 12px; margin-bottom: 24px;">
-                    <div>
-                        <h1 style="font-size: 24pt; font-weight: 800; color: #1B4965; margin: 0;" id="print-plan-title">Reading Plan</h1>
-                        <p style="font-size: 11pt; color: #d17d39; font-weight: 600; margin: 4px 0 0 0;" id="print-plan-subtitle"></p>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 14pt; font-weight: 800; color: #1B4965; letter-spacing: 0.5px;">HIS KINGDOM MINISTRY</span>
-                        <p style="font-size: 9pt; color: #64748b; margin: 2px 0 0 0;">hiskingdomministry.no</p>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1B4965; padding-bottom: 8px; margin-bottom: 20px;">
+                    <span style="font-size: 12pt; font-weight: 800; color: #1B4965; letter-spacing: 0.5px;">HIS KINGDOM MINISTRY</span>
+                    <span style="font-size: 9pt; color: #64748b;">hiskingdomministry.no</span>
                 </div>
                 <div class="print-intro" style="margin-bottom: 24px; padding: 12px 16px; background: #f8fafc; border-left: 4px solid #1B4965; border-radius: 4px; font-size: 10pt; line-height: 1.5; color: #334155;">
                     <strong>Study Guide & Reading Plan:</strong> Welcome to this reading plan from His Kingdom Ministry. Use this guide for daily reflection, Bible reading, and prayer. Check off each day as you complete your reading to track your progress.
