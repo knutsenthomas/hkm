@@ -7,6 +7,7 @@ module.exports = {
     "./*.html",
     "./en/**/*.html",
     "./es/**/*.html",
+    "./ressurser/**/*.html",
   ],
   theme: {
     extend: {

@@ -264,33 +264,54 @@
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="header-content" id="header-container">
-            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
-                <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
                 </div>
-                <span class="text-xl">His Kingdom Ministry</span>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
             </a>
 
+            <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Search website">
+                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
 
                 <div class="lang-switcher relative group">
-                    <button class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>EN</span>
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global"
+                            data-content-key="header.currentLanguage">NO</span>
                     </button>
-                    <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
-                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
-                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                            Norsk</a>
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                            English</a>
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                            Español</a>
                     </div>
                 </div>
-                <a href="/en/donations" class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    <span>Donate</span> <i class="fas fa-heart heart text-sm btn-heart-icon"></i>
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span> <i
+                        class="fas fa-heart heart text-sm btn-heart-icon"></i>
                 </a>
 
-                <button class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative" id="menu-toggle" aria-label="Toggle menu" aria-controls="mega-menu" aria-expanded="false">
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -364,10 +385,7 @@
         <div class="details-container" id="details-view" style="display: none;">
             <!-- Left Side: Content -->
             <div class="left-content">
-                <!-- Blog cover image -->
-                <div class="card" id="plan-image-card" style="display: none; padding: 0; overflow: hidden; border: none; margin-bottom: 24px;">
-                    <img id="plan-cover-image" src="" alt="Reading Plan Cover" style="width: 100%; height: auto; max-height: 480px; object-fit: cover; display: block; border-radius: 16px;">
-                </div>
+                <!-- Description -->
 
                 <!-- Description -->
                 <div class="card">
@@ -551,18 +569,11 @@
                     }
                 }
 
-                // Hero background image & Blog cover image
+                // Hero background image
                 if (plan.imageUrl) {
                     const heroSection = document.querySelector('.page-hero');
                     if (heroSection) {
                         heroSection.style.setProperty('background-image', `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('${plan.imageUrl}')`, 'important');
-                    }
-                    
-                    const imgCard = document.getElementById('plan-image-card');
-                    const imgEl = document.getElementById('plan-cover-image');
-                    if (imgCard && imgEl) {
-                        imgEl.src = plan.imageUrl;
-                        imgCard.style.display = 'block';
                     }
                 }
 
@@ -574,7 +585,10 @@
                 if (daysList.length === 0) {
                     container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">No days have been configured for this reading plan yet.</p>`;
                 } else {
-                    container.innerHTML = daysList.map(day => {
+                    const maxInitialDays = 5;
+                    const showExpandButton = daysList.length > maxInitialDays;
+                    
+                    const renderDayItem = (day) => {
                         const resourcesHtml = renderResources(day.resources);
                         return `
                             <div class="day-item">
@@ -586,7 +600,28 @@
                                 ${resourcesHtml}
                             </div>
                         `;
-                    }).join('');
+                    };
+
+                    const visibleDays = showExpandButton ? daysList.slice(0, maxInitialDays) : daysList;
+                    let html = visibleDays.map(renderDayItem).join('');
+
+                    if (showExpandButton) {
+                        html += `
+                            <div id="expand-days-container" style="text-align: center; margin-top: 24px;">
+                                <button id="btn-show-all-days" class="btn-start-plan" style="background: none; border: 2px solid var(--primary-orange); color: var(--primary-orange); box-shadow: none; font-size: 0.95rem; padding: 12px 24px; max-width: 250px; margin: 0 auto;">
+                                    Show all ${daysList.length} days
+                                </button>
+                            </div>
+                        `;
+                    }
+                    container.innerHTML = html;
+
+                    if (showExpandButton) {
+                        document.getElementById('btn-show-all-days').addEventListener('click', () => {
+                            const allHtml = daysList.map(renderDayItem).join('');
+                            container.innerHTML = allHtml;
+                        });
+                    }
                 }
 
                 // Add button click routing to Bible reader
