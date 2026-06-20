@@ -6394,3 +6394,120 @@ body:not(.cms-loading) {
 .product-hero-swiper .swiper-slide-active img {
     transition: transform 10s ease-out !important;
 }
+
+/* === Bible Promo (Homepage) === */
+.bible-home-promo {
+    padding: 80px 0;
+    background: #f8fafc;
+}
+
+.bible-home-promo-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: linear-gradient(135deg, #1B4965 0%, #0B1A24 100%);
+    border-radius: 24px;
+    padding: 50px;
+    color: #ffffff;
+    box-shadow: 0 12px 40px rgba(27, 73, 101, 0.15);
+    overflow: hidden;
+    gap: 40px;
+}
+
+.bible-home-promo-content {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.bible-home-promo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.bible-home-promo-pill i {
+    color: #d17d39;
+}
+
+.bible-home-promo-title {
+    font-size: 36px !important;
+    font-weight: 800;
+    line-height: 1.25 !important;
+    margin-bottom: 20px !important;
+    color: #ffffff !important;
+}
+
+.bible-home-promo-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 32px;
+}
+
+.bible-home-promo-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.bible-home-promo-actions .btn {
+    border-radius: 50px !important;
+}
+
+.bible-home-promo-image-panel {
+    flex: 0.8;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 320px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.bible-home-promo-image-panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.bible-home-promo-card:hover .bible-home-promo-image-panel img {
+    transform: scale(1.05);
+}
+
+@media (max-width: 991px) {
+    .bible-home-promo-card {
+        flex-direction: column;
+        padding: 40px 30px;
+        gap: 30px;
+    }
+    
+    .bible-home-promo-image-panel {
+        width: 100%;
+        height: 250px;
+    }
+}
+
+@media (max-width: 600px) {
+    .bible-home-promo .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    
+    .bible-home-promo-card {
+        padding: 30px 20px;
+        border-radius: 16px;
+    }
+    
+    .bible-home-promo-title {
+        font-size: 28px !important;
+    }
+}

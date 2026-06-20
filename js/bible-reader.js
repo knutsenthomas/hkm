@@ -34,6 +34,18 @@ class BibleReader {
         this.setupDOMElements();
         this.applySettings();
         this.bindEvents();
+        this.setupSwipeGestures();
+        
+        // Listen to Firebase auth state for synchronizing notes
+        if (window.firebase) {
+            firebase.auth().onAuthStateChanged(user => {
+                this.currentUser = user;
+                this.loadNotes();
+            });
+        } else {
+            this.currentUser = null;
+            this.loadNotes();
+        }
         
         await this.loadTranslations();
         
@@ -104,7 +116,8 @@ class BibleReader {
             
             // Bookmarks / History sidebar
             bookmarksList: document.getElementById('bookmarks-list'),
-            historyList: document.getElementById('history-list')
+            historyList: document.getElementById('history-list'),
+            notesList: document.getElementById('notes-list')
         };
     }
 
@@ -807,6 +820,287 @@ class BibleReader {
                 await this.selectChapter(item.dataset.chapterId);
             });
         });
+    }
+
+    setupSwipeGestures() {
+        if (!this.dom.readingPane) return;
+
+        let touchstartX = 0;
+        let touchstartY = 0;
+        let touchendX = 0;
+        let touchendY = 0;
+
+        const checkDirection = () => {
+            const diffX = touchendX - touchstartX;
+            const diffY = touchendY - touchstartY;
+
+            // Ensure horizontal swipe is dominant and above threshold of 60px
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+                if (diffX > 0) {
+                    // Swipe right -> Previous chapter
+                    this.navigateChapter(-1);
+                } else {
+                    // Swipe left -> Next chapter
+                    this.navigateChapter(1);
+                }
+            }
+        };
+
+        this.dom.readingPane.addEventListener('touchstart', (e) => {
+            touchstartX = e.changedTouches[0].screenX;
+            touchstartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        this.dom.readingPane.addEventListener('touchend', (e) => {
+            touchendX = e.changedTouches[0].screenX;
+            touchendY = e.changedTouches[0].screenY;
+            checkDirection();
+        }, { passive: true });
+    }
+
+    async loadNotes() {
+        if (!this.dom.notesList) return;
+        
+        if (this.currentUser) {
+            this.dom.notesList.innerHTML = `<div class="loading-state" style="padding: 20px; text-align: center;"><div class="spinner" style="margin: 0 auto 10px auto;"></div>Laster notater...</div>`;
+            try {
+                const snap = await firebase.firestore()
+                    .collection('personal_notes')
+                    .where('userId', '==', this.currentUser.uid)
+                    .get();
+                
+                this.notes = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    this.notes.push({
+                        id: doc.id,
+                        title: data.title || 'Uten tittel',
+                        text: data.text || '',
+                        createdAt: data.createdAt ? data.createdAt.toDate() : new Date()
+                    });
+                });
+                
+                // Sort by date desc
+                this.notes.sort((a, b) => b.createdAt - a.createdAt);
+            } catch (e) {
+                console.error('Error fetching notes:', e);
+                this.notes = [];
+            }
+        } else {
+            // Load from localStorage
+            this.notes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+            // Parse dates
+            this.notes = this.notes.map(n => ({
+                ...n,
+                createdAt: new Date(n.createdAt)
+            }));
+            this.notes.sort((a, b) => b.createdAt - a.createdAt);
+        }
+        
+        this.renderNotesList();
+    }
+
+    renderNotesList() {
+        if (!this.dom.notesList) return;
+
+        let syncBadge = '';
+        if (!this.currentUser) {
+            syncBadge = `
+                <div style="background: rgba(209, 125, 57, 0.1); border: 1px solid rgba(209, 125, 57, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #7f8c8d;">
+                    ⚠️ Lagres kun lokalt. <a href="/minside/login.html" style="color: var(--bible-primary); text-decoration: underline; font-weight: 600;">Logg inn</a> for å synkronisere med Min Side.
+                </div>
+            `;
+        }
+
+        const newNoteBtnHtml = `
+            <button id="btn-new-note" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; border-radius: 8px; padding: 10px 16px; font-size: 14px; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">add</span>Nytt notat
+            </button>
+        `;
+
+        if (this.notes.length === 0) {
+            this.dom.notesList.innerHTML = `
+                ${syncBadge}
+                ${newNoteBtnHtml}
+                <p class="empty-state" style="padding: 20px 0; text-align: center; color: #94a3b8; font-size: 13px;">Ingen notater ennå. Skriv dine refleksjoner her!</p>
+            `;
+        } else {
+            const listHtml = this.notes.map(n => {
+                const dateStr = n.createdAt.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = n.text;
+                const plainText = tempDiv.innerText || tempDiv.textContent || '';
+                const preview = plainText.length > 60 ? plainText.substring(0, 60) + '...' : plainText;
+
+                return `
+                    <div class="note-sidebar-item" data-id="${n.id}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; position: relative; box-sizing: border-box; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 8px;">
+                            <strong class="note-title" style="font-size: 14px; font-weight: 600; color: var(--text-base); display: block; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.title}</strong>
+                            <span class="material-symbols-outlined delete-note-btn" data-id="${n.id}" style="font-size: 18px; color: #cbd5e1; cursor: pointer; transition: color 0.2s; flex-shrink: 0;">delete</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 6px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal;">${preview || '<i>Ingen tekst</i>'}</p>
+                        <span style="font-size: 10px; color: #94a3b8;">${dateStr}</span>
+                    </div>
+                `;
+            }).join('');
+
+            this.dom.notesList.innerHTML = `
+                ${syncBadge}
+                ${newNoteBtnHtml}
+                <div class="notes-items-container" style="max-height: calc(100vh - 280px); overflow-y: auto; padding-right: 4px;">
+                    ${listHtml}
+                </div>
+            `;
+        }
+
+        // Bind events
+        const newBtn = this.dom.notesList.querySelector('#btn-new-note');
+        if (newBtn) {
+            newBtn.addEventListener('click', () => this.showNoteForm());
+        }
+
+        this.dom.notesList.querySelectorAll('.note-sidebar-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-note-btn')) {
+                    e.stopPropagation();
+                    const noteId = e.target.dataset.id;
+                    this.deleteNote(noteId);
+                    return;
+                }
+                const noteId = item.dataset.id;
+                const note = this.notes.find(n => n.id === noteId);
+                if (note) this.showNoteForm(note);
+            });
+
+            // Hover delete button effect
+            const delBtn = item.querySelector('.delete-note-btn');
+            if (delBtn) {
+                delBtn.addEventListener('mouseover', () => delBtn.style.color = '#ef4444');
+                delBtn.addEventListener('mouseout', () => delBtn.style.color = '#cbd5e1');
+            }
+        });
+    }
+
+    showNoteForm(note = null) {
+        if (!this.dom.notesList) return;
+
+        const isEdit = !!note;
+        const currentRef = this.getCurrentReferenceText();
+        const defaultTitle = isEdit ? note.title : currentRef;
+        const bodyText = isEdit ? note.text.replace(/<br>/g, '\n') : '';
+
+        this.dom.notesList.innerHTML = `
+            <div class="note-form" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; box-sizing: border-box; text-align: left;">
+                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-base);">${isEdit ? 'Rediger notat' : 'Nytt notat'}</h4>
+                
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Tittel</label>
+                    <input type="text" id="note-form-title" class="bible-control-input" value="${defaultTitle}" style="width: 100% !important; height: 36px !important;" placeholder="Tittel på notatet..." />
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Tekst</label>
+                    <textarea id="note-form-body" style="width: 100%; height: 160px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px; font-family: inherit; line-height: 1.4; resize: vertical; outline: none; box-sizing: border-box;" placeholder="Skriv dine tanker, bønner eller refleksjoner her...">${bodyText}</textarea>
+                </div>
+                
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-save-note" class="btn btn-primary" style="flex: 1; border-radius: 8px; padding: 8px 12px; font-size: 13px; background: var(--bible-primary) !important; color: #fff !important; font-weight: 600; border: none; cursor: pointer;">Lagre</button>
+                    <button id="btn-cancel-note" class="btn btn-secondary" style="flex: 1; border-radius: 8px; padding: 8px 12px; font-size: 13px; background: var(--bg-base) !important; color: var(--text-base) !important; border: 1px solid var(--border-color) !important; font-weight: 600; cursor: pointer;">Avbryt</button>
+                </div>
+            </div>
+        `;
+
+        // Focus body input if creating new
+        if (!isEdit) {
+            document.getElementById('note-form-body').focus();
+        }
+
+        // Cancel
+        document.getElementById('btn-cancel-note').addEventListener('click', () => {
+            this.renderNotesList();
+        });
+
+        // Save
+        document.getElementById('btn-save-note').addEventListener('click', async () => {
+            const titleInput = document.getElementById('note-form-title');
+            const bodyInput = document.getElementById('note-form-body');
+            
+            const title = titleInput.value.trim() || 'Uten tittel';
+            const rawBody = bodyInput.value.trim();
+            if (!rawBody) {
+                bodyInput.focus();
+                return;
+            }
+            
+            const htmlText = rawBody.replace(/\n/g, '<br>');
+            const saveBtn = document.getElementById('btn-save-note');
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Lagrer...';
+
+            if (this.currentUser) {
+                try {
+                    if (isEdit) {
+                        await firebase.firestore().collection('personal_notes').doc(note.id).update({
+                            title: title,
+                            text: htmlText,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        await firebase.firestore().collection('personal_notes').add({
+                            userId: this.currentUser.uid,
+                            title: title,
+                            text: htmlText,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error saving note:', e);
+                    alert('Feil ved lagring: ' + e.message);
+                }
+            } else {
+                // Save to localStorage
+                const localNotes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+                if (isEdit) {
+                    const existingIdx = localNotes.findIndex(n => n.id === note.id);
+                    if (existingIdx !== -1) {
+                        localNotes[existingIdx].title = title;
+                        localNotes[existingIdx].text = htmlText;
+                        localNotes[existingIdx].createdAt = new Date().toISOString();
+                    }
+                } else {
+                    const newNote = {
+                        id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        title: title,
+                        text: htmlText,
+                        createdAt: new Date().toISOString()
+                    };
+                    localNotes.push(newNote);
+                }
+                localStorage.setItem('hkm_bible_notes', JSON.stringify(localNotes));
+            }
+
+            this.loadNotes();
+        });
+    }
+
+    async deleteNote(noteId) {
+        if (!confirm('Vil du slette dette notatet?')) return;
+
+        if (this.currentUser) {
+            try {
+                await firebase.firestore().collection('personal_notes').doc(noteId).delete();
+            } catch (e) {
+                console.error('Error deleting note:', e);
+                alert('Feil ved sletting: ' + e.message);
+            }
+        } else {
+            let localNotes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+            localNotes = localNotes.filter(n => n.id !== noteId);
+            localStorage.setItem('hkm_bible_notes', JSON.stringify(localNotes));
+        }
+
+        this.loadNotes();
     }
 
     renderResourceCard(res) {

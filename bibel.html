@@ -43,9 +43,9 @@
     <!-- Custom Bible Reader CSS -->
     <style>
         :root {
-            --bible-primary: #1B4965;
-            --bible-accent: #d17d39;
-            --bible-accent-grad: linear-gradient(135deg, #d17d39, #bd4f2a);
+            --bible-primary: #d17d39;
+            --bible-accent: #1B4965;
+            --bible-accent-grad: linear-gradient(135deg, #1B4965, #0f172a);
         }
 
         /* Themes */
@@ -187,7 +187,7 @@
 
         .search-container input:focus {
             border-color: var(--bible-primary);
-            box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.1);
+            box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
         }
 
         .bible-control-input {
@@ -207,7 +207,7 @@
 
         .bible-control-input:focus {
             border-color: var(--bible-primary);
-            box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.1);
+            box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
         }
 
         .books-list-wrapper {
@@ -511,7 +511,7 @@
         }
 
         .bible-reading-pane p:hover {
-            background: rgba(27, 73, 101, 0.08);
+            background: rgba(209, 125, 57, 0.08);
         }
 
         .bible-reading-pane sup.v {
@@ -824,7 +824,7 @@
             font-size: 14px;
             font-weight: 600;
             border-radius: 8px;
-            background: #1B4965 !important;
+            background: var(--bible-primary) !important;
             color: #ffffff !important;
             border: none !important;
             cursor: pointer;
@@ -836,9 +836,9 @@
         }
 
         .btn-bible-go:hover {
-            background: #15394f !important;
+            background: #bd4f2a !important;
             transform: scale(1.03);
-            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.2);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
         }
 
         .btn-bible-go:active {
@@ -1291,6 +1291,7 @@
                     document.getElementById('bookmarks-list').style.display = 'block';
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
                 ">Favoritter</div>
                 <div class="tab-btn" id="tab-btn-history" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1298,6 +1299,7 @@
                     document.getElementById('history-list').style.display = 'block';
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
                 ">Historikk</div>
                 <div class="tab-btn" id="tab-btn-related" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1305,7 +1307,16 @@
                     document.getElementById('related-list').style.display = 'block';
                     document.getElementById('bookmarks-list').style.display = 'none';
                     document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
                 ">Ressurser</div>
+                <div class="tab-btn" id="tab-btn-notes" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-notes').classList.add('active');
+                    document.getElementById('notes-list').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                ">Notater</div>
             </div>
 
             <div class="tabs-content">
@@ -1319,6 +1330,10 @@
                 </div>
                 <!-- Related Resources List -->
                 <div id="related-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Notes List -->
+                <div id="notes-list" style="display: none;">
                     <!-- Loaded dynamically -->
                 </div>
             </div>
