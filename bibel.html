@@ -94,31 +94,31 @@
         }
 
         /* Force compact header height and dark text on this page to prevent layout gap/overlap and contrast issues */
-        #header {
+        header#header {
             background: white !important;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
         }
-        #header-container {
+        header#header #header-container {
             height: 80px !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
         }
-        #header .logo,
-        #header .logo span,
-        #header #global-search-opener,
-        #header .lang-btn {
+        header#header .logo,
+        header#header .logo span,
+        header#header #global-search-opener,
+        header#header .lang-btn {
             color: #1e293b !important;
         }
-        #header #global-search-opener:hover,
-        #header .lang-btn:hover {
+        header#header #global-search-opener:hover,
+        header#header .lang-btn:hover {
             color: #d17d39 !important;
         }
         
-        /* Layout */
+        /* Layout - dynamic offset to prevent overlap/gap */
         .bible-app-container {
             display: flex;
-            height: calc(100vh - 80px);
-            margin-top: 80px;
+            height: calc(100vh - var(--hkm-header-height, 80px));
+            margin-top: var(--hkm-header-height, 80px);
             overflow: hidden;
             background: var(--bg-base);
             color: var(--text-base);
@@ -127,14 +127,14 @@
 
         /* Mobile & Tablet Adjustments */
         @media (max-width: 1024px) {
-            #header-container {
+            header#header #header-container {
                 height: 70px !important;
                 padding-left: 20px !important;
                 padding-right: 20px !important;
             }
             .bible-app-container {
-                margin-top: 70px;
-                height: calc(100vh - 70px);
+                margin-top: var(--hkm-header-height, 70px);
+                height: calc(100vh - var(--hkm-header-height, 70px));
             }
         }
 
@@ -869,8 +869,8 @@
         /* Mobile Adjustments */
         @media (max-width: 900px) {
             .bible-app-container {
-                margin-top: 70px;
-                height: calc(100vh - 70px);
+                margin-top: var(--hkm-header-height, 70px);
+                height: calc(100vh - var(--hkm-header-height, 70px));
             }
 
             .bible-sidebar {
