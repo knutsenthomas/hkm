@@ -297,17 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!searchModal) return;
 
-    // Definerte forslag (Smarte snarveier)
-    const siteSearchSuggestions = [
-        { label: 'Blogg & Nyheter', type: 'SIDER', url: '/blogg', icon: 'article' },
-        { label: 'Podcast (Lyd & Video)', type: 'MEDIA', url: '/podcast', icon: 'podcasts' },
-        { label: 'Kommende Arrangementer', type: 'EVENT', url: '/arrangementer', icon: 'event' },
-        { label: 'Gi Gave (Donasjoner)', type: 'GIVING', url: '/donasjoner', icon: 'volunteer_activism' },
-        { label: 'Om His Kingdom Ministry', type: 'INFO', url: '/om-oss', icon: 'info' },
-        { label: 'Kontakt oss', type: 'INFO', url: '/kontakt', icon: 'mail' },
-        { label: 'Undervisning', type: 'STUDIE', url: '/undervisning', icon: 'school' },
-        { label: 'Bibelstudier', type: 'STUDIE', url: '/bibelstudier', icon: 'menu_book' }
-    ];
+    // Definerte forslag (Smarte snarveier - Dynamisk lokalisert)
+    const siteSearchSuggestions = getSiteSearchSuggestions();
 
     function openSearch() {
         // Start pre-fetching podcast/youtube data early if not already loaded
@@ -632,6 +623,111 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ===================================
+// Språk- og URL-hjelpere
+// ===================================
+
+function getCurrentLanguage() {
+    let lang = document.documentElement.lang || 'no';
+    if (lang.includes('-')) lang = lang.split('-')[0];
+    if (!['no', 'en', 'es'].includes(lang)) return 'no';
+    return lang;
+}
+
+function getLocalizedUrl(noFileUrl) {
+    const lang = getCurrentLanguage();
+    
+    // Split into pathname and query string
+    const [pathPart, queryPart] = noFileUrl.split('?');
+    const cleanNoFile = pathPart.replace(/\.html$/, '');
+    
+    let mapped = cleanNoFile;
+    if (lang === 'no') {
+        mapped = (cleanNoFile === 'index' ? '' : cleanNoFile);
+    } else {
+        if (window.i18n && typeof window.i18n.mapFileName === 'function') {
+            mapped = window.i18n.mapFileName(cleanNoFile, lang);
+        } else {
+            const mappings = {
+                'en': {
+                    'blogg': 'blog',
+                    'blogg-post': 'blog-post',
+                    'om-oss': 'about',
+                    'arrangementer': 'events',
+                    'arrangement-detaljer': 'event-details',
+                    'donasjoner': 'donations',
+                    'for-menigheter': 'for-churches',
+                    'for-bedrifter': 'for-businesses',
+                    'undervisning': 'teaching',
+                    'undervisningsserier': 'teaching',
+                    'leseplan-detaljer': 'reading-plan-details',
+                    'leseplaner': 'leseplaner'
+                },
+                'es': {
+                    'blogg': 'blog',
+                    'blogg-post': 'blog-post',
+                    'om-oss': 'sobre-nosotros',
+                    'arrangementer': 'eventos',
+                    'arrangement-detaljer': 'detalles-evento',
+                    'donasjoner': 'donaciones',
+                    'for-menigheter': 'para-iglesias',
+                    'for-bedrifter': 'para-empresas',
+                    'undervisning': 'ensenanza',
+                    'undervisningsserier': 'ensenanza',
+                    'leseplan-detaljer': 'detalles-plan-lectura',
+                    'leseplaner': 'leseplaner'
+                }
+            };
+            mapped = (mappings[lang] && mappings[lang][cleanNoFile]) || cleanNoFile;
+        }
+        mapped = (mapped === 'index' ? '' : mapped);
+    }
+    
+    const prefix = lang === 'no' ? '' : `/${lang}`;
+    const cleanPath = (mapped.startsWith('/') ? mapped : '/' + mapped);
+    const finalPath = prefix + (cleanPath === '/' ? '' : cleanPath);
+    
+    return queryPart ? `${finalPath}?${queryPart}` : (finalPath || '/');
+}
+
+function getSiteSearchSuggestions() {
+    const lang = getCurrentLanguage();
+    if (lang === 'en') {
+        return [
+            { label: 'Blog & News', type: 'PAGES', url: getLocalizedUrl('blogg'), icon: 'article' },
+            { label: 'Podcast (Audio & Video)', type: 'MEDIA', url: getLocalizedUrl('podcast'), icon: 'podcasts' },
+            { label: 'Upcoming Events', type: 'EVENT', url: getLocalizedUrl('arrangementer'), icon: 'event' },
+            { label: 'Give (Donations)', type: 'GIVING', url: getLocalizedUrl('donasjoner'), icon: 'volunteer_activism' },
+            { label: 'About His Kingdom Ministry', type: 'INFO', url: getLocalizedUrl('om-oss'), icon: 'info' },
+            { label: 'Contact us', type: 'INFO', url: getLocalizedUrl('kontakt'), icon: 'mail' },
+            { label: 'Bible online', type: 'STUDY', url: getLocalizedUrl('bibel'), icon: 'menu_book' },
+            { label: 'Reading Plans', type: 'STUDY', url: getLocalizedUrl('leseplaner'), icon: 'calendar_today' }
+        ];
+    } else if (lang === 'es') {
+        return [
+            { label: 'Blog y Noticias', type: 'PÁGINAS', url: getLocalizedUrl('blogg'), icon: 'article' },
+            { label: 'Podcast (Audio y Video)', type: 'MEDIA', url: getLocalizedUrl('podcast'), icon: 'podcasts' },
+            { label: 'Próximos Eventos', type: 'EVENTO', url: getLocalizedUrl('arrangementer'), icon: 'event' },
+            { label: 'Dar Ofrenda (Donaciones)', type: 'DONACIONES', url: getLocalizedUrl('donasjoner'), icon: 'volunteer_activism' },
+            { label: 'Sobre His Kingdom Ministry', type: 'INFO', url: getLocalizedUrl('om-oss'), icon: 'info' },
+            { label: 'Contáctenos', type: 'INFO', url: getLocalizedUrl('kontakt'), icon: 'mail' },
+            { label: 'Biblia en línea', type: 'ESTUDIO', url: getLocalizedUrl('bibel'), icon: 'menu_book' },
+            { label: 'Planes de Lectura', type: 'ESTUDIO', url: getLocalizedUrl('leseplaner'), icon: 'calendar_today' }
+        ];
+    } else {
+        return [
+            { label: 'Blogg & Nyheter', type: 'SIDER', url: getLocalizedUrl('blogg'), icon: 'article' },
+            { label: 'Podcast (Lyd & Video)', type: 'MEDIA', url: getLocalizedUrl('podcast'), icon: 'podcasts' },
+            { label: 'Kommende Arrangementer', type: 'EVENT', url: getLocalizedUrl('arrangementer'), icon: 'event' },
+            { label: 'Gi Gave (Donasjoner)', type: 'GIVING', url: getLocalizedUrl('donasjoner'), icon: 'volunteer_activism' },
+            { label: 'Om His Kingdom Ministry', type: 'INFO', url: getLocalizedUrl('om-oss'), icon: 'info' },
+            { label: 'Kontakt oss', type: 'INFO', url: getLocalizedUrl('kontakt'), icon: 'mail' },
+            { label: 'Nettbibel', type: 'STUDIE', url: getLocalizedUrl('bibel'), icon: 'menu_book' },
+            { label: 'Leseplaner', type: 'STUDIE', url: getLocalizedUrl('leseplaner'), icon: 'calendar_today' }
+        ];
+    }
+}
+
+// ===================================
 // Site-wide search helpers
 // ===================================
 
@@ -715,34 +811,149 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     };
 
     try {
-        // 1) Faste sider (Parallell henting)
+        // 1) Faste sider (Parallell henting med keywords og statisk fallback)
         const pages = [
-            { id: 'index', label: 'Forside', url: 'index' },
-            { id: 'om-oss', label: 'Om oss', url: 'om-oss' },
-            { id: 'media', label: 'Media', url: 'media' },
-            { id: 'arrangementer', label: 'Arrangementer', url: 'arrangementer' },
-            { id: 'blogg', label: 'Blogg', url: 'blogg' },
-            { id: 'kontakt', label: 'Kontakt', url: 'kontakt' },
-            { id: 'donasjoner', label: 'Donasjoner', url: 'donasjoner' },
-            { id: 'undervisning', label: 'Undervisning', url: 'undervisning' },
-            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: 'reisevirksomhet' },
-            { id: 'bibelstudier', label: 'Bibelstudier', url: 'bibelstudier' },
-            { id: 'seminarer', label: 'Seminarer', url: 'seminarer' },
-            { id: 'podcast', label: 'Podcast', url: 'podcast' }
+            { id: 'index', label: { no: 'Forside', en: 'Home', es: 'Inicio' }, url: 'index', keywords: 'hjem forside welcome velkommen' },
+            { id: 'om-oss', label: { no: 'Om oss', en: 'About us', es: 'Sobre nosotros' }, url: 'om-oss', keywords: 'hvem er vi organisasjon historie history who we are ledelse' },
+            { id: 'media', label: { no: 'Media', en: 'Media', es: 'Media' }, url: 'media', keywords: 'video undervisning taler prophetics media youtube' },
+            { id: 'arrangementer', label: { no: 'Arrangementer', en: 'Events', es: 'Eventos' }, url: 'arrangementer', keywords: 'møter kalender events arrangementer samlinger' },
+            { id: 'blogg', label: { no: 'Blogg & Nyheter', en: 'Blog & News', es: 'Blog y Noticias' }, url: 'blogg', keywords: 'blogg nyheter nyheter artikler posts news blog' },
+            { id: 'kontakt', label: { no: 'Kontakt oss', en: 'Contact us', es: 'Contacto' }, url: 'kontakt', keywords: 'epost adresse telefon kontakt contact mail skjema' },
+            { id: 'donasjoner', label: { no: 'Gave & Donasjoner', en: 'Giving & Donations', es: 'Donaciones y Ofrendas' }, url: 'donasjoner', keywords: 'gi gave donasjon støtte partner vipps bankkontonummer gift donation giving partner' },
+            { id: 'undervisning', label: { no: 'Undervisning', en: 'Teaching', es: 'Enseñanza' }, url: 'undervisning', keywords: 'sermon undervisning lærdom bibelstudy teaching' },
+            { id: 'reisevirksomhet', label: { no: 'Reisevirksomhet', en: 'Travels & Missions', es: 'Viajes de Misión' }, url: 'reisevirksomhet', keywords: 'reise misjon travels mission reisevirksomhet' },
+            { id: 'bibelstudier', label: { no: 'Bibelstudier', en: 'Bible Studies', es: 'Estudios Bíblicos' }, url: 'bibelstudier', keywords: 'bibel studier studie bible study studies' },
+            { id: 'seminarer', label: { no: 'Seminarer', en: 'Seminars', es: 'Seminarios' }, url: 'seminarer', keywords: 'kurs seminar seminarer teaching' },
+            { id: 'podcast', label: { no: 'Podcast', en: 'Podcast', es: 'Podcast' }, url: 'podcast', keywords: 'lyd podkast podcast episode episodes lydfiler' },
+            { id: 'bibel', label: { no: 'Nettbibel & Bibelstudie', en: 'Online Bible', es: 'Biblia en Línea' }, url: 'bibel', keywords: 'bibel lese bibelen nettbibel scripture holy bible read' },
+            { id: 'leseplaner', label: { no: 'Bibel leseplaner', en: 'Bible Reading Plans', es: 'Planes de Lectura Bíblica' }, url: 'leseplaner', keywords: 'leseplan bibellese leseplaner reading plan plans' },
+            { id: 'butikk', label: { no: 'Butikk', en: 'Store / Shop', es: 'Tienda' }, url: 'butikk', keywords: 'butikk shop store bøker boker salg buy' },
+            { id: 'bnn', label: { no: 'Business Network (BNN)', en: 'Business Network (BNN)', es: 'Red de Negocios (BNN)' }, url: 'bnn', keywords: 'bnn business nettverk ledere leaders næringsliv' },
+            { id: 'bli-fast-giver', label: { no: 'Bli fast giver / Partner', en: 'Become a Partner', es: 'Hazte Socio / Donante Regular' }, url: 'bli-fast-giver', keywords: 'partner fast giver fastgiver regular donor vipps bank' },
+            { id: 'personvern', label: { no: 'Personvernserklæring', en: 'Privacy Policy', es: 'Política de Privacidad' }, url: 'personvern', keywords: 'privacy policy personvern cookies vilkår terms' },
+            { id: 'tilgjengelighet', label: { no: 'Tilgjengelighetserklæring', en: 'Accessibility Statement', es: 'Declaración de Accesibilidad' }, url: 'tilgjengelighet', keywords: 'uu tilgjengelighet accessibility universal utforming' },
+            { id: 'for-menigheter', label: { no: 'For menigheter', en: 'For churches', es: 'Para iglesias' }, url: 'for-menigheter', keywords: 'menighet kirke sammarbeid seminar church churches cooperation' },
+            { id: 'for-bedrifter', label: { no: 'For bedrifter', en: 'For businesses', es: 'Para empresas' }, url: 'for-bedrifter', keywords: 'bedrift sponsor bedriftssamarbeid støtte corporate business support' }
         ];
 
         const pagePromises = pages.map(async (page) => {
-            const data = await firebaseService.getPageContent(page.id);
-            if (!data) return null;
-            const entries = collectTextEntries(data);
-            const hit = entries.find(entry => entry.text && isMatch(entry.text));
-            if (hit) {
+            const lang = getCurrentLanguage();
+            const labelText = page.label[lang] || page.label['no'];
+            const keywordsText = page.keywords || '';
+            
+            const localCombined = [labelText, keywordsText].join(' ').toLowerCase();
+            let isStaticMatch = isMatch(localCombined);
+
+            let data = null;
+            try {
+                data = await firebaseService.getPageContent(page.id);
+            } catch (e) {
+                console.warn(`Could not fetch page content for search: ${page.id}`, e);
+            }
+
+            if (data) {
+                const entries = collectTextEntries(data);
+                const hit = entries.find(entry => entry.text && isMatch(entry.text));
+                if (hit) {
+                    return {
+                        type: lang === 'en' ? 'Page' : (lang === 'es' ? 'Página' : 'Side'),
+                        title: labelText,
+                        meta: hit.path,
+                        url: getLocalizedUrl(page.url),
+                        snippet: makeSnippet(hit.text, q)
+                    };
+                }
+            }
+
+            if (isStaticMatch) {
+                let snippet = '';
+                if (data && data.seoDescription) {
+                    snippet = data.seoDescription;
+                } else if (data && data.hero && data.hero.subtitle) {
+                    snippet = data.hero.subtitle;
+                } else if (data && data.intro && data.intro.text) {
+                    snippet = data.intro.text;
+                } else {
+                    const defaultExcerpts = {
+                        no: {
+                            'index': 'His Kingdom Ministry - Forside. Velkommen til vår nettside.',
+                            'om-oss': 'Lær mer om His Kingdom Ministry, vår visjon, verdier og hvem vi er.',
+                            'media': 'Se våre videoer, taler og undervisning.',
+                            'arrangementer': 'Få oversikt over kommende møter og arrangementer.',
+                            'blogg': 'Les siste artikler og oppdateringer fra His Kingdom Ministry.',
+                            'kontakt': 'Ta kontakt med oss via e-post, telefon eller vårt kontaktskjema.',
+                            'donasjoner': 'Her kan du gi en gave eller donasjon til vårt arbeid.',
+                            'undervisning': 'Undervisning og prekener fra His Kingdom Ministry.',
+                            'reisevirksomhet': 'Informasjon om vår reisevirksomhet og misjonsturer.',
+                            'bibelstudier': 'Bibelstudier og ressurser for fordypning i Guds ord.',
+                            'seminarer': 'Delta på våre seminarer og kurs for åndelig vekst.',
+                            'podcast': 'Lytt til våre podcast-episoder direkte på nettsiden.',
+                            'bibel': 'Les Bibelen på nett med vår integrerte bibelleser.',
+                            'leseplaner': 'Følg våre bibelleseplaner for strukturert bibellesing.',
+                            'butikk': 'Besøk vår butikk for bøker og andre ressurser.',
+                            'bnn': 'Business Network (BNN) - Nettverk for kristne næringsdrivende.',
+                            'bli-fast-giver': 'Bli fast giver eller partner for å støtte vårt arbeid månedlig.',
+                            'personvern': 'Vår personvernserklæring og bruk av informasjonskapsler.',
+                            'tilgjengelighet': 'Tilgjengelighetserklæring for universell utforming.',
+                            'for-menigheter': 'Se hvordan vi samarbeider med lokale menigheter og kirker.',
+                            'for-bedrifter': 'Samarbeidsmuligheter for bedrifter som ønsker å støtte oss.'
+                        },
+                        en: {
+                            'index': 'His Kingdom Ministry - Home page. Welcome to our website.',
+                            'om-oss': 'Learn more about His Kingdom Ministry, our vision, values, and who we are.',
+                            'media': 'Watch our videos, sermons, and teachings.',
+                            'arrangementer': 'Overview of upcoming meetings and events.',
+                            'blogg': 'Read the latest articles and updates from His Kingdom Ministry.',
+                            'kontakt': 'Contact us via email, phone, or our contact form.',
+                            'donasjoner': 'Support our work by giving a gift or donation.',
+                            'undervisning': 'Teaching and sermons from His Kingdom Ministry.',
+                            'reisevirksomhet': 'Information about our travels and mission trips.',
+                            'bibelstudier': 'Bible studies and resources for deep study of God\'s word.',
+                            'seminarer': 'Join our seminars and courses for spiritual growth.',
+                            'podcast': 'Listen to our podcast episodes directly on the website.',
+                            'bibel': 'Read the Bible online with our integrated Bible reader.',
+                            'leseplaner': 'Follow our Bible reading plans for structured reading.',
+                            'butikk': 'Visit our shop for books and other resources.',
+                            'bnn': 'Business Network (BNN) - Network for Christian business leaders.',
+                            'bli-fast-giver': 'Become a regular donor or partner to support our work monthly.',
+                            'personvern': 'Our privacy policy and cookie usage.',
+                            'tilgjengelighet': 'Accessibility statement for our website.',
+                            'for-menigheter': 'See how we cooperate with local churches.',
+                            'for-bedrifter': 'Partnership opportunities for businesses to support us.'
+                        },
+                        es: {
+                            'index': 'His Kingdom Ministry - Inicio. Bienvenido a nuestro sitio web.',
+                            'om-oss': 'Aprenda más sobre His Kingdom Ministry, nuestra visión, valores y quiénes somos.',
+                            'media': 'Vea nuestros videos, sermones y enseñanzas.',
+                            'arrangementer': 'Calendario de próximos eventos y reuniones.',
+                            'blogg': 'Lea los últimos artículos y actualizaciones de His Kingdom Ministry.',
+                            'kontakt': 'Contáctenos por correo electrónico, teléfono o formulario.',
+                            'donasjoner': 'Apoye nuestro trabajo con una ofrenda o donación.',
+                            'undervisning': 'Enseñanza y sermones de His Kingdom Ministry.',
+                            'reisevirksomhet': 'Información sobre nuestros viajes y misiones.',
+                            'bibelstudier': 'Estudios bíblicos y recursos para profundizar en la palabra de Dios.',
+                            'seminarer': 'Participe en nuestros seminarios y cursos de crecimiento espiritual.',
+                            'podcast': 'Escuche nuestros episodios de podcast directamente en el sitio.',
+                            'bibel': 'Lea la Biblia en línea con nuestro lector integrado.',
+                            'leseplaner': 'Siga nuestros planes de lectura de la Biblia.',
+                            'butikk': 'Visite nuestra tienda de libros y otros recursos.',
+                            'bnn': 'Business Network (BNN) - Red para líderes empresariales cristianos.',
+                            'bli-fast-giver': 'Conviértase en donante regular o socio para apoyarnos.',
+                            'personvern': 'Nuestra política de privacidad.',
+                            'tilgjengelighet': 'Declaración de accesibilidad.',
+                            'for-menigheter': 'Vea cómo colaboramos con iglesias locales.',
+                            'for-bedrifter': 'Oportunidades de patrocinio para empresas.'
+                        }
+                    };
+                    snippet = (defaultExcerpts[lang] && defaultExcerpts[lang][page.id]) || (defaultExcerpts['no'][page.id]) || '';
+                }
+
                 return {
-                    type: 'Side',
-                    title: page.label,
-                    meta: hit.path,
-                    url: page.url,
-                    snippet: makeSnippet(hit.text, q)
+                    type: lang === 'en' ? 'Page' : (lang === 'es' ? 'Página' : 'Side'),
+                    title: labelText,
+                    meta: lang === 'en' ? 'Information' : (lang === 'es' ? 'Información' : 'Informasjon'),
+                    url: getLocalizedUrl(page.url),
+                    snippet: makeSnippet(snippet, q)
                 };
             }
             return null;
@@ -751,21 +962,22 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const pageResults = (await Promise.all(pagePromises)).filter(Boolean);
         results.push(...pageResults);
 
-        // 2) Samlinger: blogg, arrangementer, undervisning
+        // 2) Samlinger: blogg, arrangementer, undervisning (Med direkte lenker og språktilpassede typer)
         const collections = [
-            { id: 'blog', docId: 'collection_blog', label: 'Blogginnlegg', url: 'blogg' },
-            { id: 'events', docId: 'collection_events', label: 'Arrangementer', url: 'arrangementer' },
-            { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning', url: 'undervisningsserier' }
+            { id: 'blog', docId: 'collection_blog', label: { no: 'Blogginnlegg', en: 'Blog Post', es: 'Entrada del Blog' }, url: 'blogg-post.html' },
+            { id: 'events', docId: 'collection_events', label: { no: 'Arrangement', en: 'Event', es: 'Evento' }, url: 'arrangement-detaljer.html' },
+            { id: 'teaching', docId: 'collection_teaching', label: { no: 'Undervisning', en: 'Sermon', es: 'Enseñanza' }, url: 'blogg-post.html' }
         ];
 
         const collectionPromises = collections.map(async (col) => {
             const raw = await firebaseService.getPageContent(col.docId);
             const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
             const colResults = [];
+            const lang = getCurrentLanguage();
 
             items.forEach((item) => {
                 const combined = [
-                    col.label,
+                    col.label[lang] || col.label['no'],
                     'blogg',
                     'nyheter',
                     'undervisning',
@@ -779,11 +991,12 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 ].filter(Boolean).join(' ').toLowerCase();
 
                 if (isMatch(combined)) {
+                    const stableId = item.__stableId || item.id || item.externalGuid || item.wixGuid || item.postId || item.legacyId || item.slug || item.title || '';
                     colResults.push({
-                        type: col.label,
+                        type: col.label[lang] || col.label['no'],
                         title: item.title || '(uten tittel)',
                         meta: formatDate(item.date) || item.category || '',
-                        url: col.url,
+                        url: getLocalizedUrl(`${col.url}?id=${encodeURIComponent(stableId)}`),
                         snippet: makeSnippet(item.content || item.seoDescription || '', q)
                     });
                 }
@@ -794,23 +1007,23 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const allCollectionResults = await Promise.all(collectionPromises);
         allCollectionResults.forEach(res => results.push(...res));
 
-        // 3) Podcast-episoder (via felles RSS-proxy)
+        // 3) Podcast-episoder (via felles RSS-proxy med språktilpasning)
         const podcastEpisodes = await fetchPodcasts();
 
         if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
-            // Hent transkripsjoner i parallell for å søke i selve innholdet
             const transcriptPromises = podcastEpisodes.map(ep => {
                 const epId = ep.guid || ep.link || ep.title;
                 return fetchPodcastTranscript(epId).then(t => ({ ep, transcript: t }));
             });
             const podcastWithTranscripts = await Promise.all(transcriptPromises);
+            const lang = getCurrentLanguage();
 
             podcastWithTranscripts.forEach(({ ep, transcript }) => {
                 const combined = [
                     'podcast', 'lyd', 'episode', 
                     ep.title, 
                     ep.description, 
-                    transcript // Søker nå også i den fulle transkriberte teksten!
+                    transcript
                 ].filter(Boolean).join(' ').toLowerCase();
 
                 if (isMatch(combined)) {
@@ -818,7 +1031,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
                         meta: formatDate(ep.pubDate),
-                        url: ep.link || 'podcast',
+                        url: ep.link || getLocalizedUrl('podcast'),
                         snippet: makeSnippet(transcript || ep.description || '', q)
                     });
                 }
@@ -829,6 +1042,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const youtubeVideos = await fetchYouTubeVideos();
 
         if (Array.isArray(youtubeVideos) && youtubeVideos.length) {
+            const lang = getCurrentLanguage();
             youtubeVideos.forEach(v => {
                 const title = v.title;
                 const description = v.description || '';
@@ -838,14 +1052,14 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                         type: 'YouTube',
                         title: title || '(uten tittel)',
                         meta: formatDate(v.pubDate),
-                        url: v.link || 'youtube',
+                        url: v.link || getLocalizedUrl('youtube'),
                         snippet: makeSnippet(description, q)
                     });
                 }
             });
         }
 
-        // 5) Kalender-hendelser (Google Calendar via settings_gcal)
+        // 5) Kalender-hendelser (Google Calendar via settings_gcal med språktilpasset type)
         let calendarEvents = window._siteSearchCalendarEvents;
         if (typeof calendarEvents === 'undefined') {
             calendarEvents = [];
@@ -867,71 +1081,71 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             }
         }
         if (Array.isArray(calendarEvents) && calendarEvents.length) {
+            const lang = getCurrentLanguage();
             calendarEvents.forEach(ev => {
                 const summary = ev.summary || '';
                 const description = ev.description || '';
                 const location = ev.location || '';
-                const combined = ['kalender', 'arrangement', 'event', 'møte', summary, description, location].filter(Boolean).join(' ').toLowerCase();
+                const combined = ['kalender', 'arrangement', 'event', 'møte', 'calendario', 'evento', summary, description, location].filter(Boolean).join(' ').toLowerCase();
                 if (isMatch(combined)) {
                     const start = ev.start && (ev.start.dateTime || ev.start.date);
                     results.push({
-                        type: 'Kalender',
+                        type: lang === 'en' ? 'Calendar' : (lang === 'es' ? 'Calendario' : 'Kalender'),
                         title: summary || '(uten tittel)',
                         meta: formatDate(start),
-
-                        url: '/arrangementer',
+                        url: getLocalizedUrl('arrangementer'),
                         snippet: makeSnippet(description || location || '', q)
                     });
                 }
             });
         }
 
+        // 5.5) Bibel Leseplaner (Reading Plans fra Firestore)
+        let readingPlans = [];
+        try {
+            readingPlans = await firebaseService.getCollection('reading_plans');
+        } catch (e) {
+            console.warn('Kunne ikke hente leseplaner for søk:', e);
+        }
 
-        // 6) Kurs & Undervisning (Dypere søk)
+        if (Array.isArray(readingPlans) && readingPlans.length) {
+            const lang = getCurrentLanguage();
+            readingPlans.forEach(plan => {
+                const combined = [
+                    lang === 'en' ? 'reading plan bible' : (lang === 'es' ? 'plan de lectura biblia' : 'leseplan bibel leseplaner'),
+                    plan.title,
+                    plan.subtitle,
+                    plan.description
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                if (isMatch(combined)) {
+                    results.push({
+                        type: lang === 'en' ? 'Reading Plan' : (lang === 'es' ? 'Plan de Lectura' : 'Leseplan'),
+                        title: plan.title || 'Leseplan',
+                        meta: plan.subtitle || (plan.durationDays ? `${plan.durationDays} dager` : ''),
+                        url: getLocalizedUrl(`leseplan-detaljer.html?id=${plan.id}`),
+                        snippet: makeSnippet(plan.description || '', q)
+                    });
+                }
+            });
+        }
+
+        // 6) Kurs & Undervisning (Dypere søk med språktilpasset type)
         const courseData = await firebaseService.getPageContent('collection_courses');
         const courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
+        const lang = getCurrentLanguage();
         courses.forEach(course => {
-            const combined = ['kurs', 'undervisning', 'serie', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
+            const combined = ['kurs', 'undervisning', 'serie', 'course', 'curso', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
             if (isMatch(combined)) {
                 results.push({
-                    type: 'Kurs',
+                    type: lang === 'en' ? 'Course' : (lang === 'es' ? 'Curso' : 'Kurs'),
                     title: course.title || 'Kurs',
-                    meta: course.category || 'Undervisning',
-                    url: '/kurs',
+                    meta: course.category || (lang === 'en' ? 'Teaching' : (lang === 'es' ? 'Enseñanza' : 'Undervisning')),
+                    url: getLocalizedUrl('kurs'),
                     snippet: makeSnippet(course.description || '', q)
                 });
             }
         });
-
-        // 7) Spesialsider (Menigheter & Bedrifter)
-        const specialPages = [
-            { id: 'for-menigheter', label: 'For menigheter', url: '/for-menigheter' },
-            { id: 'for-bedrifter', label: 'For bedrifter', url: '/for-bedrifter' },
-            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: '/reisevirksomhet' }
-        ];
-
-        const specialPagePromises = specialPages.map(async (sp) => {
-            const data = await firebaseService.getPageContent(sp.id);
-            if (data) {
-                const entries = collectTextEntries(data);
-                const hit = entries.find(e => e.text && isMatch(e.text));
-                if (hit) {
-                    return {
-                        type: 'Side',
-                        title: sp.label,
-                        meta: 'Informasjon',
-                        url: sp.url,
-                        snippet: makeSnippet(hit.text, q)
-                    };
-                }
-            }
-            return null;
-        });
-        
-        const specialPageResults = (await Promise.all(specialPagePromises)).filter(Boolean);
-        results.push(...specialPageResults);
-
-
 
     } catch (err) {
         console.error('Feil ved søk:', err);
