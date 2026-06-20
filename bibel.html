@@ -612,6 +612,87 @@
             border-top: 1px solid var(--border-color);
         }
 
+        /* Floating Minimalist Bottom Navigation */
+        .floating-bible-nav {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(0);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            z-index: 140;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.35;
+        }
+
+        .floating-bible-nav:hover {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px) translateZ(0);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .floating-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .floating-nav-btn:hover:not(:disabled) {
+            background: var(--active-bg);
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
+        }
+
+        .floating-nav-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .floating-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .floating-nav-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 90px;
+            user-select: none;
+        }
+
+        #floating-nav-book {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            line-height: 1.1;
+        }
+
+        #floating-nav-chapter {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--bible-primary);
+            line-height: 1.2;
+        }
+
         .nav-btn {
             display: inline-flex;
             align-items: center;
@@ -1294,6 +1375,9 @@
             color: #ffffff !important;
             border-color: var(--bible-primary) !important;
         }
+        body.reading-mode-active #hkm-visitor-chat-widget {
+            display: none !important;
+        }
 
         /* Multi-verse selection styling */
         .bible-reading-pane p.selected-verse {
@@ -1309,6 +1393,29 @@
             #verse-context-toolbar {
                 gap: 4px !important;
                 padding: 4px 8px !important;
+            }
+            
+            /* Floating bible navigation on mobile */
+            .floating-bible-nav {
+                opacity: 0.95 !important;
+                bottom: 16px !important;
+                padding: 6px 12px !important;
+                gap: 12px !important;
+                transform: translateX(-50%) translateZ(0) !important;
+            }
+            .floating-bible-nav:hover {
+                transform: translateX(-50%) translateZ(0) !important;
+                opacity: 0.95 !important;
+            }
+            .floating-nav-btn {
+                width: 32px !important;
+                height: 32px !important;
+            }
+            .floating-nav-info {
+                min-width: 80px !important;
+            }
+            #floating-nav-chapter {
+                font-size: 14px !important;
             }
         }
 
@@ -1436,6 +1543,56 @@
                     width: 100% !important;
                     max-width: none !important;
                 }
+                .sidebar-mobile-controls select {
+                    padding-left: 32px !important;
+                    height: 38px !important;
+                    font-size: 13px !important;
+                }
+                .sidebar-mobile-controls select:focus,
+                .sidebar-mobile-controls input.bible-control-input:focus {
+                    border-color: var(--bible-primary) !important;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15) !important;
+                }
+                .sidebar-mobile-controls .nav-btn {
+                    background: var(--bg-base) !important;
+                    border: 1px solid var(--border-color) !important;
+                    color: var(--text-base) !important;
+                    height: 36px !important;
+                    border-radius: 8px !important;
+                    font-size: 12px !important;
+                    font-weight: 600 !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 6px !important;
+                }
+                .sidebar-mobile-controls .nav-btn:hover {
+                    background: var(--active-bg) !important;
+                    border-color: var(--bible-primary) !important;
+                    color: var(--bible-primary) !important;
+                }
+                .sidebar-mobile-controls .nav-btn.active {
+                    background: var(--bible-primary) !important;
+                    color: #ffffff !important;
+                    border-color: var(--bible-primary) !important;
+                }
+                .sidebar-mobile-controls .btn-bible-go {
+                    background: var(--bible-primary) !important;
+                    color: #ffffff !important;
+                    border-radius: 8px !important;
+                    height: 36px !important;
+                    font-size: 13px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    border: none !important;
+                }
+                .sidebar-mobile-controls .btn-bible-go:hover {
+                    opacity: 0.9 !important;
+                    transform: scale(1.02) !important;
+                }
                 /* Make sidebar close button look more like a button on mobile */
                 .close-sidebar-mobile-btn,
                 .close-sidebar-btn,
@@ -1541,14 +1698,31 @@
                 
                 /* Book list sidebar (bible-sidebar) adjustments on mobile */
                 .bible-sidebar .book-item {
-                    font-size: 16px !important;
-                    padding: 12px 16px !important;
+                    font-size: 15px !important;
+                    padding: 12px 20px !important;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.02) !important;
+                    color: var(--text-base) !important;
+                    font-weight: 500 !important;
+                    transition: all 0.2s ease !important;
+                }
+                .bible-sidebar .book-item:active {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    color: var(--bible-primary) !important;
                 }
                 .bible-sidebar #book-search {
-                    font-size: 16px !important;
+                    font-size: 14px !important;
+                    height: 38px !important;
+                    border-radius: 8px !important;
                 }
                 .bible-sidebar .books-section-title {
-                    font-size: 13px !important;
+                    font-size: 11px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.08em !important;
+                    color: var(--text-muted) !important;
+                    padding: 24px 20px 8px !important;
+                    font-weight: 700 !important;
+                    border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+                    margin-top: 8px !important;
                 }
                 .bible-sidebar .books-list-wrapper {
                     padding-bottom: 140px !important;
@@ -1665,78 +1839,81 @@
             </div>
             
             <!-- Mobile-only controls in the sidebar -->
-            <div class="sidebar-mobile-controls" id="sidebar-mobile-controls" style="display: none; padding: 16px; border-bottom: 1px solid var(--border-color); flex-direction: column; gap: 16px; box-sizing: border-box; width: 100%;">
+            <div class="sidebar-mobile-controls" id="sidebar-mobile-controls" style="display: none; padding: 16px; border-bottom: 1px solid var(--border-color); flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
                 <!-- Section Title -->
-                <div style="font-weight: 700; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Innstillinger & Verktøy</div>
+                <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7;">settings</span>
+                    <span>Verktøy & Innstillinger</span>
+                </div>
                 
-                <!-- Translation Selection -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Bibeloversettelse</label>
-                    <div class="select-wrapper" style="width: 100%;">
-                        <select id="bible-translation-select-mobile" style="width: 100%; height: 38px !important; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px;">
+                <!-- Unified Settings Card -->
+                <div style="background: rgba(27, 73, 101, 0.03); border: 1px solid rgba(27, 73, 101, 0.06); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                    
+                    <!-- Translation Selection -->
+                    <div class="select-wrapper" style="width: 100%; position: relative; display: flex; align-items: center;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; font-size: 16px; color: var(--text-muted); pointer-events: none; z-index: 10;">translate</span>
+                        <select id="bible-translation-select-mobile" style="width: 100%; height: 38px !important; padding: 0 32px 0 32px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; cursor: pointer; transition: all 0.2s;">
                             <!-- Dynamically populated -->
                         </select>
                     </div>
-                </div>
 
-                <!-- Quick Reference Search -->
-                <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Søk eller gå til vers</label>
-                    <form id="bible-quick-search-form-mobile" style="margin: 0; display: flex; gap: 8px; align-items: center; width: 100%;">
-                        <input type="text" id="bible-quick-search-mobile" placeholder="f.eks. Johannes 3:16" class="bible-control-input" style="flex: 1; min-width: 0; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px;">
-                        <button type="submit" class="btn-bible-go" style="height: 38px !important; background: var(--bible-primary); color: white; border: none; padding: 0 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Gå</button>
+                    <!-- Quick Reference Search -->
+                    <form id="bible-quick-search-form-mobile" style="margin: 0; display: flex; gap: 8px; align-items: center; width: 100%; position: relative;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; font-size: 16px; color: var(--text-muted); pointer-events: none; z-index: 10;">search</span>
+                        <input type="text" id="bible-quick-search-mobile" placeholder="Gå til vers (f.eks. Johannes 3:16)" class="bible-control-input" style="flex: 1; min-width: 0; height: 38px !important; padding: 0 12px 0 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; transition: all 0.2s;">
+                        <button type="submit" class="btn-bible-go" style="height: 38px !important; background: var(--bible-primary); color: white; border: none; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">Gå</button>
                     </form>
-                </div>
 
-                <!-- Buttons Row (Bibeleksikon, Lesemodus, Tekstinnstillinger) -->
-                <div style="display: flex; gap: 8px; width: 100%;">
-                    <!-- Settings Trigger -->
-                    <button type="button" class="nav-btn" id="mobile-text-settings-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">text_fields</span>
-                        <span>Tekst</span>
-                    </button>
-                    
-                    <!-- Bibeleksikon Trigger -->
-                    <button type="button" class="nav-btn" id="mobile-dict-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
-                        <span>Leksikon</span>
-                    </button>
-                    
-                    <!-- Reading Mode Toggle -->
-                    <button type="button" class="nav-btn" id="mobile-reading-mode-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">chrome_reader_mode</span>
-                        <span>Lese</span>
-                    </button>
-                </div>
+                    <!-- Buttons Row (Bibeleksikon, Lesemodus, Tekstinnstillinger) -->
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <!-- Settings Trigger -->
+                        <button type="button" class="nav-btn" id="mobile-text-settings-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">text_fields</span>
+                            <span>Tekst</span>
+                        </button>
+                        
+                        <!-- Bibeleksikon Trigger -->
+                        <button type="button" class="nav-btn" id="mobile-dict-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>Leksikon</span>
+                        </button>
+                        
+                        <!-- Reading Mode Toggle -->
+                        <button type="button" class="nav-btn" id="mobile-reading-mode-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">chrome_reader_mode</span>
+                            <span>Lese</span>
+                        </button>
+                    </div>
 
-                <!-- Inline Mobile Settings Panel -->
-                <div id="mobile-settings-panel" style="display: none; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
-                    <!-- Font Size -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Størrelse</span>
-                        <div class="btn-setting-group" style="display: flex; align-items: center;">
-                            <button type="button" id="btn-decrease-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px 0 0 4px; padding: 0; box-shadow: none !important; font-size: 12px; font-weight: bold;">A-</button>
-                            <button type="button" id="font-size-display-mobile" disabled style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); border-left: none; border-right: none; background: var(--bg-sidebar); color: var(--text-base); height: 32px; padding: 0 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: default; font-weight: 600; border-radius: 0; box-shadow: none !important;">18px</button>
-                            <button type="button" id="btn-increase-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 0 4px 4px 0; padding: 0; box-shadow: none !important; font-size: 12px; font-weight: bold;">A+</button>
+                    <!-- Inline Mobile Settings Panel -->
+                    <div id="mobile-settings-panel" style="display: none; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                        <!-- Font Size -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Størrelse</span>
+                            <div class="btn-setting-group" style="display: flex; align-items: center;">
+                                <button type="button" id="btn-decrease-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px 0 0 6px; padding: 0; box-shadow: none !important; font-size: 13px; font-weight: bold; border-right: none;">A-</button>
+                                <button type="button" id="font-size-display-mobile" disabled style="border: 1px solid var(--border-color); background: var(--bg-sidebar); color: var(--text-base); height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: default; font-weight: 600; border-radius: 0; box-shadow: none !important;">18px</button>
+                                <button type="button" id="btn-increase-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 0 6px 6px 0; padding: 0; box-shadow: none !important; font-size: 13px; font-weight: bold; border-left: none;">A+</button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Font Family -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Skrifttype</span>
-                        <div class="select-wrapper">
-                            <select id="settings-font-family-mobile" style="padding: 4px 24px 4px 8px; font-size: 12px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px;">
-                                <option value="serif">Serif (Klassisk)</option>
-                                <option value="sans">Sans-Serif (Moderne)</option>
-                            </select>
+                        <!-- Font Family -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Skrifttype</span>
+                            <div class="select-wrapper">
+                                <select id="settings-font-family-mobile" style="padding: 0 24px 0 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px; outline: none; cursor: pointer;">
+                                    <option value="serif">Serif (Klassisk)</option>
+                                    <option value="sans">Sans-Serif (Moderne)</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Theme Selection -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tema</span>
-                        <div class="theme-selectors" style="margin: 0; display: flex; gap: 8px;">
-                            <div class="theme-option" data-theme="cream" title="Kremgul" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #fdf6e3; box-shadow: inset 0 0 2px rgba(0,0,0,0.2);"></div>
-                            <div class="theme-option" data-theme="light" title="Lys" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #ffffff; box-shadow: inset 0 0 2px rgba(0,0,0,0.2);"></div>
-                            <div class="theme-option" data-theme="dark" title="Mørk" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #1a1a1a; box-shadow: inset 0 0 2px rgba(0,0,0,0.2);"></div>
+                        <!-- Theme Selection -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tema</span>
+                            <div class="theme-selectors" style="margin: 0; display: flex; gap: 8px;">
+                                <div class="theme-option" data-theme="cream" title="Kremgul" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #fdf6e3; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="light" title="Lys" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #ffffff; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="dark" title="Mørk" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #1a1a1a; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1874,18 +2051,6 @@
                         <!-- Loaded dynamically -->
                     </div>
 
-                    <!-- Next/Prev Buttons -->
-                    <div class="navigation-triggers">
-                        <button class="nav-btn" id="prev-chapter-btn" disabled>
-                            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
-                            <span>Forrige kapittel</span>
-                        </button>
-                        <button class="nav-btn" id="next-chapter-btn">
-                            <span>Neste kapittel</span>
-                            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
-                        </button>
-                    </div>
-
                     <!-- Bottom Chapter Cross References -->
                     <div id="chapter-cross-references-section" style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border-color); display: none; width: 100%;">
                         <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; justify-content: center; text-transform: uppercase; letter-spacing: 0.05em;">
@@ -1997,6 +2162,20 @@
                     </div>
                 </div>
             </aside>
+
+            <!-- Central Reading Area Bottom Floating Navigation -->
+            <div class="floating-bible-nav" id="floating-bible-nav">
+                <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="floating-nav-info">
+                    <span id="floating-nav-book">JOHANNES</span>
+                    <span id="floating-nav-chapter">1</span>
+                </div>
+                <button class="floating-nav-btn" id="floating-next-btn" title="Neste kapittel">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
         </main>
 
         <!-- Right Sidebar: Bookmarks & History -->

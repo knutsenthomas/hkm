@@ -368,6 +368,16 @@ class BibleReader {
             this.dom.nextChapterBtn.addEventListener('click', () => this.navigateChapter(1));
         }
 
+        // Floating Prev/Next Chapter Navigation
+        const floatPrevBtn = document.getElementById('floating-prev-btn');
+        if (floatPrevBtn) {
+            floatPrevBtn.addEventListener('click', () => this.navigateChapter(-1));
+        }
+        const floatNextBtn = document.getElementById('floating-next-btn');
+        if (floatNextBtn) {
+            floatNextBtn.addEventListener('click', () => this.navigateChapter(1));
+        }
+
         // Quick Search Form
         if (this.dom.quickSearchForm) {
             this.dom.quickSearchForm.addEventListener('submit', (e) => {
@@ -1118,6 +1128,18 @@ class BibleReader {
 
         if (this.dom.prevChapterBtn) this.dom.prevChapterBtn.disabled = !hasPrev;
         if (this.dom.nextChapterBtn) this.dom.nextChapterBtn.disabled = !hasNext;
+
+        // Floating nav updates
+        const floatPrevBtn = document.getElementById('floating-prev-btn');
+        const floatNextBtn = document.getElementById('floating-next-btn');
+        if (floatPrevBtn) floatPrevBtn.disabled = !hasPrev;
+        if (floatNextBtn) floatNextBtn.disabled = !hasNext;
+
+        const floatBookSpan = document.getElementById('floating-nav-book');
+        const floatChapSpan = document.getElementById('floating-nav-chapter');
+        const currentBook = this.books.find(b => b.id === this.selectedBookId);
+        if (floatBookSpan && currentBook) floatBookSpan.innerText = currentBook.name;
+        if (floatChapSpan) floatChapSpan.innerText = chapterNum;
     }
 
     async navigateChapter(direction) {
