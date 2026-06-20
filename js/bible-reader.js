@@ -233,6 +233,7 @@ class BibleReader {
         // Font Size
         if (this.dom.fontSizeDisplay) this.dom.fontSizeDisplay.innerText = `${this.settings.fontSize}px`;
         if (this.dom.readingPane) {
+            this.dom.readingPane.style.setProperty('--bible-font-size', `${this.settings.fontSize}px`);
             this.dom.readingPane.style.fontSize = `${this.settings.fontSize}px`;
             this.dom.readingPane.style.lineHeight = this.settings.lineHeight;
             
@@ -547,7 +548,7 @@ class BibleReader {
         const input = query.trim().toLowerCase();
         
         // Regex match, e.g. "1. Johannes 3:16", "Johannes 3:16", "Salmene 23"
-        const regex = /^(\d+)?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+))?$/i;
+        const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+))?$/i;
         const match = input.match(regex);
 
         if (!match) {
@@ -561,7 +562,12 @@ class BibleReader {
         const verseNum = match[4];
 
         // Format search query to match book name, e.g., "1 mosebok", "johannes"
-        const fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+        let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
+
+        // Translate Norwegian abbreviations
+        if (fullBookSearchName === 'apg') {
+            fullBookSearchName = 'apostlenes';
+        }
 
         const matchedBook = this.books.find(b => {
             const bName = b.name.toLowerCase();

@@ -93,6 +93,27 @@
             height: 100%;
         }
 
+        /* Force compact header height and dark text on this page to prevent layout gap/overlap and contrast issues */
+        #header {
+            background: white !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        #header-container {
+            height: 80px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        #header .logo,
+        #header .logo span,
+        #header #global-search-opener,
+        #header .lang-btn {
+            color: #1e293b !important;
+        }
+        #header #global-search-opener:hover,
+        #header .lang-btn:hover {
+            color: #d17d39 !important;
+        }
+        
         /* Layout */
         .bible-app-container {
             display: flex;
@@ -102,6 +123,19 @@
             background: var(--bg-base);
             color: var(--text-base);
             transition: background 0.3s, color 0.3s;
+        }
+
+        /* Mobile & Tablet Adjustments */
+        @media (max-width: 1024px) {
+            #header-container {
+                height: 70px !important;
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            .bible-app-container {
+                margin-top: 70px;
+                height: calc(100vh - 70px);
+            }
         }
 
         /* Sidebar Left (Books) */
@@ -456,7 +490,8 @@
             text-align: left;
         }
 
-        .bible-reading-pane p {
+        .bible-reading-pane p,
+        .bible-reading-pane p * {
             display: inline;
             position: relative;
             padding: 2px 4px;
@@ -466,7 +501,7 @@
             cursor: pointer;
             box-decoration-break: clone;
             -webkit-box-decoration-break: clone;
-            font-size: inherit;
+            font-size: var(--bible-font-size, inherit) !important;
         }
 
         .bible-reading-pane p.highlighted {
@@ -834,8 +869,8 @@
         /* Mobile Adjustments */
         @media (max-width: 900px) {
             .bible-app-container {
-                margin-top: 80px;
-                height: calc(100vh - 80px);
+                margin-top: 70px;
+                height: calc(100vh - 70px);
             }
 
             .bible-sidebar {
