@@ -2312,7 +2312,7 @@ class BibleReader {
         let loginNotice = '';
         if (!this.currentUser) {
             loginNotice = `
-                <div style="background: rgba(209, 125, 57, 0.1); border: 1px solid rgba(209, 125, 57, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: #7f8c8d; line-height: 1.4;">
+                <div style="background: rgba(27, 73, 101, 0.05); border: 1px solid rgba(27, 73, 101, 0.15); border-radius: 12px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: #475569; line-height: 1.4;">
                     <p style="margin-bottom: 8px;">${t_logInToSave}</p>
                     <a href="/minside/login.html" class="hkm-btn-primary" style="height: 30px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;">${t_loginBtn}</a>
                 </div>
@@ -2344,7 +2344,7 @@ class BibleReader {
                         <div class="hkm-rp-card" id="plan-card-${p.id}">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                                 <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; flex-grow: 1;">${p.title}</h4>
-                                <span style="font-size: 11px; font-weight: 700; background: #fff7ed; color: #d17d39; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
+                                <span style="font-size: 11px; font-weight: 700; background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
                             </div>
                             <p style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
                             
