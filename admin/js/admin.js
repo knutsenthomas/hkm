@@ -6038,6 +6038,10 @@ class AdminManager {
                                 <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
                             </div>
                             <div class="form-group" style="margin-top: 15px;">
+                                <label>YouTube API-nøkkel</label>
+                                <input type="password" id="yt-api-key" class="form-control" placeholder="Din Google Cloud API-nøkkel for YouTube">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
                                 <label>YouTube Kategorier (Playlister)</label>
                                 <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
                             </div>
@@ -6893,8 +6897,9 @@ class AdminManager {
      * @param {function} callback - Callback returning { type: 'youtube'|'file', url: string }
      */
     async openVideoManagerModal(callback) {
+        const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
         const settings = await firebaseService.getPageContent('settings_integrations') || {};
-        const apiKey = (settings.youtube?.apiKey || settings.googleCalendar?.apiKey || settings.googleAI?.apiKey || settings.googleAi?.apiKey || settings.geminiApiKey || '').trim();
+        const apiKey = (mediaSettings.youtubeApiKey || settings.youtube?.apiKey || settings.googleCalendar?.apiKey || '').trim();
 
         const modal = document.createElement('div');
         modal.className = 'admin-modal';
@@ -7623,9 +7628,11 @@ class AdminManager {
             const settings = await firebaseService.getPageContent('settings_media');
             if (settings) {
                 const ytChannel = document.getElementById('yt-channel-id');
+                const ytApiKey = document.getElementById('yt-api-key');
                 const ytPlaylists = document.getElementById('yt-playlists');
 
                 if (settings.youtubeChannelId && ytChannel) ytChannel.value = settings.youtubeChannelId;
+                if (settings.youtubeApiKey && ytApiKey) ytApiKey.value = settings.youtubeApiKey;
                 if (settings.youtubePlaylists && ytPlaylists) ytPlaylists.value = settings.youtubePlaylists;
             }
         } catch (e) {
@@ -7636,6 +7643,7 @@ class AdminManager {
     async saveMediaSettings(buttonId = 'save-media-settings') {
         const btn = document.getElementById(buttonId) || document.getElementById('save-media-settings');
         const ytChannelInput = document.getElementById('yt-channel-id');
+        const ytApiKeyInput = document.getElementById('yt-api-key');
         const ytPlaylistsInput = document.getElementById('yt-playlists');
 
         const originalText = btn?.textContent || 'Lagre';
@@ -7652,6 +7660,7 @@ class AdminManager {
             };
 
             if (ytChannelInput) nextSettings.youtubeChannelId = ytChannelInput.value.trim();
+            if (ytApiKeyInput) nextSettings.youtubeApiKey = ytApiKeyInput.value.trim();
             if (ytPlaylistsInput) nextSettings.youtubePlaylists = ytPlaylistsInput.value.trim();
 
             await firebaseService.savePageContent('settings_media', nextSettings);
