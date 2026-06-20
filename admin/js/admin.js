@@ -7171,12 +7171,16 @@ class AdminManager {
                 });
             } catch (err) {
                 console.error('YouTube Search error:', err);
+                const keyPreview = apiKey ? `${apiKey.substring(0, 6)}...${apiKey.substring(apiKey.length - 4)}` : 'Ingen nøkkel';
                 ytResultsContainer.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444; max-width: 500px; margin: 0 auto;">
                         <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444; margin-bottom: 8px;">error</span>
                         <p style="margin-top: 8px; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Feil under YouTube-søk:</p>
                         <p style="font-size: 12px; color: #64748b; line-height: 1.5; background: #fef2f2; padding: 10px; border-radius: 6px; border: 1px solid #fee2e2; word-break: break-word; text-align: left;">${err.message}</p>
-                        <p style="font-size: 12px; color: #475569; margin-top: 12px; line-height: 1.4;">Sjekk integrasjonsinnstillingene under Innstillinger -> Integrasjoner, og at YouTube Data API v3 er aktivert for API-nøkkelen i Google Cloud Console.</p>
+                        <p style="font-size: 12px; color: #475569; margin-top: 12px; line-height: 1.5; text-align: left;">
+                            <strong>Aktiv API-nøkkel på nettsiden:</strong> <code>${keyPreview}</code><br>
+                            Sjekk at denne matcher nøyaktig med nøkkelen du redigerer i Google Cloud Console. Hvis de matcher, sjekk at du trykket <em>Save / Lagre</em> og vent 1-2 minutter før du prøver igjen.
+                        </p>
                     </div>
                 `;
             }
