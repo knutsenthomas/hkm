@@ -91,8 +91,8 @@
         /* Layout */
         .bible-app-container {
             display: flex;
-            height: calc(100vh - 80px);
-            margin-top: 80px;
+            height: calc(100vh - 112px);
+            margin-top: 112px;
             overflow: hidden;
             background: var(--bg-base);
             color: var(--text-base);
@@ -690,8 +690,80 @@
             justify-content: center;
         }
 
+        /* Buttons and Interactive Elements */
+        .nav-btn, .settings-popover-trigger, .close-dict-btn, .chapter-item, .theme-option, .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn:hover:not(:disabled), .settings-popover-trigger:hover, .close-dict-btn:hover {
+            transform: scale(1.03);
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+        }
+
+        .nav-btn:active:not(:disabled), .settings-popover-trigger:active {
+            transform: scale(0.97);
+        }
+
+        /* Gå (Submit) Button Style */
+        .btn-bible-go {
+            padding: 0 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: var(--bible-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            height: 34px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-bible-go:hover {
+            background: #15394f;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25);
+        }
+
+        .btn-bible-go:active {
+            transform: scale(0.97);
+        }
+        
+        /* Mobile menu toggle */
+        .btn-mobile-sidebar {
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            transition: all 0.25s ease;
+        }
+        
+        .btn-mobile-sidebar:hover {
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
+        }
+        
+        .btn-mobile-sidebar:active {
+            transform: scale(0.95);
+        }
+
         /* Mobile Adjustments */
         @media (max-width: 900px) {
+            .bible-app-container {
+                margin-top: 80px;
+                height: calc(100vh - 80px);
+            }
+
             .bible-sidebar {
                 position: absolute;
                 left: -280px;
@@ -844,7 +916,7 @@
             <div class="bible-controls">
                 <div class="controls-left">
                     <!-- Sidebar trigger (Mobile Only) -->
-                    <button class="md:hidden p-2 rounded border border-slate-200" id="mobile-sidebar-toggle" style="background: var(--bg-card); display: flex; align-items: center; justify-content: center; cursor: pointer; outline: none; border-color: var(--border-color);">
+                    <button class="md:hidden btn-mobile-sidebar" id="mobile-sidebar-toggle">
                         <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
                     </button>
 
@@ -856,7 +928,7 @@
                     </div>
 
                     <!-- Book / Chapter triggers for quick overlay select -->
-                    <button class="nav-btn" id="trigger-book-chapter" style="padding: 8px 12px; display: flex; align-items: center; gap: 4px;" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
+                    <button class="nav-btn" id="trigger-book-chapter" style="padding: 8px 16px; display: flex; align-items: center; gap: 8px;" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
                         <span class="material-symbols-outlined" style="font-size: 18px;">grid_view</span>
                         <span>Kapittel</span>
                     </button>
@@ -875,9 +947,9 @@
 
                 <div class="controls-right">
                     <!-- Quick Reference Search -->
-                    <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 6px;">
+                    <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 8px;">
                         <input type="text" id="bible-quick-search" placeholder="f.eks. Johannes 3:16" style="padding: 8px 12px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); outline: none; width: 160px;">
-                        <button type="submit" class="btn-primary" style="padding: 0 12px; font-size: 13px; font-weight: 600; border-radius: 8px; background: var(--bible-primary); color: white; border: none; cursor: pointer; height: 34px;">Gå</button>
+                        <button type="submit" class="btn-bible-go">Gå</button>
                     </form>
 
                     <!-- Settings Trigger -->
