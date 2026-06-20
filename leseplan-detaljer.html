@@ -507,8 +507,13 @@
         }
 
         @media print {
+            @page {
+                size: auto;
+                margin: 20mm 15mm 20mm 15mm;
+            }
+
             /* Skjul alt unødvendig */
-            header, footer, aside, .other-plans-section, #site-search-modal, .cookie-consent, #global-search-opener, .hkm-chat-widget, .search-overlay, .page-hero, #expand-days-container {
+            header, footer, aside, .other-plans-section, #site-search-modal, .cookie-consent, #global-search-opener, .hkm-chat-widget, .search-overlay, .page-hero, section.page-hero, .subpage-hero, #expand-days-container {
                 display: none !important;
             }
 
@@ -519,8 +524,6 @@
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
                 font-size: 11pt !important;
                 line-height: 1.5 !important;
-                margin: 0 !important;
-                padding: 0 !important;
             }
 
             /* Containerne skal fylle hele arket */
