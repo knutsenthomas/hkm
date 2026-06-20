@@ -9679,7 +9679,50 @@ class AdminManager {
                             }
                         });
                     },
-                    quote: () => exec('formatBlock', 'blockquote')
+                    quote: () => exec('formatBlock', 'blockquote'),
+                    video: () => {
+                        const getYouTubeId = (url) => {
+                            if (!url) return null;
+                            const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                            return m ? m[1] : null;
+                        };
+                        const url = window.prompt('Lim inn YouTube-video-URL (eller klikk OK med tomt felt for å laste opp videofil fra din enhet):');
+                        
+                        if (url && url.trim()) {
+                            const videoId = getYouTubeId(url.trim());
+                            if (videoId) {
+                                const embedHtml = `<div class="youtube-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin:16px 0;"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div><p></p>`;
+                                exec('insertHTML', embedHtml);
+                                this.showToast('YouTube-video lagt til!', 'success');
+                            } else {
+                                this.showToast('Ugyldig YouTube-URL.', 'error');
+                            }
+                        } else if (url === '') {
+                            const fileInput = document.createElement('input');
+                            fileInput.type = 'file';
+                            fileInput.accept = 'video/*';
+                            fileInput.onchange = async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                try {
+                                    this.showToast('Laster opp video...', 'info');
+                                    const path = `editor/video-uploads/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                                    const fileUrl = await firebaseService.uploadFile(file, path, ['video/'], 500);
+                                    if (fileUrl) {
+                                        const videoHtml = `<video src="${fileUrl}" controls style="width:100%; max-height:480px; border-radius:8px; margin:16px 0; display:block; background:#000;"></video><p></p>`;
+                                        exec('insertHTML', videoHtml);
+                                        this.showToast('Video lastet opp!', 'success');
+                                    } else {
+                                        this.showToast('Opplasting feilet.', 'error');
+                                    }
+                                } catch (err) {
+                                    this.showToast('Kunne ikke laste opp video.', 'error');
+                                    console.error(err);
+                                }
+                            };
+                            fileInput.click();
+                        }
+                    }
                 } : {
                     ...commonHandlers,
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
@@ -9702,7 +9745,8 @@ class AdminManager {
                     },
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
-                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
+                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true),
+                    video: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
                 };
 
                 // --- High-Reliability Event Delegation for Toolbar ---
