@@ -512,8 +512,7 @@
 
         .bible-reading-pane p.highlighted {
             background: var(--highlight-bg);
-            border-bottom: 2px solid var(--bible-primary);
-            border-radius: 0;
+            border-radius: 4px;
         }
 
         .bible-reading-pane p:hover {
@@ -1250,8 +1249,7 @@
         /* Multi-verse selection styling */
         .bible-reading-pane p.selected-verse {
             background: rgba(27, 73, 101, 0.12) !important;
-            border-bottom: 2px dashed var(--bible-accent, #1B4965) !important;
-            border-radius: 0 !important;
+            border-radius: 4px !important;
         }
 
         /* Mobile adjustment for floating verse toolbar */
@@ -1389,6 +1387,29 @@
                     width: 100% !important;
                     max-width: none !important;
                 }
+                /* Make sidebar close button look more like a button on mobile */
+                .close-sidebar-mobile-btn,
+                .close-sidebar-btn {
+                    background: var(--bg-base) !important;
+                    border: 1px solid var(--border-color) !important;
+                    color: var(--text-base) !important;
+                    width: 32px !important;
+                    height: 32px !important;
+                    border-radius: 50% !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                .close-sidebar-mobile-btn:hover,
+                .close-sidebar-btn:hover {
+                    background: var(--bg-sidebar) !important;
+                    transform: scale(1.05);
+                }
             }
         }
     </style>
@@ -1490,7 +1511,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-mobile-title-row" style="justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: nowrap; width: 100%;">
                     <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Bibelbøker</span>
-                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-muted) !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;">
+                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
