@@ -3620,9 +3620,16 @@ window.addEventListener('load', () => {
                              document.body.classList.contains('crm-body') || 
                              document.body.classList.contains('minside-body')
                          ));
+
+        const path = window.location.pathname.toLowerCase().replace(/\/$/, "");
+        const isExcludedPage = path.endsWith('/bibel') || 
+                               path.endsWith('/bibel.html') || 
+                               path.includes('leseplan-detaljer') || 
+                               path.includes('reading-plan-details') || 
+                               path.includes('detalles-plan-lectura');
                          
-        if (isPortal) {
-            console.log('[VisitorChat] Chatbot disabled on admin/CRM/minside portals.');
+        if (isPortal || isExcludedPage) {
+            console.log('[VisitorChat] Chatbot disabled on admin/CRM/minside/bible/reading-plan pages.');
             return;
         }
         
