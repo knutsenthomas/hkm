@@ -1021,15 +1021,23 @@
                 if (waLink) waLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this reading plan from His Kingdom Ministry: " + shareUrl)}`;
 
                 // Intercept share clicks on mobile/modern browsers if Web Share API is available
-                const handleShare = async (e, fallbackUrl) => {
+                const handleShare = async (e, platform, fallbackUrl) => {
                     if (navigator.share) {
                         e.preventDefault();
                         try {
-                            await navigator.share({
-                                title: plan.title,
-                                text: plan.description || plan.subtitle || "Check out this reading plan from His Kingdom Ministry!",
-                                url: shareUrl
-                            });
+                            if (platform === 'fb') {
+                                // Facebook iOS app share extension requires sharing ONLY the URL to trigger rich link previews.
+                                // Passing text/title causes it to fall back to plain-text sharing without generating the card preview.
+                                await navigator.share({
+                                    url: shareUrl
+                                });
+                            } else {
+                                await navigator.share({
+                                    title: plan.title,
+                                    text: plan.description || plan.subtitle || "Check out this reading plan from His Kingdom Ministry!",
+                                    url: shareUrl
+                                });
+                            }
                         } catch (err) {
                             if (err.name !== 'AbortError') {
                                 window.open(fallbackUrl, '_blank');
@@ -1038,9 +1046,9 @@
                     }
                 };
 
-                if (fbLink) fbLink.addEventListener('click', (e) => handleShare(e, fbLink.href));
-                if (twLink) twLink.addEventListener('click', (e) => handleShare(e, twLink.href));
-                if (waLink) waLink.addEventListener('click', (e) => handleShare(e, waLink.href));
+                if (fbLink) fbLink.addEventListener('click', (e) => handleShare(e, 'fb', fbLink.href));
+                if (twLink) twLink.addEventListener('click', (e) => handleShare(e, 'tw', twLink.href));
+                if (waLink) waLink.addEventListener('click', (e) => handleShare(e, 'wa', waLink.href));
 
                 // Set text fields
                 document.getElementById('plan-hero-title').textContent = plan.title;
