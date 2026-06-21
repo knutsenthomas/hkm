@@ -5085,12 +5085,14 @@ ol.block-list {
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1.5s ease-in-out;
+    visibility: hidden;
+    transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
     z-index: 1;
 }
 
 .hero-slide.active {
     opacity: 1;
+    visibility: visible;
     z-index: 2;
 }
 
@@ -5253,7 +5255,7 @@ ol.block-list {
         width: 100%;
         padding: 0 32px;
         text-align: left;
-        margin-top: -20px;
+        margin-top: -40px; /* Pushed slightly further up on tablets/larger mobile */
     }
 
     .hero-title {
@@ -5296,7 +5298,7 @@ ol.block-list {
 
     .hero-content {
         padding: 0 16px;
-        margin-top: -40px;
+        margin-top: -75px; /* Pushed slightly further up on iPhone/smaller mobile */
     }
 }
 
@@ -5884,11 +5886,13 @@ a[href*="#deduccion-fiscal"],
     }
 
     .blog-image {
+        flex: none; /* Reset flex row properties on mobile */
         max-width: 100%;
         width: 100%;
     }
     
     .blog-content {
+        flex: none; /* Reset flex row properties on mobile to collapse to content height */
         padding: 20px 20px 16px 20px; /* Reduced bottom padding to remove empty space */
     }
 }
