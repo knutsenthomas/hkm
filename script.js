@@ -3850,6 +3850,20 @@ window.addEventListener('load', () => {
                     bottom: 92px !important;
                 }
             }
+            @media print {
+                #hkm-visitor-chat-widget,
+                .hkm-chat-toggle,
+                .hkm-chat-panel,
+                .hkm-chat-dot {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    height: 0 !important;
+                    width: 0 !important;
+                    position: absolute !important;
+                    pointer-events: none !important;
+                }
+            }
         `;
         document.head.appendChild(style);
     }
