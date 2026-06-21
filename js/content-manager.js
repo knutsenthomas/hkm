@@ -1207,6 +1207,11 @@ class ContentManager {
             heroEl.style.setProperty('background-repeat', 'no-repeat', 'important');
         }
 
+        const printImg = document.getElementById('print-post-image');
+        if (printImg && heroImage) {
+            printImg.src = heroImage;
+        }
+
         // --- Calculate Reading Time ---
         let readingTime = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
         if (!(Number.isFinite(readingTime) && readingTime > 0) && articleHtml) {
