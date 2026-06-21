@@ -77,82 +77,82 @@
         }
 
         /* Hide print elements on screen */
-        .print-only-image-body,
+        .print-only-header,
         .print-only-copyright {
             display: none;
         }
 
         @media print {
-            /* Force featured image printing */
+            /* Hide the web hero completely on print */
+            #blog-hero,
+            .page-hero,
+            section.page-hero,
+            .subpage-hero {
+                display: none !important;
+            }
+
+            /* Show print-only header container */
+            .print-only-header {
+                display: block !important;
+                width: 100% !important;
+                margin-top: 10px !important;
+                margin-bottom: 25px !important;
+            }
+
+            /* Print-only featured image */
             .print-only-image-body {
                 display: block !important;
                 width: 100% !important;
                 height: auto !important;
                 max-height: 380px !important;
                 object-fit: cover !important;
-                margin-top: 10px !important;
-                margin-bottom: 25px !important;
+                margin-bottom: 20px !important;
                 border-radius: 8px !important;
             }
-            
-            .page-hero, section.page-hero, .subpage-hero {
-                position: relative !important;
-                overflow: hidden !important;
-                background: none !important;
-                background-color: transparent !important;
-                border: none !important;
-                padding-top: 10px !important;
-                padding-bottom: 10px !important;
+
+            /* Print-only title styling */
+            .print-post-title {
+                display: block !important;
+                color: #1B4965 !important; /* Mørkeblå brand color */
+                font-size: 24pt !important;
+                font-weight: 700 !important;
+                line-height: 1.25 !important;
                 margin-top: 0 !important;
-                min-height: auto !important;
-                height: auto !important;
+                margin-bottom: 15px !important;
+                text-align: left !important;
             }
 
-            .page-hero::before,
-            .subpage-hero::before {
-                display: none !important;
-                content: none !important;
-                background: none !important;
+            /* Print-only metadata alignment (flexbox layout) */
+            .print-post-meta {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                margin-bottom: 25px !important;
+                color: #555555 !important;
+                font-size: 11pt !important;
+            }
+
+            .print-post-author-avatar {
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
+                object-fit: cover !important;
+                border: 2px solid #1B4965 !important;
+            }
+
+            .print-post-author {
+                font-weight: 600 !important;
+                color: #333333 !important;
+            }
+
+            .print-post-date {
+                color: #666666 !important;
             }
 
             /* Ensure text is readable and dark for print */
             body {
                 color: #000000 !important;
                 background: #ffffff !important;
-            }
-            
-            .page-hero-title {
-                color: #1B4965 !important; /* Mørkeblå brand color */
-                text-shadow: none !important;
-                margin-top: 10px !important;
-                margin-bottom: 10px !important;
-                font-size: 24pt !important;
-                text-align: center !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            }
-
-            #single-post-title,
-            #blog-meta-row,
-            .blog-meta, 
-            .blog-meta-top, 
-            .blog-meta-bottom, 
-            #single-post-author, 
-            #single-post-date, 
-            #single-post-readingtime, 
-            #single-post-views {
-                color: #555555 !important;
-                text-shadow: none !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            }
-
-            #single-post-author-avatar {
-                border-color: #1B4965 !important;
-                background-color: #f0f4f8 !important;
-                color: #1B4965 !important;
-                opacity: 1 !important;
-                visibility: visible !important;
             }
 
             /* Hide tags/subjects, comments interactions and chat widget */
@@ -420,7 +420,16 @@
                     }
                 }
             </style>
-            <img id="print-post-image-body" class="print-only-image-body" src="" alt="" />
+            <!-- Print-only header structure -->
+            <div class="print-only-header">
+                <img id="print-post-image-body" class="print-only-image-body" src="" alt="" />
+                <h1 class="print-post-title" id="print-post-title"></h1>
+                <div class="print-post-meta" id="print-post-meta">
+                    <img id="print-post-author-avatar" class="print-post-author-avatar" src="" alt="" style="display: none;" />
+                    <span id="print-post-author" class="print-post-author"></span>
+                    <span id="print-post-date" class="print-post-date"></span>
+                </div>
+            </div>
             <article class="blog-post-content" id="single-post-content" style="display:none;">
             </article>
 

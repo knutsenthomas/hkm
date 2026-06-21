@@ -1096,10 +1096,17 @@ class ContentManager {
         if (titleEl) titleEl.textContent = item.title || 'Blogginnlegg';
         if (breadcrumbEl) breadcrumbEl.textContent = item.title || 'Blogginnlegg';
 
+        const printTitleEl = document.getElementById('print-post-title');
+        if (printTitleEl) {
+            printTitleEl.textContent = item.title || 'Blogginnlegg';
+        }
+
         const authorEl = document.getElementById('single-post-author');
+        const printAuthorEl = document.getElementById('print-post-author');
         if (authorEl) {
             const auth = item.author || sourceItem?.author || 'Ukjent forfatter';
             authorEl.textContent = auth;
+            if (printAuthorEl) printAuthorEl.textContent = auth;
         }
 
         // Populate author avatar in hero
@@ -1127,41 +1134,46 @@ class ContentManager {
             
             const renderAvatar = (url) => {
                 const el = document.getElementById('single-post-author-avatar');
-                if (!el) return;
-                
-                if (url && url !== 'img/author-placeholder.png') {
-                    if (el.tagName === 'DIV') {
-                        const img = document.createElement('img');
-                        img.id = 'single-post-author-avatar';
-                        img.className = el.className;
-                        img.style.cssText = el.style.cssText;
-                        img.src = url;
-                        img.alt = `Forfatterens bilde: ${authorName}`;
-                        el.replaceWith(img);
-                    } else {
-                        el.src = url;
-                        el.alt = `Forfatterens bilde: ${authorName}`;
-                        el.style.display = 'inline-block';
+                if (el) {
+                    if (url && url !== 'img/author-placeholder.png') {
+                        if (el.tagName === 'DIV') {
+                            const img = document.createElement('img');
+                            img.id = 'single-post-author-avatar';
+                            img.className = el.className;
+                            img.style.cssText = el.style.cssText;
+                            img.src = url;
+                            img.alt = `Forfatterens bilde: ${authorName}`;
+                            el.replaceWith(img);
+                        } else {
+                            el.src = url;
+                            el.alt = `Forfatterens bilde: ${authorName}`;
+                            el.style.display = 'inline-block';
+                        }
+                    } else if (el.tagName === 'IMG') {
+                        // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
+                        const iconContainer = document.createElement('div');
+                        iconContainer.id = 'single-post-author-avatar';
+                        iconContainer.style.width = '40px';
+                        iconContainer.style.height = '40px';
+                        iconContainer.style.borderRadius = '50%';
+                        iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                        iconContainer.style.display = 'inline-flex';
+                        iconContainer.style.alignItems = 'center';
+                        iconContainer.style.justifyContent = 'center';
+                        iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
+                        iconContainer.style.flexShrink = '0';
+                        iconContainer.style.color = 'white';
+                        iconContainer.style.fontSize = '18px';
+                        iconContainer.innerHTML = '<i class="fas fa-user"></i>';
+                        el.replaceWith(iconContainer);
                     }
-                } else if (el.tagName === 'IMG') {
-                    // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
-                    const iconContainer = document.createElement('div');
-                    iconContainer.id = 'single-post-author-avatar';
-                    // Copy styles from the original img for layout consistency
-                    iconContainer.style.width = '40px';
-                    iconContainer.style.height = '40px';
-                    iconContainer.style.borderRadius = '50%';
-                    iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
-                    iconContainer.style.display = 'inline-flex';
-                    iconContainer.style.alignItems = 'center';
-                    iconContainer.style.justifyContent = 'center';
-                    iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
-                    iconContainer.style.flexShrink = '0';
-                    iconContainer.style.color = 'white';
-                    iconContainer.style.fontSize = '18px';
-                    
-                    iconContainer.innerHTML = '<i class="fas fa-user"></i>';
-                    el.replaceWith(iconContainer);
+                }
+
+                const printEl = document.getElementById('print-post-author-avatar');
+                if (printEl && url) {
+                    printEl.src = url;
+                    printEl.alt = `Forfatterens bilde: ${authorName}`;
+                    printEl.style.display = 'inline-block';
                 }
             };
 
@@ -1191,6 +1203,10 @@ class ContentManager {
         if (dateEl) {
             const dateStr = item.date ? this.formatDate(item.date) : '';
             dateEl.textContent = dateStr;
+            const printDateEl = document.getElementById('print-post-date');
+            if (printDateEl) {
+                printDateEl.textContent = dateStr;
+            }
         }
 
         if (categoryEl) {
