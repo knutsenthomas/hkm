@@ -513,12 +513,12 @@ export default function ReadingPlansAdmin() {
 
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                         {(day.resources || []).map((res, resIdx) => (
-                                                            <div key={resIdx} style={{ display: 'grid', gridTemplateColumns: '120px 120px 1fr 1fr auto', gap: '8px', background: 'white', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', alignItems: 'center' }}>
+                                                            <div key={resIdx} style={{ display: 'grid', gridTemplateColumns: '150px 150px 1fr 1fr auto', gap: '8px', background: 'white', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', alignItems: 'center' }}>
                                                                 {/* Type */}
                                                                 <select
                                                                     value={res.type}
                                                                     onChange={(e) => handleResourceFieldChange(day.dayNumber, resIdx, 'type', e.target.value)}
-                                                                    style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white' }}
+                                                                    style={{ padding: '6px 24px 6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white' }}
                                                                 >
                                                                     <option value="article">Dokument/Artikkel</option>
                                                                     <option value="video">Video/YouTube</option>
@@ -530,7 +530,7 @@ export default function ReadingPlansAdmin() {
                                                                 <select
                                                                     value={res.source}
                                                                     onChange={(e) => handleResourceFieldChange(day.dayNumber, resIdx, 'source', e.target.value)}
-                                                                    style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white' }}
+                                                                    style={{ padding: '6px 24px 6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white' }}
                                                                 >
                                                                     <option value="internal">Intern ressurser</option>
                                                                     <option value="external">Ekstern URL</option>
@@ -541,7 +541,7 @@ export default function ReadingPlansAdmin() {
                                                                     <select
                                                                         value={res.internalResourceId || ''}
                                                                         onChange={(e) => handleResourceFieldChange(day.dayNumber, resIdx, 'internalResourceId', e.target.value)}
-                                                                        style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white', gridColumn: 'span 2' }}
+                                                                        style={{ padding: '6px 24px 6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', background: 'white', gridColumn: 'span 2' }}
                                                                     >
                                                                         <option value="">Velg undervisningspost...</option>
                                                                         {teachings.map(t => (
