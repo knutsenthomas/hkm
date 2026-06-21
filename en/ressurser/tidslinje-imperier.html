@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 
 <head>
     <link rel="canonical" href="https://www.hiskingdomministry.no/ressurser/tidslinje-imperier">
@@ -10,8 +10,8 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historisk tidslinje over bibelske imperier | His Kingdom Ministry</title>
-    <meta name="description" content="Utforsk den historiske tidslinjen over de store imperiene som påvirket det bibelske narrativet: Egypt, Assyria, Babylon, Persia, Hellas og Romerriket.">
+    <title>Historical Timeline of Biblical Empires | His Kingdom Ministry</title>
+    <meta name="description" content="Explore the historical timeline of the great empires that shaped the biblical narrative: Egypt, Assyria, Babylon, Persia, Greece, and the Romen Empire.">
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,17 +25,17 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles.css?v=2026.04.27.08.37">
-    <link rel="stylesheet" href="../css/cookie-consent.css">
-    <link rel="stylesheet" href="../css/subpage-hero.css">
+    <link rel="stylesheet" href="../../styles.css?v=2026.04.27.08.37">
+    <link rel="stylesheet" href="../../css/cookie-consent.css">
+    <link rel="stylesheet" href="../../css/subpage-hero.css">
 
     <!-- Firebase Config & Service -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
-    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+    <script type="module" src="../../js/firebase-config.js"></script>
+    <script type="module" src="../../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../../js/content-manager.js?v=2026.05.10.8"></script>
 
     <!-- Error Logger -->
-    <script type="module" src="../js/error-logger.js"></script>
+    <script type="module" src="../../js/error-logger.js"></script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 
     <!-- Loader Safety Net -->
@@ -188,68 +188,58 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
+    <link rel="stylesheet" href="../../css/search-v2.css?v=1.0.3">
 </head>
 
 <body class="cms-loading header-dark-start bg-[#faf9f6] text-slate-800">
 
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="header-content" id="header-container">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
-                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
-                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
-                    Ministry</span>
+                <span class="text-xl">His Kingdom Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
+            <div class="flex items-center gap-5 header-actions">
+                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Search the site">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
-                <a href="/bibel" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                <a href="/en/bibel" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
                     <span class="material-symbols-outlined text-2xl">menu_book</span>
                 </a>
-                <a href="/leseplaner" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                <a href="/en/leseplaner" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
                     <span class="material-symbols-outlined text-2xl">calendar_today</span>
                 </a>
-
+                <!-- Desktop Language Switcher -->
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global"
-                            data-content-key="header.currentLanguage">NO</span>
+                        <i class="fas fa-globe text-lg"></i> <span>EN</span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
-                            Norsk</a>
-                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
-                            English</a>
-                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
-                            Español</a>
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
-                <a href="/donasjoner"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span> <i
-                        class="fas fa-heart heart text-sm btn-heart-icon"></i>
+
+                <a href="/en/donations"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Donate <i class="fas fa-heart text-sm"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
-                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
-                    data-content-attr="aria-label">
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle menu">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -275,16 +265,11 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/" class="text-sm font-bold text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/en/"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <a href="/en/" class="text-sm font-bold text-primary-orange" data-lang="en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -293,74 +278,73 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Engasjer deg -->
+                    <!-- Column 1: Get Involved -->
                     <div class="menu-col">
                         <h3 class="menu-section-title" data-content-doc="settings_global"
-                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                            data-content-key="menu.sections.engage.title">Get Involved</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/donasjoner" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
-                            <li><a href="/bli-fast-giver" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
-                            <li><a href="/for-menigheter" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
-                            <li><a href="/for-bedrifter" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
-                            <li><a href="/bnn" data-content-doc="settings_global"
+                            <li><a href="/en/donations" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Support the Work</a></li>
+                            <li><a href="/en/regular-donors" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a></li>
+                            <li><a href="/en/for-churches" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For Churches</a></li>
+                            <li><a href="/en/for-businesses" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For Businesses</a></li>
+                            <li><a href="/en/bnn" data-content-doc="settings_global"
                                     data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 2: Bli kjent med oss -->
+                    <!-- Column 2: Get to Know Us -->
                     <div class="menu-col">
                         <h3 class="menu-section-title" data-content-doc="settings_global"
-                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                            data-content-key="menu.sections.about.title">Get to Know Us</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/om-oss" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.about">Om oss</a></li>
-                            <li><a href="/kontakt" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
+                            <li><a href="/en/about" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">About Us</a></li>
+                            <li><a href="/en/contact" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contact Us</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Ressurser & Media -->
+                    <!-- Column 3: Resources & Media -->
                     <div class="menu-col">
                         <h3 class="menu-section-title" data-content-doc="settings_global"
-                            data-content-key="menu.sections.resources.title">Ressurser</h3>
+                            data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a></li>
-                            <li><a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a></li>
-                            <li><a href="/ressurser/tidslinje-imperier" data-content-doc="settings_global" data-content-key="menu.sections.resources.timeline">Tidslinje: Imperier</a></li>
-                                    <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
-                            <li><a href="/arrangementer" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
-                            <li><a href="/media" data-content-doc="settings_global"
+                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Read the Bible</a></li>
+                            <li><a href="/en/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Reading Plans</a></li>
+                            <li><a href="/en/ressurser/tidslinje-imperier" data-content-doc="settings_global" data-content-key="menu.sections.resources.timeline">Timeline: Empires</a></li>
+                            <li><a href="/butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Store</a></li>
+                            <li><a href="/en/events" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Events</a></li>
+                            <li><a href="/en/media" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
-                            <li><a href="/blogg" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
-                            <li><a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a></li>
-                            <li><a href="/minside/index.html" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
+                            <li><a href="/en/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">News & Blog</a></li>
+                            <li><a href="/en/teaching" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Courses</a></li>
+                            <li><a href="/minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">My Page</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
-                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
                             class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
-                            data-content-key="menu.footer.store">Butikk</a>
-                        <a href="/donasjoner" data-content-doc="settings_global"
-                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
-                        <a href="/om-oss" data-content-doc="settings_global"
-                            data-content-key="menu.footer.about">Om oss</a>
-                        <a href="/personvern" data-content-doc="settings_global"
-                            data-content-key="menu.footer.privacy">Personvern</a>
-                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
                     </div>
                 </div>
             </div>
@@ -370,11 +354,11 @@
     <!-- Hero Section -->
     <section class="page-hero" style="background-image: url('/img/empires-hero.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
         <div class="container min-h-[140px] flex flex-col items-center justify-center text-center pt-8">
-            <h1 class="page-hero-title text-3xl md:text-5xl font-extrabold text-white leading-tight">Bibelske Imperier</h1>
-            <p class="page-hero-subtitle text-sm md:text-lg text-slate-200 mt-2 max-w-2xl">En historisk tidslinje over stormaktene som formet det bibelske narrativet og påvirket Guds folks historie.</p>
+            <h1 class="page-hero-title text-3xl md:text-5xl font-extrabold text-white leading-tight">Biblical Empires</h1>
+            <p class="page-hero-subtitle text-sm md:text-lg text-slate-200 mt-2 max-w-2xl">A historical timeline of the great powers that shaped the biblical narrative and influenced the history of God's people.</p>
             <div class="mt-6 flex flex-wrap justify-center gap-4">
-                <a href="/leseplaner.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/30 text-white font-semibold hover:bg-white/10 active:scale-[0.98] transition-all duration-300 text-sm">
-                    <span class="material-symbols-outlined text-lg">arrow_back</span> Tilbake til Leseplaner
+                <a href="/en/leseplaner" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/30 text-white font-semibold hover:bg-white/10 active:scale-[0.98] transition-all duration-300 text-sm">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Reading Plans
                 </a>
             </div>
         </div>
@@ -384,13 +368,13 @@
     <div class="nav-pills-container">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none justify-center">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Hopp til:</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Jump to:</span>
                 <a href="#egypt" class="nav-pill">Egypt</a>
                 <a href="#assyria" class="nav-pill">Assyria</a>
                 <a href="#babylon" class="nav-pill">Babylon</a>
                 <a href="#persia" class="nav-pill">Persia</a>
-                <a href="#hellas" class="nav-pill">Hellas</a>
-                <a href="#roma" class="nav-pill">Roma</a>
+                <a href="#hellas" class="nav-pill">Greece</a>
+                <a href="#roma" class="nav-pill">Rome</a>
             </div>
         </div>
     </div>
@@ -415,30 +399,30 @@
                                     <i class="fa-solid fa-mountain text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Ca. 1600 - 1200 f.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Det egyptiske riket</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600">c. 1600 - 1200 BC</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Egyptian Empire</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Maktens og trelldommens land"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"The land of power and bondage"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Egypt var den ubestridte stormakten i det gamle Nære Østen under bronsealderen. Deres rike strakte seg fra Nilen til elven Eufrat på høyden av sin makt. Egyptisk religion og arkitektur var preget av monumentale byggverk som pyramider og templer, ledet av faraoene som ble ansett som guddommelige.
+                                Egypt was the undisputed superpower in the ancient Near East during the Bronze Age. At the height of its power, their empire stretched from the Nile to the Euphrates River. Egyptian religion and architecture were characterized by monumental structures like pyramids and temples, led by the pharaohs who were considered divine.
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-500 shrink-0">•</span>
-                                    <span><strong>Patriarkene:</strong> Josef stiger til makt i Egypt, noe som redder Jakobs familie fra hungersnød.</span>
+                                    <span><strong>The Patriarchs:</strong> Joseph rises to power in Egypt, saving Jacob's family from famine.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-500 shrink-0">•</span>
-                                    <span><strong>Trelldommen:</strong> Et nytt dynasti tar makten, glemmer Josef, og undertrykker israelittene som slaver i over 400 år.</span>
+                                    <span><strong>The Bondage:</strong> A new dynasty takes power, forgets Joseph, and oppresses the Israelites as slaves for over 400 years.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-500 shrink-0">•</span>
-                                    <span><strong>Exodus:</strong> Gud kaller Moses, sender de ti plager over Egypt, og splitter Rødehavet for å befri sitt folk. Dette blir den sentrale frelseshendelsen i GT.</span>
+                                    <span><strong>The Exodus:</strong> God calls Moses, sends the ten plagues upon Egypt, and splits the Red Sea to deliver His people. This becomes the central redemptive event of the Old Testament.</span>
                                 </li>
                             </ul>
 
@@ -446,8 +430,8 @@
                             <div class="bg-amber-50/50 rounded-xl p-4 border border-amber-100 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-amber-600 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-amber-800 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">1. Mosebok 41 (Josefs makt), 2. Mosebok 1-15 (Plagene og utgangen), Hebreerne 11:23-29.</p>
+                                    <span class="text-xs font-bold text-amber-800 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">Genesis 41 (Joseph's power), Exodus 1-15 (Plagues and Exodus), Hebrews 11:23-29.</p>
                                 </div>
                             </div>
                         </div>
@@ -471,38 +455,38 @@
                                     <i class="fa-solid fa-shield-halved text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-red-600">Ca. 740 - 612 f.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Det assyriske riket</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-red-600">c. 740 - 612 BC</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Assyrian Empire</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Nordrikets fall og deportasjon"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"The fall of the Northern Kingdom and deportation"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Med utgangspunkt i byen Ninive ved elven Tigris, bygde assyrerne en av oldtidens mest fryktede militærmaskiner. De var beryktet for sin brutale krigføring, beleiringskunst og systematiske deportasjon av beseirede folkeslag for å knuse all nasjonal identitet og hindre opprør.
+                                Based in the city of Nineveh by the Tigris River, the Assyrians built one of the most feared military machines of antiquity. They were infamous for their brutal warfare, siege tactics, and systematic deportation of conquered peoples to crush national identity and prevent rebellion.
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-red-500 shrink-0">•</span>
-                                    <span><strong>Israels fall (722 f.Kr.):</strong> Assyrerkongen Sargon II erobrer Samaria og deporterer de ti nordlige stammene av Israel. De blir spredt i imperiet og blir kjent som "de ti tapte stammer".</span>
+                                    <span><strong>The Fall of Israel (722 BC):</strong> The Assyrian king Sargon II conquers Samaria and deports the ten northern tribes of Israel. They are scattered throughout the empire and become known as the "ten lost tribes".</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-red-500 shrink-0">•</span>
-                                    <span><strong>Beleiringen av Jerusalem (701 f.Kr.):</strong> Kong Sanherib beleirer Jerusalem under kong Hiskia. Etter bønn fra Hiskia og profeten Jesaja, blir den assyriske hæren mirakuløst slått av Herrens engel.</span>
+                                    <span><strong>The Siege of Jerusalem (701 BC):</strong> King Sennacherib besieges Jerusalem during the reign of King Hezekiah. Following the prayers of Hezekiah and the prophet Isaiah, the Assyrian army is miraculously defeated by the Angel of the Lord.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-red-500 shrink-0">•</span>
-                                    <span><strong>Ninives omvendelse og fall:</strong> Profeten Jona sendes til hovedstaden Ninive for å forkynne omvendelse, mens Nahums bok profeterer om byens totale undergang.</span>
+                                    <span><strong>The Repentance and Fall of Nineveh:</strong> The prophet Jonah is sent to the capital city of Nineveh to preach repentance, while the book of Nahum prophesies the city's total destruction.</span>
                                 </li>
                             </ul>
 
                             <div class="bg-red-50/50 rounded-xl p-4 border border-red-100 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-red-600 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-red-800 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">2. Kongebok 17 (Samarias fall), 2. Kongebok 19 (Sanheribs beleiring), Jesaja 36-37, Jona, Nahum.</p>
+                                    <span class="text-xs font-bold text-red-800 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">2 Kings 17 (Fall of Samaria), 2 Kings 19 (Sennacherib's siege), Isaiah 36-37, Jonah, Nahum.</p>
                                 </div>
                             </div>
                         </div>
@@ -522,18 +506,18 @@
                                     <i class="fa-solid fa-monument text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Ca. 612 - 539 f.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Det babylonske riket</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-amber-700">c. 612 - 539 BC</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Babylonian Empire</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Jerusalems ødeleggelse og eksil"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"The destruction of Jerusalem and exile"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Etter assyrernes fall overtok Babylon rollen som stormakt under det nybabylonske dynasti. Kong Nebukadnesar II opplevde en gullalder med monumentale byggverk som Istarporten og de legendariske hengende hager. Riket var relativt kortvarig, men dets teologiske og historiske innvirkning var massiv.
+                                After the fall of the Assyrians, Babylon took over the role of superpower under the Neo-Babylonian dynasty. King Nebuchadnezzar II oversaw a golden age of monumental building, including the Ishtar Gate and the legendary Hanging Gardens. The empire was relatively short-lived, but its theological and historical impact was massive.
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-700 shrink-0">•</span>
@@ -541,19 +525,19 @@
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-700 shrink-0">•</span>
-                                    <span><strong>Det babylonske fangenskapet:</strong> Jødene lever i eksil i 70 år. Denne krisen tvinger dem til å granske Guds ord, noe som fører til at store deler av det gamle testamentet nedtegnes og synagogevesenet oppstår.</span>
+                                    <span><strong>The Babylonian Captivity:</strong> The Jews live in exile for 70 years. This crisis forces them to search the Scriptures, leading to the preservation and writing of large parts of the Old Testament and the rise of the synagogue system.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-amber-700 shrink-0">•</span>
-                                    <span><strong>Daniel i Babylon:</strong> Daniel og hans tre venner utdannes i kongens hoff. Daniel profeterer og tyder Nebukadnesars drømmer om fremtidige riker.</span>
+                                    <span><strong>Daniel in Babylon:</strong> Daniel and his three friends are educated in the king's court. Daniel prophesies and interprets Nebuchadnezzar's dreams of future kingdoms.</span>
                                 </li>
                             </ul>
 
                             <div class="bg-amber-100/30 rounded-xl p-4 border border-amber-200 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-amber-800 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-amber-900 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">2. Kongebok 25 (Tempelets ødeleggelse), Jeremia 25 (De 70 årene), Daniel 1-6 (I babylonsk hoff), Salme 137.</p>
+                                    <span class="text-xs font-bold text-amber-900 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">2 Kings 25 (Destruction of the temple), Jeremiah 25 (The 70 years), Daniel 1-6 (In the Babylonian court), Psalm 137.</p>
                                 </div>
                             </div>
                         </div>
@@ -576,38 +560,38 @@
                                     <i class="fa-solid fa-crown text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-yellow-600">Ca. 539 - 331 f.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Det medo-persiske riket</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-yellow-600">c. 539 - 331 BC</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Medo-Persian Empire</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Hjemvendelse og gjenoppbygging"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Return and rebuild"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Kyros den store erobret Babylon i 539 f.Kr. og etablerte et av historiens største og mest tidsmessige riker. I motsetning til assyrerne og babylonerne, praktiserte perserne en liberal politikk der underkuede folkegrupper fikk vende tilbake til sine hjemland og dyrke sine egne guder under persiske satraper (guvernører).
+                                Cyrus the Great conquered Babylon in 539 BC, establishing one of the largest and most advanced empires in history. In contrast to the Assyrians and Babylonians, the Persians practiced a liberal policy allowing exiled peoples to return to their homelands and worship their own gods under Persian satraps (governors).
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-yellow-600 shrink-0">•</span>
-                                    <span><strong>Kyros-ediktet og returen:</strong> Kyros gir jødene tillatelse til å reise tilbake til Jerusalem for å gjenreise Herrens tempel, og returnerer tempelkarene.</span>
+                                    <span><strong>The Edict of Cyrus and the Return:</strong> Cyrus decrees permission for the Jews to return to Jerusalem to rebuild the Temple of the Lord and returns the plundered temple vessels.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-yellow-600 shrink-0">•</span>
-                                    <span><strong>Esra og Nehemia:</strong> Under persisk beskyttelse blir tempelet gjenoppbygd under Serubabel og Esra, og Jerusalems murer reises av Nehemia.</span>
+                                    <span><strong>Ezra and Nehemiah:</strong> Under Persian protection, the Temple is rebuilt under Zerubbabel and Ezra, and the walls of Jerusalem are restored by Nehemiah.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-yellow-600 shrink-0">•</span>
-                                    <span><strong>Dronning Ester:</strong> Ester blir dronning i den persiske hovedstaden Susa under Ahasverus (Xerxes I) og forhindrer at jødene blir utryddet.</span>
+                                    <span><strong>Queen Esther:</strong> Esther becomes queen in the Persian capital of Susa under Ahasuerus (Xerxes I) and prevents the genocide of the Jewish people.</span>
                                 </li>
                             </ul>
 
                             <div class="bg-yellow-50/50 rounded-xl p-4 border border-yellow-100 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-yellow-600 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-yellow-800 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">Esra 1-6 (Tempelet reises), Nehemia 1-4 (Muren reises), Ester (Redningsaksjonen i Susa), Haggai og Sakarja.</p>
+                                    <span class="text-xs font-bold text-yellow-800 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">Ezra 1-6 (Rebuilding of the Temple), Nehemiah 1-4 (Rebuilding of the walls), Esther (Rescue in Susa), Haggai and Zechariah.</p>
                                 </div>
                             </div>
                         </div>
@@ -627,38 +611,38 @@
                                     <i class="fa-solid fa-building-columns text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-600">Ca. 331 - 63 f.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Det greske riket (Hellenismen)</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-600">c. 331 - 63 BC</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Greek Empire (Hellenism)</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"De tause årene og makkabeernes opprør"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"The silent years and the Maccabean revolt"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Aleksander den store erobret hele Perserriket på bare ti år. Med erobringene fulgte en massiv spredning av gresk språk, kultur og filosofi (hellenisering) over hele Midtøsten. Etter Aleksanders tidlige død ble imperiet splittet mellom hans generaler, der Ptolemeerne i Egypt og Selevkidene i Syria stred om makten over Judea.
+                                Alexander the Great conquered the entire Persian Empire in just ten years. His conquests brought a massive spread of Greek language, culture, and philosophy (Hellenization) across the Middle East. After Alexander's early death, the empire was split among his generals, with the Ptolemies in Egypt and the Seleucids in Syria contending for control of Judea.
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-cyan-500 shrink-0">•</span>
-                                    <span><strong>De 400 tause år:</strong> Perioden kalles også den intertestamentale tiden. Det kom ingen nye bibelske profeter, men jødisk tro og samfunn gjennomgikk dype endringer.</span>
+                                    <span><strong>The 400 Silent Years:</strong> This period is also called the intertestamental period. No new biblical prophets arose, but Jewish faith and society underwent profound changes.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-cyan-500 shrink-0">•</span>
-                                    <span><strong>Septuaginta:</strong> Det gamle testamentet blir oversatt fra hebraisk til Koiné-gresk i Alexandria. Dette gjorde Skriften tilgjengelig for hele den siviliserte verden og la grunnlaget for NT-misjonen.</span>
+                                    <span><strong>The Septuagint:</strong> The Old Testament is translated from Hebrew to Koine Greek in Alexandria. This made the Scriptures accessible to the civilized world and laid the foundation for the New Testament mission.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-cyan-500 shrink-0">•</span>
-                                    <span><strong>Makkabeeropprøret (167 f.Kr.):</strong> Selevkider-kongen Antiochus IV Epiphanes prøvde å utradere jødedommen og innviet tempelet til Zevs. Prestefamilien Hasmoneerne gjorde opprør, renset tempelet (feiret som Hanukka) og sikret jødisk uavhengighet.</span>
+                                    <span><strong>The Maccabean Revolt (167 BC):</strong> The Seleucid king Antiochus IV Epiphanes attempted to eradicate Judaism and dedicated the Temple to Zeus. The Hasmonean priestly family revolted, cleansed the Temple (celebrated as Hanukkah), and secured Jewish independence.</span>
                                 </li>
                             </ul>
 
                             <div class="bg-cyan-50/50 rounded-xl p-4 border border-cyan-100 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-cyan-600 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-cyan-800 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">Daniel 8 (Den greske geitebukken), Daniel 11 (Kampen mellom kongen i nord og sør), 1. og 2. Makkabeerbok (historiske kilder).</p>
+                                    <span class="text-xs font-bold text-cyan-800 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">Daniel 8 (The Greek goat), Daniel 11 (The conflict between the kings of the North and South), 1 and 2 Maccabees (historical sources).</p>
                                 </div>
                             </div>
                         </div>
@@ -681,38 +665,38 @@
                                     <i class="fa-solid fa-gavel text-lg"></i>
                                 </span>
                                 <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-800">Ca. 63 f.Kr. - 476 e.Kr.</span>
-                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">Romerriket</h2>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-800">c. 63 BC - AD 476</span>
+                                    <h2 class="text-xl md:text-2xl font-extrabold text-[#1B4965] leading-snug">The Roman Empire</h2>
                                 </div>
                             </div>
-                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Evangeliets spredning under Pax Romana"</p>
+                            <p class="text-sm font-semibold text-slate-500 mb-4 italic">"Evangeliets spredning under Pax Romena"</p>
                             
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historisk kontekst</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Historical Context</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                                Romerriket ekspanderte i hele Middelhavsområdet og erobret Judea i 63 f.Kr. ved general Pompeius. Romerne brakte politisk stabilitet (*Pax Romana*), et formidabelt veinett, og et sterkt retts- og militærsystem, noe som muliggjorde trygg reising på tvers av landegrenser.
+                                The Roman Empire ekspanderte i hele Middelhavsområdet og erobret Judea i 63 f.Kr. ved general Pompeius. Romerne brakte politisk stabilitet (*Pax Romena*), et formidabelt veinett, og et sterkt retts- og militærsystem, noe som muliggjorde trygg reising på tvers av landegrenser.
                             </p>
 
-                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Bibelsk relevans</h3>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-2">Biblical Relevance</h3>
                             <ul class="space-y-2 mb-4">
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-blue-800 shrink-0">•</span>
-                                    <span><strong>Jesus blir født og korsfestet:</strong> Jesus blir født under keiser Augustus' folketelling, vokser opp i romersk-okkuperte Galilea, og blir korsfestet under den romerske prefekten Pontius Pilatus.</span>
+                                    <span><strong>Jesus is Born and Crucified:</strong> Jesus is born during the census of Emperor Augustus, grows up in Roman-occupied Galilee, and is crucified under the Roman prefect Pontius Pilate.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-blue-800 shrink-0">•</span>
-                                    <span><strong>Evangeliets spredning:</strong> Pax Romana og de romerske veiene tillot apostlene å reise vidt omkring. Apostelen Paulus brukte sitt romerske borgerskap til rettssikkerhet under sine misjonsreiser.</span>
+                                    <span><strong>Evangeliets spredning:</strong> Pax Romena og de romerske veiene tillot apostlene å reise vidt omkring. Apostelen Paulus brukte sitt romerske borgerskap til rettssikkerhet under sine misjonsreiser.</span>
                                 </li>
                                 <li class="text-slate-600 text-sm flex gap-2">
                                     <span class="text-blue-800 shrink-0">•</span>
-                                    <span><strong>Jerusalems fall (70 e.Kr.):</strong> Jødene gjør opprør i 66 e.Kr. Den romerske generalen (senere keiser) Titus beleirer og ødelegger Jerusalem og brenner Herodes' tempel, slik Jesus forutsa i Lukas 21.</span>
+                                    <span><strong>The Fall of Jerusalem (70 AD):</strong> The Jews revolt in 66 AD. The Roman general (later emperor) Titus besieges and destroys Jerusalem, burning Herod's Temple, just as Jesus foretold in Luke 21.</span>
                                 </li>
                             </ul>
 
                             <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100 flex items-start gap-3">
                                 <span class="material-symbols-outlined text-blue-800 text-xl shrink-0 mt-0.5">menu_book</span>
                                 <div>
-                                    <span class="text-xs font-bold text-blue-950 block uppercase tracking-wider mb-1">Nøkkeltekster</span>
-                                    <p class="text-xs text-slate-600">Lukas 2 (Fødselen), Matteus 22:21 (Skatt til keiseren), Apostlenes gjerninger (Missionsreise under romersk lov), Romerne 13.</p>
+                                    <span class="text-xs font-bold text-blue-950 block uppercase tracking-wider mb-1">Key Scriptures</span>
+                                    <p class="text-xs text-slate-600">Luke 2 (The Birth), Matthew 22:21 (Tribute to Caesar), Acts (Missionary journeys under Roman law), Romans 13.</p>
                                 </div>
                             </div>
                         </div>
@@ -729,113 +713,79 @@
                 <span class="material-symbols-outlined text-2xl font-bold">query_stats</span>
             </span>
             <h2 class="text-2xl md:text-3xl font-extrabold text-[#1B4965] tracking-tight leading-tight">
-                Gud over imperiene
+                God Over the Empires
             </h2>
             <p class="text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
                 Gjennom hele den bibelske historien ser vi hvordan Gud reiser opp og faller imperier for å tjene sine planer. Fra frigjøringen i Egypt to dannelsen av det greske språket og det romerske veinettet, ble alt lagt til rette for at frelseshistorien skulle fullføres og spres til jordens ender.
             </p>
             <div class="flex flex-wrap gap-4 justify-center mt-4">
-                <a href="/leseplaner.html" class="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-br from-[#d17d39] to-[#bd4f2a] hover:scale-105 active:scale-[0.98] transition-all duration-300 shadow-md">
-                    Gå til leseplaner
+                <a href="/en/leseplaner" class="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-br from-[#d17d39] to-[#bd4f2a] hover:scale-105 active:scale-[0.98] transition-all duration-300 shadow-md">
+                    Go to Reading Plans
                 </a>
-                <a href="/bibel" class="px-6 py-3 rounded-xl font-bold text-[#1B4965] bg-slate-100 hover:bg-slate-200 active:scale-[0.98] transition-all duration-300">
-                    Les Bibelen online
+                <a href="/en/bibel" class="px-6 py-3 rounded-xl font-bold text-[#1B4965] bg-slate-100 hover:bg-slate-200 active:scale-[0.98] transition-all duration-300">
+                    Read the Bible Online
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer" id="kontakt">
+    <footer class="footer" id="contact">
         <div class="container">
             <div class="footer-layout-v2">
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
-                    <!-- Brand / Intro -->
                     <div class="footer-brand">
-                        <a href="/" class="logo">
+                        <a href="/en/" class="logo">
                             <div class="logo-icon">
-                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
-                                    data-content-attr="alt">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
-                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
-                                Kingdom Ministry</span>
+                            <span class="logo-text">His Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description" data-content-doc="settings_global"
-                            data-content-key="footer.description">His Kingdom Ministry er en
-                            non-profit organisasjon dedikert til
-                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
                     </div>
 
-                    <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
+                            <h4>About us</h4>
                             <ul>
-                                <li><a href="/" data-content-doc="settings_global"
-                                        data-content-key="footer.links.about.home">Hjem</a></li>
-                                <li><a href="/om-oss" data-content-doc="settings_global"
-                                        data-content-key="footer.links.about.about">Om oss</a></li>
-                                <li><a href="/om-oss" data-content-doc="settings_global"
-                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
-                                <li><a href="/kontakt" data-content-doc="settings_global"
-                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
-                            </h4>
+                            <h4>Resources</h4>
                             <ul>
-                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
-                                <li><a href="/media" data-content-doc="settings_global"
-                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
-                                <li><a href="/ressurser/tidslinje-imperier" data-content-doc="settings_global" data-content-key="footer.links.resources.timeline">Tidslinje: Imperier</a></li>
-                                <li><a href="/arrangementer" data-content-doc="settings_global"
-                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
-                                <li><a href="/blogg" data-content-doc="settings_global"
-                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
-                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
-                                        data-content-key="footer.links.resources.store">Butikk</a></li>
-                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
-                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+                                <li><a href="/en/ressurser/tidslinje-imperier" data-content-doc="settings_global" data-content-key="footer.links.resources.timeline">Timeline: Empires</a></li>
+                                <li><a href="/en/events">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
+                            <h4>Media</h4>
                             <ul>
-                                <li><a href="/media" data-content-doc="settings_global"
-                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
-                                <li><a href="/media" data-content-doc="settings_global"
-                                        data-content-key="footer.links.media.videos">Videoer</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
-                                        data-content-doc="settings_global"
-                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
-                                Involvering</h4>
+                            <h4>Involvement</h4>
                             <ul>
-                                <li><a href="/arrangementer" data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
-                                <li><a href="/donasjoner" data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
-                                <li><a href="/personvern" data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
-                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
-                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
-                                </li>
-                                <li><a href="javascript:void(0)"
-                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
-                                        data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
-                                </li>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
                             </ul>
                         </div>
                     </div>
@@ -843,11 +793,10 @@
 
                 <!-- Right Section: Cards -->
                 <div class="footer-right">
-                    <!-- Follow Us Card -->
                     <div class="footer-card">
-                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
+                        <h3>Follow Us</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
                                     class="fab fa-facebook-f"></i></a>
                             <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
                                     class="fab fa-instagram"></i></a>
@@ -856,35 +805,26 @@
                         </div>
                     </div>
 
-                    <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
-                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h3>
-                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
-                            data-content-key="footer.contactButton">Kontaktskjema</a>
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global"
-                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.email">
-                                    post@hiskingdomministry.no</p>
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global"
-                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
-                                    615</p>
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global"
-                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global"
-                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
-                                </p>
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -892,10 +832,8 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
-                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
-                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
-                    data-content-key="footer.adminLink">Admin</a>
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -907,9 +845,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- JavaScript -->
-    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
-    <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/i18n.js"></script>
+    <script type="module" src="../../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../../js/cookie-consent.js"></script>
+    <script type="module" src="../../js/i18n.js"></script>
 
     <script>
         // Highlighting navigation pills based on scroll position

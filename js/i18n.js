@@ -15,7 +15,8 @@ const i18nManager = {
             'blog', 'bnn', 'calendar', 'contact', 'donations',
             'event-details', 'events', 'for-businesses', 'for-churches',
             'index', 'media', 'podcast', 'privacy',
-            'regular-donors', 'teaching', 'youtube', 'reading-plan-details'
+            'regular-donors', 'teaching', 'youtube', 'reading-plan-details',
+            'tidslinje-imperier'
         ]),
         es: new Set([
             'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
@@ -24,7 +25,8 @@ const i18nManager = {
             'detalles-evento', 'donaciones', 'donantes-regulares',
             'ensenanza', 'eventos', 'index', 'media',
             'para-empresas', 'para-iglesias', 'podcast',
-            'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura'
+            'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura',
+            'tidslinje-imperier'
         ])
     },
 
@@ -167,6 +169,21 @@ const i18nManager = {
     setLanguage(lang, redirect = true) {
         if (!this.languages.includes(lang)) lang = this.defaultLang;
 
+        const currentLang = document.documentElement.lang || this.defaultLang;
+        if (redirect && lang !== currentLang && !/\/minside(\/|$)/.test(window.location.pathname)) {
+            if (!this.isTranslationAvailable(lang)) {
+                // Show toast notification
+                let msg = 'Denne siden er foreløpig kun tilgjengelig på norsk.';
+                if (currentLang === 'en') {
+                    msg = 'This page is currently only available in Norwegian.';
+                } else if (currentLang === 'es') {
+                    msg = 'Esta página actualmente solo está disponible en noruego.';
+                }
+                this.showNotification(msg, 'warning');
+                return;
+            }
+        }
+
         localStorage.setItem(this.storageKey, lang);
         document.documentElement.lang = lang;
         this.fixLocalizedLogoLinks(lang);
@@ -186,10 +203,97 @@ const i18nManager = {
         }
     },
 
+    isTranslationAvailable(lang) {
+        // 1. Check alternate tags first
+        const alternateEl = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`);
+        if (alternateEl) {
+            return true;
+        }
+
+        // If target language is default, it's always available (all pages exist in Norwegian)
+        if (lang === 'no') {
+            return true;
+        }
+
+        // 2. Fallback to hardcoded knownFiles mapping
+        const currentPath = window.location.pathname || '/';
+        const pathParts = currentPath
+            .split('/')
+            .filter(Boolean)
+            .map(part => part.replace(/\.html$/, ''));
+
+        if (pathParts[0] === 'en' || pathParts[0] === 'es') {
+            pathParts.shift();
+        }
+
+        let currentFile = pathParts[pathParts.length - 1] || 'index';
+        const mappedFile = this.mapFileName(currentFile, lang);
+
+        if (this.knownFiles[lang] && this.knownFiles[lang].has(mappedFile)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    showNotification(msg, type = 'info') {
+        if (window.showToast) {
+            window.showToast(msg, type);
+            return;
+        }
+
+        // Determine correct path prefix
+        const path = window.location.pathname || '';
+        const inLangFolder = /^\/(en|es)(\/|$)/.test(path);
+        const inRessurserFolder = /^\/ressurser(\/|$)/.test(path);
+        const inMinSideFolder = /^\/minside(\/|$)/.test(path);
+        const prefix = (inLangFolder || inRessurserFolder || inMinSideFolder) ? '../' : '';
+
+        // Inject stylesheet if missing
+        if (!document.querySelector('link[href*="notifications.css"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `${prefix}css/notifications.css`;
+            document.head.appendChild(link);
+        }
+
+        // Inject script if missing
+        if (!document.querySelector('script[src*="notifications.js"]')) {
+            const script = document.createElement('script');
+            script.src = `${prefix}js/notifications.js`;
+            document.body.appendChild(script);
+        }
+
+        // Poll for window.showToast to become available
+        let attempts = 0;
+        const checkAndShow = () => {
+            if (window.showToast) {
+                window.showToast(msg, type);
+            } else if (attempts < 20) {
+                attempts++;
+                setTimeout(checkAndShow, 100);
+            } else {
+                alert(msg);
+            }
+        };
+        checkAndShow();
+    },
+
     /**
      * Navigates to the corresponding page in the target language.
      */
     redirectToLanguage(lang) {
+        // Check if there is an alternate tag in head
+        const alternateEl = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`);
+        if (alternateEl) {
+            let targetUrl = alternateEl.getAttribute('href');
+            if (targetUrl.startsWith('https://www.hiskingdomministry.no')) {
+                targetUrl = targetUrl.replace('https://www.hiskingdomministry.no', window.location.origin);
+            }
+            window.location.href = targetUrl + window.location.search;
+            return;
+        }
+
         const currentPath = window.location.pathname || '/';
         const pathParts = currentPath
             .split('/')

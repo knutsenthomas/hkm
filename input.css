@@ -435,6 +435,12 @@ ul {
     text-align: center;
 }
 
+.page-hero-subtitle {
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+    -ms-hyphens: none !important;
+}
+
 
 
 .page-hero-title {

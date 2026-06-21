@@ -96,6 +96,13 @@
   margin-bottom: 0 !important;
 }
 
+.page-hero-subtitle,
+.subpage-hero .page-hero-subtitle {
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+  -ms-hyphens: none !important;
+}
+
 .blog-post-section {
   padding: 40px 20px 80px;
 }
