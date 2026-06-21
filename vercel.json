@@ -18,10 +18,20 @@
     { "source": "/en/reading-plan-details.html", "destination": "/api/share-preview?lang=en" },
     { "source": "/es/detalles-plan-lectura", "destination": "/api/share-preview?lang=es" },
     { "source": "/es/detalles-plan-lectura.html", "destination": "/api/share-preview?lang=es" },
+    { "source": "/blogg-post", "destination": "/api/share-preview?type=blog&lang=no" },
+    { "source": "/blogg-post.html", "destination": "/api/share-preview?type=blog&lang=no" },
+    { "source": "/en/blog-post", "destination": "/api/share-preview?type=blog&lang=en" },
+    { "source": "/en/blog-post.html", "destination": "/api/share-preview?type=blog&lang=en" },
+    { "source": "/es/blog-post", "destination": "/api/share-preview?type=blog&lang=es" },
+    { "source": "/es/blog-post.html", "destination": "/api/share-preview?type=blog&lang=es" },
+    { "source": "/arrangement-detaljer", "destination": "/api/share-preview?type=event&lang=no" },
+    { "source": "/arrangement-detaljer.html", "destination": "/api/share-preview?type=event&lang=no" },
+    { "source": "/en/event-details", "destination": "/api/share-preview?type=event&lang=en" },
+    { "source": "/en/event-details.html", "destination": "/api/share-preview?type=event&lang=en" },
+    { "source": "/es/detalles-evento", "destination": "/api/share-preview?type=event&lang=es" },
+    { "source": "/es/detalles-evento.html", "destination": "/api/share-preview?type=event&lang=es" },
     { "source": "/en/blog", "destination": "/en/blog.html" },
-    { "source": "/en/blog-post", "destination": "/en/blog-post.html" },
-    { "source": "/es/blog", "destination": "/es/blog.html" },
-    { "source": "/es/blog-post", "destination": "/es/blog-post.html" }
+    { "source": "/es/blog", "destination": "/es/blog.html" }
   ],
   "functions": {
     "api/share-preview.js": {
