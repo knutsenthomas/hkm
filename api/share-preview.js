@@ -125,7 +125,15 @@ export default async function handler(req, res) {
     // Get the request host to format absolute image URL if it's relative
     const host = req.headers.host || 'hiskingdomministry.no';
     const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const absolutePageUrl = `${protocol}://${host}${req.url}`;
+
+    // Construct clean user-facing page URL for Open Graph to prevent Facebook crawler redirection loops or bad links
+    let cleanPath = `/leseplan-detaljer?id=${id}`;
+    if (lang === 'en') {
+      cleanPath = `/en/reading-plan-details?id=${id}`;
+    } else if (lang === 'es') {
+      cleanPath = `/es/detalles-plan-lectura?id=${id}`;
+    }
+    const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
 
     if (imageUrl.startsWith('/')) {
       imageUrl = `${protocol}://${host}${imageUrl}`;

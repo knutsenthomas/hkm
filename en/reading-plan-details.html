@@ -800,15 +800,15 @@
                     </div>
                     
                     <div class="share-social-grid" style="display: flex; align-items: center; gap: 12px; justify-content: center;">
-                        <button class="share-btn fb" onclick="shareOnFacebook()" title="Share on Facebook" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #1877f2; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        <a id="share-fb-link" href="#" target="_blank" class="share-btn fb" title="Share on Facebook" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #1877f2; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
                             <i class="fab fa-facebook-f"></i>
-                        </button>
-                        <button class="share-btn tw" onclick="shareOnTwitter()" title="Share on X (Twitter)" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #000000; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        </a>
+                        <a id="share-tw-link" href="#" target="_blank" class="share-btn tw" title="Share on X (Twitter)" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #000000; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
                             <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: white;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-                        </button>
-                        <button class="share-btn wa" onclick="shareOnWhatsApp()" title="Share on WhatsApp" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #25d366; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                        </a>
+                        <a id="share-wa-link" href="#" target="_blank" class="share-btn wa" title="Share on WhatsApp" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #25d366; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
                             <i class="fab fa-whatsapp"></i>
-                        </button>
+                        </a>
                         <button class="share-btn link" onclick="copyShareLink()" id="copy-link-btn" title="Copy link" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #e2e8f0; color: #475569; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">link</span>
                         </button>
@@ -1007,6 +1007,41 @@
             }
 
             function renderPlanDetails(plan) {
+                // Populate share links
+                const shareUrl = window.location.href;
+                const encodedUrl = encodeURIComponent(shareUrl);
+                
+                const fbLink = document.getElementById('share-fb-link');
+                if (fbLink) fbLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                
+                const twLink = document.getElementById('share-tw-link');
+                if (twLink) twLink.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent("Check out this reading plan from His Kingdom Ministry!")}`;
+                
+                const waLink = document.getElementById('share-wa-link');
+                if (waLink) waLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this reading plan from His Kingdom Ministry: " + shareUrl)}`;
+
+                // Intercept share clicks on mobile/modern browsers if Web Share API is available
+                const handleShare = async (e, fallbackUrl) => {
+                    if (navigator.share) {
+                        e.preventDefault();
+                        try {
+                            await navigator.share({
+                                title: plan.title,
+                                text: plan.description || plan.subtitle || "Check out this reading plan from His Kingdom Ministry!",
+                                url: shareUrl
+                            });
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                window.open(fallbackUrl, '_blank');
+                            }
+                        }
+                    }
+                };
+
+                if (fbLink) fbLink.addEventListener('click', (e) => handleShare(e, fbLink.href));
+                if (twLink) twLink.addEventListener('click', (e) => handleShare(e, twLink.href));
+                if (waLink) waLink.addEventListener('click', (e) => handleShare(e, waLink.href));
+
                 // Set text fields
                 document.getElementById('plan-hero-title').textContent = plan.title;
                 document.getElementById('plan-breadcrumb').textContent = plan.title;
@@ -1220,23 +1255,7 @@
                 return div.innerHTML;
             }
 
-            // Global sharing functions
-            window.shareOnFacebook = function() {
-                const url = encodeURIComponent(window.location.href);
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-            };
 
-            window.shareOnTwitter = function() {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Check out this reading plan from His Kingdom Ministry!");
-                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-            };
-
-            window.shareOnWhatsApp = function() {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Check out this reading plan from His Kingdom Ministry: " + window.location.href);
-                window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-            };
 
             window.copyShareLink = function() {
                 navigator.clipboard.writeText(window.location.href).then(() => {
