@@ -26,9 +26,9 @@
   "functions": {
     "api/share-preview.js": {
       "includeFiles": [
-        "leseplan-detaljer.html",
-        "en/reading-plan-details.html",
-        "es/detalles-plan-lectura.html"
+        "dist/leseplan-detaljer-template.html",
+        "dist/en/reading-plan-details-template.html",
+        "dist/es/detalles-plan-lectura-template.html"
       ]
     }
   }

@@ -67,21 +67,21 @@ export default async function handler(req, res) {
   const { id, lang = 'no' } = req.query;
 
   // Resolve the HTML template file name based on lang
-  let templateFileName = 'leseplan-detaljer.html';
+  let templatePath = 'dist/leseplan-detaljer-template.html';
   if (lang === 'en') {
-    templateFileName = 'en/reading-plan-details.html';
+    templatePath = 'dist/en/reading-plan-details-template.html';
   } else if (lang === 'es') {
-    templateFileName = 'es/detalles-plan-lectura.html';
+    templatePath = 'dist/es/detalles-plan-lectura-template.html';
   }
 
   // Load the HTML file
   let html = '';
   try {
-    const filePath = path.join(process.cwd(), templateFileName);
+    const filePath = path.join(process.cwd(), templatePath);
     html = fs.readFileSync(filePath, 'utf8');
   } catch (err) {
-    console.error(`Failed to read HTML template ${templateFileName}:`, err);
-    res.status(500).send(`Internal Server Error: Missing HTML template (${templateFileName})`);
+    console.error(`Failed to read HTML template ${templatePath}:`, err);
+    res.status(500).send(`Internal Server Error: Missing HTML template (${templatePath})`);
     return;
   }
 
