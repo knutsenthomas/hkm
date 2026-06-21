@@ -558,10 +558,10 @@ export default function ReadingPlansAdmin() {
                                                                             style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px' }}
                                                                         />
                                                                         <input
-                                                                            type="url"
+                                                                            type="text"
                                                                             value={res.url}
                                                                             onChange={(e) => handleResourceFieldChange(day.dayNumber, resIdx, 'url', e.target.value)}
-                                                                            placeholder="https://..."
+                                                                            placeholder="https://... eller intern sti"
                                                                             style={{ padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px' }}
                                                                         />
                                                                     </>
