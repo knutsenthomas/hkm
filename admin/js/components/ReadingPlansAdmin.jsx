@@ -7,6 +7,8 @@ export default function ReadingPlansAdmin() {
     const [currentPlan, setCurrentPlan] = useState(null);
     const [teachings, setTeachings] = useState([]); // List of internal teachings to link
     const [expandedDays, setExpandedDays] = useState({}); // Keep track of expanded day editors
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [aiGenerating, setAiGenerating] = useState(false);
 
     // Firestore reference
     const db = window.firebase ? window.firebase.firestore() : null;
@@ -214,6 +216,85 @@ export default function ReadingPlansAdmin() {
         }));
     };
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            setUploadingImage(true);
+            let fileToUpload = file;
+            if (window.imageCompression) {
+                try {
+                    const options = { maxSizeMB: 1, maxWidthOrHeight: 1200, useWebWorker: true };
+                    fileToUpload = await window.imageCompression(file, options);
+                    fileToUpload = new File([fileToUpload], file.name, { type: file.type });
+                } catch (compErr) {
+                    console.warn("Compression failed, uploading original:", compErr);
+                }
+            }
+            
+            const filename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+            const path = `editor/reading-plans/${filename}`;
+            
+            if (!window.firebaseService || typeof window.firebaseService.uploadImage !== 'function') {
+                throw new Error("Opplastingstjeneste er ikke tilgjengelig.");
+            }
+            
+            const url = await window.firebaseService.uploadImage(fileToUpload, path);
+            setCurrentPlan(prev => ({ ...prev, imageUrl: url }));
+        } catch (err) {
+            console.error("Upload failed:", err);
+            alert("Kunne ikke laste opp bilde: " + err.message);
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    const handleUnsplashClick = () => {
+        if (window.unsplashManager) {
+            window.unsplashManager.open((selection) => {
+                if (selection && selection.url) {
+                    setCurrentPlan(prev => ({ ...prev, imageUrl: selection.url }));
+                }
+            });
+        } else {
+            alert("Unsplash-søk er ikke tilgjengelig akkurat nå.");
+        }
+    };
+
+    const handleAiGenerateClick = () => {
+        const promptText = prompt("Beskriv bildet du ønsker at Gemini skal generere:\nF.eks: En fredelig bibel som ligger åpen på et trebord med sollys som strømmer inn gjennom et vindu");
+        if (!promptText || !promptText.trim()) return;
+        
+        setAiGenerating(true);
+        
+        try {
+            if (!window.firebase) {
+                throw new Error("Firebase er ikke tilgjengelig.");
+            }
+            const callable = window.firebase.functions().httpsCallable('aiProcess');
+            callable({
+                task: 'generate_image',
+                prompt: promptText
+            }).then(result => {
+                if (result.data && result.data.imageUrl) {
+                    setCurrentPlan(prev => ({ ...prev, imageUrl: result.data.imageUrl }));
+                } else {
+                    throw new Error("Ingen bilde-URL mottatt fra serveren.");
+                }
+            }).catch(err => {
+                console.error("Gemini image generation failed:", err);
+                alert("Kunne ikke generere bilde: " + err.message);
+            }).finally(() => {
+                setAiGenerating(false);
+            });
+        } catch (err) {
+            console.error("Gemini connection error:", err);
+            alert("Tilkoblingsfeil: " + err.message);
+            setAiGenerating(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="section-card" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
@@ -257,15 +338,91 @@ export default function ReadingPlansAdmin() {
                             />
                         </div>
                         <div style={{ gridColumn: 'span 2' }}>
-                            <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Bilde-URL (valgfri)</label>
-                            <input
-                                type="text"
-                                value={currentPlan.imageUrl || ''}
-                                onChange={(e) => setCurrentPlan({ ...currentPlan, imageUrl: e.target.value })}
-                                placeholder="F.eks: https://images.unsplash.com/photo-..."
-                                style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '15px' }}
-                            />
-                            <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>Tips: Kopier en bilde-adresse fra Unsplash.com for fine, gratis bibel- eller naturmotiver.</span>
+                            <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Forsidebilde (valgfri)</label>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '16px', background: '#f8fafc' }}>
+                                
+                                {/* Preview Container if URL exists */}
+                                {currentPlan.imageUrl && (
+                                    <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: '10px', overflow: 'hidden', border: '1px solid #cbd5e1', background: '#e2e8f0' }}>
+                                        <img src={currentPlan.imageUrl} alt="Leseplan forsidebilde" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setCurrentPlan(prev => ({ ...prev, imageUrl: '' }))}
+                                            style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(15, 23, 42, 0.7)', border: 'none', color: 'white', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
+                                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(15, 23, 42, 0.9)'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(15, 23, 42, 0.7)'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '18px', margin: '0 auto' }}>delete</span>
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Upload/Generation states */}
+                                {(uploadingImage || aiGenerating) && (
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '20px', background: 'white', borderRadius: '10px', border: '1px dashed #cbd5e1' }}>
+                                        <div className="loader" style={{ width: '20px', height: '20px' }}></div>
+                                        <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>
+                                            {uploadingImage ? 'Laster opp bilde...' : 'Gemini genererer bilde...'}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Buttons Grid */}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => document.getElementById('reading-plan-file-input').click()}
+                                        disabled={uploadingImage || aiGenerating}
+                                        className="btn btn-secondary"
+                                        style={{ flex: '1 1 140px', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1.5px solid #cbd5e1', background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '13px', color: '#334155', transition: 'all 0.2s' }}
+                                    >
+                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>upload</span>
+                                        Last opp
+                                    </button>
+                                    <input 
+                                        type="file" 
+                                        id="reading-plan-file-input" 
+                                        accept="image/*" 
+                                        onChange={handleFileUpload} 
+                                        style={{ display: 'none' }} 
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={handleUnsplashClick}
+                                        disabled={uploadingImage || aiGenerating}
+                                        className="btn btn-secondary"
+                                        style={{ flex: '1 1 140px', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1.5px solid #cbd5e1', background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '13px', color: '#334155', transition: 'all 0.2s' }}
+                                    >
+                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>image_search</span>
+                                        Unsplash
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleAiGenerateClick}
+                                        disabled={uploadingImage || aiGenerating}
+                                        className="btn btn-secondary"
+                                        style={{ flex: '1 1 140px', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '1.5px solid #d17d39', background: '#fff7ed', cursor: 'pointer', fontWeight: 600, fontSize: '13px', color: '#d17d39', transition: 'all 0.2s' }}
+                                    >
+                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>auto_awesome</span>
+                                        Generer med AI
+                                    </button>
+                                </div>
+
+                                {/* Manual URL Input */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Eller skriv inn URL manuelt:</span>
+                                    <input
+                                        type="text"
+                                        value={currentPlan.imageUrl || ''}
+                                        onChange={(e) => setCurrentPlan({ ...currentPlan, imageUrl: e.target.value })}
+                                        placeholder="F.eks: https://images.unsplash.com/photo-..."
+                                        style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', background: 'white' }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <div style={{ gridColumn: 'span 2' }}>
                             <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px', fontSize: '14px', color: '#0f172a' }}>Beskrivelse</label>
@@ -468,7 +625,7 @@ export default function ReadingPlansAdmin() {
                     <div key={plan.id} className="card modern" style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1B4965', margin: 0 }}>{plan.title}</h3>
-                            <span style={{ fontSize: '11px', fontWeight: 700, color: '#d17d39', background: '#fff7ed', padding: '2px 8px', borderRadius: '20px' }}>{plan.durationDays} dager</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: '#d17d39', background: '#fff7ed', padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{plan.durationDays} dager</span>
                         </div>
                         <p style={{ fontSize: '13px', color: '#64748b', margin: 0, flexGrow: 1, lineheight: 1.5 }}>
                             {plan.description || 'Ingen beskrivelse.'}
