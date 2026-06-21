@@ -3841,13 +3841,10 @@ window.addEventListener('load', () => {
 
         const path = window.location.pathname.toLowerCase().replace(/\/$/, "");
         const isExcludedPage = path.endsWith('/bibel') || 
-                               path.endsWith('/bibel.html') || 
-                               path.includes('leseplan-detaljer') || 
-                               path.includes('reading-plan-details') || 
-                               path.includes('detalles-plan-lectura');
+                               path.endsWith('/bibel.html');
                          
         if (isPortal || isExcludedPage) {
-            console.log('[VisitorChat] Chatbot disabled on admin/CRM/minside/bible/reading-plan pages.');
+            console.log('[VisitorChat] Chatbot disabled on portal or Bible reader page.');
             return;
         }
         
