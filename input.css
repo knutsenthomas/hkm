@@ -6104,35 +6104,31 @@ a[href*="#deduccion-fiscal"],
         width: 100% !important;
     }
 
-    /* Premium Hero Section - More Compact */
+    /* Premium Hero Section - Transparent/Ink-Friendly on Print */
     .page-hero,
     .subpage-hero {
-        background-color: #1a1a1a !important;
-        min-height: 50mm !important;
+        background: none !important;
+        background-color: transparent !important;
+        min-height: auto !important;
+        height: auto !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: flex-end !important;
-        /* Push text to bottom */
-        align-items: flex-start !important;
-        padding: 10mm 15mm !important;
-        margin: 0 0 10mm 0 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 10px 0 !important;
+        margin: 0 0 15px 0 !important;
         border-radius: 0 !important;
         position: relative !important;
         page-break-inside: avoid;
-        border-bottom: 4pt solid #f39c12;
+        border: none !important;
     }
 
-    /* Darker overlay for text pop in print */
+    /* Remove overlay in print */
     .page-hero::before,
     .subpage-hero::before {
-        content: "" !important;
-        position: absolute !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4)) !important;
-        z-index: 2 !important;
+        display: none !important;
+        content: none !important;
+        background: none !important;
     }
 
     .page-hero-title,
@@ -6408,16 +6404,19 @@ a[href*="#deduccion-fiscal"],
         justify-content: center !important;
         align-items: center !important;
         text-align: center !important;
-        min-height: 110px !important;
-        height: 110px !important;
-        padding: 6mm 0 !important;
+        min-height: auto !important;
+        height: auto !important;
+        padding: 10px 0 !important;
         margin-top: 0 !important;
         margin-bottom: 12px !important;
-        margin-left: 48px !important;
-        margin-right: 48px !important;
-        width: calc(100% - 96px) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
         box-sizing: border-box !important;
-        border-radius: 8px !important;
+        border-radius: 0 !important;
+        border: none !important;
+        background: none !important;
+        background-color: transparent !important;
     }
 
     .page-hero .container, .subpage-hero .container {
@@ -6438,11 +6437,11 @@ a[href*="#deduccion-fiscal"],
     body .page-hero .hero-title,
     body .page-hero-title,
     body .hero-title {
-        font-size: 16pt !important;
-        color: white !important;
+        font-size: 20pt !important;
+        color: #1B4965 !important; /* Mørkeblå brand color on white print */
         font-weight: 700 !important;
-        margin: 0 !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+        margin: 0 0 10px 0 !important;
+        text-shadow: none !important;
         text-align: center !important;
         width: 100% !important;
         display: block !important;
@@ -6466,6 +6465,13 @@ a[href*="#deduccion-fiscal"],
         padding-top: 16px !important;
         border-top: 1px solid #e2e8f0 !important;
         width: 100% !important;
+    }
+
+    /* Hide chat widget on print */
+    .hkm-chat-toggle,
+    .hkm-chat-panel,
+    .hkm-chat-dot {
+        display: none !important;
     }
 }
 

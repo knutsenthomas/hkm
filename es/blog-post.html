@@ -98,11 +98,21 @@
             .page-hero, section.page-hero, .subpage-hero {
                 position: relative !important;
                 overflow: hidden !important;
-                background: transparent !important;
-                padding-top: 20px !important;
-                padding-bottom: 20px !important;
+                background: none !important;
+                background-color: transparent !important;
+                border: none !important;
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+                margin-top: 0 !important;
                 min-height: auto !important;
                 height: auto !important;
+            }
+
+            .page-hero::before,
+            .subpage-hero::before {
+                display: none !important;
+                content: none !important;
+                background: none !important;
             }
 
             /* Ensure text is readable and dark for print */
@@ -118,8 +128,12 @@
                 margin-bottom: 10px !important;
                 font-size: 24pt !important;
                 text-align: center !important;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
 
+            #single-post-title,
+            #blog-meta-row,
             .blog-meta, 
             .blog-meta-top, 
             .blog-meta-bottom, 
@@ -129,14 +143,27 @@
             #single-post-views {
                 color: #555555 !important;
                 text-shadow: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
 
-            /* Hide tags/subjects and comments interactions */
+            #single-post-author-avatar {
+                border-color: #1B4965 !important;
+                background-color: #f0f4f8 !important;
+                color: #1B4965 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            /* Hide tags/subjects, comments interactions and chat widget */
             #single-post-author-box,
             #blog-interactions,
             .blog-share,
             .blog-navigation,
-            #single-post-related {
+            #single-post-related,
+            .hkm-chat-toggle,
+            .hkm-chat-panel,
+            .hkm-chat-dot {
                 display: none !important;
             }
 
