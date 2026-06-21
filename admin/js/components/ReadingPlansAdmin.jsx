@@ -630,7 +630,7 @@ export default function ReadingPlansAdmin() {
                         <p style={{ fontSize: '13px', color: '#64748b', margin: 0, flexGrow: 1, lineheight: 1.5 }}>
                             {plan.description || 'Ingen beskrivelse.'}
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
                             <button
                                 onClick={() => handleEditPlan(plan)}
                                 className="btn-secondary"
