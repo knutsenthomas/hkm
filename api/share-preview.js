@@ -298,8 +298,9 @@ export default async function handler(req, res) {
     }
     const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
 
-    if (imageUrl.startsWith('/')) {
-      imageUrl = `${protocol}://${host}${imageUrl}`;
+    if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      const cleanImgPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+      imageUrl = `${protocol}://${host}${cleanImgPath}`;
     }
 
     // Strip HTML tags from description if any

@@ -332,19 +332,20 @@
                                 d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
                         </svg></a>
                     <a href="javascript:void(0)" class="social-link"
-                        onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
+                        onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(window.location.href), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
                         style="background: #0077b5; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
                             class="fab fa-linkedin-in"></i></a>
-                    <a href="https://instagram.com" target="_blank" class="social-link"
-                        style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                            class="fab fa-instagram"></i></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="navigator.clipboard.writeText(window.location.href).then(function(){ if (window.showToast) { window.showToast('Link copied! Instagram does not support direct link sharing. Paste it in your bio or story.', 'info'); } else { alert('Link copied!'); } }).catch(function(){ window.open('https://instagram.com', '_blank'); }); return false;"
+                        style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                        title="Instagram (Copy link)"><i class="fab fa-instagram"></i></a>
                     <a href="javascript:void(0)" class="social-link" onclick="window.print(); return false;"
                         style="background: #6c757d; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
                         title="Print"><i class="fas fa-print"></i></a>
                     <a href="javascript:void(0)" class="social-link"
-                        onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { alert('Sharing is not supported on this device.'); } return false;"
+                        onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { navigator.clipboard.writeText(window.location.href).then(function(){ if(window.showToast){ window.showToast('Link copied to clipboard!', 'success'); }else{ alert('Link copied!'); } }).catch(function(){ alert('Could not copy the link.'); }); } return false;"
                         style="background: #f39c12; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
-                        title="Share with app"><i class="fas fa-share-nodes"></i></a>
+                        title="Share or copy link"><i class="fas fa-share-nodes"></i></a>
                 </div>
             </div>
 
