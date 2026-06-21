@@ -12,10 +12,25 @@
   ],
   "rewrites": [
     { "source": "/api/bible/:path*", "destination": "/api/bible" },
+    { "source": "/leseplan-detaljer", "destination": "/api/share-preview?lang=no" },
+    { "source": "/leseplan-detaljer.html", "destination": "/api/share-preview?lang=no" },
+    { "source": "/en/reading-plan-details", "destination": "/api/share-preview?lang=en" },
+    { "source": "/en/reading-plan-details.html", "destination": "/api/share-preview?lang=en" },
+    { "source": "/es/detalles-plan-lectura", "destination": "/api/share-preview?lang=es" },
+    { "source": "/es/detalles-plan-lectura.html", "destination": "/api/share-preview?lang=es" },
     { "source": "/en/blog", "destination": "/en/blog.html" },
     { "source": "/en/blog-post", "destination": "/en/blog-post.html" },
     { "source": "/es/blog", "destination": "/es/blog.html" },
     { "source": "/es/blog-post", "destination": "/es/blog-post.html" }
-  ]
+  ],
+  "functions": {
+    "api/share-preview.js": {
+      "includeFiles": [
+        "leseplan-detaljer.html",
+        "en/reading-plan-details.html",
+        "es/detalles-plan-lectura.html"
+      ]
+    }
+  }
 }
 
