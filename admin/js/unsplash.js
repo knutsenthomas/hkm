@@ -76,7 +76,27 @@ class UnsplashManager {
         this.loader.style.display = 'block';
 
         try {
-            const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=20&client_id=${this.ACCESS_KEY}`;
+            // Translate search term to English using Google Translate API for better Unsplash results
+            let searchQuery = query;
+            try {
+                const sl = 'no';
+                const tl = 'en';
+                const translateUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(query)}`;
+                const translateRes = await fetch(translateUrl);
+                if (translateRes.ok) {
+                    const translateData = await translateRes.json();
+                    if (translateData && translateData[0]) {
+                        const translatedText = translateData[0].map(s => s[0]).filter(Boolean).join('');
+                        if (translatedText && translatedText.trim()) {
+                            searchQuery = translatedText.trim();
+                        }
+                    }
+                }
+            } catch (transErr) {
+                console.warn('[Unsplash] Translation error, using original query:', transErr);
+            }
+
+            const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=20&client_id=${this.ACCESS_KEY}`;
             const response = await fetch(url);
 
             if (!response.ok) {
