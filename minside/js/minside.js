@@ -3475,7 +3475,7 @@ class MinSideManager {
                         <div class="course-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
                             <div class="course-body">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <span class="course-badge" style="background: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700;">${totalDays} dager</span>
+                                    <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700;">${totalDays} dager</span>
                                 </div>
                                 <div class="course-title" style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${p.title}</div>
                                 <div class="course-desc" style="font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
