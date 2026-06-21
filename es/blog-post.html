@@ -75,6 +75,61 @@
                 padding-top: 16px !important;
             }
         }
+
+        /* Hide print elements on screen */
+        .print-only-image,
+        .print-only-copyright {
+            display: none;
+        }
+
+        @media print {
+            /* Force featured image printing */
+            .print-only-image {
+                display: block !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                z-index: 1 !important;
+                opacity: 0.65 !important;
+            }
+            
+            .page-hero, section.page-hero, .subpage-hero {
+                position: relative !important;
+                overflow: hidden !important;
+                background: transparent !important;
+            }
+
+            .page-hero-title,
+            .blog-meta {
+                position: relative !important;
+                z-index: 10 !important;
+            }
+
+            /* Hide tags/subjects and comments interactions */
+            #single-post-author-box,
+            #blog-interactions,
+            .blog-share,
+            .blog-navigation,
+            #single-post-related {
+                display: none !important;
+            }
+
+            /* Show copyright notice */
+            .print-only-copyright {
+                display: block !important;
+                margin-top: 40px !important;
+                border-top: 1px solid #ccc !important;
+                padding-top: 15px !important;
+                font-size: 10pt !important;
+                color: #555 !important;
+                text-align: center !important;
+                page-break-inside: avoid !important;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+            }
+        }
     </style>
         
     <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
@@ -257,7 +312,7 @@
     <section class="page-hero subpage-hero relative" id="blog-hero"
         style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); margin-top: 0; transition: opacity 0.4s ease;">
         <!-- Print-only image overlay to guarantee rendering on paper -->
-        <img id="print-post-image" class="print-only-image" src="" alt="" style="display: none;" />
+        <img id="print-post-image" class="print-only-image" src="" alt="" />
         <div class="container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
             <!-- Title hidden until JS populates it -->
             <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease; margin:0;">Entrada del Blog</h1>
