@@ -5253,6 +5253,7 @@ ol.block-list {
         width: 100%;
         padding: 0 32px;
         text-align: left;
+        margin-top: -20px;
     }
 
     .hero-title {
@@ -5295,6 +5296,7 @@ ol.block-list {
 
     .hero-content {
         padding: 0 16px;
+        margin-top: -40px;
     }
 }
 
