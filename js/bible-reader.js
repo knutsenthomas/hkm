@@ -829,11 +829,10 @@ class BibleReader {
                         if (this.dom.verseToolbar) {
                             this.dom.verseToolbar.style.display = 'flex';
                             
-                            // Align at horizontal center of the paragraph and top of it
-                            const x = paragraph.offsetLeft + (paragraph.offsetWidth / 2);
+                            // Align at horizontal center of the screen/container
                             const y = paragraph.offsetTop;
                             
-                            this.dom.verseToolbar.style.left = `${x}px`;
+                            this.dom.verseToolbar.style.left = '50%';
                             this.dom.verseToolbar.style.top = `${y}px`;
                         }
                         return;

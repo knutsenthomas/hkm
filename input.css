@@ -5992,7 +5992,7 @@ a[href*="#deduccion-fiscal"],
     }
 
     /* Contact forms and other inputs */
-    input,
+    input:not([type="checkbox"]):not([type="radio"]),
     textarea,
     select {
         width: 100% !important;
@@ -6020,6 +6020,11 @@ a[href*="#deduccion-fiscal"],
     .lang-switcher .lang-btn span {
         display: none !important;
     }
+}
+
+/* Copyright under print screen default */
+.print-only-copyright {
+    display: none;
 }
 
 /* ===================================
@@ -6069,7 +6074,7 @@ a[href*="#deduccion-fiscal"],
 
     /* Page Setup */
     @page {
-        margin: 10mm;
+        margin: 6mm 10mm;
     }
 
     /* Magazine-style Layout Reset */
@@ -6192,15 +6197,245 @@ a[href*="#deduccion-fiscal"],
     }
 
     /* Print Footer - Professional Branding */
+    /* Print Footer - Professional Branding - Disabled to let page-specific copyrights rule */
     body::after {
-        content: "Dokument fra His Kingdom Ministry (www.hiskingdomministry.no) - © 2026";
-        display: block;
-        text-align: left;
-        font-size: 9pt;
-        color: #999;
-        margin-top: 12mm;
-        padding: 8mm 5mm;
-        border-top: 0.5pt solid #eee;
+        display: none !important;
+    }
+
+    /* Leseplan Detaljer Print Override */
+    .details-layout {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .details-container {
+        display: block !important;
+        max-width: 100% !important;
+        width: calc(100% - 96px) !important;
+        margin-left: 48px !important;
+        margin-right: 48px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    .left-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .print-only-header {
+        display: block !important;
+    }
+
+    .print-intro {
+        margin-bottom: 10px !important;
+        padding: 6px 12px !important;
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin-bottom: 10px !important;
+        page-break-inside: auto !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+    }
+
+    .card::before {
+        display: none !important;
+    }
+
+    .card-title {
+        font-size: 11pt !important;
+        color: black !important;
+        border-bottom: 1.5px solid #d17d39 !important;
+        padding-bottom: 3px !important;
+        margin-bottom: 6px !important;
+        font-weight: 700 !important;
+    }
+
+    .card-title-icon {
+        display: none !important;
+    }
+
+    #plan-description-text {
+        font-size: 8.5pt !important;
+        line-height: 1.3 !important;
+        margin-bottom: 6px !important;
+        color: #334155 !important;
+    }
+
+    .plan-stats-grid {
+        display: flex !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
+        margin-top: 6px !important;
+        padding-top: 6px !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+
+    .stat-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .stat-icon {
+        display: none !important;
+    }
+
+    .stat-content {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .stat-label {
+        font-size: 7.5pt !important;
+        text-transform: uppercase !important;
+        color: #64748b !important;
+        font-weight: 600 !important;
+    }
+
+    .stat-value {
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
+        color: black !important;
+    }
+
+    .day-list {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .day-item {
+        page-break-inside: avoid !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 6px 8px !important;
+        background: #f8fafc !important;
+        border-radius: 8px !important;
+    }
+
+    .day-header-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .day-badge-num {
+        background: #d17d39 !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: 1px 4px !important;
+        border-radius: 4px !important;
+        font-size: 7.5pt !important;
+    }
+
+    .day-verses {
+        font-weight: 700 !important;
+        color: black !important;
+        font-size: 8.5pt !important;
+    }
+
+    .day-prayer {
+        font-size: 8pt !important;
+        color: #334155 !important;
+        border-left: 2px solid #d17d39 !important;
+        padding-left: 6px !important;
+        margin: 3px 0 0 0 !important;
+        line-height: 1.25 !important;
+        font-style: italic !important;
+    }
+
+    .day-resources {
+        display: none !important;
+    }
+
+    body .hidden-day,
+    .day-item.hidden-day,
+    #days-list-container .hidden-day {
+        display: flex !important;
+    }
+
+    /* Print-spesifikke justeringer for subpage-hero */
+    .page-hero, section.page-hero, .subpage-hero {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        min-height: 110px !important;
+        height: 110px !important;
+        padding: 6mm 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+        margin-left: 48px !important;
+        margin-right: 48px !important;
+        width: calc(100% - 96px) !important;
+        box-sizing: border-box !important;
+        border-radius: 8px !important;
+    }
+
+    .page-hero .container, .subpage-hero .container {
+        padding: 0 16px !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    body .subpage-hero .page-hero-title,
+    body .subpage-hero .hero-title,
+    body .page-hero .page-hero-title,
+    body .page-hero .hero-title,
+    body .page-hero-title,
+    body .hero-title {
+        font-size: 16pt !important;
+        color: white !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+        text-align: center !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
+    /* Skjul andre leseplaner under print */
+    .other-plans-section,
+    #other-plans-section,
+    .other-plans-grid,
+    #other-plans-grid {
+        display: none !important;
+    }
+
+    /* Copyright under print */
+    .print-only-copyright {
+        display: block !important;
+        text-align: center !important;
+        font-size: 8pt !important;
+        color: #64748b !important;
+        margin-top: 32px !important;
+        padding-top: 16px !important;
+        border-top: 1px solid #e2e8f0 !important;
+        width: 100% !important;
     }
 }
 
