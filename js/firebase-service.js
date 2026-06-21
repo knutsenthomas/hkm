@@ -21,6 +21,7 @@ class FirebaseService {
         this._fetchErrorNoticeTimestamps = new Map();
         this._userRoleCacheTtlMs = 10 * 60 * 1000; // 10 min fallback cache for auth/routing stability
         this._userRoleCacheKeyPrefix = 'hkm_user_role_cache:';
+        this._retryRegistered = false;
         this.tryAutoInit();
     }
 
@@ -97,6 +98,24 @@ class FirebaseService {
 
         // Check if firebase is available globally (from script tag)
         if (typeof firebase === 'undefined') {
+            if (typeof window !== 'undefined' && !this._retryRegistered) {
+                this._retryRegistered = true;
+                const retryInit = () => {
+                    if (typeof firebase !== 'undefined') {
+                        this.tryAutoInit();
+                    }
+                };
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', retryInit);
+                } else {
+                    window.addEventListener('load', retryInit);
+                }
+                setTimeout(retryInit, 100);
+                setTimeout(retryInit, 500);
+                setTimeout(retryInit, 1000);
+                setTimeout(retryInit, 2000);
+                setTimeout(retryInit, 5000);
+            }
             return false;
         }
 
@@ -149,7 +168,7 @@ class FirebaseService {
 
             this.db = firebase.firestore();
             this.auth = firebase.auth();
-            this.storage = firebase.storage();
+            this.storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
             // Improve Firestore reliability in local/dev environments where WebChannel can hang.
             // Must be set before first Firestore operation.

@@ -2028,6 +2028,16 @@ window.addEventListener('load', () => {
 
     function waitForFirebaseService(attempt = 0) {
         if (mounted) return;
+
+        // Try to trigger auto-initialization if it's not initialized yet but firebase is loaded
+        if (window.firebaseService && !window.firebaseService.isInitialized && typeof firebase !== 'undefined') {
+            try {
+                window.firebaseService.tryAutoInit();
+            } catch (e) {
+                console.error('[VisitorChat] Error auto-initializing firebaseService:', e);
+            }
+        }
+
         const firebaseReady = !!(window.firebaseService && window.firebaseService.isInitialized && typeof firebase !== 'undefined');
         if (firebaseReady) {
             mounted = true;
@@ -2037,7 +2047,10 @@ window.addEventListener('load', () => {
             return;
         }
 
-        if (attempt >= 80) return;
+        if (attempt >= 80) {
+            console.warn('[VisitorChat] Timeout waiting for Firebase service.');
+            return;
+        }
         window.setTimeout(() => waitForFirebaseService(attempt + 1), 250);
     }
 
@@ -2052,10 +2065,24 @@ window.addEventListener('load', () => {
             // ignore
         }
         if (!chatApp) {
-            const defaultApp = firebase.apps && firebase.apps.length ? firebase.app() : null;
-            const options = (defaultApp && defaultApp.options) ? defaultApp.options : window.firebaseConfig;
-            if (!options) return;
-            chatApp = firebase.initializeApp(options, 'hkmVisitorChat');
+            try {
+                const defaultApp = firebase.apps && firebase.apps.length ? firebase.app() : null;
+                const options = (defaultApp && defaultApp.options) ? defaultApp.options : window.firebaseConfig;
+                if (!options) {
+                    console.warn('[VisitorChat] No Firebase options found for chat app.');
+                    return;
+                }
+                chatApp = firebase.initializeApp(options, 'hkmVisitorChat');
+            } catch (initErr) {
+                console.error('[VisitorChat] Error initializing chat firebase app:', initErr);
+                // Fallback to default app if initialization of separate app failed
+                try {
+                    chatApp = firebase.app();
+                } catch (fallbackErr) {
+                    console.error('[VisitorChat] Fallback to default firebase app also failed:', fallbackErr);
+                    return;
+                }
+            }
         }
 
         const db = chatApp.firestore();
