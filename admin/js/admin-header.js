@@ -380,6 +380,7 @@ const initAdminHeader = () => {
             { label: 'Hero Slider', icon: 'view_carousel', section: 'hero', category: 'nettsted' },
             { label: 'Undervisning', icon: 'school', section: 'teaching', category: 'nettsted' },
             { label: 'Kursadministrasjon', icon: 'menu_book', section: 'courses', category: 'nettsted' },
+            { label: 'Leseplaner', icon: 'auto_stories', section: 'reading-plans', category: 'nettsted' },
             { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
             { header: 'kommunikasjon', label: 'Kommunikasjon' },
             { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
