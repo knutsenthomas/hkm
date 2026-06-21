@@ -1207,7 +1207,7 @@ class ContentManager {
             heroEl.style.setProperty('background-repeat', 'no-repeat', 'important');
         }
 
-        const printImg = document.getElementById('print-post-image');
+        const printImg = document.getElementById('print-post-image-body');
         if (printImg && heroImage) {
             printImg.src = heroImage;
         }
