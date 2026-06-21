@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-v15';
+const CACHE_NAME = 'hkm-admin-v16';
 const STATIC_ASSETS = [
     '/admin/css/dashboard.css',
     '/admin/css/admin-unified.css',
@@ -33,7 +33,9 @@ function shouldCacheStatic(request, url) {
 self.addEventListener('install', (event) => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
-        await cache.addAll(STATIC_ASSETS);
+        // Force bypass HTTP cache to get fresh static assets from server
+        const requests = STATIC_ASSETS.map(url => new Request(url, { cache: 'reload' }));
+        await cache.addAll(requests);
         await self.skipWaiting();
     })());
 });

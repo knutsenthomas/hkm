@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-app-v15';
+const CACHE_NAME = 'hkm-admin-app-v16';
 const SHELL_ASSETS = [
     '/admin/index.html',
     '/admin/login.html',
@@ -32,7 +32,9 @@ function isStaticAsset(request, url) {
 self.addEventListener('install', (event) => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
-        await cache.addAll(SHELL_ASSETS);
+        // Use { cache: 'reload' } to force bypass HTTP cache and get fresh copies from server
+        const requests = SHELL_ASSETS.map(url => new Request(url, { cache: 'reload' }));
+        await cache.addAll(requests);
         await self.skipWaiting();
     })());
 });
