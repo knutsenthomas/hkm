@@ -62,6 +62,26 @@ const translations = {
         no: 'Alle',
         en: 'All',
         es: 'Todos'
+    },
+    summary: {
+        no: 'Sammendrag',
+        en: 'Summary',
+        es: 'Resumen'
+    },
+    keyVerses: {
+        no: 'Nøkkelvers',
+        en: 'Key Verses',
+        es: 'Versículos clave'
+    },
+    discussionQuestions: {
+        no: 'Diskusjonsspørsmål',
+        en: 'Discussion Questions',
+        es: 'Preguntas de discusión'
+    },
+    summaryAndKeyVerses: {
+        no: 'Sammendrag & nøkkelvers',
+        en: 'Summary & Key Verses',
+        es: 'Resumen y versículos clave'
     }
 };
 
@@ -1166,6 +1186,82 @@ function createPodcastCard(episode, indexInView) {
 
     const descText = getEpisodeCardDescription(episode);
 
+    // Get Firestore override data
+    const dbData = typeof podcastTranscriptDataById !== 'undefined' ? podcastTranscriptDataById.get(episode.id) : null;
+    const summary = dbData ? (dbData.summary || dbData.description || '').trim() : '';
+    const keyVerses = dbData && Array.isArray(dbData.keyVerses) ? dbData.keyVerses : [];
+    const discussionQuestions = dbData && Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : [];
+
+    const hasSummary = !!summary;
+    const hasVerses = keyVerses.length > 0;
+    const hasQuestions = discussionQuestions.length > 0;
+
+    let accordionHtml = '';
+    if (hasSummary || hasVerses || hasQuestions) {
+        let leftColHtml = '';
+        if (hasSummary) {
+            leftColHtml += `
+                <div style="margin-bottom: 24px;">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2" style="font-size: 11px; letter-spacing: 1px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">${t('summary')}</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed" style="color: #475569; font-size: 14px; line-height: 1.6; font-weight: 400;">${summary}</p>
+                </div>
+            `;
+        }
+        if (hasVerses) {
+            leftColHtml += `
+                <div style="margin-bottom: 24px;">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#d17d39] mb-3" style="font-size: 11px; letter-spacing: 1px; color: #d17d39; font-weight: 700; text-transform: uppercase;">${t('keyVerses')}</h4>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        ${keyVerses.map(kv => `
+                            <div class="flex gap-4 items-start p-3 bg-white rounded-lg border-l-4 border-[#d17d39] shadow-sm" style="display: flex; gap: 16px; align-items: flex-start; padding: 12px; background-color: #ffffff; border-radius: 8px; border-left: 4px solid #d17d39; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                                <div class="min-w-[80px] shrink-0 font-bold text-xs text-[#1B4965] uppercase tracking-wide pt-0.5" style="min-width: 80px; flex-shrink: 0; font-weight: 700; font-size: 11px; color: #1B4965; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px;">${kv.reference}</div>
+                                <div class="text-sm italic text-slate-700 leading-relaxed" style="font-size: 13.5px; font-style: italic; color: #334155; line-height: 1.5; flex-grow: 1;">"${kv.text}"</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        let rightColHtml = '';
+        if (hasQuestions) {
+            rightColHtml += `
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#1B4965] mb-3" style="font-size: 11px; letter-spacing: 1px; color: #1B4965; font-weight: 700; text-transform: uppercase;">${t('discussionQuestions')}</h4>
+                    <ol style="display: flex; flex-direction: column; gap: 12px; list-style: none; padding-left: 0; margin: 0;">
+                        ${discussionQuestions.map((q, i) => `
+                            <li class="flex gap-3 items-start" style="display: flex; gap: 12px; align-items: flex-start;">
+                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-[#1B4965]/10 text-[#1B4965] font-bold text-xs shrink-0" style="display: flex; align-items: center; justify-center: center; width: 24px; height: 24px; border-radius: 9999px; background-color: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700; font-size: 12px; flex-shrink: 0;">${i + 1}</span>
+                                <p class="text-sm text-slate-700 pt-0.5 leading-relaxed" style="margin: 0; font-size: 13.5px; color: #334155; line-height: 1.5; padding-top: 2px;">${q}</p>
+                            </li>
+                        `).join('')}
+                    </ol>
+                </div>
+            `;
+        }
+
+        accordionHtml = `
+            <div class="podcast-accordion mt-6 border-t border-slate-200/60 pt-4" style="margin-top: 24px; border-top: 1px solid rgba(226, 232, 240, 0.6); padding-top: 16px;">
+                <button class="accordion-toggle flex items-center justify-between w-full text-left font-semibold text-[#1B4965] hover:text-[#d17d39] transition-colors py-2" aria-expanded="false" style="display: flex; align-items: center; justify-content: space-between; width: 100%; border: none; background: none; padding: 8px 0; text-align: left; font-weight: 600; color: #1B4965; transition: color 0.2s; cursor: pointer;">
+                    <span>${t('summaryAndKeyVerses')}</span>
+                    <span class="material-symbols-outlined transition-transform duration-300 transform" style="font-size: 20px; transition: transform 0.3s;">expand_more</span>
+                </button>
+                <div class="accordion-content hidden mt-4" style="display: none; margin-top: 16px;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50/50 p-6 rounded-xl border border-slate-100" style="display: grid; gap: 32px; background-color: rgba(248, 250, 252, 0.5); padding: 24px; border-radius: 12px; border: 1px solid #f1f5f9;">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            ${leftColHtml || `<p class="text-sm text-slate-500 italic" style="font-size: 13.5px; color: #64748b; font-style: italic;">Ingen oppsummering tilgjengelig.</p>`}
+                        </div>
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            ${rightColHtml || `<p class="text-sm text-slate-500 italic" style="font-size: 13.5px; color: #64748b; font-style: italic;">Ingen diskusjonsspørsmål tilgjengelig.</p>`}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     card.innerHTML = `
         <div class="podcast-artwork">
             <img src="${thumbnail}" alt="${episode.title}">
@@ -1180,10 +1276,11 @@ function createPodcastCard(episode, indexInView) {
             <h3 class="podcast-title">${episode.title}</h3>
             <p class="podcast-description">${descText}</p>
             <div class="podcast-meta"><span><i class="far fa-calendar"></i> ${pubDate}</span></div>
-            <div class="podcast-actions">
+            <div class="podcast-actions" style="margin-bottom: 8px;">
                 <button class="btn-play-internal" data-audio="${episode.audioUrl}"><i class="fas fa-play"></i> ${t('listenNow')}</button>
                 <a href="${episode.link}" target="_blank" class="btn-icon-outline"><i class="fas fa-external-link-alt"></i></a>
             </div>
+            ${accordionHtml}
         </div>
     `;
 
@@ -1197,6 +1294,24 @@ function createPodcastCard(episode, indexInView) {
             }
         });
     });
+
+    const toggleBtn = card.querySelector('.accordion-toggle');
+    if (toggleBtn) {
+        const content = card.querySelector('.accordion-content');
+        const icon = toggleBtn.querySelector('.material-symbols-outlined');
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            if (isExpanded) {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        });
+    }
 
     return card;
 }

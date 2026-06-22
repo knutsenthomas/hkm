@@ -600,11 +600,10 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
     console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
 
     // --- AUTOMATISK OPPSUMMERING ---
-    let autoSummary = null;
+    let autoData = null;
     try {
       console.log(`Genererer automatisk oppsummering for episode ${episodeId}...`);
-      // Vi bruker den eksisterende hjelpefunksjonen
-      autoSummary = await generatePodcastSummaryWithGemini({
+      autoData = await generatePodcastSummaryWithGemini({
         episodeTitle: episodeTitle || '',
         transcriptText: transcriptHtml
       });
@@ -613,9 +612,8 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
       console.error(`Automatisk oppsummering feilet (men transkripsjonen fortsetter):`, summaryError);
     }
 
-    await transcriptRef.set({
+    const docPayload = {
       text: transcriptHtml,
-      summary: autoSummary || FieldValue.delete(), // Lagre hvis vi fikk en, slett ikke hvis vi ikke fikk
       episodeId,
       title: episodeTitle || null,
       audioUrl,
@@ -625,7 +623,34 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
       completedAt: FieldValue.serverTimestamp(),
       lastError: FieldValue.delete(),
       nextRetryAt: FieldValue.delete(),
-    }, { merge: true });
+    };
+
+    if (autoData) {
+      if (autoData.summary) {
+        docPayload.summary = autoData.summary;
+        docPayload.description = autoData.summary;
+      } else {
+        docPayload.summary = FieldValue.delete();
+        docPayload.description = FieldValue.delete();
+      }
+      if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
+        docPayload.keyVerses = autoData.keyVerses;
+      } else {
+        docPayload.keyVerses = FieldValue.delete();
+      }
+      if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
+        docPayload.discussionQuestions = autoData.discussionQuestions;
+      } else {
+        docPayload.discussionQuestions = FieldValue.delete();
+      }
+    } else {
+      docPayload.summary = FieldValue.delete();
+      docPayload.description = FieldValue.delete();
+      docPayload.keyVerses = FieldValue.delete();
+      docPayload.discussionQuestions = FieldValue.delete();
+    }
+
+    await transcriptRef.set(docPayload, { merge: true });
 
     console.log(`Transkripsjon og oppsummering lagret vellykket i Firestore.`);
     return { success: true, message: "Transkribering fullført" };
@@ -5845,13 +5870,26 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
 
   const promptString = [
     'Du er en norsk redaktør for kristent innhold.',
-    'Lag en kort, varm og tydelig oppsummering av podcast-episoden under.',
-    'Krav:',
-    '- Skriv på norsk bokmål.',
-    '- 2-3 setninger, maks 320 tegn.',
-    '- Ingen punktliste, ingen emojis, ingen markdown.',
-    '- Ikke finn opp detaljer som ikke finnes i teksten.',
-    '- Avslutt med en naturlig setning, ikke call-to-action.',
+    'Analyser transkripsjonen av podcast-episoden under og returner et strukturert JSON-objekt.',
+    '',
+    'Krav til JSON-struktur:',
+    '{',
+    '  "summary": "En kort, varm og tydelig oppsummering på 2-3 setninger, maks 320 tegn, uten punktlister, emojis eller markdown-formatering.",',
+    '  "keyVerses": [',
+    '    {',
+    '      "reference": "Skriftsted-referanse (f.eks: APG 1,8 eller JOH 4,7). Bruk store bokstaver og kortform.",',
+    '      "text": "Selve teksten til bibelverset slik det lyder på norsk bokmål. Finn gjerne det sanne, offisielle sitatet hvis det siteres delvis i talen."',
+    '    }',
+    '  ],',
+    '  "discussionQuestions": [',
+    '    "3-4 relevante diskusjonsspørsmål til refleksjon (som kulepunkter/spørsmål)."',
+    '  ]',
+    '}',
+    '',
+    'Viktig:',
+    '- "keyVerses" skal inneholde faktiske bibelvers som siteres, refereres til eller er høyst relevante for innholdet i talen. Hvis det ikke er noen bibelvers overhodet, la listen være tom ([]) og ikke dikt dem opp.',
+    '- Skriv alt på norsk bokmål.',
+    '- Svar KUN med rå JSON. Ikke legg til ```json ... ``` eller markdown-blokker.',
     '',
     `Tittel: ${String(episodeTitle || '').trim() || 'Uten tittel'}`,
     'Transkripsjon:',
@@ -5890,7 +5928,7 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
         const completion = await openai.chat.completions.create({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "Du er en norsk redaktør for kristent innhold." },
+            { role: "system", content: "Du er en norsk redaktør for kristent innhold som alltid svarer i rå JSON." },
             { role: "user", content: promptString }
           ]
         });
@@ -5907,12 +5945,27 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
     throw lastModelError || new Error('Ingen AI-modell kunne lage oppsummering.');
   }
 
-  const summary = normalizePodcastSummaryText(resultText);
-  if (!summary) {
-    throw new Error('AI returnerte tom oppsummering.');
+  // Parse structured JSON
+  try {
+    const cleanedText = resultText.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+    const parsed = JSON.parse(cleanedText);
+    if (parsed && typeof parsed === 'object') {
+      return {
+        summary: normalizePodcastSummaryText(parsed.summary || ''),
+        keyVerses: Array.isArray(parsed.keyVerses) ? parsed.keyVerses : [],
+        discussionQuestions: Array.isArray(parsed.discussionQuestions) ? parsed.discussionQuestions : []
+      };
+    }
+  } catch (parseError) {
+    console.warn("Klarte ikke å parse JSON fra AI-oppsummering, bruker fallback-struktur:", parseError);
   }
 
-  return summary;
+  // Fallback if parsing fails
+  return {
+    summary: normalizePodcastSummaryText(resultText),
+    keyVerses: [],
+    discussionQuestions: []
+  };
 }
 
 exports.transcribePodcast = onCall({
@@ -5965,12 +6018,16 @@ exports.generatePodcastSummary = onCall({
   }
 
   try {
-    const summary = await generatePodcastSummaryWithGemini({
+    const aiData = await generatePodcastSummaryWithGemini({
       episodeTitle,
       transcriptText
     });
 
-    return { summary };
+    return {
+      summary: aiData.summary,
+      keyVerses: aiData.keyVerses,
+      discussionQuestions: aiData.discussionQuestions
+    };
   } catch (error) {
     console.error('Feil under generering av podcast-oppsummering:', error);
     throw new HttpsError(

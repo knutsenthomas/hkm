@@ -8508,6 +8508,17 @@ class AdminManager {
             const rawDescription = item.summary || item.description || '';
             // Strip HTML tags from description for clean display in textarea
             const podcastSummary = rawDescription.replace(/<[^>]*>/g, '').trim();
+
+            const existingKeyVerses = Array.isArray(item.keyVerses) ? item.keyVerses : [];
+            const formattedKeyVerses = existingKeyVerses.map(kv => {
+                if (kv && kv.reference && kv.text) {
+                    return `${kv.reference} | ${kv.text}`;
+                }
+                return '';
+            }).filter(Boolean).join('\n');
+
+            const existingQuestions = Array.isArray(item.discussionQuestions) ? item.discussionQuestions : [];
+            const formattedQuestions = existingQuestions.join('\n');
             const teachingCandidates = (collectionItems || [])
                 .filter((opt, optIndex) => optIndex !== index)
                 .filter(opt => (opt.id || opt.title))
@@ -8824,8 +8835,8 @@ class AdminManager {
                               </div>
 
                             <button type="button" class="btn-primary" id="ai-write-content" style="margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; background:linear-gradient(135deg, #d17d39, #bd4f2a); border:none; box-shadow: 0 4px 15px rgba(209, 125, 57, 0.25); min-height: 48px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;">edit_note</span>
-                                Skriv innhold med AI
+                                <span class="material-symbols-outlined" style="font-size: 22px;">${collectionId === 'podcast_transcripts' ? 'hearing' : 'edit_note'}</span>
+                                ${collectionId === 'podcast_transcripts' ? 'Transkriber & Oppsummer med AI' : 'Skriv innhold med AI'}
                             </button>
 
                             <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height: 48px; border-radius: 12px; font-weight: 600; border: 1px solid #e2e8f0; background: #f8fafc; color: #d17d39; transition: all 0.3s ease;">
@@ -8850,15 +8861,24 @@ class AdminManager {
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
                              ${collectionId === 'podcast_transcripts' ? `
-                             <h4 class="sidebar-section-title">PODCAST OPPSUMMERING (AI)</h4>
+                             <h4 class="sidebar-section-title">PODCAST AI OPPSUMMERING</h4>
                              <div class="sidebar-group">
                                  <label>AI-generert oppsummering</label>
-                                 <textarea id="col-item-summary" class="sidebar-control" style="height: 200px; font-size: 13px; line-height: 1.5;" placeholder="Lim inn AI-oppsummering her...">${podcastSummary}</textarea>
+                                 <textarea id="col-item-summary" class="sidebar-control" style="height: 120px; font-size: 13px; line-height: 1.5;" placeholder="Lim inn AI-oppsummering her...">${podcastSummary}</textarea>
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Nøkkelvers (Format: APG 1,8 | Tekst...)</label>
+                                 <textarea id="col-item-key-verses" class="sidebar-control" style="height: 120px; font-size: 13px; line-height: 1.5;" placeholder="F.eks:\nAPG 1,8 | Men dere skal få kraft...\nJOH 4,7 | Da kommer en samaritansk kvinne...">${formattedKeyVerses}</textarea>
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Diskusjonsspørsmål (Ett per linje)</label>
+                                 <textarea id="col-item-questions" class="sidebar-control" style="height: 120px; font-size: 13px; line-height: 1.5;" placeholder="F.eks:\nHvilke områder unngår du?\nHvordan vise kjærlighet?">${formattedQuestions}</textarea>
                                  <button type="button" class="btn" id="generate-podcast-ai-summary" style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 12px; font-weight: 600; min-height: 42px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; border: none; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);">
                                      <span class="material-symbols-outlined" style="font-size: 20px;">auto_awesome</span>
-                                     Generer med AI
+                                     Generer alt med AI
                                  </button>
-                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 12px;">Dette vises i listen og som introduksjon på podcast-siden.</p>
+                                 <div id="podcast-ai-status" style="font-size: 12px; margin-top: 8px; font-weight: 500; min-height: 18px;"></div>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 12px;">Dette vises i listen og som sammendrag/nøkkelvers på nettsiden.</p>
                              </div>
                              ` : ''}
                              ${collectionId === 'blog' ? `
@@ -10679,10 +10699,10 @@ class AdminManager {
 
                         const originalBtnHtml = generateAiSummaryBtn.innerHTML;
                         generateAiSummaryBtn.disabled = true;
-                        generateAiSummaryBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lager forslag...';
+                        generateAiSummaryBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Genererer...';
 
                         if (aiStatus) {
-                            aiStatus.textContent = 'Lager AI-oppsummering fra teksten...';
+                            aiStatus.textContent = 'Genererer oppsummering, vers og spørsmål fra teksten...';
                             aiStatus.style.color = '#334155';
                         }
 
@@ -10699,7 +10719,22 @@ class AdminManager {
                             }
 
                             summaryField.value = aiSummary;
-                            this.showToast('AI-oppsummering satt inn. Du kan redigere før lagring.', 'success', 5000);
+
+                            // Handle keyVerses
+                            const kvField = document.getElementById('col-item-key-verses');
+                            const kvData = response?.data?.keyVerses || [];
+                            if (kvField && Array.isArray(kvData)) {
+                                kvField.value = kvData.map(kv => `${kv.reference} | ${kv.text}`).join('\n');
+                            }
+
+                            // Handle discussionQuestions
+                            const qField = document.getElementById('col-item-questions');
+                            const qData = response?.data?.discussionQuestions || [];
+                            if (qField && Array.isArray(qData)) {
+                                qField.value = qData.join('\n');
+                            }
+
+                            this.showToast('AI-oppsummering, vers og diskusjonsspørsmål er klare!', 'success', 5000);
                             if (aiStatus) {
                                 aiStatus.textContent = 'AI-oppsummering klar. Husk å klikke Lagre og publiser.';
                                 aiStatus.style.color = '#166534';
@@ -10899,6 +10934,92 @@ class AdminManager {
                     const title = document.getElementById('col-item-title-v2')?.value || document.getElementById('col-item-title-sidebar')?.value || item.title || '';
                     if (!title) {
                         this.showToast('Vennligst skriv en tittel først!', 'info');
+                        return;
+                    }
+
+                    if (collectionId === 'podcast_transcripts') {
+                        const episodeId = String(item?.id || '').trim();
+                        const audioUrl = String(item?.audioUrl || '').trim();
+
+                        if (!episodeId) {
+                            this.showToast('Mangler episode-ID. Kan ikke transkribere.', 'error', 5000);
+                            return;
+                        }
+
+                        if (!audioUrl) {
+                            this.showToast('Fant ingen lydfil for episoden. Kan ikke transkribere.', 'error', 5000);
+                            return;
+                        }
+
+                        const confirmMsg = "Vil du transkribere denne episoden og generere sammendrag med AI? Dette tar vanligvis 1-3 minutter.";
+                        if (!confirm(confirmMsg)) return;
+
+                        aiWriteBtn.disabled = true;
+                        const originalHtml = aiWriteBtn.innerHTML;
+                        aiWriteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Transkriberer...';
+
+                        const aiStatus = document.getElementById('podcast-ai-status');
+                        if (aiStatus) {
+                            aiStatus.textContent = 'Transkriberer og oppsummerer nå. Vennligst vent...';
+                            aiStatus.style.color = '#334155';
+                        }
+
+                        try {
+                            const callable = firebase.functions().httpsCallable('transcribePodcast');
+                            await callable({
+                                episodeId,
+                                audioUrl,
+                                episodeTitle: title
+                            });
+
+                            const refreshedDoc = await firebase.firestore().collection('podcast_transcripts').doc(episodeId).get();
+                            const refreshedData = refreshedDoc.exists ? refreshedDoc.data() : null;
+
+                            if (refreshedData && typeof refreshedData.text === 'string' && refreshedData.text.trim()) {
+                                const refreshedBlocks = this.htmlToEditorJsBlocks(refreshedData.text);
+                                await editor.render(refreshedBlocks);
+                                item.text = refreshedData.text;
+                                item.content = refreshedBlocks;
+                            }
+
+                            if (refreshedData) {
+                                if (refreshedData.summary) {
+                                    const summaryField = document.getElementById('col-item-summary');
+                                    if (summaryField) summaryField.value = refreshedData.summary;
+                                    item.summary = refreshedData.summary;
+                                    item.description = refreshedData.summary;
+                                }
+                                if (refreshedData.keyVerses) {
+                                    const kvField = document.getElementById('col-item-key-verses');
+                                    const formattedKV = refreshedData.keyVerses.map(kv => `${kv.reference} | ${kv.text}`).join('\n');
+                                    if (kvField) kvField.value = formattedKV;
+                                    item.keyVerses = refreshedData.keyVerses;
+                                }
+                                if (refreshedData.discussionQuestions) {
+                                    const qField = document.getElementById('col-item-questions');
+                                    const formattedQuestions = refreshedData.discussionQuestions.join('\n');
+                                    if (qField) qField.value = formattedQuestions;
+                                    item.discussionQuestions = refreshedData.discussionQuestions;
+                                }
+                            }
+
+                            this.showToast('Transkribering og oppsummering fullført!', 'success', 5000);
+                            if (aiStatus) {
+                                aiStatus.textContent = 'Fullført. Husk å klikke Lagre og publiser.';
+                                aiStatus.style.color = '#166534';
+                            }
+                        } catch (err) {
+                            console.error('Transkripsjon og oppsummering feilet:', err);
+                            const reason = this._getCallableErrorMessage(err, 'Kunne ikke fullføre transkripsjon/oppsummering.');
+                            this.showToast(`Feilet: ${reason}`, 'error', 7000);
+                            if (aiStatus) {
+                                aiStatus.textContent = `Feilet: ${reason}`;
+                                aiStatus.style.color = '#b91c1c';
+                            }
+                        } finally {
+                            aiWriteBtn.disabled = false;
+                            aiWriteBtn.innerHTML = originalHtml;
+                        }
                         return;
                     }
 
@@ -11142,6 +11263,28 @@ class AdminManager {
                     const podcastSummaryVal = document.getElementById('col-item-summary')?.value?.trim() || '';
                     item.description = podcastSummaryVal;
                     item.summary = podcastSummaryVal;
+
+                    // Parse keyVerses
+                    const keyVersesRaw = document.getElementById('col-item-key-verses')?.value || '';
+                    item.keyVerses = keyVersesRaw.split('\n')
+                        .map(line => {
+                            const parts = line.split('|');
+                            if (parts.length >= 2) {
+                                return { reference: parts[0].trim(), text: parts.slice(1).join('|').trim() };
+                            }
+                            if (line.trim()) {
+                                return { reference: 'Skriftsted', text: line.trim() };
+                            }
+                            return null;
+                        })
+                        .filter(Boolean);
+
+                    // Parse discussionQuestions
+                    const questionsRaw = document.getElementById('col-item-questions')?.value || '';
+                    item.discussionQuestions = questionsRaw.split('\n')
+                        .map(q => q.trim())
+                        .filter(Boolean);
+
                     const htmlFromBlocks = this.editorJsBlocksToHtml((nextContent?.blocks) || []);
                     item.text = htmlFromBlocks || (typeof item.text === 'string' ? item.text : '');
                 }
