@@ -5118,6 +5118,7 @@ ol.block-list {
     /* No zoom animation */
     transform: scale(1.05);
     transition: none;
+    filter: brightness(0.78) contrast(1.02); /* Dim bright images for text contrast */
 }
 
 .hero-slide.active .hero-bg,
@@ -5132,9 +5133,9 @@ ol.block-list {
     inset: 0;
     /* Dark gradient at top (for menu) and bottom (for text) */
     background: linear-gradient(180deg,
-            rgba(0, 0, 0, 0.6) 0%,
-            rgba(0, 0, 0, 0.1) 25%,
-            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, 0.72) 0%,
+            rgba(0, 0, 0, 0.35) 25%,
+            rgba(0, 0, 0, 0.15) 50%,
             rgba(0, 0, 0, 0.85) 100%);
     pointer-events: none;
 }
