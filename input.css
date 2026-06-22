@@ -8164,6 +8164,11 @@ html[data-theme="dark"] .mobile-theme-toggle-btn {
     color: #cbd5e1 !important;
 }
 
+/* Global Form Spacing Fix for HKM Assistent */
+.hkm-chat-field {
+    margin-bottom: 18px !important;
+}
+
 /* 10. HKM Assistent Chat Widget Dark Mode Overrides */
 html[data-theme="dark"] .hkm-chat-panel,
 html[data-theme="dark"] .hkm-chat-main,
