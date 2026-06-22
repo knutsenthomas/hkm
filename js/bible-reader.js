@@ -3386,18 +3386,37 @@ class BibleReader {
                     
                     await this.saveProgress();
 
-                    // Also save to generic personal notes
+                    // Also save/update in generic personal notes, and reload Notes list
                     const db = this.getFirestore();
                     if (db) {
-                        await db.collection('personal_notes').add({
-                            userId: this.currentUser.uid,
-                            title: `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`,
-                            text: text,
-                            createdAt: this.getServerTimestamp(),
-                            isReadingPlanNote: true,
-                            readingPlanId: this.activePlanId,
-                            dayNumber: this.activePlanDay
-                        });
+                        const snap = await db.collection('personal_notes')
+                            .where('userId', '==', this.currentUser.uid)
+                            .where('readingPlanId', '==', this.activePlanId)
+                            .where('dayNumber', '==', this.activePlanDay)
+                            .get();
+
+                        if (!snap.empty) {
+                            // Update existing note
+                            const docId = snap.docs[0].id;
+                            await db.collection('personal_notes').doc(docId).update({
+                                text: text,
+                                createdAt: this.getServerTimestamp()
+                            });
+                        } else {
+                            // Add new note
+                            await db.collection('personal_notes').add({
+                                userId: this.currentUser.uid,
+                                title: `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`,
+                                text: text,
+                                createdAt: this.getServerTimestamp(),
+                                isReadingPlanNote: true,
+                                readingPlanId: this.activePlanId,
+                                dayNumber: this.activePlanDay
+                            });
+                        }
+
+                        // Reload Notes tab dynamically
+                        await this.loadNotes();
                     }
 
                     saveStatus.innerText = "Lagret i dine notater!";
