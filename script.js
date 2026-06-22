@@ -130,9 +130,15 @@ window.addEventListener('scroll', () => {
             }
             const scrollTrigger = document.body.classList.contains('page-index') ? 24 : 100;
             if (window.scrollY > scrollTrigger) {
-                header.classList.add('scrolled');
+                if (!header.classList.contains('scrolled')) {
+                    header.classList.add('scrolled');
+                    if (typeof syncViewportLayoutVars === 'function') syncViewportLayoutVars();
+                }
             } else {
-                if (!document.body.classList.contains('header-always-scrolled')) header.classList.remove('scrolled');
+                if (!document.body.classList.contains('header-always-scrolled') && header.classList.contains('scrolled')) {
+                    header.classList.remove('scrolled');
+                    if (typeof syncViewportLayoutVars === 'function') syncViewportLayoutVars();
+                }
             }
             scrollTicking = false;
         });
