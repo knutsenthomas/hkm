@@ -550,6 +550,22 @@
             display: none !important;
         }
 
+        /* Felles forbedring av hero-lesbarhet */
+        .page-hero-title {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+        .page-hero-subtitle {
+            color: #f1f5f9 !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        }
+        .hero-breadcrumbs, .hero-breadcrumbs a, .hero-breadcrumbs span {
+            color: #e2e8f0 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+        }
+        .hero-breadcrumbs a:hover {
+            color: #ffffff !important;
+        }
     </style>
     <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
 
@@ -758,6 +774,7 @@
                 <div class="print-intro" style="margin-bottom: 24px; padding: 12px 16px; background: #f8fafc; border-left: 4px solid #1B4965; border-radius: 4px; font-size: 10pt; line-height: 1.5; color: #334155;">
                     <strong>Study Guide & Reading Plan:</strong> Welcome to this reading plan from His Kingdom Ministry. Use this guide for daily reflection, Bible reading, and prayer. Check off each day as you complete your reading to track your progress.
                 </div>
+                <div id="print-plan-overview" style="margin-bottom: 24px;"></div>
             </div>
 
             <!-- Left Side: Content -->
@@ -1167,6 +1184,51 @@
                     }
                 }
 
+                // Populate print overview section
+                const printOverview = document.getElementById('print-plan-overview');
+                if (printOverview) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('john') || titleLower.includes('johannes')) {
+                        printOverview.innerHTML = `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
+                                <h3 style="margin: 0 0 12px 0; color: #1B4965; font-size: 13pt; font-weight: 800; border-bottom: 2px solid #1B4965; padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">menu_book</span> Introduction to the Gospel of John
+                                </h3>
+                                <p style="margin: 0 0 16px 0; font-size: 9.5pt; color: #334155; line-height: 1.5;">
+                                    The Gospel of John offers a unique perspective on who Jesus is. While the other three gospels (the Synoptics) focus heavily on Jesus' deeds and parables in Galilee, John takes us on a deeper theological journey to reveal Jesus' divine identity as the Messiah, the Son of God, and his intimate relationship with the Father.
+                                </p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #f1f5f9;">
+                                        <strong style="display: block; margin-bottom: 6px; font-size: 9pt; color: #1B4965; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">Key Themes:</strong>
+                                        <ul style="margin: 0; padding-left: 16px; font-size: 8.5pt; color: #475569; line-height: 1.5;">
+                                            <li><strong>The Word Became Flesh:</strong> Jesus is the eternal <em>Logos</em> who was with God and was God, and through whom the world was made.</li>
+                                            <li><strong>Seven Signs:</strong> Selected miraculous works that manifest Jesus' glory and prompt faith.</li>
+                                            <li><strong>"I Am" Statements:</strong> Seven times Jesus reveals his identity using God's covenant name (e.g., Bread of Life, Light of the World).</li>
+                                        </ul>
+                                    </div>
+                                    <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #f1f5f9;">
+                                        <strong style="display: block; margin-bottom: 6px; font-size: 9pt; color: #1B4965; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">Structure of the Gospel:</strong>
+                                        <ul style="margin: 0; padding-left: 16px; font-size: 8.5pt; color: #475569; line-height: 1.5;">
+                                            <li><strong>John 1:1-18:</strong> The Prologue - The True Light enters the world.</li>
+                                            <li><strong>John 1:19 - 12:50:</strong> The Book of Signs - Jesus' public ministry and encounters.</li>
+                                            <li><strong>John 13:1 - 20:31:</strong> The Book of Glory - Farewell discourse, cross, and resurrection.</li>
+                                            <li><strong>John 21:</strong> The Epilogue - Breakfast by the lake and restoration of Peter.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        printOverview.innerHTML = `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 16px;">
+                                <h3 style="margin: 0 0 8px 0; color: #1B4965; font-size: 11pt; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">About this Reading Plan</h3>
+                                <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || 'This reading plan helps you study God\'s Word day by day.')}</p>
+                            </div>
+                        `;
+                    }
+                }
+
                 // Render day list
                 const daysList = plan.days || [];
                 daysList.sort((a, b) => a.dayNumber - b.dayNumber);
@@ -1361,15 +1423,29 @@
 
                     const title = res.title || 'Resource';
                     return `
-                        <a href="${res.url}" target="_blank" class="resource-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; color: var(--primary-orange); background: #fff7ed; border: 1px solid rgba(209,125,57,0.15); padding: 6px 14px; border-radius: 20px; text-decoration: none; transition: all 0.2s ease;">
-                            <i class="fas ${icon}"></i> ${escapeHtml(title)}
-                        </a>
+                        <div class="resource-item" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <a href="${res.url}" target="_blank" class="resource-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; color: var(--primary-orange); background: #fff7ed; border: 1px solid rgba(209,125,57,0.15); padding: 6px 14px; border-radius: 20px; text-decoration: none; transition: all 0.2s ease;">
+                                    <i class="fas ${icon}"></i> ${escapeHtml(title)}
+                                </a>
+                                <button class="qr-toggle-btn hidden md:inline-flex" onclick="toggleQrCode(this)" style="background: none; border: 1px solid #cbd5e1; color: #64748b; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                    <i class="fas fa-qrcode"></i> Show QR
+                                </button>
+                            </div>
+                            <div class="qr-code-box" style="display: none; align-items: center; gap: 12px; margin-top: 4px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; width: fit-content; box-sizing: border-box;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(res.url)}" alt="QR Code" style="width: 80px; height: 80px; border-radius: 4px; background: white; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" />
+                                <div style="font-size: 0.75rem; color: #475569; line-height: 1.3; text-align: left;">
+                                    <strong style="display: block; margin-bottom: 2px; color: var(--text-dark);">Scan with mobile</strong>
+                                    <span>Open the resource on your phone.</span>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 }).join('');
 
                 return `
-                    <div class="day-resources" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px dashed var(--border); padding-top: 12px;">
-                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px;">Resources:</span>
+                    <div class="day-resources" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--border); padding-top: 12px; width: 100%;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px; text-align: left;">Resources:</span>
                         ${items}
                     </div>
                 `;
@@ -1416,6 +1492,24 @@
             }
 
 
+
+            window.toggleQrCode = function(btn) {
+                const box = btn.closest('.resource-item').querySelector('.qr-code-box');
+                if (box) {
+                    const isHidden = window.getComputedStyle(box).display === 'none';
+                    if (isHidden) {
+                        box.style.setProperty('display', 'flex', 'important');
+                        btn.innerHTML = '<i class="fas fa-qrcode"></i> Hide QR';
+                        btn.style.borderColor = 'var(--primary-orange)';
+                        btn.style.color = 'var(--primary-orange)';
+                    } else {
+                        box.style.setProperty('display', 'none', 'important');
+                        btn.innerHTML = '<i class="fas fa-qrcode"></i> Show QR';
+                        btn.style.borderColor = '#cbd5e1';
+                        btn.style.color = '#64748b';
+                    }
+                }
+            };
 
             window.copyShareLink = function() {
                 navigator.clipboard.writeText(window.location.href).then(() => {

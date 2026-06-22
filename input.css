@@ -6398,7 +6398,34 @@ a[href*="#deduccion-fiscal"],
     }
 
     .day-resources {
+        display: block !important;
+        margin-top: 8px !important;
+        border-top: 1px dashed #cbd5e1 !important;
+        padding-top: 8px !important;
+    }
+
+    .day-resources .resource-link {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        color: #1B4965 !important;
+        font-weight: 700 !important;
+        text-decoration: underline !important;
+        margin-right: 15px !important;
+        font-size: 8.5pt !important;
+        display: inline-flex !important;
+    }
+
+    .qr-toggle-btn {
         display: none !important;
+    }
+
+    .qr-code-box {
+        display: flex !important;
+        margin-top: 6px !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
     }
 
     body .hidden-day,
