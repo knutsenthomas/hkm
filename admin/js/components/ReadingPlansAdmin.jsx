@@ -623,6 +623,11 @@ export default function ReadingPlansAdmin() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                 {plans.map(plan => (
                     <div key={plan.id} className="card modern" style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                        {plan.imageUrl && (
+                            <div style={{ width: '100%', height: '140px', borderRadius: '10px', overflow: 'hidden', marginBottom: '4px' }}>
+                                <img src={plan.imageUrl} alt={plan.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                        )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1B4965', margin: 0 }}>{plan.title}</h3>
                             <span style={{ fontSize: '11px', fontWeight: 700, color: '#d17d39', background: '#fff7ed', padding: '2px 8px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{plan.durationDays} dager</span>
