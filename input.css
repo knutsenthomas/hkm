@@ -5118,7 +5118,7 @@ ol.block-list {
     /* No zoom animation */
     transform: scale(1.05);
     transition: none;
-    filter: brightness(0.78) contrast(1.02); /* Dim bright images for text contrast */
+    filter: brightness(0.84) contrast(1.01); /* Dim bright images for text contrast */
 }
 
 .hero-slide.active .hero-bg,
