@@ -828,6 +828,9 @@
                     </div>
                 </div>
 
+                <!-- Dynamic Screen Overview Card -->
+                <div id="screen-plan-overview" class="card print:hidden" style="display: none;"></div>
+
                 <!-- Day outline list -->
                 <div class="card">
                     <h2 class="card-title">
@@ -1287,6 +1290,48 @@
                                 <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || 'Denne leseplanen hjelper deg å fordype deg i Guds ord dag for dag.')}</p>
                             </div>
                         `;
+                    }
+                }
+
+                // Populate screen overview section (introduksjon til Johannesevangeliet på skjermen)
+                const screenOverview = document.getElementById('screen-plan-overview');
+                if (screenOverview) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('johannes')) {
+                        screenOverview.innerHTML = `
+                            <h2 class="card-title">
+                                <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> Introduksjon til Johannesevangeliet
+                            </h2>
+                            <div style="background: rgba(209, 125, 57, 0.05); border-left: 4px solid var(--primary-orange); padding: 16px 20px; border-radius: 0 12px 12px 0; margin-bottom: 24px;">
+                                <strong style="color: var(--primary-orange); display: block; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Den Store Ideen</strong>
+                                <p style="margin: 0; color: var(--text-dark); font-size: 1.05rem; line-height: 1.5; font-weight: 500;">Johannesevangeliet er skrevet for at vi skal tro at Jesus er Messias, Guds Sønn, og at vi ved troen kan ha liv i hans navn.</p>
+                            </div>
+                            <p class="plan-description" style="margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
+                                Johannesevangeliet gir oss en unik fremstilling av hvem Jesus er. Mens de andre tre evangeliene (de synoptiske) fokuserer mye på Jesu gjerninger og lignelser i Galilea, tar Johannes oss med på en dypere teologisk reise for å åpenbare Jesu guddommelige natur og hans intime forhold til Faderen.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="border-top: 1px solid rgba(226,232,240,0.8); padding-top: 24px;">
+                                <div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0 0 12px 0;">Sentrale Temaer</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #475569; line-height: 1.6; font-size: 0.95rem; display: flex; flex-direction: column; gap: 8px;">
+                                        <li><strong>Ordet ble menneske:</strong> Jesus er det evige <em>Logos</em> som var hos Gud og var Gud.</li>
+                                        <li><strong>De syv tegnene:</strong> Utvalgte undergjerninger som viser Jesu herlighet og vekker tro.</li>
+                                        <li><strong>"Jeg er"-uttalelsene:</strong> Syv ganger åpenbarer Jesus sin identitet med Guds eget paktsnavn (f.eks. Livets brød, Verdens lys).</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0 0 12px 0;">Evangeliets Oppbygning</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #475569; line-height: 1.6; font-size: 0.95rem; display: flex; flex-direction: column; gap: 8px;">
+                                        <li><strong>Joh 1:1-18:</strong> Prologen - Det sanne lyset kommer til verden.</li>
+                                        <li><strong>Joh 1:19 - 12:50:</strong> Tegnenes bok - Jesu offentlige tjeneste.</li>
+                                        <li><strong>Joh 13:1 - 20:31:</strong> Herlighetens bok - Avskjedstalen, korset og oppstandelsen.</li>
+                                        <li><strong>Joh 21:</strong> Epilogen - Frokost ved sjøen og oppreisningen av Peter.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        screenOverview.style.display = 'block';
+                    } else {
+                        screenOverview.style.display = 'none';
                     }
                 }
 

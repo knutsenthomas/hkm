@@ -817,6 +817,9 @@
                     </div>
                 </div>
 
+                <!-- Dynamic Screen Overview Card -->
+                <div id="screen-plan-overview" class="card print:hidden" style="display: none;"></div>
+
                 <!-- Day outline list -->
                 <div class="card">
                     <h2 class="card-title">
@@ -1232,6 +1235,48 @@
                                 <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || 'Este plan de lectura te ayuda a profundizar en la Palabra de Dios día a día.')}</p>
                             </div>
                         `;
+                    }
+                }
+
+                // Populate screen overview section (introduksjon til Johannesevangeliet på skjermen)
+                const screenOverview = document.getElementById('screen-plan-overview');
+                if (screenOverview) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('juan') || titleLower.includes('johannes') || titleLower.includes('john')) {
+                        screenOverview.innerHTML = `
+                            <h2 class="card-title">
+                                <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> Introducción al Evangelio de Juan
+                            </h2>
+                            <div style="background: rgba(209, 125, 57, 0.05); border-left: 4px solid var(--primary-orange); padding: 16px 20px; border-radius: 0 12px 12px 0; margin-bottom: 24px;">
+                                <strong style="color: var(--primary-orange); display: block; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">La Gran Idea</strong>
+                                <p style="margin: 0; color: var(--text-dark); font-size: 1.05rem; line-height: 1.5; font-weight: 500;">El Evangelio de Juan está escrito para que creáis que Jesús es el Cristo, el Hijo de Dios, y para que creyendo, tengáis vida en su nombre.</p>
+                            </div>
+                            <p class="plan-description" style="margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
+                                El Evangelio de Juan ofrece una perspectiva única sobre quién es Jesús. Mientras que los otros tres Evangelios (los sinópticos) se centran principalmente en las obras y parábolas de Jesús en Galilea, Juan nos invita a un viaje teológico más profundo para revelar la naturaleza divina de Jesús y su relación íntima con el Padre.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="border-top: 1px solid rgba(226,232,240,0.8); padding-top: 24px;">
+                                <div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0 0 12px 0;">Temas Clave</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #475569; line-height: 1.6; font-size: 0.95rem; display: flex; flex-direction: column; gap: 8px;">
+                                        <li><strong>El Verbo se hizo carne:</strong> Jesús es el <em>Logos</em> eterno que estaba con Dios y era Dios.</li>
+                                        <li><strong>Las siete señales:</strong> Milagros seleccionados que demuestran la gloria de Jesús e inspiran fe.</li>
+                                        <li><strong>Las declaraciones "Yo Soy":</strong> Siete veces Jesús revela su identidad usando el nombre del pacto de Dios (ej. Pan de vida, Luz del mundo).</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0 0 12px 0;">Estructura del Evangelio</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #475569; line-height: 1.6; font-size: 0.95rem; display: flex; flex-direction: column; gap: 8px;">
+                                        <li><strong>Juan 1:1-18:</strong> El Prólogo - La Luz verdadera entra al mundo.</li>
+                                        <li><strong>Juan 1:19 - 12:50:</strong> El Libro de las Señales - El ministerio público y los encuentros de Jesús.</li>
+                                        <li><strong>Juan 13:1 - 20:31:</strong> El Libro de la Gloria - El discurso de despedida, la cruz y la resurrección.</li>
+                                        <li><strong>Juan 21:</strong> El Epílogo - Desayuno junto al lago y restauración de Pedro.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                        screenOverview.style.display = 'block';
+                    } else {
+                        screenOverview.style.display = 'none';
                     }
                 }
 
