@@ -7668,4 +7668,155 @@ html[data-theme="dark"] .calendar-agenda-subtitle {
     color: #94a3b8 !important;
 }
 
+/* ==========================================================================
+   Subpages Dark Mode Overrides (Phase 2)
+   ========================================================================== */
+
+/* 1. Bible Page Header Background Fix */
+html[data-theme="dark"] header#header {
+    background: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] header#header .logo,
+html[data-theme="dark"] header#header .logo span,
+html[data-theme="dark"] header#header #global-search-opener,
+html[data-theme="dark"] header#header .lang-btn {
+    color: #f8fafc !important;
+}
+
+/* 2. Reading Plans (Leseplaner) Controls and Cards */
+html[data-theme="dark"] .plans-controls {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .plan-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .plan-card:hover {
+    border-color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .plan-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .plan-image-wrapper .duration-badge {
+    background: rgba(15, 23, 42, 0.85) !important;
+    color: #ff9d4d !important;
+}
+
+/* 3. Media Page Sticky Filter Tabs */
+html[data-theme="dark"] .media-tabs-section {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .media-tab {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .media-tab:hover {
+    border-color: var(--primary-orange) !important;
+    color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .media-tab.active {
+    background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)) !important;
+    border-color: var(--primary-orange) !important;
+    color: #ffffff !important;
+}
+
+/* 4. Courses Page (Kurs) Filters, Cards, and Modal */
+html[data-theme="dark"] .filter-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .filter-btn:hover {
+    border-color: var(--primary-orange) !important;
+    color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .filter-btn.active {
+    background: var(--primary-orange) !important;
+    border-color: var(--primary-orange) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .course-card {
+    background: #1e293b !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .course-card h3 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .enroll-modal {
+    background: #1e293b !important;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-theme="dark"] .enroll-modal .course-preview {
+    background: #0f172a !important;
+}
+
+/* 5. Blog Post Content and Tags */
+html[data-theme="dark"] .blog-post-content p,
+html[data-theme="dark"] .blog-post-content span,
+html[data-theme="dark"] .blog-post-content li,
+html[data-theme="dark"] .blog-post-content strong {
+    color: var(--rte-text-color) !important;
+}
+
+html[data-theme="dark"] .blog-post-content h1,
+html[data-theme="dark"] .blog-post-content h2,
+html[data-theme="dark"] .blog-post-content h3,
+html[data-theme="dark"] .blog-post-content h4,
+html[data-theme="dark"] .blog-post-content h5,
+html[data-theme="dark"] .blog-post-content h6 {
+    color: var(--rte-header-color) !important;
+}
+
+html[data-theme="dark"] #single-post-author-box {
+    background: #1e293b !important;
+}
+
+html[data-theme="dark"] .blog-tag {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .blog-tag:hover {
+    background: rgba(209, 125, 57, 0.15) !important;
+    border-color: var(--primary-orange) !important;
+    color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .blog-share {
+    border-top-color: #334155 !important;
+}
+
+/* 6. Local Root Variable Specificity Overrides */
+html[data-theme="dark"] {
+    --border: #334155 !important;
+    --text-muted: #94a3b8 !important;
+}
+
+/* 7. Header Theme Toggle Button Hover State Fix */
+#theme-toggle-btn:hover,
+.header.scrolled #theme-toggle-btn:hover,
+.header.menu-open #theme-toggle-btn:hover {
+    color: var(--primary-orange) !important;
+}
+
 
