@@ -143,7 +143,7 @@ export default async function handler(req, res) {
             language: { id: "eng", name: "English" }
           },
           {
-            id: "RVR1960",
+            id: "RV1960",
             name: "Reina Valera 1960",
             abbreviation: "RVR1960",
             language: { id: "spa", name: "Español" }
@@ -457,6 +457,8 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         targetBible = "DNB";
       } else if (bibleId.startsWith("OPENBIBLE_")) {
         targetBible = "WEB";
+      } else if (bibleId === "RVR1960") {
+        targetBible = "RV1960";
       }
 
       const bollsData = await fetchWithServerCache(
@@ -483,6 +485,8 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         targetBible = "DNB";
       } else if (bibleId.startsWith("OPENBIBLE_")) {
         targetBible = "WEB";
+      } else if (bibleId === "RVR1960") {
+        targetBible = "RV1960";
       }
 
       const bollsData = await fetchWithServerCache(
@@ -515,6 +519,8 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         targetBible = "DNB";
       } else if (bibleId.startsWith("OPENBIBLE_")) {
         targetBible = "WEB";
+      } else if (bibleId === "RVR1960") {
+        targetBible = "RV1960";
       }
 
       const [bookId, chapterNum] = chapterId.includes("_") ? chapterId.split("_") : [null, null];

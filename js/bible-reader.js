@@ -42,7 +42,7 @@ class BibleReader {
         const activeLang = document.documentElement.lang || 'no';
         let defaultBible = 'OPENBIBLE_NB';
         if (activeLang === 'en') defaultBible = 'WEB';
-        else if (activeLang === 'es') defaultBible = 'RVR1960';
+        else if (activeLang === 'es') defaultBible = 'RV1960';
         this.selectedBibleId = localStorage.getItem(`hkm_bible_translation_${activeLang}`) || defaultBible;
         this.selectedBookId = '';
         this.selectedChapterId = '';
