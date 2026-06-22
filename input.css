@@ -8164,4 +8164,108 @@ html[data-theme="dark"] .mobile-theme-toggle-btn {
     color: #cbd5e1 !important;
 }
 
+/* 10. HKM Assistent Chat Widget Dark Mode Overrides */
+html[data-theme="dark"] .hkm-chat-panel,
+html[data-theme="dark"] .hkm-chat-main,
+html[data-theme="dark"] .hkm-chat-mode-switch,
+html[data-theme="dark"] .hkm-chat-mode-intro,
+html[data-theme="dark"] .hkm-chat-email-panel,
+html[data-theme="dark"] .hkm-chat-footer,
+html[data-theme="dark"] .hkm-chat-form {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
 
+html[data-theme="dark"] .hkm-chat-closed-notice,
+html[data-theme="dark"] .hkm-chat-human-bridge {
+    background-color: rgba(209, 125, 57, 0.15) !important;
+    background: rgba(209, 125, 57, 0.15) !important;
+    border-color: rgba(209, 125, 57, 0.3) !important;
+    color: #ffedd5 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-mode-btn {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-mode-btn.active {
+    background-color: rgba(209, 125, 57, 0.15) !important;
+    background: rgba(209, 125, 57, 0.15) !important;
+    border-color: #d17d39 !important;
+    color: #f97316 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-mode-intro,
+html[data-theme="dark"] .hkm-chat-body {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-msg.agent {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+html[data-theme="dark"] .hkm-chat-followup-btn {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-followup-btn:hover {
+    background-color: rgba(209, 125, 57, 0.15) !important;
+    background: rgba(209, 125, 57, 0.15) !important;
+    border-color: #d17d39 !important;
+    color: #ffedd5 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-input {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .hkm-chat-input::placeholder {
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .hkm-chat-form-disabled .hkm-chat-input {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    color: #64748b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-send:disabled {
+    background-color: #334155 !important;
+    background: #334155 !important;
+    color: #64748b !important;
+}
+
+html[data-theme="dark"] .hkm-chat-privacy-label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .hkm-chat-field label {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .hkm-chat-field input,
+html[data-theme="dark"] .hkm-chat-field textarea {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .hkm-chat-field input:focus,
+html[data-theme="dark"] .hkm-chat-field textarea:focus {
+    border-color: #d17d39 !important;
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+}
