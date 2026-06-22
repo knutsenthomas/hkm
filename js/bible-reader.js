@@ -4147,7 +4147,7 @@ class BibleReader {
                 </select>
                 <select class="audio-speed-select" id="audio-speed-select" title="Hastighet">
                     <option value="0.8">0.8x</option>
-                    <option value="1.0" selected>1.0x</option>
+                    <option value="1" selected>1.0x</option>
                     <option value="1.2">1.2x</option>
                     <option value="1.5">1.5x</option>
                 </select>
