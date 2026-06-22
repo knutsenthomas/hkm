@@ -2,6 +2,13 @@
 <html lang="no">
 
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/tilgjengelighet">
     <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/tilgjengelighet">
     <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/accessibility">

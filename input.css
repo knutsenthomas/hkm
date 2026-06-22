@@ -6981,6 +6981,16 @@ html[data-theme="dark"] .header:not(.scrolled):not(.menu-open) {
     backdrop-filter: blur(12px) !important;
 }
 
+/* Ensure header is transparent at the top on dark-start pages in dark mode */
+html[data-theme="dark"] .header-dark-start .header:not(.scrolled):not(.menu-open) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
 /* Target elements with hardcoded colors */
 html[data-theme="dark"] .bg-white,
 html[data-theme="dark"] .card,

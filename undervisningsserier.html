@@ -2,6 +2,13 @@
 <html lang="no">
 
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/undervisningsserier">
     <meta name="description" content="Oppdag våre dyptgående undervisningsserier om bibelske bøker og teologiske emner.">
     <meta charset="UTF-8">

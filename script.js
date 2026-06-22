@@ -3905,6 +3905,10 @@ window.addEventListener('load', () => {
         const toggleBtn = document.getElementById('theme-toggle-btn');
         if (!toggleBtn) return;
 
+        // Apply theme from localStorage on page load if not already initialized
+        const savedTheme = localStorage.getItem('hkm_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
         toggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';

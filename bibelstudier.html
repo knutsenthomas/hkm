@@ -2,6 +2,13 @@
 <html lang="no">
 
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/bibelstudier">
     <meta name="description" content="Dypdykk i Guds ord med våre strukturerte bibelstudier og undervisningsserier.">
     <meta charset="UTF-8">

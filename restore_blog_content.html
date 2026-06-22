@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta charset="UTF-8">
     <title>Gjenopprett blogginnhold</title>
     <style>

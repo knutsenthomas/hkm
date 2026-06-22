@@ -2,6 +2,13 @@
 <html lang="no">
 
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/seminarer">
     <meta name="description" content="Bli med på våre seminarer og opplæringskurs for å vokse i troen og utrustes til tjeneste.">
     <meta charset="UTF-8">

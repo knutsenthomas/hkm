@@ -2,6 +2,13 @@
 <html lang="es">
 
 <head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('hkm_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/es/detalles-plan-lectura">
     <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/leseplan-detaljer">
     <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/reading-plan-details">
