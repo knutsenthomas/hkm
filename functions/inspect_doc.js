@@ -11,7 +11,7 @@ const db = admin.firestore();
 
 async function inspectDoc() {
   try {
-    const doc = await db.collection('reading_plans').doc('T7B7Bg1EUAKaDaetKqZT').get();
+    const doc = await db.collection('reading_plans').doc('P0goQTHeFCsRjwHrxI9m').get();
     if (!doc.exists) {
       console.log("Document not found");
     } else {

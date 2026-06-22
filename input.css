@@ -6906,3 +6906,239 @@ body:not(.cms-loading) {
         font-size: 28px !important;
     }
 }
+
+/* ==========================================================================
+   Premium Enhancements: Dypkobling, Mørk Modus, and Audio-spiller
+   ========================================================================== */
+
+/* 1. Dypkobling (Target Verse Flash Highlight) */
+@keyframes verse-highlight-flash {
+    0% { background-color: rgba(209, 125, 57, 0.4); }
+    100% { background-color: transparent; }
+}
+.verse-temp-highlight {
+    animation: verse-highlight-flash 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+    width: 100%;
+}
+
+/* 2. Global Mørk Modus (Dark Mode overrides) */
+html[data-theme="dark"] {
+    --text-dark: #f8fafc; /* Slate 50 */
+    --text-light: #94a3b8; /* Slate 400 */
+    --bg-light: #0f172a; /* Slate 900 */
+    --bg-white: #1e293b; /* Slate 800 */
+    --header-bg: #0f172a;
+    --border-color: #334155; /* Slate 700 */
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Base resets & layout fixes for dark mode */
+html[data-theme="dark"] body {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+html[data-theme="dark"] .header {
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .header:not(.scrolled):not(.menu-open) {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+/* Target elements with hardcoded colors */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .undervisning-card,
+html[data-theme="dark"] .event-card,
+html[data-theme="dark"] .blogg-card,
+html[data-theme="dark"] .leseplan-card,
+html[data-theme="dark"] .product-card,
+html[data-theme="dark"] .minside-card,
+html[data-theme="dark"] .bible-home-promo-card,
+html[data-theme="dark"] .donation-box,
+html[data-theme="dark"] .contact-info-card,
+html[data-theme="dark"] .day-item {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .bg-gray-50,
+html[data-theme="dark"] .bg-gray-100,
+html[data-theme="dark"] section[class*="bg-gray-"] {
+    background-color: #0d1321 !important;
+}
+
+html[data-theme="dark"] .text-gray-900,
+html[data-theme="dark"] .text-gray-800,
+html[data-theme="dark"] .text-gray-700,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+html[data-theme="dark"] .bible-home-promo-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-500,
+html[data-theme="dark"] .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .border-gray-100,
+html[data-theme="dark"] .border-gray-200,
+html[data-theme="dark"] .border-gray-300 {
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .mega-menu {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .mega-menu-content {
+    background-color: #0f172a !important;
+}
+
+/* 3. Audio Bibelavspiller (Sticky Player Bar) */
+.hkm-audio-player-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150px);
+    width: calc(100% - 32px);
+    max-width: 550px;
+    background: rgba(15, 23, 42, 0.85); /* Dark slate with blur */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 12px 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    color: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hkm-audio-player-bar.active {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.audio-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    outline: none;
+}
+
+.audio-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-orange);
+}
+
+.audio-btn:active {
+    transform: scale(0.95);
+}
+
+.audio-btn.play-pause-btn {
+    background: #d17d39; /* primary orange */
+    width: 40px;
+    height: 40px;
+}
+
+.audio-btn.play-pause-btn:hover {
+    background: #bd4f2a;
+    color: #ffffff;
+}
+
+.audio-info-display {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #f1f5f9;
+}
+
+.audio-speed-select {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    height: auto !important;
+    width: auto !important;
+    min-height: 0 !important;
+    box-sizing: border-box;
+}
+
+.audio-speed-select option {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.audio-close-btn {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.audio-close-btn:hover {
+    color: #ef4444;
+}
+
+/* Audio active reading highlight */
+.audio-playing-highlight {
+    background-color: rgba(209, 125, 57, 0.12) !important; /* primary orange overlay */
+    border-left: 3px solid var(--primary-orange) !important;
+    padding-left: 12px !important;
+    border-radius: 0 4px 4px 0 !important;
+    transition: background-color 0.3s ease, border-left-color 0.3s ease;
+}
+

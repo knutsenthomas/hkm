@@ -59,6 +59,28 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(request.url);
     if (!isSameOrigin(url)) return;
 
+    // Bible API Caching (Cache-First strategy)
+    if (url.pathname.startsWith('/api/bible/')) {
+        event.respondWith((async () => {
+            const bibleCache = await caches.open('hkm-bible-api-cache-v1');
+            const cachedResponse = await bibleCache.match(request);
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            try {
+                const freshResponse = await fetch(request);
+                if (freshResponse && freshResponse.ok) {
+                    bibleCache.put(request, freshResponse.clone()).catch(() => {});
+                }
+                return freshResponse;
+            } catch (error) {
+                console.error('[sw.js] Bible API offline request failed:', error);
+                throw error;
+            }
+        })());
+        return;
+    }
+
     // Never serve admin pages/assets from cache. This prevents stale dashboard JS/CSS and stuck loaders.
     if (isAdminRequest(url)) {
         event.respondWith((async () => {
@@ -74,12 +96,18 @@ self.addEventListener('fetch', (event) => {
     }
 
     // HTML documents should be network-first to avoid stale app shells and auth flows.
+    // Caches successfully fetched pages so they can be viewed offline.
     if (isHtmlRequest(request)) {
         event.respondWith((async () => {
+            const cache = await caches.open(CACHE_NAME);
             try {
-                return await fetch(request);
+                const fresh = await fetch(request);
+                if (fresh && fresh.ok) {
+                    cache.put(request, fresh.clone()).catch(() => { });
+                }
+                return fresh;
             } catch (error) {
-                const cached = await caches.match(request);
+                const cached = await cache.match(request);
                 if (cached) return cached;
                 throw error;
             }

@@ -583,6 +583,9 @@
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="flex items-center gap-5 header-actions">
+                <button id="theme-toggle-btn" class="flex items-center text-white hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                    <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                </button>
                 <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Buscar en el sitio">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
@@ -1186,12 +1189,17 @@
                         const resourcesHtml = renderResources(day.resources);
                         const isChecked = completedDays.includes(day.dayNumber.toString()) ? 'checked' : '';
                         const isHiddenClass = (showExpandButton && index >= maxInitialDays) ? 'day-item-expandable hidden-day' : '';
+                        const versesText = (day.verses || '').trim();
+                        const isReflection = !versesText || versesText.toLowerCase() === 'reflexión' || versesText.toLowerCase() === 'reflexion';
+                        const versesHtml = isReflection 
+                            ? `<span>Reflexión</span>` 
+                            : `<a href="/es/bibel.html?ref=${encodeURIComponent(versesText)}" class="verse-link" style="color: var(--primary-orange); text-decoration: underline; font-weight: 600; cursor: pointer;">${escapeHtml(versesText)}</a>`;
                         return `
                             <div class="day-item ${isHiddenClass}">
                                 <div class="day-header-info" style="display: flex; align-items: center; gap: 10px;">
                                     <input type="checkbox" class="day-checkbox" data-day="${day.dayNumber}" ${isChecked} style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-orange); margin: 0; flex-shrink: 0;">
                                     <span class="day-badge-num">Día ${day.dayNumber}</span>
-                                    <span class="day-verses">${escapeHtml(day.verses || 'Reflexión')}</span>
+                                    <span class="day-verses">${versesHtml}</span>
                                 </div>
                                 ${day.prayerFocus ? `<div class="day-prayer"><strong>Enfoque:</strong> ${escapeHtml(day.prayerFocus)}</div>` : ''}
                                 ${resourcesHtml}

@@ -59,6 +59,22 @@ class BibleReader {
             theme: 'cream' // 'light' | 'cream' | 'dark'
         };
 
+        // Sync with global dark mode theme
+        const activeGlobalTheme = localStorage.getItem('hkm_theme') || 'light';
+        if (activeGlobalTheme === 'dark') {
+            this.settings.theme = 'dark';
+        } else if (this.settings.theme === 'dark') {
+            this.settings.theme = 'cream';
+        }
+
+        // Audio Player State
+        this.audioIsPlaying = false;
+        this.audioIsPaused = false;
+        this.audioVerses = [];
+        this.currentAudioIndex = 0;
+        this.audioSpeed = 1.0;
+        this.activeUtterance = null;
+
         // Cache for loaded books/chapters
         this.cache = {
             books: {},
@@ -84,7 +100,12 @@ class BibleReader {
                 'no_resources_found': 'Ingen relaterte ressurser funnet for denne boken enda.',
                 'new_note': 'Nytt notat',
                 'fetching_resources': 'Henter relaterte ressurser...',
-                'dictionary': 'Ordbok'
+                'dictionary': 'Ordbok',
+                'play_audio': 'Lytt til kapittelet',
+                'stop_audio': 'Stopp',
+                'pause_audio': 'Pause',
+                'playing_verse': 'Leser vers',
+                'paused': 'Pauset'
             },
             'en': {
                 'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
@@ -94,7 +115,12 @@ class BibleReader {
                 'no_resources_found': 'No related resources found for this book yet.',
                 'new_note': 'New Note',
                 'fetching_resources': 'Fetching related resources...',
-                'dictionary': 'Lexicon'
+                'dictionary': 'Lexicon',
+                'play_audio': 'Listen to chapter',
+                'stop_audio': 'Stop',
+                'pause_audio': 'Pause',
+                'playing_verse': 'Reading verse',
+                'paused': 'Paused'
             },
             'es': {
                 'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
@@ -104,7 +130,12 @@ class BibleReader {
                 'no_resources_found': 'Aún no se han encontrado recursos relacionados para este libro.',
                 'new_note': 'Nueva Nota',
                 'fetching_resources': 'Obteniendo recursos relacionados...',
-                'dictionary': 'Diccionario'
+                'dictionary': 'Diccionario',
+                'play_audio': 'Escuchar el capítulo',
+                'stop_audio': 'Detener',
+                'pause_audio': 'Pausar',
+                'playing_verse': 'Leyendo versículo',
+                'paused': 'Pausado'
             }
         };
         return (translations[lang] || translations['no'])[key] || key;
@@ -347,6 +378,17 @@ class BibleReader {
             btn.addEventListener('click', () => {
                 this.settings.theme = btn.dataset.theme;
                 this.applySettings();
+
+                // Sync to global theme
+                const globalTheme = btn.dataset.theme === 'dark' ? 'dark' : 'light';
+                localStorage.setItem('hkm_theme', globalTheme);
+                document.documentElement.setAttribute('data-theme', globalTheme);
+
+                // Sync toggle button icon
+                const icons = document.querySelectorAll('.theme-toggle-icon');
+                icons.forEach(icon => {
+                    icon.textContent = globalTheme === 'dark' ? 'light_mode' : 'dark_mode';
+                });
             });
         });
 
@@ -1104,6 +1146,9 @@ class BibleReader {
     }
 
     async selectChapter(chapterId) {
+        // Stop audio playback when changing chapter
+        this.stopAudioPlayback();
+
         this.clearSelection();
         this.selectedChapterId = chapterId;
         
@@ -1232,6 +1277,31 @@ class BibleReader {
 
         // Restore bookmarks highlight
         this.restoreHighlights();
+
+        // Inject Audio Play Button dynamically next to Lookup Chapter button
+        if (this.dom.btnLookupChapter) {
+            let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
+            if (!playAudioBtn) {
+                playAudioBtn = document.createElement('button');
+                playAudioBtn.id = 'btn-play-audio-dynamic';
+                playAudioBtn.className = 'nav-btn';
+                playAudioBtn.style.cssText = 'margin-top: 4px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;';
+                playAudioBtn.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                    <span>${this.t('play_audio')}</span>
+                `;
+                
+                // Click listener
+                playAudioBtn.addEventListener('click', () => this.toggleAudioPlayback());
+                
+                // Insert after lookup button
+                this.dom.btnLookupChapter.parentNode.insertBefore(playAudioBtn, this.dom.btnLookupChapter.nextSibling);
+            } else {
+                // Update translation text if language changed
+                const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
+                if (labelSpan) labelSpan.textContent = this.t('play_audio');
+            }
+        }
 
         // Scroll reading pane to top
         const mainContent = document.querySelector('.bible-content-pane');
@@ -2103,15 +2173,186 @@ class BibleReader {
             return;
         }
 
-        const query = currentBook.name; // e.g. "Matteus"
-        const resources = await this.searchLocalResources(query);
+        const lang = document.documentElement.lang || 'no';
+        const sectionTitles = {
+            no: {
+                planResources: 'Dagens leseplan-ressurser',
+                prayerFocus: 'Bønnefokus',
+                defaultPrayer: 'Be over skriftstedene du leser i dag.',
+                noPlanResources: 'Ingen ekstra ressurser tilknyttet denne dagen.',
+                crossRefs: 'Kryssreferanser',
+                generalResources: `Generelle ressurser for ${currentBook.name}`,
+                noGeneralResources: 'Ingen relaterte ressurser funnet.',
+                planResTag: 'LESEPLAN RESSURS'
+            },
+            en: {
+                planResources: "Today's Reading Plan Resources",
+                prayerFocus: 'Prayer Focus',
+                defaultPrayer: 'Pray over the scriptures you read today.',
+                noPlanResources: 'No extra resources connected to this day.',
+                crossRefs: 'Cross References',
+                generalResources: `General Resources for ${currentBook.name}`,
+                noGeneralResources: 'No related resources found.',
+                planResTag: 'READING PLAN RESOURCE'
+            },
+            es: {
+                planResources: 'Recursos del Plan de Lectura de Hoy',
+                prayerFocus: 'Enfoque de Oración',
+                defaultPrayer: 'Ora sobre las escrituras que leas hoy.',
+                noPlanResources: 'No hay recursos adicionales relacionados con este día.',
+                crossRefs: 'Referencias Cruzadas',
+                generalResources: `Recursos Generales para ${currentBook.name}`,
+                noGeneralResources: 'No se encontraron recursos relacionados.',
+                planResTag: 'RECURSO DEL PLAN'
+            }
+        };
 
-        if (resources.length === 0) {
-            relatedList.innerHTML = `<div class="empty-state">${this.t('no_resources_found')}</div>`;
-            return;
+        const tSec = sectionTitles[lang] || sectionTitles.no;
+
+        // 1. Reading Plan resources
+        let planResourcesHtml = '';
+        if (this.activePlanMode && this.activePlanData) {
+            const currentDayNum = this.activePlanDay;
+            const dayConfig = this.activePlanData.days.find(d => d.dayNumber === currentDayNum) || this.activePlanData.days[0];
+            if (dayConfig) {
+                let dayResourcesHtml = '';
+                if (dayConfig.resources && dayConfig.resources.length > 0) {
+                    dayConfig.resources.forEach(res => {
+                        let iconName = 'article';
+                        if (res.type === 'video') iconName = 'play_circle';
+                        else if (res.type === 'podcast') iconName = 'podcasts';
+
+                        dayResourcesHtml += `
+                            <a href="${res.url || '#'}" target="_blank" class="related-resource-item" style="margin-bottom: 8px;">
+                                <div class="related-resource-icon">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">${iconName}</span>
+                                </div>
+                                <div class="related-resource-info">
+                                    <span class="related-resource-type">${tSec.planResTag}</span>
+                                    <h4 class="related-resource-title" title="${res.title}">${res.title}</h4>
+                                </div>
+                            </a>
+                        `;
+                    });
+                } else {
+                    dayResourcesHtml = `<div style="font-size: 13px; color: var(--text-muted); padding: 4px 8px;">${tSec.noPlanResources}</div>`;
+                }
+
+                const prayerFocus = dayConfig.prayerFocus || tSec.defaultPrayer;
+                planResourcesHtml = `
+                    <div class="hkm-resources-section" style="margin-bottom: 24px;">
+                        <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">menu_book</span>
+                            <span>${tSec.planResources}</span>
+                        </h3>
+                        <div style="background: var(--active-bg); border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--bible-primary); font-size: 11px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">favorite</span>
+                                <span>${tSec.prayerFocus}</span>
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-base); line-height: 1.4;">${prayerFocus}</div>
+                        </div>
+                        <div class="day-resources-list" style="display: flex; flex-direction: column; gap: 4px;">
+                            ${dayResourcesHtml}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
-        relatedList.innerHTML = resources.map(res => this.renderResourceCard(res)).join('');
+        // 2. Cross references
+        let crossRefsHtml = '';
+        let crossRefs = [];
+        try {
+            const currentRef = this.getCurrentReferenceText();
+            const res = await fetch(`/api/bible/cross-references?chapterName=${encodeURIComponent(currentRef)}`);
+            if (res.ok) {
+                crossRefs = await res.json();
+                if (crossRefs && crossRefs.length > 0) {
+                    let crossRefsItemsHtml = crossRefs.map((item, idx) => `
+                        <div class="cross-ref-item-sidebar" data-idx="${idx}" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; transition: all 0.25s ease; cursor: pointer; box-sizing: border-box; width: 100%; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--bible-primary); font-size: 13px;">
+                                <span>${item.ref}</span>
+                                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-base); line-height: 1.4;">${item.explanation}</div>
+                        </div>
+                    `).join('');
+
+                    crossRefsHtml = `
+                        <div class="hkm-resources-section" style="margin-bottom: 24px;">
+                            <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 24px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">link</span>
+                                <span>${tSec.crossRefs}</span>
+                            </h3>
+                            <div class="sidebar-cross-refs-list" style="display: flex; flex-direction: column; gap: 4px;">
+                                ${crossRefsItemsHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        } catch (e) {
+            console.error("Error fetching cross references for sidebar:", e);
+        }
+
+        // 3. General Book resources
+        let generalResourcesHtml = '';
+        try {
+            const query = currentBook.name;
+            const resources = await this.searchLocalResources(query);
+            
+            let resourcesListHtml = '';
+            if (resources && resources.length > 0) {
+                resourcesListHtml = resources.map(res => this.renderResourceCard(res)).join('');
+            } else {
+                resourcesListHtml = `<div style="font-size: 13px; color: var(--text-muted); padding: 4px 8px;">${tSec.noGeneralResources}</div>`;
+            }
+
+            generalResourcesHtml = `
+                <div class="hkm-resources-section" style="margin-bottom: 12px;">
+                    <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 24px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">explore</span>
+                        <span>${tSec.generalResources}</span>
+                    </h3>
+                    <div class="general-resources-list" style="display: flex; flex-direction: column; gap: 4px;">
+                        ${resourcesListHtml}
+                    </div>
+                </div>
+            `;
+        } catch (e) {
+            console.error("Error fetching general resources:", e);
+        }
+
+        // Combine everything
+        relatedList.innerHTML = `
+            <div class="hkm-resources-tab-container" style="padding: 4px 0;">
+                ${planResourcesHtml}
+                ${crossRefsHtml}
+                ${generalResourcesHtml}
+            </div>
+        `;
+
+        // Bind events to cross references in sidebar
+        const sidebarCrossRefItems = relatedList.querySelectorAll('.cross-ref-item-sidebar');
+        sidebarCrossRefItems.forEach(el => {
+            const idx = parseInt(el.getAttribute('data-idx'), 10);
+            el.addEventListener('click', () => {
+                const ref = crossRefs[idx].ref;
+                this.parseAndNavigateToReference(ref);
+            });
+            // Hover styling
+            el.addEventListener('mouseenter', () => {
+                el.style.borderColor = 'var(--bible-primary)';
+                el.style.transform = 'translateY(-1px)';
+                el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.borderColor = 'var(--border-color)';
+                el.style.transform = 'none';
+                el.style.boxShadow = 'none';
+            });
+        });
     }
 
     // ──────────────────────────────────────────────────────────
@@ -3012,10 +3253,10 @@ class BibleReader {
         planHeader.style.display = 'block';
         this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
 
-        // 4. Force Leseplan tab active in right sidebar
-        const rpTabBtn = document.getElementById('tab-btn-reading-plan');
-        if (rpTabBtn) {
-            rpTabBtn.click();
+        // 4. Force Ressurser tab active in right sidebar
+        const relatedTabBtn = document.getElementById('tab-btn-related');
+        if (relatedTabBtn) {
+            relatedTabBtn.click();
         }
         
         // Force open right sidebar on desktop/tablet for side-by-side
@@ -3705,6 +3946,228 @@ class BibleReader {
                     readingPlanId: planId,
                     dayNumber: dayNumber
                 });
+        }
+    }
+
+    // ==========================================================================
+    // Audio Player (Text-to-Speech) Functionality
+    // ==========================================================================
+    
+    toggleAudioPlayback() {
+        if (this.audioIsPlaying) {
+            this.stopAudioPlayback();
+        } else {
+            this.startAudioPlayback();
+        }
+    }
+
+    startAudioPlayback() {
+        if (!this.dom.readingPane) return;
+        
+        // Find all verses
+        const paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
+        this.audioVerses = paragraphs.filter(p => p.querySelector('sup.v'));
+        
+        if (this.audioVerses.length === 0) {
+            alert('Kunne ikke finne vers for opplesning i dette kapittelet.');
+            return;
+        }
+
+        this.audioIsPlaying = true;
+        this.audioIsPaused = false;
+        this.currentAudioIndex = 0;
+        this.showAudioPlayerBar();
+        this.speakNextVerse();
+    }
+
+    stopAudioPlayback() {
+        if (!this.audioIsPlaying) return;
+        
+        this.audioIsPlaying = false;
+        this.audioIsPaused = false;
+        
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        
+        // Remove highlights
+        if (this.audioVerses) {
+            this.audioVerses.forEach(p => p.classList.remove('audio-playing-highlight'));
+        }
+        
+        this.hideAudioPlayerBar();
+    }
+
+    toggleAudioPause() {
+        if (!this.audioIsPlaying) return;
+        
+        const playPauseBtn = document.getElementById('audio-play-pause-toggle');
+        
+        if (this.audioIsPaused) {
+            this.audioIsPaused = false;
+            if (playPauseBtn) playPauseBtn.innerHTML = '<span class="material-symbols-outlined">pause</span>';
+            this.resumeAudioPlayback();
+        } else {
+            this.audioIsPaused = true;
+            if (playPauseBtn) playPauseBtn.innerHTML = '<span class="material-symbols-outlined">play_arrow</span>';
+            this.pauseAudioPlayback();
+        }
+        this.updateAudioPlayerUI();
+    }
+
+    pauseAudioPlayback() {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.pause();
+        }
+    }
+
+    resumeAudioPlayback() {
+        if (window.speechSynthesis) {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            } else {
+                this.speakNextVerse();
+            }
+        }
+    }
+
+    speakNextVerse() {
+        if (!this.audioIsPlaying || this.audioIsPaused) return;
+
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+
+        // Clean up previous highlights
+        this.audioVerses.forEach(p => p.classList.remove('audio-playing-highlight'));
+
+        if (this.currentAudioIndex >= this.audioVerses.length) {
+            this.stopAudioPlayback();
+            return;
+        }
+
+        const p = this.audioVerses[this.currentAudioIndex];
+        p.classList.add('audio-playing-highlight');
+        p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Clone element to strip verse number for cleaner reading
+        const pCopy = p.cloneNode(true);
+        const sup = pCopy.querySelector('sup.v');
+        let verseNum = '';
+        if (sup) {
+            verseNum = sup.innerText.trim();
+            sup.remove();
+        }
+        const text = pCopy.innerText.trim();
+
+        this.updateAudioPlayerUI(verseNum);
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        this.activeUtterance = utterance;
+        
+        utterance.rate = this.audioSpeed || 1.0;
+        
+        const lang = document.documentElement.lang || 'no';
+        utterance.lang = lang === 'es' ? 'es-ES' : (lang === 'en' ? 'en-US' : 'no-NO');
+        
+        if (window.speechSynthesis) {
+            const voices = window.speechSynthesis.getVoices();
+            const matchingVoice = voices.find(v => v.lang.startsWith(lang));
+            if (matchingVoice) utterance.voice = matchingVoice;
+        }
+
+        utterance.onend = () => {
+            if (this.audioIsPlaying && !this.audioIsPaused) {
+                this.currentAudioIndex++;
+                this.speakNextVerse();
+            }
+        };
+
+        utterance.onerror = (e) => {
+            console.error('[SpeechSynthesis] Utterance error:', e);
+            if (this.audioIsPlaying && !this.audioIsPaused && e.error !== 'interrupted') {
+                setTimeout(() => {
+                    this.currentAudioIndex++;
+                    this.speakNextVerse();
+                }, 100);
+            }
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    showAudioPlayerBar() {
+        let playerBar = document.getElementById('hkm-audio-player-bar');
+        if (!playerBar) {
+            playerBar = document.createElement('div');
+            playerBar.id = 'hkm-audio-player-bar';
+            playerBar.className = 'hkm-audio-player-bar';
+            playerBar.innerHTML = `
+                <div class="audio-controls-group">
+                    <button class="audio-btn play-pause-btn" id="audio-play-pause-toggle" title="${this.t('pause_audio')}">
+                        <span class="material-symbols-outlined">pause</span>
+                    </button>
+                    <button class="audio-btn" id="audio-stop-btn" title="${this.t('stop_audio')}">
+                        <span class="material-symbols-outlined">stop</span>
+                    </button>
+                </div>
+                <div class="audio-info-display" id="audio-info-display">
+                    ${this.t('playing_verse')}...
+                </div>
+                <select class="audio-speed-select" id="audio-speed-select" title="Hastighet">
+                    <option value="0.8">0.8x</option>
+                    <option value="1.0" selected>1.0x</option>
+                    <option value="1.2">1.2x</option>
+                    <option value="1.5">1.5x</option>
+                </select>
+                <button class="audio-btn audio-close-btn" id="audio-close-btn" title="Lukk">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                </button>
+            `;
+            document.body.appendChild(playerBar);
+
+            // Bind player bar events
+            document.getElementById('audio-play-pause-toggle').addEventListener('click', () => this.toggleAudioPause());
+            document.getElementById('audio-stop-btn').addEventListener('click', () => this.stopAudioPlayback());
+            document.getElementById('audio-close-btn').addEventListener('click', () => this.stopAudioPlayback());
+            document.getElementById('audio-speed-select').addEventListener('change', (e) => {
+                this.audioSpeed = parseFloat(e.target.value);
+                if (this.audioIsPlaying && !this.audioIsPaused) {
+                    this.speakNextVerse();
+                }
+            });
+        }
+        
+        const speedSelect = document.getElementById('audio-speed-select');
+        if (speedSelect) speedSelect.value = String(this.audioSpeed);
+        
+        setTimeout(() => playerBar.classList.add('active'), 50);
+        
+        const playPauseBtn = document.getElementById('audio-play-pause-toggle');
+        if (playPauseBtn) {
+            playPauseBtn.innerHTML = this.audioIsPaused 
+                ? '<span class="material-symbols-outlined">play_arrow</span>'
+                : '<span class="material-symbols-outlined">pause</span>';
+        }
+    }
+
+    hideAudioPlayerBar() {
+        const playerBar = document.getElementById('hkm-audio-player-bar');
+        if (playerBar) {
+            playerBar.classList.remove('active');
+        }
+    }
+
+    updateAudioPlayerUI(verseNum = '') {
+        const infoDisplay = document.getElementById('audio-info-display');
+        if (!infoDisplay) return;
+
+        if (this.audioIsPaused) {
+            infoDisplay.textContent = this.t('paused');
+        } else if (verseNum) {
+            infoDisplay.textContent = `${this.t('playing_verse')} ${verseNum}`;
+        } else {
+            infoDisplay.textContent = `${this.t('playing_verse')}...`;
         }
     }
 }
