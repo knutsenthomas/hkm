@@ -3911,9 +3911,12 @@ window.addEventListener('load', () => {
         const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .mobile-theme-toggle-btn');
         if (toggleBtns.length === 0) return;
 
-        // Apply theme from localStorage on page load if not already initialized
-        const savedTheme = localStorage.getItem('hkm_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        // Apply theme from localStorage or fallback to system preference
+        let activeTheme = localStorage.getItem('hkm_theme');
+        if (!activeTheme) {
+            activeTheme = document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        }
+        document.documentElement.setAttribute('data-theme', activeTheme);
 
         toggleBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -3939,6 +3942,21 @@ window.addEventListener('load', () => {
         // Set initial icon
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
         updateThemeToggleIcon(currentTheme);
+
+        // Listen to system theme changes if user hasn't chosen a theme
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('hkm_theme')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                updateThemeToggleIcon(newTheme);
+                
+                if (window.bibleReader) {
+                    window.bibleReader.settings.theme = newTheme;
+                    window.bibleReader.saveSettings();
+                    window.bibleReader.applySettings();
+                }
+            }
+        });
     }
 
     function updateThemeToggleIcon(theme) {

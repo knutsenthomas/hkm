@@ -2,11 +2,16 @@
 <html lang="no">
 
 <head>
-    <!-- Theme Initializer -->
+        <!-- Theme Initializer -->
     <script>
         (function () {
-            const theme = localStorage.getItem('hkm_theme') || 'light';
-            document.documentElement.setAttribute('data-theme', theme);
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
         })();
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/tilgjengelighet">
@@ -86,9 +91,6 @@
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
-                <button id="theme-toggle-btn" class="hidden md:flex items-center text-white transition-colors" aria-label="Bytt tema" title="Bytt tema">
-                    <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
-                </button>
                 <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>

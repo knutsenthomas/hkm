@@ -2,11 +2,16 @@
 <html lang="es">
 
 <head>
-    <!-- Theme Initializer -->
+        <!-- Theme Initializer -->
     <script>
         (function () {
-            const theme = localStorage.getItem('hkm_theme') || 'light';
-            document.documentElement.setAttribute('data-theme', theme);
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
         })();
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/es/blog">
@@ -92,9 +97,6 @@
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="flex items-center gap-5 header-actions">
-                <button id="theme-toggle-btn" class="hidden md:flex items-center text-white transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
-                    <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
-                </button>
                 <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Buscar en el sitio">
                     <span class="material-symbols-outlined text-2xl">search</span>
                 </button>
@@ -148,8 +150,9 @@
                 </div>
 
                 <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
-                <div class="flex md:hidden items-center justify-between gap-4">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
                             <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
@@ -165,10 +168,11 @@
                         </div>
                     </div>
 
-                    <!-- Mobile Theme Toggle Button -->
-                    <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
-                        <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
-                    </button>
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
