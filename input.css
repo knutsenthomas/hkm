@@ -7817,7 +7817,6 @@ html[data-theme="dark"] {
 .header.scrolled #theme-toggle-btn:hover,
 .header.menu-open #theme-toggle-btn:hover {
     color: currentColor !important;
-    opacity: 0.75;
 }
 
 
