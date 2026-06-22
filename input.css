@@ -7720,7 +7720,7 @@ html[data-theme="dark"] .media-tabs-section {
 html[data-theme="dark"] .media-tab {
     background: #1e293b !important;
     border-color: #334155 !important;
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
 }
 
 html[data-theme="dark"] .media-tab:hover {
@@ -7738,7 +7738,7 @@ html[data-theme="dark"] .media-tab.active {
 html[data-theme="dark"] .filter-btn {
     background: #1e293b !important;
     border-color: #334155 !important;
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
 }
 
 html[data-theme="dark"] .filter-btn:hover {
@@ -7818,6 +7818,20 @@ html[data-theme="dark"] {
 .header.scrolled #theme-toggle-btn:hover,
 .header.menu-open #theme-toggle-btn:hover {
     color: currentColor !important;
+}
+
+/* 8. Footer Bottom Dark Mode Text Contrast Fix */
+html[data-theme="dark"] .footer-bottom {
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .footer-bottom a {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .footer-bottom a:hover {
+    color: var(--primary-orange) !important;
 }
 
 
