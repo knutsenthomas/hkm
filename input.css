@@ -5182,6 +5182,13 @@ ol.block-list {
     opacity: 1;
     transform: translateY(0);
     transition: none;
+
+    /* Disable word splitting */
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+    -ms-hyphens: none !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
 }
 
 .hero-subtitle {
@@ -5193,6 +5200,13 @@ ol.block-list {
     transform: translateY(0);
     transition: none;
     max-width: 650px;
+
+    /* Disable word splitting */
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+    -ms-hyphens: none !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
 }
 
 .slide-buttons {
