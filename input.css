@@ -7436,4 +7436,96 @@ html[data-theme="dark"] .about-feature-text p {
     color: #94a3b8 !important;
 }
 
+/* Donations & Regular Donor Page Dark Mode Overrides */
+html[data-theme="dark"] .donation-form {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .donation-form-content {
+    background-color: #1e293b !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .amount-btn {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .amount-btn.active,
+html[data-theme="dark"] .amount-btn:hover {
+    background-color: var(--primary-orange) !important;
+    color: white !important;
+    border-color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .regular-donor {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .regular-donor div[style*="background: #f8f9fa"] {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .regular-donor div[style*="background: white"] {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+    border-color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .regular-donor div[style*="color: #5a6e7f"] {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] #skattefradrag {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+}
+
+/* Donor Card (bli-fast-giver.html) Dark Mode Overrides */
+html[data-theme="dark"] .donor-card {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .donor-card:hover {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: var(--primary-orange) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-theme="dark"] .donor-card-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .donor-card-text {
+    color: #94a3b8 !important;
+}
+
+/* Bank Details Box Dark Mode Overrides */
+html[data-theme="dark"] .bank-details-box {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+    border-color: var(--primary-orange) !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .bank-detail-row {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme="dark"] .bank-detail-label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .bank-detail-value {
+    color: #f8fafc !important;
+}
+
 
