@@ -3908,30 +3908,32 @@ window.addEventListener('load', () => {
 // Global Theme Toggle Implementation
 (function() {
     function initThemeToggle() {
-        const toggleBtn = document.getElementById('theme-toggle-btn');
-        if (!toggleBtn) return;
+        const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .mobile-theme-toggle-btn');
+        if (toggleBtns.length === 0) return;
 
         // Apply theme from localStorage on page load if not already initialized
         const savedTheme = localStorage.getItem('hkm_theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
 
-        toggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            // Apply global theme
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('hkm_theme', newTheme);
-            
-            // Sync toggle button icon
-            updateThemeToggleIcon(newTheme);
-            
-            // Sync with Bible reader if it exists on page
-            if (window.bibleReader) {
-                window.bibleReader.settings.theme = newTheme === 'dark' ? 'dark' : 'light';
-                window.bibleReader.saveSettings();
-                window.bibleReader.applySettings();
-            }
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                // Apply global theme
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('hkm_theme', newTheme);
+                
+                // Sync toggle button icon
+                updateThemeToggleIcon(newTheme);
+                
+                // Sync with Bible reader if it exists on page
+                if (window.bibleReader) {
+                    window.bibleReader.settings.theme = newTheme === 'dark' ? 'dark' : 'light';
+                    window.bibleReader.saveSettings();
+                    window.bibleReader.applySettings();
+                }
+            });
         });
 
         // Set initial icon

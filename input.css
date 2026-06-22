@@ -7834,4 +7834,11 @@ html[data-theme="dark"] .footer-bottom a:hover {
     color: var(--primary-orange) !important;
 }
 
+/* 9. Mobile Theme Toggle Button Dark Mode Override */
+html[data-theme="dark"] .mobile-theme-toggle-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
 
