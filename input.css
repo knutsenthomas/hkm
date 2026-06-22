@@ -6982,7 +6982,7 @@ html[data-theme="dark"] .header:not(.scrolled):not(.menu-open) {
 }
 
 /* Ensure header is transparent at the top on dark-start pages in dark mode */
-html[data-theme="dark"] .header-dark-start .header:not(.scrolled):not(.menu-open) {
+html[data-theme="dark"] .header-dark-start header#header:not(.scrolled):not(.menu-open) {
     background: transparent !important;
     background-color: transparent !important;
     border-bottom: none !important;
