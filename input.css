@@ -7814,12 +7814,6 @@ html[data-theme="dark"] {
     --text-muted: #94a3b8 !important;
 }
 
-/* 7. Header Theme Toggle Button Hover State Fix */
-#theme-toggle-btn:hover,
-.header.scrolled #theme-toggle-btn:hover,
-.header.menu-open #theme-toggle-btn:hover {
-    color: currentColor !important;
-}
 
 /* 8. Footer Bottom Dark Mode Text Contrast Fix */
 html[data-theme="dark"] .footer-bottom {
