@@ -1360,13 +1360,15 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-read
 .header.scrolled #global-search-opener,
 .header.scrolled .header-bible-btn,
 .header.scrolled .header-reading-plans-btn,
+.header.scrolled #theme-toggle-btn,
 .header.menu-open .logo,
 .header.menu-open .nav-link,
 .header.menu-open .lang-btn,
 .header.menu-open .header-search-btn,
 .header.menu-open #global-search-opener,
 .header.menu-open .header-bible-btn,
-.header.menu-open .header-reading-plans-btn {
+.header.menu-open .header-reading-plans-btn,
+.header.menu-open #theme-toggle-btn {
     color: var(--text-dark) !important;
 }
 
@@ -6953,14 +6955,14 @@ body:not(.cms-loading) {
 
 /* 2. Global Mørk Modus (Dark Mode overrides) */
 html[data-theme="dark"] {
-    --text-dark: #f8fafc; /* Slate 50 */
-    --text-light: #94a3b8; /* Slate 400 */
-    --bg-light: #0f172a; /* Slate 900 */
-    --bg-white: #1e293b; /* Slate 800 */
-    --header-bg: #0f172a;
-    --border-color: #334155; /* Slate 700 */
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.5);
+    --text-dark: #f8fafc !important; /* Slate 50 */
+    --text-light: #94a3b8 !important; /* Slate 400 */
+    --bg-light: #0f172a !important; /* Slate 900 */
+    --bg-white: #1e293b !important; /* Slate 800 */
+    --header-bg: #0f172a !important;
+    --border-color: #334155 !important; /* Slate 700 */
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+    --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Base resets & layout fixes for dark mode */
@@ -7372,6 +7374,41 @@ html[data-theme="dark"] .sidebar-info-item {
 
 html[data-theme="dark"] .sidebar-info-item i {
     color: var(--primary-orange) !important;
+}
+
+/* Extra Homepage Sections and Cards Dark Mode Overrides */
+html[data-theme="dark"] .bible-home-promo {
+    background-color: #0d1321 !important;
+}
+
+html[data-theme="dark"] .bible-home-promo-text {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .teaching-front {
+    background-color: #0d1321 !important;
+}
+
+html[data-theme="dark"] .media-card,
+html[data-theme="dark"] .blog-card,
+html[data-theme="dark"] .feature-box,
+html[data-theme="dark"] .cause-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .testimonial-prev,
+html[data-theme="dark"] .testimonial-next {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .testimonial-prev:hover,
+html[data-theme="dark"] .testimonial-next:hover {
+    background-color: var(--primary-orange) !important;
+    color: white !important;
 }
 
 
