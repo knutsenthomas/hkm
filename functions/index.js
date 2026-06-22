@@ -626,22 +626,43 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
     };
 
     if (autoData) {
-      if (autoData.summary) {
-        docPayload.summary = autoData.summary;
-        docPayload.description = autoData.summary;
+      if (autoData.no?.summary) {
+        docPayload.summary = autoData.no.summary;
+        docPayload.description = autoData.no.summary;
       } else {
         docPayload.summary = FieldValue.delete();
         docPayload.description = FieldValue.delete();
       }
-      if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
-        docPayload.keyVerses = autoData.keyVerses;
+      if (Array.isArray(autoData.no?.keyVerses) && autoData.no.keyVerses.length > 0) {
+        docPayload.keyVerses = autoData.no.keyVerses;
       } else {
         docPayload.keyVerses = FieldValue.delete();
       }
-      if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
-        docPayload.discussionQuestions = autoData.discussionQuestions;
+      if (Array.isArray(autoData.no?.discussionQuestions) && autoData.no.discussionQuestions.length > 0) {
+        docPayload.discussionQuestions = autoData.no.discussionQuestions;
       } else {
         docPayload.discussionQuestions = FieldValue.delete();
+      }
+
+      const translations = {};
+      if (autoData.en?.summary || autoData.en?.keyVerses?.length || autoData.en?.discussionQuestions?.length) {
+        translations.en = {
+          summary: autoData.en.summary || '',
+          description: autoData.en.summary || '',
+          keyVerses: autoData.en.keyVerses || [],
+          discussionQuestions: autoData.en.discussionQuestions || []
+        };
+      }
+      if (autoData.es?.summary || autoData.es?.keyVerses?.length || autoData.es?.discussionQuestions?.length) {
+        translations.es = {
+          summary: autoData.es.summary || '',
+          description: autoData.es.summary || '',
+          keyVerses: autoData.es.keyVerses || [],
+          discussionQuestions: autoData.es.discussionQuestions || []
+        };
+      }
+      if (Object.keys(translations).length > 0) {
+        docPayload.translations = translations;
       }
     } else {
       docPayload.summary = FieldValue.delete();
@@ -5869,26 +5890,51 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
   }
 
   const promptString = [
-    'Du er en norsk redaktør for kristent innhold.',
-    'Analyser transkripsjonen av podcast-episoden under og returner et strukturert JSON-objekt.',
+    'Du er en redaktør for kristent innhold som oversetter innhold til norsk (no), engelsk (en) og spansk (es).',
+    'Analyser transkripsjonen av podcast-episoden under og returner et strukturert JSON-objekt med oppsummering, nøkkelvers og diskusjonsspørsmål oversatt til norsk bokmål ("no"), engelsk ("en") og spansk ("es").',
     '',
     'Krav til JSON-struktur:',
     '{',
-    '  "summary": "En kort, varm og tydelig oppsummering på 2-3 setninger, maks 320 tegn, uten punktlister, emojis eller markdown-formatering.",',
-    '  "keyVerses": [',
-    '    {',
-    '      "reference": "Skriftsted-referanse (f.eks: APG 1,8 eller JOH 4,7). Bruk store bokstaver og kortform.",',
-    '      "text": "Selve teksten til bibelverset slik det lyder på norsk bokmål. Finn gjerne det sanne, offisielle sitatet hvis det siteres delvis i talen."',
-    '    }',
-    '  ],',
-    '  "discussionQuestions": [',
-    '    "3-4 relevante diskusjonsspørsmål til refleksjon (som kulepunkter/spørsmål)."',
-    '  ]',
+    '  "no": {',
+    '    "summary": "En kort, varm og tydelig oppsummering på 2-3 setninger, maks 320 tegn, uten punktlister, emojis eller markdown-formatering.",',
+    '    "keyVerses": [',
+    '      {',
+    '        "reference": "Skriftsted-referanse (f.eks: APG 1,8 eller JOH 4,7). Bruk store bokstaver og kortform.",',
+    '        "text": "Selve teksten til bibelverset slik det lyder på norsk bokmål. Finn gjerne det sanne, offisielle sitatet hvis det siteres delvis i talen."',
+    '      }',
+    '    ],',
+    '    "discussionQuestions": [',
+    '      "3-4 relevante diskusjonsspørsmål til refleksjon (som kulepunkter/spørsmål)."',
+    '    ]',
+    '  },',
+    '  "en": {',
+    '    "summary": "En tilsvarende oppsummering skrevet på engelsk (maks 320 tegn).",',
+    '    "keyVerses": [',
+    '      {',
+    '        "reference": "Tilsvarende skriftsted-referanse på engelsk (f.eks: Acts 1:8 or John 4:7).",',
+    '        "text": "Selve teksten til bibelverset på engelsk (søk opp offisiell oversettelse som f.eks. ESV eller NIV)."',
+    '      }',
+    '    ],',
+    '    "discussionQuestions": [',
+    '      "De samme diskusjonsspørsmålene oversatt til engelsk."',
+    '    ]',
+    '  },',
+    '  "es": {',
+    '    "summary": "En tilsvarende oppsummering skrevet på spansk (maks 320 tegn).",',
+    '    "keyVerses": [',
+    '      {',
+    '        "reference": "Tilsvarende skriftsted-referanse på spansk (f.eks: Hechos 1:8 or Juan 4:7).",',
+    '        "text": "Selve teksten til bibelverset på spansk (søk opp offisiell oversettelse som f.eks. RVR1960)."',
+    '      }',
+    '    ],',
+    '    "discussionQuestions": [',
+    '      "De samme diskusjonsspørsmålene oversatt til spansk."',
+    '    ]',
+    '  }',
     '}',
     '',
     'Viktig:',
-    '- "keyVerses" skal inneholde faktiske bibelvers som siteres, refereres til eller er høyst relevante for innholdet i talen. Hvis det ikke er noen bibelvers overhodet, la listen være tom ([]) og ikke dikt dem opp.',
-    '- Skriv alt på norsk bokmål.',
+    '- "keyVerses" skal inneholde faktiske bibelvers som siteres, refereres til eller er høyst relevante for innholdet i talen. Hvis det ikke er noen bibelvers overhodet, la listen være tom ([]) for alle språk.',
     '- Svar KUN med rå JSON. Ikke legg til ```json ... ``` eller markdown-blokker.',
     '',
     `Tittel: ${String(episodeTitle || '').trim() || 'Uten tittel'}`,
@@ -5928,7 +5974,7 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
         const completion = await openai.chat.completions.create({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "Du er en norsk redaktør for kristent innhold som alltid svarer i rå JSON." },
+            { role: "system", content: "Du er en redaktør for kristent innhold som oversetter til norsk, engelsk og spansk og alltid svarer i rå JSON." },
             { role: "user", content: promptString }
           ]
         });
@@ -5949,22 +5995,42 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
   try {
     const cleanedText = resultText.trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
     const parsed = JSON.parse(cleanedText);
-    if (parsed && typeof parsed === 'object') {
-      return {
-        summary: normalizePodcastSummaryText(parsed.summary || ''),
-        keyVerses: Array.isArray(parsed.keyVerses) ? parsed.keyVerses : [],
-        discussionQuestions: Array.isArray(parsed.discussionQuestions) ? parsed.discussionQuestions : []
-      };
+    
+    let noObj = parsed.no || {};
+    let enObj = parsed.en || {};
+    let esObj = parsed.es || {};
+
+    if (!parsed.no && parsed.summary) {
+      noObj = parsed;
     }
+
+    return {
+      no: {
+        summary: normalizePodcastSummaryText(noObj.summary || ''),
+        keyVerses: Array.isArray(noObj.keyVerses) ? noObj.keyVerses : [],
+        discussionQuestions: Array.isArray(noObj.discussionQuestions) ? noObj.discussionQuestions : []
+      },
+      en: {
+        summary: normalizePodcastSummaryText(enObj.summary || ''),
+        keyVerses: Array.isArray(enObj.keyVerses) ? enObj.keyVerses : [],
+        discussionQuestions: Array.isArray(enObj.discussionQuestions) ? enObj.discussionQuestions : []
+      },
+      es: {
+        summary: normalizePodcastSummaryText(esObj.summary || ''),
+        keyVerses: Array.isArray(esObj.keyVerses) ? esObj.keyVerses : [],
+        discussionQuestions: Array.isArray(esObj.discussionQuestions) ? esObj.discussionQuestions : []
+      }
+    };
   } catch (parseError) {
     console.warn("Klarte ikke å parse JSON fra AI-oppsummering, bruker fallback-struktur:", parseError);
   }
 
   // Fallback if parsing fails
+  const cleanFallbackText = normalizePodcastSummaryText(resultText);
   return {
-    summary: normalizePodcastSummaryText(resultText),
-    keyVerses: [],
-    discussionQuestions: []
+    no: { summary: cleanFallbackText, keyVerses: [], discussionQuestions: [] },
+    en: { summary: cleanFallbackText, keyVerses: [], discussionQuestions: [] },
+    es: { summary: cleanFallbackText, keyVerses: [], discussionQuestions: [] }
   };
 }
 
@@ -6024,9 +6090,9 @@ exports.generatePodcastSummary = onCall({
     });
 
     return {
-      summary: aiData.summary,
-      keyVerses: aiData.keyVerses,
-      discussionQuestions: aiData.discussionQuestions
+      summary: aiData.no?.summary,
+      keyVerses: aiData.no?.keyVerses,
+      discussionQuestions: aiData.no?.discussionQuestions
     };
   } catch (error) {
     console.error('Feil under generering av podcast-oppsummering:', error);
@@ -6078,15 +6144,38 @@ exports.scheduledPodcastTranscription = onSchedule({
           });
 
           const updatePayload = {};
-          if (autoData.summary) {
-            updatePayload.summary = autoData.summary;
-            updatePayload.description = autoData.summary;
+          if (autoData.no?.summary) {
+            updatePayload.summary = autoData.no.summary;
+            updatePayload.description = autoData.no.summary;
           }
-          if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
-            updatePayload.keyVerses = autoData.keyVerses;
+          if (Array.isArray(autoData.no?.keyVerses) && autoData.no.keyVerses.length > 0) {
+            updatePayload.keyVerses = autoData.no.keyVerses;
           }
-          if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
-            updatePayload.discussionQuestions = autoData.discussionQuestions;
+          if (Array.isArray(autoData.no?.discussionQuestions) && autoData.no.discussionQuestions.length > 0) {
+            updatePayload.discussionQuestions = autoData.no.discussionQuestions;
+          }
+
+          const translations = transcriptData.translations || {};
+          if (autoData.en?.summary || autoData.en?.keyVerses?.length || autoData.en?.discussionQuestions?.length) {
+            translations.en = {
+              ...(translations.en || {}),
+              summary: autoData.en.summary || '',
+              description: autoData.en.summary || '',
+              keyVerses: autoData.en.keyVerses || [],
+              discussionQuestions: autoData.en.discussionQuestions || []
+            };
+          }
+          if (autoData.es?.summary || autoData.es?.keyVerses?.length || autoData.es?.discussionQuestions?.length) {
+            translations.es = {
+              ...(translations.es || {}),
+              summary: autoData.es.summary || '',
+              description: autoData.es.summary || '',
+              keyVerses: autoData.es.keyVerses || [],
+              discussionQuestions: autoData.es.discussionQuestions || []
+            };
+          }
+          if (Object.keys(translations).length > 0) {
+            updatePayload.translations = translations;
           }
 
           if (Object.keys(updatePayload).length > 0) {
@@ -6161,8 +6250,9 @@ exports.backfillPodcastSummaries = onRequest({
 
       const needsSummary = !transcriptData.summary && !transcriptData.description;
       const needsQuestions = !transcriptData.discussionQuestions || transcriptData.discussionQuestions.length === 0;
+      const force = req.query.force === 'true';
 
-      if (needsSummary || needsQuestions) {
+      if (needsSummary || needsQuestions || force) {
         if (processed.length >= limit) {
           break;
         }
@@ -6180,15 +6270,38 @@ exports.backfillPodcastSummaries = onRequest({
           });
 
           const updatePayload = {};
-          if (autoData.summary) {
-            updatePayload.summary = autoData.summary;
-            updatePayload.description = autoData.summary;
+          if (autoData.no?.summary) {
+            updatePayload.summary = autoData.no.summary;
+            updatePayload.description = autoData.no.summary;
           }
-          if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
-            updatePayload.keyVerses = autoData.keyVerses;
+          if (Array.isArray(autoData.no?.keyVerses) && autoData.no.keyVerses.length > 0) {
+            updatePayload.keyVerses = autoData.no.keyVerses;
           }
-          if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
-            updatePayload.discussionQuestions = autoData.discussionQuestions;
+          if (Array.isArray(autoData.no?.discussionQuestions) && autoData.no.discussionQuestions.length > 0) {
+            updatePayload.discussionQuestions = autoData.no.discussionQuestions;
+          }
+
+          const translations = transcriptData.translations || {};
+          if (autoData.en?.summary || autoData.en?.keyVerses?.length || autoData.en?.discussionQuestions?.length) {
+            translations.en = {
+              ...(translations.en || {}),
+              summary: autoData.en.summary || '',
+              description: autoData.en.summary || '',
+              keyVerses: autoData.en.keyVerses || [],
+              discussionQuestions: autoData.en.discussionQuestions || []
+            };
+          }
+          if (autoData.es?.summary || autoData.es?.keyVerses?.length || autoData.es?.discussionQuestions?.length) {
+            translations.es = {
+              ...(translations.es || {}),
+              summary: autoData.es.summary || '',
+              description: autoData.es.summary || '',
+              keyVerses: autoData.es.keyVerses || [],
+              discussionQuestions: autoData.es.discussionQuestions || []
+            };
+          }
+          if (Object.keys(translations).length > 0) {
+            updatePayload.translations = translations;
           }
 
           if (Object.keys(updatePayload).length > 0) {

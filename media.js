@@ -1221,9 +1221,23 @@ function createPodcastCard(episode, indexInView) {
 
     // Get Firestore override data
     const dbData = typeof podcastTranscriptDataById !== 'undefined' ? podcastTranscriptDataById.get(episode.id) : null;
-    const summary = dbData ? (dbData.summary || dbData.description || '').trim() : '';
-    const keyVerses = dbData && Array.isArray(dbData.keyVerses) ? dbData.keyVerses : [];
-    const discussionQuestions = dbData && Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : [];
+    
+    let summary = '';
+    let keyVerses = [];
+    let discussionQuestions = [];
+
+    if (dbData) {
+        if (lang === 'no') {
+            summary = (dbData.summary || dbData.description || '').trim();
+            keyVerses = Array.isArray(dbData.keyVerses) ? dbData.keyVerses : [];
+            discussionQuestions = Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : [];
+        } else {
+            const tr = dbData.translations?.[lang] || {};
+            summary = (tr.summary || tr.description || dbData.summary || dbData.description || '').trim();
+            keyVerses = Array.isArray(tr.keyVerses) ? tr.keyVerses : (Array.isArray(dbData.keyVerses) ? dbData.keyVerses : []);
+            discussionQuestions = Array.isArray(tr.discussionQuestions) ? tr.discussionQuestions : (Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : []);
+        }
+    }
 
     const hasSummary = !!summary;
     const hasVerses = keyVerses.length > 0;
