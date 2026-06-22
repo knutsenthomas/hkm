@@ -16,7 +16,7 @@ const i18nManager = {
             'event-details', 'events', 'for-businesses', 'for-churches',
             'index', 'media', 'podcast', 'privacy',
             'regular-donors', 'teaching', 'youtube', 'reading-plan-details',
-            'tidslinje-imperier'
+            'tidslinje-imperier', 'leseplaner'
         ]),
         es: new Set([
             'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
@@ -26,7 +26,7 @@ const i18nManager = {
             'ensenanza', 'eventos', 'index', 'media',
             'para-empresas', 'para-iglesias', 'podcast',
             'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura',
-            'tidslinje-imperier'
+            'tidslinje-imperier', 'leseplaner'
         ])
     },
 
