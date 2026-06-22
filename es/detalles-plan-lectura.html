@@ -1183,11 +1183,34 @@
                     const maxInitialDays = 5;
                     const showExpandButton = daysList.length > maxInitialDays;
                     const storageKey = `hkm_plan_${plan.id}_completed`;
-                    const completedDays = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    const pwaKey = `hkm_reading_plan_progress_${plan.id}`;
+                    
+                    const getLocalCompleted = () => {
+                        try {
+                            const pwaData = localStorage.getItem(pwaKey);
+                            if (pwaData) {
+                                const parsed = JSON.parse(pwaData);
+                                if (parsed && Array.isArray(parsed.completedDays)) {
+                                    return parsed.completedDays.map(Number);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Failed to parse local PWA progress:", e);
+                        }
+                        try {
+                            const oldData = localStorage.getItem(storageKey);
+                            if (oldData) {
+                                return JSON.parse(oldData).map(Number);
+                            }
+                        } catch (e) {}
+                        return [];
+                    };
+
+                    let completedDays = getLocalCompleted();
                     
                     const renderDayItem = (day, index) => {
                         const resourcesHtml = renderResources(day.resources);
-                        const isChecked = completedDays.includes(day.dayNumber.toString()) ? 'checked' : '';
+                        const isChecked = completedDays.includes(day.dayNumber) ? 'checked' : '';
                         const isHiddenClass = (showExpandButton && index >= maxInitialDays) ? 'day-item-expandable hidden-day' : '';
                         const versesText = (day.verses || '').trim();
                         const isReflection = !versesText || versesText.toLowerCase() === 'reflexión' || versesText.toLowerCase() === 'reflexion';
@@ -1230,19 +1253,94 @@
                         });
                     }
 
-                    // Save checkbox state to localStorage
-                    container.addEventListener('change', (e) => {
-                        if (e.target && e.target.classList.contains('day-checkbox')) {
-                            const dayNum = e.target.dataset.day;
-                            const isChecked = e.target.checked;
-                            const currentCompleted = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                            let updated;
-                            if (isChecked) {
-                                updated = [...new Set([...currentCompleted, dayNum])];
-                            } else {
-                                updated = currentCompleted.filter(d => d !== dayNum);
+                    // Auth Listener to fetch progress from Firestore
+                    if (window.firebase && typeof firebase.auth === 'function') {
+                        firebase.auth().onAuthStateChanged(async (user) => {
+                            if (user) {
+                                try {
+                                    const db = firebase.firestore();
+                                    const userPlanDoc = await db.collection('users')
+                                        .doc(user.uid)
+                                        .collection('reading_plans')
+                                        .doc(plan.id)
+                                        .get();
+                                    
+                                    if (userPlanDoc.exists) {
+                                        const progress = userPlanDoc.data();
+                                        if (progress && Array.isArray(progress.completedDays)) {
+                                            completedDays = progress.completedDays.map(Number);
+                                            document.querySelectorAll('.day-checkbox').forEach(cb => {
+                                                const day = parseInt(cb.dataset.day, 10);
+                                                cb.checked = completedDays.includes(day);
+                                            });
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error("Error loading Firestore plan progress:", e);
+                                }
                             }
-                            localStorage.setItem(storageKey, JSON.stringify(updated));
+                        });
+                    }
+
+                    // Save checkbox state
+                    container.addEventListener('change', async (e) => {
+                        if (e.target && e.target.classList.contains('day-checkbox')) {
+                            const dayNum = parseInt(e.target.dataset.day, 10);
+                            const isChecked = e.target.checked;
+                            
+                            if (isChecked) {
+                                if (!completedDays.includes(dayNum)) completedDays.push(dayNum);
+                            } else {
+                                completedDays = completedDays.filter(d => d !== dayNum);
+                            }
+                            
+                            localStorage.setItem(storageKey, JSON.stringify(completedDays.map(String)));
+                            
+                            try {
+                                const pwaData = localStorage.getItem(pwaKey);
+                                let parsed = pwaData ? JSON.parse(pwaData) : null;
+                                if (!parsed) {
+                                    parsed = {
+                                        planId: plan.id,
+                                        currentDay: 1,
+                                        completedDays: [],
+                                        reflections: {}
+                                    };
+                                }
+                                parsed.completedDays = completedDays;
+                                localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                            } catch (err) {
+                                console.error("Error updating local PWA progress:", err);
+                            }
+
+                            if (window.firebase && typeof firebase.auth === 'function') {
+                                const user = firebase.auth().currentUser;
+                                if (user) {
+                                    try {
+                                        const db = firebase.firestore();
+                                        const ref = db.collection('users')
+                                            .doc(user.uid)
+                                            .collection('reading_plans')
+                                            .doc(plan.id);
+                                        
+                                        const userPlanDoc = await ref.get();
+                                        let progress = userPlanDoc.exists ? userPlanDoc.data() : null;
+                                        if (!progress) {
+                                            progress = {
+                                                planId: plan.id,
+                                                currentDay: 1,
+                                                completedDays: [],
+                                                reflections: {}
+                                            };
+                                        }
+                                        progress.completedDays = completedDays;
+                                        progress.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
+                                        await ref.set(progress);
+                                    } catch (err) {
+                                        console.error("Failed to update Firestore plan progress:", err);
+                                    }
+                                }
+                            }
                         }
                     });
                 }
