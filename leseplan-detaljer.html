@@ -43,6 +43,15 @@
             --text-muted: #64748b;
             --border: #f1f5f9;
             --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+        }
+
+        html[data-theme="dark"] {
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --bg-light: #0f172a;
+            --bg-white: #1e293b;
         }
 
         body {
@@ -67,11 +76,11 @@
 
         /* Card styles */
         .card {
-            background: white;
+            background: var(--bg-white);
             border-radius: 24px;
             padding: 40px;
             box-shadow: 0 10px 30px -10px rgba(27, 73, 101, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid var(--border);
             margin-bottom: 32px;
             position: relative;
             overflow: hidden;
@@ -118,7 +127,7 @@
         .plan-description {
             font-size: 1.1rem;
             line-height: 1.7;
-            color: #334155;
+            color: var(--text-dark);
             margin: 0;
         }
 
@@ -136,10 +145,10 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            background: #f8fafc;
+            background: var(--bg-light);
             padding: 16px;
             border-radius: 16px;
-            border: 1px solid rgba(226, 232, 240, 0.5);
+            border: 1px solid var(--border);
         }
 
         .stat-icon {
@@ -243,11 +252,11 @@
         }
 
         .other-plan-card {
-            background: white;
+            background: var(--bg-white);
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 20px -6px rgba(27, 73, 101, 0.08);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid var(--border);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
@@ -352,9 +361,9 @@
             flex-direction: column;
             gap: 12px;
             padding: 24px;
-            background: white;
+            background: var(--bg-white);
             border-radius: 16px;
-            border: 1px solid #f1f5f9;
+            border: 1px solid var(--border);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.015);
         }
@@ -391,10 +400,10 @@
 
         .day-prayer {
             font-size: 0.95rem;
-            color: #475569;
+            color: var(--text-dark);
             margin-left: 0;
             border-left: 3px solid var(--primary-orange);
-            background: #faf8f5;
+            background: var(--bg-light);
             padding: 12px 16px;
             border-radius: 0 8px 8px 0;
             line-height: 1.6;
@@ -404,11 +413,11 @@
         .sidebar-card {
             position: sticky;
             top: 120px;
-            background: white;
+            background: var(--bg-white);
             border-radius: 24px;
             padding: 40px 32px;
             box-shadow: 0 20px 40px -15px rgba(27, 73, 101, 0.08), 0 1px 3px rgba(0, 0, 0, 0.01);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid var(--border);
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -1334,72 +1343,72 @@
                             <p class="plan-description" style="margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
                                 Johannesevangeliet gir oss en unik fremstilling av hvem Jesus er. Mens de andre tre evangeliene (de synoptiske) fokuserer mye på Jesu gjerninger og lignelser i Galilea, tar Johannes oss med på en dypere teologisk reise for å åpenbare Jesu guddommelige natur og hans intime forhold til Faderen.
                             </p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="border-top: 1px solid rgba(226,232,240,0.8); padding-top: 24px;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 intro-grid-container">
                                 <!-- Sentrale Temaer Card -->
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+                                <div class="intro-section-card">
                                     <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
                                         <span class="material-symbols-outlined" style="color: var(--primary-orange); font-size: 20px; vertical-align: middle;">explore</span> Sentrale Temaer
                                     </h3>
                                     <div style="display: flex; flex-direction: column; gap: 12px;">
                                         <!-- Theme 1 -->
-                                        <div style="background: white; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 4px;">
-                                            <strong style="color: var(--primary-blue); font-size: 0.95rem; font-weight: 700;">Ordet ble menneske</strong>
-                                            <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">Jesus er det evige <em>Logos</em> som var hos Gud og var Gud.</p>
+                                        <div class="intro-theme-item">
+                                            <strong>Ordet ble menneske</strong>
+                                            <p>Jesus er det evige <em>Logos</em> som var hos Gud og var Gud.</p>
                                         </div>
                                         <!-- Theme 2 -->
-                                        <div style="background: white; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 4px;">
-                                            <strong style="color: var(--primary-blue); font-size: 0.95rem; font-weight: 700;">De syv tegnene</strong>
-                                            <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">Utvalgte undergjerninger som viser Jesu herlighet og vekker tro.</p>
+                                        <div class="intro-theme-item">
+                                            <strong>De syv tegnene</strong>
+                                            <p>Utvalgte undergjerninger som viser Jesu herlighet og vekker tro.</p>
                                         </div>
                                         <!-- Theme 3 -->
-                                        <div style="background: white; border: 1px solid #f1f5f9; border-radius: 12px; padding: 12px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 4px;">
-                                            <strong style="color: var(--primary-blue); font-size: 0.95rem; font-weight: 700;">"Jeg er"-uttalelsene</strong>
-                                            <p style="margin: 0; color: #475569; font-size: 0.9rem; line-height: 1.5;">Syv ganger åpenbarer Jesus sin identitet med Guds eget paktsnavn (f.eks. Livets brød, Verdens lys).</p>
+                                        <div class="intro-theme-item">
+                                            <strong>"Jeg er"-uttalelsene</strong>
+                                            <p>Syv ganger åpenbarer Jesus sin identitet med Guds eget paktsnavn (f.eks. Livets brød, Verdens lys).</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Evangeliets Oppbygning Card (Timeline) -->
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+                                <div class="intro-section-card">
                                     <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
                                         <span class="material-symbols-outlined" style="color: var(--primary-blue); font-size: 20px; vertical-align: middle;">account_tree</span> Evangeliets Oppbygning
                                     </h3>
                                     <!-- Timeline Stepper Container -->
-                                    <div style="position: relative; padding-left: 20px; display: flex; flex-direction: column; gap: 16px; border-left: 2px solid rgba(27, 73, 101, 0.1); margin-left: 10px; margin-top: 4px;">
+                                    <div class="intro-timeline">
                                         <!-- Step 1 -->
-                                        <div style="position: relative;">
+                                        <div class="intro-timeline-item">
                                             <!-- Node circle -->
-                                            <div style="position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-blue); border: 2px solid white; box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.2);"></div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: var(--primary-blue); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;">Joh 1:1-18</strong>
-                                                <span style="color: #475569; font-size: 0.85rem; line-height: 1.4;"><strong style="color: var(--text-dark);">Prologen:</strong> Det sanne lyset kommer til verden.</span>
+                                            <div class="intro-timeline-node"></div>
+                                            <div class="intro-timeline-content">
+                                                <strong>Joh 1:1-18</strong>
+                                                <span><strong style="color: var(--text-dark);">Prologen:</strong> Det sanne lyset kommer til verden.</span>
                                             </div>
                                         </div>
                                         <!-- Step 2 -->
-                                        <div style="position: relative;">
+                                        <div class="intro-timeline-item">
                                             <!-- Node circle -->
-                                            <div style="position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-blue); border: 2px solid white; box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.2);"></div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: var(--primary-blue); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;">Joh 1:19 - 12:50</strong>
-                                                <span style="color: #475569; font-size: 0.85rem; line-height: 1.4;"><strong style="color: var(--text-dark);">Tegnenes bok:</strong> Jesu offentlige tjeneste.</span>
+                                            <div class="intro-timeline-node"></div>
+                                            <div class="intro-timeline-content">
+                                                <strong>Joh 1:19 - 12:50</strong>
+                                                <span><strong style="color: var(--text-dark);">Tegnenes bok:</strong> Jesu offentlige tjeneste.</span>
                                             </div>
                                         </div>
                                         <!-- Step 3 -->
-                                        <div style="position: relative;">
+                                        <div class="intro-timeline-item">
                                             <!-- Node circle -->
-                                            <div style="position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-blue); border: 2px solid white; box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.2);"></div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: var(--primary-blue); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;">Joh 13:1 - 20:31</strong>
-                                                <span style="color: #475569; font-size: 0.85rem; line-height: 1.4;"><strong style="color: var(--text-dark);">Herlighetens bok:</strong> Avskjedstalen, korset og oppstandelsen.</span>
+                                            <div class="intro-timeline-node"></div>
+                                            <div class="intro-timeline-content">
+                                                <strong>Joh 13:1 - 20:31</strong>
+                                                <span><strong style="color: var(--text-dark);">Herlighetens bok:</strong> Avskjedstalen, korset og oppstandelsen.</span>
                                             </div>
                                         </div>
                                         <!-- Step 4 -->
-                                        <div style="position: relative;">
+                                        <div class="intro-timeline-item">
                                             <!-- Node circle -->
-                                            <div style="position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-blue); border: 2px solid white; box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.2);"></div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: var(--primary-blue); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;">Joh 21</strong>
-                                                <span style="color: #475569; font-size: 0.85rem; line-height: 1.4;"><strong style="color: var(--text-dark);">Epilogen:</strong> Frokost ved sjøen og oppreisningen av Peter.</span>
+                                            <div class="intro-timeline-node"></div>
+                                            <div class="intro-timeline-content">
+                                                <strong>Joh 21</strong>
+                                                <span><strong style="color: var(--text-dark);">Epilogen:</strong> Frokost ved sjøen og oppreisningen av Peter.</span>
                                             </div>
                                         </div>
                                     </div>

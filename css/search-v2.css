@@ -204,3 +204,53 @@
         padding: 60px 20px 20px 20px !important;
     }
 }
+
+/* ==========================================
+   Dark Mode Overrides for Global Search
+   ========================================== */
+html[data-theme="dark"] {
+    --hkm-text-main: #f8fafc;
+    --hkm-text-muted: #94a3b8;
+}
+
+html[data-theme="dark"] .search-modal-container {
+    background: rgba(30, 41, 59, 0.98) !important; /* Slate 800 */
+    border: 1px solid rgba(51, 65, 85, 0.8) !important; /* Slate 700 */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-theme="dark"] .close-search-btn {
+    background: #334155 !important; /* Slate 700 */
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .close-search-btn:hover {
+    background: #475569 !important;
+}
+
+html[data-theme="dark"] .search-input-group {
+    background: #0f172a !important; /* Slate 900 */
+}
+
+html[data-theme="dark"] .search-input-group:focus-within {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .search-suggestions-container {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+}
+
+html[data-theme="dark"] .search-suggestion-item {
+    border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+
+html[data-theme="dark"] .search-suggestion-item:hover {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .search-suggestion-icon {
+    background: #1e3a8a !important;
+    color: #3b82f6 !important;
+}

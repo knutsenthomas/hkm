@@ -283,3 +283,36 @@ ol.block-list { list-style-type: decimal; }
         font-size: 1.15rem;
     }
 }
+
+/* ==========================================
+   Dark Mode Overrides for Blog Content
+   ========================================== */
+html[data-theme="dark"] {
+    --rte-text-color: #cbd5e1; /* Slate 300 */
+    --rte-header-color: #f8fafc; /* Slate 50 */
+}
+
+html[data-theme="dark"] .block-paragraph:first-of-type {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .block-quote {
+    background: #1e293b !important; /* Slate 800 */
+    border-left-color: #d17d39 !important;
+}
+
+html[data-theme="dark"] .block-quote p {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .block-quote cite {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .block-delimiter {
+    color: #334155 !important;
+}
+
+html[data-theme="dark"] .block-image figcaption {
+    color: #94a3b8 !important;
+}

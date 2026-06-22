@@ -289,3 +289,74 @@
         border-radius: 16px;
     }
 }
+
+/* ==========================================
+   Dark Mode Overrides for Likes & Comments
+   ========================================== */
+html[data-theme="dark"] .interactions-container {
+    border-top-color: #334155 !important;
+}
+
+html[data-theme="dark"] .like-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .like-btn:hover {
+    background: #334155 !important;
+}
+
+html[data-theme="dark"] .like-btn.liked {
+    background: rgba(231, 76, 60, 0.15) !important;
+    color: #e74c3c !important;
+    border-color: rgba(231, 76, 60, 0.3) !important;
+}
+
+html[data-theme="dark"] .likes-count-text {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .comment-form {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .comment-input-group label {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .comment-input-group input,
+html[data-theme="dark"] .comment-input-group textarea {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .comment-input-group input:focus,
+html[data-theme="dark"] .comment-input-group textarea:focus {
+    border-color: #d17d39 !important;
+}
+
+html[data-theme="dark"] .comment-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .comment-author {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .comment-text {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .comment-date {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .comments-empty {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
