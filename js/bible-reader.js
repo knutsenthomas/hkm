@@ -43,7 +43,7 @@ class BibleReader {
         let defaultBible = 'OPENBIBLE_NB';
         if (activeLang === 'en') defaultBible = 'WEB';
         else if (activeLang === 'es') defaultBible = 'RVR1960';
-        this.selectedBibleId = localStorage.getItem('hkm_bible_translation') || defaultBible;
+        this.selectedBibleId = localStorage.getItem(`hkm_bible_translation_${activeLang}`) || defaultBible;
         this.selectedBookId = '';
         this.selectedChapterId = '';
         this.activeChapterData = null;
@@ -264,7 +264,8 @@ class BibleReader {
         if (this.dom.translationSelect) {
             this.dom.translationSelect.addEventListener('change', async (e) => {
                 this.selectedBibleId = e.target.value;
-                localStorage.setItem('hkm_bible_translation', this.selectedBibleId);
+                const currentLang = document.documentElement.lang || 'no';
+                localStorage.setItem(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
                 const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
                 if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
                 await this.loadBooks();
@@ -281,7 +282,8 @@ class BibleReader {
         if (mobileTransSelect) {
             mobileTransSelect.addEventListener('change', async (e) => {
                 this.selectedBibleId = e.target.value;
-                localStorage.setItem('hkm_bible_translation', this.selectedBibleId);
+                const currentLang = document.documentElement.lang || 'no';
+                localStorage.setItem(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
                 if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
                 await this.loadBooks();
                 // Re-navigate to current book/chapter if possible

@@ -104,11 +104,9 @@
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/es/../index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
-                        <a href="/es/../en/index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇺🇸
-                            English</a>
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇪🇸
-                            Español</a>
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
 
@@ -146,15 +144,15 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/es/../index" class="text-sm font-bold text-primary-orange"
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/../en/index"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>

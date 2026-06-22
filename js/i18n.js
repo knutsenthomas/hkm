@@ -139,6 +139,9 @@ const i18nManager = {
             // Set language based strictly on the URL path
             if (/^\/en(\/|$)/.test(path)) currentLang = 'en';
             else if (/^\/es(\/|$)/.test(path)) currentLang = 'es';
+            
+            // Sync detected language to localStorage
+            localStorage.setItem(this.storageKey, currentLang);
         }
 
         document.documentElement.lang = currentLang;
