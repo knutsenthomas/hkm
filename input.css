@@ -7372,6 +7372,20 @@ html[data-theme="dark"] .mobile-theme-toggle-btn:hover {
     color: var(--primary-orange) !important;
 }
 
+/* Mobile language selector overrides inside mega menu for high-contrast dark mode */
+html[data-theme="dark"] .mega-menu div.rounded-full {
+    background-color: rgba(30, 41, 59, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .mega-menu div.rounded-full .bg-gray-300 {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
+    color: #cbd5e1 !important;
+}
+
 /* 3. Audio Bibelavspiller (Sticky Player Bar) */
 .hkm-audio-player-bar {
     position: fixed;
