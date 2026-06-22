@@ -2985,8 +2985,8 @@ body.hero-animate .slide-buttons {
     height: 45px;
     background: white;
     /* White icon background */
-    color: var(--text-dark);
-    /* Dark icon color */
+    color: #1B4965 !important;
+    /* Fixed dark blue icon color to avoid contrast issues */
     border-radius: 8px;
     /* Square with rounded corners match screenshot */
     display: flex;
@@ -2997,8 +2997,8 @@ body.hero-animate .slide-buttons {
 }
 
 .footer-social-icons a:hover {
-    background: var(--primary-orange);
-    color: white;
+    background: var(--primary-orange) !important;
+    color: white !important;
 }
 
 .contact-card .btn {
@@ -7409,6 +7409,31 @@ html[data-theme="dark"] .testimonial-prev:hover,
 html[data-theme="dark"] .testimonial-next:hover {
     background-color: var(--primary-orange) !important;
     color: white !important;
+}
+
+/* About Section Dark Mode Overrides */
+html[data-theme="dark"] .about-feature-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .about-feature-item:hover {
+    background: #1e293b !important;
+    border-color: var(--primary-orange) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .about-feature-icon-box {
+    background: #0f172a !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .about-feature-text h4 {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .about-feature-text p {
+    color: #94a3b8 !important;
 }
 
 
