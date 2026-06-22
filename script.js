@@ -3914,7 +3914,9 @@ window.addEventListener('load', () => {
         // Apply theme from localStorage or fallback to system preference
         let activeTheme = localStorage.getItem('hkm_theme');
         if (!activeTheme) {
-            activeTheme = document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const hour = new Date().getHours();
+            const isNight = hour >= 22 || hour < 6;
+            activeTheme = document.documentElement.getAttribute('data-theme') || (isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         }
         document.documentElement.setAttribute('data-theme', activeTheme);
 
