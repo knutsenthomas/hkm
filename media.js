@@ -522,7 +522,8 @@ let podcastOverrides = {};
 let podcastTranscriptDataById = new Map();
 let currentPodcastFilter = 'all';
 let currentPodcastSort = 'newest';
-let currentPodcastView = localStorage.getItem('hkm_podcast_view') || 'grid';
+let currentPodcastView = 'list';
+let currentPodcastSearchQuery = '';
 
 // Spillerkø / nåværende episode (for Spotify-lignende navigasjon)
 let currentEpisodeOrder = [];
@@ -994,6 +995,59 @@ function enhanceTranscriptRichFormatting(html) {
     return wrapper.innerHTML;
 }
 
+const monthsByLang = {
+    no: ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'],
+    en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    es: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
+};
+
+function formatPodcastDate(dateText, lang) {
+    const d = new Date(dateText);
+    if (isNaN(d.getTime())) return dateText;
+    const day = d.getDate();
+    const monthIndex = d.getMonth();
+    const year = d.getFullYear();
+    
+    const months = monthsByLang[lang] || monthsByLang['no'];
+    const monthStr = months[monthIndex];
+    
+    if (lang === 'en') {
+        return `${monthStr} ${day}, ${year}`;
+    } else if (lang === 'es') {
+        return `${day}. ${monthStr} ${year}`;
+    } else {
+        return `${day}. ${monthStr} ${year}`;
+    }
+}
+
+function formatPodcastDuration(durationStr) {
+    const raw = String(durationStr || '').trim();
+    if (!raw) return '';
+    
+    // Check if it is HH:MM:SS or MM:SS
+    if (raw.includes(':')) {
+        const parts = raw.split(':');
+        if (parts.length === 3) {
+            const hours = parseInt(parts[0], 10) || 0;
+            const minutes = parseInt(parts[1], 10) || 0;
+            const totalMin = hours * 60 + minutes;
+            return `${totalMin} min`;
+        } else if (parts.length === 2) {
+            const minutes = parseInt(parts[0], 10) || 0;
+            return `${minutes} min`;
+        }
+    }
+    
+    // Check if it is seconds
+    const seconds = parseInt(raw, 10);
+    if (!isNaN(seconds)) {
+        const minutes = Math.round(seconds / 60);
+        return `${minutes} min`;
+    }
+    
+    return raw;
+}
+
 async function initPodcastRSS() {
     const grid = document.getElementById('podcast-grid');
     if (!grid) return;
@@ -1037,7 +1091,9 @@ async function initPodcastRSS() {
                 audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
                 episodeNumber: episodes.length - index,
                 categories: getEpisodeCategories(episode),
-                category: getEpisodeCategory(episode)
+                category: getEpisodeCategory(episode),
+                author: asText(episode["itunes:author"]) || asText(episode.author) || "His Kingdom Ministry",
+                duration: formatPodcastDuration(asText(episode["itunes:duration"]))
             };
         });
 
@@ -1056,8 +1112,7 @@ function initPodcastControls() {
 
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
-    const viewGridBtn = document.getElementById('view-grid-btn');
-    const viewListBtn = document.getElementById('view-list-btn');
+    const searchInput = document.getElementById('podcast-search-input');
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1075,34 +1130,10 @@ function initPodcastControls() {
         });
     }
 
-    if (viewGridBtn && viewListBtn) {
-        // Sync active state from currentPodcastView
-        if (currentPodcastView === 'list') {
-            viewGridBtn.classList.remove('active');
-            viewListBtn.classList.add('active');
-        } else {
-            viewGridBtn.classList.add('active');
-            viewListBtn.classList.remove('active');
-        }
-
-        viewGridBtn.addEventListener('click', () => {
-            if (currentPodcastView !== 'grid') {
-                currentPodcastView = 'grid';
-                localStorage.setItem('hkm_podcast_view', 'grid');
-                viewListBtn.classList.remove('active');
-                viewGridBtn.classList.add('active');
-                renderPodcastEpisodes();
-            }
-        });
-
-        viewListBtn.addEventListener('click', () => {
-            if (currentPodcastView !== 'list') {
-                currentPodcastView = 'list';
-                localStorage.setItem('hkm_podcast_view', 'list');
-                viewGridBtn.classList.remove('active');
-                viewListBtn.classList.add('active');
-                renderPodcastEpisodes();
-            }
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentPodcastSearchQuery = e.target.value;
+            renderPodcastEpisodes();
         });
     }
 }
@@ -1130,14 +1161,17 @@ function renderPodcastEpisodes() {
     const grid = document.getElementById('podcast-grid');
     if (!grid) return;
 
-    // Legg til eller fjern list-view klasse basert på lagret tilstand
-    if (currentPodcastView === 'list') {
-        grid.classList.add('list-view');
-    } else {
-        grid.classList.remove('list-view');
-    }
-
     let filtered = [...allPodcastEpisodes];
+
+    // Søkefiltrering
+    if (currentPodcastSearchQuery) {
+        const query = currentPodcastSearchQuery.toLowerCase().trim();
+        filtered = filtered.filter(ep => 
+            ep.title.toLowerCase().includes(query) || 
+            (ep.description && ep.description.toLowerCase().includes(query)) ||
+            (ep.author && ep.author.toLowerCase().includes(query))
+        );
+    }
 
     // Filtrering
     if (currentPodcastFilter !== 'all') {
@@ -1181,10 +1215,9 @@ function createPodcastCard(episode, indexInView) {
     card.className = 'podcast-card';
     card.setAttribute('data-category', 'podcast');
 
-    const pubDate = new Date(episode.pubDate).toLocaleDateString('no-NO');
-    const thumbnail = episode.thumbnail || 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop';
-
-    const descText = getEpisodeCardDescription(episode);
+    const lang = document.documentElement.lang || 'no';
+    const pubDate = formatPodcastDate(episode.pubDate, lang);
+    const thumbnail = episode.thumbnail || 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?w=400&h=400&fit=crop';
 
     // Get Firestore override data
     const dbData = typeof podcastTranscriptDataById !== 'undefined' ? podcastTranscriptDataById.get(episode.id) : null;
@@ -1201,9 +1234,9 @@ function createPodcastCard(episode, indexInView) {
         let leftColHtml = '';
         if (hasSummary) {
             leftColHtml += `
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 24px;">
                     <h4 class="podcast-accordion-section-title summary-title">${t('summary')}</h4>
-                    <p style="font-size: 13.5px; color: var(--text-dark); line-height: 1.5; margin: 0; opacity: 0.85;">${summary}</p>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.5; margin: 0; opacity: 0.85;">${summary}</p>
                 </div>
             `;
         }
@@ -1242,19 +1275,15 @@ function createPodcastCard(episode, indexInView) {
 
         accordionHtml = `
             <div class="podcast-accordion">
-                <button class="podcast-accordion-toggle" aria-expanded="false">
-                    <span>${t('summaryAndKeyVerses')}</span>
-                    <span class="material-symbols-outlined chevron-icon">expand_more</span>
-                </button>
                 <div class="podcast-accordion-content">
                     <div class="podcast-accordion-grid">
                         <!-- Left Column -->
                         <div style="display: flex; flex-direction: column; gap: 20px;">
-                            ${leftColHtml || `<p style="font-size: 13.5px; color: var(--text-light); italic: true; margin: 0;">Ingen oppsummering tilgjengelig.</p>`}
+                            ${leftColHtml || `<p style="font-size: 13.5px; color: var(--text-light); font-style: italic; margin: 0;">Ingen oppsummering tilgjengelig.</p>`}
                         </div>
                         <!-- Right Column -->
                         <div style="display: flex; flex-direction: column; gap: 20px;">
-                            ${rightColHtml || `<p style="font-size: 13.5px; color: var(--text-light); italic: true; margin: 0;">Ingen diskusjonsspørsmål tilgjengelig.</p>`}
+                            ${rightColHtml || `<p style="font-size: 13.5px; color: var(--text-light); font-style: italic; margin: 0;">Ingen diskusjonsspørsmål tilgjengelig.</p>`}
                         </div>
                     </div>
                 </div>
@@ -1263,39 +1292,44 @@ function createPodcastCard(episode, indexInView) {
     }
 
     card.innerHTML = `
-        <div class="podcast-artwork">
-            <img src="${thumbnail}" alt="${episode.title}">
-            <div class="podcast-play-overlay">
-                <button class="play-btn-circle" data-audio="${episode.audioUrl}">
+        <div class="podcast-row-main">
+            <div class="podcast-row-artwork">
+                <img src="${thumbnail}" alt="${episode.title}">
+            </div>
+            <div class="podcast-row-details">
+                <span class="podcast-row-date">${pubDate}</span>
+                <h3 class="podcast-row-title">${episode.title}</h3>
+                <p class="podcast-row-meta">${episode.author} · ${episode.duration}</p>
+                ${(hasSummary || hasVerses || hasQuestions) ? `
+                    <button class="podcast-row-accordion-toggle" aria-expanded="false">
+                        <span>${t('summaryAndKeyVerses')}</span>
+                        <span class="material-symbols-outlined chevron-icon">expand_more</span>
+                    </button>
+                ` : ''}
+            </div>
+            <div class="podcast-row-actions">
+                <a href="${episode.link}" target="_blank" class="podcast-row-external-link" title="Åpne i plattform">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                </a>
+                <button class="podcast-row-play-btn" data-audio="${episode.audioUrl}" title="${t('listenNow')}">
                     <i class="fas fa-play"></i>
                 </button>
             </div>
         </div>
-        <div class="podcast-content">
-            <span class="podcast-episode">${t('episode')} ${episode.episodeNumber}</span>
-            <h3 class="podcast-title">${episode.title}</h3>
-            <p class="podcast-description">${descText}</p>
-            <div class="podcast-meta"><span><i class="far fa-calendar"></i> ${pubDate}</span></div>
-            <div class="podcast-actions" style="margin-bottom: 8px;">
-                <button class="btn-play-internal" data-audio="${episode.audioUrl}"><i class="fas fa-play"></i> ${t('listenNow')}</button>
-                <a href="${episode.link}" target="_blank" class="btn-icon-outline"><i class="fas fa-external-link-alt"></i></a>
-            </div>
-            ${accordionHtml}
-        </div>
+        ${accordionHtml}
     `;
 
     card.querySelectorAll('[data-audio]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (episode.audioUrl) {
-                // Finn global indeks i dagens spillerkø
                 const queueIndex = currentEpisodeOrder.indexOf(episode);
                 toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, queueIndex, episode);
             }
         });
     });
 
-    const toggleBtn = card.querySelector('.podcast-accordion-toggle');
+    const toggleBtn = card.querySelector('.podcast-row-accordion-toggle');
     if (toggleBtn) {
         const content = card.querySelector('.podcast-accordion-content');
         toggleBtn.addEventListener('click', (e) => {
@@ -1392,11 +1426,14 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
 }
 
 function updatePlayIcons(isPlaying, activeBtn) {
-    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i').forEach(i => {
+    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i, .podcast-row-play-btn i').forEach(i => {
         i.className = 'fas fa-play';
     });
     if (isPlaying) {
-        if (activeBtn) activeBtn.querySelector('i').className = 'fas fa-pause';
+        if (activeBtn) {
+            const icon = activeBtn.querySelector('i');
+            if (icon) icon.className = 'fas fa-pause';
+        }
         const barPlayIcon = document.querySelector('.player-control-play i');
         if (barPlayIcon) barPlayIcon.className = 'fas fa-pause';
     }

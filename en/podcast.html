@@ -279,25 +279,20 @@
                 <p class="section-description" data-content-key="intro.description">Here you can listen to all our podcast episodes directly in the browser.</p>
             </div>
 
-            <!-- Podcast Filters & Sorting -->
-            <div class="podcast-controls"
-                style="margin-bottom: 40px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
-                <div id="podcast-categories" class="youtube-categories"
-                    style="margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 12px;">
+            <!-- Search bar -->
+            <div class="podcast-search-wrap">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" id="podcast-search-input" class="podcast-search-input" placeholder="Search for episodes or themes...">
+            </div>
+
+            <!-- Podcast Filters -->
+            <div class="podcast-controls" style="margin-bottom: 40px; display: flex; justify-content: center;">
+                <div id="podcast-categories" class="youtube-categories" style="margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
                     <button class="category-btn active" data-filter="all">All</button>
                     <button class="category-btn" data-filter="tro">Faith</button>
                     <button class="category-btn" data-filter="bibel">Bible</button>
                     <button class="category-btn" data-filter="bønn">Prayer</button>
                     <button class="category-btn" data-filter="undervisning">Teaching</button>
-                </div>
-
-                <div class="podcast-sort" style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 0.9rem; color: var(--text-light); font-weight: 600;">Sort by:</span>
-                    <select id="podcast-sort-select"
-                        style="padding: 8px 15px; border-radius: 20px; border: 2px solid var(--border-color); background: white; font-family: inherit; font-size: 0.9rem; color: var(--text-dark); outline: none; cursor: pointer;">
-                        <option value="newest">Newest first</option>
-                        <option value="oldest">Oldest first</option>
-                    </select>
                 </div>
             </div>
 
