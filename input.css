@@ -4240,6 +4240,157 @@ body {
   }
 }
 
+/* Podcast Accordion Redesign matching design template */
+.podcast-accordion {
+  margin-top: 16px;
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  padding-top: 12px;
+}
+
+html[data-theme="dark"] .podcast-accordion {
+  border-top-color: rgba(51, 65, 85, 0.6);
+}
+
+.podcast-accordion-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary-orange, #d17d39);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.podcast-accordion-toggle:hover {
+  opacity: 0.85;
+}
+
+.podcast-accordion-toggle .chevron-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.podcast-accordion-toggle[aria-expanded="true"] .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.podcast-accordion-content {
+  display: none;
+  margin-top: 16px;
+  text-align: left;
+}
+
+.podcast-accordion-content.expanded {
+  display: block;
+}
+
+/* Accordion layout grid */
+.podcast-accordion-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* On desktop, if the card is in list-view, we span 2 columns */
+@media (min-width: 768px) {
+  .podcast-grid.list-view .podcast-accordion-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+.podcast-accordion-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.podcast-accordion-section-title.summary-title {
+  color: var(--text-light, #7f8c8d);
+}
+
+.podcast-accordion-section-title.verses-title {
+  color: var(--primary-orange, #d17d39);
+}
+
+.podcast-accordion-section-title.questions-title {
+  color: var(--text-dark, #2c3e50);
+}
+
+html[data-theme="dark"] .podcast-accordion-section-title.questions-title {
+  color: #f8fafc;
+}
+
+.podcast-verse-item {
+  margin-bottom: 16px;
+}
+
+.podcast-verse-item:last-child {
+  margin-bottom: 0;
+}
+
+.podcast-verse-ref {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-orange, #d17d39);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.podcast-verse-text {
+  font-size: 13.5px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text-dark, #2c3e50);
+  border-left: 2px solid var(--primary-orange, #d17d39);
+  padding-left: 12px;
+  margin: 0;
+}
+
+html[data-theme="dark"] .podcast-verse-text {
+  color: #cbd5e1;
+}
+
+.podcast-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.podcast-question-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.podcast-question-num {
+  font-weight: 700;
+  color: var(--primary-orange, #d17d39);
+  font-size: 13.5px;
+  flex-shrink: 0;
+}
+
+.podcast-question-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-dark, #2c3e50);
+  margin: 0;
+}
+
+html[data-theme="dark"] .podcast-question-text {
+  color: #cbd5e1;
+}
+
 /* Podcast Platforms */
 .section-footer {
     margin-top: 40px;
