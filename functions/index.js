@@ -28,6 +28,7 @@ const path = require('path');
 const os = require('os');
 const { parseStringPromise } = require('xml2js');
 const OpenAI = require('openai');
+const textToSpeech = require('@google-cloud/text-to-speech');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
@@ -6992,63 +6993,148 @@ exports.getBibleChapterAudio = onCall({
     console.error("Feil ved sjekk av storage-eksistens, fortsetter med generering:", storageError);
   }
 
-  // 2. Hent OpenAI API-nøkkel
-  const openaiKey = openaiApiKeyParam.value();
-  if (!openaiKey) {
-    throw new HttpsError("failed-precondition", "OpenAI API-nøkkel mangler på serveren.");
-  }
-
-  console.log(`Genererer lyd for ${cleanBookId} kapittel ${cleanChapterNum} (${cleanText.length} tegn)...`);
-
   try {
-    const openai = new OpenAI({ apiKey: openaiKey });
+    console.log(`Genererer lyd for ${cleanBookId} kapittel ${cleanChapterNum} (${cleanText.length} tegn) med stemme ${cleanVoice}...`);
 
-    // OpenAI TTS har en grense på 4096 tegn per forespørsel.
-    // Vi deler opp teksten i deler på maks 3800 tegn for å være sikre.
-    const chunks = [];
-    let currentText = cleanText;
+  // Del opp teksten i deler på maks 3800 tegn (både OpenAI og GCTS har grenser)
+  const chunks = [];
+  let currentText = cleanText;
 
-    while (currentText.length > 0) {
-      if (currentText.length <= 3800) {
-        chunks.push(currentText);
-        break;
-      }
-
-      // Finn siste avsnitts- eller setningsgrense innenfor de første 3800 tegnene
-      let splitIndex = currentText.lastIndexOf('\n', 3800);
-      if (splitIndex === -1 || splitIndex < 1000) {
-        splitIndex = currentText.lastIndexOf('. ', 3800);
-      }
-      if (splitIndex === -1 || splitIndex < 1000) {
-        splitIndex = 3800; // Hard deling hvis ingen god grense finnes
-      } else {
-        splitIndex += 1; // Inkluder punktum eller linjeskift
-      }
-
-      chunks.push(currentText.substring(0, splitIndex).trim());
-      currentText = currentText.substring(splitIndex).trim();
+  while (currentText.length > 0) {
+    if (currentText.length <= 3800) {
+      chunks.push(currentText);
+      break;
     }
 
-    console.log(`Delt opp kapittelteksten i ${chunks.length} deler for TTS-generering.`);
+    // Finn siste avsnitts- eller setningsgrense innenfor de første 3800 tegnene
+    let splitIndex = currentText.lastIndexOf('\n', 3800);
+    if (splitIndex === -1 || splitIndex < 1000) {
+      splitIndex = currentText.lastIndexOf('. ', 3800);
+    }
+    if (splitIndex === -1 || splitIndex < 1000) {
+      splitIndex = 3800; // Hard deling hvis ingen god grense finnes
+    } else {
+      splitIndex += 1; // Inkluder punktum eller linjeskift
+    }
 
-    // Bruk den valgte stemmen for bibelopplesning
-    const voice = cleanVoice;
+    chunks.push(currentText.substring(0, splitIndex).trim());
+    currentText = currentText.substring(splitIndex).trim();
+  }
 
-    const buffers = [];
+  console.log(`Delt opp kapittelteksten i ${chunks.length} deler for TTS-generering.`);
+
+  let buffers = [];
+  let success = false;
+
+  // 1. Forsøk Google Cloud Text-to-Speech (GCTS) for 100% aksentfri opplesning
+  try {
+    const isFemale = cleanVoice === 'nova';
+    let primaryConfig;
+    let fallbackConfig;
+
+    if (cleanLang.startsWith('en')) {
+      primaryConfig = {
+        languageCode: 'en-US',
+        name: isFemale ? 'en-US-Neural2-F' : 'en-US-Neural2-J',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+      fallbackConfig = {
+        languageCode: 'en-US',
+        name: isFemale ? 'en-US-Wavenet-F' : 'en-US-Wavenet-D',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+    } else if (cleanLang.startsWith('es')) {
+      primaryConfig = {
+        languageCode: 'es-ES',
+        name: isFemale ? 'es-ES-Neural2-F' : 'es-ES-Neural2-B',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+      fallbackConfig = {
+        languageCode: 'es-ES',
+        name: isFemale ? 'es-ES-Wavenet-C' : 'es-ES-Wavenet-B',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+    } else {
+      // Standard: Norsk (no)
+      primaryConfig = {
+        languageCode: 'no-NO',
+        name: isFemale ? 'no-NO-Neural2-F' : 'no-NO-Neural2-B',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+      fallbackConfig = {
+        languageCode: 'no-NO',
+        name: isFemale ? 'no-NO-Wavenet-A' : 'no-NO-Wavenet-B',
+        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+      };
+    }
+
+    console.log(`Prøver Google Cloud TTS (Neural2: ${primaryConfig.name})...`);
+    const ttsClient = new textToSpeech.TextToSpeechClient();
+
     for (let i = 0; i < chunks.length; i++) {
-      console.log(`Genererer del ${i + 1}/${chunks.length}...`);
-      const response = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: voice,
-        input: chunks[i],
-      });
+      console.log(`Genererer GCTS del ${i + 1}/${chunks.length}...`);
+      let response;
+      try {
+        [response] = await ttsClient.synthesizeSpeech({
+          input: { text: chunks[i] },
+          voice: primaryConfig,
+          audioConfig: { audioEncoding: 'MP3' },
+        });
+      } catch (neuralError) {
+        console.warn(`GCTS Neural2 feilet, prøver WaveNet fallback (${fallbackConfig.name}):`, neuralError);
+        [response] = await ttsClient.synthesizeSpeech({
+          input: { text: chunks[i] },
+          voice: fallbackConfig,
+          audioConfig: { audioEncoding: 'MP3' },
+        });
+      }
 
-      const buffer = Buffer.from(await response.arrayBuffer());
+      if (!response || !response.audioContent) {
+        throw new Error("Mottok ikke lydinnhold fra Google Cloud TTS.");
+      }
+
+      const buffer = Buffer.from(response.audioContent, 'base64');
       buffers.push(buffer);
     }
 
-    // Sett sammen MP3-bufferne til én fil
-    const combinedBuffer = Buffer.concat(buffers);
+    success = true;
+    console.log("Lydfil vellykket generert med Google Cloud TTS!");
+  } catch (gctsError) {
+    console.error("Google Cloud TTS feilet fullstendig, faller tilbake til OpenAI TTS:", gctsError);
+    buffers = []; // Nullstill bufferne for fallback
+  }
+
+  // 2. Fallback til OpenAI TTS dersom Google Cloud TTS feilet eller API-en ikke er aktivert
+  if (!success) {
+    const openaiKey = openaiApiKeyParam.value();
+    if (!openaiKey) {
+      throw new HttpsError("failed-precondition", "Både Google Cloud TTS feilet og OpenAI API-nøkkel mangler.");
+    }
+
+    try {
+      console.log(`Forsøker OpenAI TTS fallback med stemme ${cleanVoice}...`);
+      const openai = new OpenAI({ apiKey: openaiKey });
+
+      for (let i = 0; i < chunks.length; i++) {
+        console.log(`Genererer OpenAI del ${i + 1}/${chunks.length}...`);
+        const response = await openai.audio.speech.create({
+          model: "tts-1",
+          voice: cleanVoice,
+          input: chunks[i],
+        });
+
+        const buffer = Buffer.from(await response.arrayBuffer());
+        buffers.push(buffer);
+      }
+      success = true;
+    } catch (openaiError) {
+      console.error("OpenAI TTS fallback feilet også:", openaiError);
+      throw new HttpsError("internal", "Kunne ikke generere lyd med noen av TTS-motorene: " + openaiError.message);
+    }
+  }
+
+  // Sett sammen MP3-bufferne til én fil
+  const combinedBuffer = Buffer.concat(buffers);
 
     // Lagre til Firebase Storage
     await file.save(combinedBuffer, {
