@@ -537,12 +537,21 @@ class AdminManager {
         if (!post || typeof post !== 'object') return this._hashString('');
         // Only hash stable text fields — content is an EditorJS object whose `time`
         // field changes on every open, which would make the hash unstable.
+        const keyVersesStr = (Array.isArray(post.keyVerses) ? post.keyVerses : [])
+            .map(kv => `${kv?.reference || ''}:${kv?.text || ''}`)
+            .join(',');
+        const questionsStr = (Array.isArray(post.discussionQuestions) ? post.discussionQuestions : [])
+            .join(',');
         const payload = [
             post.title || '',
             post.category || '',
             post.seoTitle || '',
             post.seoDescription || '',
             post.text || '',
+            post.summary || '',
+            post.description || '',
+            keyVersesStr,
+            questionsStr,
             (Array.isArray(post.tags) ? post.tags : []).join(',')
         ].join('|');
         return this._hashString(payload);
@@ -1159,6 +1168,32 @@ class AdminManager {
         }
         if (typeof post.description === 'string') {
             translation.description = await this._translateRichText(post.description, targetLang, 'no');
+        }
+        if (Array.isArray(post.keyVerses)) {
+            const translatedKeyVerses = [];
+            for (const kv of post.keyVerses) {
+                if (kv && typeof kv === 'object') {
+                    const reference = typeof kv.reference === 'string'
+                        ? await this._translateRichText(kv.reference, targetLang, 'no')
+                        : (kv.reference || '');
+                    const text = typeof kv.text === 'string'
+                        ? await this._translateRichText(kv.text, targetLang, 'no')
+                        : (kv.text || '');
+                    translatedKeyVerses.push({ reference, text });
+                }
+            }
+            translation.keyVerses = translatedKeyVerses;
+        }
+        if (Array.isArray(post.discussionQuestions)) {
+            const translatedQuestions = [];
+            for (const q of post.discussionQuestions) {
+                if (typeof q === 'string') {
+                    translatedQuestions.push(await this._translateRichText(q, targetLang, 'no'));
+                } else {
+                    translatedQuestions.push(q);
+                }
+            }
+            translation.discussionQuestions = translatedQuestions;
         }
         return translation;
     }

@@ -6043,7 +6043,7 @@ exports.scheduledPodcastTranscription = onSchedule({
   schedule: "*/5 * * * *",
   timeoutSeconds: 540,
   memory: "1GiB",
-  secrets: [geminiApiKeyParam]
+  secrets: [geminiApiKeyParam, openaiApiKeyParam]
 }, async () => {
   if (!PODCAST_AUTO_TRANSCRIPTION_ENABLED) {
     console.log("Automatisk podcast-transkribering er deaktivert. Bruk manuell generering i admin.");
@@ -6065,7 +6065,42 @@ exports.scheduledPodcastTranscription = onSchedule({
     const nextRetryAtMs = transcriptData?.nextRetryAt && typeof transcriptData.nextRetryAt.toMillis === "function"
       ? transcriptData.nextRetryAt.toMillis()
       : 0;
-  if (transcriptData?.text) {
+    if (transcriptData?.text) {
+      const needsSummary = !transcriptData.summary && !transcriptData.description;
+      const needsQuestions = !transcriptData.discussionQuestions || transcriptData.discussionQuestions.length === 0;
+
+      if (needsSummary || needsQuestions) {
+        try {
+          console.log(`Auto-genererer manglende oppsummering/spørsmål for episode ${episode.episodeId}`);
+          const autoData = await generatePodcastSummaryWithGemini({
+            episodeTitle: episode.title || transcriptData.title || '',
+            transcriptText: transcriptData.text
+          });
+
+          const updatePayload = {};
+          if (autoData.summary) {
+            updatePayload.summary = autoData.summary;
+            updatePayload.description = autoData.summary;
+          }
+          if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
+            updatePayload.keyVerses = autoData.keyVerses;
+          }
+          if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
+            updatePayload.discussionQuestions = autoData.discussionQuestions;
+          }
+
+          if (Object.keys(updatePayload).length > 0) {
+            await transcriptRef.update(updatePayload);
+            console.log(`Vellykket auto-generering av oppsummering/spørsmål for ${episode.episodeId}`);
+            processedCount += 1;
+          }
+        } catch (summaryError) {
+          console.error(`Auto-generering feilet for ${episode.episodeId}:`, summaryError);
+          if (isGeminiRateLimitError(summaryError)) {
+            break;
+          }
+        }
+      }
       continue;
     }
 
@@ -6092,6 +6127,95 @@ exports.scheduledPodcastTranscription = onSchedule({
         break;
       }
     }
+  }
+});
+
+exports.backfillPodcastSummaries = onRequest({
+  cors: true,
+  timeoutSeconds: 540,
+  memory: "1GiB",
+  secrets: [geminiApiKeyParam, openaiApiKeyParam]
+}, async (req, res) => {
+  try {
+    let limit = req.query.limit ? parseInt(req.query.limit, 10) : 5;
+    if (req.query.limit === 'all' || req.query.limit === '0') {
+      limit = Number.MAX_SAFE_INTEGER;
+    }
+
+    const episodes = await fetchPodcastEpisodesFromRss(Number.MAX_SAFE_INTEGER);
+    let processed = [];
+    let failed = [];
+
+    for (const episode of episodes) {
+      const transcriptRef = db.collection("podcast_transcripts").doc(episode.episodeId);
+      const transcriptSnap = await transcriptRef.get();
+      
+      if (!transcriptSnap.exists) {
+        continue;
+      }
+      
+      const transcriptData = transcriptSnap.data();
+      if (!transcriptData.text) {
+        continue;
+      }
+
+      const needsSummary = !transcriptData.summary && !transcriptData.description;
+      const needsQuestions = !transcriptData.discussionQuestions || transcriptData.discussionQuestions.length === 0;
+
+      if (needsSummary || needsQuestions) {
+        if (processed.length >= limit) {
+          break;
+        }
+
+        if (processed.length > 0) {
+          console.log("Sleeping 4 seconds to respect Gemini Free Tier rate limits...");
+          await new Promise((resolve) => setTimeout(resolve, 4000));
+        }
+
+        try {
+          console.log(`Backfilling episode ${episode.episodeId}`);
+          const autoData = await generatePodcastSummaryWithGemini({
+            episodeTitle: episode.title || transcriptData.title || '',
+            transcriptText: transcriptData.text
+          });
+
+          const updatePayload = {};
+          if (autoData.summary) {
+            updatePayload.summary = autoData.summary;
+            updatePayload.description = autoData.summary;
+          }
+          if (Array.isArray(autoData.keyVerses) && autoData.keyVerses.length > 0) {
+            updatePayload.keyVerses = autoData.keyVerses;
+          }
+          if (Array.isArray(autoData.discussionQuestions) && autoData.discussionQuestions.length > 0) {
+            updatePayload.discussionQuestions = autoData.discussionQuestions;
+          }
+
+          if (Object.keys(updatePayload).length > 0) {
+            await transcriptRef.update(updatePayload);
+            processed.push(episode.episodeId);
+          }
+        } catch (e) {
+          console.error(`Failed to backfill ${episode.episodeId}:`, e);
+          failed.push({ id: episode.episodeId, error: e.message });
+          if (isGeminiRateLimitError(e)) {
+            console.log("Gemini rate limit exceeded. Stopping backfill.");
+            break;
+          }
+        }
+      }
+    }
+
+    res.status(200).send({
+      message: "Backfill completed",
+      processedCount: processed.length,
+      processed,
+      failedCount: failed.length,
+      failed
+    });
+  } catch (error) {
+    console.error("Backfill failed:", error);
+    res.status(500).send({ error: error.message });
   }
 });
 
