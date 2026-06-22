@@ -7538,4 +7538,134 @@ html[data-theme="dark"] .bank-detail-value {
     color: #f8fafc !important;
 }
 
+/* ==========================================================================
+   Subpages Dark Mode Overrides
+   ========================================================================== */
+
+/* 1. Universal Subpage Sections Overrides */
+html[data-theme="dark"] section.section,
+html[data-theme="dark"] .section {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
+}
+
+/* 2. BNN Page Card Styles */
+html[data-theme="dark"] section.section div[style*="background: #f8f9fa"],
+html[data-theme="dark"] section.section div[style*="background:#f8f9fa"],
+html[data-theme="dark"] .bg-\[\#f8f9fa\] {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* 3. About Page (Om Oss) Team and Value Sections */
+html[data-theme="dark"] .team-section {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .team-member {
+    background: #1e293b !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .value-card {
+    background: #1e293b !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .circular-image {
+    border-color: #1e293b !important;
+    background: #1e293b !important;
+}
+
+/* 4. Contact Page (Kontakt) Containers */
+html[data-theme="dark"] .contact-section {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .contact-form-container {
+    background: #1e293b !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .social-links-contact a {
+    background: #1e293b !important;
+    color: var(--primary-orange) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .social-links-contact a:hover {
+    background: var(--primary-orange) !important;
+    color: white !important;
+}
+
+/* Form fields placeholder contrast */
+html[data-theme="dark"] ::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+/* 5. Corporate Partnership Icon Background */
+html[data-theme="dark"] .bg-orange-50 {
+    background-color: rgba(209, 125, 57, 0.15) !important;
+}
+
+/* 6. Custom Calendar Page Overrides */
+html[data-theme="dark"] .calendar-section {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .calendar-container {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .calendar-grid {
+    background: #334155 !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .cal-day-header {
+    background: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .cal-cell {
+    background: #1e293b !important;
+}
+
+html[data-theme="dark"] .cal-cell.other-month {
+    background: #0f172a !important;
+    color: #475569 !important;
+}
+
+html[data-theme="dark"] .cal-cell.today {
+    background: rgba(209, 125, 57, 0.15) !important;
+}
+
+html[data-theme="dark"] .cal-event-tag {
+    background: rgba(209, 125, 57, 0.25) !important;
+    color: #ff9d4d !important;
+}
+
+html[data-theme="dark"] .cal-view-btn {
+    background: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .cal-view-btn.active {
+    background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .calendar-agenda-card,
+html[data-theme="dark"] .calendar-agenda-item {
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .calendar-agenda-subtitle {
+    color: #94a3b8 !important;
+}
+
 
