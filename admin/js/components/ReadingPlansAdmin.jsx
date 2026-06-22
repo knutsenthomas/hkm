@@ -622,7 +622,7 @@ export default function ReadingPlansAdmin() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                 {plans.map(plan => (
-                    <div key={plan.id} className="card modern" style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                    <div key={plan.id} className="card modern group" style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
                         {plan.imageUrl && (
                             <div style={{ width: '100%', height: '140px', borderRadius: '10px', overflow: 'hidden', marginBottom: '4px' }}>
                                 <img src={plan.imageUrl} alt={plan.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -635,7 +635,7 @@ export default function ReadingPlansAdmin() {
                         <p style={{ fontSize: '13px', color: '#64748b', margin: 0, flexGrow: 1, lineheight: 1.5 }}>
                             {plan.description || 'Ingen beskrivelse.'}
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
+                        <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200" style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '8px' }}>
                             <button
                                 onClick={() => handleEditPlan(plan)}
                                 className="btn-secondary"
