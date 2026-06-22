@@ -5637,12 +5637,14 @@ ol.block-list {
 .mega-menu {
     position: fixed;
     inset: 0;
-    background: white;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     z-index: 19000;
     /* Lowered to stay below header (20000) */
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s ease-in-out;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s, backdrop-filter 0.35s;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -5686,7 +5688,7 @@ ol.block-list {
         margin-bottom: 4px !important;
     }
     .mega-nav-list a {
-        font-size: 1.05rem !important;
+        font-size: 1.05rem;
     }
     .mega-menu-footer {
         margin-top: 15px !important;
@@ -5719,7 +5721,7 @@ ol.block-list {
         margin-bottom: 8px !important;
     }
     .mega-nav-list a {
-        font-size: 1.25rem !important;
+        font-size: 1.25rem;
     }
     .mega-menu-footer {
         margin-top: 40px !important;
@@ -5859,13 +5861,21 @@ ol.block-list {
 }
 
 .menu-section-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 24px;
-    color: var(--text-light);
-    /* Lighter color for headers */
-    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+    color: #1B4965; /* Dark blue title in light mode */
+    font-weight: 700;
+    border-bottom: 2px solid rgba(27, 73, 101, 0.08);
+    padding-bottom: 8px;
+    display: block;
+    width: 100%;
+}
+
+html[data-theme="dark"] .menu-section-title {
+    color: #cbd5e1;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
 .mega-nav-list {
@@ -5874,53 +5884,131 @@ ol.block-list {
 }
 
 .mega-nav-list li {
-    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mega-nav-list li .material-symbols-outlined {
+    font-size: 1.35rem;
+    color: #1B4965; /* Hovedfarge Mørkeblå */
+    opacity: 0.65;
+    transition: color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+html[data-theme="dark"] .mega-nav-list li .material-symbols-outlined {
+    color: #94a3b8;
+    opacity: 0.8;
 }
 
 .mega-nav-list a {
-    font-size: 1.5rem;
-    /* Large text for links */
+    font-size: 1.15rem;
     font-weight: 500;
     color: var(--text-dark);
     text-decoration: none;
-    transition: color 0.25s ease, transform 0.25s ease;
-    transform-origin: center;
+    transition: color 0.3s ease;
     display: inline-block;
 }
 
-.mega-nav-list a:hover {
+html[data-theme="dark"] .mega-nav-list a {
+    color: #f1f5f9;
+}
+
+/* Hover effects on the list item row wrapper */
+.mega-nav-list li:hover {
+    transform: translateX(6px);
+}
+
+.mega-nav-list li:hover .material-symbols-outlined {
     color: var(--primary-orange);
-    transform: scale(1.04);
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.mega-nav-list li:hover a {
+    color: var(--primary-orange);
 }
 
 /* Menu Footer */
 .mega-menu-footer {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 40px;
-    margin-top: 60px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 32px;
+    margin-top: 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
 }
 
+html[data-theme="dark"] .mega-menu-footer {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
 .mega-menu-footer .btn-large {
-    padding: 16px 50px;
-    font-size: 1.1rem;
+    padding: 14px 40px;
+    font-size: 1.05rem;
+    font-weight: 600;
     border-radius: 50px;
-    min-width: 300px;
+    min-width: 280px;
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(209, 125, 57, 0.15);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.mega-menu-footer .btn-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(209, 125, 57, 0.35);
+}
+
+.mega-menu-footer .btn-large:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .menu-footer-links {
     display: flex;
     justify-content: center;
     gap: 24px;
+    flex-wrap: wrap;
 }
 
 .menu-footer-links a {
     color: var(--text-light);
     font-size: 0.9rem;
+    font-weight: 500;
     text-decoration: none;
+    transition: color 0.25s ease;
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.menu-footer-links a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1.5px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary-orange);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.menu-footer-links a:hover {
+    color: var(--primary-orange);
+}
+
+.menu-footer-links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
 }
 
 /* Temporarily disable all tax-deduction UI until approval is granted */
@@ -7251,12 +7339,36 @@ html[data-theme="dark"] .border-gray-300 {
 }
 
 html[data-theme="dark"] .mega-menu {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
 }
 
 html[data-theme="dark"] .mega-menu-content {
-    background-color: #0f172a !important;
+    background-color: rgba(15, 23, 42, 0.85) !important;
+}
+
+/* Mobile theme button and floating language selector overrides */
+.mobile-theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease !important;
+}
+.mobile-theme-toggle-btn:hover {
+    background: white !important;
+    color: var(--primary-orange) !important;
+    transform: scale(1.05);
+}
+html[data-theme="dark"] .mobile-theme-toggle-btn {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #cbd5e1 !important;
+}
+html[data-theme="dark"] .mobile-theme-toggle-btn:hover {
+    background: rgba(30, 41, 59, 0.8) !important;
+    color: var(--primary-orange) !important;
 }
 
 /* 3. Audio Bibelavspiller (Sticky Player Bar) */
