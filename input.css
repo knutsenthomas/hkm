@@ -7686,7 +7686,8 @@ html[data-theme="dark"] header#header .lang-btn {
 }
 
 /* 2. Reading Plans (Leseplaner) Controls and Cards */
-html[data-theme="dark"] .plans-controls {
+html[data-theme="dark"] .plans-controls,
+html[data-theme="dark"] .kurs-controls {
     background: #0f172a !important;
     border-bottom-color: #334155 !important;
 }
