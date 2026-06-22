@@ -7343,7 +7343,8 @@ html[data-theme="dark"] .mega-menu-content {
     color: #f1f5f9;
 }
 
-.audio-speed-select {
+.audio-speed-select,
+.audio-voice-select {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: #ffffff !important;
@@ -7359,7 +7360,8 @@ html[data-theme="dark"] .mega-menu-content {
     box-sizing: border-box;
 }
 
-.audio-speed-select option {
+.audio-speed-select option,
+.audio-voice-select option {
     background: #0f172a;
     color: #ffffff;
 }

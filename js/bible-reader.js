@@ -73,6 +73,7 @@ class BibleReader {
         this.audioVerses = [];
         this.currentAudioIndex = 0;
         this.audioSpeed = 1.0;
+        this.audioVoice = localStorage.getItem('hkm_bible_audio_voice') || 'onyx';
         this.activeUtterance = null;
 
         // Cache for loaded books/chapters
@@ -4022,7 +4023,8 @@ class BibleReader {
             bookId: this.selectedBookId,
             chapterNum: this.selectedChapterId.split('_')[1],
             lang: lang,
-            text: chapterText
+            text: chapterText,
+            voice: this.audioVoice
         })
         .then(result => {
             if (!this.audioIsPlaying) {
@@ -4119,6 +4121,11 @@ class BibleReader {
     showAudioPlayerBar() {
         let playerBar = document.getElementById('hkm-audio-player-bar');
         if (!playerBar) {
+            const activeLang = document.documentElement.lang || 'no';
+            const labelVoice = activeLang === 'es' ? 'Voz' : (activeLang === 'en' ? 'Voice' : 'Stemme');
+            const labelMale = activeLang === 'es' ? 'Hombre' : (activeLang === 'en' ? 'Male' : 'Mann (Onyx)');
+            const labelFemale = activeLang === 'es' ? 'Mujer' : (activeLang === 'en' ? 'Female' : 'Kvinne (Nova)');
+
             playerBar = document.createElement('div');
             playerBar.id = 'hkm-audio-player-bar';
             playerBar.className = 'hkm-audio-player-bar';
@@ -4134,6 +4141,10 @@ class BibleReader {
                 <div class="audio-info-display" id="audio-info-display">
                     ${this.t('playing_verse')}...
                 </div>
+                <select class="audio-voice-select" id="audio-voice-select" title="${labelVoice}">
+                    <option value="onyx">${labelMale}</option>
+                    <option value="nova">${labelFemale}</option>
+                </select>
                 <select class="audio-speed-select" id="audio-speed-select" title="Hastighet">
                     <option value="0.8">0.8x</option>
                     <option value="1.0" selected>1.0x</option>
@@ -4156,10 +4167,24 @@ class BibleReader {
                     this.bibleAudio.playbackRate = this.audioSpeed;
                 }
             });
+            document.getElementById('audio-voice-select').addEventListener('change', (e) => {
+                const newVoice = e.target.value;
+                if (newVoice !== this.audioVoice) {
+                    this.audioVoice = newVoice;
+                    localStorage.setItem('hkm_bible_audio_voice', newVoice);
+                    if (this.audioIsPlaying) {
+                        this.stopAudioPlayback();
+                        this.startAudioPlayback();
+                    }
+                }
+            });
         }
         
         const speedSelect = document.getElementById('audio-speed-select');
         if (speedSelect) speedSelect.value = String(this.audioSpeed);
+
+        const voiceSelect = document.getElementById('audio-voice-select');
+        if (voiceSelect) voiceSelect.value = String(this.audioVoice);
         
         setTimeout(() => playerBar.classList.add('active'), 50);
         

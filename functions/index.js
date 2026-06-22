@@ -6939,7 +6939,7 @@ exports.getBibleChapterAudio = onCall({
   timeoutSeconds: 300,
   memory: "512MiB"
 }, async (request) => {
-  const { bookId, chapterNum, lang, text } = request.data || {};
+  const { bookId, chapterNum, lang, text, voice } = request.data || {};
 
   if (!bookId || !chapterNum || !lang || !text) {
     throw new HttpsError("invalid-argument", "Mangler nødvendige parametere (bookId, chapterNum, lang, text).");
@@ -6949,13 +6949,17 @@ exports.getBibleChapterAudio = onCall({
   const cleanBookId = String(bookId).toLowerCase();
   const cleanChapterNum = String(chapterNum);
   const cleanText = String(text).trim();
+  let cleanVoice = String(voice || 'onyx').toLowerCase();
+  if (!['onyx', 'nova', 'alloy', 'echo', 'shimmer', 'fable'].includes(cleanVoice)) {
+    cleanVoice = 'onyx';
+  }
 
   if (cleanText.length < 5) {
     throw new HttpsError("invalid-argument", "Teksten er for kort til å generere lyd.");
   }
 
   const bucket = admin.storage().bucket();
-  const filePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}.mp3`;
+  const filePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}_${cleanVoice}.mp3`;
   const file = bucket.file(filePath);
 
   try {
@@ -6965,6 +6969,24 @@ exports.getBibleChapterAudio = onCall({
       console.log(`Lydfil allerede cachet i Storage: ${filePath}`);
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
       return { success: true, audioUrl: publicUrl };
+    }
+
+    // 2. Bakoverkompatibilitet: Sjekk om gammel fil uten suffix finnes (kun for default 'onyx' stemme)
+    if (cleanVoice === 'onyx') {
+      const oldFilePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}.mp3`;
+      const oldFile = bucket.file(oldFilePath);
+      const [oldExists] = await oldFile.exists();
+      if (oldExists) {
+        console.log(`Gammel lydfil uten suffix finnes for onyx. Kopierer til ny sti: ${filePath}`);
+        await oldFile.copy(file);
+        try {
+          await file.makePublic();
+        } catch (copyMakePublicError) {
+          console.warn("Kunne ikke gjøre kopiert fil offentlig:", copyMakePublicError);
+        }
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+        return { success: true, audioUrl: publicUrl };
+      }
     }
   } catch (storageError) {
     console.error("Feil ved sjekk av storage-eksistens, fortsetter med generering:", storageError);
@@ -7009,8 +7031,8 @@ exports.getBibleChapterAudio = onCall({
 
     console.log(`Delt opp kapittelteksten i ${chunks.length} deler for TTS-generering.`);
 
-    // Bruk den varme og dype stemmen 'onyx' for bibelopplesning
-    const voice = 'onyx';
+    // Bruk den valgte stemmen for bibelopplesning
+    const voice = cleanVoice;
 
     const buffers = [];
     for (let i = 0; i < chunks.length; i++) {
