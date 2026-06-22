@@ -3983,20 +3983,91 @@ class BibleReader {
     startAudioPlayback() {
         if (!this.dom.readingPane) return;
         
-        // Find all verses
+        // Find all paragraphs containing verses
         const paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
-        this.audioVerses = paragraphs.filter(p => p.querySelector('sup.v'));
-        
-        if (this.audioVerses.length === 0) {
-            alert('Kunne ikke finne vers for opplesning i dette kapittelet.');
+        if (paragraphs.length === 0) {
+            alert('Kunne ikke finne tekst for opplesning i dette kapittelet.');
+            return;
+        }
+
+        // Combine text of all paragraphs, stripping verse numbers for cleaner audio reading
+        const textParts = paragraphs.map(p => {
+            const pCopy = p.cloneNode(true);
+            const sup = pCopy.querySelector('sup.v');
+            if (sup) sup.remove();
+            return pCopy.innerText.trim();
+        }).filter(Boolean);
+
+        const chapterText = textParts.join('\n\n');
+
+        if (chapterText.length < 10) {
+            alert('Kunne ikke finne nok tekst for opplesning.');
             return;
         }
 
         this.audioIsPlaying = true;
         this.audioIsPaused = false;
-        this.currentAudioIndex = 0;
         this.showAudioPlayerBar();
-        this.speakNextVerse();
+        
+        const infoDisplay = document.getElementById('audio-info-display');
+        if (infoDisplay) {
+            infoDisplay.textContent = 'Genererer lyd med AI...';
+        }
+
+        const lang = document.documentElement.lang || 'no';
+
+        // Call getBibleChapterAudio Cloud Function
+        const callable = firebase.functions().httpsCallable('getBibleChapterAudio');
+        callable({
+            bookId: this.selectedBookId,
+            chapterNum: this.selectedChapterId.split('_')[1],
+            lang: lang,
+            text: chapterText
+        })
+        .then(result => {
+            if (!this.audioIsPlaying) {
+                // User stopped playback while it was generating
+                return;
+            }
+
+            const audioUrl = result.data.audioUrl;
+            if (!audioUrl) {
+                throw new Error("Mottok ingen lyd-URL fra serveren.");
+            }
+
+            console.log("Playing Bible audio:", audioUrl);
+            
+            // Create Audio object
+            this.bibleAudio = new Audio(audioUrl);
+            this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
+            
+            // Bind audio events
+            this.bibleAudio.onended = () => {
+                this.stopAudioPlayback();
+            };
+
+            this.bibleAudio.onerror = (e) => {
+                console.error("Audio playback error:", e);
+                alert("Feil under avspilling av lydfilen.");
+                this.stopAudioPlayback();
+            };
+
+            this.bibleAudio.play().then(() => {
+                if (infoDisplay) {
+                    infoDisplay.textContent = (this.t('playing_verse') || 'Spiller av') + '...';
+                }
+                this.updateAudioPlayerUI();
+            }).catch(playErr => {
+                console.error("Audio play failed:", playErr);
+                alert("Kunne ikke starte avspilling av lydfilen.");
+                this.stopAudioPlayback();
+            });
+        })
+        .catch(error => {
+            console.error("Error generating Bible audio:", error);
+            alert("Kunne ikke generere lyd for kapittelet: " + error.message);
+            this.stopAudioPlayback();
+        });
     }
 
     stopAudioPlayback() {
@@ -4005,13 +4076,9 @@ class BibleReader {
         this.audioIsPlaying = false;
         this.audioIsPaused = false;
         
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-        
-        // Remove highlights
-        if (this.audioVerses) {
-            this.audioVerses.forEach(p => p.classList.remove('audio-playing-highlight'));
+        if (this.bibleAudio) {
+            this.bibleAudio.pause();
+            this.bibleAudio = null;
         }
         
         this.hideAudioPlayerBar();
@@ -4035,84 +4102,18 @@ class BibleReader {
     }
 
     pauseAudioPlayback() {
-        if (window.speechSynthesis) {
-            window.speechSynthesis.pause();
+        if (this.bibleAudio) {
+            this.bibleAudio.pause();
         }
     }
 
     resumeAudioPlayback() {
-        if (window.speechSynthesis) {
-            if (window.speechSynthesis.paused) {
-                window.speechSynthesis.resume();
-            } else {
-                this.speakNextVerse();
-            }
+        if (this.bibleAudio) {
+            this.bibleAudio.play().catch(err => {
+                console.error("Error resuming audio playback:", err);
+                this.stopAudioPlayback();
+            });
         }
-    }
-
-    speakNextVerse() {
-        if (!this.audioIsPlaying || this.audioIsPaused) return;
-
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-
-        // Clean up previous highlights
-        this.audioVerses.forEach(p => p.classList.remove('audio-playing-highlight'));
-
-        if (this.currentAudioIndex >= this.audioVerses.length) {
-            this.stopAudioPlayback();
-            return;
-        }
-
-        const p = this.audioVerses[this.currentAudioIndex];
-        p.classList.add('audio-playing-highlight');
-        p.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // Clone element to strip verse number for cleaner reading
-        const pCopy = p.cloneNode(true);
-        const sup = pCopy.querySelector('sup.v');
-        let verseNum = '';
-        if (sup) {
-            verseNum = sup.innerText.trim();
-            sup.remove();
-        }
-        const text = pCopy.innerText.trim();
-
-        this.updateAudioPlayerUI(verseNum);
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        this.activeUtterance = utterance;
-        
-        utterance.rate = this.audioSpeed || 1.0;
-        
-        const lang = document.documentElement.lang || 'no';
-        utterance.lang = lang === 'es' ? 'es-ES' : (lang === 'en' ? 'en-US' : 'no-NO');
-        
-        if (window.speechSynthesis) {
-            const voices = window.speechSynthesis.getVoices();
-            const matchingVoice = voices.find(v => v.lang.startsWith(lang));
-            if (matchingVoice) utterance.voice = matchingVoice;
-        }
-
-        utterance.onend = () => {
-            if (this.audioIsPlaying && !this.audioIsPaused) {
-                this.currentAudioIndex++;
-                this.speakNextVerse();
-            }
-        };
-
-        utterance.onerror = (e) => {
-            console.error('[SpeechSynthesis] Utterance error:', e);
-            if (this.audioIsPlaying && !this.audioIsPaused && e.error !== 'interrupted') {
-                setTimeout(() => {
-                    this.currentAudioIndex++;
-                    this.speakNextVerse();
-                }, 100);
-            }
-        };
-
-        window.speechSynthesis.speak(utterance);
     }
 
     showAudioPlayerBar() {
@@ -4151,8 +4152,8 @@ class BibleReader {
             document.getElementById('audio-close-btn').addEventListener('click', () => this.stopAudioPlayback());
             document.getElementById('audio-speed-select').addEventListener('change', (e) => {
                 this.audioSpeed = parseFloat(e.target.value);
-                if (this.audioIsPlaying && !this.audioIsPaused) {
-                    this.speakNextVerse();
+                if (this.bibleAudio) {
+                    this.bibleAudio.playbackRate = this.audioSpeed;
                 }
             });
         }
@@ -4177,16 +4178,14 @@ class BibleReader {
         }
     }
 
-    updateAudioPlayerUI(verseNum = '') {
+    updateAudioPlayerUI() {
         const infoDisplay = document.getElementById('audio-info-display');
         if (!infoDisplay) return;
 
         if (this.audioIsPaused) {
-            infoDisplay.textContent = this.t('paused');
-        } else if (verseNum) {
-            infoDisplay.textContent = `${this.t('playing_verse')} ${verseNum}`;
+            infoDisplay.textContent = this.t('paused') || 'Pauset';
         } else {
-            infoDisplay.textContent = `${this.t('playing_verse')}...`;
+            infoDisplay.textContent = (this.t('playing_verse') || 'Spiller av') + '...';
         }
     }
 }

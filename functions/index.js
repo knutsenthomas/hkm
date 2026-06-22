@@ -6932,3 +6932,123 @@ exports.syncGoogleTasks = onRequest({ cors: true }, async (req, res) => {
     return res.status(500).send("Kunne ikke synkronisere oppgaver: " + error.message);
   }
 });
+
+exports.getBibleChapterAudio = onCall({
+  cors: true,
+  secrets: [openaiApiKeyParam],
+  timeoutSeconds: 300,
+  memory: "512MiB"
+}, async (request) => {
+  const { bookId, chapterNum, lang, text } = request.data || {};
+
+  if (!bookId || !chapterNum || !lang || !text) {
+    throw new HttpsError("invalid-argument", "Mangler nødvendige parametere (bookId, chapterNum, lang, text).");
+  }
+
+  const cleanLang = String(lang).toLowerCase();
+  const cleanBookId = String(bookId).toLowerCase();
+  const cleanChapterNum = String(chapterNum);
+  const cleanText = String(text).trim();
+
+  if (cleanText.length < 5) {
+    throw new HttpsError("invalid-argument", "Teksten er for kort til å generere lyd.");
+  }
+
+  const bucket = admin.storage().bucket();
+  const filePath = `bible_audio/${cleanLang}/${cleanBookId}_${cleanChapterNum}.mp3`;
+  const file = bucket.file(filePath);
+
+  try {
+    // 1. Sjekk om filen allerede er cachet i Storage
+    const [exists] = await file.exists();
+    if (exists) {
+      console.log(`Lydfil allerede cachet i Storage: ${filePath}`);
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+      return { success: true, audioUrl: publicUrl };
+    }
+  } catch (storageError) {
+    console.error("Feil ved sjekk av storage-eksistens, fortsetter med generering:", storageError);
+  }
+
+  // 2. Hent OpenAI API-nøkkel
+  const openaiKey = openaiApiKeyParam.value();
+  if (!openaiKey) {
+    throw new HttpsError("failed-precondition", "OpenAI API-nøkkel mangler på serveren.");
+  }
+
+  console.log(`Genererer lyd for ${cleanBookId} kapittel ${cleanChapterNum} (${cleanText.length} tegn)...`);
+
+  try {
+    const openai = new OpenAI({ apiKey: openaiKey });
+
+    // OpenAI TTS har en grense på 4096 tegn per forespørsel.
+    // Vi deler opp teksten i deler på maks 3800 tegn for å være sikre.
+    const chunks = [];
+    let currentText = cleanText;
+
+    while (currentText.length > 0) {
+      if (currentText.length <= 3800) {
+        chunks.push(currentText);
+        break;
+      }
+
+      // Finn siste avsnitts- eller setningsgrense innenfor de første 3800 tegnene
+      let splitIndex = currentText.lastIndexOf('\n', 3800);
+      if (splitIndex === -1 || splitIndex < 1000) {
+        splitIndex = currentText.lastIndexOf('. ', 3800);
+      }
+      if (splitIndex === -1 || splitIndex < 1000) {
+        splitIndex = 3800; // Hard deling hvis ingen god grense finnes
+      } else {
+        splitIndex += 1; // Inkluder punktum eller linjeskift
+      }
+
+      chunks.push(currentText.substring(0, splitIndex).trim());
+      currentText = currentText.substring(splitIndex).trim();
+    }
+
+    console.log(`Delt opp kapittelteksten i ${chunks.length} deler for TTS-generering.`);
+
+    // Bruk den varme og dype stemmen 'onyx' for bibelopplesning
+    const voice = 'onyx';
+
+    const buffers = [];
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`Genererer del ${i + 1}/${chunks.length}...`);
+      const response = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: voice,
+        input: chunks[i],
+      });
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      buffers.push(buffer);
+    }
+
+    // Sett sammen MP3-bufferne til én fil
+    const combinedBuffer = Buffer.concat(buffers);
+
+    // Lagre til Firebase Storage
+    await file.save(combinedBuffer, {
+      contentType: "audio/mpeg",
+      resumable: false,
+      metadata: {
+        cacheControl: "public, max-age=31536000"
+      }
+    });
+
+    try {
+      await file.makePublic();
+    } catch (makePublicError) {
+      console.warn("Kunne ikke gjøre filen offentlig tilgjengelig:", makePublicError);
+    }
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    console.log(`Lydfil vellykket generert og lagret: ${publicUrl}`);
+    return { success: true, audioUrl: publicUrl };
+
+  } catch (error) {
+    console.error("Feil ved generering av bibellyd:", error);
+    throw new HttpsError("internal", `Kunne ikke generere lyd for kapittelet: ${error.message}`);
+  }
+});
