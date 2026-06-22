@@ -7057,13 +7057,13 @@ exports.getBibleChapterAudio = onCall({
     } else {
       // Standard: Norsk (no)
       primaryConfig = {
-        languageCode: 'no-NO',
-        name: isFemale ? 'no-NO-Neural2-F' : 'no-NO-Neural2-B',
+        languageCode: 'nb-NO',
+        name: isFemale ? 'nb-NO-Neural2-F' : 'nb-NO-Neural2-B',
         ssmlGender: isFemale ? 'FEMALE' : 'MALE'
       };
       fallbackConfig = {
-        languageCode: 'no-NO',
-        name: isFemale ? 'no-NO-Wavenet-A' : 'no-NO-Wavenet-B',
+        languageCode: 'nb-NO',
+        name: isFemale ? 'nb-NO-Wavenet-A' : 'nb-NO-Wavenet-B',
         ssmlGender: isFemale ? 'FEMALE' : 'MALE'
       };
     }
