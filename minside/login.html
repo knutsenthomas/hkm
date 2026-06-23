@@ -43,6 +43,64 @@
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
 
+        html[data-theme="dark"] {
+            --main-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        html[data-theme="dark"] .form-control {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .form-control::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="dark"] .btn-google {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .btn-google:hover {
+            background-color: #334155;
+        }
+
+        html[data-theme="dark"] .divider {
+            color: #64748b;
+        }
+
+        html[data-theme="dark"] .divider::before,
+        html[data-theme="dark"] .divider::after {
+            background: #334155;
+        }
+
+        html[data-theme="dark"] .lang-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .lang-dropdown {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .lang-switch-btn {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .lang-switch-btn:hover {
+            background-color: #334155;
+        }
+
+
         * {
             margin: 0;
             padding: 0;

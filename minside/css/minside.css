@@ -2749,4 +2749,88 @@ html, body {
     border-color: #ffffff !important;
 }
 
+/* ==========================================================================
+   DARK THEME OVERRIDES (Min Side)
+   ========================================================================== */
+html[data-theme="dark"] {
+    --primary-color: #f8fafc;
+    --accent-light: #2d1e18;
+    --sidebar-bg: #1e293b;
+    --main-bg: #0f172a;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --border-solid: #334155;
+    --card-bg: #1e293b;
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 12px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Unread Activity Card Gradient override */
+html[data-theme="dark"] .ms-notifications-container .activity-item.unread {
+    background: linear-gradient(90deg, #2d2018 0%, #1e293b 100%) !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* Quick overview action cards hover override */
+html[data-theme="dark"] .ov-action-btn:hover {
+    background: #1e293b !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* Notes controls overrides */
+html[data-theme="dark"] .note-btn-edit,
+html[data-theme="dark"] .note-btn-delete {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+html[data-theme="dark"] .note-btn-edit:hover {
+    color: var(--accent-color) !important;
+    background: #2d1e18 !important;
+}
+html[data-theme="dark"] .note-btn-delete:hover {
+    color: #dc2626 !important;
+    background: #7f1d1d !important;
+}
+
+/* Rich Text Editor */
+html[data-theme="dark"] .rte-wrapper {
+    border-color: #334155 !important;
+}
+html[data-theme="dark"] .rte-toolbar {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+html[data-theme="dark"] .rte-btn:hover {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Notes Cards and Texts */
+html[data-theme="dark"] .personal-note-card,
+html[data-theme="dark"] .activity-item {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+html[data-theme="dark"] .personal-note-body {
+    color: #cbd5e1 !important;
+}
+
+/* Notification dot border color in dark mode header */
+html[data-theme="dark"] .notification-dot,
+html[data-theme="dark"] #notif-badge-header,
+html[data-theme="dark"] #notification-dot,
+html[data-theme="dark"] .notification-btn .notification-dot {
+    border-color: #0f172a !important;
+}
+
+/* General form elements in minside if not matched by global */
+html[data-theme="dark"] select option {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+
 

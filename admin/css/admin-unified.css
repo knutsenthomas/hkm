@@ -7022,13 +7022,226 @@ body.admin-body select:focus-visible,
 body.admin-body input:focus,
 body.admin-body input:focus-visible,
 body.admin-body textarea:focus,
-body.admin-body textarea:focus-visible,
-body.admin-body [role="button"]:focus,
-body.admin-body [role="button"]:focus-visible,
 body.admin-body div:focus,
 body.admin-body div:focus-visible {
   outline: none !important;
 }
+
+/* ==========================================================================
+   DARK THEME OVERRIDES (Admin Panel)
+   ========================================================================== */
+html[data-theme="dark"] {
+  --admin-surface: #1e293b;
+  --admin-surface-muted: #0f172a;
+  --admin-border: #334155;
+  --admin-text: #f8fafc;
+  --admin-text-muted: #94a3b8;
+  
+  --admin-page-bg: #0f172a;
+  --admin-page-panel: #1e293b;
+  --admin-page-panel-border: #334155;
+  --admin-page-panel-soft: #0f172a;
+  --admin-page-muted: #94a3b8;
+  --admin-page-icon-bg: #2d1e18;
+  --admin-page-icon-border: rgba(209, 125, 57, 0.2);
+
+  /* dashboard.css variables overrides */
+  --primary-color: #f8fafc;
+  --accent-light: #2d1e18;
+  --sidebar-bg: #1e293b;
+  --main-bg: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --card-bg: #1e293b;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Force body styling */
+html[data-theme="dark"] body.admin-body,
+html[data-theme="dark"] body.minside-body,
+html[data-theme="dark"] body.crm-body,
+html[data-theme="dark"] body.builder-active {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Sidebar PC background overrides */
+@media (min-width: 992px) {
+  html[data-theme="dark"] body.builder-active .sidebar,
+  html[data-theme="dark"] body.builder-active #admin-sidebar,
+  html[data-theme="dark"] .sidebar {
+    background: #1e293b !important;
+    border-right: 1px solid #334155 !important;
+  }
+  html[data-theme="dark"] body.builder-recipients-open .recipients-drawer {
+    background: #1e293b !important;
+  }
+}
+
+/* Sidebar Navigation Items */
+html[data-theme="dark"] .nav-link {
+  color: #94a3b8 !important;
+}
+html[data-theme="dark"] .nav-link:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html[data-theme="dark"] .nav-link.active {
+  background-color: #2d1e18 !important;
+  color: #ff8854 !important;
+}
+
+/* Force hardcoded section content & header backgrounds */
+html[data-theme="dark"] .section-content > .section-header:not(.in-topbar),
+html[data-theme="dark"] .design-ui-header:not(.in-topbar) {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .section-header-icon {
+  background: #2d1e18 !important;
+}
+
+html[data-theme="dark"] .section-header-icon span {
+  color: #d17d39 !important;
+}
+
+/* Tables in admin panel */
+html[data-theme="dark"] table,
+html[data-theme="dark"] .table-responsive,
+html[data-theme="dark"] .custom-table,
+html[data-theme="dark"] .logs-table {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] th,
+html[data-theme="dark"] .logs-table th {
+  background-color: #0f172a !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-bottom: 2px solid #334155 !important;
+}
+
+html[data-theme="dark"] td,
+html[data-theme="dark"] .logs-table td {
+  border-bottom: 1px solid #334155 !important;
+  color: #cbd5e1 !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] tr:hover td {
+  background-color: #334155 !important;
+}
+
+/* Form Controls */
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .log-filter-btn {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+html[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%2394a3b8' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") !important;
+}
+
+/* Modals */
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .modal-body,
+html[data-theme="dark"] .hkm-modal,
+html[data-theme="dark"] .popup-box,
+html[data-theme="dark"] .logs-container {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .modal-header,
+html[data-theme="dark"] .modal-footer,
+html[data-theme="dark"] .logs-header {
+  border-color: #334155 !important;
+  background-color: #0f172a !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Cards & Lists */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .analytics-card,
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .stat-card-premium,
+html[data-theme="dark"] .chart-card-premium {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Fix specific backgrounds */
+html[data-theme="dark"] .bg-white {
+  background-color: #1e293b !important;
+}
+
+html[data-theme="dark"] .bg-gray-50,
+html[data-theme="dark"] .bg-gray-100 {
+  background-color: #0f172a !important;
+}
+
+/* Tabs & Pills */
+html[data-theme="dark"] .nav-tabs,
+html[data-theme="dark"] .tab-container {
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link.active,
+html[data-theme="dark"] .tab-btn.active {
+  background-color: #1e293b !important;
+  border-color: #334155 #334155 #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link:hover,
+html[data-theme="dark"] .tab-btn:hover {
+  border-color: #334155 #334155 transparent !important;
+}
+
+/* Topbar / Main header */
+html[data-theme="dark"] .main-header,
+html[data-theme="dark"] .top-bar {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+/* Role chips and badges */
+html[data-theme="dark"] .role-chip {
+  background: #2d1e18 !important;
+  color: #ff8854 !important;
+}
+html[data-theme="dark"] .badge {
+  border-color: #334155 !important;
+}
+
+/* Builder elements and Recipient drawer */
+html[data-theme="dark"] .recipients-drawer,
+html[data-theme="dark"] .builder-elements-sidebar-v2 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
 
 
 
