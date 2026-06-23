@@ -7219,11 +7219,73 @@ html[data-theme="dark"] .tab-btn:hover {
   border-color: #334155 #334155 transparent !important;
 }
 
-/* Topbar / Main header */
+/* Force main header to be dark slate and override shorthand backgrounds */
+html[data-theme="dark"] body.admin-body .main-header,
+html[data-theme="dark"] body.crm-body .main-header,
+html[data-theme="dark"] body.minside-body .main-header,
+html[data-theme="dark"] body.builder-active .main-header,
+html[data-theme="dark"] body.builder-active .workspace-top-bar,
+html[data-theme="dark"] body.admin-body #dashboard-main-header,
+html[data-theme="dark"] body.crm-body #dashboard-main-header,
+html[data-theme="dark"] body.minside-body #dashboard-main-header,
+html[data-theme="dark"] body.builder-active #dashboard-main-header,
 html[data-theme="dark"] .main-header,
+html[data-theme="dark"] #dashboard-main-header,
 html[data-theme="dark"] .top-bar {
-  background-color: #0f172a !important;
+  background: #1e293b !important;
+  background-color: #1e293b !important;
   border-bottom: 1px solid #334155 !important;
+}
+
+/* Force main content background below the header to be dark navy */
+html[data-theme="dark"] body.admin-body .main-content,
+html[data-theme="dark"] body.minside-body .main-content,
+html[data-theme="dark"] body.crm-body .main-content,
+html[data-theme="dark"] .main-content,
+html[data-theme="dark"] .newsletter-dashboard-layout {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+}
+
+/* User profile link widget in header */
+html[data-theme="dark"] body.admin-body .user-profile-link,
+html[data-theme="dark"] body.minside-body .user-profile-link,
+html[data-theme="dark"] body.crm-body .user-profile-link,
+html[data-theme="dark"] body.builder-active .user-profile-link,
+html[data-theme="dark"] .user-profile-link {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* User profile text elements */
+html[data-theme="dark"] body.admin-body .main-header .user-name,
+html[data-theme="dark"] body.minside-body .main-header .user-name,
+html[data-theme="dark"] body.crm-body .main-header .user-name,
+html[data-theme="dark"] body.builder-active .main-header .user-name,
+html[data-theme="dark"] .user-name {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] body.admin-body .main-header .user-role,
+html[data-theme="dark"] body.minside-body .main-header .user-role,
+html[data-theme="dark"] body.crm-body .main-header .user-role,
+html[data-theme="dark"] body.builder-active .main-header .user-role,
+html[data-theme="dark"] .user-role {
+  color: #94a3b8 !important;
+}
+
+/* Header action and toggle buttons */
+html[data-theme="dark"] .notification-btn,
+html[data-theme="dark"] .mobile-nav-toggle,
+html[data-theme="dark"] #mobile-nav-toggle,
+html[data-theme="dark"] #mobile-toggle,
+html[data-theme="dark"] .mobile-toggle,
+html[data-theme="dark"] .lang-switcher .lang-btn {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
 }
 
 /* Role chips and badges */
@@ -7241,6 +7303,46 @@ html[data-theme="dark"] .builder-elements-sidebar-v2 {
   background-color: #1e293b !important;
   border-color: #334155 !important;
 }
+
+/* Specific elements inside Newsletter Builder dashboard */
+html[data-theme="dark"] .ai-suggestion-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.newsletter-type .card-badge {
+  background: #2d1e18 !important;
+  color: #ff8854 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.blog-type .card-badge {
+  background: #1b3052 !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .ai-suggestion-card.teaching-type .card-badge {
+  background: #064e3b !important;
+  color: #34d399 !important;
+}
+
+/* Specific outline buttons */
+html[data-theme="dark"] .btn.btn-outline,
+html[data-theme="dark"] .btn-outline {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+html[data-theme="dark"] .btn.btn-outline:hover,
+html[data-theme="dark"] .btn-outline:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Specific icon buttons */
+html[data-theme="dark"] .btn-icon {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
 
 
 

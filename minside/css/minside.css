@@ -2832,5 +2832,51 @@ html[data-theme="dark"] select option {
     color: #f8fafc !important;
 }
 
+/* Force main header and content background overrides in minside.css to be safe */
+html[data-theme="dark"] body.minside-body .main-header,
+html[data-theme="dark"] body.minside-body #dashboard-main-header,
+html[data-theme="dark"] .main-header,
+html[data-theme="dark"] #dashboard-main-header {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] body.minside-body .main-content,
+html[data-theme="dark"] .main-content {
+  background: #0f172a !important;
+  background-color: #0f172a !important;
+}
+
+html[data-theme="dark"] body.minside-body .user-profile-link,
+html[data-theme="dark"] .user-profile-link {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] body.minside-body .main-header .user-name,
+html[data-theme="dark"] .user-name {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] body.minside-body .main-header .user-role,
+html[data-theme="dark"] .user-role {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .notification-btn,
+html[data-theme="dark"] .mobile-nav-toggle,
+html[data-theme="dark"] #mobile-nav-toggle,
+html[data-theme="dark"] #mobile-toggle,
+html[data-theme="dark"] .mobile-toggle,
+html[data-theme="dark"] .lang-switcher .lang-btn {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+
 
 
