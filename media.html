@@ -81,6 +81,159 @@
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
         
     <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
+    
+    <style>
+        /* Media & Ressurser Dashboard Styles */
+        .media-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 64px;
+        }
+
+        @media (max-width: 1024px) {
+            .media-dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .media-dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .dashboard-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--card-border, #e2e8f0);
+            border-radius: 20px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--card-shadow, 0 4px 20px -2px rgba(15, 23, 42, 0.05));
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--card-shadow-hover, 0 20px 40px -4px rgba(15, 23, 42, 0.1));
+            border-color: var(--primary-orange, #d17d39);
+        }
+
+        .dashboard-card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover .dashboard-card-icon {
+            transform: scale(1.08);
+        }
+
+        .icon-youtube { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .icon-podcast { background: rgba(209, 125, 57, 0.1); color: #d17d39; }
+        .icon-bibelstudier { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .icon-leseplaner { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .icon-tidslinje { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .icon-personer { background: rgba(20, 184, 166, 0.1); color: #14b8a6; }
+
+        .dashboard-card-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark, #1e293b);
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+
+        .dashboard-card-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-muted, #64748b);
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .dashboard-card-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-top: 8px;
+            display: block;
+        }
+
+        .dashboard-card-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-blue, #1B4965);
+            margin-top: 24px;
+            transition: color 0.2s ease;
+        }
+
+        .dashboard-card:hover .dashboard-card-footer {
+            color: var(--primary-orange, #d17d39);
+        }
+
+        /* Feed Headers styling */
+        .feed-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 32px;
+            border-bottom: 2px solid var(--card-border, #e2e8f0);
+            padding-bottom: 16px;
+        }
+
+        .feed-section-info {
+            max-width: 60%;
+        }
+
+        .feed-section-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark, #1e293b);
+            margin: 0 0 6px 0;
+        }
+
+        .feed-section-desc {
+            font-size: 14px;
+            color: var(--text-muted, #64748b);
+            margin: 0;
+        }
+
+        .feed-see-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid var(--primary-blue, #1B4965);
+            border-radius: 12px;
+            color: var(--primary-blue, #1B4965);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .feed-see-all-btn:hover {
+            background: var(--primary-blue, #1B4965);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 
 <body class="header-dark-start">
@@ -311,131 +464,130 @@
     <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
         style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;">
         <div class="container">
-            <h1 class="page-hero-title" data-content-key="hero.title">Media</h1>
-            <p class="page-hero-subtitle" data-content-key="hero.subtitle">Utforsk våre videoer, podcaster og annet
-                innhold</p>
+            <h1 class="page-hero-title" data-content-key="hero.title">Media & Ressurser</h1>
+            <p class="page-hero-subtitle" data-content-key="hero.subtitle">Utforsk videoer, podcaster, bibelstudier og historiske ressurser.</p>
         </div>
     </section>
 
-    <!-- Media Filter Tabs -->
-    <section class="media-tabs-section">
-        <div class="container">
-            <div class="media-tabs">
-                <a href="/media" class="media-tab active">
-                    <i class="fas fa-th"></i>
-                    Alle
+    <!-- Media & Ressurser Dashboard Section -->
+    <section class="py-16 bg-[#faf9f6]">
+        <div class="container max-w-6xl mx-auto px-6">
+            <div class="media-dashboard-grid">
+                <!-- 1. YouTube -->
+                <a href="/youtube" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-youtube">
+                        <i class="fab fa-youtube text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">YouTube-videoer</h3>
+                    <p class="dashboard-card-text">Se våre nyeste videoer, taler og undervisninger direkte på YouTube.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Se videoer</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </a>
-                <a href="/youtube" class="media-tab">
-                    <i class="fab fa-youtube"></i>
-                    YouTube
+
+                <!-- 2. Podcast -->
+                <a href="/podcast" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-podcast">
+                        <i class="fas fa-podcast text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Podcast & Lyd</h3>
+                    <p class="dashboard-card-text">Lytt til podcasten "Tro og Liv" for daglig oppmuntring og bibelsk undervisning.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Hør episoder</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </a>
-                <a href="/podcast" class="media-tab">
-                    <i class="fas fa-podcast"></i>
-                    Podcast
+
+                <!-- 3. Bibelstudier -->
+                <a href="/bibelstudier" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-bibelstudier">
+                        <i class="fas fa-book-bible text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Bibelstudier</h3>
+                    <p class="dashboard-card-text">Gå i dybden på Bibelens bøker og temaer med hefter og studier.</p>
+                    <span class="dashboard-card-count" data-count="bibelstudier">Laster...</span>
+                    <div class="dashboard-card-footer">
+                        <span>Utforsk studier</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </a>
-                <a href="/undervisning" class="media-tab">
-                    <i class="fas fa-book-open"></i>
-                    Undervisning
+
+                <!-- 4. Leseplaner -->
+                <a href="/leseplaner" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-leseplaner">
+                        <i class="fas fa-calendar-alt text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Leseplaner</h3>
+                    <p class="dashboard-card-text">Følg våre leseplaner for en strukturert gjennomgang av Bibelen.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Se leseplaner</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </a>
-                <a href="/leseplaner" class="media-tab">
-                    <i class="fas fa-calendar-alt"></i>
-                    Leseplaner
+
+                <!-- 5. Tidslinje -->
+                <a href="/ressurser/tidslinje-imperier" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-tidslinje">
+                        <i class="fas fa-history text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Tidslinje: Imperier</h3>
+                    <p class="dashboard-card-text">Se historien til de store imperiene som påvirket det bibelske narrativet.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Vis tidslinje</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+
+                <!-- 6. Bibelske personer -->
+                <a href="/ressurser/bibelske-personer" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-personer">
+                        <i class="fas fa-user-friends text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Bibelske personer</h3>
+                    <p class="dashboard-card-text">Lær mer om livene, historien og den teologiske rollen til sentrale personer.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Utforsk personer</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </a>
             </div>
-        </div>
-    </section>
 
-    <!-- YouTube Section -->
-    <section class="media-content-section" id="youtube-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label">YouTube</span>
-                <h2 class="section-title" data-content-key="youtube.title">Siste Videoer</h2>
-                <p class="section-description" data-content-key="youtube.description">Se våre nyeste videoer og
-                    undervisninger</p>
+            <!-- YouTube Latest Feed -->
+            <div class="feed-section-header">
+                <div class="feed-section-info">
+                    <h2 class="feed-section-title">Siste fra YouTube</h2>
+                    <p class="feed-section-desc">Se våre nyeste videoer og undervisninger.</p>
+                </div>
+                <a href="/youtube" class="feed-see-all-btn">
+                    <span>Se alle videoer</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
 
-            <div class="media-grid" id="youtube-grid">
-                <!-- YouTube videos will be loaded here dynamisk -->
+            <div class="media-grid" id="youtube-grid" style="margin-bottom: 64px;">
                 <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
                     <div class="loader"></div>
                     <p style="margin-top: 15px; color: var(--text-muted);">Henter videoer fra YouTube...</p>
                 </div>
             </div>
 
-            <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="/youtube" class="btn btn-primary">
-                    <i class="fab fa-youtube"></i> Se alle videoer
+            <!-- Podcast Latest Feed -->
+            <div class="feed-section-header">
+                <div class="feed-section-info">
+                    <h2 class="feed-section-title">Siste fra Podcast</h2>
+                    <p class="feed-section-desc">Lytt til de nyeste episodene av "Tro og Liv".</p>
+                </div>
+                <a href="/podcast" class="feed-see-all-btn">
+                    <span>Hør alle episoder</span>
+                    <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-        </div>
-    </section>
 
-    <!-- Podcast-seksjon fjernet: administrasjon og visning flyttes til podcast.html -->
-
-    <!-- Teaching Resources Section -->
-    <section class="media-content-section teaching-section" id="teaching-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label">Undervisning</span>
-                <h2 class="section-title" data-content-key="teaching.title">Undervisningsressurser</h2>
-                <p class="section-description" data-content-key="teaching.description">Dyptgående bibelstudier og
-                    undervisningsserier</p>
-                <div style="margin-top: 20px;">
-                    <a href="/undervisning" class="btn btn-outline btn-sm">Se alle ressurser</a>
-                </div>
-            </div>
-
-            <div class="teaching-grid">
-                <div class="teaching-card" data-category="Bibelstudier">
-                    <div class="teaching-icon">
-                        <i class="fas fa-book-bible"></i>
-                    </div>
-                    <h3 class="teaching-title">Bibelstudier</h3>
-                    <p class="teaching-description">Systematiske studier gjennom Bibelens bøker med dyptgående
-                        forklaringer.</p>
-                    <span class="teaching-count" data-count="bibelstudier">Laster...</span>
-                    <a href="/bibelstudier" class="btn btn-outline btn-sm">Utforsk</a>
-                </div>
-
-                <div class="teaching-card" data-category="Seminarer">
-                    <div class="teaching-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3 class="teaching-title">Seminarer</h3>
-                    <p class="teaching-description">Opptak fra våre seminarer og konferanser om ulike temaer.</p>
-                    <span class="teaching-count" data-count="seminarer">Laster...</span>
-                    <a href="/seminarer" class="btn btn-outline btn-sm">Utforsk</a>
-                </div>
-
-                <div class="teaching-card" data-category="Undervisningsserier">
-                    <div class="teaching-icon">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <h3 class="teaching-title">Undervisningsserier</h3>
-                    <p class="teaching-description">Tematiske undervisningsserier om viktige kristne emner.</p>
-                    <span class="teaching-count" data-count="undervisningsserier">Laster...</span>
-                    <a href="/undervisningsserier" class="btn btn-outline btn-sm">Utforsk</a>
-                </div>
-
-                <div class="teaching-card" data-category="Leseplaner">
-                    <div class="teaching-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <h3 class="teaching-title">Leseplaner</h3>
-                    <p class="teaching-description">Følg våre bibelleseplaner for daglig åndelig påfyll og fordypning.</p>
-                    <span class="teaching-count">Flere leseplaner tilgjengelig</span>
-                    <a href="/leseplaner" class="btn btn-outline btn-sm">Utforsk</a>
-                </div>
-
-                <div class="teaching-card" data-category="Timeline">
-                    <div class="teaching-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3 class="teaching-title">Tidslinje: Imperier</h3>
-                    <p class="teaching-description">Utforsk den historiske tidslinjen over de store imperiene som påvirket det bibelske narrativet.</p>
-                    <span class="teaching-count">Tidslinje tilgjengelig</span>
-                    <a href="/ressurser/tidslinje-imperier" class="btn btn-outline btn-sm">Utforsk</a>
+            <div class="podcast-grid" id="podcast-grid" style="margin-bottom: 64px;">
+                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <div class="loader"></div>
+                    <p style="margin-top: 15px; color: var(--text-muted);">Henter podcast-episoder...</p>
                 </div>
             </div>
         </div>
@@ -447,8 +599,7 @@
             <div class="newsletter-content">
                 <i class="fas fa-bell newsletter-icon"></i>
                 <h2>Få Varsler om Nytt Innhold</h2>
-                <p>Abonner på vårt nyhetsbrev og få beskjed når vi publiserer nye videoer, podcaster og undervisning.
-                </p>
+                <p>Abonner på vårt nyhetsbrev og få beskjed når vi publiserer nye videoer, podcaster og undervisning.</p>
                 <form class="newsletter-form">
                     <input type="email" placeholder="Din e-postadresse" required>
                     <button type="submit" class="btn btn-primary">Abonner</button>
