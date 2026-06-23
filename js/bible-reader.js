@@ -1939,7 +1939,7 @@ class BibleReader {
         let html = text.trim().replace(/\r/g, '');
 
         // Preprocessing: Fix missing spacing/newlines before and after header tags (e.g. "word.### Heading" -> "word.\n\n### Heading")
-        html = html.replace(/([^\n])(#{1,3}\s+)/g, '$1\n\n$2');
+        html = html.replace(/([^#\n])(#{1,3}\s+)/g, '$1\n\n$2');
 
         // Preprocessing: Fix missing newlines at lowercase-to-uppercase boundaries (e.g. "kontekstI" -> "kontekst\n\nI")
         // This splits combined headers and paragraph text if newlines were stripped.
