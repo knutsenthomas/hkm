@@ -164,7 +164,7 @@ export default async function handler(req, res) {
           const plan = decodeFirestoreFields(payload.fields);
           title = plan.title || 'Leseplan';
           description = plan.description || plan.subtitle || 'Bibeleseplan fra His Kingdom Ministry';
-          imageUrl = plan.imageUrl || 'https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?auto=format&fit=crop&w=600&q=80';
+          imageUrl = plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80';
         }
       }
     } else if (type === 'blog') {
