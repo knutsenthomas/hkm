@@ -76,7 +76,8 @@ function renderDetails(container, lang) {
     const role = char.role[lang] || char.role.no;
     const heroSection = document.querySelector('.subpage-hero');
     if (heroSection) {
-        heroSection.style.background = `linear-gradient(135deg, rgba(27, 73, 101, 0.85) 0%, rgba(209, 125, 57, 0.9) 100%), url('${char.image}') center 30% / cover no-repeat`;
+        heroSection.style.setProperty('background', `linear-gradient(135deg, rgba(27, 73, 101, 0.85) 0%, rgba(209, 125, 57, 0.9) 100%), url('${char.image}') center 30% / cover no-repeat`, 'important');
+        heroSection.style.setProperty('background-image', `linear-gradient(135deg, rgba(27, 73, 101, 0.85) 0%, rgba(209, 125, 57, 0.9) 100%), url('${char.image}')`, 'important');
         
         const heroTitle = heroSection.querySelector('.hero-title');
         if (heroTitle) {
