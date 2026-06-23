@@ -1737,12 +1737,12 @@ class BibleReader {
 
     parseMarkdown(text) {
         if (!text) return '';
-        let html = text.trim();
+        let html = text.trim().replace(/\r/g, '');
 
-        // Headers
-        html = html.replace(/### (.*?)\n/g, '<h5 style="font-weight:700; font-size:14px; margin-top:16px; margin-bottom:8px; color:var(--text-base);">$1</h5>');
-        html = html.replace(/## (.*?)\n/g, '<h4 style="font-weight:700; font-size:15px; margin-top:20px; margin-bottom:10px; color:var(--text-base);">$1</h4>');
-        html = html.replace(/# (.*?)\n/g, '<h3 style="font-weight:700; font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--text-base);">$1</h3>');
+        // Headers (using multiline anchors to match line-by-line accurately)
+        html = html.replace(/^### (.*?)$/gm, '<h5 style="font-weight:700; font-size:14px; margin-top:16px; margin-bottom:8px; color:var(--text-base);">$1</h5>');
+        html = html.replace(/^## (.*?)$/gm, '<h4 style="font-weight:700; font-size:15px; margin-top:20px; margin-bottom:10px; color:var(--text-base);">$1</h4>');
+        html = html.replace(/^# (.*?)$/gm, '<h3 style="font-weight:700; font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--text-base);">$1</h3>');
 
         // Bold & Italic
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
