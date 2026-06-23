@@ -44,11 +44,11 @@
 }
 
 .search-modal-container {
-    background: rgba(255, 255, 255, 0.98) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
     border-radius: 24px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04), 0 30px 60px -15px rgba(15, 23, 42, 0.08) !important;
     width: 100% !important;
     max-width: 650px !important;
     position: relative !important;
@@ -94,13 +94,13 @@
 
 .search-input-group {
     background: #f8fafc !important;
-    border: 2px solid transparent !important;
-    border-radius: 14px !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    border-radius: 16px !important;
     display: flex !important;
     align-items: center !important;
-    padding: 4px !important;
+    padding: 6px !important;
     margin-bottom: 20px !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative !important;
 }
 
@@ -230,6 +230,7 @@ html[data-theme="dark"] .close-search-btn:hover {
 
 html[data-theme="dark"] .search-input-group {
     background: #0f172a !important; /* Slate 900 */
+    border-color: rgba(255,255,255,0.08) !important;
 }
 
 html[data-theme="dark"] .search-input-group:focus-within {
@@ -253,4 +254,178 @@ html[data-theme="dark"] .search-suggestion-item:hover {
 html[data-theme="dark"] .search-suggestion-icon {
     background: #1e3a8a !important;
     color: #3b82f6 !important;
+}
+
+/* --- New Intelligent Search UI Components --- */
+
+.search-popular-tags {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 20px !important;
+}
+
+.search-popular-title {
+    font-size: 12px !important;
+    color: var(--hkm-text-muted) !important;
+    font-weight: 600 !important;
+    margin-right: 4px !important;
+}
+
+.search-tag-btn {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #475569 !important;
+    padding: 6px 12px !important;
+    border-radius: 9999px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+}
+
+.search-tag-btn:hover {
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    color: #1B4965 !important;
+    transform: translateY(-1px) !important;
+}
+
+.search-tag-btn:active {
+    transform: translateY(0) scale(0.96) !important;
+}
+
+.search-suggestions-header {
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    color: #1B4965 !important;
+    letter-spacing: 0.05em !important;
+    padding: 14px 16px 8px 16px !important;
+    border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+}
+
+.search-result-group {
+    border-bottom: 1px solid rgba(0,0,0,0.04) !important;
+    padding-bottom: 10px !important;
+}
+
+.search-result-group:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+
+.search-result-group-title {
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    color: #1B4965 !important;
+    letter-spacing: 0.05em !important;
+    padding: 6px 10px !important;
+    background: #eff6ff !important;
+    border-radius: 6px !important;
+    margin: 16px 16px 8px 16px !important;
+    display: inline-block !important;
+}
+
+.search-result-group-items {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.site-search-result-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0,0,0,0.02) !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+.site-search-result-item:hover {
+    background: #f8fafc !important;
+}
+
+.site-search-result-item:last-child {
+    border-bottom: none !important;
+}
+
+.search-result-item-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    margin-right: 16px !important;
+}
+
+.search-result-item-title {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: var(--hkm-text-main) !important;
+    margin-bottom: 4px !important;
+}
+
+.search-result-item-snippet {
+    font-size: 12px !important;
+    color: var(--hkm-text-muted) !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-shadow: none !important;
+    text-overflow: ellipsis !important;
+}
+
+.search-result-item-meta {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    color: #475569 !important;
+    background: #e2e8f0 !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+}
+
+/* --- Dark Mode Extensions for Intelligent Search --- */
+
+html[data-theme="dark"] .search-tag-btn {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .search-tag-btn:hover {
+    background: #1e3a8a !important;
+    border-color: #3b82f6 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .search-suggestions-header {
+    color: #60a5fa !important;
+    border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+
+html[data-theme="dark"] .search-result-group {
+    border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+
+html[data-theme="dark"] .search-result-group-title {
+    color: #60a5fa !important;
+    background: #1e3a8a !important;
+}
+
+html[data-theme="dark"] .site-search-result-item {
+    border-bottom-color: rgba(255,255,255,0.03) !important;
+}
+
+html[data-theme="dark"] .site-search-result-item:hover {
+    background: #0f172a !important;
+}
+
+html[data-theme="dark"] .search-result-item-meta {
+    background: #334155 !important;
+    color: #cbd5e1 !important;
 }

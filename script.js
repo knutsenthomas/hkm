@@ -305,6 +305,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Definerte forslag (Smarte snarveier - Dynamisk lokalisert)
     const siteSearchSuggestions = getSiteSearchSuggestions();
+    const lang = getCurrentLanguage();
+
+    // Inject popular search tags dynamically inside modal
+    const modalTitle = searchModal.querySelector('.search-modal-title');
+    if (modalTitle && !searchModal.querySelector('.search-popular-tags')) {
+        const tagsHtml = `
+            <div class="search-popular-tags">
+                <span class="search-popular-title">${lang === 'en' ? 'Popular searches:' : (lang === 'es' ? 'Búsquedas populares:' : 'Populære søk:')}</span>
+                <button class="search-tag-btn" data-tag="Tro">${lang === 'en' ? 'Faith' : (lang === 'es' ? 'Fe' : 'Tro')}</button>
+                <button class="search-tag-btn" data-tag="Nåde">${lang === 'en' ? 'Grace' : (lang === 'es' ? 'Gracia' : 'Nåde')}</button>
+                <button class="search-tag-btn" data-tag="Jesus">Jesus</button>
+                <button class="search-tag-btn" data-tag="Leseplan">${lang === 'en' ? 'Reading Plan' : (lang === 'es' ? 'Plan' : 'Leseplan')}</button>
+                <button class="search-tag-btn" data-tag="Gave">${lang === 'en' ? 'Give' : (lang === 'es' ? 'Dar' : 'Gave')}</button>
+            </div>
+        `;
+        modalTitle.insertAdjacentHTML('afterend', tagsHtml);
+        
+        // Add event listeners to tags
+        searchModal.querySelectorAll('.search-tag-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tagValue = btn.getAttribute('data-tag');
+                if (searchInput) {
+                    searchInput.value = tagValue;
+                    if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
+                    if (resultsContainer) {
+                        resultsContainer.classList.remove('hidden');
+                        performSiteSearch(tagValue, resultsContainer);
+                    }
+                }
+            });
+        });
+    }
 
     function openSearch() {
         // Start pre-fetching podcast/youtube data early if not already loaded
@@ -318,7 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBodyScroll('site-search-v2');
         if (searchInput) {
             searchInput.value = '';
-            if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
+            if (suggestionsContainer) {
+                updateSiteSearchSuggestions('');
+                suggestionsContainer.classList.remove('hidden');
+            }
             if (resultsContainer) resultsContainer.classList.add('hidden');
             setTimeout(() => searchInput.focus(), 100);
         }
@@ -389,9 +424,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSiteSearchSuggestions(query) {
         if (!suggestionsContainer) return;
+        const lang = getCurrentLanguage();
 
         if (query.length < 1) {
-            suggestionsContainer.classList.add('hidden');
+            suggestionsContainer.innerHTML = `
+                <div class="search-suggestions-header">${lang === 'en' ? 'Quick Links' : (lang === 'es' ? 'Enlaces Rápidos' : 'Hurtiglenker')}</div>
+                ${siteSearchSuggestions.map(item => `
+                    <div class="search-suggestion-item" onclick="window.location.href='${item.url}'">
+                        <div class="search-suggestion-icon">
+                            <span class="material-symbols-outlined">${item.icon}</span>
+                        </div>
+                        <div class="search-suggestion-content">
+                            <span class="search-suggestion-label">${item.label}</span>
+                            <span class="search-suggestion-type">${item.type}</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
+                    </div>
+                `).join('')}
+            `;
+            suggestionsContainer.classList.remove('hidden');
+            if (resultsContainer) resultsContainer.classList.add('hidden');
             return;
         }
 
@@ -401,18 +453,21 @@ document.addEventListener('DOMContentLoaded', () => {
         ).slice(0, 5);
 
         if (filtered.length > 0) {
-            suggestionsContainer.innerHTML = filtered.map(item => `
-                <div class="search-suggestion-item" onclick="window.location.href='${item.url}'">
-                    <div class="search-suggestion-icon">
-                        <span class="material-symbols-outlined">${item.icon}</span>
+            suggestionsContainer.innerHTML = `
+                <div class="search-suggestions-header">${lang === 'en' ? 'Suggestions' : (lang === 'es' ? 'Sugerencias' : 'Forslag')}</div>
+                ${filtered.map(item => `
+                    <div class="search-suggestion-item" onclick="window.location.href='${item.url}'">
+                        <div class="search-suggestion-icon">
+                            <span class="material-symbols-outlined">${item.icon}</span>
+                        </div>
+                        <div class="search-suggestion-content">
+                            <span class="search-suggestion-label">${item.label}</span>
+                            <span class="search-suggestion-type">${item.type}</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
                     </div>
-                    <div class="search-suggestion-content">
-                        <span class="search-suggestion-label">${item.label}</span>
-                        <span class="search-suggestion-type">${item.type}</span>
-                    </div>
-                    <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
-                </div>
-            `).join('');
+                `).join('')}
+            `;
             suggestionsContainer.classList.remove('hidden');
             if (resultsContainer) resultsContainer.classList.add('hidden');
         } else {
@@ -1164,20 +1219,36 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     }
 
     if (!results.length) {
-        resultsEl.innerHTML = '<p class="site-search-helper">Ingen treff for dette søket.</p>';
+        const lang = getCurrentLanguage();
+        resultsEl.innerHTML = `<p class="site-search-helper">${lang === 'en' ? 'No results found.' : (lang === 'es' ? 'No se encontraron resultados.' : 'Ingen treff for dette søket.')}</p>`;
         return;
     }
 
-    const html = results.map((r) => `
-        <a href="${r.url}" class="site-search-result">
-            <div class="site-search-result-header">
-                <span class="site-search-result-type">${escapeHtml(r.type)}</span>
-                ${r.meta ? `<span class="site-search-result-meta">${escapeHtml(r.meta)}</span>` : ''}
+    const groups = {};
+    results.forEach((r) => {
+        if (!groups[r.type]) groups[r.type] = [];
+        groups[r.type].push(r);
+    });
+
+    let html = '';
+    for (const [type, items] of Object.entries(groups)) {
+        html += `
+            <div class="search-result-group">
+                <div class="search-result-group-title">${escapeHtml(type)}</div>
+                <div class="search-result-group-items">
+                    ${items.map(r => `
+                        <a href="${r.url}" class="site-search-result-item">
+                            <div class="search-result-item-content">
+                                <div class="search-result-item-title">${escapeHtml(r.title)}</div>
+                                ${r.snippet ? `<div class="search-result-item-snippet">${escapeHtml(r.snippet)}</div>` : ''}
+                            </div>
+                            ${r.meta ? `<span class="search-result-item-meta">${escapeHtml(r.meta)}</span>` : ''}
+                        </a>
+                    `).join('')}
+                </div>
             </div>
-            <div class="site-search-result-title">${escapeHtml(r.title)}</div>
-            ${r.snippet ? `<div class="site-search-result-snippet">${escapeHtml(r.snippet)}</div>` : ''}
-        </a>
-    `).join('');
+        `;
+    }
 
     resultsEl.innerHTML = html;
 }
