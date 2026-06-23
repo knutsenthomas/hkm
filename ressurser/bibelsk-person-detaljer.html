@@ -85,11 +85,13 @@
         <div class="header-content" id="header-container">
             <!-- Logo -->
             <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
-                <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
                     <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
                         data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
                 </div>
-                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom Ministry</span>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
@@ -105,16 +107,22 @@
                 </a>
 
                 <div class="lang-switcher relative group">
-                    <button class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global"
+                            data-content-key="header.currentLanguage">NO</span>
                     </button>
-                    <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
                         <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴 Norsk</a>
+                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                            Norsk</a>
                         <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸 English</a>
+                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                            English</a>
                         <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸 Español</a>
+                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                            Español</a>
                     </div>
                 </div>
                 <a href="/donasjoner"
@@ -127,7 +135,8 @@
                 <button
                     class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
                     id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
-                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel" data-content-attr="aria-label">
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -143,7 +152,8 @@
             <div class="flex flex-col gap-6">
                 <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Søk..." data-content-doc="settings_global" data-content-key="menu.searchPlaceholder"
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
@@ -155,10 +165,12 @@
                             <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/en/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
@@ -176,49 +188,59 @@
                 <div class="mega-menu-grid">
                     <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">volunteer_activism</span>
-                                <a href="/donasjoner" data-content-doc="settings_global" data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                <a href="/donasjoner" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">favorite</span>
-                                <a href="/bli-fast-giver" data-content-doc="settings_global" data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">church</span>
-                                <a href="/for-menigheter" data-content-doc="settings_global" data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                <a href="/for-menigheter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">corporate_fare</span>
-                                <a href="/for-bedrifter" data-content-doc="settings_global" data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                <a href="/for-bedrifter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">business_center</span>
-                                <a href="/bnn" data-content-doc="settings_global" data-content-key="menu.sections.engage.network">Business Network</a>
+                                <a href="/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a>
                             </li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">info</span>
-                                <a href="/om-oss" data-content-doc="settings_global" data-content-key="menu.sections.about.about">Om oss</a>
+                                <a href="/om-oss" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">mail</span>
-                                <a href="/kontakt" data-content-doc="settings_global" data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                <a href="/kontakt" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a>
                             </li>
                         </ul>
                     </div>
 
                     <!-- Column 3: Ressurser & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title" data-content-doc="settings_global" data-content-key="menu.sections.resources.title">Ressurser</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
                         <ul class="mega-nav-list">
                             <li>
                                 <span class="material-symbols-outlined">menu_book</span>
@@ -226,21 +248,56 @@
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">calendar_month</span>
-                                <a href="/leseplaner" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">shopping_bag</span>
-                                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global" data-content-key="menu.sections.resources.store">Butikk</a>
+                                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">event</span>
-                                <a href="/arrangementer" data-content-doc="settings_global" data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                <a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <a href="/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a>
                             </li>
                             <li>
                                 <span class="material-symbols-outlined">feed</span>
-                                <a href="/blogg" data-content-doc="settings_global" data-content-key="menu.sections.resources.blog">Blogg & nyheter</a>
+                                <a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">person</span>
+                                <a href="/minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a>
                             </li>
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
                     </div>
                 </div>
             </div>
@@ -290,7 +347,8 @@
                                     data-content-doc="settings_global" data-content-key="brand.logoAlt"
                                     data-content-attr="alt">
                             </div>
-                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom Ministry</span>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
                         </a>
                         <p class="brand-description" data-content-doc="settings_global"
                             data-content-key="footer.description">His Kingdom Ministry er en
@@ -315,11 +373,13 @@
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
                             <ul>
                                 <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
                                 <li><a href="/media" data-content-doc="settings_global"
                                         data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+
                                 <li><a href="/arrangementer" data-content-doc="settings_global"
                                     data-content-key="footer.links.resources.courses">Arrangementer</a></li>
                                 <li><a href="/blogg" data-content-doc="settings_global"
@@ -340,12 +400,14 @@
                                         data-content-key="footer.links.media.videos">Videoer</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
                                         data-content-doc="settings_global"
-                                        data-content-key="footer.links.media.youtube">YouTube</a></li>
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                </li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">Involvering</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
                             <ul>
                                 <li><a href="/arrangementer" data-content-doc="settings_global"
                                         data-content-key="footer.links.involvement.calendar">Kalender</a></li>
@@ -355,11 +417,13 @@
                                         data-content-key="footer.links.involvement.privacy">Personvern</a></li>
                                 <li><a href="/betingelser">Vilkår og betingelser</a></li>
                                 <li><a href="/tilgjengelighet" data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a></li>
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
                                 <li><a href="javascript:void(0)"
                                         onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
                                         data-content-doc="settings_global"
-                                        data-content-key="footer.links.involvement.cookies">Cookies</a></li>
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -390,12 +454,14 @@
                             <div class="detail-item">
                                 <strong data-content-doc="settings_global"
                                     data-content-key="footer.contact.emailLabel">E-post:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.email">post@hiskingdomministry.no</p>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
                                 <strong data-content-doc="settings_global"
                                     data-content-key="footer.contact.phoneLabel">Telefon:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94 615</p>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
                             </div>
                             <div class="detail-item">
                                 <strong data-content-doc="settings_global"
@@ -405,7 +471,8 @@
                             <div class="detail-item">
                                 <strong data-content-doc="settings_global"
                                     data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</p>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
                             </div>
                         </div>
                     </div>
