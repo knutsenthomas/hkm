@@ -266,6 +266,7 @@ class BibleReader {
             dictDefinition: document.getElementById('dict-definition'),
             dictContextualNote: document.getElementById('dict-contextual-note'),
             closeDictBtn: document.getElementById('close-dict-btn'),
+            toggleExpandDictBtn: document.getElementById('toggle-expand-dict-btn'),
             dictSpinner: document.getElementById('dict-spinner'),
             dictContentWrap: document.getElementById('dict-content-wrap'),
             dictManualTrigger: document.getElementById('dict-manual-trigger'),
@@ -567,6 +568,20 @@ class BibleReader {
         if (this.dom.closeDictBtn) {
             this.dom.closeDictBtn.addEventListener('click', () => {
                 this.dom.dictDrawer.classList.remove('active');
+                this.dom.dictDrawer.classList.remove('expanded');
+                const expandBtnIcon = this.dom.toggleExpandDictBtn ? this.dom.toggleExpandDictBtn.querySelector('span') : null;
+                if (expandBtnIcon) expandBtnIcon.textContent = 'open_in_full';
+            });
+        }
+
+        // Toggle Expand/Shrink Dictionary Drawer
+        if (this.dom.toggleExpandDictBtn) {
+            this.dom.toggleExpandDictBtn.addEventListener('click', () => {
+                const isExpanded = this.dom.dictDrawer.classList.toggle('expanded');
+                const expandBtnIcon = this.dom.toggleExpandDictBtn.querySelector('span');
+                if (expandBtnIcon) {
+                    expandBtnIcon.textContent = isExpanded ? 'close_fullscreen' : 'open_in_full';
+                }
             });
         }
 

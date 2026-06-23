@@ -8277,21 +8277,21 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
 
 /* Bible Lexicon Extended Analysis styles */
 .dict-extended-btn {
-    background: #1B4965 !important;
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
     color: white !important;
-    box-shadow: 0 4px 10px rgba(27, 73, 101, 0.15) !important;
+    box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2) !important;
     transition: all 0.2s ease-in-out;
 }
 .dict-extended-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(27, 73, 101, 0.25) !important;
+    box-shadow: 0 6px 14px rgba(209, 125, 57, 0.3) !important;
     filter: brightness(1.1) !important;
 }
 .dict-extended-btn:active {
     transform: scale(0.98);
 }
 .dict-extended-btn:disabled {
-    background: #1B4965 !important;
+    background: linear-gradient(135deg, #e0a373, #d5896f) !important;
     color: rgba(255, 255, 255, 0.7) !important;
     cursor: not-allowed;
     transform: none;
