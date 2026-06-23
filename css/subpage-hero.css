@@ -181,3 +181,26 @@
   text-align: center !important;
 }
 
+@media (min-width: 769px) {
+  .subpage-hero .hero-title,
+  .subpage-hero .page-hero-title {
+    font-size: 48px !important;
+  }
+  .subpage-hero p,
+  .subpage-hero .page-hero-subtitle {
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .subpage-hero .hero-title,
+  .subpage-hero .page-hero-title {
+    font-size: 56px !important;
+  }
+  .subpage-hero p,
+  .subpage-hero .page-hero-subtitle {
+    font-size: 24px !important;
+  }
+}
+
+
