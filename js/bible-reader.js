@@ -2540,6 +2540,7 @@ class BibleReader {
                 completed: 'Fullført',
                 all_plans: 'Tilgjengelige leseplaner',
                 start_plan_btn: 'Start denne planen',
+                continue_plan_btn: 'Fortsett leseplan',
                 log_in_to_save: 'Logg inn på Min Side for å lagre din fremgang.',
                 login_btn: 'Logg inn',
                 days: 'dager'
@@ -2555,6 +2556,7 @@ class BibleReader {
                 completed: 'Completed',
                 all_plans: 'Available Reading Plans',
                 start_plan_btn: 'Start this plan',
+                continue_plan_btn: 'Continue reading plan',
                 log_in_to_save: 'Log in to save your progress.',
                 login_btn: 'Log in',
                 days: 'days'
@@ -2570,6 +2572,7 @@ class BibleReader {
                 completed: 'Completado',
                 all_plans: 'Planes de Lectura Disponibles',
                 start_plan_btn: 'Comenzar este plan',
+                continue_plan_btn: 'Continuar plan de lectura',
                 log_in_to_save: 'Inicia sesión para guardar tu progreso.',
                 login_btn: 'Iniciar sesión',
                 days: 'días'
@@ -2671,7 +2674,8 @@ class BibleReader {
                 const plans = [];
                 snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
 
-                this.renderAvailablePlansList(plans);
+                const startedPlanIds = await this.getStartedPlanIds();
+                this.renderAvailablePlansList(plans, startedPlanIds);
             } catch (err) {
                 console.error("Error fetching available plans:", err);
                 container.innerHTML = `
@@ -2814,9 +2818,46 @@ class BibleReader {
         this.setupReadingPlanUI();
     }
 
-    renderAvailablePlansList(plans) {
+    async getStartedPlanIds() {
+        const startedPlanIds = new Set();
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
+            try {
+                const snap = await db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .get();
+                snap.forEach(doc => {
+                    startedPlanIds.add(doc.id);
+                });
+            } catch (err) {
+                console.warn("[BibleReader] Failed to get started plans from Firestore:", err);
+            }
+        }
+        
+        // Check localStorage for guest progress
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('hkm_reading_plan_progress_')) {
+                const planId = key.substring('hkm_reading_plan_progress_'.length);
+                startedPlanIds.add(planId);
+            }
+        }
+        return startedPlanIds;
+    }
+
+    renderAvailablePlansList(plans, startedPlanIds = new Set()) {
         const container = this.dom.readingPlanContent;
         if (!container) return;
+
+        // Sort plans: started plans first
+        plans.sort((a, b) => {
+            const aStarted = startedPlanIds.has(a.id);
+            const bStarted = startedPlanIds.has(b.id);
+            if (aStarted && !bStarted) return -1;
+            if (!aStarted && bStarted) return 1;
+            return 0;
+        });
 
         const t_browsePlans = this.getTranslation('all_plans', 'Leseplaner');
         const t_startPlan = this.getTranslation('start_plan_btn', 'Start leseplan');
@@ -2854,8 +2895,18 @@ class BibleReader {
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     ${plans.map(p => {
                         const totalDays = p.durationDays || p.days.length;
+                        const isStarted = startedPlanIds.has(p.id);
+                        const t_startPlanText = isStarted 
+                            ? this.getTranslation('continue_plan_btn', 'Fortsett leseplan')
+                            : t_startPlan;
+                        
                         return `
-                        <div class="hkm-rp-card" id="plan-card-${p.id}">
+                        <div class="hkm-rp-card" id="plan-card-${p.id}" style="${isStarted ? 'border: 2px solid #d17d39 !important; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.08); position: relative;' : ''}">
+                            ${isStarted ? `
+                            <div style="position: absolute; top: -10px; right: 16px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                Påbegynt
+                            </div>
+                            ` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                                 <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; flex-grow: 1;">${p.title}</h4>
                                 <span style="font-size: 11px; font-weight: 700; background: rgba(209, 125, 57, 0.1); color: #d17d39; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
@@ -2866,11 +2917,19 @@ class BibleReader {
                                 <button class="hkm-btn-secondary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.togglePlanPreview('${p.id}')">
                                     Vis dager
                                 </button>
-                                ${this.currentUser ? `
-                                <button class="hkm-btn-primary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.enrollInPlan('${p.id}')">
-                                    ${t_startPlan}
+                                ${isStarted ? `
+                                <button class="hkm-btn-primary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.location.href = window.location.pathname + '?plan=${p.id}'">
+                                    ${t_startPlanText}
                                 </button>
-                                ` : ''}
+                                ` : (this.currentUser ? `
+                                <button class="hkm-btn-primary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.enrollInPlan('${p.id}')">
+                                    ${t_startPlanText}
+                                </button>
+                                ` : `
+                                <button class="hkm-btn-primary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.location.href = window.location.pathname + '?plan=${p.id}'">
+                                    ${t_startPlanText}
+                                </button>
+                                `)}
                             </div>
                             
                             <!-- Plan Preview Days -->
@@ -2927,7 +2986,8 @@ class BibleReader {
             const plans = [];
             snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
 
-            this.renderAvailablePlansList(plans);
+            const startedPlanIds = await this.getStartedPlanIds();
+            this.renderAvailablePlansList(plans, startedPlanIds);
         } catch (err) {
             console.error("Error loading plans:", err);
         }
