@@ -72,6 +72,23 @@ function renderDetails(container, lang) {
     const charName = char.name[lang] || char.name.no;
     document.title = `${charName} | His Kingdom Ministry`;
     
+    // Update Subpage Hero dynamically with relevant background portrait
+    const role = char.role[lang] || char.role.no;
+    const heroSection = document.querySelector('.subpage-hero');
+    if (heroSection) {
+        heroSection.style.background = `linear-gradient(135deg, rgba(27, 73, 101, 0.85) 0%, rgba(209, 125, 57, 0.9) 100%), url('${char.image}') center 30% / cover no-repeat`;
+        
+        const heroTitle = heroSection.querySelector('.hero-title');
+        if (heroTitle) {
+            heroTitle.textContent = charName;
+        }
+        
+        const heroSubtitle = heroSection.querySelector('p');
+        if (heroSubtitle) {
+            heroSubtitle.textContent = role;
+        }
+    }
+    
     // Get translations for fact labels
     const meaningLabel = lang === 'en' ? 'Name Meaning' : (lang === 'es' ? 'Significado del Nombre' : 'Navnets betydning');
     const eraLabel = lang === 'en' ? 'Era' : (lang === 'es' ? 'Época' : 'Historisk tid');
@@ -80,7 +97,6 @@ function renderDetails(container, lang) {
     const storyTitle = lang === 'en' ? 'Biblical Biography & History' : (lang === 'es' ? 'Biografía e Historia Bíblica' : 'Biografi og bibelsk historie');
     const significanceTitle = lang === 'en' ? 'Theological Significance' : (lang === 'es' ? 'Teológica Importancia' : 'Teologisk betydning');
     
-    const role = char.role[lang] || char.role.no;
     const era = char.era[lang] || char.era.no;
     const meaning = char.meaning[lang] || char.meaning.no;
     const summary = char.summary[lang] || char.summary.no;
