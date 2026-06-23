@@ -3021,17 +3021,83 @@ class BibleReader {
 
                 if (userPlanDoc.exists) {
                     this.userPlanProgress = userPlanDoc.data();
+                    
+                    // Merge local guest progress if exists
+                    const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                    if (localProgress) {
+                        try {
+                            const localData = JSON.parse(localProgress);
+                            let needsUpdate = false;
+                            
+                            if (localData.completedDays && Array.isArray(localData.completedDays)) {
+                                this.userPlanProgress.completedDays = this.userPlanProgress.completedDays || [];
+                                for (const day of localData.completedDays) {
+                                    if (!this.userPlanProgress.completedDays.includes(day)) {
+                                        this.userPlanProgress.completedDays.push(day);
+                                        needsUpdate = true;
+                                    }
+                                }
+                            }
+                            
+                            if (localData.reflections && typeof localData.reflections === 'object') {
+                                this.userPlanProgress.reflections = this.userPlanProgress.reflections || {};
+                                for (const day of Object.keys(localData.reflections)) {
+                                    if (!this.userPlanProgress.reflections[day]) {
+                                        this.userPlanProgress.reflections[day] = localData.reflections[day];
+                                        needsUpdate = true;
+                                    }
+                                }
+                            }
+                            
+                            if (localData.currentDay > (this.userPlanProgress.currentDay || 1)) {
+                                this.userPlanProgress.currentDay = localData.currentDay;
+                                needsUpdate = true;
+                            }
+                            
+                            if (needsUpdate) {
+                                console.log("[BibleReader] Merging local guest progress into Firestore:", this.userPlanProgress);
+                                await db.collection('users')
+                                    .doc(this.currentUser.uid)
+                                    .collection('reading_plans')
+                                    .doc(planId)
+                                    .set(this.userPlanProgress, { merge: true });
+                            }
+                            localStorage.removeItem('hkm_reading_plan_progress_' + planId);
+                        } catch (err) {
+                            console.warn("[BibleReader] Failed to merge local progress:", err);
+                        }
+                    }
+
                     if (!activeDayNum) {
                         activeDayNum = this.userPlanProgress.currentDay || 1;
                     }
                 } else {
-                    this.userPlanProgress = {
-                        planId: planId,
-                        currentDay: 1,
-                        completedDays: [],
-                        reflections: {}
-                    };
-                    if (!activeDayNum) activeDayNum = 1;
+                    // Migrate local progress if it exists
+                    const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                    if (localProgress) {
+                        try {
+                            this.userPlanProgress = JSON.parse(localProgress);
+                            console.log("[BibleReader] Migrating local guest progress to Firestore:", this.userPlanProgress);
+                            await db.collection('users')
+                                .doc(this.currentUser.uid)
+                                .collection('reading_plans')
+                                .doc(planId)
+                                .set(this.userPlanProgress, { merge: true });
+                            localStorage.removeItem('hkm_reading_plan_progress_' + planId);
+                        } catch (err) {
+                            console.warn("[BibleReader] Failed to migrate local progress:", err);
+                        }
+                    }
+                    
+                    if (!this.userPlanProgress) {
+                        this.userPlanProgress = {
+                            planId: planId,
+                            currentDay: 1,
+                            completedDays: [],
+                            reflections: {}
+                        };
+                    }
+                    if (!activeDayNum) activeDayNum = this.userPlanProgress.currentDay || 1;
                 }
             } else {
                 // Guest progress from localStorage
