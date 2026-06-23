@@ -7278,7 +7278,31 @@ html[data-theme="dark"] .user-role {
   color: #94a3b8 !important;
 }
 
+/* Header title white text override */
+html[data-theme="dark"] body.admin-body .section-title,
+html[data-theme="dark"] body.minside-body .section-title,
+html[data-theme="dark"] body.crm-body .section-title,
+html[data-theme="dark"] body.builder-active .section-title,
+html[data-theme="dark"] .section-title {
+  color: #ffffff !important;
+}
+
+/* Header subtitle overrides */
+html[data-theme="dark"] body.admin-body .section-subtitle,
+html[data-theme="dark"] body.minside-body .section-subtitle,
+html[data-theme="dark"] body.crm-body .section-subtitle,
+html[data-theme="dark"] body.builder-active .section-subtitle,
+html[data-theme="dark"] .section-subtitle {
+  color: #94a3b8 !important;
+}
+
 /* Header action and toggle buttons */
+html[data-theme="dark"] body.admin-body .main-header .mobile-nav-toggle,
+html[data-theme="dark"] body.crm-body .main-header .mobile-nav-toggle,
+html[data-theme="dark"] body.minside-body .main-header .mobile-nav-toggle,
+html[data-theme="dark"] body.builder-active .main-header .mobile-nav-toggle,
+html[data-theme="dark"] body.admin-body .main-header .mobile-toggle,
+html[data-theme="dark"] body.minside-body .main-header .mobile-toggle,
 html[data-theme="dark"] .notification-btn,
 html[data-theme="dark"] .mobile-nav-toggle,
 html[data-theme="dark"] #mobile-nav-toggle,
@@ -7290,6 +7314,7 @@ html[data-theme="dark"] .lang-switcher .lang-btn {
   border-color: #334155 !important;
   color: #f8fafc !important;
 }
+
 
 /* Role chips and badges */
 html[data-theme="dark"] .role-chip {
