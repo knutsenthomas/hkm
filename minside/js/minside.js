@@ -4154,21 +4154,21 @@ class MinSideManager {
     _renderNotesUI(container, personalNotes, hkmNotes) {
         const makePNote = (n) => `
         <div class="personal-note-card" data-id="${n.id}">
-            <div class="personal-note-header">
+            <div class="personal-note-card-top">
                 <div class="personal-note-title">${n.title || t('notes.untitled')}</div>
-                <div class="personal-note-right">
-                    <div class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
-                    <div class="personal-note-actions">
-                        <button class="note-btn-edit" data-id="${n.id}" title="${t('common.edit')}">
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-                        <button class="note-btn-delete" data-id="${n.id}" title="${t('profile.remove')}">
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-                    </div>
+                <div class="personal-note-body rte-content">${n.text || ''}</div>
+            </div>
+            <div class="personal-note-card-bottom">
+                <span class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</span>
+                <div class="personal-note-actions">
+                    <button class="note-btn-edit" data-id="${n.id}" title="${t('common.edit')}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button class="note-btn-delete" data-id="${n.id}" title="${t('profile.remove')}">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
                 </div>
             </div>
-            <div class="personal-note-body rte-content">${n.text || ''}</div>
         </div>`;
 
         container.innerHTML = `
@@ -4224,7 +4224,7 @@ class MinSideManager {
             </div>
 
             <!-- Personal notes list -->
-            <div id="personal-notes-list" class="notes-list">
+            <div id="personal-notes-list" class="personal-notes-grid">
                 ${personalNotes.length === 0
                 ? `<div class="note-empty-personal">
                         <span class="material-symbols-outlined">edit_note</span>

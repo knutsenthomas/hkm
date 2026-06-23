@@ -1833,8 +1833,8 @@ class BibleReader {
 
             this.dom.dictWordTitle.innerText = dictRes.word || word;
             this.dom.dictCategory.innerText = dictRes.category || this.t('dictionary');
-            this.dom.dictDefinition.innerHTML = dictRes.definition || '';
-            this.dom.dictContextualNote.innerHTML = dictRes.contextualNote || '';
+            this.dom.dictDefinition.innerHTML = this.parseMarkdown(dictRes.definition) || '';
+            this.dom.dictContextualNote.innerHTML = this.parseMarkdown(dictRes.contextualNote) || '';
 
             // Show/hide the extended analysis trigger based on biblical relevance
             const isRejected = dictRes.category === 'Ikke bibelrelatert' || 
