@@ -7386,6 +7386,34 @@ html[data-theme="dark"] .category-btn.active {
     border-color: var(--primary-orange) !important;
 }
 
+html[data-theme="dark"] .nav-pills-container {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .nav-pill {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .nav-pill:hover {
+    background: #334155 !important;
+    color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .nav-pill.active {
+    background: var(--primary-orange) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-orange) !important;
+}
+
+html[data-theme="dark"] .nav-pill.active:hover {
+    background: var(--primary-orange) !important;
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+}
+
 html[data-theme="dark"] .mega-menu {
     background-color: rgba(15, 23, 42, 0.85) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
