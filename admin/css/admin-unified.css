@@ -7081,17 +7081,20 @@ html[data-theme="dark"] body.builder-active {
 }
 
 /* Sidebar Navigation Items */
-html[data-theme="dark"] .nav-link {
-  color: #94a3b8 !important;
+html[data-theme="dark"] .nav-link,
+html[data-theme="dark"] .nav-link .material-symbols-outlined {
+  color: #ffffff !important;
 }
 html[data-theme="dark"] .nav-link:hover {
   background-color: #334155 !important;
-  color: #f8fafc !important;
+  color: #ffffff !important;
 }
-html[data-theme="dark"] .nav-link.active {
+html[data-theme="dark"] .nav-link.active,
+html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
   background-color: #2d1e18 !important;
-  color: #ff8854 !important;
+  color: #ffffff !important;
 }
+
 
 /* Force hardcoded section content & header backgrounds */
 html[data-theme="dark"] .section-content > .section-header:not(.in-topbar),

@@ -2877,6 +2877,17 @@ html[data-theme="dark"] .lang-switcher .lang-btn {
   color: #f8fafc !important;
 }
 
-
-
-
+/* Sidebar Navigation Items */
+html[data-theme="dark"] .nav-link,
+html[data-theme="dark"] .nav-link .material-symbols-outlined {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .nav-link:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .nav-link.active,
+html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
+  background-color: #2d1e18 !important;
+  color: #ffffff !important;
+}
