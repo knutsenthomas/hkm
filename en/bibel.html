@@ -2307,6 +2307,23 @@
                             This is the definition...
                         </div>
 
+                        <!-- Dypere teologisk analyse knapp og innhold -->
+                        <div id="dict-extended-trigger-wrap" style="display: none; margin-bottom: 24px;">
+                            <button id="dict-extended-btn" class="dict-extended-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; background: linear-gradient(135deg, #1B4965, #2A6F97); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(27,73,101,0.15);">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">psychology</span>
+                                <span id="dict-extended-btn-text">Show deeper theological analysis</span>
+                            </button>
+                        </div>
+                        <div id="dict-extended-section" style="display: none; margin-bottom: 24px; padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div class="dict-section-title" style="margin-top: 0; display: flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--bible-primary);">menu_book</span>
+                                <span id="dict-extended-header-text">Deeper analysis (Gemini & dictionaries)</span>
+                            </div>
+                            <div id="dict-extended-text" style="font-size: 13px; line-height: 1.6; color: var(--text-base); margin-top: 10px;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
                         <!-- Grunntekst (Originalspråk) Section -->
                         <div id="dict-original-words-section" style="display: none; margin-top: 20px; margin-bottom: 24px;">
                             <div class="dict-section-title">Original Text (Greek/Hebrew)</div>

@@ -106,7 +106,10 @@ class BibleReader {
                 'stop_audio': 'Stopp',
                 'pause_audio': 'Pause',
                 'playing_verse': 'Leser vers',
-                'paused': 'Pauset'
+                'paused': 'Pauset',
+                'extended_btn': 'Vis dypere teologisk analyse',
+                'extended_loading': 'Analyserer dypere...',
+                'extended_header': 'Dypere analyse (Gemini & ordbøker)'
             },
             'en': {
                 'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
@@ -121,7 +124,10 @@ class BibleReader {
                 'stop_audio': 'Stop',
                 'pause_audio': 'Pause',
                 'playing_verse': 'Reading verse',
-                'paused': 'Paused'
+                'paused': 'Paused',
+                'extended_btn': 'Show deeper theological analysis',
+                'extended_loading': 'Analyzing deeper...',
+                'extended_header': 'Deeper analysis (Gemini & dictionaries)'
             },
             'es': {
                 'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
@@ -136,7 +142,10 @@ class BibleReader {
                 'stop_audio': 'Detener',
                 'pause_audio': 'Pausar',
                 'playing_verse': 'Leyendo versículo',
-                'paused': 'Pausado'
+                'paused': 'Pausado',
+                'extended_btn': 'Ver análisis teológico profundo',
+                'extended_loading': 'Analizando en detalle...',
+                'extended_header': 'Análisis profundo (Gemini y diccionarios)'
             }
         };
         return (translations[lang] || translations['no'])[key] || key;
@@ -263,6 +272,11 @@ class BibleReader {
             dictSearchInput: document.getElementById('dict-search-input'),
             dictSearchSubmitBtn: document.getElementById('dict-search-submit-btn'),
             dictWelcomeState: document.getElementById('dict-welcome-state'),
+            dictExtendedBtn: document.getElementById('dict-extended-btn'),
+            dictExtendedBtnText: document.getElementById('dict-extended-btn-text'),
+            dictExtendedSection: document.getElementById('dict-extended-section'),
+            dictExtendedText: document.getElementById('dict-extended-text'),
+            dictExtendedTriggerWrap: document.getElementById('dict-extended-trigger-wrap'),
             
             // Bookmarks / History sidebar
             bookmarksList: document.getElementById('bookmarks-list'),
@@ -582,6 +596,58 @@ class BibleReader {
                 const query = this.dom.dictSearchInput.value.trim();
                 if (query) {
                     this.lookupWord(query);
+                }
+            });
+        }
+
+        // Extended Theological Analysis trigger
+        if (this.dom.dictExtendedBtn) {
+            this.dom.dictExtendedBtn.addEventListener('click', async () => {
+                const word = this.dom.dictWordTitle.innerText.trim();
+                if (!word) return;
+
+                this.dom.dictExtendedBtn.disabled = true;
+                const originalText = this.dom.dictExtendedBtnText.textContent;
+                this.dom.dictExtendedBtnText.textContent = this.t('extended_loading');
+                
+                const icon = this.dom.dictExtendedBtn.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.classList.add('spin-animation');
+                }
+
+                try {
+                    const params = new URLSearchParams({
+                        word: word,
+                        extended: 'true',
+                        lang: document.documentElement.lang || 'no'
+                    });
+                    
+                    const res = await fetch(`/api/bible/dictionary?${params.toString()}`);
+                    if (!res.ok) {
+                        throw new Error(`Failed to load extended analysis: ${res.status}`);
+                    }
+                    const data = await res.json();
+                    
+                    if (this.dom.dictExtendedText) {
+                        this.dom.dictExtendedText.innerHTML = this.parseMarkdown(data.extendedAnalysis);
+                    }
+                    
+                    if (this.dom.dictExtendedSection) {
+                        this.dom.dictExtendedSection.style.display = 'block';
+                        this.dom.dictExtendedSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                    
+                    if (this.dom.dictExtendedTriggerWrap) {
+                        this.dom.dictExtendedTriggerWrap.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error("Error fetching extended analysis:", err);
+                    this.dom.dictExtendedBtnText.textContent = originalText;
+                    this.dom.dictExtendedBtn.disabled = false;
+                } finally {
+                    if (icon) {
+                        icon.classList.remove('spin-animation');
+                    }
                 }
             });
         }
@@ -1539,6 +1605,13 @@ class BibleReader {
         if (this.dom.dictSearchInput) this.dom.dictSearchInput.value = word;
         this.dom.dictWordTitle.innerText = word;
 
+        // Reset extended analysis sections and button states
+        if (this.dom.dictExtendedSection) this.dom.dictExtendedSection.style.display = 'none';
+        if (this.dom.dictExtendedTriggerWrap) this.dom.dictExtendedTriggerWrap.style.display = 'none';
+        if (this.dom.dictExtendedText) this.dom.dictExtendedText.innerHTML = '';
+        if (this.dom.dictExtendedBtn) this.dom.dictExtendedBtn.disabled = false;
+        if (this.dom.dictExtendedBtnText) this.dom.dictExtendedBtnText.textContent = this.t('extended_btn');
+
         const dictRelatedBox = document.getElementById('dict-related-resources');
         if (dictRelatedBox) dictRelatedBox.innerHTML = '';
 
@@ -1563,6 +1636,19 @@ class BibleReader {
             this.dom.dictCategory.innerText = dictRes.category || this.t('dictionary');
             this.dom.dictDefinition.innerHTML = dictRes.definition || '';
             this.dom.dictContextualNote.innerHTML = dictRes.contextualNote || '';
+
+            // Show/hide the extended analysis trigger based on biblical relevance
+            const isRejected = dictRes.category === 'Ikke bibelrelatert' || 
+                               dictRes.category === 'Not Bible-related' || 
+                               dictRes.category === 'No relacionado con la Biblia';
+            
+            if (this.dom.dictExtendedTriggerWrap) {
+                if (!isRejected && dictRes.definition && !dictRes.definition.includes('Ingen forhåndsdefinert forklaring')) {
+                    this.dom.dictExtendedTriggerWrap.style.display = 'block';
+                } else {
+                    this.dom.dictExtendedTriggerWrap.style.display = 'none';
+                }
+            }
 
             // Render original words (grunntekst) in dictionary drawer
             if (this.dom.dictOriginalWordsSection && this.dom.dictOriginalWordsList) {
@@ -1647,6 +1733,60 @@ class BibleReader {
             this.dom.dictDefinition.innerHTML = 'Kunne ikke kontakte ordbok-tjenesten. Kontroller nettforbindelsen din.';
             this.dom.dictContextualNote.innerHTML = '';
         }
+    }
+
+    parseMarkdown(text) {
+        if (!text) return '';
+        let html = text.trim();
+
+        // Headers
+        html = html.replace(/### (.*?)\n/g, '<h5 style="font-weight:700; font-size:14px; margin-top:16px; margin-bottom:8px; color:var(--text-base);">$1</h5>');
+        html = html.replace(/## (.*?)\n/g, '<h4 style="font-weight:700; font-size:15px; margin-top:20px; margin-bottom:10px; color:var(--text-base);">$1</h4>');
+        html = html.replace(/# (.*?)\n/g, '<h3 style="font-weight:700; font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--text-base);">$1</h3>');
+
+        // Bold & Italic
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        // List items
+        const lines = html.split('\n');
+        let inList = false;
+        const processedLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (line.startsWith('- ') || line.startsWith('* ')) {
+                const content = line.substring(2);
+                if (!inList) {
+                    processedLines.push('<ul style="margin-top:8px; margin-bottom:12px; padding-left:20px; list-style-type:disc;">');
+                    inList = true;
+                }
+                processedLines.push(`<li style="font-size:13px; line-height:1.5; color:var(--text-base); margin-bottom:4px;">${content}</li>`);
+            } else {
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                processedLines.push(lines[i]);
+            }
+        }
+        if (inList) {
+            processedLines.push('</ul>');
+        }
+
+        html = processedLines.join('\n');
+
+        // Paragraphs
+        html = html.split('\n\n').map(block => {
+            const trimmed = block.trim();
+            if (!trimmed) return '';
+            if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<li') || trimmed.startsWith('</ul')) {
+                return trimmed;
+            }
+            return `<p style="margin-bottom:12px; line-height:1.6; font-size:13px; color:var(--text-base);">${trimmed}</p>`;
+        }).join('\n');
+
+        return html;
     }
 
     toggleVerseHighlight(paragraphElement, verseNumber) {

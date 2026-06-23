@@ -273,6 +273,7 @@ export default async function handler(req, res) {
       const context = urlObj.searchParams.get('context') || '';
       const scriptureRef = urlObj.searchParams.get('scriptureRef') || '';
       const lang = urlObj.searchParams.get('lang') || 'no';
+      const extended = urlObj.searchParams.get('extended') === 'true';
 
       if (!word) {
         return res.status(400).json({ error: "Word query parameter is required" });
@@ -280,7 +281,7 @@ export default async function handler(req, res) {
 
       const cleanWord = word.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'«»]/g, "");
 
-      // Quick check of hardcoded local fallback dict for basic Norwegian terms
+      // Quick check of hardcoded local fallback dict for basic Norwegian terms (only when not requesting extended analysis)
       const fallbackDict = {
         "nåde": {
           definition: "Guds totale og ufortjente barmhjertighet, kjærlighet og tilgivelse overfor mennesker. Det handler om å få fullstendig tilgivelse og velsignelse helt uavhengig av egne gjerninger eller prestasjoner.",
@@ -397,14 +398,8 @@ export default async function handler(req, res) {
         }
       };
 
-      if (lang === 'no') {
-        let fallbackEntry = fallbackDict[cleanWord];
-        if (!fallbackEntry) {
-          const foundKey = Object.keys(fallbackDict).find(k => cleanWord.includes(k) || k.includes(cleanWord));
-          if (foundKey) {
-            fallbackEntry = fallbackDict[foundKey];
-          }
-        }
+      if (lang === 'no' && !extended) {
+        const fallbackEntry = fallbackDict[cleanWord];
         if (fallbackEntry) {
           return res.status(200).json({
             word: word,
@@ -412,13 +407,15 @@ export default async function handler(req, res) {
             category: fallbackEntry.category,
             contextualNote: fallbackEntry.contextualNote,
             originalWords: [],
-            crossReferences: fallbackEntry.crossReferences || []
+            crossReferences: fallbackEntry.crossReferences || [],
+            extendedAnalysis: ""
           });
         }
       }
 
-      // Check Firestore Cache first
-      const cached = await getCachedDefinition(lang, cleanWord);
+      // Check Firestore Cache first with separated cache keys
+      const cacheKey = extended ? `${cleanWord}_extended` : cleanWord;
+      const cached = await getCachedDefinition(lang, cacheKey);
       if (cached) {
         return res.status(200).json(cached);
       }
@@ -513,8 +510,9 @@ Instruksjoner for respons-JSON:
 2. "definition": En fyldig, teologisk nøyaktig og vakkert formulert oversettelse og bearbeidelse av kildedefinisjonene over på det valgte språket.
 3. "category": En passende kategori (f.eks. "Historisk gruppe", "Teologisk begrep", "Bibelsk geografi").
 4. "contextualNote": En kort oppsummering eller kontekstuell merknad om ordets betydning i Bibelen.
-5. "originalWords": Dersom ordet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. "charis" for nåde), oppgi det opprinnelige ordet med greske/hebraiske tegn, translitterasjon, uttale (f.eks. "ka'-ris"), språk (gresk eller hebraisk), og direkte betydning. ALDRI inkluder Strong-numre.
-6. "crossReferences": Liste med relevante kryssreferanser (bibelvers). Bruk gjerne referansene oppgitt i kildeteksten (${refsText}) eller andre svært relevante vers. For hver referanse, oppgi standard referanse (f.eks. "Matteus 24:42") og en kort kommentar til verset på det valgte språket.
+5. "extendedAnalysis": ${extended ? `Siden brukeren ba om en utvidet analyse (extended=true), må du skrive en grundig og dyptgående teologisk og bibelhistorisk analyse/essay om ordet på 300-600 ord. Bruk markdown for formatering (overskrifter som '### Historisk kontekst' eller '### Teologisk betydning', fet skrift, lister). Utforsk ordets opprinnelse, bruk i hele Bibelen og praktisk betydning i dag.` : `Siden brukeren IKKE ba om utvidet analyse, må du sette dette feltet til nøyaktig en tom streng "".`}
+6. "originalWords": Dersom ordet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. "charis" for nåde), oppgi det opprinnelige ordet med greske/hebraiske tegn, translitterasjon, uttale (f.eks. "ka'-ris"), språk (gresk eller hebraisk), og direkte betydning. ALDRI inkluder Strong-numre.
+7. "crossReferences": Liste med relevante kryssreferanser (bibelvers). Bruk gjerne referansene oppgitt i kildeteksten (${refsText}) eller andre svært relevante vers. For hver referanse, oppgi standard referanse (f.eks. "Matteus 24:42") og en kort kommentar til verset på det valgte språket.
 
 Returner nøyaktig JSON i henhold til dette skjemaet:
 {
@@ -522,6 +520,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   "definition": "...",
   "category": "...",
   "contextualNote": "...",
+  "extendedAnalysis": "...",
   "originalWords": [
     {
       "word": "χάρις eller חֶסֶד",
@@ -551,6 +550,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                     definition: { type: Type.STRING },
                     category: { type: Type.STRING },
                     contextualNote: { type: Type.STRING },
+                    extendedAnalysis: { type: Type.STRING },
                     originalWords: {
                       type: Type.ARRAY,
                       items: {
@@ -577,7 +577,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                       }
                     }
                   },
-                  required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
+                  required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
                 }
               }
             });
@@ -596,6 +596,7 @@ Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning t
 - Sett 'category' til: "${rejectCategory}"
 - Sett 'definition' til: "${rejectDefinition}"
 - Sett 'contextualNote' til: "${rejectNote}"
+- Sett 'extendedAnalysis' til: ""
 
 Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte. Ta utgangspunkt i og integrer definisjoner, navnebetydninger og forklaringer fra anerkjente verk som Easton's Bible Dictionary, Smith's Bible Dictionary, International Standard Bible Encyclopedia (ISBE) og Hitchcock's Bible Names Dictionary:
 1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
@@ -603,6 +604,7 @@ Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og l
 3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium.
 4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte betydning på det valgte språket (norsk/engelsk/spansk).
 5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
+6. "extendedAnalysis": ${extended ? `Siden brukeren ba om en utvidet analyse (extended=true), må du skrive en grundig og dyptgående teologisk og bibelhistorisk analyse/essay om ordet på 300-600 ord. Bruk markdown for formatering (overskrifter som '### Historisk kontekst' eller '### Teologisk betydning', fet skrift, lister). Utforsk ordets opprinnelse, bruk i hele Bibelen og praktisk betydning i dag.` : `Siden brukeren IKKE ba om utvidet analyse, må du sette dette feltet til nøyaktig en tom streng "".`}
 
 ${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
 ${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
@@ -613,9 +615,10 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   "definition": "En definisjon eller forklaring her...",
   "category": "Kategori her...",
   "contextualNote": "Kort oppsummering...",
+  "extendedAnalysis": "...",
   "originalWords": [
     {
-      "word": "χάris eller חֶסֶד",
+      "word": "χάρις eller חֶסֶד",
       "transliteration": "charis eller chesed",
       "pronunciation": "ka'-ris eller kche'-sed",
       "language": "gresk eller hebraisk",
@@ -642,6 +645,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                     definition: { type: Type.STRING },
                     category: { type: Type.STRING },
                     contextualNote: { type: Type.STRING },
+                    extendedAnalysis: { type: Type.STRING },
                     originalWords: {
                       type: Type.ARRAY,
                       items: {
@@ -668,7 +672,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                       }
                     }
                   },
-                  required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
+                  required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
                 }
               }
             });
@@ -679,8 +683,8 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
           }
 
           if (responseData) {
-            // Save to Firestore Cache
-            await setCachedDefinition(lang, cleanWord, responseData);
+            // Save to Firestore Cache with separated cache keys
+            await setCachedDefinition(lang, cacheKey, responseData);
             return res.status(200).json(responseData);
           }
         } catch (aiErr) {

@@ -8274,3 +8274,31 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     background-color: #1e293b !important;
     background: #1e293b !important;
 }
+
+/* Bible Lexicon Extended Analysis styles */
+.dict-extended-btn {
+    transition: all 0.2s ease-in-out;
+}
+.dict-extended-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(27, 73, 101, 0.25) !important;
+    filter: brightness(1.05);
+}
+.dict-extended-btn:active {
+    transform: scale(0.98);
+}
+.dict-extended-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none !important;
+}
+.spin-animation {
+    display: inline-block;
+    animation: dict-spin 1s linear infinite;
+}
+@keyframes dict-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
