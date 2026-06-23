@@ -5303,7 +5303,7 @@ ol.block-list {
     /* No zoom animation */
     transform: scale(1.05);
     transition: none;
-    filter: brightness(0.84) contrast(1.01); /* Dim bright images for text contrast */
+    filter: brightness(0.90) contrast(1.01); /* Dim bright images for text contrast */
 }
 
 .hero-slide.active .hero-bg,
@@ -5318,10 +5318,10 @@ ol.block-list {
     inset: 0;
     /* Dark gradient at top (for menu) and bottom (for text) */
     background: linear-gradient(180deg,
-            rgba(0, 0, 0, 0.72) 0%,
-            rgba(0, 0, 0, 0.35) 25%,
-            rgba(0, 0, 0, 0.15) 50%,
-            rgba(0, 0, 0, 0.85) 100%);
+            rgba(0, 0, 0, 0.50) 0%,
+            rgba(0, 0, 0, 0.20) 25%,
+            rgba(0, 0, 0, 0.05) 50%,
+            rgba(0, 0, 0, 0.55) 100%);
     pointer-events: none;
 }
 

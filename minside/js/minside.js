@@ -4156,14 +4156,16 @@ class MinSideManager {
         <div class="personal-note-card" data-id="${n.id}">
             <div class="personal-note-header">
                 <div class="personal-note-title">${n.title || t('notes.untitled')}</div>
-                <div class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
-                <div class="personal-note-actions">
-                    <button class="note-btn-edit" data-id="${n.id}" title="${t('common.edit')}">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button class="note-btn-delete" data-id="${n.id}" title="${t('profile.remove')}">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
+                <div class="personal-note-right">
+                    <div class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
+                    <div class="personal-note-actions">
+                        <button class="note-btn-edit" data-id="${n.id}" title="${t('common.edit')}">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                        <button class="note-btn-delete" data-id="${n.id}" title="${t('profile.remove')}">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="personal-note-body rte-content">${n.text || ''}</div>
