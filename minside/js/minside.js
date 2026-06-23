@@ -3241,6 +3241,70 @@ class MinSideManager {
             </div>
         `;
 
+        // Migrate/merge guest progress from localStorage to Firestore
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('hkm_reading_plan_progress_')) {
+                const planId = key.substring('hkm_reading_plan_progress_'.length);
+                try {
+                    const localProgress = localStorage.getItem(key);
+                    if (localProgress) {
+                        const localData = JSON.parse(localProgress);
+                        
+                        // Check if document exists in Firestore
+                        const docRef = firebase.firestore()
+                            .collection('users')
+                            .doc(uid)
+                            .collection('reading_plans')
+                            .doc(planId);
+                        
+                        const docSnap = await docRef.get();
+                        let mergedData = localData;
+                        
+                        if (docSnap.exists) {
+                            const firestoreData = docSnap.data();
+                            mergedData = { ...firestoreData };
+                            
+                            // Merge completedDays
+                            if (localData.completedDays && Array.isArray(localData.completedDays)) {
+                                mergedData.completedDays = mergedData.completedDays || [];
+                                for (const day of localData.completedDays) {
+                                    if (!mergedData.completedDays.includes(day)) {
+                                        mergedData.completedDays.push(day);
+                                    }
+                                }
+                            }
+                            
+                            // Merge reflections
+                            if (localData.reflections && typeof localData.reflections === 'object') {
+                                mergedData.reflections = mergedData.reflections || {};
+                                for (const day of Object.keys(localData.reflections)) {
+                                    if (!mergedData.reflections[day]) {
+                                        mergedData.reflections[day] = localData.reflections[day];
+                                    }
+                                }
+                            }
+                            
+                            // Merge currentDay
+                            if (localData.currentDay > (mergedData.currentDay || 1)) {
+                                mergedData.currentDay = localData.currentDay;
+                            }
+                        }
+                        
+                        mergedData.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
+                        
+                        console.log(`[minside.js] Migrating/Merging plan ${planId} progress to Firestore:`, mergedData);
+                        await docRef.set(mergedData, { merge: true });
+                        localStorage.removeItem(key);
+                        // Adjust index because we removed an item
+                        i--;
+                    }
+                } catch (err) {
+                    console.warn(`[minside.js] Failed to migrate guest progress for ${planId}:`, err);
+                }
+            }
+        }
+
         // Check if there is a start parameter in hash
         const hash = window.location.hash;
         let startPlanId = null;
@@ -3443,23 +3507,55 @@ class MinSideManager {
     async renderAllAvailablePlans(container) {
         container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
         
-        let plans = [];
-        try {
-            const snap = await firebase.firestore()
-                .collection('reading_plans')
-                .orderBy('createdAt', 'desc')
-                .get();
-            snap.forEach(d => plans.push({ id: d.id, ...d.data() }));
-        } catch (e) {
-            console.error("Error loading plans:", e);
-        }
-
-        if (plans.length === 0) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <span class="material-symbols-outlined">auto_stories</span>
-                    <h3>Ingen leseplaner</h3>
-                    <p>Det er ingen tilgjengelige leseplaner for øyeblikket.</p>
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Logg inn</h3>
+                    <p>Du må være logget inn for å se dine leseplaner.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let startedPlans = [];
+        try {
+            // Get started plans for this user
+            const snap = await firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .get();
+
+            for (const doc of snap.docs) {
+                const userPlanData = doc.data();
+                const globalDoc = await firebase.firestore()
+                    .collection('reading_plans')
+                    .doc(userPlanData.planId)
+                    .get();
+                
+                if (globalDoc.exists) {
+                    startedPlans.push({
+                        id: globalDoc.id,
+                        ...globalDoc.data(),
+                        userPlan: userPlanData
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Error loading started plans:", e);
+        }
+
+        if (startedPlans.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">auto_stories</span>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">Ingen påbegynte leseplaner</h3>
+                    <p style="font-size: 14px; color: #64748b; margin: 0 0 20px 0;">Du har ikke startet noen leseplaner ennå.</p>
+                    <a href="/leseplaner.html" class="btn btn-primary" style="background: #1B4965; border-color: #1B4965; display: inline-flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined">explore</span> Finn en leseplan
+                    </a>
                 </div>
             `;
             return;
@@ -3467,22 +3563,30 @@ class MinSideManager {
 
         container.innerHTML = `
             <div style="padding: 8px;">
-                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin-bottom: 20px;">Velg en leseplan</h3>
+                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin-bottom: 20px;">Dine påbegynte leseplaner</h3>
                 <div class="courses-grid">
-                    ${plans.map(p => {
+                    ${startedPlans.map(p => {
                         const totalDays = p.durationDays || p.days.length;
+                        const completedDays = p.userPlan.completedDays || [];
+                        const progressPct = Math.round((completedDays.length / totalDays) * 100);
+                        
                         return `
                         <div class="course-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
                             <div class="course-body">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                     <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700;">${totalDays} dager</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #d17d39;">${progressPct}% fullført</span>
                                 </div>
                                 <div class="course-title" style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${p.title}</div>
                                 <div class="course-desc" style="font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
+                                
+                                <div style="height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
+                                    <div style="height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; width: ${progressPct}%;"></div>
+                                </div>
                             </div>
                             <div style="display: flex; gap: 8px; padding: 0 16px 16px 16px;">
                                 <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
-                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.enrollInPlan('${p.id}')" style="flex: 1; background: #1B4965; border-color: #1B4965;">Start plan</button>
+                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #1B4965; border-color: #1B4965;">Velg plan</button>
                             </div>
                         </div>
                         `;
@@ -3490,6 +3594,27 @@ class MinSideManager {
                 </div>
             </div>
         `;
+    }
+
+    async switchToPlan(planId) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        
+        try {
+            const ref = firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .doc(planId);
+                
+            await ref.set({
+                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            this.loadView('reading-plans');
+        } catch (e) {
+            console.error("Failed to switch plan:", e);
+        }
     }
 
     async previewPlanDetails(planId) {
@@ -3515,7 +3640,7 @@ class MinSideManager {
                 </div>
                 <div style="display:flex; gap:12px; margin-top:20px; justify-content:flex-end;">
                     <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Lukk</button>
-                    <button class="btn btn-primary" onclick="window.minSideManager.enrollInPlan('${planId}'); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Start plan</button>
+                    <button class="btn btn-primary" onclick="window.minSideManager.switchToPlan('${planId}'); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Velg plan</button>
                 </div>
             </div>
         `;
