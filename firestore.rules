@@ -423,6 +423,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Bible Dictionary Cache
+    match /bible_dictionary_cache/{docId} {
+      allow read, write: if true;
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;

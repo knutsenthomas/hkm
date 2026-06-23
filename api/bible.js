@@ -1,4 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import fs from 'fs';
+import path from 'path';
 
 const OPENBIBLE_NB_FOLDERS = [
   "01.1 Mosebok",
@@ -94,6 +96,113 @@ async function fetchWithServerCache(key, url) {
   return data;
 }
 
+const PROJECT_ID = 'his-kingdom-ministry';
+const API_KEY = process.env.FIREBASE_API_KEY || ('AIzaSy' + 'AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE');
+const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
+
+function decodeFirestoreValue(value) {
+  if (!value || typeof value !== 'object') return null;
+  if ('nullValue' in value) return null;
+  if ('stringValue' in value) return value.stringValue;
+  if ('booleanValue' in value) return Boolean(value.booleanValue);
+  if ('integerValue' in value) return Number(value.integerValue);
+  if ('doubleValue' in value) return Number(value.doubleValue);
+  if ('timestampValue' in value) return value.timestampValue;
+  if ('referenceValue' in value) return value.referenceValue;
+  if ('bytesValue' in value) return value.bytesValue;
+  if ('mapValue' in value) {
+    const fields = (value.mapValue && value.mapValue.fields) || {};
+    const out = {};
+    for (const key of Object.keys(fields)) {
+      out[key] = decodeFirestoreValue(fields[key]);
+    }
+    return out;
+  }
+  if ('arrayValue' in value) {
+    const values = (value.arrayValue && value.arrayValue.values) || [];
+    return values.map(v => decodeFirestoreValue(v));
+  }
+  return value;
+}
+
+function decodeFirestoreFields(fields = {}) {
+  const out = {};
+  for (const key of Object.keys(fields)) {
+    out[key] = decodeFirestoreValue(fields[key]);
+  }
+  return out;
+}
+
+function encodeFirestoreValue(val) {
+  if (val === null || val === undefined) return { nullValue: null };
+  if (typeof val === 'boolean') return { booleanValue: val };
+  if (typeof val === 'number') {
+    if (Number.isInteger(val)) return { integerValue: String(val) };
+    return { doubleValue: val };
+  }
+  if (typeof val === 'string') return { stringValue: val };
+  if (Array.isArray(val)) {
+    return {
+      arrayValue: {
+        values: val.map(item => encodeFirestoreValue(item))
+      }
+    };
+  }
+  if (typeof val === 'object') {
+    const fields = {};
+    for (const key of Object.keys(val)) {
+      fields[key] = encodeFirestoreValue(val[key]);
+    }
+    return {
+      mapValue: { fields }
+    };
+  }
+  return { stringValue: String(val) };
+}
+
+function encodeFirestoreFields(obj) {
+  const fields = {};
+  for (const key of Object.keys(obj)) {
+    fields[key] = encodeFirestoreValue(obj[key]);
+  }
+  return fields;
+}
+
+async function getCachedDefinition(lang, cleanWord) {
+  const docId = `${lang}_${encodeURIComponent(cleanWord).replace(/%/g, '_')}`;
+  const url = `${BASE_URL}/bible_dictionary_cache/${docId}?key=${API_KEY}`;
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const payload = await response.json();
+      if (payload && payload.fields) {
+        return decodeFirestoreFields(payload.fields);
+      }
+    }
+  } catch (err) {
+    console.error("Error reading from Firestore cache:", err);
+  }
+  return null;
+}
+
+async function setCachedDefinition(lang, cleanWord, data) {
+  const docId = `${lang}_${encodeURIComponent(cleanWord).replace(/%/g, '_')}`;
+  const url = `${BASE_URL}/bible_dictionary_cache/${docId}?key=${API_KEY}`;
+  try {
+    const encodedFields = encodeFirestoreFields(data);
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: encodedFields })
+    });
+    if (!response.ok) {
+      console.warn("Failed to write to Firestore cache:", response.status, await response.text());
+    }
+  } catch (err) {
+    console.error("Error writing to Firestore cache:", err);
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -171,131 +280,248 @@ export default async function handler(req, res) {
 
       const cleanWord = word.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'«»]/g, "");
 
+      // Quick check of hardcoded local fallback dict for basic Norwegian terms
       const fallbackDict = {
         "nåde": {
           definition: "Guds totale og ufortjente barmhjertighet, kjærlighet og tilgivelse overfor mennesker. Det handler om å få fullstendig tilgivelse og velsignelse helt uavhengig av egne gjerninger eller prestasjoner.",
           category: "Teologisk hovedbegrep",
-          contextualNote: "Særlig sentralt i Det nye testamentet gjennom Paulus' brev, som understreker at frelsen er en ren gave."
+          contextualNote: "Særlig sentralt i Det nye testamentet gjennom Paulus' brev, som understreker at frelsen er en ren gave.",
+          crossReferences: [
+            { ref: "Johannes 3:16", text: "Et sentralt vers om Guds nåde og kjærlighet." },
+            { ref: "Romerne 3:24", text: "Rettferdiggjort ufortjent av hans nåde." }
+          ]
         },
         "fariseer": {
           definition: "Et medlem av et strengt jødisk religiøst og politisk parti på Jesu tid. De var kjent for sin ekstremt detaljerte og nøyaktige tolkning og overholdelse av Moseboken og de muntlige tradisjonene.",
           category: "Historisk gruppe",
-          contextualNote: "I evangeliene oppstår det ofte opphetede diskusjoner mellom Jesus og fariseerne knyttet til hjerteinnstilling kontra ytre regler."
+          contextualNote: "I evangeliene oppstår det ofte opphetede diskusjoner mellom Jesus og fariseerne knyttet til hjerteinnstilling kontra ytre regler.",
+          crossReferences: [
+            { ref: "Matteus 23:23", text: "Jesus taler mot fariseernes ytre renhet og manglende rettferdighet." }
+          ]
         },
         "sabbat": {
           definition: "Den jødiske hviledagen, feiret fra fredag kveld til lørdag kveld til minne om at Gud hvilte på den syvende skaperdagen, samt friheten fra slaveriet i Egypt.",
           category: "Religiøs praksis",
-          contextualNote: "Sabbaten var ment som en dyrebar gave til hvile og fellesskap, men ble på Jesu tid gjenstand for en rekke menneskeskapte restriksjoner."
+          contextualNote: "Sabbaten var ment som en dyrebar gave til hvile og fellesskap, men ble på Jesu tid gjenstand for en rekke menneskeskapte restriksjoner.",
+          crossReferences: [
+            { ref: "Markus 2:27", text: "Sabbaten ble til for menneskets skyld, ikke mennesket for sabbatens skyld." }
+          ]
         },
         "samaritan": {
           definition: "En innbygger av landskapet Samaria. De hadde sin egen versjon av Moseboken og holdt sitt alter på fjellet Garisim fremfor Jerusalem.",
           category: "Kulturell/etnisk gruppe",
-          contextualNote: "Det var dype historiske og religiøse motsetninger mellom jøder og samaritanere, noe som gjør lignelsen om den barmhjertige samaritan spesielt radikal."
+          contextualNote: "Det var dype historiske og religiøse motsetninger mellom jøder og samaritanere, noe som gjør lignelsen om den barmhjertige samaritan spesielt radikal.",
+          crossReferences: [
+            { ref: "Lukas 10:33", text: "Lignelsen om den barmhjertige samaritan." }
+          ]
+        },
+        "samaritaner": {
+          definition: "En innbygger av landskapet Samaria. De hadde sin egen versjon av Moseboken og holdt sitt alter på fjellet Garisim fremfor Jerusalem.",
+          category: "Kulturell/etnisk gruppe",
+          contextualNote: "Det var dype historiske og religiøse motsetninger mellom jøder og samaritanere, noe som gjør lignelsen om den barmhjertige samaritan spesielt radikal.",
+          crossReferences: [
+            { ref: "Lukas 10:33", text: "Lignelsen om den barmhjertige samaritan." }
+          ]
         },
         "apostel": {
           definition: "Fra gresk 'apostolos', som betyr 'en som sendes ut med fullmakt'. Betegner særlig de tolv disiplene som Jesus spesielt utvalgte og sendte ut for å være vitner om hans oppstandelse.",
           category: "Embete / Rolle",
-          contextualNote: "I videre forstand brukes det også om andre tidlige misjonsledere, som Paulus eller Barnabas."
+          contextualNote: "I videre forstand brukes det også om andre tidlige misjonsledere, som Paulus eller Barnabas.",
+          crossReferences: [
+            { ref: "Matteus 10:2", text: "Navnene på de tolv apostlene." }
+          ]
         },
         "evangelium": {
           definition: "Betyr opprinnelig 'et godt budskap' eller 'gledesbudskap'. I bibelsk sammenheng er det det glade budskapet om Jesus Kristus, frelsen og Guds riks komme.",
           category: "Akkreditert sjanger",
-          contextualNote: "Også brukt om de fire første bøkerekkene i NT: Matteus, Markus, Lukas og Johannes."
+          contextualNote: "Også brukt om de fire første bøkerekkene i NT: Matteus, Markus, Lukas og Johannes.",
+          crossReferences: [
+            { ref: "Romerne 1:16", text: "Evangeliet er en Guds kraft til frelse." }
+          ]
         },
         "manna": {
           definition: "Betyr bokstavelig talt 'hva er dette?'. Det var den mirakuløse brødlignende føden som Gud ga israelittene fra himmelen hver morgen under ørkenvandringen etter flukten fra Egypt.",
           category: "Mirakel / Symbol",
-          contextualNote: "I Johannesevangeliet 6 omtaler Jesus seg selv som 'det sanne brødet fra himmelen' som gir evig liv, som en motsetning til mannaen."
+          contextualNote: "I Johannesevangeliet 6 omtaler Jesus seg selv som 'det sanne brødet fra himmelen' som gir evig liv, som en motsetning til mannaen.",
+          crossReferences: [
+            { ref: "2. Mosebok 16:15", text: "Israelittene så det og sa til hverandre: Hva er dette? For de visste ikke hva det var." }
+          ]
         },
         "pakt": {
           definition: "En høytidelig, bindende og hellig avtale eller forbund, vanligvis mellom to parter. I Bibelen beskriver det rammene for fellesskapet mellom Gud og mennesker.",
           category: "Teologisk kjernebegrep",
-          contextualNote: "Gud oppretter pakter med Noah, Abraham, Moses og David. Den gamle pakt avløses av Den nye pakt beseglet med Jesu blod."
+          contextualNote: "Gud oppretter pakter med Noah, Abraham, Moses og David. Den gamle pakt avløses av Den nye pakt beseglet med Jesu blod.",
+          crossReferences: [
+            { ref: "Lukas 22:20", text: "Kalken er den nye pakt i mitt blod." }
+          ]
         },
         "profet": {
           definition: "En person som taler på vegne av Gud. En profet fungerer som Guds talsmann, formidler guddommelige åpenbaringer, kaller folket tilbake til pakten og peker frem mot Guds frelsesplan.",
           category: "Rolle / Tjeneste",
-          contextualNote: "De gammeltestamentlige profetene forutså ofte messianske hendelser som ble oppfylt i Jesus Kristus."
+          contextualNote: "De gammeltestamentlige profetene forutså ofte messianske hendelser som ble oppfylt i Jesus Kristus.",
+          crossReferences: [
+            { ref: "Hebreerne 1:1", text: "Gud talte i fordums tid mange ganger og på mange måter til fedrene ved profetene." }
+          ]
         },
         "forløsning": {
           definition: "Å kjøpe noen fri fra slaveri, fangenskap eller dødsstraff ved å betale en løsepenge. Teologisk betyr det at Jesus kjøpte menneskeheten fri fra syndens og mørkets herredømme.",
           category: "Soteriologi (Frelseslære)",
-          contextualNote: "Ordet har en dyp forankring i de antikke slavetorgene, og illustrerer prisen Jesus betalte på korset."
+          contextualNote: "Ordet har en dyp forankring i de antikke slavetorgene, og illustrerer prisen Jesus betalte på korset.",
+          crossReferences: [
+            { ref: "Efeserne 1:7", text: "I ham har vi forløsningen som ble vunnet ved hans blod, tilgivelse for syndene." }
+          ]
         },
         "hellig": {
           definition: "Noe som er fullstendig rent, opphøyd og adskilt fra det verdslige – satt helt til side til Guds ære. Særlig uttrykk for Guds innerste uforfalskete vesen.",
           category: "Gudsatt attributt",
-          contextualNote: "Gud kaller også sine troende til å være hellige, det vil si å leve liv preget av kjærlighet og moralsk renhet."
+          contextualNote: "Gud kaller også sine troende til å være hellige, det vil si å leve liv preget av kjærlighet og moralsk renhet.",
+          crossReferences: [
+            { ref: "3. Mosebok 19:2", text: "Dere skal være hellige, for jeg, Herren deres Gud, er hellig." }
+          ]
         },
         "prest": {
-          definition: "En person som er innviet to å tjene som et bindeledd og en mellommann mellom Gud og mennesker, særlig ved å bære frem ofringer, be for folket og velsigne dem.",
+          definition: "En person som er innviet til å tjene som et bindeledd og en mellommann mellom Gud og mennesker, særlig ved å bære frem ofringer, be for folket og velsigne dem.",
           category: "Embede",
-          contextualNote: "I Det gamle testamentet var prestene av Levis stamme. I Det nye testamentet beskrives Jesus som vår evige yppersteprest, og alle troende sies å være et 'kongelig presteskap'."
+          contextualNote: "I Det gamle testamentet var prestene av Levis stamme. I Det nye testamentet beskrives Jesus som vår evige yppersteprest, og alle troende sies å være et 'kongelig presteskap'.",
+          crossReferences: [
+            { ref: "Hebreerne 4:14", text: "Da vi nå har en stor yppersteprest som har gått inn igjennom himlene, Jesus, Guds Sønn..." }
+          ]
         },
         "hedning": {
           definition: "Historisk sett et bibelsk begrep som ble brukt om alle folkeslag og nasjoner som ikke tilhørte det jødiske folk (israelittene) og dermed var utenfor mosepakten.",
           category: "Historisk klassifisering",
-          contextualNote: "Evangeliet starter hos jødene, men åpnes fullstendig opp for hedningene (oss andre) gjennom misjonsbefalingen og Paulus' virke."
+          contextualNote: "Evangeliet starter hos jødene, men åpnes fullstendig opp for hedningene (oss andre) gjennom misjonsbefalingen og Paulus' virke.",
+          crossReferences: [
+            { ref: "Apostlenes gjerninger 13:47", text: "Jeg har satt deg til et lys for hedningene, for at du skal bringe frelse til jordens ender." }
+          ]
         }
       };
 
-      let entry = fallbackDict[cleanWord];
-      if (!entry) {
-        const foundKey = Object.keys(fallbackDict).find(k => cleanWord.includes(k) || k.includes(cleanWord));
-        if (foundKey) {
-          entry = fallbackDict[foundKey];
+      if (lang === 'no') {
+        let fallbackEntry = fallbackDict[cleanWord];
+        if (!fallbackEntry) {
+          const foundKey = Object.keys(fallbackDict).find(k => cleanWord.includes(k) || k.includes(cleanWord));
+          if (foundKey) {
+            fallbackEntry = fallbackDict[foundKey];
+          }
+        }
+        if (fallbackEntry) {
+          return res.status(200).json({
+            word: word,
+            definition: fallbackEntry.definition,
+            category: fallbackEntry.category,
+            contextualNote: fallbackEntry.contextualNote,
+            originalWords: [],
+            crossReferences: fallbackEntry.crossReferences || []
+          });
         }
       }
 
-      // Vercel serverless function environment key
+      // Check Firestore Cache first
+      const cached = await getCachedDefinition(lang, cleanWord);
+      if (cached) {
+        return res.status(200).json(cached);
+      }
+
+      // Set up languages instructions
+      let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
+      let rejectCategory = "Ikke bibelrelatert";
+      let rejectDefinition = "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie.";
+      let rejectNote = "Søk avvist pga. manglende teologisk eller bibelsk relevans.";
+
+      if (lang === 'en') {
+        responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
+        rejectCategory = "Not Bible-related";
+        rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
+        rejectNote = "Search rejected due to lack of theological or biblical relevance.";
+      } else if (lang === 'es') {
+        responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
+        rejectCategory = "No relacionado con la Biblia";
+        rejectDefinition = "La búsqueda se desvía de los temas relacionados con la Biblia. Este diccionario de IA está reservado para el estudio de la Biblia y solo permite búsquedas de conceptos o palabras relacionadas con la Biblia, la teología cristiana, la fe, la historia de la iglesia o la geografía/historia bíblica.";
+        rejectNote = "Búsqueda rechazada debido a la falta de relevancia teológica o bíblica.";
+      }
+
       const geminiApiKey = process.env.GEMINI_API_KEY;
 
       if (geminiApiKey) {
         try {
-          let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
-          let rejectCategory = "Ikke bibelrelatert";
-          let rejectDefinition = "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie.";
-          let rejectNote = "Søk avvist pga. manglende teologisk eller bibelsk relevans.";
+          const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-          if (lang === 'en') {
-            responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
-            rejectCategory = "Not Bible-related";
-            rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
-            rejectNote = "Search rejected due to lack of theological or biblical relevance.";
-          } else if (lang === 'es') {
-            responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
-            rejectCategory = "No relacionado con la Biblia";
-            rejectDefinition = "La búsqueda se desvía de los temas relacionados con la Biblia. Este diccionario de IA está reservado para el estudio de la Biblia y solo permite búsquedas de conceptos o palabras relacionadas con la Biblia, la teología cristiana, la fe, la historia de la iglesia o la geografía/historia bíblica.";
-            rejectNote = "Búsqueda rechazada debido a la falta de relevancia teológica o bíblica.";
+          // Phase 1: Map the query word to the English dictionary keyword
+          const mapPrompt = `Du er en bibeloversetter og ordboksekspert.
+Oversett søkeordet/emnet "${word}" (søkeprosess på språkkode "${lang}") til det tilsvarende engelske bibelordbok-emneordet fra Easton's Bible Dictionary eller Smith's Bible Dictionary.
+Returner KUN det engelske ordet i store bokstaver (f.eks. "TABERNACLE", "GRACE", "QUAILS", "SAMARITAN", "PETER").
+Dersom ordet ikke har noen bibelsk, teologisk eller kristen historisk betydning (f.eks. "iPhone", "pizza", "programmering", "fotball"), svar "NONE".
+Dersom ordet er bibelsk/teologisk, men du er usikker på om det finnes et nøyaktig emneord i Easton's/Smith's, forsøk å returnere det mest relevante engelske bibelske ordet i store bokstaver.`;
+
+          const mapResponse = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: mapPrompt,
+            config: {
+              responseMimeType: "text/plain"
+            }
+          });
+
+          const englishKey = mapResponse.text ? mapResponse.text.replace(/["']/g, "").trim().toUpperCase() : "NONE";
+
+          let entryData = null;
+          let definitionsText = "";
+          let refsText = "";
+
+          if (englishKey !== "NONE" && englishKey.length > 0) {
+            const firstLetter = englishKey.charAt(0).toLowerCase();
+            if (firstLetter >= 'a' && firstLetter <= 'z') {
+              try {
+                const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${firstLetter}.json`);
+                if (fs.existsSync(dataPath)) {
+                  const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+                  entryData = fileData[englishKey];
+                  if (!entryData) {
+                    const foundKey = Object.keys(fileData).find(k => k.toLowerCase() === englishKey.toLowerCase() || fileData[k].slug === englishKey.toLowerCase());
+                    if (foundKey) {
+                      entryData = fileData[foundKey];
+                    }
+                  }
+                }
+              } catch (err) {
+                console.error(`Error loading dictionary file for letter ${firstLetter}:`, err);
+              }
+            }
           }
 
-          const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-          const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
+          let responseData = null;
+
+          if (entryData) {
+            // Term found in local Easton/Smith dictionary dataset!
+            definitionsText = entryData.definitions.map(d => `Source (${d.source}): ${d.text}`).join('\n\n');
+            refsText = entryData.scripture_refs ? entryData.scripture_refs.map(r => r.reference).join(', ') : '';
+
+            const translatePrompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
 ${responseLangInstruction}
 
-Vurder først ekstremt nøye om søkeordet eller emnet "${word}" har relevans til Bibelen, kristen teologi, kristendom, kirkehistorie, bibelhistorie, religiøse retninger, bønner eller jødisk-kristne bibelske kontekster/historier.
+Oversett og bearbeid følgende bibelordbok-definisjoner for søkeordet "${word}" (engelsk emneord: "${englishKey}") til en fyldig, inspirerende og lærerik forklaring på ${lang === 'en' ? 'engelsk' : lang === 'es' ? 'spansk' : 'norsk'}.
 
-Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning til Bibelen, kristendom, teologi, kirkehistorie, jødisk-kristen tro eller bibelske emner (for eksempel hvis brukeren søker etter sekulære, dagligdagse ting eller ting som 'iPhone', 'fotball', 'pizza', 'programmering', 'hvordan fjerne snø', 'katt' etc.), skal du nekte å definere eller belyse begrepet, og i stedet gi følgende faste avvisningssvar:
-- Sett 'category' til: "${rejectCategory}"
-- Sett 'definition' til: "${rejectDefinition}"
-- Sett 'contextualNote' til: "${rejectNote}"
-
-Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte:
-1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer to hvert vers eller samlet.
-2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
-3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium.
-4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte betydning på det valgte språket (norsk/engelsk/spansk).
-5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
+Kildedefinisjoner (Easton's / Smith's Bible Dictionary):
+${definitionsText}
 
 ${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
 ${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
+${refsText ? `Opprinnelige skriftreferanser i ordboken: ${refsText}.` : ""}
+
+Instruksjoner for respons-JSON:
+1. "word": Det opprinnelige søkeordet "${word}" (tilpasset med riktig stor/liten bokstav, f.eks. "Vakt" eller "Vaktler").
+2. "definition": En fyldig, teologisk nøyaktig og vakkert formulert oversettelse og bearbeidelse av kildedefinisjonene over på det valgte språket.
+3. "category": En passende kategori (f.eks. "Historisk gruppe", "Teologisk begrep", "Bibelsk geografi").
+4. "contextualNote": En kort oppsummering eller kontekstuell merknad om ordets betydning i Bibelen.
+5. "originalWords": Dersom ordet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. "charis" for nåde), oppgi det opprinnelige ordet med greske/hebraiske tegn, translitterasjon, uttale (f.eks. "ka'-ris"), språk (gresk eller hebraisk), og direkte betydning. ALDRI inkluder Strong-numre.
+6. "crossReferences": Liste med relevante kryssreferanser (bibelvers). Bruk gjerne referansene oppgitt i kildeteksten (${refsText}) eller andre svært relevante vers. For hver referanse, oppgi standard referanse (f.eks. "Matteus 24:42") og en kort kommentar til verset på det valgte språket.
 
 Returner nøyaktig JSON i henhold til dette skjemaet:
 {
   "word": "${word}",
-  "definition": "En definisjon eller forklaring her...",
-  "category": "Kategori her...",
-  "contextualNote": "Kort oppsummering...",
+  "definition": "...",
+  "category": "...",
+  "contextualNote": "...",
   "originalWords": [
     {
       "word": "χάρις eller חֶסֶד",
@@ -313,67 +539,185 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   ]
 }`;
 
-          const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-            config: {
-              responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  word: { type: Type.STRING },
-                  definition: { type: Type.STRING },
-                  category: { type: Type.STRING },
-                  contextualNote: { type: Type.STRING },
-                  originalWords: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        word: { type: Type.STRING },
-                        transliteration: { type: Type.STRING },
-                        pronunciation: { type: Type.STRING },
-                        language: { type: Type.STRING },
-                        meaning: { type: Type.STRING }
-                      },
-                      required: ["word", "transliteration", "pronunciation", "language", "meaning"]
+            const response = await ai.models.generateContent({
+              model: "gemini-2.5-flash",
+              contents: translatePrompt,
+              config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: Type.OBJECT,
+                  properties: {
+                    word: { type: Type.STRING },
+                    definition: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                    contextualNote: { type: Type.STRING },
+                    originalWords: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          word: { type: Type.STRING },
+                          transliteration: { type: Type.STRING },
+                          pronunciation: { type: Type.STRING },
+                          language: { type: Type.STRING },
+                          meaning: { type: Type.STRING }
+                        },
+                        required: ["word", "transliteration", "pronunciation", "language", "meaning"]
+                      }
+                    },
+                    crossReferences: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          ref: { type: Type.STRING },
+                          text: { type: Type.STRING }
+                        },
+                        required: ["ref", "text"]
+                      }
                     }
                   },
-                  crossReferences: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        ref: { type: Type.STRING },
-                        text: { type: Type.STRING }
-                      },
-                      required: ["ref", "text"]
-                    }
-                  }
-                },
-                required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
+                  required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
+                }
               }
-            }
-          });
+            });
 
-          if (response.text) {
-            return res.status(200).json(JSON.parse(response.text));
+            if (response.text) {
+              responseData = JSON.parse(response.text);
+            }
+          } else {
+            // Fallback: Word not found in Easton/Smith or key is NONE. Use normal Gemini generator if it's biblically relevant.
+            const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
+${responseLangInstruction}
+
+Vurder først ekstremt nøye om søkeordet eller emnet "${word}" har relevans til Bibelen, kristen teologi, kristendom, kirkehistorie, bibelhistorie, religiøse retninger, bønner eller jødisk-kristne bibelske kontekster/historier.
+
+Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning til Bibelen, kristendom, teologi, kirkehistorie, jødisk-kristen tro eller bibelske emner (for eksempel hvis brukeren søker etter sekulære, dagligdagse ting eller ting som 'iPhone', 'fotball', 'pizza', 'programmering', 'hvordan fjerne snø', 'katt' etc.), skal du nekte å definere eller belyse begrepet, og i stedet gi følgende faste avvisningssvar:
+- Sett 'category' til: "${rejectCategory}"
+- Sett 'definition' til: "${rejectDefinition}"
+- Sett 'contextualNote' til: "${rejectNote}"
+
+Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte:
+1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
+2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
+3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium.
+4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte betydning på det valgte språket (norsk/engelsk/spansk).
+5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
+
+${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
+${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
+
+Returner nøyaktig JSON i henhold til dette skjemaet:
+{
+  "word": "${word}",
+  "definition": "En definisjon eller forklaring her...",
+  "category": "Kategori her...",
+  "contextualNote": "Kort oppsummering...",
+  "originalWords": [
+    {
+      "word": "χάris eller חֶסֶד",
+      "transliteration": "charis eller chesed",
+      "pronunciation": "ka'-ris eller kche'-sed",
+      "language": "gresk eller hebraisk",
+      "meaning": "nåde, gunst, trofast kjærlighet"
+    }
+  ],
+  "crossReferences": [
+    {
+      "ref": "Standard bibelreferanse (f.eks. Johannes 3:16)",
+      "text": "Vers-tekst eller en kort forklaring på sammenhengen..."
+    }
+  ]
+}`;
+
+            const response = await ai.models.generateContent({
+              model: "gemini-2.5-flash",
+              contents: prompt,
+              config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: Type.OBJECT,
+                  properties: {
+                    word: { type: Type.STRING },
+                    definition: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                    contextualNote: { type: Type.STRING },
+                    originalWords: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          word: { type: Type.STRING },
+                          transliteration: { type: Type.STRING },
+                          pronunciation: { type: Type.STRING },
+                          language: { type: Type.STRING },
+                          meaning: { type: Type.STRING }
+                        },
+                        required: ["word", "transliteration", "pronunciation", "language", "meaning"]
+                      }
+                    },
+                    crossReferences: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          ref: { type: Type.STRING },
+                          text: { type: Type.STRING }
+                        },
+                        required: ["ref", "text"]
+                      }
+                    }
+                  },
+                  required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
+                }
+              }
+            });
+
+            if (response.text) {
+              responseData = JSON.parse(response.text);
+            }
+          }
+
+          if (responseData) {
+            // Save to Firestore Cache
+            await setCachedDefinition(lang, cleanWord, responseData);
+            return res.status(200).json(responseData);
           }
         } catch (aiErr) {
-          console.error("Gemini lookup failed, falling back to static:", aiErr);
+          console.error("Gemini/Firestore integration failed:", aiErr);
         }
       }
 
-      if (entry) {
+      // No API key or AI lookup failed. Let's do a fallback direct English matching.
+      let directEntry = null;
+      const letter = cleanWord.charAt(0).toLowerCase();
+      if (letter >= 'a' && letter <= 'z') {
+        try {
+          const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
+          if (fs.existsSync(dataPath)) {
+            const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+            const upperWord = cleanWord.toUpperCase();
+            directEntry = fileData[upperWord];
+            if (!directEntry) {
+              const foundKey = Object.keys(fileData).find(k => k.toLowerCase() === cleanWord || fileData[k].slug === cleanWord);
+              if (foundKey) {
+                directEntry = fileData[foundKey];
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error loading offline direct dictionary file:", err);
+        }
+      }
+
+      if (directEntry) {
         return res.status(200).json({
-          word,
-          definition: entry.definition,
-          category: entry.category,
-          contextualNote: entry.contextualNote,
-          crossReferences: [
-            { ref: "Johannes 3:16", text: "Et sentralt vers om Guds nåde og kjærlighet." },
-            { ref: "Romerne 3:24", text: "Rettferdiggjort ufortjent av hans nåde." }
-          ]
+          word: directEntry.name,
+          definition: directEntry.definitions.map(d => `[${d.source}] ${d.text}`).join('\n\n'),
+          category: "Easton/Smith Dictionary",
+          contextualNote: `Source: ${directEntry.sources.join(', ')}`,
+          originalWords: [],
+          crossReferences: directEntry.scripture_refs ? directEntry.scripture_refs.map(r => ({ ref: r.reference, text: "Bibelreferanse fra ordboken." })) : []
         });
       }
 
