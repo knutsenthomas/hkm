@@ -3,8 +3,8 @@ import { firebaseService } from './firebase-service.js';
 
 const BIBLE_PROJECT_VIDEOS = {
     // Law/Pentateuch
-    '1': { no: { title: 'Genesis 1-11', id: 'F4L1v9Jg2f8' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
-    'GEN': { no: { title: 'Genesis 1-11', id: 'F4L1v9Jg2f8' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
+    '1': { no: { title: 'Genesis 1-11', id: 'gGOI1KNVHUU' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
+    'GEN': { no: { title: 'Genesis 1-11', id: 'gGOI1KNVHUU' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
     
     '2': { no: { title: 'Andre Mosebok 1-18', id: 'gT1Ea209tK8' }, en: { title: 'Exodus 1-18', id: '0zf-G4v4n9M' } },
     'EXO': { no: { title: 'Andre Mosebok 1-18', id: 'gT1Ea209tK8' }, en: { title: 'Exodus 1-18', id: '0zf-G4v4n9M' } },
@@ -25,8 +25,8 @@ const BIBLE_PROJECT_VIDEOS = {
     '7': { en: { title: 'Judges', id: 'kOYy8iCfI40' } },
     'JDG': { en: { title: 'Judges', id: 'kOYy8iCfI40' } },
     
-    '8': { no: { title: 'Rut', id: 'pYh_wBPy0aE' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
-    'RUT': { no: { title: 'Rut', id: 'pYh_wBPy0aE' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
+    '8': { no: { title: 'Rut', id: '134KT08Xtx0' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
+    'RUT': { no: { title: 'Rut', id: '134KT08Xtx0' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
     
     '9': { en: { title: '1 Samuel', id: 'QGOqiZcjF7o' } },
     '1SA': { en: { title: '1 Samuel', id: 'QGOqiZcjF7o' } },
@@ -49,8 +49,8 @@ const BIBLE_PROJECT_VIDEOS = {
     '16': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
     'NEH': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
     
-    '17': { no: { title: 'Ester', id: 'op9u362dOIg' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
-    'EST': { no: { title: 'Ester', id: 'op9u362dOIg' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
+    '17': { no: { title: 'Ester', id: 'VUZbtPnTLes' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
+    'EST': { no: { title: 'Ester', id: 'VUZbtPnTLes' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
 
     // Wisdom/Poetry
     '18': { en: { title: 'Job', id: 'xQ5WvT2sDM' } },
@@ -59,8 +59,8 @@ const BIBLE_PROJECT_VIDEOS = {
     '19': { en: { title: 'Psalms', id: 'dpny224vms0' } },
     'PSA': { en: { title: 'Psalms', id: 'dpny224vms0' } },
     
-    '20': { en: { title: 'Proverbs', id: 'AzmYV8G2w8A' } },
-    'PRO': { en: { title: 'Proverbs', id: 'AzmYV8G2w8A' } },
+    '20': { no: { title: 'Salomos ordspråk', id: 'mCx1Z_r-INQ' }, en: { title: 'Proverbs Overview', id: 'AzmYV8G2w8A' } },
+    'PRO': { no: { title: 'Salomos ordspråk', id: 'mCx1Z_r-INQ' }, en: { title: 'Proverbs Overview', id: 'AzmYV8G2w8A' } },
     
     '21': { en: { title: 'Ecclesiastes', id: 'lrsQ1tc-2wk' } },
     'ECC': { en: { title: 'Ecclesiastes', id: 'lrsQ1tc-2wk' } },
@@ -131,16 +131,16 @@ const BIBLE_PROJECT_VIDEOS = {
     '42': { en: { title: 'Luke Part 1', id: 'XIb_dCIxzr0' } },
     'LUK': { en: { title: 'Luke Part 1', id: 'XIb_dCIxzr0' } },
     
-    '43': { no: { title: 'Johannesevangeliet Del 1', id: 'G-2e9mMf7E8' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
-    'JHN': { no: { title: 'Johannesevangeliet Del 1', id: 'G-2e9mMf7E8' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
+    '43': { no: { title: 'Johannesevangeliet 1-12', id: 'q1jzIc_o_DA' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
+    'JHN': { no: { title: 'Johannesevangeliet 1-12', id: 'q1jzIc_o_DA' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
 
     // History NT
-    '44': { no: { title: 'Apostlenes gjerninger Del 1', id: 'CGbGw8oFCe4' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
-    'ACT': { no: { title: 'Apostlenes gjerninger Del 1', id: 'CGbGw8oFCe4' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
+    '44': { no: { title: 'Apostlenes gjerninger 1-12', id: 'ITkcNnWj3Qc' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
+    'ACT': { no: { title: 'Apostlenes gjerninger 1-12', id: 'ITkcNnWj3Qc' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
 
     // Epistles
-    '45': { no: { title: 'Romerbrevet Del 1', id: 't-0P017x39Y' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
-    'ROM': { no: { title: 'Romerbrevet Del 1', id: 't-0P017x39Y' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
+    '45': { no: { title: 'Romerne 1-4', id: 'YacjnTUJfvU' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
+    'ROM': { no: { title: 'Romerne 1-4', id: 'YacjnTUJfvU' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
     
     '46': { en: { title: '1 Corinthians', id: 'vUR1c3c9JmY' } },
     '1CO': { en: { title: '1 Corinthians', id: 'vUR1c3c9JmY' } },
@@ -2511,7 +2511,11 @@ class BibleReader {
         const key = String(bookId).toUpperCase().trim();
         const entry = BIBLE_PROJECT_VIDEOS[key];
         if (!entry) return null;
-        return entry[lang] || entry['en'] || null;
+        const video = entry[lang] || entry['en'] || null;
+        if (video && video.id && /^[a-zA-Z0-9_-]{11}$/.test(video.id) && video.id !== 'open_in_new') {
+            return video;
+        }
+        return null;
     }
 
     async updateRelatedResources() {
