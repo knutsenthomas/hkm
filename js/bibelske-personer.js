@@ -105,11 +105,12 @@ function renderDetails(container, lang) {
     const theology = char.theologicalSignificance[lang] || char.theologicalSignificance.no;
     
     // Generate verses badges
+    const biblePath = lang === 'no' ? '/bibel' : `/${lang}/bibel`;
     const versesHtml = char.verses.map(v => `
-        <span class="verse-badge">
+        <a href="${biblePath}?ref=${encodeURIComponent(v)}" class="verse-badge">
             <i class="fas fa-book-open"></i>
             ${v}
-        </span>
+        </a>
     `).join('');
     
     const html = `

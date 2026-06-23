@@ -333,3 +333,21 @@ html[data-theme="dark"] {
     color: var(--primary-blue);
     font-size: 12px;
 }
+
+a.verse-badge {
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+a.verse-badge:hover {
+    background: #f8fafc !important;
+    border-color: #d17d39 !important;
+    color: #d17d39 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+a.verse-badge:active {
+    transform: translateY(0) scale(0.97);
+}
+
