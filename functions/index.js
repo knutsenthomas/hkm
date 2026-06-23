@@ -7026,110 +7026,111 @@ exports.getBibleChapterAudio = onCall({
   let buffers = [];
   let success = false;
 
-  // 1. Forsøk Google Cloud Text-to-Speech (GCTS) for 100% aksentfri opplesning
+  // 1. Forsøk OpenAI TTS først for naturlig og levende opplesning (Onyx/Nova stemmene)
   try {
-    const isFemale = cleanVoice === 'nova';
-    let primaryConfig;
-    let fallbackConfig;
-
-    if (cleanLang.startsWith('en')) {
-      primaryConfig = {
-        languageCode: 'en-US',
-        name: isFemale ? 'en-US-Neural2-F' : 'en-US-Neural2-J',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
-      fallbackConfig = {
-        languageCode: 'en-US',
-        name: isFemale ? 'en-US-Wavenet-F' : 'en-US-Wavenet-D',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
-    } else if (cleanLang.startsWith('es')) {
-      primaryConfig = {
-        languageCode: 'es-ES',
-        name: isFemale ? 'es-ES-Neural2-F' : 'es-ES-Neural2-B',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
-      fallbackConfig = {
-        languageCode: 'es-ES',
-        name: isFemale ? 'es-ES-Wavenet-C' : 'es-ES-Wavenet-B',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
-    } else {
-      // Standard: Norsk (no)
-      primaryConfig = {
-        languageCode: 'nb-NO',
-        name: isFemale ? 'nb-NO-Neural2-F' : 'nb-NO-Neural2-B',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
-      fallbackConfig = {
-        languageCode: 'nb-NO',
-        name: isFemale ? 'nb-NO-Wavenet-A' : 'nb-NO-Wavenet-B',
-        ssmlGender: isFemale ? 'FEMALE' : 'MALE'
-      };
+    const openaiKey = openaiApiKeyParam.value();
+    if (!openaiKey) {
+      throw new Error("OpenAI API-nøkkel mangler, hopper til Google Cloud TTS.");
     }
 
-    console.log(`Prøver Google Cloud TTS (Neural2: ${primaryConfig.name})...`);
-    const ttsClient = new textToSpeech.TextToSpeechClient();
+    console.log(`Forsøker OpenAI TTS med stemme ${cleanVoice} (naturlig stemme)...`);
+    const openai = new OpenAI({ apiKey: openaiKey });
 
     for (let i = 0; i < chunks.length; i++) {
-      console.log(`Genererer GCTS del ${i + 1}/${chunks.length}...`);
-      let response;
-      try {
-        [response] = await ttsClient.synthesizeSpeech({
-          input: { text: chunks[i] },
-          voice: primaryConfig,
-          audioConfig: { audioEncoding: 'MP3' },
-        });
-      } catch (neuralError) {
-        console.warn(`GCTS Neural2 feilet, prøver WaveNet fallback (${fallbackConfig.name}):`, neuralError);
-        [response] = await ttsClient.synthesizeSpeech({
-          input: { text: chunks[i] },
-          voice: fallbackConfig,
-          audioConfig: { audioEncoding: 'MP3' },
-        });
-      }
+      console.log(`Genererer OpenAI del ${i + 1}/${chunks.length}...`);
+      const response = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: cleanVoice,
+        input: chunks[i],
+      });
 
-      if (!response || !response.audioContent) {
-        throw new Error("Mottok ikke lydinnhold fra Google Cloud TTS.");
-      }
-
-      const buffer = Buffer.from(response.audioContent, 'base64');
+      const buffer = Buffer.from(await response.arrayBuffer());
       buffers.push(buffer);
     }
-
     success = true;
-    console.log("Lydfil vellykket generert med Google Cloud TTS!");
-  } catch (gctsError) {
-    console.error("Google Cloud TTS feilet fullstendig, faller tilbake til OpenAI TTS:", gctsError);
+    console.log("Lydfil vellykket generert med OpenAI TTS!");
+  } catch (openaiError) {
+    console.warn("OpenAI TTS feilet, faller tilbake til Google Cloud TTS:", openaiError.message || openaiError);
     buffers = []; // Nullstill bufferne for fallback
   }
 
-  // 2. Fallback til OpenAI TTS dersom Google Cloud TTS feilet eller API-en ikke er aktivert
+  // 2. Fallback til Google Cloud Text-to-Speech (GCTS)
   if (!success) {
-    const openaiKey = openaiApiKeyParam.value();
-    if (!openaiKey) {
-      throw new HttpsError("failed-precondition", "Både Google Cloud TTS feilet og OpenAI API-nøkkel mangler.");
-    }
-
     try {
-      console.log(`Forsøker OpenAI TTS fallback med stemme ${cleanVoice}...`);
-      const openai = new OpenAI({ apiKey: openaiKey });
+      const isFemale = cleanVoice === 'nova';
+      let primaryConfig;
+      let fallbackConfig;
+
+      if (cleanLang.startsWith('en')) {
+        primaryConfig = {
+          languageCode: 'en-US',
+          name: isFemale ? 'en-US-Neural2-F' : 'en-US-Neural2-J',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+        fallbackConfig = {
+          languageCode: 'en-US',
+          name: isFemale ? 'en-US-Wavenet-F' : 'en-US-Wavenet-D',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+      } else if (cleanLang.startsWith('es')) {
+        primaryConfig = {
+          languageCode: 'es-ES',
+          name: isFemale ? 'es-ES-Neural2-F' : 'es-ES-Neural2-B',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+        fallbackConfig = {
+          languageCode: 'es-ES',
+          name: isFemale ? 'es-ES-Wavenet-C' : 'es-ES-Wavenet-B',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+      } else {
+        // Standard: Norsk (no)
+        primaryConfig = {
+          languageCode: 'nb-NO',
+          name: isFemale ? 'nb-NO-Neural2-F' : 'nb-NO-Neural2-B',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+        fallbackConfig = {
+          languageCode: 'nb-NO',
+          name: isFemale ? 'nb-NO-Wavenet-A' : 'nb-NO-Wavenet-B',
+          ssmlGender: isFemale ? 'FEMALE' : 'MALE'
+        };
+      }
+
+      console.log(`Prøver Google Cloud TTS fallback (Neural2: ${primaryConfig.name})...`);
+      const ttsClient = new textToSpeech.TextToSpeechClient();
 
       for (let i = 0; i < chunks.length; i++) {
-        console.log(`Genererer OpenAI del ${i + 1}/${chunks.length}...`);
-        const response = await openai.audio.speech.create({
-          model: "tts-1",
-          voice: cleanVoice,
-          input: chunks[i],
-        });
+        console.log(`Genererer GCTS fallback del ${i + 1}/${chunks.length}...`);
+        let response;
+        try {
+          [response] = await ttsClient.synthesizeSpeech({
+            input: { text: chunks[i] },
+            voice: primaryConfig,
+            audioConfig: { audioEncoding: 'MP3' },
+          });
+        } catch (neuralError) {
+          console.warn(`GCTS Neural2 fallback feilet, prøver WaveNet fallback (${fallbackConfig.name}):`, neuralError);
+          [response] = await ttsClient.synthesizeSpeech({
+            input: { text: chunks[i] },
+            voice: fallbackConfig,
+            audioConfig: { audioEncoding: 'MP3' },
+          });
+        }
 
-        const buffer = Buffer.from(await response.arrayBuffer());
+        if (!response || !response.audioContent) {
+          throw new Error("Mottok ikke lydinnhold fra Google Cloud TTS.");
+        }
+
+        const buffer = Buffer.from(response.audioContent, 'base64');
         buffers.push(buffer);
       }
+
       success = true;
-    } catch (openaiError) {
-      console.error("OpenAI TTS fallback feilet også:", openaiError);
-      throw new HttpsError("internal", "Kunne ikke generere lyd med noen av TTS-motorene: " + openaiError.message);
+      console.log("Lydfil vellykket generert med Google Cloud TTS fallback!");
+    } catch (gctsError) {
+      console.error("Google Cloud TTS fallback feilet også:", gctsError);
+      throw new HttpsError("internal", "Kunne ikke generere lyd med noen av TTS-motorene: " + gctsError.message);
     }
   }
 
