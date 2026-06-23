@@ -268,86 +268,99 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer bg-[#1B4965] text-white">
-        <div class="footer-container">
-            <div class="footer-grid">
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <div class="w-[50px] h-[50px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
-                            <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
-                        </div>
-                        <h3 class="text-2xl font-bold">His Kingdom Ministry</h3>
+                        <a href="/en/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
                     </div>
-                    <p class="brand-description" data-content-doc="settings_global" data-content-key="footer.description">
-                        We aim to equip people for a life of following Jesus, through teaching, community, and resources.
-                    </p>
-                    
-                    <div class="footer-nav">
+
+                    <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Resources</h4>
+                            <h4>About us</h4>
                             <ul>
-                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Read the Bible</a></li>
-                                <li><a href="/en/media" data-content-doc="settings_global" data-content-key="footer.links.resources.teaching">Teaching</a></li>
-                                <li><a href="/en/events" data-content-doc="settings_global" data-content-key="footer.links.resources.courses">Events</a></li>
-                                <li><a href="/en/blog" data-content-doc="settings_global" data-content-key="footer.links.resources.blog">News & Blog</a></li>
-                                <li><a href="/butikk" data-content-doc="settings_global" data-content-key="footer.links.resources.store">Store</a></li>
-                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global" data-content-key="footer.links.resources.myPage">My Page</a></li>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
+                            <h4>Resources</h4>
                             <ul>
-                                <li><a href="/en/media" data-content-doc="settings_global" data-content-key="footer.links.media.podcast">Podcast</a></li>
-                                <li><a href="/en/media" data-content-doc="settings_global" data-content-key="footer.links.media.videos">Videos</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" data-content-doc="settings_global" data-content-key="footer.links.media.youtube">YouTube</a></li>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+                                <li><a href="/en/events">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">Get Involved</h4>
+                            <h4>Media</h4>
                             <ul>
-                                <li><a href="/en/events" data-content-doc="settings_global" data-content-key="footer.links.involvement.calendar">Calendar</a></li>
-                                <li><a href="/en/donations" data-content-doc="settings_global" data-content-key="footer.links.involvement.donate">Donate</a></li>
-                                <li><a href="/en/privacy" data-content-doc="settings_global" data-content-key="footer.links.involvement.privacy">Privacy Policy</a></li>
-                                <li><a href="/betingelser">Terms & Conditions</a></li>
-                                <li><a href="/en/accessibility" data-content-doc="settings_global" data-content-key="footer.links.involvement.accessibility">Accessibility</a></li>
-                                <li><a href="javascript:void(0)" onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;" data-content-doc="settings_global" data-content-key="footer.links.involvement.cookies">Cookies</a></li>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
+                <!-- Right Section: Cards -->
                 <div class="footer-right">
                     <div class="footer-card">
-                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Follow Us</h3>
+                        <h3>Follow Us</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i class="fab fa-youtube"></i></a>
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <div class="footer-card contact-card">
-                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Contact Us</h3>
-                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global" data-content-key="footer.contactButton">Contact Form</a>
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global" data-content-key="footer.contact.emailLabel">Email:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.email">post@hiskingdomministry.no</p>
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global" data-content-key="footer.contact.phoneLabel">Phone:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94 615</p>
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global" data-content-key="footer.contact.vippsLabel">Vipps:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
                             </div>
                             <div class="detail-item">
-                                <strong data-content-doc="settings_global" data-content-key="footer.contact.accountLabel">Account No.:</strong>
-                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759</p>
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -355,8 +368,8 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global" data-content-key="footer.copyright">His Kingdom Ministry. All rights reserved.</span></p>
-                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global" data-content-key="footer.adminLink">Admin</a>
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
