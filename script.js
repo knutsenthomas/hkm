@@ -3,6 +3,8 @@
 // JavaScript Functionality (v2.1.0)
 // ===================================
 
+import { biblicalCharacters } from './js/bibelske-personer-data.js';
+
 // DOM Elements
 const header = document.getElementById('header');
 const mobileToggle = document.getElementById('mobile-toggle');
@@ -876,7 +878,18 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     };
 
     try {
-        // 1) Faste sider (Parallell henting med keywords og statisk fallback)
+        // Pre-fetch all documents in content collection in one call to be extremely fast and always dynamic
+        let contentDocs = {};
+        try {
+            const contentSnap = await firebase.firestore().collection('content').get();
+            contentSnap.forEach(doc => {
+                contentDocs[doc.id] = doc.data();
+            });
+        } catch (e) {
+            console.warn('[Search] Failed to pre-fetch content collection, using fallbacks:', e);
+        }
+
+        // 1) Faste og dynamiske sider
         const pages = [
             { id: 'index', label: { no: 'Forside', en: 'Home', es: 'Inicio' }, url: 'index', keywords: 'hjem forside welcome velkommen' },
             { id: 'om-oss', label: { no: 'Om oss', en: 'About us', es: 'Sobre nosotros' }, url: 'om-oss', keywords: 'hvem er vi organisasjon historie history who we are ledelse' },
@@ -898,10 +911,33 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'personvern', label: { no: 'Personvernserklæring', en: 'Privacy Policy', es: 'Política de Privacidad' }, url: 'personvern', keywords: 'privacy policy personvern cookies vilkår terms' },
             { id: 'tilgjengelighet', label: { no: 'Tilgjengelighetserklæring', en: 'Accessibility Statement', es: 'Declaración de Accesibilidad' }, url: 'tilgjengelighet', keywords: 'uu tilgjengelighet accessibility universal utforming' },
             { id: 'for-menigheter', label: { no: 'For menigheter', en: 'For churches', es: 'Para iglesias' }, url: 'for-menigheter', keywords: 'menighet kirke sammarbeid seminar church churches cooperation' },
-            { id: 'for-bedrifter', label: { no: 'For bedrifter', en: 'For businesses', es: 'Para empresas' }, url: 'for-bedrifter', keywords: 'bedrift sponsor bedriftssamarbeid støtte corporate business support' }
+            { id: 'for-bedrifter', label: { no: 'For bedrifter', en: 'For businesses', es: 'Para empresas' }, url: 'for-bedrifter', keywords: 'bedrift sponsor bedriftssamarbeid støtte corporate business support' },
+            { id: 'bibelske-personer', label: { no: 'Bibelske personer', en: 'Biblical Characters', es: 'Personajes Bíblicos' }, url: 'ressurser/bibelske-personer', keywords: 'bibel personer ressurser abraham moses david jesus peter paulus ruth maria' }
         ];
 
-        const pagePromises = pages.map(async (page) => {
+        // Find any other page documents dynamically in Firestore
+        const pageDocs = [];
+        Object.keys(contentDocs).forEach(id => {
+            if (!id.startsWith('collection_') && !id.startsWith('settings_') && id !== 'hero_slides') {
+                pageDocs.push(id);
+            }
+        });
+
+        // Merge hardcoded pages with any newly found pages in Firestore
+        const allPages = [...pages];
+        pageDocs.forEach(id => {
+            if (!pages.some(p => p.id === id)) {
+                const labelStr = id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ' ');
+                allPages.push({
+                    id: id,
+                    label: { no: labelStr, en: labelStr, es: labelStr },
+                    url: id,
+                    keywords: ''
+                });
+            }
+        });
+
+        const pagePromises = allPages.map(async (page) => {
             const lang = getCurrentLanguage();
             const labelText = page.label[lang] || page.label['no'];
             const keywordsText = page.keywords || '';
@@ -909,11 +945,15 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             const localCombined = [labelText, keywordsText].join(' ').toLowerCase();
             let isStaticMatch = isMatch(localCombined);
 
-            let data = null;
-            try {
-                data = await firebaseService.getPageContent(page.id);
-            } catch (e) {
-                console.warn(`Could not fetch page content for search: ${page.id}`, e);
+            let data = contentDocs[page.id];
+            
+            // Fallback: If not in pre-fetched collection docs, try fetching individually
+            if (!data) {
+                try {
+                    data = await firebaseService.getPageContent(page.id);
+                } catch (e) {
+                    console.warn(`Could not fetch page content for search: ${page.id}`, e);
+                }
             }
 
             if (data) {
@@ -952,7 +992,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'reisevirksomhet': 'Informasjon om vår reisevirksomhet og misjonsturer.',
                             'bibelstudier': 'Bibelstudier og ressurser for fordypning i Guds ord.',
                             'seminarer': 'Delta på våre seminarer og kurs for åndelig vekst.',
-                            'podcast': 'Lytt til våre podcast-episoder direkte på nettsiden.',
+                            'podcast': 'Lytt to våre podcast-episoder direkte på nettsiden.',
                             'bibel': 'Les Bibelen på nett med vår integrerte bibelleser.',
                             'leseplaner': 'Følg våre bibelleseplaner for strukturert bibellesing.',
                             'butikk': 'Besøk vår butikk for bøker og andre ressurser.',
@@ -961,7 +1001,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'personvern': 'Vår personvernserklæring og bruk av informasjonskapsler.',
                             'tilgjengelighet': 'Tilgjengelighetserklæring for universell utforming.',
                             'for-menigheter': 'Se hvordan vi samarbeider med lokale menigheter og kirker.',
-                            'for-bedrifter': 'Samarbeidsmuligheter for bedrifter som ønsker å støtte oss.'
+                            'for-bedrifter': 'Samarbeidsmuligheter for bedrifter som ønsker å støtte oss.',
+                            'bibelske-personer': 'Utforsk de viktigste bibelske personene og deres teologiske betydning.'
                         },
                         en: {
                             'index': 'His Kingdom Ministry - Home page. Welcome to our website.',
@@ -984,7 +1025,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'personvern': 'Our privacy policy and cookie usage.',
                             'tilgjengelighet': 'Accessibility statement for our website.',
                             'for-menigheter': 'See how we cooperate with local churches.',
-                            'for-bedrifter': 'Partnership opportunities for businesses to support us.'
+                            'for-bedrifter': 'Partnership opportunities for businesses to support us.',
+                            'bibelske-personer': 'Explore key biblical characters and their theological significance.'
                         },
                         es: {
                             'index': 'His Kingdom Ministry - Inicio. Bienvenido a nuestro sitio web.',
@@ -1007,7 +1049,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'personvern': 'Nuestra política de privacidad.',
                             'tilgjengelighet': 'Declaración de accesibilidad.',
                             'for-menigheter': 'Vea cómo colaboramos con iglesias locales.',
-                            'for-bedrifter': 'Oportunidades de patrocinio para empresas.'
+                            'for-bedrifter': 'Oportunidades de patrocinio para empresas.',
+                            'bibelske-personer': 'Explore los personajes bíblicos clave y su significado teológico.'
                         }
                     };
                     snippet = (defaultExcerpts[lang] && defaultExcerpts[lang][page.id]) || (defaultExcerpts['no'][page.id]) || '';
@@ -1027,15 +1070,38 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const pageResults = (await Promise.all(pagePromises)).filter(Boolean);
         results.push(...pageResults);
 
-        // 2) Samlinger: blogg, arrangementer, undervisning (Med direkte lenker og språktilpassede typer)
+        // 2) Samlinger: blogg, arrangementer, undervisning og andre dynamiske samlinger
         const collections = [
             { id: 'blog', docId: 'collection_blog', label: { no: 'Blogginnlegg', en: 'Blog Post', es: 'Entrada del Blog' }, url: 'blogg-post.html' },
             { id: 'events', docId: 'collection_events', label: { no: 'Arrangement', en: 'Event', es: 'Evento' }, url: 'arrangement-detaljer.html' },
             { id: 'teaching', docId: 'collection_teaching', label: { no: 'Undervisning', en: 'Sermon', es: 'Enseñanza' }, url: 'blogg-post.html' }
         ];
 
+        // Find any other collections in Firestore dynamically
+        Object.keys(contentDocs).forEach(id => {
+            if (id.startsWith('collection_')) {
+                const colId = id.replace('collection_', '');
+                if (!collections.some(c => c.id === colId) && colId !== 'courses') {
+                    const labelStr = colId.charAt(0).toUpperCase() + colId.slice(1).replace(/-/g, ' ');
+                    collections.push({
+                        id: colId,
+                        docId: id,
+                        label: { no: labelStr, en: labelStr, es: labelStr },
+                        url: `${colId}-detaljer.html`
+                    });
+                }
+            }
+        });
+
         const collectionPromises = collections.map(async (col) => {
-            const raw = await firebaseService.getPageContent(col.docId);
+            let raw = contentDocs[col.docId];
+            if (!raw) {
+                try {
+                    raw = await firebaseService.getPageContent(col.docId);
+                } catch (e) {
+                    console.warn(`Could not fetch collection for search: ${col.docId}`, e);
+                }
+            }
             const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
             const colResults = [];
             const lang = getCurrentLanguage();
@@ -1130,7 +1196,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             calendarEvents = [];
             window._siteSearchCalendarEvents = calendarEvents;
             try {
-                const settings = await firebaseService.getPageContent('settings_gcal');
+                const settings = contentDocs['settings_gcal'] || await firebaseService.getPageContent('settings_gcal');
                 if (settings && settings.apiKey && settings.calendarId) {
                     const nowIso = new Date().toISOString();
                     const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=50`;
@@ -1190,6 +1256,39 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                         meta: plan.subtitle || (plan.durationDays ? `${plan.durationDays} dager` : ''),
                         url: getLocalizedUrl(`leseplan-detaljer.html?id=${plan.id}`),
                         snippet: makeSnippet(plan.description || '', q)
+                    });
+                }
+            });
+        }
+
+        // 5.7) Bibelske personer (fra js/bibelske-personer-data.js)
+        if (Array.isArray(biblicalCharacters) && biblicalCharacters.length) {
+            const lang = getCurrentLanguage();
+            biblicalCharacters.forEach(person => {
+                const nameText = person.name[lang] || person.name['no'] || '';
+                const roleText = person.role[lang] || person.role['no'] || '';
+                const eraText = person.era[lang] || person.era['no'] || '';
+                const summaryText = person.summary[lang] || person.summary['no'] || '';
+                const storyText = person.story[lang] || person.story['no'] || '';
+                const significanceText = person.theologicalSignificance[lang] || person.theologicalSignificance['no'] || '';
+                
+                const combined = [
+                    lang === 'en' ? 'biblical character person' : (lang === 'es' ? 'personaje bíblico persona' : 'bibelsk person personer bibelen'),
+                    nameText,
+                    roleText,
+                    eraText,
+                    summaryText,
+                    storyText,
+                    significanceText
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                if (isMatch(combined)) {
+                    results.push({
+                        type: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'),
+                        title: nameText,
+                        meta: roleText,
+                        url: getLocalizedUrl(`ressurser/bibelsk-person-detaljer.html?id=${person.id}`),
+                        snippet: makeSnippet(summaryText || storyText || '', q)
                     });
                 }
             });
