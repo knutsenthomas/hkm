@@ -150,6 +150,16 @@
             margin-bottom: 32px;
         }
 
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-none {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
         .nav-pill {
             display: inline-flex;
             align-items: center;
@@ -469,7 +479,7 @@
                 <div class="timeline-node top-8"></div>
                 
                 <!-- Left Column (Empty on right card, content on left card) -->
-                <div class="w-full md:w-1/2 md:pr-12 flex justify-end order-2 md:order-1">
+                <div class="w-full md:w-1/2 pl-12 md:pl-0 md:pr-12 md:flex justify-end order-2 md:order-1">
                     <div class="empire-card border-t-4 border-t-amber-500">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">
@@ -525,7 +535,7 @@
                 
                 <div class="hidden md:block w-1/2 order-1"></div>
                 
-                <div class="w-full md:w-1/2 md:pl-12 flex justify-start order-2">
+                <div class="w-full md:w-1/2 pl-12 md:flex justify-start order-2">
                     <div class="empire-card border-t-4 border-t-red-600">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">
@@ -576,7 +586,7 @@
             <div id="babylon" class="timeline-item relative flex flex-col md:flex-row w-full mb-16 pt-2">
                 <div class="timeline-node top-8"></div>
                 
-                <div class="w-full md:w-1/2 md:pr-12 flex justify-end order-2 md:order-1">
+                <div class="w-full md:w-1/2 pl-12 md:pl-0 md:pr-12 md:flex justify-end order-2 md:order-1">
                     <div class="empire-card border-t-4 border-t-amber-700">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">
@@ -630,7 +640,7 @@
                 
                 <div class="hidden md:block w-1/2 order-1"></div>
                 
-                <div class="w-full md:w-1/2 md:pl-12 flex justify-start order-2">
+                <div class="w-full md:w-1/2 pl-12 md:flex justify-start order-2">
                     <div class="empire-card border-t-4 border-t-yellow-600">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">
@@ -681,7 +691,7 @@
             <div id="hellas" class="timeline-item relative flex flex-col md:flex-row w-full mb-16 pt-2">
                 <div class="timeline-node top-8"></div>
                 
-                <div class="w-full md:w-1/2 md:pr-12 flex justify-end order-2 md:order-1">
+                <div class="w-full md:w-1/2 pl-12 md:pl-0 md:pr-12 md:flex justify-end order-2 md:order-1">
                     <div class="empire-card border-t-4 border-t-cyan-600">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">
@@ -735,7 +745,7 @@
                 
                 <div class="hidden md:block w-1/2 order-1"></div>
                 
-                <div class="w-full md:w-1/2 md:pl-12 flex justify-start order-2">
+                <div class="w-full md:w-1/2 pl-12 md:flex justify-start order-2">
                     <div class="empire-card border-t-4 border-t-blue-800">
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-3 mb-3">

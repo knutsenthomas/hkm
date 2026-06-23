@@ -17,9 +17,7 @@ html[data-theme="dark"] {
 }
 
 /* Back Button */
-.back-btn-container {
-    margin-bottom: 32px;
-}
+
 
 .back-link-btn {
     display: inline-flex;
@@ -175,10 +173,22 @@ html[data-theme="dark"] {
     align-items: start;
 }
 
+.back-btn-container {
+    margin-bottom: 32px;
+    padding: 0;
+}
+
+@media (min-width: 901px) {
+    .back-btn-container {
+        padding: 0 24px;
+    }
+}
+
 @media (max-width: 900px) {
     .character-detail-container {
         grid-template-columns: 1fr;
         gap: 32px;
+        padding: 0;
     }
 }
 
@@ -192,7 +202,7 @@ html[data-theme="dark"] {
 
 @media (max-width: 640px) {
     .detail-main-card {
-        padding: 24px;
+        padding: 20px 16px;
     }
 }
 
@@ -230,6 +240,12 @@ html[data-theme="dark"] {
     padding: 32px;
     position: sticky;
     top: 40px;
+}
+
+@media (max-width: 640px) {
+    .detail-sidebar-card {
+        padding: 20px 16px;
+    }
 }
 
 .sidebar-image-wrap {

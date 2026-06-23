@@ -175,3 +175,9 @@
     text-align: left !important;
   }
 }
+
+.subpage-hero p,
+.subpage-hero .page-hero-subtitle {
+  text-align: center !important;
+}
+
