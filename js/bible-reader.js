@@ -109,7 +109,7 @@ class BibleReader {
                 'paused': 'Pauset',
                 'extended_btn': 'Vis dypere teologisk analyse',
                 'extended_loading': 'Analyserer dypere...',
-                'extended_header': 'Dypere analyse (Gemini & ordbøker)'
+                'extended_header': 'Dypere analyse'
             },
             'en': {
                 'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
@@ -127,7 +127,7 @@ class BibleReader {
                 'paused': 'Paused',
                 'extended_btn': 'Show deeper theological analysis',
                 'extended_loading': 'Analyzing deeper...',
-                'extended_header': 'Deeper analysis (Gemini & dictionaries)'
+                'extended_header': 'Deeper analysis'
             },
             'es': {
                 'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
@@ -145,7 +145,7 @@ class BibleReader {
                 'paused': 'Pausado',
                 'extended_btn': 'Ver análisis teológico profundo',
                 'extended_loading': 'Analizando en detalle...',
-                'extended_header': 'Análisis profundo (Gemini y diccionarios)'
+                'extended_header': 'Análisis profundo'
             }
         };
         return (translations[lang] || translations['no'])[key] || key;
@@ -1754,6 +1754,13 @@ class BibleReader {
         if (!text) return '';
         let html = text.trim().replace(/\r/g, '');
 
+        // Preprocessing: Fix missing spacing/newlines before and after header tags (e.g. "word.### Heading" -> "word.\n\n### Heading")
+        html = html.replace(/([^\n])(#{1,3}\s+)/g, '$1\n\n$2');
+
+        // Preprocessing: Fix missing newlines at lowercase-to-uppercase boundaries (e.g. "kontekstI" -> "kontekst\n\nI")
+        // This splits combined headers and paragraph text if newlines were stripped.
+        html = html.replace(/([a-zæøå])([A-ZÆØÅ])/g, '$1\n\n$2');
+
         // Headers (using multiline anchors to match line-by-line accurately)
         html = html.replace(/^### (.*?)$/gm, '<h5 style="font-weight:700; font-size:14px; margin-top:16px; margin-bottom:8px; color:var(--text-base);">$1</h5>');
         html = html.replace(/^## (.*?)$/gm, '<h4 style="font-weight:700; font-size:15px; margin-top:20px; margin-bottom:10px; color:var(--text-base);">$1</h4>');
@@ -1791,15 +1798,19 @@ class BibleReader {
 
         html = processedLines.join('\n');
 
-        // Paragraphs
-        html = html.split('\n\n').map(block => {
+        // Paragraphs: Split on single newlines so any text lines get wrapped as paragraphs for maximum readability.
+        const blocks = html.split('\n');
+        const processedBlocks = [];
+        for (let block of blocks) {
             const trimmed = block.trim();
-            if (!trimmed) return '';
+            if (!trimmed) continue;
             if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<li') || trimmed.startsWith('</ul')) {
-                return trimmed;
+                processedBlocks.push(trimmed);
+            } else {
+                processedBlocks.push(`<p style="margin-bottom:16px; line-height:1.6; font-size:14px; color:var(--text-base);">${trimmed}</p>`);
             }
-            return `<p style="margin-bottom:12px; line-height:1.6; font-size:13px; color:var(--text-base);">${trimmed}</p>`;
-        }).join('\n');
+        }
+        html = processedBlocks.join('\n');
 
         return html;
     }
