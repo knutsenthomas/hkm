@@ -16,7 +16,7 @@ const i18nManager = {
             'event-details', 'events', 'for-businesses', 'for-churches',
             'index', 'media', 'podcast', 'privacy',
             'regular-donors', 'teaching', 'youtube', 'reading-plan-details',
-            'tidslinje-imperier', 'leseplaner'
+            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje'
         ]),
         es: new Set([
             'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
@@ -26,7 +26,7 @@ const i18nManager = {
             'ensenanza', 'eventos', 'index', 'media',
             'para-empresas', 'para-iglesias', 'podcast',
             'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura',
-            'tidslinje-imperier', 'leseplaner'
+            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje'
         ])
     },
 
@@ -360,7 +360,9 @@ const i18nManager = {
                 'blogg-post-3': 'blog-post-3',
                 'blogg-post-4': 'blog-post-4',
                 'blogg-post-5': 'blog-post-5',
-                'leseplan-detaljer': 'reading-plan-details'
+                'leseplan-detaljer': 'reading-plan-details',
+                'tidslinje-imperier': 'tidslinje-imperier',
+                'bibelsk-tidslinje': 'bibelsk-tidslinje'
             },
             'es': {
                 'index': 'index',
@@ -392,7 +394,9 @@ const i18nManager = {
                 'blogg-post-3': 'blog-post-3',
                 'blogg-post-4': 'blog-post-4',
                 'blogg-post-5': 'blog-post-5',
-                'leseplan-detaljer': 'detalles-plan-lectura'
+                'leseplan-detaljer': 'detalles-plan-lectura',
+                'tidslinje-imperier': 'tidslinje-imperier',
+                'bibelsk-tidslinje': 'bibelsk-tidslinje'
             }
         };
 

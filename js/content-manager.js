@@ -89,6 +89,7 @@ class ContentManager {
         if (p('tilgjengelighet') || p('accessibility') || p('accesibilidad')) return 'tilgjengelighet';
         if (p('betingelser')) return 'betingelser';
         if (p('tidslinje-imperier')) return 'tidslinje-imperier';
+        if (p('bibelsk-tidslinje')) return 'bibelsk-tidslinje';
         return '';
     }
 

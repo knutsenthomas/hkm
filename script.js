@@ -912,7 +912,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'tilgjengelighet', label: { no: 'Tilgjengelighetserklæring', en: 'Accessibility Statement', es: 'Declaración de Accesibilidad' }, url: 'tilgjengelighet', keywords: 'uu tilgjengelighet accessibility universal utforming' },
             { id: 'for-menigheter', label: { no: 'For menigheter', en: 'For churches', es: 'Para iglesias' }, url: 'for-menigheter', keywords: 'menighet kirke sammarbeid seminar church churches cooperation' },
             { id: 'for-bedrifter', label: { no: 'For bedrifter', en: 'For businesses', es: 'Para empresas' }, url: 'for-bedrifter', keywords: 'bedrift sponsor bedriftssamarbeid støtte corporate business support' },
-            { id: 'bibelske-personer', label: { no: 'Bibelske personer', en: 'Biblical Characters', es: 'Personajes Bíblicos' }, url: 'ressurser/bibelske-personer', keywords: 'bibel personer ressurser abraham moses david jesus peter paulus ruth maria' }
+            { id: 'bibelske-personer', label: { no: 'Bibelske personer', en: 'Biblical Characters', es: 'Personajes Bíblicos' }, url: 'ressurser/bibelske-personer', keywords: 'bibel personer ressurser abraham moses david jesus peter paulus ruth maria' },
+            { id: 'bibelsk-tidslinje', label: { no: 'Bibelens tidslinje', en: 'Biblical Timeline', es: 'Línea de Tiempo Bíblica' }, url: 'ressurser/bibelsk-tidslinje', keywords: 'bibel tidslinje historie skapelsen syndefallet noa abraham moses david jesus kirke timeline history' }
         ];
 
         // Find any other page documents dynamically in Firestore
@@ -1002,7 +1003,9 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'tilgjengelighet': 'Tilgjengelighetserklæring for universell utforming.',
                             'for-menigheter': 'Se hvordan vi samarbeider med lokale menigheter og kirker.',
                             'for-bedrifter': 'Samarbeidsmuligheter for bedrifter som ønsker å støtte oss.',
-                            'bibelske-personer': 'Utforsk de viktigste bibelske personene og deres teologiske betydning.'
+                            'bibelske-personer': 'Utforsk de viktigste bibelske personene og deres teologiske betydning.',
+                            'tidslinje-imperier': 'Utforsk den historiske tidslinjen over de store imperiene som påvirket det bibelske narrativet.',
+                            'bibelsk-tidslinje': 'Utforsk Bibelens historiske tidslinje fra urhistorien til kirkens fremvekst og moderne tid.'
                         },
                         en: {
                             'index': 'His Kingdom Ministry - Home page. Welcome to our website.',
@@ -1026,7 +1029,9 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'tilgjengelighet': 'Accessibility statement for our website.',
                             'for-menigheter': 'See how we cooperate with local churches.',
                             'for-bedrifter': 'Partnership opportunities for businesses to support us.',
-                            'bibelske-personer': 'Explore key biblical characters and their theological significance.'
+                            'bibelske-personer': 'Explore key biblical characters and their theological significance.',
+                            'tidslinje-imperier': 'Explore the historical timeline of the major empires that influenced the biblical narrative.',
+                            'bibelsk-tidslinje': 'Explore the historical timeline of the Bible from prehistory to the early church and modern times.'
                         },
                         es: {
                             'index': 'His Kingdom Ministry - Inicio. Bienvenido a nuestro sitio web.',
@@ -1050,7 +1055,9 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                             'tilgjengelighet': 'Declaración de accesibilidad.',
                             'for-menigheter': 'Vea cómo colaboramos con iglesias locales.',
                             'for-bedrifter': 'Oportunidades de patrocinio para empresas.',
-                            'bibelske-personer': 'Explore los personajes bíblicos clave y su significado teológico.'
+                            'bibelske-personer': 'Explore los personajes bíblicos clave y su significado teológico.',
+                            'tidslinje-imperier': 'Explore la línea de tiempo de los grandes imperios que influyeron en la narrativa bíblica.',
+                            'bibelsk-tidslinje': 'Explore la línea de tiempo histórica de la Biblia desde la creación hasta la iglesia primitiva y los tiempos modernos.'
                         }
                     };
                     snippet = (defaultExcerpts[lang] && defaultExcerpts[lang][page.id]) || (defaultExcerpts['no'][page.id]) || '';
