@@ -449,7 +449,7 @@ export default async function handler(req, res) {
 
           // Phase 1: Map the query word to the English dictionary keyword
           const mapPrompt = `Du er en bibeloversetter og ordboksekspert.
-Oversett søkeordet/emnet "${word}" (søkeprosess på språkkode "${lang}") til det tilsvarende engelske bibelordbok-emneordet fra Easton's Bible Dictionary, Smith's Bible Dictionary eller International Standard Bible Encyclopedia (ISBE).
+Oversett søkeordet/emnet "${word}" (søkeprosess på språkkode "${lang}") til det tilsvarende engelske bibelordbok-emneordet fra Easton's Bible Dictionary, Smith's Bible Dictionary, International Standard Bible Encyclopedia (ISBE) eller Hitchcock's Bible Names Dictionary.
 Returner KUN det engelske ordet i store bokstaver (f.eks. "TABERNACLE", "GRACE", "QUAILS", "SAMARITAN", "PETER").
 Dersom ordet ikke har noen bibelsk, teologisk eller kristen historisk betydning (f.eks. "iPhone", "pizza", "programmering", "fotball"), svar "NONE".
 Dersom ordet er bibelsk/teologisk, men du er usikker på om det finnes et nøyaktig emneord i disse verkene, forsøk å returnere det mest relevante engelske bibelske ordet i store bokstaver.`;
@@ -499,7 +499,7 @@ Dersom ordet er bibelsk/teologisk, men du er usikker på om det finnes et nøyak
             const translatePrompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
 ${responseLangInstruction}
 
-Oversett og bearbeid følgende bibelordbok-definisjoner for søkeordet "${word}" (engelsk emneord: "${englishKey}") til en fyldig, inspirerende og lærerik forklaring på ${lang === 'en' ? 'engelsk' : lang === 'es' ? 'spansk' : 'norsk'}. Du skal også supplere med og integrere teologisk innsikt fra International Standard Bible Encyclopedia (ISBE) for å gi et mest mulig utfyllende svar.
+Oversett og bearbeid følgende bibelordbok-definisjoner for søkeordet "${word}" (engelsk emneord: "${englishKey}") til en fyldig, inspirerende og lærerik forklaring på ${lang === 'en' ? 'engelsk' : lang === 'es' ? 'spansk' : 'norsk'}. Du skal også supplere med og integrere teologisk innsikt fra International Standard Bible Encyclopedia (ISBE) samt navnebetydningen fra Hitchcock's Bible Names Dictionary (dersom ordet er et personnavn) for å gi et mest mulig utfyllende svar.
 
 Kildedefinisjoner (Easton's / Smith's Bible Dictionary):
 ${definitionsText}
@@ -597,7 +597,7 @@ Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning t
 - Sett 'definition' til: "${rejectDefinition}"
 - Sett 'contextualNote' til: "${rejectNote}"
 
-Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte. Ta utgangspunkt i og integrer definisjoner og forklaringer fra anerkjente verk som Easton's Bible Dictionary, Smith's Bible Dictionary og International Standard Bible Encyclopedia (ISBE):
+Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte. Ta utgangspunkt i og integrer definisjoner, navnebetydninger og forklaringer fra anerkjente verk som Easton's Bible Dictionary, Smith's Bible Dictionary, International Standard Bible Encyclopedia (ISBE) og Hitchcock's Bible Names Dictionary:
 1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
 2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
 3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium.
