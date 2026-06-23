@@ -7031,7 +7031,9 @@ body.admin-body div:focus-visible {
    DARK THEME OVERRIDES (Admin Panel)
    ========================================================================== */
 html[data-theme="dark"] {
+  background-color: #0f172a !important;
   --admin-surface: #1e293b;
+
   --admin-surface-muted: #0f172a;
   --admin-border: #334155;
   --admin-text: #f8fafc;
@@ -7259,6 +7261,18 @@ html[data-theme="dark"] .user-profile-link {
   background: #1e293b !important;
   background-color: #1e293b !important;
   border-color: #334155 !important;
+}
+
+/* User profile link widget in header - hover state in dark mode */
+html[data-theme="dark"] body.admin-body .main-header .user-profile-link:hover,
+html[data-theme="dark"] body.minside-body .main-header .user-profile-link:hover,
+html[data-theme="dark"] body.crm-body .main-header .user-profile-link:hover,
+html[data-theme="dark"] body.builder-active .main-header .user-profile-link:hover,
+html[data-theme="dark"] .user-profile-link:hover {
+  background: #334155 !important;
+  background-color: #334155 !important;
+  border-color: rgba(209, 125, 57, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* User profile text elements */
