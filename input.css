@@ -7414,6 +7414,133 @@ html[data-theme="dark"] .nav-pill.active:hover {
     opacity: 0.9 !important;
 }
 
+/* Dark mode styles for timeline content helper/info boxes */
+html[data-theme="dark"] .bg-emerald-50\/50 {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+}
+html[data-theme="dark"] .border-emerald-100 {
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+html[data-theme="dark"] .text-emerald-800 {
+    color: #34d399 !important;
+}
+html[data-theme="dark"] .bg-emerald-50\/50 a:hover {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .bg-amber-50\/50 {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+}
+html[data-theme="dark"] .bg-amber-100\/30 {
+    background-color: rgba(245, 158, 11, 0.08) !important;
+}
+html[data-theme="dark"] .border-amber-100,
+html[data-theme="dark"] .border-amber-200 {
+    border-color: rgba(245, 158, 11, 0.2) !important;
+}
+html[data-theme="dark"] .text-amber-800 {
+    color: #fbbf24 !important;
+}
+html[data-theme="dark"] .bg-amber-50\/50 a:hover,
+html[data-theme="dark"] .bg-amber-100\/30 a:hover {
+    color: #fbbf24 !important;
+}
+
+html[data-theme="dark"] .bg-yellow-50\/50 {
+    background-color: rgba(234, 179, 8, 0.1) !important;
+}
+html[data-theme="dark"] .border-yellow-100 {
+    border-color: rgba(234, 179, 8, 0.2) !important;
+}
+html[data-theme="dark"] .text-yellow-800 {
+    color: #facc15 !important;
+}
+html[data-theme="dark"] .bg-yellow-50\/50 a:hover {
+    color: #facc15 !important;
+}
+
+html[data-theme="dark"] .bg-red-50\/50 {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+html[data-theme="dark"] .border-red-100 {
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
+html[data-theme="dark"] .text-red-800 {
+    color: #f87171 !important;
+}
+html[data-theme="dark"] .bg-red-50\/50 a:hover {
+    color: #f87171 !important;
+}
+
+html[data-theme="dark"] .bg-purple-50\/50 {
+    background-color: rgba(168, 85, 247, 0.1) !important;
+}
+html[data-theme="dark"] .border-purple-100 {
+    border-color: rgba(168, 85, 247, 0.2) !important;
+}
+html[data-theme="dark"] .text-purple-800 {
+    color: #c084fc !important;
+}
+html[data-theme="dark"] .bg-purple-50\/50 a:hover {
+    color: #c084fc !important;
+}
+
+html[data-theme="dark"] .bg-indigo-50\/50 {
+    background-color: rgba(99, 102, 241, 0.1) !important;
+}
+html[data-theme="dark"] .border-indigo-100 {
+    border-color: rgba(99, 102, 241, 0.2) !important;
+}
+html[data-theme="dark"] .text-indigo-800 {
+    color: #818cf8 !important;
+}
+html[data-theme="dark"] .bg-indigo-50\/50 a:hover {
+    color: #818cf8 !important;
+}
+
+html[data-theme="dark"] .bg-cyan-50\/50 {
+    background-color: rgba(6, 182, 212, 0.1) !important;
+}
+html[data-theme="dark"] .border-cyan-100 {
+    border-color: rgba(6, 182, 212, 0.2) !important;
+}
+html[data-theme="dark"] .text-cyan-800 {
+    color: #22d3ee !important;
+}
+html[data-theme="dark"] .bg-cyan-50\/50 a:hover {
+    color: #22d3ee !important;
+}
+
+html[data-theme="dark"] .bg-blue-50\/50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+html[data-theme="dark"] .border-blue-100 {
+    border-color: rgba(59, 130, 246, 0.2) !important;
+}
+html[data-theme="dark"] .text-blue-800 {
+    color: #60a5fa !important;
+}
+html[data-theme="dark"] .bg-blue-50\/50 a:hover {
+    color: #60a5fa !important;
+}
+
+/* Overrides for inline styles with primary-blue and orange colors */
+html[data-theme="dark"] [style*="rgba(27, 73, 101"] span[style*="#1B4965"],
+html[data-theme="dark"] [style*="rgba(27, 73, 101"] .material-symbols-outlined {
+    color: #38bdf8 !important;
+}
+html[data-theme="dark"] [style*="rgba(27, 73, 101"] a:hover {
+    color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] [style*="rgba(209, 125, 57"] span[style*="#d17d39"],
+html[data-theme="dark"] [style*="rgba(209, 125, 57"] .material-symbols-outlined {
+    color: #fbd38d !important;
+}
+html[data-theme="dark"] [style*="rgba(209, 125, 57"] a:hover {
+    color: #fbd38d !important;
+}
+
 html[data-theme="dark"] .mega-menu {
     background-color: rgba(15, 23, 42, 0.85) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
