@@ -1,6 +1,190 @@
 // js/bible-reader.js
 import { firebaseService } from './firebase-service.js';
 
+const BIBLE_PROJECT_VIDEOS = {
+    // Law/Pentateuch
+    '1': { no: { title: 'Genesis 1-11', id: 'F4L1v9Jg2f8' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
+    'GEN': { no: { title: 'Genesis 1-11', id: 'F4L1v9Jg2f8' }, en: { title: 'Genesis 1-11', id: 'GQI72THyO5I' } },
+    
+    '2': { no: { title: 'Andre Mosebok 1-18', id: 'gT1Ea209tK8' }, en: { title: 'Exodus 1-18', id: '0zf-G4v4n9M' } },
+    'EXO': { no: { title: 'Andre Mosebok 1-18', id: 'gT1Ea209tK8' }, en: { title: 'Exodus 1-18', id: '0zf-G4v4n9M' } },
+    
+    '3': { no: { title: 'Tredje Mosebok', id: 'd_xVzZ9e7hI' }, en: { title: 'Leviticus', id: 'WmvyrLXoQDM' } },
+    'LEV': { no: { title: 'Tredje Mosebok', id: 'd_xVzZ9e7hI' }, en: { title: 'Leviticus', id: 'WmvyrLXoQDM' } },
+    
+    '4': { en: { title: 'Numbers', id: 'tp5MI_1PK2E' } },
+    'NUM': { en: { title: 'Numbers', id: 'tp5MI_1PK2E' } },
+    
+    '5': { en: { title: 'Deuteronomy', id: 'q5QEJ6p4gqA' } },
+    'DEU': { en: { title: 'Deuteronomy', id: 'q5QEJ6p4gqA' } },
+
+    // History
+    '6': { en: { title: 'Joshua', id: 'JqOqUAQIyeQ' } },
+    'JOS': { en: { title: 'Joshua', id: 'JqOqUAQIyeQ' } },
+    
+    '7': { en: { title: 'Judges', id: 'kOYy8iCfI40' } },
+    'JDG': { en: { title: 'Judges', id: 'kOYy8iCfI40' } },
+    
+    '8': { no: { title: 'Rut', id: 'pYh_wBPy0aE' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
+    'RUT': { no: { title: 'Rut', id: 'pYh_wBPy0aE' }, en: { title: 'Ruth', id: '0h1eoBeR4Jk' } },
+    
+    '9': { en: { title: '1 Samuel', id: 'QGOqiZcjF7o' } },
+    '1SA': { en: { title: '1 Samuel', id: 'QGOqiZcjF7o' } },
+    
+    '10': { en: { title: '2 Samuel', id: 'YvoWDXcUMdU' } },
+    '2SA': { en: { title: '2 Samuel', id: 'YvoWDXcUMdU' } },
+    
+    '11': { en: { title: 'Kings', id: 'bVFW3w19574' } },
+    '1KI': { en: { title: 'Kings', id: 'bVFW3w19574' } },
+    '12': { en: { title: 'Kings', id: 'bVFW3w19574' } },
+    '2KI': { en: { title: 'Kings', id: 'bVFW3w19574' } },
+    
+    '13': { en: { title: 'Chronicles', id: 'HR7xEgR1ToU' } },
+    '1CH': { en: { title: 'Chronicles', id: 'HR7xEgR1ToU' } },
+    '14': { en: { title: 'Chronicles', id: 'HR7xEgR1ToU' } },
+    '2CH': { en: { title: 'Chronicles', id: 'HR7xEgR1ToU' } },
+    
+    '15': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
+    'EZR': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
+    '16': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
+    'NEH': { en: { title: 'Ezra-Nehemiah', id: 'm5qcDYyG1zc' } },
+    
+    '17': { no: { title: 'Ester', id: 'op9u362dOIg' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
+    'EST': { no: { title: 'Ester', id: 'op9u362dOIg' }, en: { title: 'Esther', id: 'oJJg6Z-8p4c' } },
+
+    // Wisdom/Poetry
+    '18': { en: { title: 'Job', id: 'xQ5WvT2sDM' } },
+    'JOB': { en: { title: 'Job', id: 'xQ5WvT2sDM' } },
+    
+    '19': { en: { title: 'Psalms', id: 'dpny224vms0' } },
+    'PSA': { en: { title: 'Psalms', id: 'dpny224vms0' } },
+    
+    '20': { en: { title: 'Proverbs', id: 'AzmYV8G2w8A' } },
+    'PRO': { en: { title: 'Proverbs', id: 'AzmYV8G2w8A' } },
+    
+    '21': { en: { title: 'Ecclesiastes', id: 'lrsQ1tc-2wk' } },
+    'ECC': { en: { title: 'Ecclesiastes', id: 'lrsQ1tc-2wk' } },
+    
+    '22': { en: { title: 'Song of Songs', id: '4KC7YE3DuOw' } },
+    'SNG': { en: { title: 'Song of Songs', id: '4KC7YE3DuOw' } },
+
+    // Major Prophets
+    '23': { en: { title: 'Isaiah Part 1', id: 'd0A6Uchb1F8' } },
+    'ISA': { en: { title: 'Isaiah Part 1', id: 'd0A6Uchb1F8' } },
+    
+    '24': { en: { title: 'Jeremiah', id: 'RSK36cHbrk0' } },
+    'JER': { en: { title: 'Jeremiah', id: 'RSK36cHbrk0' } },
+    
+    '25': { en: { title: 'Lamentations', id: 'p8GDFPd373E' } },
+    'LAM': { en: { title: 'Lamentations', id: 'p8GDFPd373E' } },
+    
+    '26': { en: { title: 'Ezekiel Part 1', id: 'sDePx156Vd0' } },
+    'EZK': { en: { title: 'Ezekiel Part 1', id: 'sDePx156Vd0' } },
+    
+    '27': { en: { title: 'Daniel', id: '9cSC9uobtPM' } },
+    'DAN': { en: { title: 'Daniel', id: '9cSC9uobtPM' } },
+
+    // Minor Prophets
+    '28': { en: { title: 'Hosea', id: 'kE6SZ1ogqUo' } },
+    'HOS': { en: { title: 'Hosea', id: 'kE6SZ1ogqUo' } },
+    
+    '29': { en: { title: 'Joel', id: 'mGgWaPGpGz4' } },
+    'JOL': { en: { title: 'Joel', id: 'mGgWaPGpGz4' } },
+    
+    '30': { en: { title: 'Amos', id: 'e_y1eCqO03U' } },
+    'AMO': { en: { title: 'Amos', id: 'e_y1eCqO03U' } },
+    
+    '31': { en: { title: 'Obadiah', id: 'i4ogCrEqG5s' } },
+    'OBD': { en: { title: 'Obadiah', id: 'i4ogCrEqG5s' } },
+    
+    '32': { no: { title: 'Jona', id: 'W0-5F1nko8E' }, en: { title: 'Jonah', id: 'dLIasUb_YpU' } },
+    'JON': { no: { title: 'Jona', id: 'W0-5F1nko8E' }, en: { title: 'Jonah', id: 'dLIasUb_YpU' } },
+    
+    '33': { en: { title: 'Micah', id: 'MFEUMcrZQDw' } },
+    'MIC': { en: { title: 'Micah', id: 'MFEUMcrZQDw' } },
+    
+    '34': { en: { title: 'Nahum', id: 'Y30DanA5EhU' } },
+    'NAM': { en: { title: 'Nahum', id: 'Y30DanA5EhU' } },
+    
+    '35': { en: { title: 'Habakkuk', id: '2KqK6aG2w8A' } },
+    'HAB': { en: { title: 'Habakkuk', id: '2KqK6aG2w8A' } },
+    
+    '36': { en: { title: 'Zephaniah', id: 'oJJg6Z-8p4c' } },
+    'ZEP': { en: { title: 'Zephaniah', id: 'oJJg6Z-8p4c' } },
+    
+    '37': { en: { title: 'Haggai', id: 'hHe9Mhfyv0w' } },
+    'HAG': { en: { title: 'Haggai', id: 'hHe9Mhfyv0w' } },
+    
+    '38': { en: { title: 'Zechariah', id: '1r_1Mhfyv0w' } },
+    'ZEC': { en: { title: 'Zechariah', id: '1r_1Mhfyv0w' } },
+    
+    '39': { en: { title: 'Malachi', id: 'oG9-ctfnX6o' } },
+    'MAL': { en: { title: 'Malachi', id: 'oG9-ctfnX6o' } },
+
+    // Gospels
+    '40': { en: { title: 'Matthew Part 1', id: 'qO7OnQDdxwc' } },
+    'MAT': { en: { title: 'Matthew Part 1', id: 'qO7OnQDdxwc' } },
+    
+    '41': { en: { title: 'Mark', id: 'HGHqu9-RaCg' } },
+    'MRK': { en: { title: 'Mark', id: 'HGHqu9-RaCg' } },
+    
+    '42': { en: { title: 'Luke Part 1', id: 'XIb_dCIxzr0' } },
+    'LUK': { en: { title: 'Luke Part 1', id: 'XIb_dCIxzr0' } },
+    
+    '43': { no: { title: 'Johannesevangeliet Del 1', id: 'G-2e9mMf7E8' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
+    'JHN': { no: { title: 'Johannesevangeliet Del 1', id: 'G-2e9mMf7E8' }, en: { title: 'John Part 1', id: 'G-2e9mMf7E8' } },
+
+    // History NT
+    '44': { no: { title: 'Apostlenes gjerninger Del 1', id: 'CGbGw8oFCe4' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
+    'ACT': { no: { title: 'Apostlenes gjerninger Del 1', id: 'CGbGw8oFCe4' }, en: { title: 'Acts Part 1', id: 'CGbGw8oFCe4' } },
+
+    // Epistles
+    '45': { no: { title: 'Romerbrevet Del 1', id: 't-0P017x39Y' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
+    'ROM': { no: { title: 'Romerbrevet Del 1', id: 't-0P017x39Y' }, en: { title: 'Romans Part 1', id: 'ej2mF4d90PI' } },
+    
+    '46': { en: { title: '1 Corinthians', id: 'vUR1c3c9JmY' } },
+    '1CO': { en: { title: '1 Corinthians', id: 'vUR1c3c9JmY' } },
+    
+    '47': { en: { title: '2 Corinthians', id: 'c7GpPgZZ_QQ' } },
+    '2CO': { en: { title: '2 Corinthians', id: 'c7GpPgZZ_QQ' } },
+    
+    '48': { en: { title: 'Galatians', id: 'vmx4sf97MhY' } },
+    'GAL': { en: { title: 'Galatians', id: 'vmx4sf97MhY' } },
+    
+    '49': { en: { title: 'Ephesians', id: 'Y7oWDXcUMdU' } },
+    'EPH': { en: { title: 'Ephesians', id: 'Y7oWDXcUMdU' } },
+    
+    '50': { en: { title: 'Philippians', id: 'oG9-ctfnX6o' } },
+    'PHP': { en: { title: 'Philippians', id: 'oG9-ctfnX6o' } },
+    
+    '51': { en: { title: 'Colossians', id: 'pYh_wBPy0aE' } },
+    'COL': { en: { title: 'Colossians', id: 'pYh_wBPy0aE' } },
+    
+    '52': { en: { title: '1 Thessalonians', id: 'kE6SZ1ogqUo' } },
+    '1TH': { en: { title: '1 Thessalonians', id: 'kE6SZ1ogqUo' } },
+    
+    '53': { en: { title: '2 Thessalonians', id: 'oJJg6Z-8p4c' } },
+    '2TH': { en: { title: '2 Thessalonians', id: 'oJJg6Z-8p4c' } },
+    
+    '54': { en: { title: '1 Timothy', id: 'oG9-ctfnX6o' } },
+    '1TI': { en: { title: '1 Timothy', id: 'oG9-ctfnX6o' } },
+    
+    '55': { en: { title: '2 Timothy', id: '1r_1Mhfyv0w' } },
+    '2TI': { en: { title: '2 Timothy', id: '1r_1Mhfyv0w' } },
+    
+    '56': { en: { title: 'Titus', id: 'P8H122k' } },
+    'TIT': { en: { title: 'Titus', id: 'P8H122k' } },
+    
+    '57': { en: { title: 'Philemon', id: 'aW983lG1zc' } },
+    'PHM': { en: { title: 'Philemon', id: 'aW983lG1zc' } },
+    
+    '58': { en: { title: 'Hebrews', id: '1r_1Mhfyv0w' } },
+    'HEB': { en: { title: 'Hebrews', id: '1r_1Mhfyv0w' } },
+    
+    '59': { en: { title: 'James', id: '1r_1Mhfyv0w' } },
+    'JAS': { en: { title: 'James', id: '1r_1Mhfyv0w' } }
+};
+
 class BibleReader {
     getFirestore() {
         if (firebaseService) {
@@ -2323,6 +2507,13 @@ class BibleReader {
         return results;
     }
 
+    getBibleProjectVideo(bookId, lang) {
+        const key = String(bookId).toUpperCase().trim();
+        const entry = BIBLE_PROJECT_VIDEOS[key];
+        if (!entry) return null;
+        return entry[lang] || entry['en'] || null;
+    }
+
     async updateRelatedResources() {
         const relatedList = document.getElementById('related-list');
         if (!relatedList) return;
@@ -2341,6 +2532,24 @@ class BibleReader {
         }
 
         const lang = document.documentElement.lang || 'no';
+
+        // 0. BibleProject Intro Video
+        let bpVideoHtml = '';
+        const bpVideo = this.getBibleProjectVideo(this.selectedBookId, lang);
+        if (bpVideo) {
+            const label = lang === 'no' ? 'Introduksjonsvideo fra BibleProject' : lang === 'es' ? 'Video de introducción de BibleProject' : 'BibleProject Introduction Video';
+            bpVideoHtml = `
+                <div class="hkm-resources-section" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #ff0000;">play_circle</span>
+                        <span>${label}</span>
+                    </h3>
+                    <div class="bp-video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; border: 1px solid var(--border-color); margin-bottom:16px; background: #000000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                        <iframe src="https://www.youtube.com/embed/${bpVideo.id}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
+                    </div>
+                </div>
+            `;
+        }
         const sectionTitles = {
             no: {
                 planResources: 'Dagens leseplan-ressurser',
@@ -2494,6 +2703,7 @@ class BibleReader {
         // Combine everything
         relatedList.innerHTML = `
             <div class="hkm-resources-tab-container" style="padding: 4px 0;">
+                ${bpVideoHtml}
                 ${planResourcesHtml}
                 ${crossRefsHtml}
                 ${generalResourcesHtml}
