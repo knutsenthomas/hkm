@@ -151,6 +151,8 @@ const minsideTranslations = {
         'profile.emailNotificationsSub': 'Mottar nyhetsbrev og oppdateringer',
         'profile.emailReadingPlans': 'Daglige leseplanoppdateringer',
         'profile.emailReadingPlansSub': 'Få dagens bibellesing og andakt på e-post',
+        'profile.notificationTime': 'Tidspunkt for daglig oppdatering',
+        'profile.notificationTimeSub': 'Velg hvilken time du vil motta e-post og push-varsel',
         'profile.savePreferences': 'Lagre preferanser',
 
         // Activity
@@ -404,6 +406,8 @@ const minsideTranslations = {
         'profile.emailNotificationsSub': 'Receive newsletters and updates',
         'profile.emailReadingPlans': 'Daily Reading Plan Updates',
         'profile.emailReadingPlansSub': 'Get today\'s Bible reading and devotional by email',
+        'profile.notificationTime': 'Notification Time',
+        'profile.notificationTimeSub': 'Choose the hour you want to receive emails and push notifications',
         'profile.savePreferences': 'Save preferences',
 
         // Activity
@@ -657,6 +661,8 @@ const minsideTranslations = {
         'profile.emailNotificationsSub': 'Recibir boletines y actualizaciones',
         'profile.emailReadingPlans': 'Actualizaciones Diarias del Plan de Lectura',
         'profile.emailReadingPlansSub': 'Recibe la lectura bíblica y el devocional de hoy por correo electrónico',
+        'profile.notificationTime': 'Hora de notificación',
+        'profile.notificationTimeSub': 'Elige la hora en la que deseas recibir correos y notificaciones push',
         'profile.savePreferences': 'Guardar preferencias',
 
         // Activity
@@ -2008,6 +2014,19 @@ class MinSideManager {
                             </label>
                         </div>
                     </div>
+                    <div class="setting-row" style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                        <div>
+                            <div class="setting-row-label">${t('profile.notificationTime')}</div>
+                            <div class="setting-row-sub">${t('profile.notificationTimeSub')}</div>
+                        </div>
+                        <select id="notification-time-select" class="form-control" style="width: 100px; height: 38px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; padding: 4px 8px; cursor: pointer; text-align: center;">
+                            ${[...Array(24).keys()].map(h => {
+                                const padHour = String(h).padStart(2, '0');
+                                const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                            }).join('')}
+                        </select>
+                    </div>
                     <div class="ms-card-footer-pad">
                         <div class="edit-form-actions" style="justify-content:flex-start">
                             <button class="btn btn-primary" id="save-prefs-btn">
@@ -2086,6 +2105,7 @@ class MinSideManager {
             const pushReadingPlans = document.getElementById('push-reading-plans-toggle')?.checked ?? true;
             const emailConsent = document.getElementById('email-toggle')?.checked;
             const emailReadingPlans = document.getElementById('email-reading-plans-toggle')?.checked ?? true;
+            const readingPlanNotificationHour = parseInt(document.getElementById('notification-time-select')?.value ?? '7', 10);
             const btn = document.getElementById('save-prefs-btn');
             if (btn) { btn.disabled = true; }
             try {
@@ -2098,6 +2118,7 @@ class MinSideManager {
                         pushReadingPlans,
                         emailConsent,
                         emailReadingPlans,
+                        readingPlanNotificationHour,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     },
                     { merge: true }

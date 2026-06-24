@@ -7166,8 +7166,9 @@ exports.getBibleChapterAudio = onCall({
  * Daglig planlagt jobb for å sende leseplanpåminnelser (både push-varsel og e-post).
  * Kjører hver dag klokken 07:00.
  */
-exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) => {
-  console.log("⏰ Starter daglig kjøring av leseplanvarslinger...");
+exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) => {
+  const osloHour = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Oslo" })).getHours();
+  console.log(`⏰ Starter kjøring av leseplanvarslinger for time ${osloHour}:00 (Oslo-tid)...`);
 
   try {
     // 1. Hent alle brukere
@@ -7177,6 +7178,12 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
     for (const userDoc of usersSnap.docs) {
       const userData = userDoc.data();
       const userId = userDoc.id;
+
+      // Sjekk om denne timen matcher brukerens foretrukne time (standard er 7)
+      const prefHour = userData.readingPlanNotificationHour !== undefined ? Number(userData.readingPlanNotificationHour) : 7;
+      if (prefHour !== osloHour) {
+        continue;
+      }
 
       // Sjekk om brukeren har aktivert e-post eller push for leseplaner
       const wantPush = userData.pushEnabled !== false && userData.pushReadingPlans !== false;
