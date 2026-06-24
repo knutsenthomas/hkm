@@ -7279,18 +7279,32 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
           const defaultFallbackBody = `<style>
   @media only screen and (max-width: 600px) {
     .hkm-email-container {
-      padding: 16px 10px !important;
+      padding: 0 !important;
+    }
+    .hkm-email-card {
+      border-radius: 0 !important;
+      border-left: none !important;
+      border-right: none !important;
+      box-shadow: none !important;
+    }
+    .hkm-email-header {
+      padding: 24px 16px 16px 16px !important;
     }
     .hkm-email-body {
-      padding: 24px 16px !important;
+      padding: 20px 12px !important;
     }
     .hkm-reading-card {
-      padding: 16px !important;
-      margin: 16px 0 !important;
+      padding: 12px !important;
+      margin: 12px 0 !important;
+      border-radius: 8px !important;
     }
     .hkm-devotional-box {
-      padding: 16px !important;
-      margin-bottom: 24px !important;
+      padding: 12px !important;
+      margin-bottom: 20px !important;
+      border-radius: 0 8px 8px 0 !important;
+    }
+    .hkm-email-footer {
+      padding: 24px 16px !important;
     }
     .hkm-reading-title {
       font-size: 18px !important;
@@ -7298,10 +7312,10 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
   }
 </style>
 <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-  <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+  <div class="hkm-email-card" style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
     
     <!-- Header -->
-    <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+    <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
       <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
       <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
     </div>
@@ -7335,7 +7349,7 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
     </div>
 
     <!-- Footer -->
-    <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+    <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
       <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
       <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
     </div>
@@ -7361,18 +7375,32 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
               <style>
                 @media only screen and (max-width: 600px) {
                   .hkm-email-container {
-                    padding: 16px 10px !important;
+                    padding: 0 !important;
+                  }
+                  .hkm-email-card {
+                    border-radius: 0 !important;
+                    border-left: none !important;
+                    border-right: none !important;
+                    box-shadow: none !important;
+                  }
+                  .hkm-email-header {
+                    padding: 24px 16px 16px 16px !important;
                   }
                   .hkm-email-body {
-                    padding: 24px 16px !important;
+                    padding: 20px 12px !important;
                   }
                   .hkm-reading-card {
-                    padding: 16px !important;
-                    margin: 16px 0 !important;
+                    padding: 12px !important;
+                    margin: 12px 0 !important;
+                    border-radius: 8px !important;
                   }
                   .hkm-devotional-box {
-                    padding: 16px !important;
-                    margin-bottom: 24px !important;
+                    padding: 12px !important;
+                    margin-bottom: 20px !important;
+                    border-radius: 0 8px 8px 0 !important;
+                  }
+                  .hkm-email-footer {
+                    padding: 24px 16px !important;
                   }
                   .hkm-reading-title {
                     font-size: 18px !important;
@@ -7380,9 +7408,9 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
                 }
               </style>
               <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-                <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+                <div class="hkm-email-card" style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
                   <!-- Header -->
-                  <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                  <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
                     <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
                     <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
                   </div>
@@ -7393,7 +7421,7 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
                   </div>
 
                   <!-- Footer -->
-                  <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                  <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
                     <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
                     <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
                   </div>
