@@ -1409,7 +1409,10 @@ class MinSideManager {
                 (async () => {
                     try {
                         const msg = firebase.messaging();
-                        const registration = await navigator.serviceWorker.ready;
+                        const registration = await Promise.race([
+                            navigator.serviceWorker.ready,
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+                        ]);
                         const token = await msg.getToken({
                             vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                             serviceWorkerRegistration: registration
@@ -2539,8 +2542,15 @@ class MinSideManager {
                 return;
             }
 
+            if (window.hkmLogger) window.hkmLogger.log("FCM: Henter service worker registration...");
             const msg = firebase.messaging();
-            const registration = await navigator.serviceWorker.ready;
+            const registration = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+            ]);
+            
+            if (window.hkmLogger) window.hkmLogger.log(`FCM: SW ready. Aktiv SW: ${registration.active?.scriptURL || 'ingen'}`);
+            
             const token = await msg.getToken({
                 vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                 serviceWorkerRegistration: registration

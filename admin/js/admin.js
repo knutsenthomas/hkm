@@ -2002,7 +2002,10 @@ class AdminManager {
                 (async () => {
                     try {
                         const msg = firebase.messaging();
-                        const registration = await navigator.serviceWorker.ready;
+                        const registration = await Promise.race([
+                            navigator.serviceWorker.ready,
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+                        ]);
                         const token = await msg.getToken({
                             vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                             serviceWorkerRegistration: registration
@@ -20122,7 +20125,10 @@ class AdminManager {
             if (perm !== 'granted') return;
             const msg = firebase.messaging();
             // Use the existing admin PWA service worker registration to avoid collisions
-            const registration = await navigator.serviceWorker.ready;
+            const registration = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+            ]);
             const token = await msg.getToken({
                 vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
                 serviceWorkerRegistration: registration
