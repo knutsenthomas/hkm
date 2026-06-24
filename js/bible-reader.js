@@ -1638,23 +1638,40 @@ class BibleReader {
 
             const input = firstRef.toLowerCase().trim();
             
-            // Regex match, e.g. "1. Johannes 3:16", "Johannes 3:16", "Salmene 23", "Génesis 1:1"
-            // Extended regex to allow Spanish accents and common character set, and optional comma separator
-            const regex = /^(\d+)?\s*\.?\s*([a-zæøåáéíóúüñ\s]+)\s*(\d+)(?:\s*[\:\.\s,]\s*(\d+))?$/i;
-            const match = input.match(regex);
+            // Parse reference: extract optional leading number, book name, optional chapter, and optional verse
+            // Match trailing chapter and verse, e.g. "Johannes 3:16", "Johannes 3", "1. Mosebok 12"
+            const numPattern = /\s+(\d+)(?:\s*[\:\.\s,]\s*(\d+))?$/i;
+            const numMatch = input.match(numPattern);
 
-            if (!match) {
-                console.warn("[BibleReader] Invalid reference format:", query);
-                alert("Ugyldig bibelreferanse. Prøv f.eks. 'Johannes 3:16', '1 Mos 1:1' eller 'Salmene 23'.");
-                return;
+            let prefixNum = '';
+            let bookNameQuery = input;
+            let chapterNum = '1';
+            let verseNum = undefined;
+
+            if (numMatch) {
+                chapterNum = numMatch[1];
+                verseNum = numMatch[2];
+                // The book name query is everything before the numbers match
+                const bookPart = input.substring(0, numMatch.index).trim();
+                // Extract optional leading number from book part, e.g. "1. mosebok" -> "1" and "mosebok"
+                const prefixMatch = bookPart.match(/^(\d+)\s*\.?\s*(.+)$/);
+                if (prefixMatch) {
+                    prefixNum = prefixMatch[1];
+                    bookNameQuery = prefixMatch[2].trim();
+                } else {
+                    bookNameQuery = bookPart;
+                }
+            } else {
+                // Book name only (no chapter number), e.g. "Salmene", "Ruths bok", "1. Mosebok"
+                const prefixMatch = input.match(/^(\d+)\s*\.?\s*(.+)$/);
+                if (prefixMatch) {
+                    prefixNum = prefixMatch[1];
+                    bookNameQuery = prefixMatch[2].trim();
+                } else {
+                    bookNameQuery = input;
+                }
             }
 
-            const prefixNum = match[1] || '';
-            const bookNameQuery = match[2].trim();
-            const chapterNum = match[3];
-            const verseNum = match[4];
-
-            // Format search query to match book name, e.g., "1 mosebok", "johannes"
             let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
             const lookupName = fullBookSearchName.toLowerCase().trim();
 
@@ -1668,38 +1685,43 @@ class BibleReader {
                 "5 mosebok": 5, "5. mosebok": 5, "5mos": 5, "5. mos": 5, "5 mose": 5, "5. mose": 5,
                 "josva": 6, "jos": 6,
                 "dommerne": 7, "dom": 7,
-                "rut": 8, "ru": 8, "ruth": 8,
-                "1 samuelsbok": 9, "1. samuelsbok": 9, "1sam": 9, "1. sam": 9, "1 samuel": 9, "1. samuel": 9,
+                "rut": 8, "ru": 8, "ruth": 8, "ruts bok": 8, "ruths bok": 8, "ruts": 8, "ruths": 8,
+                "1 samuelsbok": 9, "1. samuelsbok": 9, "1sam": 9, "1. sam": 9, "1 samuel": 9, "1. samuel": 9, "samuels bok": 9, "samuelsbok": 9,
                 "2 samuelsbok": 10, "2. samuelsbok": 10, "2sam": 10, "2. sam": 10, "2 samuel": 10, "2. samuel": 10,
-                "1 kongebok": 11, "1. kongebok": 11, "1kong": 11, "1. kong": 11, "1 konge": 11, "1. konge": 11,
+                "1 kongebok": 11, "1. kongebok": 11, "1kong": 11, "1. kong": 11, "1 konge": 11, "1. konge": 11, "kongebok": 11,
                 "2 kongebok": 12, "2. kongebok": 12, "2kong": 12, "2. kong": 12, "2 konge": 12, "2. konge": 12,
-                "1 krønikebok": 13, "1. krønikebok": 13, "1krøn": 13, "1. krøn": 13,
+                "1 krønikebok": 13, "1. krønikebok": 13, "1krøn": 13, "1. krøn": 13, "krønikebok": 13,
                 "2 krønikebok": 14, "2. krønikebok": 14, "2krøn": 14, "2. krøn": 14,
                 "esra": 15, "esr": 15,
                 "nehemja": 16, "neh": 16, "nehe": 16,
-                "ester": 17, "est": 17,
-                "job": 18,
-                "salmene": 19, "sal": 19, "salme": 19,
+                "ester": 17, "est": 17, "esters bok": 17, "esters": 17,
+                "job": 18, "jobs bok": 18, "jobs": 18,
+                "salmene": 19, "sal": 19, "salme": 19, "salmenes bok": 19, "salmenes": 19,
                 "salomos ordspråk": 20, "ordspråkene": 20, "ordspr": 20, "ords": 20, "ordspråk": 20,
                 "forkynneren": 21, "fork": 21,
-                "høysangen": 22, "høys": 22,
-                "jesaja": 23, "jes": 23,
-                "jeremia": 24, "jer": 24,
+                "høysangen": 22, "høys": 22, "salomos høysang": 22, "høysang": 22,
+                "jesaja": 23, "jes": 23, "jesajas bok": 23, "jesajas": 23,
+                "jeremia": 24, "jer": 24, "jeremias bok": 24, "jeremias": 24, "jeremias klagesanger": 25,
                 "klagesangene": 25, "klag": 25,
-                "esekiel": 26, "ese": 26, "esek": 26,
-                "daniel": 27, "dan": 27,
-                "hosea": 28, "hos": 28,
-                "joel": 29, "joe": 29,
-                "amos": 30, "am": 30,
-                "obadja": 31, "oba": 31,
-                "jona": 32, "jon": 32,
-                "mika": 33, "mik": 33,
-                "nahum": 34, "nah": 34,
-                "habakkuk": 35, "hab": 35,
-                "sefanja": 36, "sef": 36,
-                "haggai": 37, "hag": 37,
-                "sakarja": 38, "sak": 38,
-                "malaki": 39, "mal": 39,
+                "esekiel": 26, "ese": 26, "esek": 26, "esekiels bok": 26, "esekiels": 26,
+                "daniel": 27, "dan": 27, "daniels bok": 27, "daniels": 27,
+                "hosea": 28, "hos": 28, "hoseas bok": 28, "hoseas": 28,
+                "joel": 29, "joe": 29, "joels bok": 29, "joels": 29,
+                "amos": 30, "am": 30, "amos bok": 30, "amos": 30,
+                "obadja": 31, "oba": 31, "obadjas bok": 31, "obadjas": 31,
+                "jona": 32, "jon": 32, "jonas bok": 32, "jonas": 32,
+                "mika": 33, "mik": 33, "mikas bok": 33, "mikas": 33,
+                "nahum": 34, "nah": 34, "nahums bok": 34, "nahums": 34,
+                "habakkuk": 35, "hab": 35, "habakkuks bok": 35, "habakkuks": 35,
+                "sefanja": 36, "sef": 36, "sefanjas bok": 36, "sefanjas": 36,
+                "haggai": 37, "hag": 37, "haggais bok": 37, "haggais": 37,
+                "sakarja": 38, "sak": 38, "sakarjas bok": 38, "sakarjas": 38,
+                "malaki": 39, "mal": 39, "malakis bok": 39, "malakis": 39,
+                // Samlinger/grupper og spesialnavn
+                "2. til 5. mosebok": 2, "2 til 5 mosebok": 2,
+                "1. og 2. petersbrev": 60, "1 og 2 petersbrev": 60,
+                "brevene i det nye testamente": 45,
+                "evangeliene": 40, "evangeliene (matteus, markus, lukas, johannes)": 40,
                 // Nye testamentet
                 "matteus": 40, "matt": 40, "mat": 40,
                 "markus": 41, "mark": 41, "mar": 41,
@@ -1720,19 +1742,29 @@ class BibleReader {
                 "titus": 56, "tit": 56,
                 "filemon": 57, "filem": 57, "phm": 57,
                 "hebreerne": 58, "heb": 58,
-                "jakob": 59, "jak": 59,
-                "1 peter": 60, "1. peter": 60, "1pet": 60, "1. pet": 60, "1 pet": 60,
-                "2 peter": 61, "2. peter": 61, "2pet": 61, "2. pet": 61, "2 pet": 61,
-                "1 johannes": 62, "1. johannes": 62, "1joh": 62, "1. joh": 62, "1 joh": 62,
-                "2 johannes": 63, "2. johannes": 63, "2joh": 63, "2. joh": 63, "2 joh": 63,
-                "3 johannes": 64, "3. johannes": 64, "3joh": 64, "3. joh": 64, "3 joh": 64,
-                "judas": 65, "jud": 65,
-                "åpenbaringen": 66, "åp": 66
+                "jakob": 59, "jak": 59, "jakobs brev": 59, "jakobs": 59,
+                "1 peter": 60, "1. peter": 60, "1pet": 60, "1. pet": 60, "1 pet": 60, "1 peters brev": 60, "1 peters": 60,
+                "2 peter": 61, "2. peter": 61, "2pet": 61, "2. pet": 61, "2 pet": 61, "2 peters brev": 61, "2 peters": 61,
+                "1 johannes": 62, "1. johannes": 62, "1joh": 62, "1. joh": 62, "1 joh": 62, "1 johannes brev": 62, "1 johannes": 62,
+                "2 johannes": 63, "2. johannes": 63, "2joh": 63, "2. joh": 63, "2 joh": 63, "2 johannes brev": 63, "2 johannes": 63,
+                "3 johannes": 64, "3. johannes": 64, "3joh": 64, "3. joh": 64, "3 joh": 64, "3 johannes brev": 64, "3 johannes": 64,
+                "judas": 65, "jud": 65, "judas brev": 65, "judas": 65,
+                "åpenbaringen": 66, "åp": 66, "johannes åpenbaring": 66, "åpenbaring": 66
             };
 
-            const bookIdFromLookup = norwegianBookToId[lookupName];
+            // Check direct mapping and normalized lookup match
+            const normalizedLookup = lookupName.replace(/[\.\s]/g, '');
+            let bookIdFromLookup = norwegianBookToId[lookupName];
+            if (!bookIdFromLookup) {
+                for (const [key, id] of Object.entries(norwegianBookToId)) {
+                    if (key.replace(/[\.\s]/g, '') === normalizedLookup) {
+                        bookIdFromLookup = id;
+                        break;
+                    }
+                }
+            }
+            
             let matchedBook = null;
-
             if (bookIdFromLookup) {
                 matchedBook = this.books.find(b => String(b.id) === String(bookIdFromLookup));
             }
@@ -1742,8 +1774,11 @@ class BibleReader {
                 matchedBook = this.books.find(b => {
                     const bName = b.name.toLowerCase();
                     const normalizedBName = bName.replace(/[\.\s]/g, '');
-                    const normalizedSearch = lookupName.replace(/[\.\s]/g, '');
-                    return normalizedBName === normalizedSearch || normalizedBName.startsWith(normalizedSearch) || normalizedBName.includes(normalizedSearch);
+                    return normalizedBName === normalizedLookup || 
+                           normalizedBName.startsWith(normalizedLookup) || 
+                           normalizedBName.includes(normalizedLookup) ||
+                           normalizedLookup.startsWith(normalizedBName) ||
+                           normalizedLookup.includes(normalizedBName);
                 });
             }
 
