@@ -2205,11 +2205,37 @@ class MinSideManager {
                     },
                     { merge: true }
                 );
-                if (pushEnabled) await this._requestPushPermission();
-                if (btn) { btn.textContent = '✓ Lagret!'; setTimeout(() => { if (btn) { btn.disabled = false; btn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('profile.savePreferences')}`; } }, 2000); }
+                
+                // Show immediate visual confirmation
+                if (btn) { 
+                    btn.textContent = '✓ Lagret!'; 
+                }
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Preferansene dine ble lagret!", "success", 4000);
+                }
+
+                // Request push notifications in the background so it doesn't block the UI
+                if (pushEnabled) {
+                    this._requestPushPermission().catch(pushErr => {
+                        console.warn('Background push registration failed:', pushErr);
+                    });
+                }
+
+                setTimeout(() => { 
+                    if (btn) { 
+                        btn.disabled = false; 
+                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}`; 
+                    } 
+                }, 2000);
             } catch (e) {
                 console.warn('save prefs:', e);
-                if (btn) { btn.disabled = false; }
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Kunne ikke lagre preferanser: " + (e.message || e), "error", 5000);
+                }
+                if (btn) { 
+                    btn.disabled = false; 
+                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}`; 
+                }
             }
         });
 

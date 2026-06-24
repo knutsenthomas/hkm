@@ -20098,7 +20098,7 @@ class AdminManager {
                 }, { merge: true });
 
                 if (pushEnabled) {
-                    await this._requestAdminPushPermission(authUser.uid);
+                    this._requestAdminPushPermission(authUser.uid).catch(e => console.warn(e));
                 }
 
                 await firebaseService.savePageContent('settings_profile', data);
