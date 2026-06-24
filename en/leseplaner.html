@@ -654,6 +654,7 @@
             // Load from Firestore
             async function loadPlans() {
                 try {
+                    const snap = await db.collection('reading_plans').orderBy('createdAt', 'desc').get();
                     const rawPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     allPlans = rawPlans.map(plan => window.contentManager ? window.contentManager.getLocalizedContentItem(plan) : plan);
                     renderPlans(allPlans);
