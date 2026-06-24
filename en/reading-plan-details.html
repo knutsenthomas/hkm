@@ -1129,12 +1129,16 @@
                     return;
                 }
 
-                const plan = { id: planId, ...planData };
+                let plan = { id: planId, ...planData };
+                if (window.contentManager) {
+                    plan = window.contentManager.getLocalizedContentItem(plan);
+                }
                 renderPlanDetails(plan);
 
                 // Load other reading plans to show at the bottom
                 try {
-                    const plans = await service.getCollection('reading_plans');
+                    const rawPlans = await service.getCollection('reading_plans');
+                    const plans = rawPlans.map(p => window.contentManager ? window.contentManager.getLocalizedContentItem(p) : p);
                     const otherPlans = plans.filter(p => p.id !== planId).slice(0, 3);
                     renderOtherPlans(otherPlans);
                 } catch (collErr) {

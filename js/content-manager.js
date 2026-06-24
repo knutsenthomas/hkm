@@ -402,14 +402,39 @@ class ContentManager {
             };
         }
 
+        const localizedDesc = this.isUsableLocalizedString(localized.description) ? localized.description : item.description;
+        const localizedSubtitle = this.isUsableLocalizedString(localized.subtitle) ? localized.subtitle : item.subtitle;
+        let localizedDays = item.days;
+        if (Array.isArray(item.days) && Array.isArray(localized.days)) {
+            localizedDays = item.days.map((day, idx) => {
+                const locDay = localized.days.find(d => d.dayNumber === day.dayNumber) || localized.days[idx];
+                if (locDay) {
+                    return {
+                        ...day,
+                        prayerFocus: this.isUsableLocalizedString(locDay.prayerFocus) ? locDay.prayerFocus : day.prayerFocus,
+                        resources: Array.isArray(day.resources) && Array.isArray(locDay.resources)
+                            ? day.resources.map((res, resIdx) => {
+                                const locRes = locDay.resources[resIdx];
+                                return locRes ? { ...res, title: this.isUsableLocalizedString(locRes.title) ? locRes.title : res.title } : res;
+                            })
+                            : day.resources
+                    };
+                }
+                return day;
+            });
+        }
+
         return {
             ...item,
             title: this.isUsableLocalizedString(localized.title) ? localized.title : item.title,
+            subtitle: localizedSubtitle,
+            description: localizedDesc,
             content: this.isUsableLocalizedContent(localized.content) ? localized.content : item.content,
             category: this.isUsableLocalizedString(localized.category) ? localized.category : item.category,
             seoTitle: this.isUsableLocalizedString(localized.seoTitle) ? localized.seoTitle : item.seoTitle,
             seoDescription: this.isUsableLocalizedString(localized.seoDescription) ? localized.seoDescription : item.seoDescription,
             tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
+            days: localizedDays,
             __stableId: this.getContentItemStableId(item)
         };
     }
