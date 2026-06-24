@@ -1403,6 +1403,29 @@ class MinSideManager {
                     message: `Ny bruker: ${user.displayName || user.email}`,
                 });
             }
+
+            // Auto-register FCM token if notification permission is already granted
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && firebase.messaging && firebase.messaging.isSupported()) {
+                (async () => {
+                    try {
+                        const msg = firebase.messaging();
+                        const registration = await navigator.serviceWorker.ready;
+                        const token = await msg.getToken({
+                            vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                            serviceWorkerRegistration: registration
+                        });
+                        if (token) {
+                            await ref.update({
+                                fcmTokens: firebase.firestore.FieldValue.arrayUnion(token),
+                                pushEnabled: true
+                            });
+                            console.log('[MinSide] Auto-registered FCM token:', token);
+                        }
+                    } catch (fcmErr) {
+                        console.warn('[MinSide] Auto FCM registration failed:', fcmErr.message);
+                    }
+                })();
+            }
         } catch (e) { console.warn('syncUserProfile:', e); }
     }
 
