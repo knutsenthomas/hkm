@@ -127,21 +127,111 @@ const i18nManager = {
     },
 
     /**
+     * Helper to auto-detect browser language or timezone-based location.
+     * Prioritizes supported browser language preferences (including Scandinavian languages and Spanish).
+     * Falls back to checking if timezone matches Scandinavian countries or Spanish-speaking countries.
+     * The fallback for all other locations is English ('en').
+     * @returns {string} 'en', 'es', or 'no'
+     */
+    getBrowserOrGeoLanguage() {
+        // 1. Detect via browser language preference list
+        const languages = navigator.languages || [navigator.language || navigator.userLanguage];
+        for (const lang of languages) {
+            if (!lang) continue;
+            const cleanLang = lang.toLowerCase();
+            if (cleanLang.startsWith('es')) {
+                return 'es';
+            }
+            if (cleanLang.startsWith('no') || cleanLang.startsWith('nb') || cleanLang.startsWith('nn') || cleanLang.startsWith('sv') || cleanLang.startsWith('da')) {
+                return 'no';
+            }
+            if (cleanLang.startsWith('en')) {
+                return 'en';
+            }
+        }
+
+        // 2. Secondary check: Timezone geographic detection
+        try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz) {
+                const lowerTz = tz.toLowerCase();
+                
+                // Scandinavia timezones (Norway, Sweden, Denmark)
+                const isScandinavia = lowerTz.includes('europe/oslo') || 
+                                     lowerTz.includes('europe/stockholm') || 
+                                     lowerTz.includes('europe/copenhagen');
+                if (isScandinavia) {
+                    return 'no';
+                }
+
+                // Spanish-speaking country timezones (Spain & Spanish-speaking Americas)
+                const isSpanishSpeaking = lowerTz.includes('madrid') || 
+                                          lowerTz.includes('mexico') || 
+                                          lowerTz.includes('buenos_aires') || 
+                                          lowerTz.includes('santiago') || 
+                                          lowerTz.includes('bogota') || 
+                                          lowerTz.includes('caracas') || 
+                                          lowerTz.includes('lima') || 
+                                          lowerTz.includes('quito') || 
+                                          lowerTz.includes('la_paz') || 
+                                          lowerTz.includes('asuncion') || 
+                                          lowerTz.includes('montevideo') || 
+                                          lowerTz.includes('havana') || 
+                                          lowerTz.includes('santo_domingo') || 
+                                          lowerTz.includes('san_juan') || 
+                                          lowerTz.includes('panama') || 
+                                          lowerTz.includes('costa_rica') || 
+                                          lowerTz.includes('el_salvador') || 
+                                          lowerTz.includes('guatemala') || 
+                                          lowerTz.includes('tegucigalpa') || 
+                                          lowerTz.includes('managua');
+                if (isSpanishSpeaking) {
+                    return 'es';
+                }
+            }
+        } catch (e) {
+            console.warn("Timezone language detection failed:", e);
+        }
+
+        // 3. Fallback for the rest of the world is English
+        return 'en';
+    },
+
+    /**
      * Detects language from localStorage, browser settings, or URL path.
+     * Automatically redirects on first-time visit to the landing page if a non-Norwegian preference is detected.
      */
     detectLanguage() {
         const path = window.location.pathname;
         let currentLang = 'no';
 
-        if (/\/minside(\/|$)/.test(path)) {
+        const hasExplicitLang = /^\/en(\/|$)/.test(path) ? 'en' : (/^\/es(\/|$)/.test(path) ? 'es' : null);
+
+        if (hasExplicitLang) {
+            currentLang = hasExplicitLang;
+            localStorage.setItem(this.storageKey, currentLang);
+        } else if (/\/minside(\/|$)/.test(path)) {
             currentLang = localStorage.getItem(this.storageKey) || 'no';
         } else {
-            // Set language based strictly on the URL path
-            if (/^\/en(\/|$)/.test(path)) currentLang = 'en';
-            else if (/^\/es(\/|$)/.test(path)) currentLang = 'es';
-            
-            // Sync detected language to localStorage
-            localStorage.setItem(this.storageKey, currentLang);
+            // We are on a Norwegian page (path does not start with /en or /es)
+            const savedPref = localStorage.getItem(this.storageKey);
+            if (savedPref) {
+                currentLang = savedPref;
+            } else {
+                // First-time visit and no preference stored. Check if we're on the homepage.
+                const isHomepage = path === '/' || path === '/index.html' || path === '/index';
+                if (isHomepage) {
+                    const autoLang = this.getBrowserOrGeoLanguage();
+                    if (autoLang && autoLang !== 'no') {
+                        currentLang = autoLang;
+                        localStorage.setItem(this.storageKey, currentLang);
+                        document.documentElement.lang = currentLang;
+                        window.location.replace(currentLang === 'en' ? '/en/' : '/es/');
+                        return currentLang;
+                    }
+                }
+                currentLang = 'no';
+            }
         }
 
         document.documentElement.lang = currentLang;
