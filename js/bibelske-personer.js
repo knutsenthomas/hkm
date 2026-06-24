@@ -23,7 +23,7 @@ function renderCatalog(container, lang) {
         return;
     }
     
-    const readBioText = lang === 'en' ? 'Read full biography' : (lang === 'es' ? 'Leer biografía completa' : 'Les hele biografien');
+    const readBioText = lang === 'en' ? 'Read more' : (lang === 'es' ? 'Leer más' : 'Les mer');
     
     const html = biblicalCharacters.map(char => {
         const name = char.name[lang] || char.name.no;
