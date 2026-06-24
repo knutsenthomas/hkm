@@ -14013,6 +14013,9 @@ class AdminManager {
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
                         Ukoblet
                        </button>`;
+                const productCell = record.productName
+                    ? `<span style="font-size:12px; color:#1B4965; font-weight:600; display:block; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${this.escapeHtml(record.productName)}">${this.escapeHtml(record.productName)}</span>`
+                    : `<span style="font-size:12px; color:#94a3b8;">—</span>`;
                 return `
                     <tr>
                         <td style="white-space: nowrap;">${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
@@ -14021,6 +14024,7 @@ class AdminManager {
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td><span class="method-tag">${method}</span></td>
+                        <td>${productCell}</td>
                         <td><span class="method-tag">${reference}</span></td>
                         <td>${profileStatus}</td>
                         <td class="text-right"><strong>${amount}</strong></td>
@@ -14032,7 +14036,7 @@ class AdminManager {
                     </tr>
                 `;
             }).join('') : `
-                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen salg matcher filteret.</td></tr>
+                <tr><td colspan="8" style="padding:28px;text-align:center;color:#64748b;">Ingen salg matcher filteret.</td></tr>
             `;
 
             // Bind click events to delete buttons
@@ -18703,6 +18707,7 @@ class AdminManager {
                                             </div>
                                         </th>
                                         <th>Metode</th>
+                                        <th>Produkt</th>
                                         <th>ID / Referanse</th>
                                         <th>Profil</th>
                                         <th class="sortable-header text-right" data-sort="amount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
@@ -18715,7 +18720,7 @@ class AdminManager {
                                     </tr>
                                 </thead>
                                 <tbody id="shop-transactions-body">
-                                    <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster transaksjoner...</td></tr>
+                                    <tr><td colspan="8" style="padding:28px;text-align:center;color:#64748b;">Laster transaksjoner...</td></tr>
                                 </tbody>
                             </table>
                         </div>
