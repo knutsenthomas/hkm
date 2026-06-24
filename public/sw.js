@@ -1,9 +1,8 @@
-const CACHE_NAME = 'hkm-admin-v27';
+const CACHE_NAME = 'hkm-admin-v28';
 const STATIC_ASSETS = [
-    '/admin/css/dashboard.css',
-    '/admin/css/admin-unified.css',
-    '/admin/img/logo_circular.png',
     '/css/notifications.css',
+    '/img/logo-hkm.png',
+    '/img/logo_circular.png',
     '/manifest.json'
 ];
 

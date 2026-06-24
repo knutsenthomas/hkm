@@ -1,10 +1,8 @@
-const CACHE_NAME = 'hkm-admin-app-v27';
+const CACHE_NAME = 'hkm-admin-app-v28';
 const SHELL_ASSETS = [
     '/admin/index.html',
     '/admin/login.html',
     '/admin/manifest.webmanifest',
-    '/admin/css/dashboard.css',
-    '/admin/css/admin-unified.css',
     '/css/notifications.css',
     '/img/logo-hkm.png',
     '/icons/icon-192.png',
