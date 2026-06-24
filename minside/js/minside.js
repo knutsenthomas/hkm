@@ -2238,7 +2238,8 @@ class MinSideManager {
 
                 // Request push notifications in the background so it doesn't block the UI
                 if (pushEnabled) {
-                    this._requestPushPermission().catch(pushErr => {
+                    const showRegToast = !p.pushEnabled;
+                    this._requestPushPermission(showRegToast).catch(pushErr => {
                         console.warn('Background push registration failed:', pushErr);
                         if (window.hkmLogger) {
                             window.hkmLogger.warn("Background push registration failed: " + (pushErr.message || pushErr));
@@ -2522,7 +2523,7 @@ class MinSideManager {
         this.loadView('profile');
     }
 
-    async _requestPushPermission() {
+    async _requestPushPermission(showSuccessToast = true) {
         try {
             if (!('Notification' in window)) {
                 if (window.hkmLogger) window.hkmLogger.warn("Push not supported: 'Notification' in window is false");
@@ -2596,7 +2597,7 @@ class MinSideManager {
                     fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
                 });
                 if (window.hkmLogger) window.hkmLogger.log("Push notifications registered successfully on device");
-                if (typeof window.showToast === 'function') {
+                if (showSuccessToast && typeof window.showToast === 'function') {
                     window.showToast("Push-varslinger ble vellykket registrert på denne enheten!", "success", 5000);
                 }
             } else {
