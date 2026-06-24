@@ -1880,11 +1880,11 @@ class MinSideManager {
                     <div class="info-card-header">
                         <h3>${t('profile.accountAdmin')}</h3>
                     </div>
-                    <div class="ms-card-body-pad">
-                        <p class="ms-danger-copy">
+                    <div class="ms-card-body-pad" style="padding: 16px 20px 18px 20px !important; display: block !important;">
+                        <p class="ms-danger-copy" style="margin-bottom: 12px !important;">
                             ${t('profile.deleteAccountNotice')}
                         </p>
-                        <button class="btn btn-danger" id="delete-account-btn">
+                        <button class="btn btn-danger" id="delete-account-btn" style="margin: 0 !important;">
                             <span class="material-symbols-outlined">delete_forever</span>
                             ${t('profile.deleteAccountBtn')}
                         </button>
@@ -2019,7 +2019,7 @@ class MinSideManager {
                             <div class="setting-row-label">${t('profile.notificationTime')}</div>
                             <div class="setting-row-sub">${t('profile.notificationTimeSub')}</div>
                         </div>
-                        <select id="notification-time-select" class="form-control" style="width: 100px; height: 38px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; padding: 4px 8px; cursor: pointer; text-align: center;">
+                        <select id="notification-time-select" class="form-control" style="width: 100px; height: 38px !important; line-height: 36px !important; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 14px !important; padding-right: 30px !important; cursor: pointer; text-align: center; display: inline-block !important;">
                             ${[...Array(24).keys()].map(h => {
                                 const padHour = String(h).padStart(2, '0');
                                 const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
