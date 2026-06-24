@@ -39,3 +39,33 @@ try {
 } catch (e) {
     console.warn('[firebase-messaging-sw.js] Kunne ikke initialisere Firebase Messaging i Service Worker:', e);
 }
+
+// Handle notification click and redirect
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    
+    let clickUrl = '/';
+    if (event.notification.data) {
+        if (event.notification.data.click_action) {
+            clickUrl = event.notification.data.click_action;
+        } else if (event.notification.data.url) {
+            clickUrl = event.notification.data.url;
+        }
+    }
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (let client of windowClients) {
+                const clientUrl = new URL(client.url, self.location.origin).pathname;
+                const targetUrl = new URL(clickUrl, self.location.origin).pathname;
+                if (clientUrl === targetUrl && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(clickUrl);
+            }
+        })
+    );
+});
+
