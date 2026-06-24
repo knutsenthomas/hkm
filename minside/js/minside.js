@@ -1423,6 +1423,9 @@ class MinSideManager {
                         }
                     } catch (fcmErr) {
                         console.warn('[MinSide] Auto FCM registration failed:', fcmErr.message);
+                        if (window.hkmLogger) {
+                            window.hkmLogger.warn(`Auto FCM registration failed: ${fcmErr.message || fcmErr}`);
+                        }
                     }
                 })();
             }
@@ -2494,6 +2497,7 @@ class MinSideManager {
     async _requestPushPermission() {
         try {
             if (!('Notification' in window)) {
+                if (window.hkmLogger) window.hkmLogger.warn("Push not supported: 'Notification' in window is false");
                 if (typeof window.showToast === 'function') {
                     window.showToast("Nettleseren din støtter ikke push-varslinger.", "error", 5000);
                 } else {
@@ -2502,6 +2506,7 @@ class MinSideManager {
                 return;
             }
             if (!firebase.messaging || !firebase.messaging.isSupported()) {
+                if (window.hkmLogger) window.hkmLogger.warn("Push not supported: firebase.messaging.isSupported() is false");
                 if (typeof window.showToast === 'function') {
                     window.showToast("Push-varslinger er ikke støttet i denne nettleseren.", "error", 5000);
                 } else {
@@ -2512,6 +2517,7 @@ class MinSideManager {
 
             const currentPermission = Notification.permission;
             if (currentPermission === 'denied') {
+                if (window.hkmLogger) window.hkmLogger.warn("Push permission is denied");
                 const msg = "Varsler er blokkert for dette nettstedet i nettleseren din. Vennligst tilbakestill tillatelsen i nettleserinnstillingene dine.";
                 if (typeof window.showToast === 'function') {
                     window.showToast(msg, "warning", 7000);
@@ -2523,6 +2529,7 @@ class MinSideManager {
 
             const perm = await Notification.requestPermission();
             if (perm !== 'granted') {
+                if (window.hkmLogger) window.hkmLogger.warn("Push permission was not granted by user: " + perm);
                 const msg = "Du må tillate varsler for å motta push-meldinger på denne enheten.";
                 if (typeof window.showToast === 'function') {
                     window.showToast(msg, "warning", 5000);
@@ -2542,6 +2549,7 @@ class MinSideManager {
                 await firebase.firestore().collection('users').doc(this.currentUser.uid).update({
                     fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
                 });
+                if (window.hkmLogger) window.hkmLogger.log("Push notifications registered successfully on device");
                 if (typeof window.showToast === 'function') {
                     window.showToast("Push-varslinger ble vellykket registrert på denne enheten!", "success", 5000);
                 }
@@ -2550,6 +2558,9 @@ class MinSideManager {
             }
         } catch (e) {
             console.warn('push permission:', e);
+            if (window.hkmLogger) {
+                window.hkmLogger.error(`FCM Registration failed: ${e.message || e}. Stack: ${e.stack || ''}`);
+            }
             const errorMsg = `Kunne ikke registrere push-varsler: ${e.message || e}`;
             if (typeof window.showToast === 'function') {
                 window.showToast(errorMsg, "error", 7000);
