@@ -15392,6 +15392,408 @@ class AdminManager {
         }));
     }
 
+    openManualSaleModal() {
+        const modal = document.getElementById('manual-sale-modal');
+        if (!modal) return;
+
+        const now = new Date();
+        const pad = (value) => String(value).padStart(2, '0');
+        const localDateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+        const form = document.getElementById('manual-sale-form');
+        if (form) form.reset();
+        const dateInput = document.getElementById('manual-sale-date');
+        if (dateInput) dateInput.value = localDateTime;
+        const statusInput = document.getElementById('manual-sale-status');
+        if (statusInput) statusInput.value = 'completed';
+        const methodInput = document.getElementById('manual-sale-method');
+        if (methodInput) methodInput.value = 'vipps_manual';
+        modal.style.display = 'flex';
+    }
+
+    closeManualSaleModal() {
+        const modal = document.getElementById('manual-sale-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    handleManualSaleUserSelect(userId) {
+        const user = userId ? this.adminUserMap?.get(userId) : null;
+        const nameInput = document.getElementById('manual-sale-buyer-name');
+        const emailInput = document.getElementById('manual-sale-buyer-email');
+        if (!user) return;
+
+        if (nameInput) {
+            nameInput.value = user.displayName || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '';
+        }
+        if (emailInput) emailInput.value = user.email || '';
+    }
+
+    async saveManualSale() {
+        const saveBtn = document.getElementById('save-manual-sale-btn');
+        const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+        const amountNok = Number(getValue('manual-sale-amount').replace(',', '.'));
+        const selectedUserId = getValue('manual-sale-user');
+        const buyerName = getValue('manual-sale-buyer-name');
+        const buyerEmail = getValue('manual-sale-buyer-email').toLowerCase();
+        const method = getValue('manual-sale-method') || 'vipps_manual';
+        const status = getValue('manual-sale-status') || 'completed';
+        const dateValue = getValue('manual-sale-date');
+        const note = getValue('manual-sale-note');
+        const reference = getValue('manual-sale-reference');
+        const selectedUser = selectedUserId ? this.adminUserMap?.get(selectedUserId) : null;
+        const resolvedUserId = selectedUserId || '';
+        const resolvedName = buyerName || selectedUser?.displayName || selectedUser?.fullName || selectedUser?.email || 'Ukjent kjøper';
+        const resolvedEmail = buyerEmail || selectedUser?.email || '';
+
+        if (!Number.isFinite(amountNok) || amountNok <= 0) {
+            this.showToast('Skriv inn et gyldig beløp.', 'warning', 3500);
+            return;
+        }
+
+        if (!resolvedName && !resolvedEmail) {
+            this.showToast('Velg en bruker eller skriv inn navn/e-post for kjøperen.', 'warning', 3500);
+            return;
+        }
+
+        const saleDate = dateValue ? new Date(dateValue) : new Date();
+        if (Number.isNaN(saleDate.getTime())) {
+            this.showToast('Datoen er ikke gyldig.', 'warning', 3500);
+            return;
+        }
+
+        await this._runWriteLocked('manual-sale:create', async () => this._withButtonLoading(saveBtn, async () => {
+            const docRef = firebaseService.db.collection('donations').doc();
+            const docId = docRef.id;
+            const timestamp = firebase.firestore.Timestamp.fromDate(saleDate);
+            const amountOre = Math.round(amountNok * 100);
+            const currentAdmin = firebase.auth().currentUser;
+            const payload = {
+                transactionId: docId,
+                manualDonationId: docId,
+                amount: amountNok,
+                amountNok,
+                amountOre,
+                currency: 'NOK',
+                method,
+                status,
+                timestamp,
+                completedAt: ['completed', 'succeeded', 'captured'].includes(String(status).toLowerCase()) ? timestamp : null,
+                userId: resolvedUserId || null,
+                donorName: resolvedName,
+                donorEmail: resolvedEmail || 'Ukjent',
+                message: note,
+                reference,
+                type: 'butikk',
+                source: 'manual_admin',
+                matchMethod: resolvedUserId ? 'manual_user_select' : 'manual_unmatched',
+                registeredBy: currentAdmin?.uid || null,
+                registeredByEmail: currentAdmin?.email || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await docRef.set(payload);
+
+            this.allDonationRecords = [{ id: docId, ...payload, createdAt: new Date(), updatedAt: new Date() }, ...(this.allDonationRecords || [])]
+                .sort((a, b) => {
+                    const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                    const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                    return bDate - aDate;
+                });
+
+            this.closeManualSaleModal();
+            this.renderDonationAdminViews();
+            this.showToast('Salget er registrert.', 'success', 4000);
+        }, {
+            loadingText: 'Lagrer...'
+        }));
+    }
+
+    openShopCsvImportModal() {
+        const modal = document.getElementById('shop-csv-import-modal');
+        if (!modal) return;
+
+        const preview = document.getElementById('shop-csv-import-preview');
+        if (preview) preview.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;">Velg eller slipp en CSV-fil med butikksalg.</div>';
+        
+        const summary = document.getElementById('shop-csv-import-summary');
+        if (summary) summary.innerHTML = '';
+
+        const saveBtn = document.getElementById('save-shop-csv-import-btn');
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined">cloud_upload</span> Importer valgte salg';
+        }
+
+        const fileInput = document.getElementById('shop-csv-import-file');
+        if (fileInput) fileInput.value = '';
+
+        this.pendingShopImportRows = [];
+        modal.style.display = 'flex';
+    }
+
+    closeShopCsvImportModal() {
+        const modal = document.getElementById('shop-csv-import-modal');
+        if (modal) modal.style.display = 'none';
+        this.pendingShopImportRows = [];
+    }
+
+    async handleShopCsvImportFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const text = e.target.result;
+                const rows = this.parseShopCsvImport(text);
+                
+                // Match rows against userMap
+                const users = Array.from(this.adminUserMap?.values() || []);
+                this.pendingShopImportRows = rows.map((row, idx) => {
+                    const rowAmt = Number(String(row.amountNok).replace(/[^0-9.-]/g, ''));
+                    const email = String(row.donorEmail || '').trim().toLowerCase();
+                    const name = String(row.donorName || '').trim();
+                    
+                    // User matching
+                    let matchedUser = null;
+                    if (email) {
+                        matchedUser = users.find(u => String(u.email || '').toLowerCase() === email);
+                    }
+                    if (!matchedUser && name) {
+                        matchedUser = users.find(u => String(u.displayName || u.fullName || '').toLowerCase() === name.toLowerCase());
+                    }
+
+                    // Parse Date
+                    let parsedDate = null;
+                    if (row.date) {
+                        const cleanDate = String(row.date).trim();
+                        const noMatch = cleanDate.match(/^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}))?/);
+                        if (noMatch) {
+                            const day = parseInt(noMatch[1], 10);
+                            const month = parseInt(noMatch[2], 10) - 1;
+                            const year = parseInt(noMatch[3], 10);
+                            const hour = noMatch[4] ? parseInt(noMatch[4], 10) : 12;
+                            const min = noMatch[5] ? parseInt(noMatch[5], 10) : 0;
+                            parsedDate = new Date(year, month, day, hour, min);
+                        } else {
+                            parsedDate = new Date(cleanDate);
+                        }
+                    }
+                    if (!parsedDate || isNaN(parsedDate.getTime())) {
+                        parsedDate = new Date();
+                    }
+
+                    return {
+                        id: `row-${idx}`,
+                        date: parsedDate,
+                        amountNok: isNaN(rowAmt) ? 0 : rowAmt,
+                        donorName: name || 'Ukjent kjøper',
+                        donorEmail: email || '',
+                        text: row.text || '',
+                        reference: row.reference || '',
+                        userId: matchedUser ? matchedUser.id : '',
+                        selected: !isNaN(rowAmt) && rowAmt > 0
+                    };
+                });
+
+                this.renderShopCsvPreview();
+            } catch (err) {
+                console.error("Failed to parse shop CSV:", err);
+                this.showToast('Kunne ikke tolke CSV-filen: ' + err.message, 'error', 5000);
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    parseShopCsvImport(text) {
+        const lines = String(text || '').split(/\r?\n/).filter(line => line.trim());
+        if (lines.length < 2) throw new Error('CSV-filen mangler rader.');
+        const delimiter = this.detectCsvDelimiter(lines[0]);
+        const rows = lines.map(line => this.parseCsvLine(line, delimiter));
+        const headers = rows[0].map(header => this.normalizeBankHeader(header));
+
+        return rows.slice(1).map((values) => {
+            const raw = {};
+            headers.forEach((header, index) => {
+                raw[header] = values[index] || '';
+            });
+
+            const amount = raw.amount || raw.belop || raw.belopinn || raw.belpinn || raw.belp || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.total || raw.prisen || raw.pris || raw.netto;
+            const buyerName = raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer || raw.kundenavn || raw.kjoper || raw.buyer;
+            const buyerEmail = raw.epost || raw.email || raw.buyeremail || raw.kjoperemail || raw.adresse;
+
+            return {
+                date: raw.dato || raw.date || raw.timestamp || raw.tidspunkt || raw.orderdate || raw.salgsdato,
+                amountNok: amount,
+                donorName: buyerName,
+                donorEmail: buyerEmail,
+                text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.items || raw.products || raw.produkter,
+                reference: raw.kid || raw.referanse || raw.reference || raw.transactionid || raw.transaksjonsid || raw.ordreid || raw.orderid || raw.id,
+                category: raw.kategori || ''
+            };
+        });
+    }
+
+    renderShopCsvPreview() {
+        const preview = document.getElementById('shop-csv-import-preview');
+        const summary = document.getElementById('shop-csv-import-summary');
+        const saveBtn = document.getElementById('save-shop-csv-import-btn');
+        if (!preview) return;
+
+        const rows = this.pendingShopImportRows || [];
+        if (rows.length === 0) {
+            preview.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;">Ingen gyldige rader funnet i filen.</div>';
+            if (saveBtn) saveBtn.disabled = true;
+            return;
+        }
+
+        const selectedCount = rows.filter(r => r.selected).length;
+        const totalAmount = rows.filter(r => r.selected).reduce((sum, r) => sum + r.amountNok, 0);
+
+        if (summary) {
+            summary.innerHTML = `Funnet ${rows.length} rader. Valgt for import: ${selectedCount} salg (totalt ${totalAmount.toLocaleString('no-NO')} kr).`;
+        }
+
+        if (saveBtn) {
+            saveBtn.disabled = selectedCount === 0;
+            saveBtn.innerHTML = `<span class="material-symbols-outlined">cloud_upload</span> Importer ${selectedCount} salg`;
+        }
+
+        let html = `
+            <table class="data-table" style="width:100%; font-size:12px;">
+                <thead>
+                    <tr>
+                        <th style="width:40px; text-align:center;"><input type="checkbox" id="shop-csv-select-all" ${rows.every(r => r.selected) ? 'checked' : ''}></th>
+                        <th>Dato</th>
+                        <th>Kjøper (fra CSV)</th>
+                        <th>E-post (fra CSV)</th>
+                        <th>Koble til brukerprofil</th>
+                        <th>Beskrivelse</th>
+                        <th>Referanse</th>
+                        <th class="text-right">Beløp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows.map((row, idx) => {
+                        const dateStr = row.date ? row.date.toLocaleDateString('no-NO') : '';
+                        return `
+                            <tr style="${row.selected ? '' : 'opacity:0.5; background:#f8fafc;'}">
+                                <td style="text-align:center;">
+                                    <input type="checkbox" class="shop-csv-row-checkbox" data-idx="${idx}" ${row.selected ? 'checked' : ''}>
+                                </td>
+                                <td>${dateStr}</td>
+                                <td><strong>${this.escapeHtml(row.donorName)}</strong></td>
+                                <td>${this.escapeHtml(row.donorEmail || '-')}</td>
+                                <td>
+                                    <select class="form-control shop-csv-row-user" data-idx="${idx}" style="font-size:11px; padding:4px 8px; height:28px;">
+                                        <option value="">(Ikke koblet)</option>
+                                        ${Array.from(this.adminUserMap?.values() || []).map(u => {
+                                            const isSelected = u.id === row.userId;
+                                            return `<option value="${u.id}" ${isSelected ? 'selected' : ''}>${this.escapeHtml(u.displayName || u.fullName || u.email)}</option>`;
+                                        }).join('')}
+                                    </select>
+                                </td>
+                                <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${this.escapeHtml(row.text)}">${this.escapeHtml(row.text || '-')}</td>
+                                <td>${this.escapeHtml(row.reference || '-')}</td>
+                                <td class="text-right"><strong>${row.amountNok.toLocaleString('no-NO')} kr</strong></td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+
+        preview.innerHTML = html;
+
+        const selectAll = document.getElementById('shop-csv-select-all');
+        if (selectAll) {
+            selectAll.onclick = () => {
+                const checked = selectAll.checked;
+                rows.forEach(r => r.selected = checked);
+                this.renderShopCsvPreview();
+            };
+        }
+
+        preview.querySelectorAll('.shop-csv-row-checkbox').forEach(cb => {
+            cb.onclick = (e) => {
+                const idx = parseInt(cb.dataset.idx, 10);
+                rows[idx].selected = cb.checked;
+                this.renderShopCsvPreview();
+            };
+        });
+
+        preview.querySelectorAll('.shop-csv-row-user').forEach(sel => {
+            sel.onchange = () => {
+                const idx = parseInt(sel.dataset.idx, 10);
+                rows[idx].userId = sel.value;
+            };
+        });
+    }
+
+    async saveShopCsvImportRows() {
+        const rows = (this.pendingShopImportRows || []).filter(row => row.selected);
+        if (!rows.length) {
+            this.showToast('Velg minst én rad å importere.', 'warning', 3500);
+            return;
+        }
+
+        const saveBtn = document.getElementById('save-shop-csv-import-btn');
+        await this._runWriteLocked('shop-csv-import:create', async () => this._withButtonLoading(saveBtn, async () => {
+            const batch = firebase.firestore().batch();
+            const currentAdmin = firebase.auth().currentUser;
+            const importedRecords = [];
+
+            rows.forEach((row) => {
+                const docRef = firebaseService.db.collection('donations').doc();
+                const docId = docRef.id;
+                const timestamp = firebase.firestore.Timestamp.fromDate(row.date || new Date());
+                const amountOre = Math.round(row.amountNok * 100);
+                const payload = {
+                    transactionId: docId,
+                    manualDonationId: docId,
+                    shopImportId: docId,
+                    amount: row.amountNok,
+                    amountNok: row.amountNok,
+                    amountOre,
+                    currency: 'NOK',
+                    method: 'manual',
+                    status: 'completed',
+                    timestamp,
+                    completedAt: timestamp,
+                    userId: row.userId || null,
+                    donorName: row.donorName,
+                    donorEmail: row.donorEmail || 'Ukjent',
+                    message: row.text,
+                    reference: row.reference || '',
+                    type: 'butikk',
+                    source: 'manual_csv_import',
+                    matchMethod: row.userId ? 'csv_email_or_name_match' : 'csv_unmatched',
+                    registeredBy: currentAdmin?.uid || null,
+                    registeredByEmail: currentAdmin?.email || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                batch.set(docRef, payload);
+                importedRecords.push({ id: docId, ...payload, createdAt: new Date(), updatedAt: new Date() });
+            });
+
+            await batch.commit();
+
+            this.allDonationRecords = [...importedRecords, ...(this.allDonationRecords || [])]
+                .sort((a, b) => {
+                    const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                    const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                    return bDate - aDate;
+                });
+
+            this.closeShopCsvImportModal();
+            this.renderDonationAdminViews();
+            this.showToast(`Vellykket importert ${importedRecords.length} salg.`, 'success', 4500);
+        }, {
+            loadingText: 'Importerer...'
+        }));
+    }
+
     async deleteDonation(donationId) {
         if (!donationId) return false;
         const confirmed = await this.showConfirm(
@@ -17007,6 +17409,52 @@ class AdminManager {
                     const hasFile = fileInput.files && fileInput.files.length > 0;
                     dropzone.style.borderColor = hasFile ? '#10b981' : '#cbd5e1';
                     dropzone.style.background = hasFile ? '#f0fdf4' : '#f8fafc';
+                }
+            });
+        }
+
+        // Shop Manual Entry listeners
+        document.getElementById('open-manual-sale-btn')?.addEventListener('click', () => this.openManualSaleModal());
+        document.getElementById('cancel-manual-sale-btn')?.addEventListener('click', () => this.closeManualSaleModal());
+        document.getElementById('manual-sale-user')?.addEventListener('change', (event) => this.handleManualSaleUserSelect(event.target.value));
+        document.getElementById('manual-sale-form')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.saveManualSale();
+        });
+
+        // Shop CSV Import listeners
+        document.getElementById('open-shop-csv-import-btn')?.addEventListener('click', () => this.openShopCsvImportModal());
+        document.getElementById('cancel-shop-csv-import-btn')?.addEventListener('click', () => this.closeShopCsvImportModal());
+        document.getElementById('shop-csv-import-file')?.addEventListener('change', (event) => this.handleShopCsvImportFile(event.target.files?.[0]));
+        document.getElementById('save-shop-csv-import-btn')?.addEventListener('click', () => this.saveShopCsvImportRows());
+
+        const shopDropzone = document.getElementById('shop-csv-import-dropzone');
+        const shopFileInput = document.getElementById('shop-csv-import-file');
+        if (shopDropzone && shopFileInput) {
+            shopDropzone.addEventListener('click', () => shopFileInput.click());
+
+            shopDropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                shopDropzone.style.borderColor = '#1B4965';
+                shopDropzone.style.background = '#f0f4f8';
+            });
+
+            shopDropzone.addEventListener('dragleave', () => {
+                const hasFile = shopFileInput.files && shopFileInput.files.length > 0;
+                shopDropzone.style.borderColor = hasFile ? '#10b981' : '#cbd5e1';
+                shopDropzone.style.background = hasFile ? '#f0fdf4' : '#f8fafc';
+            });
+
+            shopDropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer?.files?.[0];
+                if (file) {
+                    shopFileInput.files = e.dataTransfer.files;
+                    this.handleShopCsvImportFile(file);
+                } else {
+                    const hasFile = shopFileInput.files && shopFileInput.files.length > 0;
+                    shopDropzone.style.borderColor = hasFile ? '#10b981' : '#cbd5e1';
+                    shopDropzone.style.background = hasFile ? '#f0fdf4' : '#f8fafc';
                 }
             });
         }
