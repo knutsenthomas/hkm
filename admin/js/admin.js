@@ -14029,9 +14029,14 @@ class AdminManager {
                         <td>${profileStatus}</td>
                         <td class="text-right"><strong>${amount}</strong></td>
                         <td class="text-right" style="width:1px; white-space:nowrap; padding-left:0;">
-                            <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett salg" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-                            </button>
+                            <div style="display:inline-flex; gap:4px;">
+                                <button type="button" class="action-btn edit-sale-btn" data-id="${record.id}" title="Rediger salg" style="color: #1B4965; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+                                </button>
+                                <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett salg" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -14045,6 +14050,14 @@ class AdminManager {
                     e.stopPropagation();
                     const donationId = btn.dataset.id;
                     await this.deleteDonation(donationId);
+                });
+            });
+
+            // Bind click events to edit buttons
+            shopTransactionsBody.querySelectorAll('.edit-sale-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openEditSaleModal(btn.dataset.id);
                 });
             });
 
@@ -15422,6 +15435,123 @@ class AdminManager {
         }));
     }
 
+    async openEditSaleModal(recordId) {
+        const record = (this.allDonationRecords || []).find(r => r.id === recordId);
+        if (!record) { this.showToast('Fant ikke salget.', 'error', 3000); return; }
+
+        // Open modal first so the DOM is present
+        this.openManualSaleModal();
+
+        // Mark modal as edit mode
+        const modal = document.getElementById('manual-sale-modal');
+        if (modal) modal.dataset.editId = recordId;
+
+        // Update modal title and button
+        const titleEl = document.getElementById('manual-sale-modal-title');
+        const subtitleEl = document.getElementById('manual-sale-modal-subtitle');
+        const saveBtnEl = document.getElementById('save-manual-sale-btn');
+        if (titleEl) titleEl.textContent = 'Rediger butikksalg';
+        if (subtitleEl) subtitleEl.textContent = 'Oppdater detaljer for det registrerte salget.';
+        if (saveBtnEl) saveBtnEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;">save</span> Lagre endringer';
+
+        // Fill in existing values
+        const setValue = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+        setValue('manual-sale-buyer-name', record.donorName || '');
+        setValue('manual-sale-buyer-email', record.donorEmail && record.donorEmail !== 'Ukjent' ? record.donorEmail : '');
+        setValue('manual-sale-method', record.method || 'vipps_manual');
+        setValue('manual-sale-status', record.status || 'completed');
+        setValue('manual-sale-reference', record.reference || '');
+        setValue('manual-sale-note', record.message || '');
+        setValue('manual-sale-amount', record.amountNok ?? record.amount ?? '');
+        setValue('manual-sale-quantity', record.quantity || 1);
+        setValue('manual-sale-user', record.userId || '');
+
+        // Set date
+        const saleDate = record.timestamp?.toDate ? record.timestamp.toDate() : (record.timestamp ? new Date(record.timestamp) : new Date());
+        const pad = (v) => String(v).padStart(2, '0');
+        const localDT = `${saleDate.getFullYear()}-${pad(saleDate.getMonth()+1)}-${pad(saleDate.getDate())}T${pad(saleDate.getHours())}:${pad(saleDate.getMinutes())}`;
+        setValue('manual-sale-date', localDT);
+
+        // Pre-select product in grid once products are loaded
+        if (record.productId) {
+            await this.fetchWixProducts();
+            const productHidden = document.getElementById('manual-sale-product');
+            if (productHidden) productHidden.value = record.productId;
+            this.filterWixProducts('');
+        }
+    }
+
+    async saveEditSale(recordId) {
+        const saveBtn = document.getElementById('save-manual-sale-btn');
+        const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+        const amountNok = Number(getValue('manual-sale-amount').replace(',', '.'));
+        const selectedUserId = getValue('manual-sale-user');
+        const buyerName = getValue('manual-sale-buyer-name');
+        const buyerEmail = getValue('manual-sale-buyer-email').toLowerCase();
+        const method = getValue('manual-sale-method') || 'vipps_manual';
+        const status = getValue('manual-sale-status') || 'completed';
+        const dateValue = getValue('manual-sale-date');
+        const note = getValue('manual-sale-note');
+        const reference = getValue('manual-sale-reference');
+        const selectedProductId = getValue('manual-sale-product');
+        const quantity = Number(getValue('manual-sale-quantity')) || 1;
+
+        let productName = null;
+        let productId = null;
+        if (selectedProductId && selectedProductId !== 'custom') {
+            const product = this.wixProducts?.find(p => p.id === selectedProductId);
+            if (product) { productName = product.name; productId = product.id; }
+        }
+
+        const selectedUser = selectedUserId ? this.adminUserMap?.get(selectedUserId) : null;
+        const resolvedName = buyerName || selectedUser?.displayName || selectedUser?.fullName || selectedUser?.email || 'Ukjent kjøper';
+        const resolvedEmail = buyerEmail || selectedUser?.email || '';
+
+        if (!Number.isFinite(amountNok) || amountNok <= 0) {
+            this.showToast('Skriv inn et gyldig beløp.', 'warning', 3500); return;
+        }
+        const saleDate = dateValue ? new Date(dateValue) : new Date();
+        if (Number.isNaN(saleDate.getTime())) {
+            this.showToast('Datoen er ikke gyldig.', 'warning', 3500); return;
+        }
+
+        await this._runWriteLocked('manual-sale:edit', async () => this._withButtonLoading(saveBtn, async () => {
+            const timestamp = firebase.firestore.Timestamp.fromDate(saleDate);
+            const amountOre = Math.round(amountNok * 100);
+            const isCompletedStatus = ['completed', 'succeeded', 'captured'].includes(String(status).toLowerCase());
+
+            const updates = {
+                amount: amountNok,
+                amountNok,
+                amountOre,
+                method,
+                status,
+                timestamp,
+                completedAt: isCompletedStatus ? timestamp : null,
+                userId: selectedUserId || null,
+                donorName: resolvedName,
+                donorEmail: resolvedEmail || 'Ukjent',
+                message: note,
+                reference: reference || '',
+                productId: productId || null,
+                productName: productName || null,
+                quantity,
+                matchMethod: selectedUserId ? 'manual_user_select' : 'manual_unmatched',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await firebaseService.db.collection('donations').doc(recordId).update(updates);
+
+            // Update local cache
+            const idx = (this.allDonationRecords || []).findIndex(r => r.id === recordId);
+            if (idx !== -1) this.allDonationRecords[idx] = { ...this.allDonationRecords[idx], ...updates, updatedAt: new Date() };
+
+            this.closeManualSaleModal();
+            this.renderDonationAdminViews();
+            this.showToast('Salget er oppdatert.', 'success', 4000);
+        }, { loadingText: 'Lagrer...' }));
+    }
+
     openManualSaleModal() {
         const modal = document.getElementById('manual-sale-modal');
         if (!modal) return;
@@ -15455,6 +15585,15 @@ class AdminManager {
             if (productGrid) productGrid.innerHTML = '<div style="grid-column:1/-1; padding:16px; text-align:center; color:#ef4444; font-size:0.875rem;">Feil ved henting av produkter</div>';
         });
 
+
+        // Reset edit mode
+        delete modal.dataset.editId;
+        const titleEl = document.getElementById('manual-sale-modal-title');
+        const subtitleEl = document.getElementById('manual-sale-modal-subtitle');
+        const saveBtnEl = document.getElementById('save-manual-sale-btn');
+        if (titleEl) titleEl.textContent = 'Registrer manuelt butikksalg';
+        if (subtitleEl) subtitleEl.textContent = 'Registrer et manuelt salg i butikken (f.eks. Vipps, kontant eller bankoverføring).';
+        if (saveBtnEl) saveBtnEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;">save</span> Lagre salg';
 
         modal.style.display = 'flex';
     }
@@ -17638,7 +17777,13 @@ class AdminManager {
         document.getElementById('manual-sale-user')?.addEventListener('change', (event) => this.handleManualSaleUserSelect(event.target.value));
         document.getElementById('manual-sale-form')?.addEventListener('submit', (event) => {
             event.preventDefault();
-            this.saveManualSale();
+            const modal = document.getElementById('manual-sale-modal');
+            const editId = modal?.dataset?.editId;
+            if (editId) {
+                this.saveEditSale(editId);
+            } else {
+                this.saveManualSale();
+            }
         });
 
         // Wix Product Autocalculation listeners
@@ -18734,8 +18879,8 @@ class AdminManager {
                 <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
-                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuelt butikksalg</h3>
-                            <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">Registrer et manuelt salg i butikken (f.eks. Vipps, kontant eller bankoverføring).</p>
+                            <h3 id="manual-sale-modal-title" style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuelt butikksalg</h3>
+                            <p id="manual-sale-modal-subtitle" class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">Registrer et manuelt salg i butikken (f.eks. Vipps, kontant eller bankoverføring).</p>
                         </div>
                         <button class="modal-close" type="button" onclick="window.adminManager?.closeManualSaleModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
                             <span class="material-symbols-outlined" style="font-size:24px;">close</span>
