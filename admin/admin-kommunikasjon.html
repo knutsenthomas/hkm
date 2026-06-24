@@ -6,13 +6,28 @@
     <script>
         (function () {
             const savedTheme = localStorage.getItem('hkm_theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            } else {
-                const hour = new Date().getHours();
-                const isNight = hour >= 22 || hour < 6;
-                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', systemTheme);
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyTheme(theme) {
+                const active = theme || (mq.matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', active);
+            }
+            applyTheme(savedTheme);
+            if (!savedTheme) {
+                try {
+                    mq.addEventListener('change', function () {
+                        if (!localStorage.getItem('hkm_theme')) {
+                            applyTheme();
+                        }
+                    });
+                } catch (err) {
+                    try {
+                        mq.addListener(function () {
+                            if (!localStorage.getItem('hkm_theme')) {
+                                applyTheme();
+                            }
+                        });
+                    } catch (e2) {}
+                }
             }
         })();
     </script>
