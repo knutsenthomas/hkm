@@ -15439,21 +15439,18 @@ class AdminManager {
         const searchInput = document.getElementById('manual-sale-product-search');
         if (searchInput) searchInput.value = '';
 
-        // Populate wix products dropdown
-        const productSelect = document.getElementById('manual-sale-product');
-        if (productSelect) {
-            productSelect.innerHTML = '<option value="">Laster produkter...</option>';
-            this.fetchWixProducts().then(products => {
-                let html = '<option value="custom">Egendefinert vare / Annet</option>';
-                products.forEach(p => {
-                    html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
-                });
-                productSelect.innerHTML = html;
-            }).catch(err => {
-                console.warn('Kunne ikke laste produkter:', err);
-                productSelect.innerHTML = '<option value="custom">Egendefinert vare / Annet (Feil ved henting)</option>';
-            });
-        }
+        // Reset hidden product input and populate image grid
+        const productHidden = document.getElementById('manual-sale-product');
+        if (productHidden) productHidden.value = 'custom';
+        const productGrid = document.getElementById('manual-sale-product-grid');
+        if (productGrid) productGrid.innerHTML = '<div style="grid-column:1/-1; padding:24px; text-align:center; color:#64748b; font-size:0.875rem;">Laster produkter...</div>';
+        this.fetchWixProducts().then(() => {
+            this.filterWixProducts('');
+        }).catch(err => {
+            console.warn('Kunne ikke laste produkter:', err);
+            if (productGrid) productGrid.innerHTML = '<div style="grid-column:1/-1; padding:16px; text-align:center; color:#ef4444; font-size:0.875rem;">Feil ved henting av produkter</div>';
+        });
+
 
         modal.style.display = 'flex';
     }
@@ -15493,8 +15490,9 @@ class AdminManager {
     }
 
     filterWixProducts(query) {
-        const productSelect = document.getElementById('manual-sale-product');
-        if (!productSelect) return;
+        const gridContainer = document.getElementById('manual-sale-product-grid');
+        const hiddenInput = document.getElementById('manual-sale-product');
+        if (!gridContainer) return;
 
         const products = this.wixProducts || [];
         const normQuery = (query || '').toLowerCase().trim();
@@ -15513,24 +15511,73 @@ class AdminManager {
             searchTerms.push('poster');
         }
 
-        let html = '<option value="custom" data-price="0">Egendefinert vare / Annet</option>';
-        products.forEach(p => {
-            if (!normQuery) {
-                html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
-            } else {
+        const currentSelected = hiddenInput?.value || 'custom';
+
+        let filtered = products;
+        if (normQuery) {
+            filtered = products.filter(p => {
                 const nameLower = (p.name || '').toLowerCase();
                 const descLower = (p.description || '').toLowerCase();
-                
-                const matches = searchTerms.some(term => 
-                    nameLower.includes(term) || descLower.includes(term)
-                );
-                
-                if (matches) {
-                    html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
-                }
-            }
+                return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term));
+            });
+        }
+
+        // Build image-grid cards
+        const customSelected = currentSelected === 'custom' ? 'border:2px solid #1B4965; background:#f0f6fb;' : 'border:2px solid #e2e8f0; background:#fff;';
+        let html = `
+            <div class="wix-product-card" data-id="custom" data-price="0"
+                 onclick="window.adminManager?.selectWixProduct?.('custom', 0)"
+                 style="display:flex; flex-direction:column; align-items:center; border-radius:10px; padding:10px 8px; cursor:pointer; transition:all 0.18s ease; ${customSelected} text-align:center; gap:6px;">
+                <div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:28px;">✏️</div>
+                <span style="font-size:0.75rem; font-weight:600; color:#334155; line-height:1.2;">Egendefinert</span>
+                <span style="font-size:0.7rem; color:#64748b;">–</span>
+            </div>`;
+
+        filtered.forEach(p => {
+            const isSelected = currentSelected === p.id;
+            const borderStyle = isSelected ? 'border:2px solid #1B4965; background:#f0f6fb;' : 'border:2px solid #e2e8f0; background:#fff;';
+            const imgEl = p.imageUrl
+                ? `<img src="${p.imageUrl}" alt="" style="width:72px; height:72px; object-fit:cover; border-radius:8px; display:block;" loading="lazy">`
+                : `<div style="width:72px; height:72px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:24px;">🛍️</div>`;
+            const stockBadge = p.inStock
+                ? ''
+                : `<span style="position:absolute; top:4px; right:4px; background:#ef4444; color:white; font-size:0.6rem; padding:1px 5px; border-radius:4px; font-weight:700;">Utsolgt</span>`;
+            html += `
+                <div class="wix-product-card" data-id="${p.id}" data-price="${p.price}"
+                     onclick="window.adminManager?.selectWixProduct?.('${p.id.replace(/'/g, "\\'") }', ${p.price})"
+                     style="display:flex; flex-direction:column; align-items:center; border-radius:10px; padding:10px 8px; cursor:pointer; transition:all 0.18s ease; ${borderStyle} text-align:center; gap:6px; position:relative;">
+                    ${imgEl}
+                    ${stockBadge}
+                    <span style="font-size:0.73rem; font-weight:600; color:#334155; line-height:1.3; max-width:100px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${p.name}</span>
+                    <span style="font-size:0.7rem; font-weight:700; color:#1B4965;">kr ${p.price},-</span>
+                </div>`;
         });
-        productSelect.innerHTML = html;
+
+        if (filtered.length === 0 && normQuery) {
+            html += `<div style="grid-column:1/-1; padding:24px; text-align:center; color:#64748b; font-size:0.875rem;">Ingen produkter funnet for "${normQuery}"</div>`;
+        }
+
+        gridContainer.innerHTML = html;
+    }
+
+    selectWixProduct(productId, price) {
+        const hiddenInput = document.getElementById('manual-sale-product');
+        const qtyInput = document.getElementById('manual-sale-quantity');
+        const amountInput = document.getElementById('manual-sale-amount');
+        if (hiddenInput) hiddenInput.value = productId;
+
+        // Update card highlight
+        document.querySelectorAll('.wix-product-card').forEach(card => {
+            const isSelected = card.dataset.id === productId;
+            card.style.border = isSelected ? '2px solid #1B4965' : '2px solid #e2e8f0';
+            card.style.background = isSelected ? '#f0f6fb' : '#fff';
+        });
+
+        // Update amount
+        if (amountInput && price > 0) {
+            const qty = parseInt(qtyInput?.value || 1, 10);
+            amountInput.value = (price * qty).toFixed(2);
+        }
     }
 
     async saveManualSale() {
@@ -17584,25 +17631,25 @@ class AdminManager {
         });
 
         // Wix Product Autocalculation listeners
-        const productSelect = document.getElementById('manual-sale-product');
         const qtyInput = document.getElementById('manual-sale-quantity');
         const amountInput = document.getElementById('manual-sale-amount');
         const updateAutoAmount = () => {
-            const selectedOpt = productSelect?.options[productSelect.selectedIndex];
-            if (selectedOpt && selectedOpt.value && selectedOpt.value !== 'custom') {
-                const price = parseFloat(selectedOpt.getAttribute('data-price') || 0);
-                const qty = parseInt(qtyInput?.value || 1, 10);
-                if (amountInput) amountInput.value = (price * qty).toFixed(2);
+            const hiddenInput = document.getElementById('manual-sale-product');
+            const selectedId = hiddenInput?.value;
+            if (selectedId && selectedId !== 'custom') {
+                const product = this.wixProducts?.find(p => p.id === selectedId);
+                if (product) {
+                    const qty = parseInt(qtyInput?.value || 1, 10);
+                    if (amountInput) amountInput.value = (product.price * qty).toFixed(2);
+                }
             }
         };
-        productSelect?.addEventListener('change', updateAutoAmount);
         qtyInput?.addEventListener('input', updateAutoAmount);
 
         // Wix Product Search listener
         const productSearch = document.getElementById('manual-sale-product-search');
         productSearch?.addEventListener('input', (event) => {
             this.filterWixProducts(event.target.value);
-            updateAutoAmount();
         });
 
         // Shop CSV Import listeners
@@ -18693,15 +18740,18 @@ class AdminManager {
                             </div>
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Velg produkt (fra Wix)</label>
-                                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                                    <div style="position: relative; flex: 1;">
-                                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
-                                        <input type="text" id="manual-sale-product-search" placeholder="Søk i produkter..." style="width: 100%; padding: 10px 16px 10px 40px !important; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s ease; font-size: 0.875rem;">
-                                    </div>
+                                <!-- Hidden input carries the selected product id -->
+                                <input type="hidden" id="manual-sale-product" value="custom">
+                                <!-- Search box -->
+                                <div style="position: relative; margin-bottom: 10px;">
+                                    <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px; pointer-events:none;">search</span>
+                                    <input type="text" id="manual-sale-product-search" placeholder="Søk i produkter..." style="width: 100%; padding: 10px 16px 10px 40px !important; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s ease; font-size: 0.875rem; box-sizing:border-box;">
                                 </div>
-                                <select id="manual-sale-product" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                    <option value="custom">Egendefinert vare / Annet</option>
-                                </select>
+                                <!-- Visual product image grid -->
+                                <div id="manual-sale-product-grid"
+                                     style="display:grid; grid-template-columns: repeat(auto-fill, minmax(108px,1fr)); gap:8px; max-height:280px; overflow-y:auto; padding:4px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
+                                    <div style="grid-column:1/-1; padding:24px; text-align:center; color:#64748b; font-size:0.875rem;">Laster produkter...</div>
+                                </div>
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
