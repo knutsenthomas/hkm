@@ -23633,24 +23633,39 @@ class AdminManager {
             }
         });
 
-        // Insert variables logic for Quill
-        document.querySelectorAll('.insert-var-btn').forEach(btn => {
-            btn.onclick = () => {
-                const varTag = btn.dataset.var;
-                if (this.quill) {
-                    const range = this.quill.getSelection(true);
-                    this.quill.insertText(range.index, varTag);
-                    this.quill.setSelection(range.index + varTag.length);
+        // Initialize HTML/Code toggle logic
+        const toggleBtn = document.getElementById('toggle-editor-mode-btn');
+        const rawTextarea = document.getElementById('edit-template-body-raw');
+        const quillContainer = document.getElementById('quill-editor-container');
+
+        if (toggleBtn && rawTextarea && quillContainer) {
+            toggleBtn.onclick = () => {
+                const isCodeView = rawTextarea.style.display !== 'none';
+                if (isCodeView) {
+                    // Switch to visual (Quill)
+                    if (this.quill) {
+                        this.quill.root.innerHTML = rawTextarea.value;
+                    }
+                    rawTextarea.style.display = 'none';
+                    quillContainer.style.display = 'block';
+                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">code</span> HTML-kode';
+                } else {
+                    // Switch to raw HTML
+                    rawTextarea.value = this.quill ? this.quill.root.innerHTML : "";
+                    quillContainer.style.display = 'none';
+                    rawTextarea.style.display = 'block';
+                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">edit</span> Visuell editor';
                 }
             };
-        });
+        }
 
         const testBtn = document.getElementById('send-test-template-btn');
         if (testBtn) {
             testBtn.onclick = async () => {
                 const templateId = document.getElementById('edit-template-id').value;
                 const subject = document.getElementById('edit-template-subject').value;
-                const body = this.quill ? this.quill.root.innerHTML : "";
+                const isCodeView = rawTextarea && rawTextarea.style.display !== 'none';
+                const body = isCodeView ? (rawTextarea ? rawTextarea.value : "") : (this.quill ? this.quill.root.innerHTML : "");
 
                 if (!subject) {
                     this.showToast("Emnefeltet kan ikke være tomt.", "error");
@@ -23723,35 +23738,45 @@ class AdminManager {
                             .replace("{{day}}", String(currentDayNum))
                             .replace("{{title}}", planTitle);
 
-                        const emailBody = body
-                            .replace("{{name}}", "Test-bruker")
-                            .replace("{{day}}", String(currentDayNum))
-                            .replace("{{title}}", planTitle)
-                            .replace("{{reading_content}}", readingContentHtml);
+                        let emailBody = body;
+                        if (emailBody.includes("{{reading_content}}")) {
+                            emailBody = emailBody
+                                .replace("{{name}}", "Test-bruker")
+                                .replace("{{day}}", String(currentDayNum))
+                                .replace("{{title}}", planTitle)
+                                .replace("{{reading_content}}", readingContentHtml);
+                            
+                            testHtml = `
+                                <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+                                    <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+                                        <!-- Header -->
+                                        <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                                            <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                                            <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+                                        </div>
 
-                        testSubject = emailSubject;
-                        testHtml = `
-                            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
-                                <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
-                                    <!-- Header -->
-                                    <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                                        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-                                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
-                                    </div>
+                                        <!-- Body -->
+                                        <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                                            ${emailBody}
+                                        </div>
 
-                                    <!-- Body -->
-                                    <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
-                                        ${emailBody}
-                                    </div>
-
-                                    <!-- Footer -->
-                                    <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
-                                        <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
-                                        <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                                        <!-- Footer -->
+                                        <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                                            <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                                            <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
+                        } else {
+                            testHtml = emailBody
+                                .replace(/\{\{name\}\}/g, "Test-bruker")
+                                .replace(/\{\{day\}\}/g, String(currentDayNum))
+                                .replace(/\{\{title\}\}/g, planTitle)
+                                .replace(/\{\{passage\}\}/g, verses)
+                                .replace(/\{\{devotional\}\}/g, prayerFocus);
+                        }
+                        testSubject = emailSubject;
                     } else {
                         // Fallback simple wrap
                         testHtml = `
@@ -23775,9 +23800,8 @@ class AdminManager {
         saveBtn.onclick = async () => {
             const templateId = document.getElementById('edit-template-id').value;
             const subject = document.getElementById('edit-template-subject').value;
-
-            // Get content from Quill
-            const body = this.quill ? this.quill.root.innerHTML : "";
+            const isCodeView = rawTextarea && rawTextarea.style.display !== 'none';
+            const body = isCodeView ? (rawTextarea ? rawTextarea.value : "") : (this.quill ? this.quill.root.innerHTML : "");
 
             if (!subject) {
                 this.showToast("Emnefeltet kan ikke være tomt.", "error");
@@ -23817,9 +23841,108 @@ class AdminManager {
 
         const bodyContent = currentData.body || "";
 
-        // Set content in Quill
-        if (this.quill) {
-            this.quill.root.innerHTML = bodyContent;
+        const rawTextarea = document.getElementById('edit-template-body-raw');
+        const quillContainer = document.getElementById('quill-editor-container');
+        const toggleBtn = document.getElementById('toggle-editor-mode-btn');
+        const warningEl = document.getElementById('template-editor-warning');
+
+        // Setup warning & default view mode
+        if (templateId === 'daily_bible_reading') {
+            if (rawTextarea) {
+                rawTextarea.value = bodyContent;
+                rawTextarea.style.display = 'block';
+            }
+            if (quillContainer) {
+                quillContainer.style.display = 'none';
+            }
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">edit</span> Visuell editor';
+            }
+            if (warningEl) {
+                warningEl.textContent = 'OBS: Denne malen bruker avansert HTML-struktur. Vi anbefaler å redigere i HTML-modus for å bevare design og stiler.';
+                warningEl.style.display = 'block';
+            }
+        } else {
+            if (this.quill) {
+                this.quill.root.innerHTML = bodyContent;
+            }
+            if (rawTextarea) {
+                rawTextarea.style.display = 'none';
+            }
+            if (quillContainer) {
+                quillContainer.style.display = 'block';
+            }
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">code</span> HTML-kode';
+            }
+            if (warningEl) {
+                warningEl.style.display = 'none';
+            }
+        }
+
+        // Render dynamic variables
+        const varsContainer = document.getElementById('template-variables-container');
+        if (varsContainer) {
+            varsContainer.innerHTML = '';
+            
+            let vars = [];
+            if (templateId === 'welcome_email') {
+                vars = [{ tag: '{{name}}', label: 'Navn' }];
+            } else if (templateId === 'newsletter_confirmation') {
+                vars = [{ tag: '{{email}}', label: 'E-post' }];
+            } else if (templateId === 'daily_bible_reading') {
+                vars = [
+                    { tag: '{{name}}', label: 'Navn' },
+                    { tag: '{{day}}', label: 'Dag-nummer' },
+                    { tag: '{{title}}', label: 'Leseplan tittel' },
+                    { tag: '{{passage}}', label: 'Bibeltekst' },
+                    { tag: '{{devotional}}', label: 'Andakt' },
+                    { tag: '{{reading_content}}', label: 'Fullt lesekort' }
+                ];
+            } else {
+                vars = [
+                    { tag: '{{name}}', label: 'Navn' },
+                    { tag: '{{email}}', label: 'E-post' }
+                ];
+            }
+
+            vars.forEach(v => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm insert-var-btn';
+                btn.dataset.var = v.tag;
+                btn.style.width = 'auto';
+                btn.style.display = 'inline-flex';
+                btn.style.padding = '6px 14px';
+                btn.style.fontSize = '11px';
+                btn.style.height = 'auto';
+                btn.style.background = '#fff';
+                btn.style.border = '1px solid #cbd5e1';
+                btn.style.color = '#475569';
+                btn.style.borderRadius = '6px';
+                btn.style.cursor = 'pointer';
+                btn.style.fontWeight = '600';
+                btn.textContent = `+ ${v.label}`;
+                
+                btn.onclick = () => {
+                    const isCodeView = rawTextarea && rawTextarea.style.display !== 'none';
+                    if (isCodeView) {
+                        const startPos = rawTextarea.selectionStart;
+                        const endPos = rawTextarea.selectionEnd;
+                        const text = rawTextarea.value;
+                        rawTextarea.value = text.substring(0, startPos) + v.tag + text.substring(endPos);
+                        rawTextarea.focus();
+                        rawTextarea.selectionStart = startPos + v.tag.length;
+                        rawTextarea.selectionEnd = startPos + v.tag.length;
+                    } else if (this.quill) {
+                        const range = this.quill.getSelection(true);
+                        this.quill.insertText(range.index, v.tag);
+                        this.quill.setSelection(range.index + v.tag.length);
+                    }
+                };
+                
+                varsContainer.appendChild(btn);
+            });
         }
 
         modal.style.display = 'flex';

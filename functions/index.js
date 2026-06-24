@@ -7276,45 +7276,97 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
         if (wantEmail) {
           console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
 
+          const defaultFallbackBody = `<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+  <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+    
+    <!-- Header -->
+    <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+    </div>
+
+    <!-- Body -->
+    <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+      <h2>Hei {{name}}!</h2>
+      <p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
+
+      <!-- Dagens lesekort -->
+      <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin: 20px 0;">
+        <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
+        <h3 style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2;">Dag {{day}} - {{title}}</h3>
+        <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: {{passage}}</p>
+
+        <!-- Devotional Box -->
+        <div style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 24px; border-radius: 0 12px 12px 0; margin-bottom: 32px;">
+          <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2;">Dagens Andakt & Bønn</strong>
+          <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500;">{{devotional}}</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);">
+            Fortsett lesingen i nettleser
+          </a>
+        </div>
+      </div>
+
+      <p>Ha en velsignet dag!</p>
+      <p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+      <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+      <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+    </div>
+  </div>
+</div>`;
+
           const defaultFallback = {
             subject: "Dagens bibellesing: Dag {{day}} - {{title}}",
-            body: `<h2>Hei {{name}}!</h2>\n<p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>\n<p>{{reading_content}}</p>\n<p>Ha en velsignet dag!</p>\n<p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>`
+            body: defaultFallbackBody
           };
           const template = await getEmailTemplate("daily_bible_reading", defaultFallback);
 
           const name = userData.displayName || "bibelleser";
           const emailSubject = template.subject
-            .replace("{{day}}", String(currentDayNum))
-            .replace("{{title}}", planTitle);
+            .replace(/\{\{day\}\}/g, String(currentDayNum))
+            .replace(/\{\{title\}\}/g, planTitle);
 
-          const emailBody = template.body
-            .replace("{{name}}", name)
-            .replace("{{day}}", String(currentDayNum))
-            .replace("{{title}}", planTitle)
-            .replace("{{reading_content}}", readingContentHtml);
+          let html = template.body;
+          if (html.includes("{{reading_content}}")) {
+            // Backward compatibility with simplified template
+            html = html.replace(/\{\{reading_content\}\}/g, readingContentHtml);
+            html = `
+              <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+                <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+                  <!-- Header -->
+                  <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+                  </div>
 
-          const html = `
-            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
-              <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
-                <!-- Header -->
-                <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                  <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-                  <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
-                </div>
+                  <!-- Body -->
+                  <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                    ${html}
+                  </div>
 
-                <!-- Body -->
-                <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
-                  ${emailBody}
-                </div>
-
-                <!-- Footer -->
-                <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
-                  <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
-                  <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                  <!-- Footer -->
+                  <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                    <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                    <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                  </div>
                 </div>
               </div>
-            </div>
-          `;
+            `;
+          } else {
+            // Full HTML template, replace fields directly
+            html = html
+              .replace(/\{\{name\}\}/g, name)
+              .replace(/\{\{day\}\}/g, String(currentDayNum))
+              .replace(/\{\{title\}\}/g, planTitle)
+              .replace(/\{\{passage\}\}/g, verses)
+              .replace(/\{\{devotional\}\}/g, prayerFocus);
+          }
 
           try {
             await sendEmail({
