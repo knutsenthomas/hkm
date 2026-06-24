@@ -23645,6 +23645,133 @@ class AdminManager {
             };
         });
 
+        const testBtn = document.getElementById('send-test-template-btn');
+        if (testBtn) {
+            testBtn.onclick = async () => {
+                const templateId = document.getElementById('edit-template-id').value;
+                const subject = document.getElementById('edit-template-subject').value;
+                const body = this.quill ? this.quill.root.innerHTML : "";
+
+                if (!subject) {
+                    this.showToast("Emnefeltet kan ikke være tomt.", "error");
+                    return;
+                }
+
+                const currentUser = firebase.auth().currentUser;
+                const email = prompt("Oppgi e-postadresse du vil sende test-e-post til:", currentUser ? currentUser.email : "");
+                if (!email) return;
+
+                testBtn.disabled = true;
+                const originalText = testBtn.innerHTML;
+                testBtn.textContent = 'Sender...';
+
+                try {
+                    let testHtml = "";
+                    let testSubject = subject;
+
+                    if (templateId === 'welcome_email') {
+                        const emailSubject = subject.replace("{{name}}", "Test-bruker");
+                        const htmlBody = body.replace("{{name}}", "Test-bruker");
+                        testSubject = emailSubject;
+                        testHtml = `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                ${htmlBody}
+                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                    Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                                </div>
+                            </div>
+                        `;
+                    } else if (templateId === 'newsletter_confirmation') {
+                        const emailSubject = subject.replace("{{email}}", email);
+                        const htmlBody = body.replace("{{email}}", email);
+                        testSubject = emailSubject;
+                        testHtml = `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                ${htmlBody}
+                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                    Du kan melde deg av når som helst ved å svare på denne e-posten.
+                                </div>
+                            </div>
+                        `;
+                    } else if (templateId === 'daily_bible_reading') {
+                        const planTitle = "Johannesevangeliet";
+                        const currentDayNum = 3;
+                        const verses = "Johannes 3:16-21";
+                        const prayerFocus = "For så høyt har Gud elsket verden at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv. Les ordet for dagen og finn styrke.";
+
+                        const readingContentHtml = `
+                            <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin: 20px 0;">
+                                <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
+                                <h3 style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2;">Dag ${currentDayNum} - ${planTitle}</h3>
+                                <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: ${verses}</p>
+
+                                <!-- Devotional Box -->
+                                <div style="background-color: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                                    <strong style="color: #d17d39; display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; line-height: 1;">Dagens Andakt & Bønn</strong>
+                                    <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.5; font-weight: 500;">${prayerFocus}</p>
+                                </div>
+
+                                <div style="text-align: center; margin-top: 24px;">
+                                    <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);">
+                                        Fortsett lesingen i nettleser
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+
+                        const emailSubject = subject
+                            .replace("{{day}}", String(currentDayNum))
+                            .replace("{{title}}", planTitle);
+
+                        const emailBody = body
+                            .replace("{{name}}", "Test-bruker")
+                            .replace("{{day}}", String(currentDayNum))
+                            .replace("{{title}}", planTitle)
+                            .replace("{{reading_content}}", readingContentHtml);
+
+                        testSubject = emailSubject;
+                        testHtml = `
+                            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+                                <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+                                    <!-- Header -->
+                                    <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                                        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+                                    </div>
+
+                                    <!-- Body -->
+                                    <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                                        ${emailBody}
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                                        <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                                        <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Fallback simple wrap
+                        testHtml = `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                ${body}
+                            </div>
+                        `;
+                    }
+
+                    await this.sendEmailToUser(email, `[TEST] ${testSubject}`, "Test e-postmal", testHtml);
+                } catch (error) {
+                    console.error("Feil ved sending av test-e-post:", error);
+                    this.showToast("Kunne ikke sende test-e-post: " + error.message, "error");
+                } finally {
+                    testBtn.disabled = false;
+                    testBtn.innerHTML = originalText;
+                }
+            };
+        }
+
         saveBtn.onclick = async () => {
             const templateId = document.getElementById('edit-template-id').value;
             const subject = document.getElementById('edit-template-subject').value;
