@@ -23641,8 +23641,13 @@ class AdminManager {
         if (toggleBtn && rawTextarea && quillContainer) {
             toggleBtn.onclick = () => {
                 const isCodeView = rawTextarea.style.display !== 'none';
+                const templateId = document.getElementById('edit-template-id').value;
                 if (isCodeView) {
                     // Switch to visual (Quill)
+                    if (templateId === 'daily_bible_reading') {
+                        const confirmSwitch = confirm("Advarsel: Hvis du veksler til visuell editor på denne malen, vil den avanserte HTML-strukturen og alle designstiler bli slettet. Vil du fortsette?");
+                        if (!confirmSwitch) return;
+                    }
                     if (this.quill) {
                         this.quill.root.innerHTML = rawTextarea.value;
                     }
