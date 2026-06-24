@@ -41,7 +41,7 @@
         }
     });
 
-    window.addEventListener('load', async () => {
+    const initPWA = async () => {
         try {
             // Version check for cache busting on production/deployment updates
             const currentVersion = localStorage.getItem(VERSION_KEY);
@@ -70,5 +70,11 @@
         } catch (error) {
             console.warn('[HKM Admin] PWA service worker kunne ikke registreres:', error);
         }
-    });
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        initPWA();
+    } else {
+        window.addEventListener('load', initPWA);
+    }
 })();

@@ -88,14 +88,19 @@
     <script type="module">
         (function () {
             if (!('serviceWorker' in navigator)) return;
-            window.addEventListener('load', async () => {
+            const run = async () => {
                 try {
                     const reg = await navigator.serviceWorker.register('/sw.js');
                     console.log('Service Worker registrert for PWA!', reg);
                 } catch (err) {
                     console.log('Service Worker feilet:', err);
                 }
-            });
+            };
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                run();
+            } else {
+                window.addEventListener('load', run);
+            }
         })();
     </script>
             <!-- Theme Initializer -->
