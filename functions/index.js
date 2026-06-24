@@ -7231,9 +7231,9 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
             <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: ${verses}</p>
 
             <!-- Devotional Box -->
-            <div style="background-color: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-              <strong style="color: #d17d39; display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; line-height: 1;">Dagens Andakt & Bønn</strong>
-              <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.5; font-weight: 500;">${prayerFocus}</p>
+            <div style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 24px; border-radius: 0 12px 12px 0; margin-bottom: 32px;">
+              <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2;">Dagens Andakt & Bønn</strong>
+              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500;">${prayerFocus}</p>
             </div>
 
             <div style="text-align: center; margin-top: 24px;">
