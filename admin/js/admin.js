@@ -398,6 +398,72 @@ class AdminManager {
         });
     }
 
+    /**
+     * Shows a premium prompt modal with an input field.
+     */
+    showPrompt(title, message, defaultValue = '', placeholder = 'E-postadresse...') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('hkm-prompt-modal');
+            if (!modal) {
+                resolve(prompt(message, defaultValue));
+                return;
+            }
+
+            const titleEl = document.getElementById('prompt-modal-title');
+            const messageEl = document.getElementById('prompt-modal-message');
+            const inputEl = document.getElementById('prompt-modal-input');
+            const confirmBtn = document.getElementById('prompt-modal-confirm');
+            const cancelBtn = document.getElementById('prompt-modal-cancel');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+            if (inputEl) {
+                inputEl.value = defaultValue;
+                inputEl.placeholder = placeholder;
+            }
+
+            const cleanup = () => {
+                modal.style.display = 'none';
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+                inputEl.onkeydown = null;
+            };
+
+            const handleConfirm = () => {
+                const val = inputEl.value ? inputEl.value.trim() : '';
+                cleanup();
+                resolve(val);
+            };
+
+            confirmBtn.onclick = (e) => {
+                e.preventDefault();
+                handleConfirm();
+            };
+
+            cancelBtn.onclick = (e) => {
+                e.preventDefault();
+                cleanup();
+                resolve(null);
+            };
+
+            inputEl.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cleanup();
+                    resolve(null);
+                }
+            };
+
+            modal.style.display = 'flex';
+            if (inputEl) {
+                setTimeout(() => inputEl.focus(), 100);
+            }
+        });
+    }
+
     removeSplashScreen() {
         // Since splash screen is removed, we just remove the cloak to reveal the UI
         document.body.classList.remove('cloak');
@@ -23678,7 +23744,7 @@ class AdminManager {
                 }
 
                 const currentUser = firebase.auth().currentUser;
-                const email = prompt("Oppgi e-postadresse du vil sende test-e-post til:", currentUser ? currentUser.email : "");
+                const email = await this.showPrompt("Motta test-e-post", "Oppgi e-postadresse du vil sende test-e-post til:", currentUser ? currentUser.email : "");
                 if (!email) return;
 
                 testBtn.disabled = true;
@@ -23732,7 +23798,7 @@ class AdminManager {
                                 </div>
 
                                 <div style="text-align: center; margin-top: 24px;">
-                                    <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);">
+                                    <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
                                         Fortsett lesingen i nettleser
                                     </a>
                                 </div>
