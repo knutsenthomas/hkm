@@ -145,8 +145,12 @@ const minsideTranslations = {
         'profile.pushPodcastsSub': 'Få pushvarsel når en ny podcastepisode legges ut',
         'profile.pushBlogs': 'Nytt blogginnlegg',
         'profile.pushBlogsSub': 'Få pushvarsel når et nytt blogginnlegg publiseres',
+        'profile.pushReadingPlans': 'Bibel- og leseplaner',
+        'profile.pushReadingPlansSub': 'Få daglig påminnelse og varsel for dine leseplaner',
         'profile.emailNotifications': 'E-postvarslinger',
         'profile.emailNotificationsSub': 'Mottar nyhetsbrev og oppdateringer',
+        'profile.emailReadingPlans': 'Daglige leseplanoppdateringer',
+        'profile.emailReadingPlansSub': 'Få dagens bibellesing og andakt på e-post',
         'profile.savePreferences': 'Lagre preferanser',
 
         // Activity
@@ -394,8 +398,12 @@ const minsideTranslations = {
         'profile.pushPodcastsSub': 'Get notified when a new podcast episode is available',
         'profile.pushBlogs': 'New Blog Post',
         'profile.pushBlogsSub': 'Get notified when a new blog post is published',
+        'profile.pushReadingPlans': 'Bible & Reading Plans',
+        'profile.pushReadingPlansSub': 'Get daily reminders and notifications for your reading plans',
         'profile.emailNotifications': 'Email Notifications',
         'profile.emailNotificationsSub': 'Receive newsletters and updates',
+        'profile.emailReadingPlans': 'Daily Reading Plan Updates',
+        'profile.emailReadingPlansSub': 'Get today\'s Bible reading and devotional by email',
         'profile.savePreferences': 'Save preferences',
 
         // Activity
@@ -643,8 +651,12 @@ const minsideTranslations = {
         'profile.pushPodcastsSub': 'Recibe un aviso cuando haya un nuevo episodio de podcast',
         'profile.pushBlogs': 'Nueva Entrada de Blog',
         'profile.pushBlogsSub': 'Recibe un aviso cuando se publique una nueva entrada de blog',
+        'profile.pushReadingPlans': 'Planes de Lectura y Biblia',
+        'profile.pushReadingPlansSub': 'Recibe recordatorios diarios y avisos para tus planes de lectura',
         'profile.emailNotifications': 'Notificaciones por Correo',
         'profile.emailNotificationsSub': 'Recibir boletines y actualizaciones',
+        'profile.emailReadingPlans': 'Actualizaciones Diarias del Plan de Lectura',
+        'profile.emailReadingPlansSub': 'Recibe la lectura bíblica y el devocional de hoy por correo electrónico',
         'profile.savePreferences': 'Guardar preferencias',
 
         // Activity
@@ -1962,6 +1974,16 @@ class MinSideManager {
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
+                        <div class="setting-row setting-row-sub-item">
+                            <div>
+                                <div class="setting-row-label">${t('profile.pushReadingPlans')}</div>
+                                <div class="setting-row-sub">${t('profile.pushReadingPlansSub')}</div>
+                            </div>
+                            <label class="toggle toggle-sm">
+                                <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="setting-row">
@@ -1973,6 +1995,18 @@ class MinSideManager {
                             <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
                             <span class="toggle-slider"></span>
                         </label>
+                    </div>
+                    <div class="email-sub-settings" id="email-sub-settings" style="${p.emailConsent !== false ? '' : 'display:none;'}">
+                        <div class="setting-row setting-row-sub-item">
+                            <div>
+                                <div class="setting-row-label">${t('profile.emailReadingPlans')}</div>
+                                <div class="setting-row-sub">${t('profile.emailReadingPlansSub')}</div>
+                            </div>
+                            <label class="toggle toggle-sm">
+                                <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                     <div class="ms-card-footer-pad">
                         <div class="edit-form-actions" style="justify-content:flex-start">
@@ -2027,6 +2061,14 @@ class MinSideManager {
             }
         });
 
+        // Email toggle - show/hide sub-settings
+        document.getElementById('email-toggle')?.addEventListener('change', (e) => {
+            const subSettings = document.getElementById('email-sub-settings');
+            if (subSettings) {
+                subSettings.style.display = e.target.checked ? '' : 'none';
+            }
+        });
+
         this._wireFamilySearch();
         this._wireAddressAutocomplete();
 
@@ -2041,7 +2083,9 @@ class MinSideManager {
             const pushTeachings = document.getElementById('push-teachings-toggle')?.checked ?? true;
             const pushPodcasts = document.getElementById('push-podcasts-toggle')?.checked ?? true;
             const pushBlogs = document.getElementById('push-blogs-toggle')?.checked ?? true;
+            const pushReadingPlans = document.getElementById('push-reading-plans-toggle')?.checked ?? true;
             const emailConsent = document.getElementById('email-toggle')?.checked;
+            const emailReadingPlans = document.getElementById('email-reading-plans-toggle')?.checked ?? true;
             const btn = document.getElementById('save-prefs-btn');
             if (btn) { btn.disabled = true; }
             try {
@@ -2051,7 +2095,9 @@ class MinSideManager {
                         pushTeachings,
                         pushPodcasts,
                         pushBlogs,
+                        pushReadingPlans,
                         emailConsent,
+                        emailReadingPlans,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     },
                     { merge: true }
