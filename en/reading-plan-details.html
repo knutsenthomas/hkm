@@ -465,9 +465,9 @@
             color: white;
             border: none;
             border-radius: 14px;
-            padding: 18px 32px;
+            padding: 16px 24px;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             width: 100%;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -478,6 +478,7 @@
             gap: 8px;
             text-decoration: none;
             box-sizing: border-box;
+            white-space: nowrap;
         }
 
         .btn-start-plan:hover {
@@ -1525,8 +1526,11 @@
                                         // Update start-plan-btn text and link
                                         const startBtn = document.getElementById('start-plan-btn');
                                         if (startBtn) {
-                                            const btnText = lang === 'en' ? 'Continue Reading Plan' : (lang === 'es' ? 'Continuar plan de lectura' : 'Fortsett på leseplanen');
-                                            startBtn.innerHTML = `${btnText} (Day ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                                            const btnText = lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett');
+                                            const dayLabel = lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag');
+                                            startBtn.style.whiteSpace = 'nowrap';
+                                            startBtn.style.fontSize = '0.95rem';
+                                            startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
                                             startBtn.onclick = () => {
                                                 window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
                                             };

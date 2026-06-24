@@ -17608,6 +17608,132 @@ class AdminManager {
                 </div>
             </div>
 
+            <div id="manual-sale-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
+                <div class="modal-backdrop" onclick="window.adminManager?.closeManualSaleModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuelt butikksalg</h3>
+                            <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">Registrer et manuelt salg i butikken (f.eks. Vipps, kontant eller bankoverføring).</p>
+                        </div>
+                        <button class="modal-close" type="button" onclick="window.adminManager?.closeManualSaleModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                            <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                        </button>
+                    </div>
+                    <form id="manual-sale-form">
+                        <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                <select id="manual-sale-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <option value="">Ikke koble til profil</option>
+                                    ${manualDonationUserOptions}
+                                </select>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Kjøpers navn</label>
+                                    <input id="manual-sale-buyer-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Kjøpers e-post</label>
+                                    <input id="manual-sale-buyer-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
+                                    <input id="manual-sale-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="250" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
+                                    <input id="manual-sale-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
+                                    <select id="manual-sale-method" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        <option value="vipps_manual">Vipps manuelt</option>
+                                        <option value="stripe">Stripe</option>
+                                        <option value="vipps">Vipps</option>
+                                        <option value="card">Kort</option>
+                                        <option value="bank">Bank</option>
+                                        <option value="cash">Kontant</option>
+                                        <option value="manual">Manuell</option>
+                                        <option value="other">Annen tjeneste</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
+                                    <select id="manual-sale-status" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        <option value="completed">Fullført</option>
+                                        <option value="pending">Venter</option>
+                                        <option value="processing">Behandles</option>
+                                        <option value="failed">Feilet</option>
+                                        <option value="cancelled">Avbrutt</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse / Ordre-ID</label>
+                                    <input id="manual-sale-reference" class="form-control" type="text" placeholder="F.eks. Vipps-referanse eller nettbutikk-ID" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
+                                <textarea id="manual-sale-note" class="form-control" rows="3" placeholder="Valgfritt internt notat eller produktinformasjon" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease; resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; align-items:center; gap:16px;">
+                            <button class="btn-secondary" type="button" id="cancel-manual-sale-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
+                            <button class="btn-primary" type="submit" id="save-manual-sale-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease; background:#1B4965; border-color:#1B4965; color:white;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">save</span>
+                                Lagre salg
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="shop-csv-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
+                <div class="modal-backdrop" onclick="window.adminManager?.closeShopCsvImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="margin:0;">Importer salg fra CSV</h3>
+                            <p class="section-subtitle" style="margin:4px 0 0;">Last opp en CSV-fil (Vipps, Stripe eller bank) med butikksalg. Du får se og redigere rader før lagring.</p>
+                        </div>
+                        <button class="modal-close" type="button" onclick="window.adminManager?.closeShopCsvImportModal?.()">×</button>
+                    </div>
+                    <div class="modal-body" style="display:grid;gap:16px; padding:24px 32px;">
+                        <div class="form-group" style="margin:0;">
+                            <label style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin-bottom:12px;">Butikk CSV-fil</label>
+                            <input id="shop-csv-import-file" type="file" accept=".csv,.txt,text/csv,text/plain" style="display:none;">
+                            <div id="shop-csv-import-dropzone" style="border:2px dashed #cbd5e1; border-radius:12px; padding:32px 24px; text-align:center; background:#f8fafc; cursor:pointer; transition:all 0.2s ease-in-out; display:flex; flex-direction:column; align-items:center; gap:12px;" onmouseover="this.style.borderColor='#1B4965'; this.style.background='#f0f4f8';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                <span class="material-symbols-outlined" style="font-size:48px; color:#1B4965;">cloud_upload</span>
+                                <div>
+                                    <span style="font-weight:700; color:#1B4965; font-size:1rem;">Dra og slipp CSV-filen her</span>
+                                    <span style="color:#64748b; font-size:0.875rem; display:block; margin-top:4px;">eller klikk for å velge fra filutforsker</span>
+                                </div>
+                                <span style="font-size:0.75rem; color:#94a3b8; line-height:1.5; margin-top:4px;">
+                                    Støtter vanlige CSV-formater som inneholder dato, beløp, kjøpernavn og e-post.
+                                </span>
+                            </div>
+                        </div>
+                        <div id="shop-csv-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
+                        <div id="shop-csv-import-preview">
+                            <div style="padding:24px;text-align:center;color:#64748b;">Velg eller slipp en CSV-fil for å forhåndsvise innholdet.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                        <button class="btn-secondary" type="button" id="cancel-shop-csv-import-btn">Avbryt</button>
+                        <button class="btn-primary" type="button" id="save-shop-csv-import-btn" disabled style="background:#1B4965; border-color:#1B4965; color:white; cursor:pointer;">
+                            <span class="material-symbols-outlined">cloud_upload</span>
+                            Importer valgte salg
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div id="cause-form-modal" style="display: none;">
                 <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
                 <div class="modal-content" style="max-width: 600px;">
@@ -17905,11 +18031,19 @@ class AdminManager {
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
                         </div>
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="position:relative; width:220px;">
+                            <div style="position:relative; width:180px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
                                 <input id="shop-search" class="form-control" type="search" placeholder="Søk etter kjøper..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
                             </div>
-                            <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <button type="button" class="btn-primary" id="open-manual-sale-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; background:#1B4965; border-color:#1B4965; color:white; cursor:pointer;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">add_shopping_cart</span>
+                                Registrer salg
+                            </button>
+                            <button type="button" class="btn-secondary" id="open-shop-csv-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; background:white; border:1px solid #cbd5e1; color:#1e293b; cursor:pointer;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
+                                Importer CSV
+                            </button>
+                            <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; background:white; border:1px solid #cbd5e1; color:#1e293b; cursor:pointer;">
                                 <span class="material-symbols-outlined" style="font-size:20px;">print</span>
                                 Skriv ut rapport
                             </button>
