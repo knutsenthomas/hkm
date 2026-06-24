@@ -1325,58 +1325,47 @@
                 // Populate print overview section
                 const printOverview = document.getElementById('print-plan-overview');
                 if (printOverview) {
-                    const titleLower = plan.title.toLowerCase();
-                    if (titleLower.includes('johannes')) {
+                    if (plan.introduction) {
+                        const intro = plan.introduction;
+                        const themesHtml = (intro.themes || []).map(t => `
+                            <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px;">
+                                <strong style="color: #1B4965; font-size: 8.5pt;">${escapeHtml(t.title)}:</strong>
+                                <span style="color: #475569; font-size: 8pt; line-height: 1.4;">${escapeHtml(t.description)}</span>
+                            </div>
+                        `).join('');
+
+                        const timelineHtml = (intro.structure || []).map(s => `
+                            <div style="position: relative; margin-bottom: 8px;">
+                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
+                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">${escapeHtml(s.range)}</strong>
+                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;"><strong>${escapeHtml(s.title)}</strong>${s.description ? `: ${escapeHtml(s.description)}` : ''}</span>
+                            </div>
+                        `).join('');
+
+                        const introTitle = intro.title || (lang === 'en' ? 'Introduction' : (lang === 'es' ? 'Introducción' : 'Introduksjon'));
+                        const themesLabel = lang === 'en' ? 'Key Themes:' : (lang === 'es' ? 'Temas Centrales:' : 'Sentrale Temaer:');
+                        const structureLabel = lang === 'en' ? 'Structure of the Plan:' : (lang === 'es' ? 'Estructura del Plan:' : 'Planens Oppbygning:');
+
                         printOverview.innerHTML = `
                             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
                                 <h3 style="margin: 0 0 12px 0; color: #1B4965; font-size: 13pt; font-weight: 800; border-bottom: 2px solid #1B4965; padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-                                    <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">menu_book</span> Introduksjon til Johannesevangeliet
+                                    <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">menu_book</span> ${escapeHtml(introTitle)}
                                 </h3>
                                 <p style="margin: 0 0 16px 0; font-size: 9.5pt; color: #334155; line-height: 1.5;">
-                                    Johannesevangeliet gir oss en unik fremstilling av hvem Jesus er. Messias, Guds Sønn. Mens de andre tre evangeliene (de synoptiske) fokuserer mye på Jesu gjerninger og lignelser i Galilea, tar Johannes oss med på en dypere teologisk reise for å åpenbare Jesu guddommelige natur og hans intime forhold til Faderen.
+                                    ${escapeHtml(intro.description)}
                                 </p>
                                 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                     <div style="background: white; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
-                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">Sentrale Temaer:</strong>
+                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">${escapeHtml(themesLabel)}</strong>
                                         <div style="display: flex; flex-direction: column; gap: 10px;">
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: #1B4965; font-size: 8.5pt;">Ordet ble menneske:</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.4;">Jesus er det evige <em>Logos</em> som var hos Gud og var Gud, og som skapte universet.</span>
-                                            </div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: #1B4965; font-size: 8.5pt;">De syv tegnene:</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.4;">Utvalgte undergjerninger som viser Jesu herlighet og vekker tro.</span>
-                                            </div>
-                                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                                <strong style="color: #1B4965; font-size: 8.5pt;">"Jeg er"-uttalelsene:</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.4;">Syv ganger åpenbarer Jesus sin identitet med Guds eget paktsnavn (f.eks. Livets brød, Verdens lys).</span>
-                                            </div>
+                                            ${themesHtml}
                                         </div>
                                     </div>
                                     <div style="background: white; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
-                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">Evangeliets Oppbygning:</strong>
+                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">${escapeHtml(structureLabel)}</strong>
                                         <div style="position: relative; padding-left: 12px; display: flex; flex-direction: column; gap: 10px; border-left: 1.5px solid rgba(27, 73, 101, 0.2); margin-left: 6px; margin-top: 4px;">
-                                            <div style="position: relative;">
-                                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
-                                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">Joh 1:1-18</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;">Prologen - Det sanne lyset kommer til verden.</span>
-                                            </div>
-                                            <div style="position: relative;">
-                                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
-                                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">Joh 1:19 - 12:50</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;">Tegnenes bok - Jesu offentlige tjeneste og møter med mennesker.</span>
-                                            </div>
-                                            <div style="position: relative;">
-                                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
-                                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">Joh 13:1 - 20:31</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;">Herlighetens bok - Avskjedstalen, korset og oppstandelsen.</span>
-                                            </div>
-                                            <div style="position: relative;">
-                                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
-                                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">Joh 21</strong>
-                                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;">Epilogen - Frokost ved sjøen og oppreisningen av Peter.</span>
-                                            </div>
+                                            ${timelineHtml}
                                         </div>
                                     </div>
                                 </div>
@@ -1385,97 +1374,70 @@
                     } else {
                         printOverview.innerHTML = `
                             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 16px;">
-                                <h3 style="margin: 0 0 8px 0; color: #1B4965; font-size: 11pt; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">Om leseplanen</h3>
-                                <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || 'Denne leseplanen hjelper deg å fordype deg i Guds ord dag for dag.')}</p>
+                                <h3 style="margin: 0 0 8px 0; color: #1B4965; font-size: 11pt; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">${lang === 'en' ? 'About the plan' : (lang === 'es' ? 'Sobre el plan' : 'Om leseplanen')}</h3>
+                                <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || '')}</p>
                             </div>
                         `;
                     }
                 }
 
-                // Populate screen overview section (introduksjon til Johannesevangeliet på skjermen)
+                // Populate screen overview section
                 const screenOverview = document.getElementById('screen-plan-overview');
                 if (screenOverview) {
-                    const titleLower = plan.title.toLowerCase();
-                    if (titleLower.includes('johannes')) {
+                    if (plan.introduction) {
+                        const intro = plan.introduction;
+                        const themesHtml = (intro.themes || []).map(t => `
+                            <div class="intro-theme-item">
+                                <strong>${escapeHtml(t.title)}</strong>
+                                <p>${escapeHtml(t.description)}</p>
+                            </div>
+                        `).join('');
+
+                        const timelineHtml = (intro.structure || []).map(s => `
+                            <div class="intro-timeline-item">
+                                <div class="intro-timeline-node"></div>
+                                <div class="intro-timeline-content">
+                                    <strong>${escapeHtml(s.range)}</strong>
+                                    <span><strong style="color: var(--text-dark);">${escapeHtml(s.title)}</strong>${s.description ? `: ${escapeHtml(s.description)}` : ''}</span>
+                                </div>
+                            </div>
+                        `).join('');
+
+                        const introTitle = intro.title || (lang === 'en' ? 'Introduction to the Plan' : (lang === 'es' ? 'Introducción al Plan' : 'Introduksjon til leseplanen'));
+                        const bigIdeaLabel = lang === 'en' ? 'The Big Idea' : (lang === 'es' ? 'La Gran Idea' : 'Den Store Ideen');
+                        const themesLabel = lang === 'en' ? 'Key Themes' : (lang === 'es' ? 'Temas Centrales' : 'Sentrale Temaer');
+                        const structureLabel = lang === 'en' ? 'Structure of the Plan' : (lang === 'es' ? 'Estructura del Plan' : 'Planens Oppbygning');
+
                         screenOverview.innerHTML = `
                             <h2 class="card-title">
-                                <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> Introduksjon til Johannesevangeliet
+                                <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> ${escapeHtml(introTitle)}
                             </h2>
                             <div style="background: rgba(209, 125, 57, 0.05); border-left: 4px solid var(--primary-orange); padding: 16px 20px; border-radius: 0 12px 12px 0; margin-bottom: 24px;">
-                                <strong style="color: var(--primary-orange); display: block; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Den Store Ideen</strong>
-                                <p style="margin: 0; color: var(--text-dark); font-size: 1.05rem; line-height: 1.5; font-weight: 500;">Johannesevangeliet er skrevet for at vi skal tro at Jesus er Messias, Guds Sønn, og at vi ved troen kan ha liv i hans navn.</p>
+                                <strong style="color: var(--primary-orange); display: block; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">${escapeHtml(bigIdeaLabel)}</strong>
+                                <p style="margin: 0; color: var(--text-dark); font-size: 1.05rem; line-height: 1.5; font-weight: 500;">${escapeHtml(intro.bigIdea)}</p>
                             </div>
                             <p class="plan-description" style="margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
-                                Johannesevangeliet gir oss en unik fremstilling av hvem Jesus er. Mens de andre tre evangeliene (de synoptiske) fokuserer mye på Jesu gjerninger og lignelser i Galilea, tar Johannes oss med på en dypere teologisk reise for å åpenbare Jesu guddommelige natur og hans intime forhold til Faderen.
+                                ${escapeHtml(intro.description)}
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 intro-grid-container">
                                 <!-- Sentrale Temaer Card -->
                                 <div class="intro-section-card">
                                     <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
-                                        <span class="material-symbols-outlined" style="color: var(--primary-orange); font-size: 20px; vertical-align: middle;">explore</span> Sentrale Temaer
+                                        <span class="material-symbols-outlined" style="color: var(--primary-orange); font-size: 20px; vertical-align: middle;">explore</span> ${escapeHtml(themesLabel)}
                                     </h3>
                                     <div style="display: flex; flex-direction: column; gap: 12px;">
-                                        <!-- Theme 1 -->
-                                        <div class="intro-theme-item">
-                                            <strong>Ordet ble menneske</strong>
-                                            <p>Jesus er det evige <em>Logos</em> som var hos Gud og var Gud.</p>
-                                        </div>
-                                        <!-- Theme 2 -->
-                                        <div class="intro-theme-item">
-                                            <strong>De syv tegnene</strong>
-                                            <p>Utvalgte undergjerninger som viser Jesu herlighet og vekker tro.</p>
-                                        </div>
-                                        <!-- Theme 3 -->
-                                        <div class="intro-theme-item">
-                                            <strong>"Jeg er"-uttalelsene</strong>
-                                            <p>Syv ganger åpenbarer Jesus sin identitet med Guds eget paktsnavn (f.eks. Livets brød, Verdens lys).</p>
-                                        </div>
+                                        ${themesHtml}
                                     </div>
                                 </div>
 
                                 <!-- Evangeliets Oppbygning Card (Timeline) -->
                                 <div class="intro-section-card">
                                     <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
-                                        <span class="material-symbols-outlined" style="color: var(--primary-blue); font-size: 20px; vertical-align: middle;">account_tree</span> Evangeliets Oppbygning
+                                        <span class="material-symbols-outlined" style="color: var(--primary-blue); font-size: 20px; vertical-align: middle;">account_tree</span> ${escapeHtml(structureLabel)}
                                     </h3>
                                     <!-- Timeline Stepper Container -->
                                     <div class="intro-timeline">
-                                        <!-- Step 1 -->
-                                        <div class="intro-timeline-item">
-                                            <!-- Node circle -->
-                                            <div class="intro-timeline-node"></div>
-                                            <div class="intro-timeline-content">
-                                                <strong>Joh 1:1-18</strong>
-                                                <span><strong style="color: var(--text-dark);">Prologen:</strong> Det sanne lyset kommer til verden.</span>
-                                            </div>
-                                        </div>
-                                        <!-- Step 2 -->
-                                        <div class="intro-timeline-item">
-                                            <!-- Node circle -->
-                                            <div class="intro-timeline-node"></div>
-                                            <div class="intro-timeline-content">
-                                                <strong>Joh 1:19 - 12:50</strong>
-                                                <span><strong style="color: var(--text-dark);">Tegnenes bok:</strong> Jesu offentlige tjeneste.</span>
-                                            </div>
-                                        </div>
-                                        <!-- Step 3 -->
-                                        <div class="intro-timeline-item">
-                                            <!-- Node circle -->
-                                            <div class="intro-timeline-node"></div>
-                                            <div class="intro-timeline-content">
-                                                <strong>Joh 13:1 - 20:31</strong>
-                                                <span><strong style="color: var(--text-dark);">Herlighetens bok:</strong> Avskjedstalen, korset og oppstandelsen.</span>
-                                            </div>
-                                        </div>
-                                        <!-- Step 4 -->
-                                        <div class="intro-timeline-item">
-                                            <!-- Node circle -->
-                                            <div class="intro-timeline-node"></div>
-                                            <div class="intro-timeline-content">
-                                                <strong>Joh 21</strong>
-                                                <span><strong style="color: var(--text-dark);">Epilogen:</strong> Frokost ved sjøen og oppreisningen av Peter.</span>
-                                            </div>
-                                        </div>
+                                        ${timelineHtml}
                                     </div>
                                 </div>
                             </div>

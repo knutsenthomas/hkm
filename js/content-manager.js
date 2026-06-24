@@ -435,6 +435,7 @@ class ContentManager {
             seoDescription: this.isUsableLocalizedString(localized.seoDescription) ? localized.seoDescription : item.seoDescription,
             tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
             days: localizedDays,
+            introduction: (localized.introduction && typeof localized.introduction === 'object') ? localized.introduction : item.introduction,
             __stableId: this.getContentItemStableId(item)
         };
     }

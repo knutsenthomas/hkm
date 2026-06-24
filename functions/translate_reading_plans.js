@@ -119,8 +119,10 @@ async function translateAllPlans() {
     for (const doc of snap.docs) {
       const docData = doc.data();
       
-      // Skip if translations are already present and fully populated
-      if (docData.translations && docData.translations.en && docData.translations.es) {
+      // Skip if translations are already present and fully populated (including introduction if the source has one)
+      const hasEnIntro = docData.introduction ? (docData.translations && docData.translations.en && docData.translations.en.introduction) : true;
+      const hasEsIntro = docData.introduction ? (docData.translations && docData.translations.es && docData.translations.es.introduction) : true;
+      if (docData.translations && docData.translations.en && docData.translations.es && hasEnIntro && hasEsIntro) {
         console.log(`Skipping plan ${doc.id} ("${docData.title}") - Translations already exist.`);
         continue;
       }
@@ -128,55 +130,72 @@ async function translateAllPlans() {
       console.log(`--------------------------------------------------`);
       console.log(`Translating plan ID: ${doc.id} ("${docData.title}")`);
 
-      // Prepare minimal payload for translation
-      const sourceObj = {
-        title: docData.title || "",
-        subtitle: docData.subtitle || "",
-        description: docData.description || "",
-        days: (docData.days || []).map(day => ({
-          dayNumber: day.dayNumber,
-          prayerFocus: day.prayerFocus || "",
-          resources: (day.resources || []).map(res => ({
-            title: res.title || ""
-          }))
-        }))
-      };
-
-      console.log("Translating to English...");
-      const enData = await translateJSONWithGemini(sourceObj, 'en');
-
-      console.log("Translating to Spanish...");
-      const esData = await translateJSONWithGemini(sourceObj, 'es');
-
-      // Reconstruct translations
       const translations = docData.translations || {};
 
-      // Map translations to correct objects to preserve other fields (like url, type, verses)
-      const mapTranslation = (transData, langCode) => {
-        return {
-          title: transData.title || docData.title,
-          subtitle: transData.subtitle || docData.subtitle || "",
-          description: transData.description || docData.description || "",
-          days: (docData.days || []).map((day, idx) => {
-            const transDay = transData.days ? transData.days.find(d => d.dayNumber === day.dayNumber) || transData.days[idx] : null;
-            return {
-              dayNumber: day.dayNumber,
-              prayerFocus: transDay ? transDay.prayerFocus : day.prayerFocus,
-              verses: day.verses || "",
-              resources: (day.resources || []).map((res, resIdx) => {
-                const transRes = (transDay && transDay.resources) ? transDay.resources[resIdx] : null;
-                return {
-                  ...res,
-                  title: transRes ? transRes.title : res.title
-                };
-              })
-            };
-          })
+      // If we only need to translate the introduction (i.e. other translations already exist)
+      if (docData.introduction && translations.en && translations.es) {
+        console.log("Translations already exist for fields/days. Translating ONLY the introduction...");
+        
+        if (!translations.en.introduction) {
+          console.log("Translating introduction to English...");
+          translations.en.introduction = await translateJSONWithGemini(docData.introduction, 'en');
+        }
+        
+        if (!translations.es.introduction) {
+          console.log("Translating introduction to Spanish...");
+          translations.es.introduction = await translateJSONWithGemini(docData.introduction, 'es');
+        }
+      } else {
+        // Fallback: full translation of entire document
+        // Prepare minimal payload for translation
+        const sourceObj = {
+          title: docData.title || "",
+          subtitle: docData.subtitle || "",
+          description: docData.description || "",
+          introduction: docData.introduction || null,
+          days: (docData.days || []).map(day => ({
+            dayNumber: day.dayNumber,
+            prayerFocus: day.prayerFocus || "",
+            resources: (day.resources || []).map(res => ({
+              title: res.title || ""
+            }))
+          }))
         };
-      };
 
-      translations.en = mapTranslation(enData, 'en');
-      translations.es = mapTranslation(esData, 'es');
+        console.log("Translating entire plan to English...");
+        const enData = await translateJSONWithGemini(sourceObj, 'en');
+
+        console.log("Translating entire plan to Spanish...");
+        const esData = await translateJSONWithGemini(sourceObj, 'es');
+
+        // Map translations to correct objects to preserve other fields (like url, type, verses)
+        const mapTranslation = (transData, langCode) => {
+          return {
+            title: transData.title || docData.title,
+            subtitle: transData.subtitle || docData.subtitle || "",
+            description: transData.description || docData.description || "",
+            introduction: transData.introduction || null,
+            days: (docData.days || []).map((day, idx) => {
+              const transDay = transData.days ? transData.days.find(d => d.dayNumber === day.dayNumber) || transData.days[idx] : null;
+              return {
+                dayNumber: day.dayNumber,
+                prayerFocus: transDay ? transDay.prayerFocus : day.prayerFocus,
+                verses: day.verses || "",
+                resources: (day.resources || []).map((res, resIdx) => {
+                  const transRes = (transDay && transDay.resources) ? transDay.resources[resIdx] : null;
+                  return {
+                    ...res,
+                    title: transRes ? transRes.title : res.title
+                  };
+                })
+              };
+            })
+          };
+        };
+
+        translations.en = mapTranslation(enData, 'en');
+        translations.es = mapTranslation(esData, 'es');
+      }
 
       // Update Firestore
       await db.collection('reading_plans').doc(doc.id).update({
