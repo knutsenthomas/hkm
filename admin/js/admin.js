@@ -15480,25 +15480,14 @@ class AdminManager {
             return this.wixProducts;
         }
         try {
-            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-stats');
+            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products');
             const data = await res.json();
-            if (data.success && data.orders) {
-                const productsMap = new Map();
-                data.orders.forEach(o => {
-                    (o.lineItems || []).forEach(item => {
-                        const id = item.catalogReference?.catalogItemId || item.rootCatalogItemId || '';
-                        const name = item.productName?.translated || item.productName?.original || '';
-                        const price = parseFloat(item.price?.amount || 0);
-                        if (name && id) {
-                            productsMap.set(id, { id, name, price });
-                        }
-                    });
-                });
-                this.wixProducts = Array.from(productsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+            if (data.success && data.products) {
+                this.wixProducts = data.products.sort((a, b) => a.name.localeCompare(b.name));
                 return this.wixProducts;
             }
         } catch (e) {
-            console.warn('Kunne ikke hente produkter fra Wix-historikk:', e);
+            console.warn('Kunne ikke hente produkter fra Wix API:', e);
         }
         return [];
     }
@@ -15510,10 +15499,35 @@ class AdminManager {
         const products = this.wixProducts || [];
         const normQuery = (query || '').toLowerCase().trim();
 
+        // Synonym mapping for Norwegian search queries
+        let searchTerms = [normQuery];
+        if (normQuery === 'kopp' || normQuery === 'kopper') {
+            searchTerms.push('mug', 'krus', 'cup');
+        } else if (normQuery === 'krus' || normQuery === 'cup') {
+            searchTerms.push('kopp', 'mug');
+        } else if (normQuery === 'genser' || normQuery === 'gensere') {
+            searchTerms.push('hoodie', 'sweater', 'zip');
+        } else if (normQuery === 't-skjorte' || normQuery === 't-skjorter' || normQuery === 'skjorte') {
+            searchTerms.push('t-shirt', 'tee');
+        } else if (normQuery === 'plakat' || normQuery === 'plakater') {
+            searchTerms.push('poster');
+        }
+
         let html = '<option value="custom" data-price="0">Egendefinert vare / Annet</option>';
         products.forEach(p => {
-            if (!normQuery || p.name.toLowerCase().includes(normQuery)) {
+            if (!normQuery) {
                 html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
+            } else {
+                const nameLower = (p.name || '').toLowerCase();
+                const descLower = (p.description || '').toLowerCase();
+                
+                const matches = searchTerms.some(term => 
+                    nameLower.includes(term) || descLower.includes(term)
+                );
+                
+                if (matches) {
+                    html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
+                }
             }
         });
         productSelect.innerHTML = html;
