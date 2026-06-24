@@ -18682,7 +18682,7 @@ class AdminManager {
                                 <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                                     <div style="position: relative; flex: 1;">
                                         <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
-                                        <input type="text" id="manual-sale-product-search" placeholder="Søk i produkter..." style="width: 100%; padding: 10px 16px 10px 40px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s ease; font-size: 0.875rem;">
+                                        <input type="text" id="manual-sale-product-search" placeholder="Søk i produkter..." style="width: 100%; padding: 10px 16px 10px 40px !important; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s ease; font-size: 0.875rem;">
                                     </div>
                                 </div>
                                 <select id="manual-sale-product" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
