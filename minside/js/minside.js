@@ -1409,6 +1409,17 @@ class MinSideManager {
                 (async () => {
                     try {
                         const msg = firebase.messaging();
+                        
+                        // Handle foreground push notifications
+                        msg.onMessage((payload) => {
+                            console.log('[MinSide] Foreground message received:', payload);
+                            const title = payload.notification?.title || 'Ny oppdatering';
+                            const body = payload.notification?.body || '';
+                            if (typeof window.showToast === 'function') {
+                                window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
+                            }
+                        });
+
                         const registration = await Promise.race([
                             navigator.serviceWorker.ready,
                             new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
@@ -2544,6 +2555,17 @@ class MinSideManager {
 
             if (window.hkmLogger) window.hkmLogger.log("FCM: Henter service worker registration...");
             const msg = firebase.messaging();
+            
+            // Handle foreground push notifications
+            msg.onMessage((payload) => {
+                console.log('[MinSide] Foreground message received:', payload);
+                const title = payload.notification?.title || 'Ny oppdatering';
+                const body = payload.notification?.body || '';
+                if (typeof window.showToast === 'function') {
+                    window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
+                }
+            });
+
             const registration = await Promise.race([
                 navigator.serviceWorker.ready,
                 new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
