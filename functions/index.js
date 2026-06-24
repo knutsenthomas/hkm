@@ -7161,3 +7161,177 @@ exports.getBibleChapterAudio = onCall({
     throw new HttpsError("internal", `Kunne ikke generere lyd for kapittelet: ${error.message}`);
   }
 });
+
+/**
+ * Daglig planlagt jobb for å sende leseplanpåminnelser (både push-varsel og e-post).
+ * Kjører hver dag klokken 07:00.
+ */
+exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) => {
+  console.log("⏰ Starter daglig kjøring av leseplanvarslinger...");
+
+  try {
+    // 1. Hent alle brukere
+    const usersSnap = await db.collection("users").get();
+    console.log(`Fant ${usersSnap.size} brukere i databasen.`);
+
+    for (const userDoc of usersSnap.docs) {
+      const userData = userDoc.data();
+      const userId = userDoc.id;
+
+      // Sjekk om brukeren har aktivert e-post eller push for leseplaner
+      const wantPush = userData.pushEnabled !== false && userData.pushReadingPlans !== false;
+      const wantEmail = userData.emailConsent !== false && userData.emailReadingPlans !== false && userData.email;
+
+      if (!wantPush && !wantEmail) {
+        continue;
+      }
+
+      // 2. Hent aktive (ikke fullførte) leseplaner for denne brukeren
+      const activePlansSnap = await db.collection("users")
+        .doc(userId)
+        .collection("reading_plans")
+        .where("completed", "==", false)
+        .get();
+
+      if (activePlansSnap.empty) {
+        continue;
+      }
+
+      // Send varsling for hver aktive plan
+      for (const activePlanDoc of activePlansSnap.docs) {
+        const activePlanData = activePlanDoc.data();
+        const planId = activePlanData.planId;
+        const currentDayNum = activePlanData.currentDay || 1;
+
+        // Hent global leseplan-informasjon
+        const globalPlanSnap = await db.collection("reading_plans").doc(planId).get();
+        if (!globalPlanSnap.exists) {
+          console.warn(`Leseplan ${planId} finnes ikke i den globale samlingen.`);
+          continue;
+        }
+
+        const globalPlanData = globalPlanSnap.data();
+        const planTitle = globalPlanData.title;
+
+        // Finn konfigurasjonen for gjeldende dag
+        const currentDayConfig = (globalPlanData.days || []).find(d => d.dayNumber === currentDayNum);
+        if (!currentDayConfig) {
+          console.warn(`Fant ikke dag ${currentDayNum} i leseplan ${planId}.`);
+          continue;
+        }
+
+        const verses = currentDayConfig.verses || "";
+        const prayerFocus = currentDayConfig.prayerFocus || "Be over ordene du har lest i dag.";
+
+        // Bygg HTML-kortet for dagens lesing
+        const readingContentHtml = `
+          <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin: 20px 0;">
+            <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
+            <h3 style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2;">Dag ${currentDayNum} - ${planTitle}</h3>
+            <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: ${verses}</p>
+
+            <!-- Devotional Box -->
+            <div style="background-color: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+              <strong style="color: #d17d39; display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; line-height: 1;">Dagens Andakt & Bønn</strong>
+              <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.5; font-weight: 500;">${prayerFocus}</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px;">
+              <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);">
+                Fortsett lesingen i nettleser
+              </a>
+            </div>
+          </div>
+        `;
+
+        // A. Send Push-varsel hvis aktivert
+        if (wantPush && userData.fcmTokens && userData.fcmTokens.length > 0) {
+          const pushTitle = `📖 Dagens bibellesing: Dag ${currentDayNum}`;
+          const pushBody = `Dagens tekst er ${verses} fra leseplanen "${planTitle}". Klikk her for å åpne.`;
+
+          console.log(`Sender push-varsel til bruker ${userId} for plan ${planId}...`);
+          for (const token of userData.fcmTokens) {
+            try {
+              const message = {
+                token: token,
+                notification: {
+                  title: pushTitle,
+                  body: pushBody
+                },
+                data: {
+                  click_action: "https://www.hiskingdomministry.no/minside",
+                  planId: planId,
+                  dayNumber: String(currentDayNum)
+                }
+              };
+              await admin.messaging().send(message);
+              console.log(`Push-varsel sendt til token for bruker ${userId}`);
+            } catch (pushErr) {
+              console.warn(`Kunne ikke sende push til token for bruker ${userId}:`, pushErr.message);
+            }
+          }
+        }
+
+        // B. Send E-post hvis aktivert
+        if (wantEmail) {
+          console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
+
+          const defaultFallback = {
+            subject: "Dagens bibellesing: Dag {{day}} - {{title}}",
+            body: `<h2>Hei {{name}}!</h2>\n<p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>\n<p>{{reading_content}}</p>\n<p>Ha en velsignet dag!</p>\n<p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>`
+          };
+          const template = await getEmailTemplate("daily_bible_reading", defaultFallback);
+
+          const name = userData.displayName || "bibelleser";
+          const emailSubject = template.subject
+            .replace("{{day}}", String(currentDayNum))
+            .replace("{{title}}", planTitle);
+
+          const emailBody = template.body
+            .replace("{{name}}", name)
+            .replace("{{day}}", String(currentDayNum))
+            .replace("{{title}}", planTitle)
+            .replace("{{reading_content}}", readingContentHtml);
+
+          const html = `
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+              <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+                <!-- Header -->
+                <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                  <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                  <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+                </div>
+
+                <!-- Body -->
+                <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                  ${emailBody}
+                </div>
+
+                <!-- Footer -->
+                <div style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                  <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                  <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          try {
+            await sendEmail({
+              to: userData.email,
+              subject: emailSubject,
+              html: html,
+              text: `Dagens bibellesing: Dag ${currentDayNum} - ${verses}.`
+            });
+            console.log(`Leseplan-epost vellykket sendt til ${userData.email}`);
+          } catch (emailErr) {
+            console.error(`Kunne ikke sende leseplan-epost til ${userData.email}:`, emailErr);
+          }
+        }
+      }
+    }
+    console.log("Daglig kjøring av leseplanvarslinger fullført.");
+  } catch (err) {
+    console.error("Feil under kjøring av leseplanvarslinger:", err);
+  }
+});
