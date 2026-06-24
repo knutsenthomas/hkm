@@ -23653,13 +23653,13 @@ class AdminManager {
                     }
                     rawTextarea.style.display = 'none';
                     quillContainer.style.display = 'block';
-                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px);">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
+                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(3px);">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
                 } else {
                     // Switch to raw HTML
                     rawTextarea.value = this.quill ? this.quill.root.innerHTML : "";
                     quillContainer.style.display = 'none';
                     rawTextarea.style.display = 'block';
-                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px);">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
+                    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(3px);">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
                 }
             };
         }
@@ -23861,7 +23861,7 @@ class AdminManager {
                 quillContainer.style.display = 'none';
             }
             if (toggleBtn) {
-                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px);">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
+                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(3px);">edit</span><span style="display: inline-flex; align-items: center; line-height: 1;">Visuell editor</span>';
             }
             if (warningEl) {
                 warningEl.textContent = 'OBS: Denne malen bruker avansert HTML-struktur. Vi anbefaler å redigere i HTML-modus for å bevare design og stiler.';
@@ -23878,7 +23878,7 @@ class AdminManager {
                 quillContainer.style.display = 'block';
             }
             if (toggleBtn) {
-                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(1px);">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
+                toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transform: translateY(3px);">code</span><span style="display: inline-flex; align-items: center; line-height: 1;">HTML-kode</span>';
             }
             if (warningEl) {
                 warningEl.style.display = 'none';
