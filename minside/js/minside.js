@@ -2014,8 +2014,8 @@ class MinSideManager {
                             </label>
                         </div>
                     </div>
-                    <div class="setting-row" style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                        <div>
+                    <div class="setting-row" style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px; display: block !important;">
+                        <div style="margin-bottom: 12px;">
                             <div class="setting-row-label">${t('profile.notificationTime')}</div>
                             <div class="setting-row-sub">${t('profile.notificationTimeSub')}</div>
                         </div>
