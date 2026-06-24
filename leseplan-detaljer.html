@@ -1164,6 +1164,7 @@
     <!-- Fetch & Render Logic -->
     <script type="module">
         (async function () {
+            const lang = document.documentElement.lang || 'no';
             // Wait for firebaseService to be registered on window
             let service = window.firebaseService;
             if (!service) {
