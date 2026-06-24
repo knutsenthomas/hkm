@@ -7338,7 +7338,7 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
         </div>
 
         <div style="text-align: center; margin-top: 24px;">
-          <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+          <a href="https://www.hiskingdomministry.no/leseplan-detaljer?id={{planId}}&day={{day}}" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
             Fortsett lesingen i nettleser
           </a>
         </div>
@@ -7435,7 +7435,8 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
               .replace(/\{\{day\}\}/g, String(currentDayNum))
               .replace(/\{\{title\}\}/g, planTitle)
               .replace(/\{\{passage\}\}/g, verses)
-              .replace(/\{\{devotional\}\}/g, prayerFocus);
+              .replace(/\{\{devotional\}\}/g, prayerFocus)
+              .replace(/\{\{planId\}\}/g, planId);
           }
 
           try {

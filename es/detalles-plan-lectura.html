@@ -1476,6 +1476,35 @@
                         });
                     }
 
+                    // Highlight and scroll to specific day if day parameter is present
+                    const dayParam = urlParams.get('day');
+                    if (dayParam) {
+                        const targetDayNum = parseInt(dayParam, 10);
+                        if (!isNaN(targetDayNum)) {
+                            // Expand the days list if needed
+                            if (showExpandButton && targetDayNum > maxInitialDays) {
+                                const btnShowAll = document.getElementById('btn-show-all-days');
+                                if (btnShowAll) btnShowAll.click();
+                            }
+                            
+                            // Highlight the day item
+                            setTimeout(() => {
+                                const cb = document.querySelector(`.day-checkbox[data-day="${targetDayNum}"]`);
+                                if (cb) {
+                                    const dayItem = cb.closest('.day-item');
+                                    if (dayItem) {
+                                        dayItem.style.border = '2px dashed var(--primary-orange)';
+                                        dayItem.style.backgroundColor = 'rgba(209, 125, 57, 0.04)';
+                                        dayItem.style.borderRadius = '12px';
+                                        dayItem.style.padding = '16px';
+                                        dayItem.style.transition = 'all 0.3s ease';
+                                        dayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }
+                            }, 300);
+                        }
+                    }
+
                     // Auth Listener to fetch progress from Firestore
                     if (window.firebase && typeof firebase.auth === 'function') {
                         firebase.auth().onAuthStateChanged(async (user) => {
