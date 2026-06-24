@@ -1934,105 +1934,164 @@ class MinSideManager {
                     </div>
                 </div>
 
-                <!-- Push Notifications Toggle -->
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <h3>${t('profile.notificationPreferences')}</h3>
+                <!-- Push & Email Notifications Card -->
+                <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
+                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">notifications_active</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">${t('profile.notificationPreferences')}</h3>
                     </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-row-label">${t('profile.pushNotifications')}</div>
-                            <div class="setting-row-sub">${t('profile.pushNotificationsSub')}</div>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" id="push-toggle" ${p.pushEnabled ? 'checked' : ''}>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="push-sub-settings" id="push-sub-settings" style="${p.pushEnabled ? '' : 'display:none;'}">
-                        <div class="setting-row setting-row-sub-item">
-                            <div>
-                                <div class="setting-row-label">${t('profile.pushTeachings')}</div>
-                                <div class="setting-row-sub">${t('profile.pushTeachingsSub')}</div>
+                    
+                    <div style="padding: 16px 24px;">
+                        
+                        <!-- PUSH SETTINGS GROUP -->
+                        <div style="margin-bottom: 20px;">
+                            <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 16px;">
+                                    <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">send_to_mobile</span>
+                                    <div>
+                                        <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.pushNotifications')}</div>
+                                        <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.pushNotificationsSub')}</div>
+                                    </div>
+                                </div>
+                                <label class="toggle" style="flex-shrink: 0;">
+                                    <input type="checkbox" id="push-toggle" ${p.pushEnabled ? 'checked' : ''}>
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
-                            <label class="toggle toggle-sm">
-                                <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-row setting-row-sub-item">
-                            <div>
-                                <div class="setting-row-label">${t('profile.pushPodcasts')}</div>
-                                <div class="setting-row-sub">${t('profile.pushPodcastsSub')}</div>
+                            
+                            <!-- SUB-SETTING NESTED CARD -->
+                            <div class="push-sub-settings" id="push-sub-settings" style="margin-top: 8px; margin-left: 12px; border-left: 2px solid #e2e8f0; padding-left: 16px; transition: all 0.3s ease; ${p.pushEnabled ? '' : 'display:none;'}">
+                                
+                                <!-- Ny undervisning -->
+                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">school</span>
+                                        <div>
+                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushTeachings')}</div>
+                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushTeachingsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
+                                        <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Ny podcast -->
+                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">podcasts</span>
+                                        <div>
+                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushPodcasts')}</div>
+                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushPodcastsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
+                                        <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Nytt blogginnlegg -->
+                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">rate_review</span>
+                                        <div>
+                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushBlogs')}</div>
+                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushBlogsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
+                                        <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Bibel- og leseplaner -->
+                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">auto_stories</span>
+                                        <div>
+                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushReadingPlans')}</div>
+                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
+                                        <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <label class="toggle toggle-sm">
-                                <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
                         </div>
-                        <div class="setting-row setting-row-sub-item">
-                            <div>
-                                <div class="setting-row-label">${t('profile.pushBlogs')}</div>
-                                <div class="setting-row-sub">${t('profile.pushBlogsSub')}</div>
+                        
+                        <div style="border-top: 1px solid #f1f5f9; margin: 16px 0;"></div>
+                        
+                        <!-- EMAIL SETTINGS GROUP -->
+                        <div style="margin-bottom: 20px;">
+                            <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 16px;">
+                                    <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">mail</span>
+                                    <div>
+                                        <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.emailNotifications')}</div>
+                                        <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.emailNotificationsSub')}</div>
+                                    </div>
+                                </div>
+                                <label class="toggle" style="flex-shrink: 0;">
+                                    <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
-                            <label class="toggle toggle-sm">
-                                <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <div class="setting-row setting-row-sub-item">
-                            <div>
-                                <div class="setting-row-label">${t('profile.pushReadingPlans')}</div>
-                                <div class="setting-row-sub">${t('profile.pushReadingPlansSub')}</div>
+                            
+                            <!-- SUB-SETTING NESTED CARD -->
+                            <div class="email-sub-settings" id="email-sub-settings" style="margin-top: 8px; margin-left: 12px; border-left: 2px solid #e2e8f0; padding-left: 16px; transition: all 0.3s ease; ${p.emailConsent !== false ? '' : 'display:none;'}">
+                                
+                                <!-- Daglige leseplanoppdateringer -->
+                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">today</span>
+                                        <div>
+                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.emailReadingPlans')}</div>
+                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.emailReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
+                                        <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                            <label class="toggle toggle-sm">
-                                <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
                         </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-row-label">${t('profile.emailNotifications')}</div>
-                            <div class="setting-row-sub">${t('profile.emailNotificationsSub')}</div>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="email-sub-settings" id="email-sub-settings" style="${p.emailConsent !== false ? '' : 'display:none;'}">
-                        <div class="setting-row setting-row-sub-item">
-                            <div>
-                                <div class="setting-row-label">${t('profile.emailReadingPlans')}</div>
-                                <div class="setting-row-sub">${t('profile.emailReadingPlansSub')}</div>
+                        
+                        <div style="border-top: 1px solid #f1f5f9; margin: 16px 0;"></div>
+                        
+                        <!-- TIME PICKER GROUP -->
+                        <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; flex-direction: column; align-items: flex-start; gap: 14px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">schedule</span>
+                                <div>
+                                    <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.notificationTime')}</div>
+                                    <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.notificationTimeSub')}</div>
+                                </div>
                             </div>
-                            <label class="toggle toggle-sm">
-                                <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
+                            
+                            <div style="position: relative; width: 130px; margin-left: 34px;">
+                                <select id="notification-time-select" class="form-control" style="width: 100%; height: 42px !important; line-height: 40px !important; border-radius: 10px; border: 1.5px solid #cbd5e1; font-weight: 700; font-size: 14px; color: #1b4965; padding: 0 36px 0 16px !important; cursor: pointer; background-color: #f8fafc; outline: none; -webkit-appearance: none; appearance: none; background-image: url(&quot;data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e&quot;) !important; background-repeat: no-repeat !important; background-position: right 14px center !important; background-size: 12px !important;">
+                                    ${[...Array(24).keys()].map(h => {
+                                        const padHour = String(h).padStart(2, '0');
+                                        const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                                    }).join('')}
+                                </select>
+                            </div>
                         </div>
+                        
                     </div>
-                    <div class="setting-row" style="margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 16px; display: block !important;">
-                        <div style="margin-bottom: 12px;">
-                            <div class="setting-row-label">${t('profile.notificationTime')}</div>
-                            <div class="setting-row-sub">${t('profile.notificationTimeSub')}</div>
-                        </div>
-                        <select id="notification-time-select" class="form-control" style="width: 100px; height: 38px !important; line-height: 36px !important; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 14px !important; padding-right: 30px !important; cursor: pointer; text-align: center; display: inline-block !important;">
-                            ${[...Array(24).keys()].map(h => {
-                                const padHour = String(h).padStart(2, '0');
-                                const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
-                                return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
-                            }).join('')}
-                        </select>
-                    </div>
-                    <div class="ms-card-footer-pad">
-                        <div class="edit-form-actions" style="justify-content:flex-start">
-                            <button class="btn btn-primary" id="save-prefs-btn">
-                                <span class="material-symbols-outlined">save</span> ${t('profile.savePreferences')}
-                            </button>
-                        </div>
+                    
+                    <!-- FOOTER ACTIONS -->
+                    <div style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-start;">
+                        <button class="btn btn-primary" id="save-prefs-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}
+                        </button>
                     </div>
                 </div>
 
