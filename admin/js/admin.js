@@ -13184,17 +13184,20 @@ class AdminManager {
 
             if (!fileInput || !button || !urlInput) return;
 
-            button.onclick = async () => {
+            // Make clicking the button open the file dialog
+            button.onclick = () => {
+                fileInput.click();
+            };
+
+            // Trigger the upload automatically when a file is selected
+            fileInput.onchange = async () => {
                 if (!firebaseService.isInitialized) {
                     this.showToast('Firebase er ikke konfigurert. Kan ikke laste opp.', 'error', 5000);
                     return;
                 }
 
                 const file = fileInput.files && fileInput.files[0];
-                if (!file) {
-                    this.showToast('Velg en fil for opplasting.', 'warning', 3000);
-                    return;
-                }
+                if (!file) return;
 
                 button.disabled = true;
                 button.textContent = 'Laster opp...';
@@ -13205,12 +13208,15 @@ class AdminManager {
                     const url = await firebaseService.uploadImage(file, uploadPath);
                     urlInput.value = url;
                     this.updatePreview(previewId, url);
+                    this.showToast('Filen ble lastet opp med suksess!', 'success', 3000);
                 } catch (err) {
                     console.error('Upload error:', err);
                     this.showToast('Feil ved opplasting. Prøv igjen.', 'error', 5000);
                 } finally {
                     button.disabled = false;
                     button.textContent = idleText;
+                    // Clear value so the same file can be selected again
+                    fileInput.value = '';
                 }
             };
         };
