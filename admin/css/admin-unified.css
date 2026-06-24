@@ -5524,18 +5524,34 @@ body.builder-active .main-header [id="admin-avatar"] {
   border-radius: 12px;
   overflow: hidden;
   gap: 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition: all 0.25s ease;
+}
+
+.design-ui-upload-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .design-ui-upload-card-preview {
   width: 160px;
   min-height: 120px;
   flex-shrink: 0;
-  background: #f8fafc;
+  background-color: #f8fafc;
+  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
   border-right: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.design-ui-upload-card-preview:hover {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
 }
 
 .design-ui-upload-card-preview img {
@@ -5543,6 +5559,7 @@ body.builder-active .main-header [id="admin-avatar"] {
   max-height: 100px;
   object-fit: contain;
   border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .design-ui-upload-card-placeholder {
@@ -5593,8 +5610,17 @@ body.builder-active .main-header [id="admin-avatar"] {
 .design-ui-upload-url-input {
   flex: 1;
   min-width: 0;
-  height: 36px !important;
+  height: 38px !important;
   font-size: 13px !important;
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  transition: all 0.2s ease !important;
+}
+
+.design-ui-upload-url-input:focus {
+  border-color: #1B4965 !important;
+  box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1) !important;
+  outline: none !important;
 }
 
 .design-ui-upload-card-btns {
@@ -5605,6 +5631,14 @@ body.builder-active .main-header [id="admin-avatar"] {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .design-ui-branding-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
 }
 
 /* --- Search Suggestions UI --- */

@@ -13181,13 +13181,19 @@ class AdminManager {
             const fileInput = document.getElementById(fileInputId);
             const button = document.getElementById(buttonId);
             const urlInput = document.getElementById(urlInputId);
+            const previewContainer = document.getElementById(previewId);
 
             if (!fileInput || !button || !urlInput) return;
 
-            // Make clicking the button open the file dialog
-            button.onclick = () => {
+            const triggerSelect = () => {
                 fileInput.click();
             };
+
+            // Clicking either the button or the preview container opens the file dialog
+            button.onclick = triggerSelect;
+            if (previewContainer) {
+                previewContainer.onclick = triggerSelect;
+            }
 
             // Trigger the upload automatically when a file is selected
             fileInput.onchange = async () => {
@@ -13200,7 +13206,7 @@ class AdminManager {
                 if (!file) return;
 
                 button.disabled = true;
-                button.textContent = 'Laster opp...';
+                button.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:16px;vertical-align:-3px;animation:spin 1s linear infinite;">sync</span> Laster opp...';
 
                 try {
                     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -13214,15 +13220,15 @@ class AdminManager {
                     this.showToast('Feil ved opplasting. Prøv igjen.', 'error', 5000);
                 } finally {
                     button.disabled = false;
-                    button.textContent = idleText;
+                    button.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span> ${idleText}`;
                     // Clear value so the same file can be selected again
                     fileInput.value = '';
                 }
             };
         };
 
-        wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
-        wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
+        wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp');
+        wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp');
     }
 
     updatePreview(containerId, url) {
