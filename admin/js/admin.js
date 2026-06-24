@@ -12727,7 +12727,7 @@ class AdminManager {
                                                 <div class="design-ui-upload-card-btns">
                                                     <input type="file" id="site-logo-file" accept="image/*" style="display:none;">
                                                     <button class="btn btn-primary btn-sm" id="upload-logo-btn" type="button" onclick="document.getElementById('site-logo-file').click()">
-                                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span>
+                                                        <span class="material-symbols-outlined">upload</span>
                                                         Last opp
                                                     </button>
                                                 </div>
@@ -12751,7 +12751,7 @@ class AdminManager {
                                                 <div class="design-ui-upload-card-btns">
                                                     <input type="file" id="site-favicon-file" accept="image/png,image/x-icon,image/svg+xml" style="display:none;">
                                                     <button class="btn btn-primary btn-sm" id="upload-favicon-btn" type="button" onclick="document.getElementById('site-favicon-file').click()">
-                                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span>
+                                                        <span class="material-symbols-outlined">upload</span>
                                                         Last opp
                                                     </button>
                                                 </div>
@@ -13206,7 +13206,7 @@ class AdminManager {
                 if (!file) return;
 
                 button.disabled = true;
-                button.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:16px;vertical-align:-3px;animation:spin 1s linear infinite;">sync</span> Laster opp...';
+                button.innerHTML = '<span class="material-symbols-outlined spin" style="animation:spin 1s linear infinite;">sync</span> Laster opp...';
 
                 try {
                     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -13220,7 +13220,7 @@ class AdminManager {
                     this.showToast('Feil ved opplasting. Prøv igjen.', 'error', 5000);
                 } finally {
                     button.disabled = false;
-                    button.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span> ${idleText}`;
+                    button.innerHTML = `<span class="material-symbols-outlined">upload</span> ${idleText}`;
                     // Clear value so the same file can be selected again
                     fileInput.value = '';
                 }
