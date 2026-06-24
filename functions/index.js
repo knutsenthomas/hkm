@@ -7225,15 +7225,15 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
 
         // Bygg HTML-kortet for dagens lesing
         const readingContentHtml = `
-          <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin: 20px 0;">
+          <div class="hkm-reading-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin: 20px 0; text-align: left;">
             <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-            <h3 style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2;">Dag ${currentDayNum} - ${planTitle}</h3>
-            <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: ${verses}</p>
+            <h3 class="hkm-reading-title" style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dag \${currentDayNum} - \${planTitle}</h3>
+            <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: \${verses}</p>
 
             <!-- Devotional Box -->
-            <div style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 24px; border-radius: 0 12px 12px 0; margin-bottom: 32px;">
-              <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2;">Dagens Andakt & Bønn</strong>
-              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500;">${prayerFocus}</p>
+            <div class="hkm-devotional-box" style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 32px; text-align: left;">
+              <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dagens Andakt & Bønn</strong>
+              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
             </div>
 
             <div style="text-align: center; margin-top: 24px;">
@@ -7276,7 +7276,28 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
         if (wantEmail) {
           console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
 
-          const defaultFallbackBody = `<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+          const defaultFallbackBody = `<style>
+  @media only screen and (max-width: 600px) {
+    .hkm-email-container {
+      padding: 16px 10px !important;
+    }
+    .hkm-email-body {
+      padding: 24px 16px !important;
+    }
+    .hkm-reading-card {
+      padding: 16px !important;
+      margin: 16px 0 !important;
+    }
+    .hkm-devotional-box {
+      padding: 16px !important;
+      margin-bottom: 24px !important;
+    }
+    .hkm-reading-title {
+      font-size: 18px !important;
+    }
+  }
+</style>
+<div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
   <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
     
     <!-- Header -->
@@ -7286,20 +7307,20 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
     </div>
 
     <!-- Body -->
-    <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+    <div class="hkm-email-body" style="padding: 32px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
       <h2>Hei {{name}}!</h2>
       <p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
 
       <!-- Dagens lesekort -->
-      <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin: 20px 0;">
+      <div class="hkm-reading-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin: 20px 0; text-align: left;">
         <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-        <h3 style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2;">Dag {{day}} - {{title}}</h3>
-        <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px;">Bibeltekst: {{passage}}</p>
+        <h3 class="hkm-reading-title" style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
+        <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
 
         <!-- Devotional Box -->
-        <div style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 24px; border-radius: 0 12px 12px 0; margin-bottom: 32px;">
-          <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2;">Dagens Andakt & Bønn</strong>
-          <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500;">{{devotional}}</p>
+        <div class="hkm-devotional-box" style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 32px; text-align: left;">
+          <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dagens Andakt & Bønn</strong>
+          <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
         </div>
 
         <div style="text-align: center; margin-top: 24px;">
@@ -7337,7 +7358,28 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
             // Backward compatibility with simplified template
             html = html.replace(/\{\{reading_content\}\}/g, readingContentHtml);
             html = `
-              <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 20px; text-align: center; margin: 0 auto; max-width: 600px;">
+              <style>
+                @media only screen and (max-width: 600px) {
+                  .hkm-email-container {
+                    padding: 16px 10px !important;
+                  }
+                  .hkm-email-body {
+                    padding: 24px 16px !important;
+                  }
+                  .hkm-reading-card {
+                    padding: 16px !important;
+                    margin: 16px 0 !important;
+                  }
+                  .hkm-devotional-box {
+                    padding: 16px !important;
+                    margin-bottom: 24px !important;
+                  }
+                  .hkm-reading-title {
+                    font-size: 18px !important;
+                  }
+                }
+              </style>
+              <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
                 <div style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
                   <!-- Header -->
                   <div style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
@@ -7346,7 +7388,7 @@ exports.scheduledReadingNotifications = onSchedule("0 7 * * *", async (event) =>
                   </div>
 
                   <!-- Body -->
-                  <div style="padding: 40px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                  <div class="hkm-email-body" style="padding: 32px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
                     ${html}
                   </div>
 
