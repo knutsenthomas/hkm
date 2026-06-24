@@ -2208,6 +2208,7 @@ class MinSideManager {
             const btn = document.getElementById('save-prefs-btn');
             if (btn) { btn.disabled = true; }
             try {
+                if (window.hkmLogger) window.hkmLogger.log("Preferanser: Lagrer innstillinger...");
                 await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
                     {
                         pushEnabled,
@@ -2223,18 +2224,25 @@ class MinSideManager {
                     { merge: true }
                 );
                 
-                // Show immediate visual confirmation
+                // Show immediate visual confirmation on button
                 if (btn) { 
                     btn.textContent = '✓ Lagret!'; 
                 }
+                
+                const successMsg = "Preferansene dine ble lagret!";
                 if (typeof window.showToast === 'function') {
-                    window.showToast("Preferansene dine ble lagret!", "success", 4000);
+                    window.showToast(successMsg, "success", 4000);
+                } else {
+                    alert(successMsg);
                 }
 
                 // Request push notifications in the background so it doesn't block the UI
                 if (pushEnabled) {
                     this._requestPushPermission().catch(pushErr => {
                         console.warn('Background push registration failed:', pushErr);
+                        if (window.hkmLogger) {
+                            window.hkmLogger.warn("Background push registration failed: " + (pushErr.message || pushErr));
+                        }
                     });
                 }
 
@@ -2246,8 +2254,14 @@ class MinSideManager {
                 }, 2000);
             } catch (e) {
                 console.warn('save prefs:', e);
+                if (window.hkmLogger) {
+                    window.hkmLogger.error(`Save preferences failed: ${e.message || e}. Stack: ${e.stack || ''}`);
+                }
+                const errorMsg = "Kunne ikke lagre preferanser: " + (e.message || e);
                 if (typeof window.showToast === 'function') {
-                    window.showToast("Kunne ikke lagre preferanser: " + (e.message || e), "error", 5000);
+                    window.showToast(errorMsg, "error", 5000);
+                } else {
+                    alert(errorMsg);
                 }
                 if (btn) { 
                     btn.disabled = false; 
