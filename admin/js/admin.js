@@ -15497,18 +15497,24 @@ class AdminManager {
         const products = this.wixProducts || [];
         const normQuery = (query || '').toLowerCase().trim();
 
-        // Synonym mapping for Norwegian search queries
+        // Flexible stem-based synonym search.
+        // We match on ROOT STEMS so "kopper" hits "koppen", "Norgeskoppen" etc.
         let searchTerms = [normQuery];
-        if (normQuery === 'kopp' || normQuery === 'kopper') {
-            searchTerms.push('mug', 'krus', 'cup');
-        } else if (normQuery === 'krus' || normQuery === 'cup') {
-            searchTerms.push('kopp', 'mug');
-        } else if (normQuery === 'genser' || normQuery === 'gensere') {
-            searchTerms.push('hoodie', 'sweater', 'zip');
-        } else if (normQuery === 't-skjorte' || normQuery === 't-skjorter' || normQuery === 'skjorte') {
-            searchTerms.push('t-shirt', 'tee');
-        } else if (normQuery === 'plakat' || normQuery === 'plakater') {
-            searchTerms.push('poster');
+        const q = normQuery;
+        if (q.includes('kopp') || q.includes('krus') || q.includes('mug') || q.includes('cup')) {
+            searchTerms = ['kopp', 'krus', 'mug', 'cup', 'enamel', 'ceramic'];
+        } else if (q.includes('genser') || q.includes('hoodie') || q.includes('hettejakke') || q.includes('hettegenser') || q.includes('zip')) {
+            searchTerms = ['genser', 'hoodie', 'sweater', 'hettejakke', 'zip', 'hettegenser'];
+        } else if (q.includes('t-skjorte') || q.includes('tskjorte') || q.includes('t-shirt') || q.includes('tee') || (q.includes('skjorte') && !q.includes('hette'))) {
+            searchTerms = ['t-skjorte', 't-shirt', 'tee', 'skjorte'];
+        } else if (q.includes('plakat') || q.includes('poster') || q.includes('trykk')) {
+            searchTerms = ['plakat', 'poster', 'trykk', 'print'];
+        } else if (q.includes('klistremerke') || q.includes('sticker')) {
+            searchTerms = ['klistremerke', 'sticker'];
+        } else if (q.includes('bag') || q.includes('veske') || q.includes('tote')) {
+            searchTerms = ['bag', 'veske', 'tote', 'handlenett'];
+        } else if (q.includes('bok') || q.includes('book') || q.includes('fargelegg')) {
+            searchTerms = ['bok', 'book', 'fargelegg', 'coloring'];
         }
 
         const currentSelected = hiddenInput?.value || 'custom';
@@ -15523,6 +15529,7 @@ class AdminManager {
         }
 
         // Build image-grid cards
+
         const customSelected = currentSelected === 'custom' ? 'border:2px solid #1B4965; background:#f0f6fb;' : 'border:2px solid #e2e8f0; background:#fff;';
         let html = `
             <div class="wix-product-card" data-id="custom" data-price="0"
