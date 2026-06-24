@@ -23510,24 +23510,32 @@ class AdminManager {
             // Standardmaler som alltid bør finnes
             const defaultTemplates = [
                 { id: 'welcome_email', name: 'Velkomst-e-post', description: 'Sendes når en ny bruker registrerer seg.' },
-                { id: 'newsletter_confirmation', name: 'Nyhetsbrev-bekreftelse', description: 'Sendes ved påmelding til nyhetsbrev.' }
+                { id: 'newsletter_confirmation', name: 'Nyhetsbrev-bekreftelse', description: 'Sendes ved påmelding til nyhetsbrev.' },
+                { id: 'daily_bible_reading', name: 'Dagens bibellesing', description: 'Sendes som daglig e-postvarsel for leseplaner.' }
             ];
+
+            const loadedTemplates = await Promise.all(
+                defaultTemplates.map(async (t) => {
+                    const doc = await firebaseService.db.collection('email_templates').doc(t.id).get();
+                    return {
+                        ...t,
+                        data: doc.exists ? doc.data() : {}
+                    };
+                })
+            );
 
             tbody.innerHTML = '';
 
-            for (const t of defaultTemplates) {
-                const doc = await firebaseService.db.collection('email_templates').doc(t.id).get();
-                const data = doc.exists ? doc.data() : {};
-
+            for (const t of loadedTemplates) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                                                                                 <td>
                                                                                     <div class="user-info-cell">
-                                                                                        <span class="user-name">${t.name}</span>
+                                                                                        <span class="email-template-name">${t.name}</span>
                                                                                     </div>
                                                                                 </td>
                                                                                 <td><span class="text-muted">${t.description}</span></td>
-                                                                                <td>${data.updatedAt ? new Date(data.updatedAt).toLocaleDateString('no-NO') : 'Standard'}</td>
+                                                                                <td>${t.data.updatedAt ? new Date(t.data.updatedAt).toLocaleDateString('no-NO') : 'Standard'}</td>
                                                                                 <td class="col-actions">
                                                                                     <button class="icon-btn edit-template-btn" title="Rediger mal">
                                                                                         <span class="material-symbols-outlined">edit</span>
@@ -23536,7 +23544,7 @@ class AdminManager {
                                                                                 `;
 
                 tr.querySelector('.edit-template-btn').addEventListener('click', () => {
-                    this.openTemplateEditor(t.id, t.name, data);
+                    this.openTemplateEditor(t.id, t.name, t.data);
                 });
 
                 tbody.appendChild(tr);

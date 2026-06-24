@@ -254,7 +254,7 @@ body.admin-body {
     text-align: right;
 }
 
-.user-name {
+.user-name, .email-template-name {
     font-size: 14px;
     font-weight: 800;
     color: var(--text-main);

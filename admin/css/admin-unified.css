@@ -2250,7 +2250,7 @@ body.crm-body .crm-table {
   overflow: hidden;
 }
 
-.user-name {
+.user-name, .email-template-name {
   font-weight: 600;
   color: var(--admin-text, #0f172a);
 }
