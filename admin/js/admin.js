@@ -15434,6 +15434,27 @@ class AdminManager {
         if (statusInput) statusInput.value = 'completed';
         const methodInput = document.getElementById('manual-sale-method');
         if (methodInput) methodInput.value = 'vipps_manual';
+
+        // Reset search input
+        const searchInput = document.getElementById('manual-sale-product-search');
+        if (searchInput) searchInput.value = '';
+
+        // Populate wix products dropdown
+        const productSelect = document.getElementById('manual-sale-product');
+        if (productSelect) {
+            productSelect.innerHTML = '<option value="">Laster produkter...</option>';
+            this.fetchWixProducts().then(products => {
+                let html = '<option value="custom">Egendefinert vare / Annet</option>';
+                products.forEach(p => {
+                    html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
+                });
+                productSelect.innerHTML = html;
+            }).catch(err => {
+                console.warn('Kunne ikke laste produkter:', err);
+                productSelect.innerHTML = '<option value="custom">Egendefinert vare / Annet (Feil ved henting)</option>';
+            });
+        }
+
         modal.style.display = 'flex';
     }
 
@@ -15454,6 +15475,50 @@ class AdminManager {
         if (emailInput) emailInput.value = user.email || '';
     }
 
+    async fetchWixProducts() {
+        if (this.wixProducts && this.wixProducts.length > 0) {
+            return this.wixProducts;
+        }
+        try {
+            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-stats');
+            const data = await res.json();
+            if (data.success && data.orders) {
+                const productsMap = new Map();
+                data.orders.forEach(o => {
+                    (o.lineItems || []).forEach(item => {
+                        const id = item.catalogReference?.catalogItemId || item.rootCatalogItemId || '';
+                        const name = item.productName?.translated || item.productName?.original || '';
+                        const price = parseFloat(item.price?.amount || 0);
+                        if (name && id) {
+                            productsMap.set(id, { id, name, price });
+                        }
+                    });
+                });
+                this.wixProducts = Array.from(productsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+                return this.wixProducts;
+            }
+        } catch (e) {
+            console.warn('Kunne ikke hente produkter fra Wix-historikk:', e);
+        }
+        return [];
+    }
+
+    filterWixProducts(query) {
+        const productSelect = document.getElementById('manual-sale-product');
+        if (!productSelect) return;
+
+        const products = this.wixProducts || [];
+        const normQuery = (query || '').toLowerCase().trim();
+
+        let html = '<option value="custom" data-price="0">Egendefinert vare / Annet</option>';
+        products.forEach(p => {
+            if (!normQuery || p.name.toLowerCase().includes(normQuery)) {
+                html += `<option value="${p.id}" data-price="${p.price}">${p.name} (kr ${p.price},-)</option>`;
+            }
+        });
+        productSelect.innerHTML = html;
+    }
+
     async saveManualSale() {
         const saveBtn = document.getElementById('save-manual-sale-btn');
         const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
@@ -15466,6 +15531,20 @@ class AdminManager {
         const dateValue = getValue('manual-sale-date');
         const note = getValue('manual-sale-note');
         const reference = getValue('manual-sale-reference');
+        
+        // Wix product sync
+        const selectedProductId = getValue('manual-sale-product');
+        const quantity = Number(getValue('manual-sale-quantity')) || 1;
+        let productName = '';
+        let productId = '';
+        if (selectedProductId && selectedProductId !== 'custom') {
+            const product = this.wixProducts?.find(p => p.id === selectedProductId);
+            if (product) {
+                productName = product.name;
+                productId = product.id;
+            }
+        }
+
         const selectedUser = selectedUserId ? this.adminUserMap?.get(selectedUserId) : null;
         const resolvedUserId = selectedUserId || '';
         const resolvedName = buyerName || selectedUser?.displayName || selectedUser?.fullName || selectedUser?.email || 'Ukjent kjøper';
@@ -15488,6 +15567,43 @@ class AdminManager {
         }
 
         await this._runWriteLocked('manual-sale:create', async () => this._withButtonLoading(saveBtn, async () => {
+            let wixOrderId = null;
+            let wixOrderNumber = null;
+
+            // Only register in Wix if status is completed/succeeded/captured
+            const isCompletedStatus = ['completed', 'succeeded', 'captured'].includes(String(status).toLowerCase());
+
+            if (isCompletedStatus) {
+                try {
+                    const wixRes = await fetch('https://hiskingdomdesigns.no/api/create-manual-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            productId: productId || 'custom',
+                            productName: productName || note || 'Egendefinert vare',
+                            quantity: quantity,
+                            price: productId && productId !== 'custom' ? (amountNok / quantity) : amountNok,
+                            buyerName: resolvedName,
+                            buyerEmail: resolvedEmail,
+                            paymentMethod: method
+                        })
+                    });
+
+                    const wixData = await wixRes.json();
+                    if (wixData.success) {
+                        wixOrderId = wixData.orderId;
+                        wixOrderNumber = wixData.orderNumber;
+                    } else {
+                        throw new Error(wixData.error || 'Feil ved registrering i Wix');
+                    }
+                } catch (err) {
+                    this.showToast('Kunne ikke registrere i Wix: ' + err.message, 'error', 6000);
+                    throw err; // Cancel Firestore write
+                }
+            }
+
             const docRef = firebaseService.db.collection('donations').doc();
             const docId = docRef.id;
             const timestamp = firebase.firestore.Timestamp.fromDate(saleDate);
@@ -15503,19 +15619,24 @@ class AdminManager {
                 method,
                 status,
                 timestamp,
-                completedAt: ['completed', 'succeeded', 'captured'].includes(String(status).toLowerCase()) ? timestamp : null,
+                completedAt: isCompletedStatus ? timestamp : null,
                 userId: resolvedUserId || null,
                 donorName: resolvedName,
                 donorEmail: resolvedEmail || 'Ukjent',
                 message: note,
-                reference,
+                reference: reference || wixOrderNumber || '',
                 type: 'butikk',
                 source: 'manual_admin',
                 matchMethod: resolvedUserId ? 'manual_user_select' : 'manual_unmatched',
                 registeredBy: currentAdmin?.uid || null,
                 registeredByEmail: currentAdmin?.email || '',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                productId: productId || null,
+                productName: productName || null,
+                quantity: quantity,
+                wixOrderId: wixOrderId || null,
+                wixOrderNumber: wixOrderNumber || null
             };
 
             await docRef.set(payload);
@@ -15529,7 +15650,7 @@ class AdminManager {
 
             this.closeManualSaleModal();
             this.renderDonationAdminViews();
-            this.showToast('Salget er registrert.', 'success', 4000);
+            this.showToast('Salget er registrert i Firebase og Wix.', 'success', 4000);
         }, {
             loadingText: 'Lagrer...'
         }));
@@ -17448,6 +17569,28 @@ class AdminManager {
             this.saveManualSale();
         });
 
+        // Wix Product Autocalculation listeners
+        const productSelect = document.getElementById('manual-sale-product');
+        const qtyInput = document.getElementById('manual-sale-quantity');
+        const amountInput = document.getElementById('manual-sale-amount');
+        const updateAutoAmount = () => {
+            const selectedOpt = productSelect?.options[productSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.value && selectedOpt.value !== 'custom') {
+                const price = parseFloat(selectedOpt.getAttribute('data-price') || 0);
+                const qty = parseInt(qtyInput?.value || 1, 10);
+                if (amountInput) amountInput.value = (price * qty).toFixed(2);
+            }
+        };
+        productSelect?.addEventListener('change', updateAutoAmount);
+        qtyInput?.addEventListener('input', updateAutoAmount);
+
+        // Wix Product Search listener
+        const productSearch = document.getElementById('manual-sale-product-search');
+        productSearch?.addEventListener('input', (event) => {
+            this.filterWixProducts(event.target.value);
+            updateAutoAmount();
+        });
+
         // Shop CSV Import listeners
         document.getElementById('open-shop-csv-import-btn')?.addEventListener('click', () => this.openShopCsvImportModal());
         document.getElementById('cancel-shop-csv-import-btn')?.addEventListener('click', () => this.closeShopCsvImportModal());
@@ -18103,6 +18246,18 @@ class AdminManager {
                                     ${manualDonationUserOptions}
                                 </select>
                             </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Velg produkt (fra Wix)</label>
+                                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                    <div style="position: relative; flex: 1;">
+                                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
+                                        <input type="text" id="manual-sale-product-search" placeholder="Søk i produkter..." style="width: 100%; padding: 10px 16px 10px 40px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s ease; font-size: 0.875rem;">
+                                    </div>
+                                </div>
+                                <select id="manual-sale-product" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <option value="custom">Egendefinert vare / Annet</option>
+                                </select>
+                            </div>
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Kjøpers navn</label>
@@ -18113,7 +18268,11 @@ class AdminManager {
                                     <input id="manual-sale-buyer-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Antall</label>
+                                    <input id="manual-sale-quantity" class="form-control" type="number" min="1" step="1" value="1" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
                                     <input id="manual-sale-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="250" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
