@@ -7244,7 +7244,7 @@ exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) =>
             </div>
 
             <div style="text-align: center; margin-top: 24px;">
-              <a href="https://www.hiskingdomministry.no/leseplaner" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
                 Fortsett lesingen i nettleser
               </a>
             </div>
@@ -7266,7 +7266,7 @@ exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) =>
                   body: pushBody
                 },
                 data: {
-                  click_action: "https://www.hiskingdomministry.no/minside",
+                  click_action: `https://www.hiskingdomministry.no/bibel.html?plan=${planId}&day=${currentDayNum}`,
                   planId: planId,
                   dayNumber: String(currentDayNum)
                 }
