@@ -1997,6 +1997,29 @@ class AdminManager {
                 }
             }
 
+            // Auto-register FCM token if notification permission is already granted
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && firebase.messaging && firebase.messaging.isSupported()) {
+                (async () => {
+                    try {
+                        const msg = firebase.messaging();
+                        const registration = await navigator.serviceWorker.ready;
+                        const token = await msg.getToken({
+                            vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                            serviceWorkerRegistration: registration
+                        });
+                        if (token) {
+                            await userRef.update({
+                                fcmTokens: firebase.firestore.FieldValue.arrayUnion(token),
+                                pushEnabled: true
+                            });
+                            console.log('[AdminManager] Auto-registered FCM token:', token);
+                        }
+                    } catch (fcmErr) {
+                        console.warn('[AdminManager] Auto FCM registration failed:', fcmErr.message);
+                    }
+                })();
+            }
+
             // Store for blog author attribution
             this._lastKnownDisplayName = userData.displayName;
             this._lastKnownPhotoURL = userData.photoURL;
