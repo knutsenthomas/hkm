@@ -2792,7 +2792,8 @@ class BibleReader {
                 continue_plan_btn: 'Fortsett leseplan',
                 log_in_to_save: 'Logg inn på Min Side for å lagre din fremgang.',
                 login_btn: 'Logg inn',
-                days: 'dager'
+                days: 'dager',
+                sync_devotion: 'Oppdater til dagens andakt'
             },
             en: {
                 loading_plan: 'Loading reading plan...',
@@ -2808,7 +2809,8 @@ class BibleReader {
                 continue_plan_btn: 'Continue reading plan',
                 log_in_to_save: 'Log in to save your progress.',
                 login_btn: 'Log in',
-                days: 'days'
+                days: 'days',
+                sync_devotion: "Update to today's devotion"
             },
             es: {
                 loading_plan: 'Cargando plan de lectura...',
@@ -2824,7 +2826,8 @@ class BibleReader {
                 continue_plan_btn: 'Continuar plan de lectura',
                 log_in_to_save: 'Inicia sesión para guardar tu progreso.',
                 login_btn: 'Iniciar sesión',
-                days: 'días'
+                days: 'días',
+                sync_devotion: 'Actualizar al devocional de hoy'
             }
         };
         return dict[lang]?.[key] || dict['no']?.[key] || fallback;
@@ -2956,12 +2959,22 @@ class BibleReader {
         const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
         const progressPct = Math.round((completedDaysCount / totalDays) * 100);
 
+        const startedAt = userPlan.startedAt;
+        let expectedDay = currentDayNum;
+        if (startedAt) {
+            const startedAtDate = startedAt.toDate ? startedAt.toDate() : new Date(startedAt);
+            const diffTime = new Date() - startedAtDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            expectedDay = Math.min(diffDays + 1, totalDays);
+        }
+
         const t_activePlan = this.getTranslation('active_plan', 'Aktiv leseplan');
         const t_progress = this.getTranslation('progress', 'Fremgang');
         const t_day = this.getTranslation('day', 'Dag');
         const t_showVerses = this.getTranslation('show_verses', 'Vis dagens vers');
         const t_openDevotional = this.getTranslation('open_devotional', 'Åpne dagens andakt');
         const t_daysOutline = this.getTranslation('days_outline', 'Oversikt over dager');
+        const t_syncDevotion = this.getTranslation('sync_devotion', 'Oppdater til dagens andakt');
         
         if (this.activePlanMode) {
             // Render only checklist of days for clean 3rd column
@@ -3034,6 +3047,12 @@ class BibleReader {
                             <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
                             ${t_openDevotional}
                         </button>
+                        ${currentDayNum < expectedDay ? `
+                        <button class="hkm-btn-secondary" style="border: 1px dashed #d17d39; color: #d17d39; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.bibleReader.syncToExpectedDay('${globalPlan.id}', ${expectedDay})">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">sync</span>
+                            ${t_syncDevotion} (Dag ${expectedDay})
+                        </button>
+                        ` : ''}
                     </div>
                 </div>
                 ` : ''}
@@ -3065,6 +3084,55 @@ class BibleReader {
         this.activePlanDay = dayNumber;
         this.updateUrlParams();
         this.setupReadingPlanUI();
+    }
+
+    async syncToExpectedDay(planId, expectedDay) {
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
+            try {
+                // Update Firestore
+                await db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .doc(planId)
+                    .update({
+                        currentDay: expectedDay,
+                        lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                // Update Local progress object
+                if (this.userPlanProgress && this.userPlanProgress.planId === planId) {
+                    this.userPlanProgress.currentDay = expectedDay;
+                }
+                
+                // Update localStorage cache
+                const pwaKey = `hkm_reading_plan_progress_${planId}`;
+                try {
+                    const pwaData = localStorage.getItem(pwaKey);
+                    let parsed = pwaData ? JSON.parse(pwaData) : null;
+                    if (!parsed) {
+                        parsed = {
+                            planId: planId,
+                            currentDay: expectedDay,
+                            completedDays: this.userPlanProgress?.completedDays || [],
+                            reflections: {}
+                        };
+                    } else {
+                        parsed.currentDay = expectedDay;
+                    }
+                    localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                } catch (localErr) {
+                    console.warn("Failed to update PWA progress localstorage:", localErr);
+                }
+
+                // Switch and render
+                this.activePlanDay = expectedDay;
+                this.updateUrlParams();
+                this.setupReadingPlanUI();
+            } catch (err) {
+                console.error("Failed to sync reading plan day:", err);
+            }
+        }
     }
 
     async getStartedPlanIds() {

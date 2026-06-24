@@ -1519,6 +1519,111 @@
                                                 cb.checked = completedDays.includes(day);
                                             });
                                         }
+
+                                        const currentDay = progress.currentDay || 1;
+
+                                        // Update start-plan-btn text and link
+                                        const startBtn = document.getElementById('start-plan-btn');
+                                        if (startBtn) {
+                                            const btnText = lang === 'en' ? 'Continue Reading Plan' : (lang === 'es' ? 'Continuar plan de lectura' : 'Fortsett på leseplanen');
+                                            startBtn.innerHTML = `${btnText} (Day ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                                            startBtn.onclick = () => {
+                                                window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
+                                            };
+                                        }
+
+                                        // Oppdater meg / Synkroniserings-knapp hvis brukeren ligger bak
+                                        const startedAt = progress.startedAt;
+                                        if (startedAt) {
+                                            const startedAtDate = startedAt.toDate ? startedAt.toDate() : new Date(startedAt);
+                                            const diffTime = new Date() - startedAtDate;
+                                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                                            const expectedDay = Math.min(diffDays + 1, plan.durationDays || plan.days.length);
+
+                                            if (currentDay < expectedDay) {
+                                                let syncContainer = document.getElementById('sync-day-container');
+                                                if (!syncContainer && startBtn) {
+                                                    syncContainer = document.createElement('div');
+                                                    syncContainer.id = 'sync-day-container';
+                                                    syncContainer.style.marginTop = '12px';
+                                                    syncContainer.style.background = 'rgba(209, 125, 57, 0.05)';
+                                                    syncContainer.style.border = '1.5px solid rgba(209, 125, 57, 0.3)';
+                                                    syncContainer.style.borderRadius = '12px';
+                                                    syncContainer.style.padding = '12px';
+                                                    syncContainer.style.display = 'flex';
+                                                    syncContainer.style.flexDirection = 'column';
+                                                    syncContainer.style.gap = '8px';
+
+                                                    startBtn.parentNode.insertBefore(syncContainer, startBtn.nextSibling);
+                                                }
+
+                                                if (syncContainer) {
+                                                    const daysBehind = expectedDay - currentDay;
+                                                    const labelText = lang === 'en' 
+                                                        ? `You are ${daysBehind} days behind schedule.`
+                                                        : (lang === 'es' 
+                                                            ? `Estás ${daysBehind} días atrasado.`
+                                                            : `Du ligger ${daysBehind} dager bak planen.`);
+
+                                                    const btnText = lang === 'en'
+                                                        ? `Update to today's devotion (Day ${expectedDay})`
+                                                        : (lang === 'es'
+                                                            ? `Actualizar al devocional de hoy (Día ${expectedDay})`
+                                                            : `Oppdater til dagens andakt (Dag ${expectedDay})`);
+
+                                                    syncContainer.innerHTML = `
+                                                        <span style="font-size: 12px; color: #b45309; font-weight: 600; text-align: center;">${labelText}</span>
+                                                        <button class="btn-start-plan" id="sync-day-btn" style="background: #c8682a; border: none; font-size: 0.9rem; padding: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                                            <span class="material-symbols-outlined" style="font-size: 18px;">sync</span>
+                                                            ${btnText}
+                                                        </button>
+                                                    `;
+
+                                                    document.getElementById('sync-day-btn').onclick = async () => {
+                                                        const btn = document.getElementById('sync-day-btn');
+                                                        btn.disabled = true;
+                                                        btn.textContent = lang === 'en' ? 'Updating...' : (lang === 'es' ? 'Actualizando...' : 'Oppdaterer...');
+
+                                                        try {
+                                                            await db.collection('users')
+                                                                .doc(user.uid)
+                                                                .collection('reading_plans')
+                                                                .doc(plan.id)
+                                                                .update({
+                                                                    currentDay: expectedDay,
+                                                                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                                });
+
+                                                            const pwaKey = `hkm_reading_plan_progress_${plan.id}`;
+                                                            try {
+                                                                const pwaData = localStorage.getItem(pwaKey);
+                                                                let parsed = pwaData ? JSON.parse(pwaData) : null;
+                                                                if (!parsed) {
+                                                                    parsed = {
+                                                                        planId: plan.id,
+                                                                        currentDay: expectedDay,
+                                                                        completedDays: completedDays,
+                                                                        reflections: {}
+                                                                    };
+                                                                } else {
+                                                                    parsed.currentDay = expectedDay;
+                                                                }
+                                                                localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                                                            } catch (localErr) {
+                                                                console.warn("Failed to update PWA progress localstorage:", localErr);
+                                                            }
+
+                                                            window.location.reload();
+                                                        } catch (err) {
+                                                            console.error("Failed to update progress:", err);
+                                                            alert(lang === 'en' ? 'Could not update plan.' : (lang === 'es' ? 'No se pudo actualizar.' : 'Kunne ikke oppdatere planen.'));
+                                                            btn.disabled = false;
+                                                            btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">sync</span>${btnText}`;
+                                                        }
+                                                    };
+                                                }
+                                            }
+                                        }
                                     }
                                 } catch (e) {
                                     console.error("Error loading Firestore plan progress:", e);
