@@ -1730,7 +1730,7 @@ class MinSideManager {
                         <h3>Siste fra Bønneveggen</h3>
                         <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">Gå til Bønneveggen</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 2px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">Gå til Bønneveggen</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 3px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
                 </div>
                 <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
                     <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
@@ -1827,7 +1827,7 @@ class MinSideManager {
                                     </div>
                                     <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
                                 </div>
-                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 2px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber</span></div>
+                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 3.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber</span></div>
                             </div>
                         `;
                     }).join('');
