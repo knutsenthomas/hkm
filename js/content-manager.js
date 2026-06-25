@@ -1460,10 +1460,62 @@ class ContentManager {
             }
             this._currentInteractionsManager = new InteractionsManager('blog-interactions', postId);
         }
+
+        // Injisere Schema.org JSON-LD (GEO optimalisering)
+        this.injectSchemaOrgData(item, isTeaching);
         } catch (error) {
             console.error('[ContentManager] renderSingleBlogPost failed:', error);
             container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
             revealPostContainer();
+        }
+    }
+
+    injectSchemaOrgData(item, isTeaching) {
+        try {
+            const oldSchema = document.getElementById('dynamic-schema-ld');
+            if (oldSchema) oldSchema.remove();
+
+            const schemaType = isTeaching ? 'Article' : 'BlogPosting';
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": schemaType,
+                "headline": item.title || '',
+                "description": item.description || item.seoDescription || '',
+                "datePublished": item.date || item.createdAt || new Date().toISOString(),
+                "author": {
+                    "@type": "Person",
+                    "name": item.author || 'His Kingdom Ministry'
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "His Kingdom Ministry",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://www.hiskingdomministry.no/img/logo-hkm.png"
+                    }
+                }
+            };
+
+            const imageUrl = item.imageUrl || item.image || (item.authorPhoto ? item.authorPhoto : null);
+            if (imageUrl) {
+                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://www.hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
+            }
+
+            if (item.content) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = item.content;
+                const plainText = tempDiv.textContent || tempDiv.innerText || "";
+                schema.articleBody = plainText.substring(0, 5000);
+            }
+
+            const script = document.createElement('script');
+            script.id = 'dynamic-schema-ld';
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+            console.log(`[ContentManager] Injected dynamic Schema.org JSON-LD for ${schemaType}: "${item.title}"`);
+        } catch (err) {
+            console.warn('[ContentManager] Failed to inject dynamic schema:', err);
         }
     }
 
@@ -3845,6 +3897,54 @@ class ContentManager {
 
         // Sidebar: Recent Events
         this.populateSidebarRecentEvents();
+
+        // Injisere Schema.org JSON-LD (GEO optimalisering for arrangementer)
+        this.injectEventSchemaOrgData(event);
+    }
+
+    injectEventSchemaOrgData(event) {
+        try {
+            const oldSchema = document.getElementById('dynamic-event-schema-ld');
+            if (oldSchema) oldSchema.remove();
+
+            const imageUrl = this._getEventImage(event);
+            const startVal = event.start || event.date || '';
+
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Event",
+                "name": event.title || '',
+                "description": event.description || event.content || '',
+                "startDate": startVal,
+                "location": {
+                    "@type": "Place",
+                    "name": event.location || 'His Kingdom Ministry',
+                    "address": event.location || 'His Kingdom Ministry'
+                },
+                "organizer": {
+                    "@type": "Organization",
+                    "name": "His Kingdom Ministry",
+                    "url": "https://www.hiskingdomministry.no"
+                }
+            };
+
+            if (imageUrl) {
+                schema.image = imageUrl.startsWith('http') ? imageUrl : `https://www.hiskingdomministry.no/${imageUrl.replace(/^\//, '')}`;
+            }
+
+            if (event.end) {
+                schema.endDate = event.end;
+            }
+
+            const script = document.createElement('script');
+            script.id = 'dynamic-event-schema-ld';
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+            console.log(`[ContentManager] Injected dynamic Schema.org JSON-LD for Event: "${event.title}"`);
+        } catch (err) {
+            console.warn('[ContentManager] Failed to inject dynamic event schema:', err);
+        }
     }
 
     async populateSidebarRecentEvents() {
