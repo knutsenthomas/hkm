@@ -854,11 +854,22 @@ class MinSideManager {
                     // Translate immediately on auth state change
                     translateStaticHTML();
 
-                    // Load and apply bottom navigation items from settings_design
+                    // Apply bottom navigation settings (user custom first, then admin default)
                     try {
-                        const designSettings = await window.firebaseService.getPageContent('settings_design');
-                        if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
-                            this.applyBottomNavSettings(designSettings.minsideBottomNav);
+                        if (this.profileData && Array.isArray(this.profileData.customBottomNav) && this.profileData.customBottomNav.length > 0) {
+                            localStorage.setItem('hkm_user_custom_nav', JSON.stringify(this.profileData.customBottomNav));
+                            this.applyBottomNavSettings(this.profileData.customBottomNav);
+                        } else {
+                            localStorage.removeItem('hkm_user_custom_nav');
+                            const designSettings = await window.firebaseService.getPageContent('settings_design');
+                            if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
+                                const cached = localStorage.getItem('hkm_cache_settings_design');
+                                let designObj = cached ? JSON.parse(cached) : {};
+                                designObj.minsideBottomNav = designSettings.minsideBottomNav;
+                                localStorage.setItem('hkm_cache_settings_design', JSON.stringify(designObj));
+
+                                this.applyBottomNavSettings(designSettings.minsideBottomNav);
+                            }
                         }
                     } catch (e) {
                         console.warn("Failed to load design settings for bottom nav:", e);
@@ -1805,6 +1816,43 @@ class MinSideManager {
         const genderVal = p.gender ? (t(genderKeys[p.gender]) || p.gender) : '';
         const maritalVal = p.maritalStatus ? (t(maritalKeys[p.maritalStatus]) || p.maritalStatus) : '';
 
+        // Fetch allowed items (admin default)
+        let allowedItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'];
+        try {
+            const designSettings = await window.firebaseService.getPageContent('settings_design');
+            if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
+                allowedItems = designSettings.minsideBottomNav;
+            }
+        } catch (e) {}
+
+        const userCustomNav = p.customBottomNav || allowedItems;
+
+        const navLabels = {
+            'overview': { label: t('sidebar.oversikt') || 'Oversikt', icon: 'home' },
+            'profile': { label: t('sidebar.profil') || 'Profil', icon: 'person' },
+            'courses': { label: t('overview.btnCoursesLabel') || 'Kurs', icon: 'school' },
+            'reading-plans': { label: t('overview.btnReadingPlansLabel') || 'Leseplaner', icon: 'auto_stories' },
+            'giving': { label: t('overview.btnGivingLabel') || 'Gaver', icon: 'volunteer_activism' },
+            'notifications': { label: t('sidebar.varslinger') || 'Varslinger', icon: 'notifications' }
+        };
+
+        const customNavHtml = allowedItems.map(id => {
+            const checked = userCustomNav.includes(id) ? 'checked' : '';
+            const item = navLabels[id] || { label: id, icon: 'link' };
+            return `
+                <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; background: var(--admin-bg, #f8f9fa); border: 1px solid var(--admin-border, #e2e8f0); cursor: pointer; user-select: none;">
+                    <div style="display: flex; align-items: center; gap: 10px; color: var(--text-main, #1e293b);">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">${item.icon}</span>
+                        <span style="font-weight: 600; font-size: 13.5px;">${item.label}</span>
+                    </div>
+                    <label class="toggle toggle-sm" style="margin: 0;">
+                        <input type="checkbox" class="custom-nav-cb" value="${id}" ${checked}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </label>
+            `;
+        }).join('');
+
         container.innerHTML = `
         <div class="profile-grid">
             <!-- ── LEFT COLUMN ── -->
@@ -2164,6 +2212,25 @@ class MinSideManager {
                     </div>
                 </div>
 
+                <!-- Mobile Navigation Menu Preferences -->
+                <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
+                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">phone_android</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
+                    </div>
+                    <div class="ms-card-body-pad" style="padding: 20px 24px !important; display: block !important;">
+                        <p class="ms-danger-copy" style="margin-bottom: 16px !important; color: var(--text-muted, #64748b) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
+                            Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen på mobil:
+                        </p>
+                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
+                            ${customNavHtml}
+                        </div>
+                        <button class="btn btn-primary" id="save-custom-nav-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> Lagre menyvalg
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>`;
 
@@ -2198,6 +2265,44 @@ class MinSideManager {
         document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
             await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
             this.loadView('profile');
+        });
+
+        document.getElementById('save-custom-nav-btn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('save-custom-nav-btn');
+            if (btn) btn.disabled = true;
+            try {
+                const checkedBoxes = Array.from(document.querySelectorAll('.custom-nav-cb:checked'));
+                const customBottomNav = checkedBoxes.map(cb => cb.value);
+
+                // Update localStorage immediately to prevent FOUC flash on subsequent reloads
+                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(customBottomNav));
+
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
+                    { customBottomNav },
+                    { merge: true }
+                );
+
+                this.profileData.customBottomNav = customBottomNav;
+                this.applyBottomNavSettings(customBottomNav);
+
+                // Toast or animation feedback
+                if (btn) {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Meny lagret!';
+                    btn.style.background = '#10B981'; // Green
+                    btn.style.borderColor = '#10B981';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.style.background = '';
+                        btn.style.borderColor = '';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error("Save custom nav error:", err);
+                alert("Kunne ikke lagre menyvalg: " + err.message);
+                if (btn) btn.disabled = false;
+            }
         });
 
         // Push toggle - show/hide sub-settings

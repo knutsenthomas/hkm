@@ -265,6 +265,37 @@
                 <span id="notif-badge-bottom" class="notification-dot" style="display:none; position: absolute; top: 6px; right: calc(50% - 14px); width: 8px !important; min-width: 8px !important; height: 8px !important; padding: 0 !important; border-radius: 50% !important; background: #d17d39 !important; border: 1px solid #ffffff !important; box-sizing: border-box !important;"></span>
             </a>
         </nav>
+        <script>
+            (function() {
+                try {
+                    let activeIds = null;
+                    const cachedUserNav = localStorage.getItem('hkm_user_custom_nav');
+                    if (cachedUserNav) {
+                        activeIds = JSON.parse(cachedUserNav);
+                    } else {
+                        const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
+                        if (cachedDesign) {
+                            const design = JSON.parse(cachedDesign);
+                            if (design && Array.isArray(design.minsideBottomNav)) {
+                                activeIds = design.minsideBottomNav;
+                            }
+                        }
+                    }
+                    if (Array.isArray(activeIds) && activeIds.length > 0) {
+                        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item').forEach(function(el) {
+                            const view = el.getAttribute('data-view');
+                            if (view) {
+                                if (activeIds.includes(view)) {
+                                    el.style.display = 'flex';
+                                } else {
+                                    el.style.display = 'none';
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {}
+            })();
+        </script>
     </main>
 
     <!-- Firebase SDKs -->
