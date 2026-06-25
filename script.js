@@ -4046,11 +4046,12 @@ window.addEventListener('load', () => {
                 border: 1px solid #E2E8F0 !important;
                 background: #fff !important;
                 color: #334155 !important;
-                border-radius: 999px !important;
-                padding: 8px 12px !important;
+                border-radius: 16px !important;
+                padding: 8px 14px !important;
                 font-size: 12px !important;
-                line-height: 1.3 !important;
+                line-height: 1.4 !important;
                 font-weight: 600 !important;
+                text-align: left !important;
                 cursor: pointer !important;
                 transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
