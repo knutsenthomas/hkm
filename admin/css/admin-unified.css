@@ -5024,6 +5024,7 @@ body.builder-active .user-avatar,
   opacity: 1 !important;
   flex-shrink: 0 !important;
   margin-left: 8px !important;
+  overflow: hidden !important;
 }
 
 body.admin-body .user-avatar.has-initials,
@@ -5044,7 +5045,8 @@ body.builder-active .user-avatar.has-initials,
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  border-radius: 10px !important;
+  border-radius: inherit !important;
+  flex-shrink: 0 !important;
 }
 
 /* 4. Content Spacing Fixes - Universal consistency */
@@ -5450,6 +5452,8 @@ body.builder-active .main-header [id="admin-avatar"] {
   line-height: 42px !important;
   text-align: center !important;
   text-transform: uppercase !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
 }
 
 body.admin-body .main-header .user-avatar.has-initials,
