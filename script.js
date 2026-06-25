@@ -2618,8 +2618,8 @@ window.addEventListener('load', () => {
                             <input type="text" class="hkm-chat-input" maxlength="${MAX_MESSAGE_LENGTH}" placeholder="Skriv melding..." />
                             <p class="hkm-chat-status" aria-live="polite"></p>
                         </div>
-                        <button type="submit" class="hkm-chat-send">
-                            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        <button type="submit" class="hkm-chat-send" aria-label="Send melding">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="transform: translate(1px, -1px);"><path d="M22 12L2 21L5 12.5L13 12L5 11.5L2 3L22 12Z"/></svg>
                         </button>
                     </form>
                 </footer>
@@ -4182,7 +4182,7 @@ window.addEventListener('load', () => {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                background: #d17d39 !important;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
                 border: none !important;
                 width: 40px !important;
@@ -4192,15 +4192,23 @@ window.addEventListener('load', () => {
                 flex-shrink: 0 !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                transition: all 0.3s ease !important;
+                box-shadow: 0 3px 8px rgba(209, 125, 57, 0.25) !important;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .hkm-chat-send:hover:not(:disabled) {
-                background: #bd4f2a !important;
-                transform: scale(1.05) !important;
+                transform: translateY(-2px) scale(1.06) !important;
+                box-shadow: 0 5px 12px rgba(209, 125, 57, 0.35) !important;
+            }
+            .hkm-chat-send:active:not(:disabled) {
+                transform: translateY(0) scale(0.96) !important;
+                box-shadow: 0 2px 4px rgba(209, 125, 57, 0.15) !important;
             }
             .hkm-chat-send:disabled {
                 background: #E2E8F0 !important;
+                color: #94A3B8 !important;
+                box-shadow: none !important;
                 cursor: not-allowed !important;
+                transform: none !important;
             }
             
 	            .hkm-chat-email-panel {
