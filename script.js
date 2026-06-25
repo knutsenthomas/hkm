@@ -3211,7 +3211,21 @@ window.addEventListener('load', () => {
             const visibleMessages = cachedMessages.filter((item) => shouldDisplayMessageInMode(item));
 
             if (visibleMessages.length === 0) {
-                addSystemMessage((modeCopy[activeMode] && modeCopy[activeMode].empty) || 'Ingen meldinger enda.');
+                if (activeMode === 'ai') {
+                    const welcomeMsg = document.createElement('div');
+                    welcomeMsg.className = 'hkm-chat-msg agent';
+                    welcomeMsg.innerHTML = 'Hei! Hva kan jeg hjelpe deg med i dag? 😊';
+                    bodyEl.appendChild(welcomeMsg);
+
+                    // Vis start-spørsmål som forslag
+                    renderFollowUpSuggestions([
+                        'Hva er His Kingdom Ministry?',
+                        'Har dere en bibelsk tidslinje?',
+                        'Hvordan kan jeg bli fast giver?'
+                    ]);
+                } else {
+                    addSystemMessage((modeCopy[activeMode] && modeCopy[activeMode].empty) || 'Ingen meldinger enda.');
+                }
                 return;
             }
 
