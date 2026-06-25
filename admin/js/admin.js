@@ -2145,14 +2145,20 @@ class AdminManager {
                 profileModal.style.display = 'none';
             };
             // Lukk modal ved klikk utenfor innhold
-            profileModal.addEventListener('click', (e) => {
-                if (e.target === profileModal) profileModal.style.display = 'none';
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && profileModal.style.display === 'flex') {
-                    profileModal.style.display = 'none';
-                }
-            });
+            if (!profileModal.dataset.boundClick) {
+                profileModal.dataset.boundClick = '1';
+                profileModal.addEventListener('click', (e) => {
+                    if (e.target === profileModal) profileModal.style.display = 'none';
+                });
+            }
+            if (!this._boundProfileEsc) {
+                this._boundProfileEsc = true;
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && profileModal.style.display === 'flex') {
+                        profileModal.style.display = 'none';
+                    }
+                });
+            }
         }
 
         if (profileForm && !profileForm.dataset.bound) {
@@ -2169,9 +2175,12 @@ class AdminManager {
         if (!profileModal) return;
 
         const displayName = profile.displayName || user.displayName || user.email || 'Bruker';
-        document.getElementById('modal-admin-name').textContent = displayName;
-        document.getElementById('modal-admin-role').textContent = 'Administrator';
-        document.getElementById('modal-admin-email').textContent = user.email || '';
+        const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+
+        setText('modal-admin-name', displayName);
+        setText('modal-admin-role', 'Administrator');
+        setText('modal-admin-email', user.email || '');
 
         const modalAvatar = document.getElementById('modal-admin-avatar');
         if (modalAvatar) {
@@ -2194,10 +2203,10 @@ class AdminManager {
             }
         }
 
-        document.getElementById('admin-modal-display-name').value = displayName;
-        document.getElementById('admin-modal-phone').value = profile.phone || '';
-        document.getElementById('admin-modal-address').value = profile.address || '';
-        document.getElementById('admin-modal-bio').value = profile.bio || '';
+        setVal('admin-modal-display-name', displayName);
+        setVal('admin-modal-phone', profile.phone || '');
+        setVal('admin-modal-address', profile.address || '');
+        setVal('admin-modal-bio', profile.bio || '');
 
         profileModal.style.display = 'flex';
     }
@@ -2827,7 +2836,8 @@ class AdminManager {
         const emailTargetRole = document.getElementById('target-role');
         const emailUserSelection = document.getElementById('email-user-selection');
 
-        if (emailTargetRole) {
+        if (emailTargetRole && !emailTargetRole.dataset.bound) {
+            emailTargetRole.dataset.bound = '1';
             emailTargetRole.addEventListener('change', (e) => {
                 if (e.target.value === 'selected') {
                     renderUserSelection('email-user-selection');
@@ -2838,12 +2848,15 @@ class AdminManager {
             });
         }
 
-        if (emailForm) {
+        if (emailForm && !emailForm.dataset.bound) {
+            emailForm.dataset.bound = '1';
             emailForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = emailForm.querySelector('button[type="submit"]');
-                btn.disabled = true;
-                btn.textContent = 'Sender...';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Sender...';
+                }
                 emailStatusEl.textContent = 'Forbereder utsendelse...';
                 emailStatusEl.className = 'status-message info';
 
@@ -2885,8 +2898,10 @@ class AdminManager {
                     emailStatusEl.textContent = `Feil: ${error.message}`;
                     emailStatusEl.className = 'status-message error';
                 } finally {
-                    btn.disabled = false;
-                    btn.textContent = 'Send E-poster';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Send E-poster';
+                    }
                 }
             });
         }
@@ -2897,7 +2912,8 @@ class AdminManager {
         const pushTargetRole = document.getElementById('push-target-role');
         const pushUserSelection = document.getElementById('push-user-selection');
 
-        if (pushTargetRole) {
+        if (pushTargetRole && !pushTargetRole.dataset.bound) {
+            pushTargetRole.dataset.bound = '1';
             pushTargetRole.addEventListener('change', (e) => {
                 if (e.target.value === 'selected') {
                     renderUserSelection('push-user-selection');
@@ -2908,12 +2924,15 @@ class AdminManager {
             });
         }
 
-        if (pushForm) {
+        if (pushForm && !pushForm.dataset.bound) {
+            pushForm.dataset.bound = '1';
             pushForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = pushForm.querySelector('button[type="submit"]');
-                btn.disabled = true;
-                btn.textContent = 'Sender...';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Sender...';
+                }
                 pushStatusEl.textContent = 'Forbereder utsendelse...';
                 pushStatusEl.className = 'status-message info';
 
@@ -3011,8 +3030,10 @@ class AdminManager {
                     pushStatusEl.textContent = `Feil: ${error.message}`;
                     pushStatusEl.className = 'status-message error';
                 } finally {
-                    btn.disabled = false;
-                    btn.textContent = 'Send push-varsling';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Send push-varsling';
+                    }
                 }
             });
         }
@@ -17501,6 +17522,15 @@ class AdminManager {
     }
 
     bindDonationAdminFilters() {
+        const addFilteredListener = (id, eventType, callback) => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.dataset.filtersBound) return;
+                el.dataset.filtersBound = 'true';
+                el.addEventListener(eventType, callback);
+            }
+        };
+
         const setFilter = (key, value) => {
             if (typeof key === 'object') {
                 this.donationFilters = { ...(this.donationFilters || {}), ...key };
@@ -17582,32 +17612,32 @@ class AdminManager {
         };
 
         // Legacy period listeners
-        document.getElementById('global-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
-        document.getElementById('global-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
-        document.getElementById('global-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+        addFilteredListener('global-date-preset', 'change', (event) => setFilter('preset', event.target.value));
+        addFilteredListener('global-start-date', 'change', (event) => setFilter('start', event.target.value));
+        addFilteredListener('global-end-date', 'change', (event) => setFilter('end', event.target.value));
 
         // Causes period listeners
-        document.getElementById('causes-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
-        document.getElementById('causes-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
-        document.getElementById('causes-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+        addFilteredListener('causes-date-preset', 'change', (event) => setFilter('preset', event.target.value));
+        addFilteredListener('causes-start-date', 'change', (event) => setFilter('start', event.target.value));
+        addFilteredListener('causes-end-date', 'change', (event) => setFilter('end', event.target.value));
 
         // Shop period listeners
-        document.getElementById('shop-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
-        document.getElementById('shop-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
-        document.getElementById('shop-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+        addFilteredListener('shop-date-preset', 'change', (event) => setFilter('preset', event.target.value));
+        addFilteredListener('shop-start-date', 'change', (event) => setFilter('start', event.target.value));
+        addFilteredListener('shop-end-date', 'change', (event) => setFilter('end', event.target.value));
 
         // Donation tab listeners
-        document.getElementById('donation-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
-        document.getElementById('donation-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
-        document.getElementById('donation-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
-        document.getElementById('donation-search')?.addEventListener('input', (event) => setFilter('query', event.target.value));
+        addFilteredListener('donation-status-filter', 'change', (event) => setFilter('status', event.target.value));
+        addFilteredListener('donation-method-filter', 'change', (event) => setFilter('method', event.target.value));
+        addFilteredListener('donation-type-filter', 'change', (event) => setFilter('type', event.target.value));
+        addFilteredListener('donation-search', 'input', (event) => setFilter('query', event.target.value));
 
         // Donor tab listeners
-        document.getElementById('donor-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
-        document.getElementById('donor-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
-        document.getElementById('donor-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
-        document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
-        document.getElementById('donor-sort-by')?.addEventListener('change', (event) => {
+        addFilteredListener('donor-status-filter', 'change', (event) => setFilter('status', event.target.value));
+        addFilteredListener('donor-method-filter', 'change', (event) => setFilter('method', event.target.value));
+        addFilteredListener('donor-type-filter', 'change', (event) => setFilter('type', event.target.value));
+        addFilteredListener('donor-search', 'input', (event) => setFilter('donorQuery', event.target.value));
+        addFilteredListener('donor-sort-by', 'change', (event) => {
             const val = event.target.value;
             const dir = val === 'name' ? 'asc' : 'desc';
             setFilter({
@@ -17617,144 +17647,60 @@ class AdminManager {
         });
 
         // Shop tab listeners
-        document.getElementById('shop-status-filter')?.addEventListener('change', (event) => setFilter('shopStatus', event.target.value));
-        document.getElementById('shop-method-filter')?.addEventListener('change', (event) => setFilter('shopMethod', event.target.value));
-        document.getElementById('shop-search')?.addEventListener('input', (event) => setFilter('shopQuery', event.target.value));
+        addFilteredListener('shop-status-filter', 'change', (event) => setFilter('shopStatus', event.target.value));
+        addFilteredListener('shop-method-filter', 'change', (event) => setFilter('shopMethod', event.target.value));
+        addFilteredListener('shop-search', 'input', (event) => setFilter('shopQuery', event.target.value));
 
         // Sortable table headers listeners
         document.querySelectorAll('.sortable-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const field = header.dataset.sort;
-                const currentSortBy = this.donationFilters.donorSortBy || 'latestDate';
-                const currentSortDir = this.donationFilters.donorSortDir || 'desc';
-                
-                let nextDir = 'desc';
-                if (field === currentSortBy) {
-                    nextDir = currentSortDir === 'desc' ? 'asc' : 'desc';
-                } else {
-                    nextDir = field === 'name' ? 'asc' : 'desc';
-                }
-                
-                setFilter({
-                    donorSortBy: field,
-                    donorSortDir: nextDir
+            if (!header.dataset.sortBound) {
+                header.dataset.sortBound = 'true';
+                header.addEventListener('click', () => {
+                    const field = header.dataset.sort;
+                    const currentSortBy = this.donationFilters.donorSortBy || 'latestDate';
+                    const currentSortDir = this.donationFilters.donorSortDir || 'desc';
+                    
+                    let nextDir = 'desc';
+                    if (field === currentSortBy) {
+                        nextDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+                    } else {
+                        nextDir = field === 'name' ? 'asc' : 'desc';
+                    }
+                    
+                    setFilter({
+                        donorSortBy: field,
+                        donorSortDir: nextDir
+                    });
                 });
-            });
+            }
         });
 
-        document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
-        document.getElementById('open-bank-import-btn')?.addEventListener('click', () => this.openBankImportModal());
-        document.getElementById('cancel-bank-import-btn')?.addEventListener('click', () => this.closeBankImportModal());
-        document.getElementById('bank-import-file')?.addEventListener('change', (event) => this.handleBankImportFile(event.target.files?.[0]));
-        document.getElementById('save-bank-import-btn')?.addEventListener('click', () => this.saveBankImportRows());
-        document.getElementById('cancel-manual-donation-btn')?.addEventListener('click', () => this.closeManualDonationModal());
-        document.getElementById('manual-donation-user')?.addEventListener('change', (event) => this.handleManualDonationUserSelect(event.target.value));
-        document.getElementById('manual-donation-form')?.addEventListener('submit', (event) => {
+        addFilteredListener('add-manual-donation-btn', 'click', () => this.openManualDonationModal());
+        addFilteredListener('open-bank-import-btn', 'click', () => this.openBankImportModal());
+        addFilteredListener('cancel-bank-import-btn', 'click', () => this.closeBankImportModal());
+        addFilteredListener('bank-import-file', 'change', (event) => this.handleBankImportFile(event.target.files?.[0]));
+        addFilteredListener('save-bank-import-btn', 'click', () => this.saveBankImportRows());
+        addFilteredListener('cancel-manual-donation-btn', 'click', () => this.closeManualDonationModal());
+        addFilteredListener('manual-donation-user', 'change', (event) => this.handleManualDonationUserSelect(event.target.value));
+        addFilteredListener('manual-donation-form', 'submit', (event) => {
             event.preventDefault();
             this.saveManualDonation();
         });
 
         // Report print triggers
-        document.getElementById('print-donations-report-btn')?.addEventListener('click', () => this.printReport('donations'));
-        document.getElementById('print-donors-report-btn')?.addEventListener('click', () => this.printReport('donors'));
-        document.getElementById('print-shop-report-btn')?.addEventListener('click', () => this.printReport('shop'));
+        addFilteredListener('print-donations-report-btn', 'click', () => this.printReport('donations'));
+        addFilteredListener('print-donors-report-btn', 'click', () => this.printReport('donors'));
+        addFilteredListener('print-shop-report-btn', 'click', () => this.printReport('shop'));
 
-        const clearFilters = () => {
-            this.donationFilters = { 
-                preset: '30', 
-                status: 'all', 
-                method: 'all', 
-                type: 'all', 
-                query: '', 
-                donorQuery: '', 
-                donorSortBy: 'latestDate', 
-                donorSortDir: 'desc', 
-                start: '', 
-                end: '',
-                shopStatus: 'all',
-                shopMethod: 'all',
-                shopQuery: ''
-            };
-            
-            const presetEl = document.getElementById('global-date-preset');
-            if (presetEl) presetEl.value = '30';
-
-            const startEl = document.getElementById('global-start-date');
-            if (startEl) startEl.value = '';
-
-            const endEl = document.getElementById('global-end-date');
-            if (endEl) endEl.value = '';
-
-            const customDates = document.getElementById('global-custom-dates');
-            if (customDates) customDates.style.display = 'none';
-
-            // Clear causes inputs
-            const causesPresetEl = document.getElementById('causes-date-preset');
-            if (causesPresetEl) causesPresetEl.value = '30';
-            const causesStartEl = document.getElementById('causes-start-date');
-            if (causesStartEl) causesStartEl.value = '';
-            const causesEndEl = document.getElementById('causes-end-date');
-            if (causesEndEl) causesEndEl.value = '';
-            const causesCustomDates = document.getElementById('causes-custom-dates');
-            if (causesCustomDates) causesCustomDates.style.display = 'none';
-
-            // Clear shop inputs
-            const shopPresetEl = document.getElementById('shop-date-preset');
-            if (shopPresetEl) shopPresetEl.value = '30';
-            const shopStartEl = document.getElementById('shop-start-date');
-            if (shopStartEl) shopStartEl.value = '';
-            const shopEndEl = document.getElementById('shop-end-date');
-            if (shopEndEl) shopEndEl.value = '';
-            const shopCustomDates = document.getElementById('shop-custom-dates');
-            if (shopCustomDates) shopCustomDates.style.display = 'none';
-
-            const statusEl1 = document.getElementById('donation-status-filter');
-            const statusEl2 = document.getElementById('donor-status-filter');
-            if (statusEl1) statusEl1.value = 'all';
-            if (statusEl2) statusEl2.value = 'all';
-
-            const methodEl1 = document.getElementById('donation-method-filter');
-            const methodEl2 = document.getElementById('donor-method-filter');
-            if (methodEl1) methodEl1.value = 'all';
-            if (methodEl2) methodEl2.value = 'all';
-
-            const typeEl1 = document.getElementById('donation-type-filter');
-            const typeEl2 = document.getElementById('donor-type-filter');
-            if (typeEl1) typeEl1.value = 'all';
-            if (typeEl2) typeEl2.value = 'all';
-
-            const qEl = document.getElementById('donation-search');
-            if (qEl) qEl.value = '';
-
-            const dqEl = document.getElementById('donor-search');
-            if (dqEl) dqEl.value = '';
-
-            const dSortEl = document.getElementById('donor-sort-by');
-            if (dSortEl) dSortEl.value = 'latestDate';
-
-            const shopStatusEl = document.getElementById('shop-status-filter');
-            if (shopStatusEl) shopStatusEl.value = 'all';
-
-            const shopMethodEl = document.getElementById('shop-method-filter');
-            if (shopMethodEl) shopMethodEl.value = 'all';
-
-            const shopQueryEl = document.getElementById('shop-search');
-            if (shopQueryEl) shopQueryEl.value = '';
-            
-            this.renderDonationAdminViews();
-            this.renderGiftsDashboard();
-            this.renderInKindDonations();
-            this.renderWixStats();
-        };
-
-        document.getElementById('donation-clear-filters')?.addEventListener('click', clearFilters);
-        document.getElementById('donor-clear-filters')?.addEventListener('click', clearFilters);
-        document.getElementById('shop-clear-filters')?.addEventListener('click', clearFilters);
+        addFilteredListener('donation-clear-filters', 'click', clearFilters);
+        addFilteredListener('donor-clear-filters', 'click', clearFilters);
+        addFilteredListener('shop-clear-filters', 'click', clearFilters);
 
         // Drag & Drop listeners for Premium Bank Import Dropzone
         const dropzone = document.getElementById('bank-import-dropzone');
         const fileInput = document.getElementById('bank-import-file');
-        if (dropzone && fileInput) {
+        if (dropzone && fileInput && !dropzone.dataset.dropzoneBound) {
+            dropzone.dataset.dropzoneBound = 'true';
             dropzone.addEventListener('click', () => fileInput.click());
 
             dropzone.addEventListener('dragover', (e) => {
@@ -17784,10 +17730,10 @@ class AdminManager {
         }
 
         // Shop Manual Entry listeners
-        document.getElementById('open-manual-sale-btn')?.addEventListener('click', () => this.openManualSaleModal());
-        document.getElementById('cancel-manual-sale-btn')?.addEventListener('click', () => this.closeManualSaleModal());
-        document.getElementById('manual-sale-user')?.addEventListener('change', (event) => this.handleManualSaleUserSelect(event.target.value));
-        document.getElementById('manual-sale-form')?.addEventListener('submit', (event) => {
+        addFilteredListener('open-manual-sale-btn', 'click', () => this.openManualSaleModal());
+        addFilteredListener('cancel-manual-sale-btn', 'click', () => this.closeManualSaleModal());
+        addFilteredListener('manual-sale-user', 'change', (event) => this.handleManualSaleUserSelect(event.target.value));
+        addFilteredListener('manual-sale-form', 'submit', (event) => {
             event.preventDefault();
             const modal = document.getElementById('manual-sale-modal');
             const editId = modal?.dataset?.editId;
@@ -17812,23 +17758,23 @@ class AdminManager {
                 }
             }
         };
-        qtyInput?.addEventListener('input', updateAutoAmount);
+        addFilteredListener('manual-sale-quantity', 'input', updateAutoAmount);
 
         // Wix Product Search listener
-        const productSearch = document.getElementById('manual-sale-product-search');
-        productSearch?.addEventListener('input', (event) => {
+        addFilteredListener('manual-sale-product-search', 'input', (event) => {
             this.filterWixProducts(event.target.value);
         });
 
         // Shop CSV Import listeners
-        document.getElementById('open-shop-csv-import-btn')?.addEventListener('click', () => this.openShopCsvImportModal());
-        document.getElementById('cancel-shop-csv-import-btn')?.addEventListener('click', () => this.closeShopCsvImportModal());
-        document.getElementById('shop-csv-import-file')?.addEventListener('change', (event) => this.handleShopCsvImportFile(event.target.files?.[0]));
-        document.getElementById('save-shop-csv-import-btn')?.addEventListener('click', () => this.saveShopCsvImportRows());
+        addFilteredListener('open-shop-csv-import-btn', 'click', () => this.openShopCsvImportModal());
+        addFilteredListener('cancel-shop-csv-import-btn', 'click', () => this.closeShopCsvImportModal());
+        addFilteredListener('shop-csv-import-file', 'change', (event) => this.handleShopCsvImportFile(event.target.files?.[0]));
+        addFilteredListener('save-shop-csv-import-btn', 'click', () => this.saveShopCsvImportRows());
 
         const shopDropzone = document.getElementById('shop-csv-import-dropzone');
         const shopFileInput = document.getElementById('shop-csv-import-file');
-        if (shopDropzone && shopFileInput) {
+        if (shopDropzone && shopFileInput && !shopDropzone.dataset.dropzoneBound) {
+            shopDropzone.dataset.dropzoneBound = 'true';
             shopDropzone.addEventListener('click', () => shopFileInput.click());
 
             shopDropzone.addEventListener('dragover', (e) => {
@@ -23515,7 +23461,12 @@ class AdminManager {
     }
 
     async savePageContent() {
-        const pageId = document.querySelector('.page-item.active').dataset.page;
+        const activePageEl = document.querySelector('.page-item.active');
+        if (!activePageEl) {
+            this.showToast('Ingen aktiv side er valgt.', 'error', 3500);
+            return;
+        }
+        const pageId = activePageEl.dataset.page;
         const saveBtn = document.getElementById('save-content');
         const dataToSave = this.collectEditorFormData();
 
