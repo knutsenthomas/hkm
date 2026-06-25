@@ -5467,7 +5467,7 @@ class MinSideManager {
                             <h3 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
                             <p style="font-size: 13.5px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
                         </div>
-                        <button class="btn btn-primary w-auto self-end sm:self-auto" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 8px 16px !important; font-size: 13px !important; min-height: 0 !important; line-height: 1.2 !important; height: auto !important;">
+                        <button class="btn btn-primary w-auto" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 8px 16px !important; font-size: 13px !important; min-height: 0 !important; line-height: 1.2 !important; height: auto !important; margin-left: auto !important;">
                             <span class="material-symbols-outlined" style="font-size: 18px !important;">edit_note</span> Skriv bønneemne
                         </button>
                     </div>
