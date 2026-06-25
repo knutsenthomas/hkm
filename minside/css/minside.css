@@ -3051,45 +3051,44 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 /* Profile Tabs Styling */
 .profile-tabs-container {
     display: flex;
-    gap: 8px;
+    gap: 24px;
     margin-bottom: 24px;
     border-bottom: 1.5px solid #e2e8f0;
-    padding-bottom: 12px;
+    padding-bottom: 0;
     flex-wrap: wrap;
 }
 
 .profile-tab-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    font-size: 0.85rem;
+    padding: 12px 8px 8px 8px;
+    font-size: 14.5px;
     font-weight: 700;
     color: var(--text-muted, #64748b);
-    border: 1.5px solid #e2e8f0;
-    border-radius: 99px;
+    border: none;
+    border-bottom: 3px solid transparent;
     background: transparent;
     cursor: pointer;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s ease;
     white-space: nowrap;
     outline: none;
+    margin-bottom: -1.5px; /* Aligns the active border with the container's bottom border */
 }
 
 .profile-tab-btn:hover {
-    color: var(--accent-color, #d17d39);
-    border-color: var(--accent-color, #d17d39);
-    background: rgba(209, 125, 57, 0.05);
+    color: #1e293b;
+    background: transparent;
 }
 
 .profile-tab-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
 .profile-tab-btn.active {
-    color: #fff;
-    border-color: transparent;
-    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+    color: #d17d39;
+    border-bottom: 3px solid #d17d39;
+    background: transparent;
+    box-shadow: none;
 }
 
 
