@@ -5489,7 +5489,7 @@ ol.block-list {
 
     @media (display-mode: standalone), (display-mode: fullscreen) {
         .hero-nav {
-            bottom: 40px; /* Positioned lower in standalone webapp mode since there is no browser bottom bar */
+            bottom: calc(75px + env(safe-area-inset-bottom, 0px)); /* Positioned safe in standalone webapp mode to prevent overlapping with system navigation buttons/gestures */
         }
     }
 
