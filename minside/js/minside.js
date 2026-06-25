@@ -216,6 +216,9 @@ const minsideTranslations = {
         'giving.referenceNotRegistered': 'Ikke registrert',
         'giving.lblMessage': 'Melding',
         'giving.lblCurrency': 'Valuta',
+        'giving.chartTrendsTitle': 'Gavehistorikk over tid',
+        'giving.chartMethodsTitle': 'Fordeling per betalingsmetode',
+        'giving.chartNok': 'Beløp (NOK)',
 
         // Courses
         'courses.noCoursesYet': 'Ingen kurs ennå',
@@ -259,7 +262,35 @@ const minsideTranslations = {
         'deleteAccount.deleteBtn': 'Slett konto',
         'deleteAccount.cancelBtn': 'Avbryt',
         'deleteAccount.doubleConfirm': 'ER DU HELT SIKKER? Dette vil permanent slette all din data og din brukerprofil. Denne handlingen er 100% permanent og kan ikke angres.',
-        'deleteAccount.reauthRequest': 'Vennligst logg inn på nytt for å bekrefte sletting.'
+        'deleteAccount.reauthRequest': 'Vennligst logg inn på nytt for å bekrefte sletting.',
+        
+        // Prayer Wall
+        'prayer.title': 'Bønneveggen',
+        'prayer.subtitle': 'Bær hverandres byrder, og oppfyll på den måte Kristi lov.',
+        'prayer.btnWrite': 'Skriv bønneemne',
+        'prayer.anonymous': 'Anonym søster/bror',
+        'prayer.member': 'Medlem',
+        'prayer.praysForThis': '{n} ber for dette',
+        'prayer.hasPrayed': 'Jeg har bedt 🙏',
+        'prayer.pray': 'Jeg ber 🙏',
+        'prayer.emptyTitle': 'Ingen bønneemner ennå',
+        'prayer.emptyDesc': 'Bli den første til å legge inn et bønneemne på veggen.',
+        'prayer.modalTitle': 'Skriv et bønneemne',
+        'prayer.modalLabel': 'Hva kan vi be for?',
+        'prayer.modalPlaceholder': 'Skriv ditt bønneemne her...',
+        'prayer.modalAnon': 'Post anonymt',
+        'prayer.modalPost': 'Post på bønneveggen',
+        'prayer.errEmpty': 'Bønneemnet kan ikke være tomt.',
+        'prayer.posting': 'Poster...',
+        'prayer.errSave': 'Kunne ikke lagre bønneemnet: ',
+        'prayer.confirmDelete': 'Er du sikker på at du vil slette dette bønneemnet?',
+        'prayer.errDelete': 'Feil under sletting: ',
+        'prayer.errNotFound': 'Bønneemnet finnes ikke.',
+        'prayer.errFetchEdit': 'Kunne ikke hente bønneemnet for redigering: ',
+        'prayer.editModalTitle': 'Rediger bønneemne',
+        'prayer.editModalSave': 'Lagre endringer',
+        'prayer.editModalSaving': 'Lagrer...',
+        'prayer.errUpdate': 'Kunne ikke oppdatere bønneemnet: '
     },
     en: {
         'common.loading': 'Loading',
@@ -473,6 +504,9 @@ const minsideTranslations = {
         'giving.referenceNotRegistered': 'Not registered',
         'giving.lblMessage': 'Message',
         'giving.lblCurrency': 'Currency',
+        'giving.chartTrendsTitle': 'Giving Trends Over Time',
+        'giving.chartMethodsTitle': 'Distribution by Payment Method',
+        'giving.chartNok': 'Amount (NOK)',
 
         // Courses
         'courses.noCoursesYet': 'No courses yet',
@@ -516,7 +550,35 @@ const minsideTranslations = {
         'deleteAccount.deleteBtn': 'Delete Account',
         'deleteAccount.cancelBtn': 'Cancel',
         'deleteAccount.doubleConfirm': 'ARE YOU ABSOLUTELY SURE? This will permanently delete all your data and your user profile. This action is 100% permanent and cannot be undone.',
-        'deleteAccount.reauthRequest': 'Please log in again to confirm deletion.'
+        'deleteAccount.reauthRequest': 'Please log in again to confirm deletion.',
+        
+        // Prayer Wall
+        'prayer.title': 'Prayer Wall',
+        'prayer.subtitle': 'Bear one another\'s burdens, and so fulfill the law of Christ.',
+        'prayer.btnWrite': 'Share Prayer Request',
+        'prayer.anonymous': 'Anonymous sister/brother',
+        'prayer.member': 'Member',
+        'prayer.praysForThis': '{n} praying for this',
+        'prayer.hasPrayed': 'I have prayed 🙏',
+        'prayer.pray': 'I pray 🙏',
+        'prayer.emptyTitle': 'No prayer requests yet',
+        'prayer.emptyDesc': 'Be the first to share a prayer request on the wall.',
+        'prayer.modalTitle': 'Share a Prayer Request',
+        'prayer.modalLabel': 'What can we pray for?',
+        'prayer.modalPlaceholder': 'Write your prayer request here...',
+        'prayer.modalAnon': 'Post anonymously',
+        'prayer.modalPost': 'Post to Prayer Wall',
+        'prayer.errEmpty': 'Prayer request cannot be empty.',
+        'prayer.posting': 'Posting...',
+        'prayer.errSave': 'Could not save prayer request: ',
+        'prayer.confirmDelete': 'Are you sure you want to delete this prayer request?',
+        'prayer.errDelete': 'Error during deletion: ',
+        'prayer.errNotFound': 'Prayer request not found.',
+        'prayer.errFetchEdit': 'Could not retrieve prayer request for editing: ',
+        'prayer.editModalTitle': 'Edit Prayer Request',
+        'prayer.editModalSave': 'Save Changes',
+        'prayer.editModalSaving': 'Saving...',
+        'prayer.errUpdate': 'Could not update prayer request: '
     },
     es: {
         'common.loading': 'Cargando',
@@ -730,6 +792,9 @@ const minsideTranslations = {
         'giving.referenceNotRegistered': 'No registrado',
         'giving.lblMessage': 'Mensaje',
         'giving.lblCurrency': 'Moneda',
+        'giving.chartTrendsTitle': 'Historial de donaciones',
+        'giving.chartMethodsTitle': 'Distribución por método de pago',
+        'giving.chartNok': 'Monto (NOK)',
 
         // Courses
         'courses.noCoursesYet': 'No hay cursos aún',
@@ -773,7 +838,35 @@ const minsideTranslations = {
         'deleteAccount.deleteBtn': 'Eliminar cuenta',
         'deleteAccount.cancelBtn': 'Cancelar',
         'deleteAccount.doubleConfirm': '¿ESTÁS ABSOLUTAMENTE SEGURO? Esto eliminará permanentemente todos tus datos y tu perfil de usuario. Esta acción es 100% permanente y no se puede deshacer.',
-        'deleteAccount.reauthRequest': 'Por favor, inicia sesión de nuevo para confirmar la eliminación.'
+        'deleteAccount.reauthRequest': 'Por favor, inicia sesión de nuevo para confirmar la eliminación.',
+        
+        // Prayer Wall
+        'prayer.title': 'Muro de Oración',
+        'prayer.subtitle': 'Sobrellevad los unos las cargas de los otros, y cumplid así la ley de Cristo.',
+        'prayer.btnWrite': 'Escribir Petición',
+        'prayer.anonymous': 'Hermana/hermano anónimo',
+        'prayer.member': 'Miembro',
+        'prayer.praysForThis': '{n} orando por esto',
+        'prayer.hasPrayed': 'He orado 🙏',
+        'prayer.pray': 'Yo oro 🙏',
+        'prayer.emptyTitle': 'No hay peticiones de oración aún',
+        'prayer.emptyDesc': 'Sé el primero en publicar una petición de oración en el muro.',
+        'prayer.modalTitle': 'Escribir petición de oración',
+        'prayer.modalLabel': '¿Por qué podemos orar?',
+        'prayer.modalPlaceholder': 'Escribe tu petición de oración aquí...',
+        'prayer.modalAnon': 'Publicar anónimamente',
+        'prayer.modalPost': 'Publicar en el muro',
+        'prayer.errEmpty': 'La petición de oración no puede estar vacía.',
+        'prayer.posting': 'Publicando...',
+        'prayer.errSave': 'No se pudo guardar la petición de oración: ',
+        'prayer.confirmDelete': '¿Estás seguro de que quieres eliminar esta petición de oración?',
+        'prayer.errDelete': 'Error durante la eliminación: ',
+        'prayer.errNotFound': 'La petición de oración no existe.',
+        'prayer.errFetchEdit': 'No se pudo recuperar la petición de oración para editar: ',
+        'prayer.editModalTitle': 'Editar petición de oración',
+        'prayer.editModalSave': 'Guardar cambios',
+        'prayer.editModalSaving': 'Guardando...',
+        'prayer.errUpdate': 'No se pudo actualizar la petición de oración: '
     }
 };
 
@@ -3282,6 +3375,216 @@ class MinSideManager {
         let selectedType = 'all';
         let selectedYear = 'all';
 
+        const updateGivingCharts = () => {
+            if (typeof Chart === 'undefined') return;
+
+            // 1. Prepare Trends Chart Data
+            let trendsLabels = [];
+            let trendsData = [];
+
+            const chartFiltered = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                const year = date ? date.getFullYear() : null;
+                const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+                
+                const type = (d.type || 'Gave').toLowerCase();
+                const matchesType = (selectedType === 'all' || 
+                    (selectedType === 'gave' && type === 'gave') || 
+                    (selectedType === 'butikk' && type === 'butikk'));
+                
+                return matchesYear && matchesType;
+            });
+
+            if (selectedYear === 'all') {
+                // Group by year
+                const yearsMap = {};
+                chartFiltered.forEach(d => {
+                    const date = this._getDonationDate(d);
+                    if (date) {
+                        const year = date.getFullYear();
+                        if (year) {
+                            yearsMap[year] = (yearsMap[year] || 0) + this._normalizeDonationAmountNok(d);
+                        }
+                    }
+                });
+                trendsLabels = Object.keys(yearsMap).sort((a, b) => parseInt(a) - parseInt(b));
+                trendsData = trendsLabels.map(y => yearsMap[y]);
+            } else {
+                // Group by month for selected year
+                const monthsMap = Array(12).fill(0);
+                const yearInt = parseInt(selectedYear);
+                
+                const isNoLang = document.documentElement.lang === 'no' || !document.documentElement.lang;
+                const isEsLang = document.documentElement.lang === 'es';
+                const monthsLabelsNo = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
+                const monthsLabelsEs = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                const monthsLabelsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                trendsLabels = isNoLang ? monthsLabelsNo : (isEsLang ? monthsLabelsEs : monthsLabelsEn);
+
+                chartFiltered.forEach(d => {
+                    const date = this._getDonationDate(d);
+                    if (date && date.getFullYear() === yearInt) {
+                        const month = date.getMonth();
+                        monthsMap[month] += this._normalizeDonationAmountNok(d);
+                    }
+                });
+                trendsData = monthsMap;
+            }
+
+            // 2. Prepare Methods Chart Data
+            const methodsMap = {};
+            chartFiltered.forEach(d => {
+                const method = String(d.method || 'card').trim().toLowerCase();
+                const label = this._getDonationMethodLabel(method);
+                methodsMap[label] = (methodsMap[label] || 0) + this._normalizeDonationAmountNok(d);
+            });
+            const methodsLabels = Object.keys(methodsMap);
+            const methodsData = methodsLabels.map(l => methodsMap[l]);
+
+            // Clean up existing charts
+            if (this.givingTrendsChart) {
+                try { this.givingTrendsChart.destroy(); } catch (e) {}
+                this.givingTrendsChart = null;
+            }
+            if (this.givingMethodsChart) {
+                try { this.givingMethodsChart.destroy(); } catch (e) {}
+                this.givingMethodsChart = null;
+            }
+
+            // 3. Render Trends Chart (Line Chart)
+            const ctxTrends = container.querySelector('#giving-trends-chart');
+            if (ctxTrends) {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const gridColor = isDark ? '#334155' : '#e2e8f0';
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                this.givingTrendsChart = new Chart(ctxTrends, {
+                    type: 'line',
+                    data: {
+                        labels: trendsLabels,
+                        datasets: [{
+                            label: t('giving.chartNok'),
+                            data: trendsData,
+                            borderColor: '#1B4965',
+                            backgroundColor: 'rgba(27, 73, 101, 0.05)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#bd4f2a',
+                            pointBorderColor: '#ffffff',
+                            pointHoverRadius: 6,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'kr ' + context.raw.toLocaleString('no-NO', { minimumFractionDigits: 0 });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '600'
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: gridColor
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '500'
+                                    },
+                                    callback: function(value) {
+                                        return 'kr ' + value.toLocaleString('no-NO');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 4. Render Methods Chart (Doughnut Chart)
+            const ctxMethods = container.querySelector('#giving-methods-chart');
+            if (ctxMethods && methodsLabels.length > 0) {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const legendColor = isDark ? '#f8fafc' : '#0f172a';
+
+                this.givingMethodsChart = new Chart(ctxMethods, {
+                    type: 'doughnut',
+                    data: {
+                        labels: methodsLabels,
+                        datasets: [{
+                            data: methodsData,
+                            backgroundColor: [
+                                '#1B4965',
+                                '#bd4f2a',
+                                '#d17d39',
+                                '#475569',
+                                '#94a3b8',
+                                '#cbd5e1'
+                            ],
+                            borderWidth: isDark ? 2 : 1,
+                            borderColor: isDark ? '#1e293b' : '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: legendColor,
+                                    boxWidth: 12,
+                                    padding: 16,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '600',
+                                        size: 11
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const pct = ((context.raw / total) * 100).toFixed(1);
+                                        return context.label + ': kr ' + context.raw.toLocaleString('no-NO') + ' (' + pct + '%)';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+        };
+
         const updateGivingView = () => {
             const filtered = donations.filter(d => {
                 const date = this._getDonationDate(d);
@@ -3382,6 +3685,7 @@ class MinSideManager {
                     });
                 }
             }
+            updateGivingCharts();
         };
 
         container.innerHTML = `
@@ -3399,6 +3703,21 @@ class MinSideManager {
                 <div class="stat-chip">
                     <div class="stat-chip-label">${t('giving.totalGiftsCount')}</div>
                     <div class="stat-chip-value" id="giving-stat-count-value">—</div>
+                </div>
+            </div>
+
+            <div class="giving-charts-card">
+                <div class="table-card" style="padding: 20px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartTrendsTitle')}</h3>
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 220px; width: 100%;">
+                        <canvas id="giving-trends-chart"></canvas>
+                    </div>
+                </div>
+                <div class="table-card" style="padding: 20px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartMethodsTitle')}</h3>
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 220px; width: 100%;">
+                        <canvas id="giving-methods-chart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -5413,7 +5732,7 @@ class MinSideManager {
                         ? `<div class="member-avatar"><img src="${p.userPhotoURL}" alt=""></div>`
                         : `<div class="member-avatar" style="background: #1B4965; color: #ffffff;">${(p.userName || '?').charAt(0).toUpperCase()}</div>`);
 
-                const nameHtml = p.isAnonymous ? 'Anonym søster/bror' : (p.userName || 'Medlem');
+                const nameHtml = p.isAnonymous ? t('prayer.anonymous') : (p.userName || t('prayer.member'));
                 
                 return `
                     <div class="info-card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 15px rgba(15,23,42,0.01); background: #ffffff; margin-bottom: 0px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;" id="prayer-card-${p.id}">
@@ -5429,7 +5748,7 @@ class MinSideManager {
                                     </div>
                                     ${isOwner ? `
                                         <div style="display: flex; gap: 8px;">
-                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #1B4965; padding: 4px; cursor:pointer;" onclick="window.minSideManager.editPrayer('${p.id}')" title="Rediger">
+                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #1B4965; padding: 4px; cursor:pointer;" onclick="window.minSideManager.editPrayer('${p.id}')" title="${t('common.edit')}">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                             </button>
                                             <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')" title="Slett">
@@ -5442,9 +5761,9 @@ class MinSideManager {
                                 <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; white-space: pre-wrap; font-family: inherit;">${p.text}</p>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
-                                <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber for dette</span></div>
+                                <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${t('prayer.praysForThis', { n: count })}</span></div>
                                 
-                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled' : ''} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px; position: relative; top: 1px !important; line-height: 1; display: inline-block;">favorite</span><span style="line-height: 1; display: inline-block;">${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span></button>
+                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: not-allowed !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"' : 'style="background: #1B4965 !important; border-color: #1B4965 !important; color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px !important; position: relative !important; top: 1px !important; line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">favorite</span><span style="line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">${hasPrayed ? t('prayer.hasPrayed') : t('prayer.pray')}</span></button>
                             </div>
                         </div>
                     </div>
@@ -5455,11 +5774,11 @@ class MinSideManager {
                 <div style="padding: 16px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
                     <div class="prayer-wall-header">
                         <div>
-                            <h3>Bønneveggen</h3>
-                            <p>Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
+                            <h3>${t('prayer.title')}</h3>
+                            <p>${t('prayer.subtitle')}</p>
                         </div>
                         <button class="btn-write-prayer-style" id="btn-write-prayer">
-                            <span class="material-symbols-outlined" style="font-size: 18px !important;">edit_note</span> Skriv bønneemne
+                            <span class="material-symbols-outlined" style="font-size: 18px !important;">edit_note</span> ${t('prayer.btnWrite')}
                         </button>
                     </div>
 
@@ -5467,8 +5786,8 @@ class MinSideManager {
                         ${prayers.length > 0 ? feedHtml : `
                             <div class="empty-state" style="padding: 60px 20px; text-align: center; grid-column: 1 / -1; width: 100%;">
                                 <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">favorite</span>
-                                <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">Ingen bønneemner ennå</h3>
-                                <p style="font-size: 14px; color: #64748b; margin: 0;">Bli den første til å legge inn et bønneemne på veggen.</p>
+                                <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">${t('prayer.emptyTitle')}</h3>
+                                <p style="font-size: 14px; color: #64748b; margin: 0;">${t('prayer.emptyDesc')}</p>
                             </div>
                         `}
                     </div>
@@ -5494,9 +5813,9 @@ class MinSideManager {
         const diffHours = Math.round(diffMs / 3600000);
         const diffDays = Math.round(diffMs / 86400000);
 
-        if (diffMins < 60) return `${diffMins} min siden`;
-        if (diffHours < 24) return `${diffHours} t siden`;
-        return `${diffDays} dager siden`;
+        if (diffMins < 60) return t('time.minutesAgo', { n: diffMins });
+        if (diffHours < 24) return t('time.hoursAgo', { n: diffHours });
+        return t('time.daysAgo', { n: diffDays });
     }
 
     async supportPrayer(prayerId, authorUid) {
@@ -5545,14 +5864,14 @@ class MinSideManager {
     }
 
     async deletePrayer(prayerId) {
-        if (!confirm("Er du sikker på at du vil slette dette bønneemnet?")) return;
+        if (!confirm(t('prayer.confirmDelete'))) return;
         try {
             await firebase.firestore().collection('prayers').doc(prayerId).delete();
             const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
             if (viewContainer) this.loadPrayerWallFeed(viewContainer);
         } catch (err) {
             console.error("Delete prayer error:", err);
-            alert("Feil under sletting: " + err.message);
+            alert(t('prayer.errDelete') + err.message);
         }
     }
 
@@ -5560,7 +5879,7 @@ class MinSideManager {
         try {
             const doc = await firebase.firestore().collection('prayers').doc(prayerId).get();
             if (!doc.exists) {
-                alert("Bønneemnet finnes ikke.");
+                alert(t('prayer.errNotFound'));
                 return;
             }
             const data = doc.data();
@@ -5568,7 +5887,7 @@ class MinSideManager {
             this.openEditPrayerModal(prayerId, data, viewContainer);
         } catch (err) {
             console.error("Fetch prayer error:", err);
-            alert("Kunne ikke hente bønneemnet for redigering: " + err.message);
+            alert(t('prayer.errFetchEdit') + err.message);
         }
     }
 
@@ -5582,20 +5901,20 @@ class MinSideManager {
         modal.innerHTML = `
             <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">Rediger bønneemne</h3>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${t('prayer.editModalTitle')}</h3>
                     <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
                 </div>
                 
                 <div style="margin-bottom: 16px;">
-                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">Hva kan vi be for?</label>
-                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="Skriv ditt bønneemne...">${data.text || ''}</textarea>
+                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">${t('prayer.modalLabel')}</label>
+                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="${t('prayer.modalPlaceholder')}">${data.text || ''}</textarea>
                 </div>
 
                 <div style="margin-bottom: 24px;">
                     <label style="display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; cursor:pointer; user-select:none; margin: 0;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">visibility_off</span>
-                            <span style="font-size:13.5px; font-weight:600; color:#334155;">Post anonymt</span>
+                            <span style="font-size:13.5px; font-weight:600; color:#334155;">${t('prayer.modalAnon')}</span>
                         </div>
                         <label class="toggle toggle-sm" style="margin: 0;">
                             <input type="checkbox" id="prayer-anon-check" ${data.isAnonymous ? 'checked' : ''}>
@@ -5605,9 +5924,9 @@ class MinSideManager {
                 </div>
 
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
-                    <button class="btn btn-outline" id="btn-cancel-prayer">Avbryt</button>
+                    <button class="btn btn-outline" id="btn-cancel-prayer">${t('common.cancel')}</button>
                     <button class="btn btn-primary" id="btn-save-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none;">
-                        Lagre endringer
+                        ${t('prayer.editModalSave')}
                     </button>
                 </div>
             </div>
@@ -5633,13 +5952,13 @@ class MinSideManager {
             const isAnonymous = modal.querySelector('#prayer-anon-check').checked;
             
             if (!text) {
-                alert("Bønneemnet kan ikke være tomt.");
+                alert(t('prayer.errEmpty'));
                 return;
             }
 
             const saveBtn = modal.querySelector('#btn-save-prayer');
             saveBtn.disabled = true;
-            saveBtn.innerText = 'Lagrer...';
+            saveBtn.innerText = t('prayer.editModalSaving');
 
             try {
                 await firebase.firestore().collection('prayers').doc(prayerId).update({
@@ -5652,9 +5971,9 @@ class MinSideManager {
                 this.loadPrayerWallFeed(container);
             } catch (err) {
                 console.error("Update prayer request failed:", err);
-                alert("Kunne ikke oppdatere bønneemnet: " + err.message);
+                alert(t('prayer.errUpdate') + err.message);
                 saveBtn.disabled = false;
-                saveBtn.innerText = 'Lagre endringer';
+                saveBtn.innerText = t('prayer.editModalSave');
             }
         };
     }
@@ -5669,20 +5988,20 @@ class MinSideManager {
         modal.innerHTML = `
             <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">Skriv et bønneemne</h3>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${t('prayer.modalTitle')}</h3>
                     <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
                 </div>
                 
                 <div style="margin-bottom: 16px;">
-                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">Hva kan vi be for?</label>
-                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="Skriv ditt bønneemne her..."></textarea>
+                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">${t('prayer.modalLabel')}</label>
+                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="${t('prayer.modalPlaceholder')}"></textarea>
                 </div>
 
                 <div style="margin-bottom: 24px;">
                     <label style="display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; cursor:pointer; user-select:none; margin: 0;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">visibility_off</span>
-                            <span style="font-size:13.5px; font-weight:600; color:#334155;">Post anonymt</span>
+                            <span style="font-size:13.5px; font-weight:600; color:#334155;">${t('prayer.modalAnon')}</span>
                         </div>
                         <label class="toggle toggle-sm" style="margin: 0;">
                             <input type="checkbox" id="prayer-anon-check">
@@ -5692,9 +6011,9 @@ class MinSideManager {
                 </div>
 
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
-                    <button class="btn btn-outline" id="btn-cancel-prayer">Avbryt</button>
+                    <button class="btn btn-outline" id="btn-cancel-prayer">${t('common.cancel')}</button>
                     <button class="btn btn-primary" id="btn-save-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none;">
-                        Post på bønneveggen
+                        ${t('prayer.modalPost')}
                     </button>
                 </div>
             </div>
@@ -5720,13 +6039,13 @@ class MinSideManager {
             const isAnonymous = modal.querySelector('#prayer-anon-check').checked;
             
             if (!text) {
-                alert("Bønneemnet kan ikke være tomt.");
+                alert(t('prayer.errEmpty'));
                 return;
             }
 
             const saveBtn = modal.querySelector('#btn-save-prayer');
             saveBtn.disabled = true;
-            saveBtn.innerText = 'Poster...';
+            saveBtn.innerText = t('prayer.posting');
 
             try {
                 await firebase.firestore().collection('prayers').add({
@@ -5744,9 +6063,9 @@ class MinSideManager {
                 this.loadPrayerWallFeed(container);
             } catch (err) {
                 console.error("Save prayer request failed:", err);
-                alert("Kunne ikke lagre bønneemnet: " + err.message);
+                alert(t('prayer.errSave') + err.message);
                 saveBtn.disabled = false;
-                saveBtn.innerText = 'Post på bønneveggen';
+                saveBtn.innerText = t('prayer.modalPost');
             }
         };
     }

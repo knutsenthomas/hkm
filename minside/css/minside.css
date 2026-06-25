@@ -1434,8 +1434,20 @@ body.admin-body .btn-full,
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   GIVING  
-   ══════════════════════════════════════════════════════════════════ */
+.giving-charts-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .giving-charts-card {
+        grid-template-columns: 2fr 1.2fr;
+    }
+}
+
 .giving-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
