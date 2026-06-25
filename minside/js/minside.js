@@ -810,6 +810,63 @@ function translateStaticHTML() {
     });
 }
 
+const BIBLE_BOOKS = {
+    no: [
+        "1. Mosebok", "2. Mosebok", "3. Mosebok", "4. Mosebok", "5. Mosebok",
+        "Josva", "Dommerne", "Rut", "1. Samuelsbok", "2. Samuelsbok",
+        "1. Kongebok", "2. Kongebok", "1. Krønikebok", "2. Krønikebok", "Esra",
+        "Nehemja", "Ester", "Job", "Salmene", "Ordspråkene",
+        "Forkynneren", "Høysangen", "Jesaja", "Jeremia", "Klagesangene",
+        "Esekiel", "Daniel", "Hosea", "Joel", "Amos",
+        "Obadja", "Jona", "Mika", "Nahum", "Habakkuk",
+        "Sefanja", "Haggai", "Sakarja", "Malaki", "Matteus",
+        "Markus", "Lukas", "Johannes", "Apostlenes gjerninger", "Romerne",
+        "1. Korinterne", "2. Korinterne", "Galaterne", "Efeserne", "Filipperne",
+        "Kolosserne", "1. Tessalonikerne", "2. Tessalonikerne", "1. Timoteus", "2. Timoteus",
+        "Titus", "Filemon", "Hebreerne", "Jakob", "1. Peter",
+        "2. Peter", "1. Johannes", "2. Johannes", "3. Johannes", "Judas",
+        "Åpenbaringen"
+    ],
+    en: [
+        "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
+        "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel",
+        "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra",
+        "Nehemiah", "Esther", "Job", "Psalms", "Proverbs",
+        "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations",
+        "Ezekiel", "Daniel", "Hosea", "Joel", "Amos",
+        "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk",
+        "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew",
+        "Mark", "Luke", "John", "Acts", "Romans",
+        "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians",
+        "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy",
+        "Titus", "Philemon", "Hebrews", "James", "1 Peter",
+        "2 Peter", "1 John", "2 John", "3 John", "Judas",
+        "Revelation"
+    ],
+    es: [
+        "Génesis", "Éxodo", "Levítico", "Números", "Deuteronomio",
+        "Josué", "Jueces", "Rut", "1 Samuel", "2 Samuel",
+        "1 Reyes", "2 Reyes", "1 Crónicas", "2 Crónicas", "Esdras",
+        "Nehemías", "Ester", "Job", "Salmos", "Proverbios",
+        "Eclesiastés", "Cantares", "Isaías", "Jeremías", "Lamentaciones",
+        "Ezequiel", "Daniel", "Oseas", "Joel", "Amós",
+        "Abdías", "Jonás", "Miqueas", "Nahúm", "Habacuc",
+        "Sofonías", "Hageo", "Zacarías", "Malaquías", "Mateo",
+        "Marcos", "Lucas", "Juan", "Hechos", "Romanos",
+        "1 Corintios", "2 Corintios", "Gálatas", "Efesios", "Filipenses",
+        "Colosenses", "1 Tesalonicenses", "2 Tesalonicenses", "1 Timoteo", "2 Timoteo",
+        "Tito", "Filemón", "Hebreos", "Santiago", "1 Pedro",
+        "2 Pedro", "1 Juan", "2 Juan", "3 Juan", "Judas",
+        "Apocalipsis"
+    ]
+};
+
+function isBibleReference(query) {
+    const q = query.trim();
+    // Matcher f.eks. "Johannes 3:16", "Joh 3", "1. Mosebok 1:1", "1 Sam 3:4", "Matteus 6:9-13"
+    const pattern = /^(?:[1-5]\.?\s*)?[a-zA-ZæøåÆØÅáéíóúñÁÉÍÓÚÑ\s]{3,}\s+\d+(?:\s*[\:\.\s,\-]\s*\d+)*$/i;
+    return pattern.test(q);
+}
 
 class MinSideManager {
     constructor() {
@@ -5563,6 +5620,12 @@ class MinSideManager {
             selectedIndex = -1;
             input.focus();
             
+            const searchIcon = document.querySelector('#global-search-overlay span.material-symbols-outlined');
+            if (searchIcon) {
+                searchIcon.textContent = 'search';
+                searchIcon.classList.remove('animate-spin');
+            }
+            
             // Show initial prompt
             resultsContainer.innerHTML = `
                 <div class="empty-state" style="padding: 40px 20px; text-align: center;">
@@ -5655,8 +5718,14 @@ class MinSideManager {
 
         // Real-time search query matching
         let minSideSearchDebounce;
-        const renderSearchResults = (queryStr, bibleData) => {
+        let latestMinSideQuery = '';
+
+        const renderSearchResults = (queryStr, bibleData, isLoadingBible = false) => {
             const query = queryStr.trim().toLowerCase();
+            
+            // Verify query is still active to avoid race condition/jumping
+            if (latestMinSideQuery !== query) return;
+
             const results = [];
             const searchCollection = (list) => {
                 list.forEach(item => {
@@ -5666,6 +5735,37 @@ class MinSideManager {
                 });
             };
 
+            // Autocomplete/suggest Bible books based on query prefix
+            const lang = document.documentElement.lang || 'no';
+            const books = BIBLE_BOOKS[lang] || BIBLE_BOOKS['no'];
+            const lowerQ = query.toLowerCase();
+            
+            if (!isBibleReference(queryStr)) {
+                const matchedBooks = books.filter(book => {
+                    const lowerBook = book.toLowerCase();
+                    return lowerBook.startsWith(lowerQ) || (lowerQ.length >= 3 && lowerBook.includes(lowerQ));
+                });
+
+                matchedBooks.slice(0, 3).forEach(book => {
+                    results.push({
+                        id: `${book} 1`,
+                        type: 'bible-ref',
+                        title: `${book} 1`,
+                        desc: lang === 'en' ? `Open ${book} chapter 1 in the online Bible` : (lang === 'es' ? `Abrir ${book} capítulo 1 en la Biblia en línea` : `Åpne ${book} kapittel 1 i nettbibelen`)
+                    });
+                });
+            }
+
+            // Sjekk om det er en direkte bibelreferanse og legg til direktelenke
+            if (isBibleReference(queryStr)) {
+                results.push({
+                    id: queryStr,
+                    type: 'bible-ref',
+                    title: queryStr.charAt(0).toUpperCase() + queryStr.slice(1),
+                    desc: lang === 'en' ? 'Open this chapter/passage in the online Bible' : (lang === 'es' ? 'Abrir este capítulo/pasaje en la Biblia en línea' : 'Åpne dette kapittelet/skriftstedet i nettbibelen')
+                });
+            }
+
             searchCollection(searchCache.courses);
             searchCollection(searchCache.readingPlans);
             searchCollection(searchCache.notes);
@@ -5673,21 +5773,44 @@ class MinSideManager {
 
             // Add Bible search result if available and relevant
             if (bibleData && bibleData.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(bibleData.category.toLowerCase())) {
+                let versesHtml = '';
+                if (Array.isArray(bibleData.crossReferences) && bibleData.crossReferences.length > 0) {
+                    let bibleUrlBase = '../bibel.html';
+                    if (lang === 'en') bibleUrlBase = '../en/bibel.html';
+                    else if (lang === 'es') bibleUrlBase = '../es/bibel.html';
+
+                    versesHtml = bibleData.crossReferences.map(refObj => {
+                        const cleanRef = refObj.ref.trim();
+                        const href = `${bibleUrlBase}?ref=${encodeURIComponent(cleanRef)}`;
+                        return `<a href="${href}" onclick="event.stopPropagation();" style="display: inline-block; font-size: 11px; margin: 4px 4px 0 0; padding: 4px 8px; border-radius: 6px; background: #1B496515; color: #1B4965; font-weight: 600; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='#1B496530'" onmouseout="this.style.background='#1B496515'">${cleanRef}</a>`;
+                    }).join('');
+                }
+
                 results.push({
                     id: bibleData.word || queryStr,
                     type: 'bible-search',
                     title: bibleData.word || queryStr,
-                    desc: bibleData.definition || bibleData.contextualNote || ''
+                    desc: bibleData.definition || bibleData.contextualNote || '',
+                    versesHtml: versesHtml
                 });
             }
 
             if (results.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="empty-state" style="padding: 40px 20px; text-align: center;">
-                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">sentiment_dissatisfied</span>
-                        <p style="font-size: 14px; color: #64748b; margin: 0;">Ingen resultater samsvarte med "${queryStr}"</p>
-                    </div>
-                `;
+                if (isLoadingBible) {
+                    resultsContainer.innerHTML = `
+                        <div style="padding: 40px 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                            <div class="spinner" style="width: 20px; height: 20px; border-width: 2.5px; border-color: #cbd5e1; border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                            <span style="font-size: 14px; color: #64748b; font-weight: 500;">Søker...</span>
+                        </div>
+                    `;
+                } else {
+                    resultsContainer.innerHTML = `
+                        <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                            <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">sentiment_dissatisfied</span>
+                            <p style="font-size: 14px; color: #64748b; margin: 0;">Ingen resultater samsvarte med "${queryStr}"</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
@@ -5697,10 +5820,11 @@ class MinSideManager {
                 'reading-plan': { name: 'Leseplaner & Andakt', icon: 'auto_stories', color: '#bd4f2a' },
                 'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
                 'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' },
-                'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#1b4965' }
+                'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#1b4965' },
+                'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#1b4965' }
             };
 
-            resultsContainer.innerHTML = results.map((r, idx) => {
+            let html = results.map((r, idx) => {
                 const label = typeLabels[r.type];
                 return `
                     <div class="search-result-item" data-index="${idx}" style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; background: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px;" onclick="window.minSideManager.selectSearchResult('${r.type}', '${r.id}')">
@@ -5709,8 +5833,9 @@ class MinSideManager {
                                 <span class="material-symbols-outlined" style="font-size: 20px;">${label.icon}</span>
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 13.5px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.title}</div>
-                                <div style="font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.desc}</div>
+                                <div style="font-size: 13.5px; font-weight: 700; color: #0f172a; ${r.type === 'bible-search' ? '' : 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'}">${r.title}</div>
+                                <div style="font-size: 12px; color: #64748b; ${r.type === 'bible-search' ? 'line-height: 1.4;' : 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'}">${r.desc}</div>
+                                ${r.versesHtml ? `<div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">${r.versesHtml}</div>` : ''}
                             </div>
                         </div>
                         <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; flex-shrink: 0;">
@@ -5719,11 +5844,29 @@ class MinSideManager {
                     </div>
                 `;
             }).join('');
+
+            if (isLoadingBible) {
+                html += `
+                    <div class="bible-search-loading-placeholder" style="padding: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; margin-top: 8px;">
+                        <div class="spinner" style="width: 16px; height: 16px; border-width: 2px; border-color: #cbd5e1; border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                        <span style="font-size: 12.5px; color: #64748b; font-weight: 500;">Søker i Bibel & Ordbok...</span>
+                    </div>
+                `;
+            }
+
+            resultsContainer.innerHTML = html;
         };
 
         input.addEventListener('input', () => {
             const query = input.value.trim();
+            latestMinSideQuery = query.toLowerCase();
+
             if (query.length < 2) {
+                const searchIcon = document.querySelector('#global-search-overlay span.material-symbols-outlined');
+                if (searchIcon) {
+                    searchIcon.textContent = 'search';
+                    searchIcon.classList.remove('animate-spin');
+                }
                 resultsContainer.innerHTML = `
                     <div class="empty-state" style="padding: 40px 20px; text-align: center;">
                         <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">search</span>
@@ -5733,23 +5876,35 @@ class MinSideManager {
                 return;
             }
 
-            // Sync render local search instantly
-            renderSearchResults(query, null);
+            // Sync render local search instantly, but flag that Bible is loading
+            renderSearchResults(query, null, true);
 
             // Debounced fetch for Bible database
             clearTimeout(minSideSearchDebounce);
+
+            const searchIcon = document.querySelector('#global-search-overlay span.material-symbols-outlined');
+            if (searchIcon) {
+                searchIcon.textContent = 'sync';
+                searchIcon.classList.add('animate-spin');
+            }
+
             minSideSearchDebounce = setTimeout(async () => {
                 try {
                     const lang = document.documentElement.lang || 'no';
                     const res = await fetch(`/api/bible/dictionary?word=${encodeURIComponent(query)}&lang=${lang}`);
                     if (res.ok) {
                         const bibleData = await res.json();
-                        if (input.value.trim() === query) {
-                            renderSearchResults(query, bibleData);
+                        if (latestMinSideQuery === query.toLowerCase()) {
+                            renderSearchResults(query, bibleData, false);
                         }
                     }
                 } catch (e) {
                     console.warn("[Search] Bible search on minside failed:", e);
+                } finally {
+                    if (latestMinSideQuery === query.toLowerCase() && searchIcon) {
+                        searchIcon.textContent = 'search';
+                        searchIcon.classList.remove('animate-spin');
+                    }
                 }
             }, 400);
         });
@@ -5758,13 +5913,14 @@ class MinSideManager {
     selectSearchResult(type, id) {
         const overlay = document.getElementById('global-search-overlay');
         if (overlay) overlay.style.display = 'none';
-        if (type === 'bible-search') {
+        if (type === 'bible-search' || type === 'bible-ref') {
             const lang = document.documentElement.lang || 'no';
-            let url = '../bibel.html?dict=' + encodeURIComponent(id);
+            const paramName = type === 'bible-search' ? 'dict' : 'ref';
+            let url = '../bibel.html?' + paramName + '=' + encodeURIComponent(id);
             if (lang === 'en') {
-                url = '../en/bibel.html?dict=' + encodeURIComponent(id);
+                url = '../en/bibel.html?' + paramName + '=' + encodeURIComponent(id);
             } else if (lang === 'es') {
-                url = '../es/bibel.html?dict=' + encodeURIComponent(id);
+                url = '../es/bibel.html?' + paramName + '=' + encodeURIComponent(id);
             }
             window.location.href = url;
             return;
