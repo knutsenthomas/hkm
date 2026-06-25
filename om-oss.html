@@ -83,6 +83,278 @@
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
         
     <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
+    <style>
+        /* ===================================
+           Premium Design Overrides for Om Oss
+           =================================== */
+
+        /* 1. Hero Section */
+        .page-hero.subpage-hero {
+            background-attachment: scroll !important;
+            padding: 140px 0 100px 0 !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .page-hero.subpage-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(209, 125, 57, 0.15) 0%, transparent 60%) !important;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 2. Circular Image video block */
+        .about-image {
+            position: relative !important;
+        }
+        .circular-image {
+            border: 8px solid var(--bg-white, #ffffff) !important;
+            box-shadow: 0 30px 60px -15px rgba(27, 73, 101, 0.18) !important;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-image:hover .circular-image {
+            transform: scale(1.02) !important;
+        }
+        .play-button {
+            width: 72px !important;
+            height: 72px !important;
+            font-size: 22px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 12px 28px rgba(189, 79, 42, 0.35) !important;
+        }
+        .play-button::before {
+            background: rgba(189, 79, 42, 0.3) !important;
+            animation: pulse-ring 2s infinite !important;
+        }
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+        }
+
+        /* 3. About Features (Oppdrag / Historie) */
+        .about-feature-item {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            border-radius: 18px !important;
+            padding: 20px !important;
+            box-shadow: 0 10px 30px -15px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-feature-item:hover {
+            background: #ffffff !important;
+            border-color: rgba(209, 125, 57, 0.25) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 16px 36px -12px rgba(27, 73, 101, 0.08) !important;
+        }
+        .about-feature-icon-box {
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            color: #ffffff !important;
+            font-size: 18px !important;
+            box-shadow: 0 6px 14px rgba(189, 79, 42, 0.2) !important;
+        }
+        .about-feature-text h4 {
+            color: #1B4965 !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+        }
+        .about-feature-text p {
+            color: #475569 !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        /* 4. Hva Vi Står For Value Cards */
+        .vision-values {
+            background: linear-gradient(to bottom, #f8fafc, #ffffff) !important;
+            padding: 100px 0 !important;
+        }
+        .values-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+            gap: 28px !important;
+            margin-top: 60px !important;
+        }
+        .value-card {
+            text-align: left !important;
+            padding: 40px 32px !important;
+            border-radius: 24px !important;
+            background: #ffffff !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 10px 35px -12px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d17d39, #bd4f2a);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .value-card:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 24px 48px -15px rgba(27, 73, 101, 0.12) !important;
+            border-color: rgba(27, 73, 101, 0.12) !important;
+        }
+        .value-card:hover::before {
+            opacity: 1;
+        }
+        .value-icon {
+            margin: 0 0 24px 0 !important;
+            width: 56px !important;
+            height: 56px !important;
+            background: linear-gradient(135deg, #1B4965, #2c6e95) !important;
+            border-radius: 14px !important;
+            font-size: 22px !important;
+            box-shadow: 0 8px 20px rgba(27, 73, 101, 0.15) !important;
+            color: #ffffff !important;
+        }
+        .value-card:nth-child(even) .value-icon {
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 8px 20px rgba(189, 79, 42, 0.15) !important;
+        }
+        .value-card h3 {
+            font-size: 19px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 14px !important;
+            letter-spacing: -0.02em !important;
+        }
+        .value-card p {
+            font-size: 14.5px !important;
+            line-height: 1.65 !important;
+            color: #475569 !important;
+            margin: 0 !important;
+        }
+
+        /* 5. Team Section */
+        .team-section {
+            padding: 100px 0 !important;
+        }
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+            gap: 32px !important;
+            margin-top: 60px !important;
+        }
+        .team-member {
+            background: #ffffff !important;
+            border-radius: 28px !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 12px 40px -15px rgba(27, 73, 101, 0.04) !important;
+            padding: 40px 32px !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+        .team-member:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 24px 50px -15px rgba(27, 73, 101, 0.08) !important;
+            border-color: rgba(209, 125, 57, 0.15) !important;
+        }
+        .team-image {
+            width: 148px !important;
+            height: 148px !important;
+            border-radius: 50% !important;
+            border: 6px solid #ffffff !important;
+            box-shadow: 0 10px 25px rgba(27, 73, 101, 0.08) !important;
+            margin-bottom: 24px !important;
+            overflow: hidden !important;
+            transition: transform 0.4s ease !important;
+        }
+        .team-member:hover .team-image {
+            transform: scale(1.03) !important;
+        }
+        .team-name {
+            font-size: 21px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 6px !important;
+        }
+        .team-role {
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #bd4f2a !important;
+            margin-bottom: 20px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+        }
+        .team-bio {
+            font-size: 14.5px !important;
+            line-height: 1.7 !important;
+            color: #475569 !important;
+            text-align: left !important;
+            margin-top: 0 !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
+            padding-top: 20px !important;
+        }
+        .team-toggle {
+            background: rgba(189, 79, 42, 0.06) !important;
+            border: none !important;
+            color: #bd4f2a !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            margin-top: 16px !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            transition: all 0.2s !important;
+        }
+        .team-toggle:hover {
+            background: #bd4f2a !important;
+            color: #ffffff !important;
+        }
+        .team-social {
+            margin-top: 24px !important;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 16px !important;
+        }
+        .team-social a {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            background: #f8fafc !important;
+            border: 1px solid rgba(0, 0, 0, 0.02) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #475569 !important;
+            font-size: 15px !important;
+            transition: all 0.25s ease !important;
+        }
+        .team-social a:hover {
+            background: #1B4965 !important;
+            color: #ffffff !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 12px rgba(27, 73, 101, 0.15) !important;
+        }
+        .team-social a[href*="instagram"]:hover {
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7) !important;
+        }
+        .team-social a[href*="youtube"]:hover {
+            background: #ff0000 !important;
+        }
+        .team-social a[href*="facebook"]:hover {
+            background: #1877f2 !important;
+        }
+    </style>
 </head>
 
 <body class="cms-loading">
