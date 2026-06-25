@@ -2125,10 +2125,24 @@ class MinSideManager {
             `;
         }).join('');
 
+        const activeTab = this._activeProfileTab || 'my-profile';
+
         container.innerHTML = `
-        <div class="profile-grid">
-            <!-- ── LEFT COLUMN ── -->
-            <div class="profile-left">
+        <div class="profile-tabs-container">
+            <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">
+                <span class="material-symbols-outlined">person</span>
+                <span>Min profil</span>
+            </button>
+            <button class="profile-tab-btn ${activeTab === 'notifications' ? 'active' : ''}" data-profile-tab="notifications">
+                <span class="material-symbols-outlined">notifications_active</span>
+                <span>Varsler</span>
+            </button>
+        </div>
+
+        <div id="profile-tab-content-my-profile" class="profile-tab-content" style="${activeTab === 'my-profile' ? '' : 'display: none;'}">
+            <div class="profile-grid">
+                <!-- ── LEFT COLUMN ── -->
+                <div class="profile-left">
 
                 <!-- Contact information -->
                 <div class="info-card profile-edit-card" id="contact-card">
