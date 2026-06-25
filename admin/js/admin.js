@@ -13576,8 +13576,11 @@ class AdminManager {
                 record.donorEmail,
                 record.email,
                 record.method,
-                record.status
-            ].join(' ').toLowerCase();
+                record.status,
+                record.productName,
+                record.reference,
+                record.wixOrderNumber
+            ].filter(Boolean).join(' ').toLowerCase();
             return haystack.includes(query);
         });
     }
@@ -15600,7 +15603,16 @@ class AdminManager {
 
     closeManualSaleModal() {
         const modal = document.getElementById('manual-sale-modal');
-        if (modal) modal.style.display = 'none';
+        if (!modal) return;
+        modal.style.display = 'none';
+        // Always clear edit mode so re-opening the modal starts fresh
+        delete modal.dataset.editId;
+        const titleEl = document.getElementById('manual-sale-modal-title');
+        const subtitleEl = document.getElementById('manual-sale-modal-subtitle');
+        const saveBtnEl = document.getElementById('save-manual-sale-btn');
+        if (titleEl) titleEl.textContent = 'Registrer manuelt butikksalg';
+        if (subtitleEl) subtitleEl.textContent = 'Registrer et manuelt salg i butikken (f.eks. Vipps, kontant eller bankoverf\u00f8ring).';
+        if (saveBtnEl) saveBtnEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;">save</span> Lagre salg';
     }
 
     handleManualSaleUserSelect(userId) {

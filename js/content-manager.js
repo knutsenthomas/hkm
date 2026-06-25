@@ -267,7 +267,7 @@ class ContentManager {
             return `title:${title}`;
         }
 
-        return `id:${item.id || ''}`;
+        if (item.id) return `id:${item.id}`;
 
         const urlPath = this.getBlogUrlPath(item.url || item.link || '');
         if (urlPath) return `url:${urlPath}`;
@@ -637,7 +637,8 @@ class ContentManager {
 
     setHTMLIfChanged(container, html, signatureKey) {
         if (!container) return false;
-        const signature = `${signatureKey}:${html}`;
+        const htmlHash = html ? `${html.length}_${html.slice(0, 100)}_${html.slice(-100)}` : '';
+        const signature = `${signatureKey}:${htmlHash}`;
         if (this._renderHtmlSignatures.get(signatureKey) === signature) {
             return false;
         }
@@ -853,7 +854,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'arrangementer') {
-            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             const events = await this.loadEvents();
 
             // 1. Month View
@@ -878,7 +879,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'kalender') {
-            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             if (settings.showMonthView !== false) {
                 const events = await this.loadEvents();
                 this.setupCalendarNavigation();
@@ -905,7 +906,7 @@ class ContentManager {
         if (this.pageId === 'blogg') {
             console.log("[ContentManager] Loading content for 'blogg' page...");
             try {
-                const blogData = await window.firebaseService.getPageContent('collection_blog');
+                const blogData = await this.getContentDoc('collection_blog', { silent: true });
                 console.log("[ContentManager] Blog data received:", blogData);
 
                 const blogItems = this.getDedupedBlogItems(blogData);
@@ -1090,8 +1091,8 @@ class ContentManager {
         }
 
         console.log(`[ContentManager] Fetching data for single post (ID: ${itemId})...`);
-        const blogData = await window.firebaseService.getPageContent('collection_blog');
-        const teachingData = await window.firebaseService.getPageContent('collection_teaching');
+        const blogData = await this.getContentDoc('collection_blog', { silent: true });
+        const teachingData = await this.getContentDoc('collection_teaching', { silent: true });
         
         console.log(`[ContentManager] Data received. Blog items: ${blogData?.items?.length || 0}, Teaching items: ${teachingData?.items?.length || 0}`);
         const blogItems = this.getDedupedBlogItems(blogData);
@@ -3671,7 +3672,7 @@ class ContentManager {
 
         // 3. Background Sync for specific event (Google Calendar direct)
         // This ensures the page is always up to date even if cache is stale or event range is outside standard load
-        const integrations = await window.firebaseService.getPageContent('settings_integrations');
+        const integrations = await this.getContentDoc('settings_integrations', { silent: true });
         const gcal = integrations?.googleCalendar || {};
         const apiKey = gcal.apiKey;
         if (apiKey) {
@@ -3685,7 +3686,7 @@ class ContentManager {
                     const freshEvent = await this.fetchSingleGoogleCalendarEvent(apiKey, calendar.id, eventKey);
                     if (freshEvent) {
                         // Load Firestore items to ensure overrides (images and text from dashboard) are applied
-                        const eventData = await window.firebaseService.getPageContent('collection_events');
+                        const eventData = await this.getContentDoc('collection_events', { silent: true });
                         const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
                         event = this._mergeEventWithFirestore(freshEvent, firebaseItems);
                         this.populateEventDetailsDOM(event);

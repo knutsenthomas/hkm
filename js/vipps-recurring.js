@@ -5,6 +5,14 @@ const PAYPAL_CREATE_PLAN_URL = "https://createpaypalsubscriptionplan-42bhgdjkcq-
 const PAYPAL_ACTIVATE_SUB_URL = "https://activatepaypalsubscription-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a";
 
+async function parseJsonOrThrow(response) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error(data.error || `Serverfeil: ${response.status}`);
+    }
+    return data;
+}
+
 // Localization settings
 const isEnglish = window.location.href.includes("/en/");
 const isSpanish = window.location.href.includes("/es/");
@@ -660,10 +668,7 @@ function openAgreementModal(method = "vipps") {
                     })
                 });
 
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || `Serverfeil: ${response.status}`);
-                }
+                const data = await parseJsonOrThrow(response);
 
                 if (!data.redirectUrl) {
                     throw new Error("Mottok ikke bekreftelseslenke fra Vipps.");
@@ -765,9 +770,9 @@ function openAgreementModal(method = "vipps") {
                     body: JSON.stringify({ amount })
                 });
 
-                const planData = await planResponse.json();
-                if (!planResponse.ok || !planData.planId) {
-                    throw new Error(planData.error || "Failed to create PayPal subscription plan");
+                const planData = await parseJsonOrThrow(planResponse);
+                if (!planData.planId) {
+                    throw new Error("Failed to create PayPal subscription plan");
                 }
 
                 const planId = planData.planId;
@@ -808,9 +813,9 @@ function openAgreementModal(method = "vipps") {
                                     })
                                 });
 
-                                const activateData = await activateResponse.json();
-                                if (!activateResponse.ok || activateData.status !== "success") {
-                                    throw new Error(activateData.error || "Failed to activate PayPal subscription");
+                                const activateData = await parseJsonOrThrow(activateResponse);
+                                if (activateData.status !== "success") {
+                                    throw new Error("Failed to activate PayPal subscription");
                                 }
 
                                 showLoadingOverlayRecurring(false);
@@ -875,7 +880,7 @@ async function handleVippsReturn() {
             body: JSON.stringify({ reference })
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         overlay.remove();
 
         const url = new URL(window.location.href);

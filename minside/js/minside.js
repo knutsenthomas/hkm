@@ -1481,11 +1481,14 @@ class MinSideManager {
         const uid = this.currentUser?.uid;
         if (!uid) return;
         try {
-            firebase.firestore()
+            this._badgeUnsubscribe = firebase.firestore()
                 .collection('user_notifications')
                 .where('userId', '==', uid)
                 .where('read', '==', false)
-                .onSnapshot(snap => this._setBadge(snap.size));
+                .onSnapshot(
+                    snap => this._setBadge(snap.size),
+                    err => console.warn('[MinSide] notification badge listener error:', err)
+                );
         } catch (e) { console.warn('badge listener:', e); }
     }
 
@@ -3475,67 +3478,71 @@ class MinSideManager {
         `;
 
         // Migrate/merge guest progress from localStorage to Firestore
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('hkm_reading_plan_progress_')) {
-                const planId = key.substring('hkm_reading_plan_progress_'.length);
-                try {
-                    const localProgress = localStorage.getItem(key);
-                    if (localProgress) {
-                        const localData = JSON.parse(localProgress);
-                        
-                        // Check if document exists in Firestore
-                        const docRef = firebase.firestore()
-                            .collection('users')
-                            .doc(uid)
-                            .collection('reading_plans')
-                            .doc(planId);
-                        
-                        const docSnap = await docRef.get();
-                        let mergedData = localData;
-                        
-                        if (docSnap.exists) {
-                            const firestoreData = docSnap.data();
-                            mergedData = { ...firestoreData };
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('hkm_reading_plan_progress_')) {
+                    const planId = key.substring('hkm_reading_plan_progress_'.length);
+                    try {
+                        const localProgress = localStorage.getItem(key);
+                        if (localProgress) {
+                            const localData = JSON.parse(localProgress);
                             
-                            // Merge completedDays
-                            if (localData.completedDays && Array.isArray(localData.completedDays)) {
-                                mergedData.completedDays = mergedData.completedDays || [];
-                                for (const day of localData.completedDays) {
-                                    if (!mergedData.completedDays.includes(day)) {
-                                        mergedData.completedDays.push(day);
+                            // Check if document exists in Firestore
+                            const docRef = firebase.firestore()
+                                .collection('users')
+                                .doc(uid)
+                                .collection('reading_plans')
+                                .doc(planId);
+                            
+                            const docSnap = await docRef.get();
+                            let mergedData = localData;
+                            
+                            if (docSnap.exists) {
+                                const firestoreData = docSnap.data();
+                                mergedData = { ...firestoreData };
+                                
+                                // Merge completedDays
+                                if (localData.completedDays && Array.isArray(localData.completedDays)) {
+                                    mergedData.completedDays = mergedData.completedDays || [];
+                                    for (const day of localData.completedDays) {
+                                        if (!mergedData.completedDays.includes(day)) {
+                                            mergedData.completedDays.push(day);
+                                        }
                                     }
+                                }
+                                
+                                // Merge reflections
+                                if (localData.reflections && typeof localData.reflections === 'object') {
+                                    mergedData.reflections = mergedData.reflections || {};
+                                    for (const day of Object.keys(localData.reflections)) {
+                                        if (!mergedData.reflections[day]) {
+                                            mergedData.reflections[day] = localData.reflections[day];
+                                        }
+                                    }
+                                }
+                                
+                                // Merge currentDay
+                                if (localData.currentDay > (mergedData.currentDay || 1)) {
+                                    mergedData.currentDay = localData.currentDay;
                                 }
                             }
                             
-                            // Merge reflections
-                            if (localData.reflections && typeof localData.reflections === 'object') {
-                                mergedData.reflections = mergedData.reflections || {};
-                                for (const day of Object.keys(localData.reflections)) {
-                                    if (!mergedData.reflections[day]) {
-                                        mergedData.reflections[day] = localData.reflections[day];
-                                    }
-                                }
-                            }
+                            mergedData.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
                             
-                            // Merge currentDay
-                            if (localData.currentDay > (mergedData.currentDay || 1)) {
-                                mergedData.currentDay = localData.currentDay;
-                            }
+                            console.log(`[minside.js] Migrating/Merging plan ${planId} progress to Firestore:`, mergedData);
+                            await docRef.set(mergedData, { merge: true });
+                            localStorage.removeItem(key);
+                            // Adjust index because we removed an item
+                            i--;
                         }
-                        
-                        mergedData.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
-                        
-                        console.log(`[minside.js] Migrating/Merging plan ${planId} progress to Firestore:`, mergedData);
-                        await docRef.set(mergedData, { merge: true });
-                        localStorage.removeItem(key);
-                        // Adjust index because we removed an item
-                        i--;
+                    } catch (err) {
+                        console.warn(`[minside.js] Failed to migrate guest progress for ${planId}:`, err);
                     }
-                } catch (err) {
-                    console.warn(`[minside.js] Failed to migrate guest progress for ${planId}:`, err);
                 }
             }
+        } catch (storageError) {
+            console.warn('[minside.js] localStorage guest progress migration failed:', storageError);
         }
 
         // Check if there is a start parameter in hash

@@ -153,20 +153,26 @@
             box-shadow: 0 2px 8px rgba(209, 125, 57, 0.15);
             filter: brightness(0.95);
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
     <script src="https://js.stripe.com/v3/"></script>
 <!-- Tailwind CSS Play CDN -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-orange': '#f39c12',
+                            'primary-red': '#e74c3c',
+                            'text-dark': '#333333',
+                        }
                     }
                 }
-            }
+            };
         }
     </script>
     <!-- Loader Safety Net -->
@@ -278,10 +284,31 @@
                         icon.className = 'icon-circle processing';
                         icon.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
                         title.innerText = "Behandler betaling...";
-                        message.innerText = "Betalingen behandles fortsatt av banken (f.eks. Vipps). Vi oppdaterer statusen snart.";
-                        // Refresh page after 5 seconds to check again
-                        setTimeout(() => location.reload(), 5000);
-                        return; // Don't show button yet
+                        message.innerText = "Betalingen behandles fortsatt av banken. Vi oppdaterer statusen snart.";
+                        
+                        let attempts = 0;
+                        try {
+                            attempts = parseInt(sessionStorage.getItem('payment_check_attempts') || '0', 10);
+                        } catch (e) {}
+
+                        if (attempts < 3) {
+                            try {
+                                sessionStorage.setItem('payment_check_attempts', (attempts + 1).toString());
+                            } catch (e) {}
+                            setTimeout(() => location.reload(), 5000);
+                        } else {
+                            try {
+                                sessionStorage.removeItem('payment_check_attempts');
+                            } catch (e) {}
+                            icon.className = 'icon-circle error';
+                            icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                            title.innerText = "Det tar lengre tid enn normalt";
+                            message.innerText = "Banken din behandler fortsatt denne transaksjonen. Vennligst sjekk om du har mottatt bekreftelse i Vipps/bank-appen din, eller ta kontakt med oss hvis kurset ikke dukker opp innen kort tid.";
+                            btn.innerText = "Gå til Min Side";
+                            btn.href = "index.html";
+                            btn.classList.remove('hidden');
+                        }
+                        return; // Don't show button yet if we are still retrying
 
                     case "requires_payment_method":
                         icon.className = 'icon-circle error';
@@ -289,7 +316,7 @@
                         title.innerText = "Betaling feilet";
                         message.innerText = "Betalingen ble ikke gjennomført. Vennligst prøv en annen betalingsmetode.";
                         btn.innerText = "Prøv igjen";
-                        btn.href = "index.html#payment"; // Adjust link
+                        btn.href = "index.html";
                         break;
 
                     default:
@@ -298,7 +325,7 @@
                         title.innerText = "Noe gikk galt";
                         message.innerText = "Status: " + paymentIntent.status;
                         btn.innerText = "Kontakt Kundeservice";
-                        btn.href = "../kontakt.html";
+                        btn.href = "/kontakt.html";
                         break;
                 }
                 btn.classList.remove('hidden');

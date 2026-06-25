@@ -249,7 +249,13 @@ async function checkStatus() {
         return;
     }
 
-    const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+    const { paymentIntent, error } = await stripe.retrievePaymentIntent(clientSecret);
+
+    if (error || !paymentIntent) {
+        console.error("Stripe retrievePaymentIntent error:", error);
+        showMessage("Kunne ikke hente betalingsstatus.");
+        return;
+    }
 
     switch (paymentIntent.status) {
         case "succeeded":

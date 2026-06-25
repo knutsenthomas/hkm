@@ -101,6 +101,7 @@ class FirebaseService {
             if (typeof window !== 'undefined' && !this._retryRegistered) {
                 this._retryRegistered = true;
                 const retryInit = () => {
+                    if (this.isInitialized) return;
                     if (typeof firebase !== 'undefined') {
                         this.tryAutoInit();
                     }
@@ -167,6 +168,21 @@ class FirebaseService {
             }
 
             this.db = firebase.firestore();
+
+            // Enable offline persistence for faster subsequent loads
+            // Use synchronizeTabs: true to allow multiple tabs to share the same persistence layer
+            try {
+                this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                    if (err.code === 'failed-precondition') {
+                        console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
+                    } else if (err.code === 'unimplemented') {
+                        console.warn("[FirebaseService] Persistence not supported by browser");
+                    }
+                });
+            } catch (persistenceError) {
+                console.warn("[FirebaseService] enablePersistence threw synchronous error:", persistenceError);
+            }
+
             this.auth = firebase.auth();
             this.storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
@@ -200,20 +216,6 @@ class FirebaseService {
 
             // Be explicit about local auth persistence for stable admin sessions.
             this.ensureAuthPersistence().catch(() => { });
-
-            // Enable offline persistence for faster subsequent loads
-            // Use synchronizeTabs: true to allow multiple tabs to share the same persistence layer
-            try {
-                this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-                    if (err.code === 'failed-precondition') {
-                        console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
-                    } else if (err.code === 'unimplemented') {
-                        console.warn("[FirebaseService] Persistence not supported by browser");
-                    }
-                });
-            } catch (persistenceError) {
-                console.warn("[FirebaseService] enablePersistence threw synchronous error:", persistenceError);
-            }
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
@@ -773,15 +775,18 @@ class FirebaseService {
         if (!this.isInitialized) return null;
 
         try {
-            return this.db.collection("content").doc(pageId).onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    this._setCachedContent(pageId, data);
-                    callback(data);
-                } else {
-                    this._setCachedContent(pageId, null);
-                }
-            });
+            return this.db.collection("content").doc(pageId).onSnapshot(
+                (doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        this._setCachedContent(pageId, data);
+                        callback(data);
+                    } else {
+                        this._setCachedContent(pageId, null);
+                    }
+                },
+                (error) => { console.error(`[Firebase] onSnapshot error for '${pageId}':`, error); }
+            );
         } catch (error) {
             console.error(`❌ Failed to subscribe to page '${pageId}':`, error);
             return null;
@@ -1259,11 +1264,16 @@ class FirebaseService {
         if (!safeDocId || typeof callback !== 'function') return null;
 
         try {
-            return this.db.collection('siteContent').doc(safeDocId).onSnapshot((doc) => {
-                const data = doc.exists ? (doc.data() || null) : null;
-                this._setCachedContent(`siteContent:${safeDocId}`, data);
-                callback(data, doc);
-            });
+            return this.db.collection('siteContent').doc(safeDocId).onSnapshot(
+                (doc) => {
+                    const data = doc.exists ? (doc.data() || null) : null;
+                    this._setCachedContent(`siteContent:${safeDocId}`, data);
+                    callback(data, doc);
+                },
+                (error) => {
+                    console.error(`❌ Failed to subscribe to siteContent '${safeDocId}':`, error);
+                }
+            );
         } catch (error) {
             console.error(`❌ Failed to subscribe to siteContent '${safeDocId}':`, error);
             return null;
@@ -1321,13 +1331,16 @@ class FirebaseService {
             .replace(/\//g, '_');
         if (!safePostId || typeof callback !== 'function') return null;
 
-        return this.db.collection('interactions').doc(safePostId).onSnapshot((doc) => {
-            if (doc.exists) {
-                callback(doc.data());
-            } else {
-                callback({ likes_count: 0, liked_by: [] });
-            }
-        });
+        return this.db.collection('interactions').doc(safePostId).onSnapshot(
+            (doc) => {
+                if (doc.exists) {
+                    callback(doc.data());
+                } else {
+                    callback({ likes_count: 0, liked_by: [] });
+                }
+            },
+            (error) => { console.error(`[Firebase] subscribeToLikes error for '${safePostId}':`, error); }
+        );
     }
 
     async addComment(postId, commentData) {
@@ -1355,13 +1368,16 @@ class FirebaseService {
         if (!safePostId || typeof callback !== 'function') return null;
 
         const commentsRef = this.db.collection('interactions').doc(safePostId).collection('comments').orderBy('timestamp', 'desc');
-        return commentsRef.onSnapshot((snapshot) => {
-            const comments = [];
-            snapshot.forEach((doc) => {
-                comments.push({ id: doc.id, ...doc.data() });
-            });
-            callback(comments);
-        });
+        return commentsRef.onSnapshot(
+            (snapshot) => {
+                const comments = [];
+                snapshot.forEach((doc) => {
+                    comments.push({ id: doc.id, ...doc.data() });
+                });
+                callback(comments);
+            },
+            (error) => { console.error(`[Firebase] subscribeToComments error for '${safePostId}':`, error); }
+        );
     }
 
     async deleteComment(postId, commentId) {

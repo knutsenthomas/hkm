@@ -169,6 +169,31 @@ window.minsideAuthLanguageChange = function(lang) {
     translateStaticHTML();
 };
 
+    function safeLocalStorageSet(key, val) {
+        try {
+            window.localStorage.setItem(key, val);
+        } catch (e) {
+            console.warn('localStorage set failed:', e);
+        }
+    }
+
+    function safeLocalStorageGet(key) {
+        try {
+            return window.localStorage.getItem(key);
+        } catch (e) {
+            console.warn('localStorage get failed:', e);
+            return null;
+        }
+    }
+
+    function safeLocalStorageRemove(key) {
+        try {
+            window.localStorage.removeItem(key);
+        } catch (e) {
+            console.warn('localStorage remove failed:', e);
+        }
+    }
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[HKM] MinSide Auth Script loaded");
 
@@ -336,8 +361,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideMessage();
 
         try {
-            await waitForFirebaseReady();
-            const userCredential = await firebaseService.register(email, password);
+            const service = await waitForFirebaseReady();
+            const userCredential = await service.register(email, password);
             await userCredential.user.updateProfile({ displayName: name });
             await routeByRole();
         } catch (error) {
@@ -366,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await waitForFirebaseReady();
             await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
-            window.localStorage.setItem('emailForSignIn', email);
+            safeLocalStorageSet('emailForSignIn', email);
             showMessage(t('auth.magicLinkSuccess'), 'success');
             btn.textContent = t('auth.linkSent');
         } catch (error) {
@@ -407,7 +432,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 5. Verify Magic Link on Load ---
     if (typeof firebase !== 'undefined' && firebase.auth().isSignInWithEmailLink(window.location.href)) {
-        let email = window.localStorage.getItem('emailForSignIn');
+        let email = safeLocalStorageGet('emailForSignIn');
         if (!email) {
             const promptMsg = document.documentElement.lang === 'es' ? 'Confirme su dirección de correo electrónico:' :
                               document.documentElement.lang === 'en' ? 'Confirm your email address:' :
@@ -417,7 +442,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         firebase.auth().signInWithEmailLink(email, window.location.href)
             .then(async () => {
-                window.localStorage.removeItem('emailForSignIn');
+                safeLocalStorageRemove('emailForSignIn');
                 await routeByRole();
             })
             .catch((error) => {
@@ -426,8 +451,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function routeByRole() {
-        const service = window.firebaseService;
-        const user = firebase.auth().currentUser;
+        const service = await waitForFirebaseReady();
+        
+        let user = firebase.auth().currentUser;
+        if (!user) {
+            user = await new Promise((resolve) => {
+                const unsubscribe = firebase.auth().onAuthStateChanged((u) => {
+                    unsubscribe();
+                    resolve(u);
+                });
+            });
+        }
+
         if (!user || !service) {
             window.location.href = '/minside/index.html';
             return;

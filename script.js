@@ -33,9 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(applySubpageHeroCentering, 250);
 
     if (document.body && !document.body.classList.contains('page-index')) {
+        const observers = [];
         document.querySelectorAll('.page-hero').forEach((hero) => {
             const observer = new MutationObserver(() => applySubpageHeroCentering());
             observer.observe(hero, { childList: true, subtree: true, attributes: true });
+            observers.push(observer);
+        });
+        window.addEventListener('unload', () => {
+            observers.forEach(obs => obs.disconnect());
         });
     }
 });
