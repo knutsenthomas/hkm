@@ -525,6 +525,7 @@ class BibleReader {
             // Verse Context Toolbar & Chapter Lookup
             verseToolbar: document.getElementById('verse-context-toolbar'),
             toolbarBtnBookmark: document.getElementById('toolbar-btn-bookmark'),
+            toolbarBtnRange: document.getElementById('toolbar-btn-range'),
             toolbarBtnLookup: document.getElementById('toolbar-btn-lookup'),
             toolbarBtnShare: document.getElementById('toolbar-btn-share'),
             toolbarBtnDownload: document.getElementById('toolbar-btn-download'),
@@ -952,6 +953,26 @@ class BibleReader {
                 }
             });
         }
+        if (this.dom.toolbarBtnRange) {
+            this.dom.toolbarBtnRange.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    this.rangeSelectionMode = true;
+                    this.rangeStartVerse = this.selectedVerses[this.selectedVerses.length - 1];
+                    
+                    const path = window.location.pathname;
+                    let msg = "Klikk på det siste verset du vil markere";
+                    if (path.includes('/en/')) {
+                        msg = "Click on the last verse you want to select";
+                    } else if (path.includes('/es/')) {
+                        msg = "Haz clic en el último versículo que quieras seleccionar";
+                    }
+                    
+                    this.showToast(msg, 0);
+                    if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+                }
+            });
+        }
 
         if (this.dom.toolbarBtnLookup) {
             this.dom.toolbarBtnLookup.addEventListener('click', (e) => {
@@ -1161,14 +1182,68 @@ class BibleReader {
                         e.stopPropagation();
                         const verseNum = verseSup.innerText.trim();
                         
-                        // Toggle selected state
-                        const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
-                        if (existingIdx >= 0) {
-                            this.selectedVerses.splice(existingIdx, 1);
-                            paragraph.classList.remove('selected-verse');
+                        // Range selection modes
+                        if (this.rangeSelectionMode && this.rangeStartVerse) {
+                            const paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
+                            const idx1 = paragraphs.indexOf(this.rangeStartVerse.paragraph);
+                            const idx2 = paragraphs.indexOf(paragraph);
+                            
+                            if (idx1 >= 0 && idx2 >= 0) {
+                                const startIdx = Math.min(idx1, idx2);
+                                const endIdx = Math.max(idx1, idx2);
+                                
+                                for (let i = startIdx; i <= endIdx; i++) {
+                                    const p = paragraphs[i];
+                                    const vSup = p.querySelector('sup.v');
+                                    if (vSup) {
+                                        const vNum = vSup.innerText.trim();
+                                        const exists = this.selectedVerses.some(v => v.paragraph === p);
+                                        if (!exists) {
+                                            this.selectedVerses.push({ paragraph: p, verseNum: vNum });
+                                            p.classList.add('selected-verse');
+                                        }
+                                    }
+                                }
+                            }
+                            this.rangeSelectionMode = false;
+                            this.dismissToast();
+                        } else if (e.shiftKey && this.lastSelectedVerse && this.lastSelectedVerse.paragraph !== paragraph) {
+                            const paragraphs = Array.from(this.dom.readingPane.querySelectorAll('p'));
+                            const idx1 = paragraphs.indexOf(this.lastSelectedVerse.paragraph);
+                            const idx2 = paragraphs.indexOf(paragraph);
+                            
+                            if (idx1 >= 0 && idx2 >= 0) {
+                                const startIdx = Math.min(idx1, idx2);
+                                const endIdx = Math.max(idx1, idx2);
+                                
+                                for (let i = startIdx; i <= endIdx; i++) {
+                                    const p = paragraphs[i];
+                                    const vSup = p.querySelector('sup.v');
+                                    if (vSup) {
+                                        const vNum = vSup.innerText.trim();
+                                        const exists = this.selectedVerses.some(v => v.paragraph === p);
+                                        if (!exists) {
+                                            this.selectedVerses.push({ paragraph: p, verseNum: vNum });
+                                            p.classList.add('selected-verse');
+                                        }
+                                    }
+                                }
+                            }
                         } else {
-                            this.selectedVerses.push({ paragraph, verseNum });
-                            paragraph.classList.add('selected-verse');
+                            // Toggle selected state
+                            const existingIdx = this.selectedVerses.findIndex(v => v.verseNum === verseNum && v.paragraph === paragraph);
+                            if (existingIdx >= 0) {
+                                this.selectedVerses.splice(existingIdx, 1);
+                                paragraph.classList.remove('selected-verse');
+                                if (this.lastSelectedVerse && this.lastSelectedVerse.paragraph === paragraph) {
+                                    this.lastSelectedVerse = this.selectedVerses[this.selectedVerses.length - 1] || null;
+                                }
+                            } else {
+                                const newSelection = { paragraph, verseNum };
+                                this.selectedVerses.push(newSelection);
+                                paragraph.classList.add('selected-verse');
+                                this.lastSelectedVerse = newSelection;
+                            }
                         }
 
                         if (this.selectedVerses.length === 0) {
@@ -1222,6 +1297,65 @@ class BibleReader {
         if (this.highlightedVerseElement) {
             this.highlightedVerseElement.classList.remove('verse-temp-highlight');
             this.highlightedVerseElement = null;
+        }
+        this.rangeSelectionMode = false;
+        this.dismissToast();
+    }
+
+    showToast(message, duration = 3000) {
+        this.dismissToast();
+
+        const toast = document.createElement('div');
+        toast.id = 'bible-toast';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1B4965;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10001;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        `;
+        
+        toast.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size: 18px; color: #fef08a;">info</span>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        toast.offsetHeight; // trigger reflow
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+        toast.style.opacity = '1';
+        
+        if (duration > 0) {
+            this.toastTimeout = setTimeout(() => {
+                this.dismissToast();
+            }, duration);
+        }
+    }
+
+    dismissToast() {
+        const existing = document.getElementById('bible-toast');
+        if (existing) {
+            existing.style.transform = 'translateX(-50%) translateY(20px)';
+            existing.style.opacity = '0';
+            setTimeout(() => existing.remove(), 300);
+        }
+        if (this.toastTimeout) {
+            clearTimeout(this.toastTimeout);
+            this.toastTimeout = null;
         }
     }
 
