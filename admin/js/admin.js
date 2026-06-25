@@ -17791,6 +17791,94 @@ class AdminManager {
         addFilteredListener('print-donors-report-btn', 'click', () => this.printReport('donors'));
         addFilteredListener('print-shop-report-btn', 'click', () => this.printReport('shop'));
 
+        const clearFilters = () => {
+            this.donationFilters = { 
+                preset: '30', 
+                status: 'all', 
+                method: 'all', 
+                type: 'all', 
+                query: '', 
+                donorQuery: '', 
+                donorSortBy: 'latestDate', 
+                donorSortDir: 'desc', 
+                start: '', 
+                end: '',
+                shopStatus: 'all',
+                shopMethod: 'all',
+                shopQuery: ''
+            };
+            
+            const presetEl = document.getElementById('global-date-preset');
+            if (presetEl) presetEl.value = '30';
+
+            const startEl = document.getElementById('global-start-date');
+            if (startEl) startEl.value = '';
+
+            const endEl = document.getElementById('global-end-date');
+            if (endEl) endEl.value = '';
+
+            const customDates = document.getElementById('global-custom-dates');
+            if (customDates) customDates.style.display = 'none';
+
+            // Clear causes inputs
+            const causesPresetEl = document.getElementById('causes-date-preset');
+            if (causesPresetEl) causesPresetEl.value = '30';
+            const causesStartEl = document.getElementById('causes-start-date');
+            if (causesStartEl) causesStartEl.value = '';
+            const causesEndEl = document.getElementById('causes-end-date');
+            if (causesEndEl) causesEndEl.value = '';
+            const causesCustomDates = document.getElementById('causes-custom-dates');
+            if (causesCustomDates) causesCustomDates.style.display = 'none';
+
+            // Clear shop inputs
+            const shopPresetEl = document.getElementById('shop-date-preset');
+            if (shopPresetEl) shopPresetEl.value = '30';
+            const shopStartEl = document.getElementById('shop-start-date');
+            if (shopStartEl) shopStartEl.value = '';
+            const shopEndEl = document.getElementById('shop-end-date');
+            if (shopEndEl) shopEndEl.value = '';
+            const shopCustomDates = document.getElementById('shop-custom-dates');
+            if (shopCustomDates) shopCustomDates.style.display = 'none';
+
+            const statusEl1 = document.getElementById('donation-status-filter');
+            const statusEl2 = document.getElementById('donor-status-filter');
+            if (statusEl1) statusEl1.value = 'all';
+            if (statusEl2) statusEl2.value = 'all';
+
+            const methodEl1 = document.getElementById('donation-method-filter');
+            const methodEl2 = document.getElementById('donor-method-filter');
+            if (methodEl1) methodEl1.value = 'all';
+            if (methodEl2) methodEl2.value = 'all';
+
+            const typeEl1 = document.getElementById('donation-type-filter');
+            const typeEl2 = document.getElementById('donor-type-filter');
+            if (typeEl1) typeEl1.value = 'all';
+            if (typeEl2) typeEl2.value = 'all';
+
+            const qEl = document.getElementById('donation-search');
+            if (qEl) qEl.value = '';
+
+            const dqEl = document.getElementById('donor-search');
+            if (dqEl) dqEl.value = '';
+
+            const dSortEl = document.getElementById('donor-sort-by');
+            if (dSortEl) dSortEl.value = 'latestDate';
+
+            const shopStatusEl = document.getElementById('shop-status-filter');
+            if (shopStatusEl) shopStatusEl.value = 'all';
+
+            const shopMethodEl = document.getElementById('shop-method-filter');
+            if (shopMethodEl) shopMethodEl.value = 'all';
+
+            const shopQueryEl = document.getElementById('shop-search');
+            if (shopQueryEl) shopQueryEl.value = '';
+            
+            this.renderDonationAdminViews();
+            this.renderGiftsDashboard();
+            this.renderInKindDonations();
+            this.renderWixStats();
+        };
+
         addFilteredListener('donation-clear-filters', 'click', clearFilters);
         addFilteredListener('donor-clear-filters', 'click', clearFilters);
         addFilteredListener('shop-clear-filters', 'click', clearFilters);
