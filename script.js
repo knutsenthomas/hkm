@@ -1063,7 +1063,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'for-menigheter', label: { no: 'For menigheter', en: 'For churches', es: 'Para iglesias' }, url: 'for-menigheter', keywords: 'menighet kirke sammarbeid seminar church churches cooperation' },
             { id: 'for-bedrifter', label: { no: 'For bedrifter', en: 'For businesses', es: 'Para empresas' }, url: 'for-bedrifter', keywords: 'bedrift sponsor bedriftssamarbeid støtte corporate business support' },
             { id: 'bibelske-personer', label: { no: 'Bibelske personer', en: 'Biblical Characters', es: 'Personajes Bíblicos' }, url: 'ressurser/bibelske-personer', keywords: 'bibel personer ressurser abraham moses david jesus peter paulus ruth maria' },
-            { id: 'bibelsk-tidslinje', label: { no: 'Bibelens tidslinje', en: 'Biblical Timeline', es: 'Línea de Tiempo Bíblica' }, url: 'ressurser/bibelsk-tidslinje', keywords: 'bibel tidslinje historie skapelsen syndefallet noa abraham moses david jesus kirke timeline history' }
+            { id: 'bibelsk-tidslinje', label: { no: 'Bibelens tidslinje', en: 'Biblical Timeline', es: 'Línea de Tiempo Bíblica' }, url: 'ressurser/bibelsk-tidslinje', keywords: 'bibel tidslinje historie skapelsen syndefallet noa abraham moses david jesus kirke timeline history' },
+            { id: 'tidslinje-imperier', label: { no: 'Imperienes tidslinje', en: 'Timeline of Empires', es: 'Línea de Tiempo de Imperios' }, url: 'ressurser/tidslinje-imperier', keywords: 'bibel tidslinje historie riker imperier babylon persia hellas roma timeline empire empires kingdoms history' }
         ];
 
         // Find any other page documents dynamically in Firestore

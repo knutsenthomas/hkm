@@ -1,3 +1,5 @@
+import { biblicalCharacters } from '../../js/bibelske-personer-data.js';
+
 /* ═══════════════════════════════════════════════════════
    MIN SIDE — PCO-inspired Member Profile
    ═══════════════════════════════════════════════════════ */
@@ -6336,6 +6338,86 @@ class MinSideManager {
             searchCollection(searchCache.notes);
             searchCollection(searchCache.prayers);
 
+            // Match biblical characters
+            if (Array.isArray(biblicalCharacters) && biblicalCharacters.length) {
+                biblicalCharacters.forEach(person => {
+                    const nameText = person.name[lang] || person.name['no'] || '';
+                    const roleText = person.role[lang] || person.role['no'] || '';
+                    const eraText = person.era[lang] || person.era['no'] || '';
+                    const summaryText = person.summary[lang] || person.summary['no'] || '';
+                    const storyText = person.story[lang] || person.story['no'] || '';
+                    const significanceText = person.theologicalSignificance[lang] || person.theologicalSignificance['no'] || '';
+                    
+                    const combined = [
+                        lang === 'en' ? 'biblical character person' : (lang === 'es' ? 'personaje bíblico persona' : 'bibelsk person personer bibelen'),
+                        nameText,
+                        roleText,
+                        eraText,
+                        summaryText,
+                        storyText,
+                        significanceText
+                    ].filter(Boolean).join(' ').toLowerCase();
+
+                    if (combined.includes(query)) {
+                        results.push({
+                            id: person.id,
+                            type: 'biblical-character',
+                            title: nameText,
+                            desc: roleText || summaryText || ''
+                        });
+                    }
+                });
+            }
+
+            // Match timelines
+            try {
+                const timelines = [
+                    {
+                        id: 'bibelsk-tidslinje',
+                        title: {
+                            no: 'Bibelens tidslinje',
+                            en: 'Biblical Timeline',
+                            es: 'Línea de Tiempo Bíblica'
+                        },
+                        keywords: {
+                            no: 'bibel tidslinje historie skapelsen syndefallet noa abraham moses david jesus kirke',
+                            en: 'bible timeline history creation fall noah abraham moses david jesus church',
+                            es: 'biblia línea de tiempo historia creación caída noé abrahán moisés david jesús iglesia'
+                        }
+                    },
+                    {
+                        id: 'tidslinje-imperier',
+                        title: {
+                            no: 'Imperienes tidslinje',
+                            en: 'Timeline of Empires',
+                            es: 'Línea de Tiempo de Imperios'
+                        },
+                        keywords: {
+                            no: 'imperie tidslinje historie riker babylon persia hellas roma',
+                            en: 'empire timeline history kingdoms babylon persia greece rome',
+                            es: 'imperio línea de tiempo historia reinos babilonia persia grecia roma'
+                        }
+                    }
+                ];
+
+                timelines.forEach(tl => {
+                    const titleText = tl.title[lang] || tl.title.no || '';
+                    const keywordsText = tl.keywords[lang] || tl.keywords.no || '';
+                    const combined = [titleText, keywordsText].join(' ').toLowerCase();
+
+                    if (combined.includes(query)) {
+                        results.push({
+                            id: tl.id,
+                            type: 'timeline-ref',
+                            title: titleText,
+                            desc: lang === 'en' ? 'Historical Timeline' : (lang === 'es' ? 'Línea de Tiempo Histórica' : 'Historisk tidslinje')
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error("Error matching timelines in minside search:", e);
+            }
+
             // Add Bible search result if available and relevant
             if (bibleData && bibleData.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(bibleData.category.toLowerCase())) {
                 let versesHtml = '';
@@ -6386,7 +6468,9 @@ class MinSideManager {
                 'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
                 'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' },
                 'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#1b4965' },
-                'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#1b4965' }
+                'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#1b4965' },
+                'biblical-character': { name: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'), icon: 'person', color: '#1B4965' },
+                'timeline-ref': { name: lang === 'en' ? 'Timeline' : (lang === 'es' ? 'Línea de Tiempo' : 'Tidslinje'), icon: 'timeline', color: '#bd4f2a' }
             };
 
             let html = results.map((r, idx) => {
@@ -6478,14 +6562,34 @@ class MinSideManager {
     selectSearchResult(type, id) {
         const overlay = document.getElementById('global-search-overlay');
         if (overlay) overlay.style.display = 'none';
+        const lang = document.documentElement.lang || 'no';
         if (type === 'bible-search' || type === 'bible-ref') {
-            const lang = document.documentElement.lang || 'no';
             const paramName = type === 'bible-search' ? 'dict' : 'ref';
             let url = '../bibel.html?' + paramName + '=' + encodeURIComponent(id);
             if (lang === 'en') {
                 url = '../en/bibel.html?' + paramName + '=' + encodeURIComponent(id);
             } else if (lang === 'es') {
                 url = '../es/bibel.html?' + paramName + '=' + encodeURIComponent(id);
+            }
+            window.location.href = url;
+            return;
+        }
+        if (type === 'biblical-character') {
+            let url = '../ressurser/bibelsk-person-detaljer.html?id=' + encodeURIComponent(id);
+            if (lang === 'en') {
+                url = '../en/ressurser/bibelsk-person-detaljer.html?id=' + encodeURIComponent(id);
+            } else if (lang === 'es') {
+                url = '../es/ressurser/bibelsk-person-detaljer.html?id=' + encodeURIComponent(id);
+            }
+            window.location.href = url;
+            return;
+        }
+        if (type === 'timeline-ref') {
+            let url = '../ressurser/' + id + '.html';
+            if (lang === 'en') {
+                url = '../en/ressurser/' + id + '.html';
+            } else if (lang === 'es') {
+                url = '../es/ressurser/' + id + '.html';
             }
             window.location.href = url;
             return;

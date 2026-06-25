@@ -1,5 +1,6 @@
 // js/bible-reader.js
 import { firebaseService } from './firebase-service.js';
+import { biblicalCharacters } from './bibelske-personer-data.js';
 
 const BIBLE_PROJECT_VIDEOS = {
     // Law/Pentateuch
@@ -2774,6 +2775,85 @@ class BibleReader {
             }
         } catch (e) {
             console.error("Error searching YouTube:", e);
+        }
+
+        // Match biblical characters
+        if (biblicalCharacters && Array.isArray(biblicalCharacters)) {
+            const lang = document.documentElement.lang || 'no';
+            biblicalCharacters.forEach(char => {
+                const name = (char.name[lang] || char.name.no || '').toLowerCase();
+                const role = (char.role[lang] || char.role.no || '').toLowerCase();
+                const era = (char.era[lang] || char.era.no || '').toLowerCase();
+                const meaning = (char.meaning[lang] || char.meaning.no || '').toLowerCase();
+                const summary = (char.summary[lang] || char.summary.no || '').toLowerCase();
+                const story = (char.story[lang] || char.story.no || '').toLowerCase();
+                const theology = (char.theologicalSignificance[lang] || char.theologicalSignificance.no || '').toLowerCase();
+
+                if (name.includes(term) || role.includes(term) || era.includes(term) || meaning.includes(term) || summary.includes(term) || story.includes(term) || theology.includes(term)) {
+                    const charName = char.name[lang] || char.name.no;
+                    const resPath = lang === 'no' ? '/ressurser' : `/${lang}/ressurser`;
+                    results.push({
+                        title: charName,
+                        type: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'),
+                        icon: 'person',
+                        link: `${resPath}/bibelsk-person-detaljer.html?id=${char.id}`,
+                        thumbnail: char.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+                    });
+                }
+            });
+        }
+
+        // Match timelines
+        try {
+            const lang = document.documentElement.lang || 'no';
+            const timelines = [
+                {
+                    id: 'bibelsk-tidslinje',
+                    title: {
+                        no: 'Bibelens tidslinje',
+                        en: 'Biblical Timeline',
+                        es: 'Línea de Tiempo Bíblica'
+                    },
+                    keywords: {
+                        no: 'bibel tidslinje historie skapelsen syndefallet noa abraham moses david jesus kirke',
+                        en: 'bible timeline history creation fall noah abraham moses david jesus church',
+                        es: 'biblia línea de tiempo historia creación caída noé abrahán moisés david jesús iglesia'
+                    },
+                    link: lang === 'no' ? '/ressurser/bibelsk-tidslinje.html' : `/${lang}/ressurser/bibelsk-tidslinje.html`,
+                    thumbnail: '/img/bible-timeline-hero.png'
+                },
+                {
+                    id: 'tidslinje-imperier',
+                    title: {
+                        no: 'Imperienes tidslinje',
+                        en: 'Timeline of Empires',
+                        es: 'Línea de Tiempo de Imperios'
+                    },
+                    keywords: {
+                        no: 'imperie tidslinje historie riker babylon persia hellas roma',
+                        en: 'empire timeline history kingdoms babylon persia greece rome',
+                        es: 'imperio línea de tiempo historia reinos babilonia persia grecia roma'
+                    },
+                    link: lang === 'no' ? '/ressurser/tidslinje-imperier.html' : `/${lang}/ressurser/tidslinje-imperier.html`,
+                    thumbnail: '/img/empires-hero.png'
+                }
+            ];
+
+            timelines.forEach(tl => {
+                const title = (tl.title[lang] || tl.title.no || '').toLowerCase();
+                const keywords = (tl.keywords[lang] || tl.keywords.no || '').toLowerCase();
+                if (title.includes(term) || keywords.includes(term)) {
+                    results.push({
+                        title: tl.title[lang] || tl.title.no,
+                        type: lang === 'en' ? 'Timeline' : (lang === 'es' ? 'Línea de Tiempo' : 'Tidslinje'),
+                        icon: 'timeline',
+                        link: tl.link,
+                        thumbnail: tl.thumbnail || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Error matching timelines in searchLocalResources:", e);
         }
 
         return results;
