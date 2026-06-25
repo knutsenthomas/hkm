@@ -31,6 +31,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Varslinger',
         'sidebar.logg': 'Logg',
         'sidebar.notater': 'Notater',
+        'sidebar.prayerWall': 'Bønnevegg',
         'sidebar.admin': 'Administrasjon',
         'sidebar.loggut': 'Logg ut',
         'header.oversikt': 'Oversikt',
@@ -66,6 +67,7 @@ const minsideTranslations = {
         'view.readingPlans': 'Leseplaner & Andakt',
         'overview.btnReadingPlansLabel': 'Leseplaner',
         'view.notes': 'Notater',
+        'view.prayerWall': 'Bønnevegg',
 
         // Overview
         'overview.goodMorning': 'God morgen',
@@ -286,6 +288,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Notifications',
         'sidebar.logg': 'Log',
         'sidebar.notater': 'Notes',
+        'sidebar.prayerWall': 'Prayer Wall',
         'sidebar.admin': 'Administration',
         'sidebar.loggut': 'Log Out',
         'header.oversikt': 'Overview',
@@ -321,6 +324,7 @@ const minsideTranslations = {
         'view.readingPlans': 'Reading Plans',
         'overview.btnReadingPlansLabel': 'Reading Plans',
         'view.notes': 'Notes',
+        'view.prayerWall': 'Prayer Wall',
 
         // Overview
         'overview.goodMorning': 'Good morning',
@@ -541,6 +545,7 @@ const minsideTranslations = {
         'sidebar.varslinger': 'Notificaciones',
         'sidebar.logg': 'Historial',
         'sidebar.notater': 'Notas',
+        'sidebar.prayerWall': 'Muro de Oración',
         'sidebar.admin': 'Administración',
         'sidebar.loggut': 'Cerrar Sesión',
         'header.oversikt': 'Resumen',
@@ -576,6 +581,7 @@ const minsideTranslations = {
         'view.readingPlans': 'Planes de Lectura',
         'overview.btnReadingPlansLabel': 'Planes de Lectura',
         'view.notes': 'Notas',
+        'view.prayerWall': 'Muro de Oración',
 
         // Overview
         'overview.goodMorning': 'Buen día',
@@ -818,6 +824,7 @@ class MinSideManager {
             courses: this.renderCourses,
             notes: this.renderNotes,
             'reading-plans': this.renderReadingPlans,
+            'prayer-wall': this.renderPrayerWall,
         };
 
 
@@ -853,6 +860,9 @@ class MinSideManager {
 
                     // Translate immediately on auth state change
                     translateStaticHTML();
+
+                    // Initialize Global Search Overlay
+                    this.initGlobalSearch();
 
                     // Apply bottom navigation settings (user custom first, then admin default)
                     try {
@@ -962,6 +972,7 @@ class MinSideManager {
             courses: { title: t('view.courses'), icon: 'school' },
             notes: { title: t('view.notes'), icon: 'notes' },
             'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
+            'prayer-wall': { title: t('view.prayerWall'), icon: 'favorite' },
         };
 
         // Update Header Title and Icon (Admin Style)
@@ -3770,13 +3781,33 @@ class MinSideManager {
 
         const currentDayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
 
+        const readingStreak = this.profileData?.readingStreak || 0;
+        const streakHtml = readingStreak > 0 ? `
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #bd4f2a;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">local_fire_department</span>
+                <span>${readingStreak} dagers streak! 🔥</span>
+            </div>
+        ` : '';
+
+        const certificateHtml = userPlan.completed ? `
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-start;">
+                <button class="btn btn-outline" id="btn-download-cert" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; border-color: #10b981; color: #10b981; border-radius: 10px; font-weight: 700; padding: 8px 16px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">workspace_premium</span>
+                    Vis / Skriv ut fullføringsbevis
+                </button>
+            </div>
+        ` : '';
+
         container.innerHTML = `
             <div class="ms-reading-plan-dashboard">
                 <!-- Plan Header & Progress Card -->
                 <div class="ms-rp-card-header" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
                         <div>
-                            <h2 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 8px 0;">${globalPlan.title}</h2>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+                                <h2 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0;">${globalPlan.title}</h2>
+                                ${streakHtml}
+                            </div>
                             <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; max-width: 600px;">${globalPlan.description || ''}</p>
                         </div>
                         <button class="btn btn-secondary btn-sm" id="btn-change-plan">Bytt leseplan</button>
@@ -3792,6 +3823,8 @@ class MinSideManager {
                             <div style="height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; width: ${progressPct}%; transition: width 0.4s ease;"></div>
                         </div>
                     </div>
+
+                    ${certificateHtml}
                 </div>
 
                 <!-- Main Layout Grid: Left Panel (Active Day), Right Panel (Days Checklist) -->
@@ -3884,6 +3917,12 @@ class MinSideManager {
         container.querySelector('#btn-start-devotional').onclick = () => {
             this.openDevotionalWizard(globalPlan, currentDayNum);
         };
+
+        if (container.querySelector('#btn-download-cert')) {
+            container.querySelector('#btn-download-cert').onclick = () => {
+                this.showCompletionCertificate(globalPlan.title);
+            };
+        }
     }
 
     async renderAllAvailablePlans(container) {
@@ -4411,9 +4450,17 @@ class MinSideManager {
             title.innerText = 'Andakt fullført!';
             stepContainer.appendChild(title);
 
+            const readingStreak = this.profileData?.readingStreak || 0;
+            const streakHtml = readingStreak > 0 ? `
+                <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; color: #bd4f2a; margin-top: 12px; margin-bottom: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">local_fire_department</span>
+                    <span>${readingStreak} dagers streak! 🔥</span>
+                </div>
+            ` : '';
+
             const desc = document.createElement('p');
             desc.className = 'hkm-celebration-desc';
-            desc.innerText = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".`;
+            desc.innerHTML = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".<br>${streakHtml}`;
             stepContainer.appendChild(desc);
 
             const actions = document.createElement('div');
@@ -4479,6 +4526,51 @@ class MinSideManager {
         
         userPlan.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
         await ref.set(userPlan, { merge: true });
+
+        // Calculate and update streaks in users/{uid}
+        try {
+            const userRef = firebase.firestore().collection('users').doc(uid);
+            const userDocSnap = await userRef.get();
+            if (userDocSnap.exists) {
+                const userData = userDocSnap.data();
+                
+                // Get today's local date string YYYY-MM-DD
+                const tzOffset = new Date().getTimezoneOffset() * 60000;
+                const localISODate = new Date(Date.now() - tzOffset).toISOString().slice(0, 10); // YYYY-MM-DD
+                
+                let currentStreak = userData.readingStreak || 0;
+                let longestStreak = userData.longestStreak || 0;
+                const lastReadDate = userData.lastReadDate || "";
+
+                if (lastReadDate !== localISODate) {
+                    const yesterday = new Date(Date.now() - tzOffset - 86400000);
+                    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+                    
+                    if (lastReadDate === yesterdayStr) {
+                        currentStreak += 1;
+                    } else {
+                        currentStreak = 1;
+                    }
+                    
+                    if (currentStreak > longestStreak) {
+                        longestStreak = currentStreak;
+                    }
+                    
+                    await userRef.set({
+                        readingStreak: currentStreak,
+                        longestStreak: longestStreak,
+                        lastReadDate: localISODate
+                    }, { merge: true });
+                    
+                    // Update current profileData cache
+                    this.profileData.readingStreak = currentStreak;
+                    this.profileData.longestStreak = longestStreak;
+                    this.profileData.lastReadDate = localISODate;
+                }
+            }
+        } catch (streakErr) {
+            console.error("Failed to update user streaks:", streakErr);
+        }
         
         if (reflectionText) {
             await firebase.firestore()
@@ -4493,6 +4585,199 @@ class MinSideManager {
                     dayNumber: dayNumber
                 });
         }
+    }
+
+    showCompletionCertificate(planTitle) {
+        const userName = this.profileData?.displayName || "Deltaker";
+        const dateStr = new Date().toLocaleDateString('no-NO', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        const certWindow = window.open('', '_blank');
+        certWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Fullføringsbevis - ${planTitle}</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap">
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background: #f1f5f9;
+                        font-family: 'Outfit', sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        -webkit-print-color-adjust: exact;
+                    }
+                    .certificate {
+                        background: #ffffff;
+                        width: 800px;
+                        height: 560px;
+                        padding: 40px;
+                        border: 15px solid #1B4965;
+                        box-sizing: border-box;
+                        position: relative;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                        background-image: radial-gradient(circle, #f8fafc 10%, transparent 10.5%);
+                        background-size: 15px 15px;
+                    }
+                    .inner-border {
+                        border: 2px solid #d17d39;
+                        height: 100%;
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 30px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        align-items: center;
+                        text-align: center;
+                    }
+                    .logo {
+                        font-weight: 900;
+                        font-size: 20px;
+                        color: #1B4965;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                    }
+                    .title {
+                        font-family: 'Playfair Display', serif;
+                        font-size: 42px;
+                        font-weight: 700;
+                        color: #1B4965;
+                        margin: 10px 0 0 0;
+                    }
+                    .subtitle {
+                        font-size: 14px;
+                        color: #64748b;
+                        text-transform: uppercase;
+                        letter-spacing: 0.15em;
+                        margin-top: 5px;
+                    }
+                    .presented {
+                        font-size: 16px;
+                        font-style: italic;
+                        color: #475569;
+                        margin-top: 20px;
+                    }
+                    .name {
+                        font-size: 32px;
+                        font-weight: 700;
+                        color: #0f172a;
+                        border-bottom: 2px solid #e2e8f0;
+                        padding-bottom: 8px;
+                        min-width: 300px;
+                        margin: 10px 0;
+                    }
+                    .for-completing {
+                        font-size: 15px;
+                        color: #475569;
+                        max-width: 500px;
+                        line-height: 1.5;
+                    }
+                    .plan-name {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #bd4f2a;
+                    }
+                    .footer-info {
+                        display: flex;
+                        justify-content: space-between;
+                        width: 100%;
+                        margin-top: 30px;
+                        padding: 0 40px;
+                        box-sizing: border-box;
+                    }
+                    .sign-block {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+                    .sign-line {
+                        width: 150px;
+                        border-top: 1px solid #cbd5e1;
+                        margin-top: 40px;
+                        padding-top: 5px;
+                        font-size: 11px;
+                        color: #64748b;
+                        font-weight: 600;
+                    }
+                    .badge {
+                        width: 70px;
+                        height: 70px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #ffffff;
+                        font-weight: 700;
+                        font-size: 12px;
+                        border: 3px solid #ffffff;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                        transform: rotate(-10deg);
+                    }
+                    .print-btn {
+                        position: absolute;
+                        top: -50px;
+                        right: 0;
+                        background: #1B4965;
+                        color: #ffffff;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: 700;
+                        font-size: 14px;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                    }
+                    @media print {
+                        body {
+                            background: #ffffff;
+                        }
+                        .print-btn {
+                            display: none;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div style="position: relative;">
+                    <button class="print-btn" onclick="window.print()">Skriv ut / Lagre som PDF</button>
+                    <div class="certificate">
+                        <div class="inner-border">
+                            <div class="logo">His Kingdom Ministry</div>
+                            <div>
+                                <div class="title">FULLFØRINGSBEVIS</div>
+                                <div class="subtitle">Leseplan Fullført</div>
+                            </div>
+                            <div class="presented">Tildeles stolt til</div>
+                            <div class="name">${userName}</div>
+                            <div class="for-completing">
+                                for å ha fullført leseplanen og andakten:<br>
+                                <span class="plan-name">"${planTitle}"</span>
+                            </div>
+                            <div class="footer-info">
+                                <div class="sign-block">
+                                    <div style="font-family: 'Playfair Display', serif; font-size: 18px; color: #bd4f2a; font-style: italic;">His Kingdom Ministry</div>
+                                    <div class="sign-line">Utsteder</div>
+                                </div>
+                                <div class="badge">
+                                    <span>FULLFØRT</span>
+                                </div>
+                                <div class="sign-block">
+                                    <div style="font-size: 14px; font-weight: 600; color: #334155; margin-top: 10px;">${dateStr}</div>
+                                    <div class="sign-line">Dato</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+        certWindow.document.close();
     }
 
     // ══════════════════════════════════════════════════════════
@@ -4963,6 +5248,482 @@ class MinSideManager {
                 alert('Feil: ' + error.message);
             }
         }
+    }
+
+    async renderPrayerWall(container) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Logg inn</h3>
+                    <p>Du må være logget inn for å se bønneveggen.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="ms-full-width">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        `;
+
+        this.loadPrayerWallFeed(container);
+    }
+
+    async loadPrayerWallFeed(container) {
+        const uid = this.currentUser?.uid;
+        try {
+            const snap = await firebase.firestore().collection('prayers').get();
+            const prayers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            prayers.sort((a, b) => {
+                const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+                const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+                return bTime - aTime;
+            });
+
+            const feedHtml = prayers.map(p => {
+                const isOwner = p.userId === uid;
+                const completedDays = p.prayedUserIds || [];
+                const hasPrayed = completedDays.includes(uid);
+                const count = p.prayedCount || completedDays.length || 0;
+                
+                const timeStr = p.createdAt ? this.formatTimeAgo(p.createdAt) : t('time.justNow');
+                
+                const avatarHtml = p.isAnonymous 
+                    ? `<div class="member-avatar" style="background: #cbd5e1; color: #ffffff;"><span class="material-symbols-outlined" style="font-size: 18px;">visibility_off</span></div>`
+                    : (p.userPhotoURL 
+                        ? `<div class="member-avatar"><img src="${p.userPhotoURL}" alt=""></div>`
+                        : `<div class="member-avatar" style="background: #1B4965; color: #ffffff;">${(p.userName || '?').charAt(0).toUpperCase()}</div>`);
+
+                const nameHtml = p.isAnonymous ? 'Anonym søster/bror' : (p.userName || 'Medlem');
+                
+                return `
+                    <div class="info-card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 15px rgba(15,23,42,0.01); background: #ffffff; margin-bottom: 16px; overflow: hidden;" id="prayer-card-${p.id}">
+                        <div style="padding: 16px 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    ${avatarHtml}
+                                    <div>
+                                        <div style="font-size: 14px; font-weight: 700; color: #0f172a;">${nameHtml}</div>
+                                        <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">${timeStr}</div>
+                                    </div>
+                                </div>
+                                ${isOwner ? `
+                                    <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            
+                            <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; white-space: pre-wrap; font-family: inherit;">${p.text}</p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #64748b;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a;">volunteer_activism</span>
+                                    <span>${count} ber for dette</span>
+                                </div>
+                                
+                                <button class="btn ${hasPrayed ? 'btn-secondary' : 'btn-primary'}" 
+                                        ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important;"' : 'style="background: #1B4965; border-color: #1B4965; color: #ffffff;"'} 
+                                        onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
+                                    <span>${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div style="padding: 8px; max-width: 650px; margin: 0 auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined">edit_note</span> Skriv bønneemne
+                        </button>
+                    </div>
+
+                    <div id="prayer-feed-list">
+                        ${prayers.length > 0 ? feedHtml : `
+                            <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">favorite</span>
+                                <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">Ingen bønneemner ennå</h3>
+                                <p style="font-size: 14px; color: #64748b; margin: 0;">Bli den første til å legge inn et bønneemne på veggen.</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+
+            // Bind create button
+            container.querySelector('#btn-write-prayer').onclick = () => {
+                this.openCreatePrayerModal(container);
+            };
+
+        } catch (err) {
+            console.error("Load prayer feed error:", err);
+            container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Feil</h3><p>Kunne ikke laste bønneveggen: ${err.message}</p></div>`;
+        }
+    }
+
+    formatTimeAgo(timestamp) {
+        if (!timestamp) return '';
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds ? timestamp.seconds * 1000 : timestamp);
+        const diffMs = Date.now() - date.getTime();
+        const diffMins = Math.round(diffMs / 60000);
+        const diffHours = Math.round(diffMs / 3600000);
+        const diffDays = Math.round(diffMs / 86400000);
+
+        if (diffMins < 60) return `${diffMins} min siden`;
+        if (diffHours < 24) return `${diffHours} t siden`;
+        return `${diffDays} dager siden`;
+    }
+
+    async supportPrayer(prayerId, authorUid) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+
+        try {
+            const ref = firebase.firestore().collection('prayers').doc(prayerId);
+            await firebase.firestore().runTransaction(async (transaction) => {
+                const doc = await transaction.get(ref);
+                if (!doc.exists) throw new Error("Document does not exist!");
+                
+                const data = doc.data();
+                const prayedUserIds = data.prayedUserIds || [];
+                if (!prayedUserIds.includes(uid)) {
+                    prayedUserIds.push(uid);
+                    const newCount = (data.prayedCount || 0) + 1;
+                    transaction.update(ref, {
+                        prayedUserIds,
+                        prayedCount: newCount
+                    });
+                }
+            });
+
+            // Write notification to the owner
+            if (authorUid && authorUid !== uid) {
+                const name = this.profileData?.displayName || 'En søster/bror';
+                await firebase.firestore().collection('user_notifications').add({
+                    userId: authorUid,
+                    title: 'Bønnefellesskap',
+                    message: `${name} ber for ditt bønneemne! 🙏`,
+                    read: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: 'prayer'
+                });
+            }
+
+            // Reload prayer wall view
+            const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
+            if (viewContainer) this.loadPrayerWallFeed(viewContainer);
+
+        } catch (err) {
+            console.error("Support prayer failed:", err);
+            alert("Kunne ikke fullføre handlingen: " + err.message);
+        }
+    }
+
+    async deletePrayer(prayerId) {
+        if (!confirm("Er du sikker på at du vil slette dette bønneemnet?")) return;
+        try {
+            await firebase.firestore().collection('prayers').doc(prayerId).delete();
+            const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
+            if (viewContainer) this.loadPrayerWallFeed(viewContainer);
+        } catch (err) {
+            console.error("Delete prayer error:", err);
+            alert("Feil under sletting: " + err.message);
+        }
+    }
+
+    openCreatePrayerModal(container) {
+        let modal = document.getElementById('hkm-prayer-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-prayer-modal';
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
+                <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">Skriv et bønneemne</h3>
+                    <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">Hva kan vi be for?</label>
+                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="Skriv ditt bønneemne her..."></textarea>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; cursor:pointer; user-select:none; margin: 0;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">visibility_off</span>
+                            <span style="font-size:13.5px; font-weight:600; color:#334155;">Post anonymt</span>
+                        </div>
+                        <label class="toggle toggle-sm" style="margin: 0;">
+                            <input type="checkbox" id="prayer-anon-check">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div style="display:flex; gap:12px; justify-content:flex-end;">
+                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Avbryt</button>
+                    <button class="btn btn-primary" id="btn-save-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none;">
+                        Post på bønneveggen
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#btn-save-prayer').onclick = async () => {
+            const text = modal.querySelector('#prayer-input-text').value.trim();
+            const isAnonymous = modal.querySelector('#prayer-anon-check').checked;
+            
+            if (!text) {
+                alert("Bønneemnet kan ikke være tomt.");
+                return;
+            }
+
+            const saveBtn = modal.querySelector('#btn-save-prayer');
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Poster...';
+
+            try {
+                await firebase.firestore().collection('prayers').add({
+                    userId: this.currentUser.uid,
+                    userName: this.profileData?.displayName || 'Medlem',
+                    userPhotoURL: this.profileData?.photoURL || '',
+                    text,
+                    isAnonymous,
+                    prayedCount: 0,
+                    prayedUserIds: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                modal.remove();
+                this.loadPrayerWallFeed(container);
+            } catch (err) {
+                console.error("Save prayer request failed:", err);
+                alert("Kunne ikke lagre bønneemnet: " + err.message);
+                saveBtn.disabled = false;
+                saveBtn.innerText = 'Post på bønneveggen';
+            }
+        };
+    }
+
+    async performAccountDeletion() {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        try {
+            await firebase.firestore().collection('users').doc(user.uid).delete();
+            await user.delete();
+            window.location.href = '/';
+        } catch (error) {
+            if (error.code === 'auth/requires-recent-login') {
+                alert(t('deleteAccount.reauthRequest'));
+                await firebase.auth().signOut();
+                window.location.href = '/minside/login.html';
+            } else {
+                alert('Feil: ' + error.message);
+            }
+        }
+    }
+
+    initGlobalSearch() {
+        const overlay = document.getElementById('global-search-overlay');
+        const btn = document.getElementById('global-search-btn');
+        const closeBtn = document.getElementById('close-search-btn');
+        const input = document.getElementById('global-search-input');
+        const resultsContainer = document.getElementById('global-search-results');
+        
+        if (!overlay || !input) return;
+
+        let searchCache = {
+            courses: [],
+            readingPlans: [],
+            notes: [],
+            prayers: []
+        };
+        let selectedIndex = -1;
+
+        const openSearch = async () => {
+            overlay.style.display = 'flex';
+            input.value = '';
+            selectedIndex = -1;
+            input.focus();
+            
+            // Show initial prompt
+            resultsContainer.innerHTML = `
+                <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">search</span>
+                    <p style="font-size: 14px; color: #64748b; margin: 0;">Skriv noe for å søke på tvers av Min Side...</p>
+                </div>
+            `;
+
+            // Prefetch search content
+            try {
+                const uid = this.currentUser?.uid;
+                const db = firebase.firestore();
+                const [coursesSnap, plansSnap, notesSnap, prayersSnap] = await Promise.all([
+                    db.collection('teaching').get(),
+                    db.collection('reading_plans').get(),
+                    uid ? db.collection('personal_notes').where('userId', '==', uid).get() : Promise.resolve({ empty: true }),
+                    db.collection('prayers').get()
+                ]);
+
+                searchCache.courses = coursesSnap.empty ? [] : coursesSnap.docs.map(d => ({ id: d.id, type: 'course', title: d.data().title || '', desc: d.data().description || '' }));
+                searchCache.readingPlans = plansSnap.empty ? [] : plansSnap.docs.map(d => ({ id: d.id, type: 'reading-plan', title: d.data().title || '', desc: d.data().description || '' }));
+                searchCache.notes = (!notesSnap || notesSnap.empty) ? [] : notesSnap.docs.map(d => ({ id: d.id, type: 'note', title: d.data().title || '', desc: d.data().text || d.data().content || '' }));
+                searchCache.prayers = prayersSnap.empty ? [] : prayersSnap.docs.map(d => {
+                    const data = d.data();
+                    const name = data.isAnonymous ? 'Anonym' : (data.userName || 'Medlem');
+                    return { id: d.id, type: 'prayer-wall', title: `Bønneemne fra ${name}`, desc: data.text || '' };
+                });
+            } catch (err) {
+                console.warn("[search] Failed to prefetch search data:", err);
+            }
+        };
+
+        const closeSearch = () => {
+            overlay.style.display = 'none';
+        };
+
+        btn?.addEventListener('click', openSearch);
+        closeBtn?.addEventListener('click', closeSearch);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeSearch();
+        });
+
+        // Global hotkeys (CMD+K / ESC)
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                if (overlay.style.display === 'none' || !overlay.style.display) {
+                    openSearch();
+                } else {
+                    closeSearch();
+                }
+            } else if (e.key === 'Escape') {
+                closeSearch();
+            } else if (overlay.style.display === 'flex') {
+                // Keyboard navigation in search results
+                const items = resultsContainer.querySelectorAll('.search-result-item');
+                if (items.length > 0) {
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex + 1) % items.length;
+                        highlightItem(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                        highlightItem(items);
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (selectedIndex >= 0 && selectedIndex < items.length) {
+                            items[selectedIndex].click();
+                        }
+                    }
+                }
+            }
+        });
+
+        const highlightItem = (items) => {
+            items.forEach((item, idx) => {
+                if (idx === selectedIndex) {
+                    item.classList.add('selected');
+                    item.style.background = 'var(--admin-bg, #f8f9fa)';
+                    item.style.borderColor = '#1B4965';
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                    item.style.background = '#ffffff';
+                    item.style.borderColor = '#e2e8f0';
+                }
+            });
+        };
+
+        // Real-time search query matching
+        input.addEventListener('input', () => {
+            const query = input.value.trim().toLowerCase();
+            if (query.length < 2) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">search</span>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Skriv minst 2 tegn for å søke...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const results = [];
+            const searchCollection = (list) => {
+                list.forEach(item => {
+                    if (item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)) {
+                        results.push(item);
+                    }
+                });
+            };
+
+            searchCollection(searchCache.courses);
+            searchCollection(searchCache.readingPlans);
+            searchCollection(searchCache.notes);
+            searchCollection(searchCache.prayers);
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">sentiment_dissatisfied</span>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Ingen resultater samsvarte med "${input.value}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            selectedIndex = -1;
+            const typeLabels = {
+                'course': { name: 'Kurs & Undervisning', icon: 'school', color: '#1B4965' },
+                'reading-plan': { name: 'Leseplaner & Andakt', icon: 'auto_stories', color: '#bd4f2a' },
+                'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
+                'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' }
+            };
+
+            resultsContainer.innerHTML = results.map((r, idx) => {
+                const label = typeLabels[r.type];
+                return `
+                    <div class="search-result-item" data-index="${idx}" style="padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; background: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px;" onclick="window.minSideManager.selectSearchResult('${r.type}', '${r.id}')">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: ${label.color}15; display: flex; align-items: center; justify-content: center; color: ${label.color}; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">${label.icon}</span>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 13.5px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.title}</div>
+                                <div style="font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.desc}</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; flex-shrink: 0;">
+                            ${label.name}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+    }
+
+    selectSearchResult(type, id) {
+        const overlay = document.getElementById('global-search-overlay');
+        if (overlay) overlay.style.display = 'none';
+        this.loadView(type);
     }
 }
 
