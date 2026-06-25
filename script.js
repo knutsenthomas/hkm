@@ -387,10 +387,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === searchModal) closeSearchModal();
     });
 
-    // Lukk med ESC
+    // Snarveier (Lukk med ESC, åpne med CMD+K / Ctrl+K)
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && searchModal.classList.contains('active')) {
             closeSearchModal();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            openSearch();
         }
     });
 
