@@ -25,13 +25,24 @@ try {
         messaging.onBackgroundMessage((payload) => {
             console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-            const notificationTitle = payload.notification.title;
-            const notificationOptions = {
-                body: payload.notification.body,
-                icon: payload.notification.image || '/img/logo-hkm.png'
-            };
+            // If the payload has a notification object, Firebase SDK will handle showing it automatically.
+            // We only manually show a notification if it is a data-only message (no payload.notification).
+            if (payload.notification) {
+                console.log('[firebase-messaging-sw.js] Notification payload handled automatically by Firebase SDK.');
+                return;
+            }
 
-            self.registration.showNotification(notificationTitle, notificationOptions);
+            // Fallback for data-only messages
+            if (payload.data && (payload.data.title || payload.data.body)) {
+                const notificationTitle = payload.data.title || 'Ny oppdatering';
+                const notificationOptions = {
+                    body: payload.data.body || '',
+                    icon: payload.data.image || payload.data.icon || '/img/logo-hkm.png',
+                    data: payload.data // Pass along data so notificationclick can read click_action
+                };
+
+                self.registration.showNotification(notificationTitle, notificationOptions);
+            }
         });
     } else {
         console.warn('[firebase-messaging-sw.js] Firebase Messaging er ikke støttet i denne nettleseren.');
