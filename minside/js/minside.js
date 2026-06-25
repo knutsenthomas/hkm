@@ -5359,26 +5359,28 @@ class MinSideManager {
                 const nameHtml = p.isAnonymous ? 'Anonym søster/bror' : (p.userName || 'Medlem');
                 
                 return `
-                    <div class="info-card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 15px rgba(15,23,42,0.01); background: #ffffff; margin-bottom: 16px; overflow: hidden;" id="prayer-card-${p.id}">
-                        <div style="padding: 16px 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    ${avatarHtml}
-                                    <div>
-                                        <div style="font-size: 14px; font-weight: 700; color: #0f172a;">${nameHtml}</div>
-                                        <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">${timeStr}</div>
+                    <div class="info-card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 15px rgba(15,23,42,0.01); background: #ffffff; margin-bottom: 0px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;" id="prayer-card-${p.id}">
+                        <div style="padding: 16px 20px; display: flex; flex-direction: column; height: 100%; justify-content: space-between; flex-grow: 1;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        ${avatarHtml}
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 700; color: #0f172a;">${nameHtml}</div>
+                                            <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">${timeStr}</div>
+                                        </div>
                                     </div>
+                                    ${isOwner ? `
+                                        <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                        </button>
+                                    ` : ''}
                                 </div>
-                                ${isOwner ? `
-                                    <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
-                                    </button>
-                                ` : ''}
+                                
+                                <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; white-space: pre-wrap; font-family: inherit;">${p.text}</p>
                             </div>
                             
-                            <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; white-space: pre-wrap; font-family: inherit;">${p.text}</p>
-                            
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
                                 <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #64748b;">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a;">volunteer_activism</span>
                                     <span>${count} ber for dette</span>
@@ -5397,20 +5399,20 @@ class MinSideManager {
             }).join('');
 
             container.innerHTML = `
-                <div style="padding: 8px; max-width: 650px; margin: 0 auto;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div style="padding: 8px; max-width: 1200px; margin: 0 auto; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; width: 100%;">
                         <div>
-                            <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
-                            <p style="font-size: 13px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
+                            <h3 style="font-size: 20px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
+                            <p style="font-size: 13.5px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
                         </div>
-                        <button class="btn btn-primary" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; gap: 8px;">
+                        <button class="btn btn-primary" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;">
                             <span class="material-symbols-outlined">edit_note</span> Skriv bønneemne
                         </button>
                     </div>
 
-                    <div id="prayer-feed-list">
+                    <div id="prayer-feed-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; width: 100%;">
                         ${prayers.length > 0 ? feedHtml : `
-                            <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                            <div class="empty-state" style="padding: 60px 20px; text-align: center; grid-column: 1 / -1; width: 100%;">
                                 <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">favorite</span>
                                 <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">Ingen bønneemner ennå</h3>
                                 <p style="font-size: 14px; color: #64748b; margin: 0;">Bli den første til å legge inn et bønneemne på veggen.</p>
