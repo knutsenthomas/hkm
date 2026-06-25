@@ -3048,4 +3048,48 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
   opacity: 0.9;
 }
 
+/* Profile Tabs Styling */
+.profile-tabs-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.profile-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted, #64748b);
+    border: 1.5px solid #e2e8f0;
+    border-radius: 99px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    outline: none;
+}
+
+.profile-tab-btn:hover {
+    color: var(--accent-color, #d17d39);
+    border-color: var(--accent-color, #d17d39);
+    background: rgba(209, 125, 57, 0.05);
+}
+
+.profile-tab-btn:active {
+    transform: scale(0.97);
+}
+
+.profile-tab-btn.active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+}
+
 

@@ -2323,8 +2323,32 @@ class MinSideManager {
                     </div>
                 </div>
 
-                <!-- Push & Email Notifications Card -->
+                <!-- Mobile Navigation Menu Preferences -->
                 <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
+                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">phone_android</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
+                    </div>
+                    <div class="ms-card-body-pad" style="padding: 20px 24px !important; display: block !important;">
+                        <p class="ms-danger-copy" style="margin-bottom: 16px !important; color: var(--text-muted, #64748b) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
+                            Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen på mobil:
+                        </p>
+                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
+                            ${customNavHtml}
+                        </div>
+                        <button class="btn btn-primary" id="save-custom-nav-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> Lagre menyvalg
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        </div>
+
+        <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'} max-width: 650px; margin: 0 auto;">
+            <!-- Push & Email Notifications Card -->
+            <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
                     <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
                         <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">notifications_active</span>
                         <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">${t('profile.notificationPreferences')}</h3>
@@ -2483,28 +2507,27 @@ class MinSideManager {
                         </button>
                     </div>
                 </div>
-
-                <!-- Mobile Navigation Menu Preferences -->
-                <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
-                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
-                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">phone_android</span>
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
-                    </div>
-                    <div class="ms-card-body-pad" style="padding: 20px 24px !important; display: block !important;">
-                        <p class="ms-danger-copy" style="margin-bottom: 16px !important; color: var(--text-muted, #64748b) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
-                            Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen på mobil:
-                        </p>
-                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
-                            ${customNavHtml}
-                        </div>
-                        <button class="btn btn-primary" id="save-custom-nav-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> Lagre menyvalg
-                        </button>
-                    </div>
-                </div>
-
-            </div>
         </div>`;
+
+        // Tab switching events
+        const tabBtns = container.querySelectorAll('.profile-tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-profile-tab');
+                this._activeProfileTab = target;
+
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                container.querySelectorAll('.profile-tab-content').forEach(c => {
+                    c.style.display = 'none';
+                });
+                const activeContent = container.querySelector(`#profile-tab-content-${target}`);
+                if (activeContent) {
+                    activeContent.style.display = target === 'notifications' ? 'block' : '';
+                }
+            });
+        });
 
         // ── Wire up events ──
         // Contact edit toggle
