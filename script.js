@@ -887,6 +887,18 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     };
 
     try {
+        // Start parallel Bible dictionary lookup early
+        let biblePromise = Promise.resolve(null);
+        if (q.length >= 2) {
+            const lang = getCurrentLanguage();
+            biblePromise = fetch(`/api/bible/dictionary?word=${encodeURIComponent(q)}&lang=${lang}`)
+                .then(res => res.ok ? res.json() : null)
+                .catch(err => {
+                    console.warn('[Search] Bible search failed:', err);
+                    return null;
+                });
+        }
+
         // Pre-fetch all documents in content collection in one call to be extremely fast and always dynamic
         let contentDocs = {};
         try {
@@ -1326,6 +1338,19 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 });
             }
         });
+
+        // Await the Bible dictionary search results
+        const bibleResult = await biblePromise;
+        if (bibleResult && bibleResult.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(bibleResult.category.toLowerCase())) {
+            const searchLang = getCurrentLanguage();
+            results.push({
+                type: searchLang === 'en' ? 'Bible & Dictionary' : (searchLang === 'es' ? 'Biblia y Diccionario' : 'Bibel & Ordbok'),
+                title: bibleResult.word || q,
+                meta: bibleResult.category,
+                url: getLocalizedUrl(`bibel.html?dict=${encodeURIComponent(bibleResult.word || q)}`),
+                snippet: makeSnippet(bibleResult.definition || bibleResult.contextualNote || '', q)
+            });
+        }
 
     } catch (err) {
         console.error('Feil ved søk:', err);

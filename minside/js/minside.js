@@ -5654,18 +5654,9 @@ class MinSideManager {
         };
 
         // Real-time search query matching
-        input.addEventListener('input', () => {
-            const query = input.value.trim().toLowerCase();
-            if (query.length < 2) {
-                resultsContainer.innerHTML = `
-                    <div class="empty-state" style="padding: 40px 20px; text-align: center;">
-                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">search</span>
-                        <p style="font-size: 14px; color: #64748b; margin: 0;">Skriv minst 2 tegn for å søke...</p>
-                    </div>
-                `;
-                return;
-            }
-
+        let minSideSearchDebounce;
+        const renderSearchResults = (queryStr, bibleData) => {
+            const query = queryStr.trim().toLowerCase();
             const results = [];
             const searchCollection = (list) => {
                 list.forEach(item => {
@@ -5680,11 +5671,21 @@ class MinSideManager {
             searchCollection(searchCache.notes);
             searchCollection(searchCache.prayers);
 
+            // Add Bible search result if available and relevant
+            if (bibleData && bibleData.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(bibleData.category.toLowerCase())) {
+                results.push({
+                    id: bibleData.word || queryStr,
+                    type: 'bible-search',
+                    title: bibleData.word || queryStr,
+                    desc: bibleData.definition || bibleData.contextualNote || ''
+                });
+            }
+
             if (results.length === 0) {
                 resultsContainer.innerHTML = `
                     <div class="empty-state" style="padding: 40px 20px; text-align: center;">
                         <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">sentiment_dissatisfied</span>
-                        <p style="font-size: 14px; color: #64748b; margin: 0;">Ingen resultater samsvarte med "${input.value}"</p>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Ingen resultater samsvarte med "${queryStr}"</p>
                     </div>
                 `;
                 return;
@@ -5695,7 +5696,8 @@ class MinSideManager {
                 'course': { name: 'Kurs & Undervisning', icon: 'school', color: '#1B4965' },
                 'reading-plan': { name: 'Leseplaner & Andakt', icon: 'auto_stories', color: '#bd4f2a' },
                 'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
-                'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' }
+                'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' },
+                'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#1b4965' }
             };
 
             resultsContainer.innerHTML = results.map((r, idx) => {
@@ -5717,12 +5719,56 @@ class MinSideManager {
                     </div>
                 `;
             }).join('');
+        };
+
+        input.addEventListener('input', () => {
+            const query = input.value.trim();
+            if (query.length < 2) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1; margin-bottom: 12px;">search</span>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Skriv minst 2 tegn for å søke...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sync render local search instantly
+            renderSearchResults(query, null);
+
+            // Debounced fetch for Bible database
+            clearTimeout(minSideSearchDebounce);
+            minSideSearchDebounce = setTimeout(async () => {
+                try {
+                    const lang = document.documentElement.lang || 'no';
+                    const res = await fetch(`/api/bible/dictionary?word=${encodeURIComponent(query)}&lang=${lang}`);
+                    if (res.ok) {
+                        const bibleData = await res.json();
+                        if (input.value.trim() === query) {
+                            renderSearchResults(query, bibleData);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("[Search] Bible search on minside failed:", e);
+                }
+            }, 400);
         });
     }
 
     selectSearchResult(type, id) {
         const overlay = document.getElementById('global-search-overlay');
         if (overlay) overlay.style.display = 'none';
+        if (type === 'bible-search') {
+            const lang = document.documentElement.lang || 'no';
+            let url = '../bibel.html?dict=' + encodeURIComponent(id);
+            if (lang === 'en') {
+                url = '../en/bibel.html?dict=' + encodeURIComponent(id);
+            } else if (lang === 'es') {
+                url = '../es/bibel.html?dict=' + encodeURIComponent(id);
+            }
+            window.location.href = url;
+            return;
+        }
         this.loadView(type);
     }
 }
