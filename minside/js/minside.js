@@ -5509,12 +5509,12 @@ class MinSideManager {
 
         modal = document.createElement('div');
         modal.id = 'hkm-prayer-modal';
-        modal.className = 'modal active';
+        modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
+            <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                     <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">Skriv et bønneemne</h3>
-                    <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
+                    <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
                 </div>
                 
                 <div style="margin-bottom: 16px;">
@@ -5536,7 +5536,7 @@ class MinSideManager {
                 </div>
 
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
-                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Avbryt</button>
+                    <button class="btn btn-outline" id="btn-cancel-prayer">Avbryt</button>
                     <button class="btn btn-primary" id="btn-save-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none;">
                         Post på bønneveggen
                     </button>
@@ -5544,6 +5544,20 @@ class MinSideManager {
             </div>
         `;
         document.body.appendChild(modal);
+
+        // Force reflow and add active class for fade-in animation
+        modal.offsetHeight;
+        modal.classList.add('active');
+
+        const closeFn = () => {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 250);
+        };
+
+        const closeBtn = modal.querySelector('.close');
+        const cancelBtn = modal.querySelector('#btn-cancel-prayer');
+        if (closeBtn) closeBtn.onclick = closeFn;
+        if (cancelBtn) cancelBtn.onclick = closeFn;
 
         modal.querySelector('#btn-save-prayer').onclick = async () => {
             const text = modal.querySelector('#prayer-input-text').value.trim();
@@ -5570,7 +5584,7 @@ class MinSideManager {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                modal.remove();
+                closeFn();
                 this.loadPrayerWallFeed(container);
             } catch (err) {
                 console.error("Save prayer request failed:", err);
