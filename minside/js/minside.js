@@ -2360,7 +2360,7 @@ class MinSideManager {
         </div>
         </div>
 
-        <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'} max-width: 650px; margin: 0 auto;">
+        <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'}">
             <!-- Push & Email Notifications Card -->
             <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
                     <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
