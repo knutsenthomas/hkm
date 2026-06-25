@@ -1096,12 +1096,17 @@ class BibleReader {
             });
         }
 
-        // Hide toolbar on scroll in content pane
+        // Hide toolbar and clear highlight on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
         if (mainContentPane) {
             mainContentPane.addEventListener('scroll', () => {
                 if (this.dom.verseToolbar) {
                     this.dom.verseToolbar.style.display = 'none';
+                }
+                // Clear highlighted verse if the user scrolls manually
+                if (this.highlightedVerseElement && !this.isProgrammaticScrolling) {
+                    this.highlightedVerseElement.classList.remove('verse-temp-highlight');
+                    this.highlightedVerseElement = null;
                 }
             });
         }
@@ -1214,6 +1219,10 @@ class BibleReader {
             this.selectedVerses = [];
         }
         if (this.dom.verseToolbar) this.dom.verseToolbar.style.display = 'none';
+        if (this.highlightedVerseElement) {
+            this.highlightedVerseElement.classList.remove('verse-temp-highlight');
+            this.highlightedVerseElement = null;
+        }
     }
 
     getSelectedVersesReference() {
@@ -1865,14 +1874,24 @@ class BibleReader {
     }
 
     scrollToVerse(verseNum) {
+        if (this.highlightedVerseElement) {
+            this.highlightedVerseElement.classList.remove('verse-temp-highlight');
+            this.highlightedVerseElement = null;
+        }
         setTimeout(() => {
             const paragraphs = this.dom.readingPane.querySelectorAll('p');
             for (const p of paragraphs) {
                 const sup = p.querySelector('sup.v');
                 if (sup && sup.innerText.trim() === String(verseNum)) {
+                    this.isProgrammaticScrolling = true;
                     p.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     p.classList.add('verse-temp-highlight');
-                    setTimeout(() => p.classList.remove('verse-temp-highlight'), 3000);
+                    this.highlightedVerseElement = p;
+                    
+                    if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
+                    this.scrollTimeout = setTimeout(() => {
+                        this.isProgrammaticScrolling = false;
+                    }, 1000);
                     break;
                 }
             }

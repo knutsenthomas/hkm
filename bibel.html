@@ -573,13 +573,13 @@
 
         .verse-temp-highlight {
             background: var(--highlight-bg) !important;
-            animation: pulse-highlight 3s ease-out;
+            animation: pulse-highlight 1.5s ease-out forwards;
+            border-radius: 4px;
         }
 
         @keyframes pulse-highlight {
-            0% { background: var(--highlight-bg); }
-            70% { background: var(--highlight-bg); }
-            100% { background: transparent; }
+            0% { background: rgba(253, 224, 71, 0.8); }
+            100% { background: var(--highlight-bg); }
         }
 
         /* Chapter selectors overlay */

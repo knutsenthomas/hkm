@@ -7237,15 +7237,16 @@ body:not(.cms-loading) {
 
 /* 1. Dypkobling (Target Verse Flash Highlight) */
 @keyframes verse-highlight-flash {
-    0% { background-color: rgba(209, 125, 57, 0.4); }
-    100% { background-color: transparent; }
+    0% { background-color: rgba(209, 125, 57, 0.5); }
+    100% { background-color: rgba(209, 125, 57, 0.22); }
 }
 .verse-temp-highlight {
-    animation: verse-highlight-flash 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: verse-highlight-flash 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     border-radius: 4px;
     padding: 2px 6px;
     display: inline-block;
     width: 100%;
+    transition: background-color 0.4s ease;
 }
 
 /* 2. Global Mørk Modus (Dark Mode overrides) */
