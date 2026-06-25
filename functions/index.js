@@ -5922,7 +5922,7 @@ async function getOrUpdateYoutubeCache() {
  */
 exports.onVisitorChatMessageAI = onDocumentCreated({
   document: "visitorChats/{chatId}/messages/{messageId}",
-  secrets: [geminiApiKeyParam, openaiApiKeyParam],
+  secrets: [geminiApiKeyParam, openaiApiKeyParam, googleChatWebhookUrlParam],
 }, async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
@@ -5948,6 +5948,92 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     // Only fetch podcast/YouTube when the message is relevant — these are slow external calls.
     const msgText = (msgData.text || "").toLowerCase();
     const needsMedia = /podcast|episode|youtube|video|kanal|media/.test(msgText);
+
+    // Sjekk om meldingen krever eskalering (frustrasjon eller spesifikk forespørsel)
+    const isEscalationRequested = /snakke med.*menneske|snakke med.*person|human helper|menneskelig|sjelesørger|sjelesorg|kontakte dere|ring meg|kontakt meg|refusjon|klage/i.test(msgText) || 
+                                  /irritert|sint|ubrukelig|dårlig service|dårlig hjelp|forferdelig/i.test(msgText);
+
+    if (isEscalationRequested) {
+      console.log(`[ChatAI] Automatisk eskalering trigget for chatId=${chatId} på grunn av: "${msgText}"`);
+      
+      const chatRef = db.collection("visitorChats").doc(chatId);
+      const chatDoc = await chatRef.get();
+      const chatData = chatDoc.exists ? (chatDoc.data() || {}) : {};
+      const visitorName = clampText(chatData.visitorName || "Anonym besokende", 120);
+      const visitorEmail = clampText(chatData.visitorEmail || "", 254);
+      const sourcePage = clampText(chatData.lastPagePath || chatData.sourcePage || msgData.pagePath || "", 220);
+
+      // 1. Send varsel til Google Chat webhook
+      const webhookUrl = getGoogleChatWebhookUrl();
+      if (webhookUrl) {
+        try {
+          const googleChatCard = {
+            cardsV2: [{
+              cardId: `escalation_${Date.now()}`,
+              card: {
+                header: {
+                  title: `${visitorName} [AUTO-ESKALERT]`,
+                  subtitle: visitorEmail || "Ingen e-post oppgitt",
+                  imageUrl: "https://hiskingdomministry.no/img/logo-hkm.png",
+                  imageType: "CIRCLE"
+                },
+                sections: [
+                  {
+                    header: "Automatisk eskalering til menneske",
+                    widgets: [
+                      {
+                        textParagraph: {
+                          text: `AI-assistenten har overført samtalen til en menneskelig agent på grunn av sentiment/nøkkelord:\n\n*"${msgData.text}"*`
+                        }
+                      },
+                      {
+                        decoratedText: {
+                          topLabel: "Side",
+                          text: sourcePage || "Ukjent side",
+                          startIcon: { knownIcon: "DESCRIPTION" }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }],
+            thread: {
+              threadKey: `visitor_${chatId}`,
+            }
+          };
+
+          await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify(googleChatCard),
+          });
+        } catch (webhookErr) {
+          console.error("[ChatAI] Webhook-varsling feilet under eskalering:", webhookErr.message);
+        }
+      }
+
+      // 2. Oppdater modus til google_chat og sett requestHuman til true
+      await chatRef.set({
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastTargetMode: "google_chat",
+        requestHuman: true,
+      }, { merge: true });
+
+      // 3. Send en forklarende melding til brukeren i chatten
+      await chatRef.collection("messages").add({
+        sender: "agent",
+        source: "ai_gemini",
+        fromName: "HKM Assistent",
+        text: "Jeg skjønner at du ønsker å snakke med en av oss, eller at dette krever manuell oppfølging. Jeg har nå overført samtalen til en av våre menneskelige medarbeidere, og de vil svare deg så fort som mulig. Vennligst hold vinduet åpent eller legg igjen e-postadressen din.",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return;
+    }
 
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold in parallel
     const firestoreReads = [
