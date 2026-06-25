@@ -14,8 +14,13 @@ export default async function handler(req, res) {
 
   const { action, playlistId, channelId, pageToken } = req.query;
 
-  // Retrieve API Key from query params, env variables, or fallback
-  const apiKey = req.query.key || process.env.YOUTUBE_API_KEY || 'AIzaSyD622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
+  // Retrieve API Key from query params or env variables
+  const apiKey = req.query.key || process.env.YOUTUBE_API_KEY;
+
+  if (!apiKey) {
+    res.status(401).json({ error: { message: "YouTube API Key is missing. Please set YOUTUBE_API_KEY environment variable." } });
+    return;
+  }
 
   try {
     let url = '';
