@@ -1723,6 +1723,22 @@ class MinSideManager {
                 </div>
             </div>
 
+            <!-- Bønneveggen preview -->
+            <div class="info-card ms-overview-card-gap" id="ov-prayer-preview-card" style="display: none;">
+                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Siste fra Bønneveggen</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px;">
+                        Gå til Bønneveggen <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                    </button>
+                </div>
+                <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </div>
+
             <!-- Quick actions -->
             <div class="info-card ms-overview-card-gap">
                 <div class="info-card-header"><h3>${t('overview.quickLinks')}</h3></div>
@@ -1774,14 +1790,60 @@ class MinSideManager {
         // Parallel fetches
         const uid = user?.uid;
         try {
-            const [notifSnap, donations, coursesSnap, recentSnap] = await Promise.all([
+            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap] = await Promise.all([
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).where('read', '==', false).get(),
                 this._fetchCurrentUserDonations(),
                 firebase.firestore().collection('teaching').get(),
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get(),
+                firebase.firestore().collection('prayers').get()
             ]);
+
+            // Prayers preview rendering
+            const ovPrayerCard = document.getElementById('ov-prayer-preview-card');
+            const ovPrayerFeed = document.getElementById('ov-prayer-feed-preview');
+            if (ovPrayerCard && ovPrayerFeed) {
+                ovPrayerCard.style.display = 'block';
+                
+                const prayers = prayersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                prayers.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+                    return bTime - aTime;
+                });
+                
+                const topPrayers = prayers.slice(0, 3);
+                if (topPrayers.length > 0) {
+                    ovPrayerFeed.innerHTML = topPrayers.map(p => {
+                        const name = p.isAnonymous ? 'Anonym' : (p.userName || 'Medlem');
+                        const count = p.prayedCount || (p.prayedUserIds || []).length || 0;
+                        const textSnippet = p.text.length > 80 ? p.text.substring(0, 80) + '...' : p.text;
+                        
+                        return `
+                            <div class="ov-prayer-item" style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span style="font-size: 12px; font-weight: 700; color: #1B4965;">${name}</span>
+                                        <span style="font-size: 11px; color: #94a3b8;">${p.createdAt ? this.formatTimeAgo(p.createdAt) : ''}</span>
+                                    </div>
+                                    <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">volunteer_activism</span>
+                                    <span>${count} ber</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    ovPrayerFeed.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
+                            Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.
+                        </div>
+                    `;
+                }
+            }
 
             // Notif count
             const notifEl = document.getElementById('ov-notif-count');
