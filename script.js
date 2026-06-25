@@ -2644,6 +2644,7 @@ window.addEventListener('load', () => {
 	        const headerStatusDot = root.querySelector('.status-dot');
 	        const headerStatusText = root.querySelector('.status-text');
 	        const OSLO_TZ = 'Europe/Oslo';
+	        const sessionStartTime = Date.now();
 
 	        function toMonthDayKey(month, day) {
 	            return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -3017,7 +3018,13 @@ window.addEventListener('load', () => {
             const source = data.source || '';
             const targetMode = data.targetMode || '';
 
+            // Skjul meldinger fra forrige økt når man er i AI-modus for å starte med et rent chatvindu,
+            // men behold meldingshistorikken for live support (google_chat) for kontinuitet.
             if (mode === 'ai') {
+                const msgTime = data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime()) : Date.now();
+                if (msgTime < sessionStartTime - 5000) {
+                    return false;
+                }
                 return (sender === 'visitor' && targetMode === 'ai') || source === 'ai_gemini';
             }
 
