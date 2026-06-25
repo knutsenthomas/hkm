@@ -266,6 +266,8 @@ const minsideTranslations = {
         
         // Prayer Wall
         'prayer.title': 'Bønneveggen',
+        'prayer.disabledTitle': 'Deaktivert',
+        'prayer.disabledMsg': 'Bønneveggen er for øyeblikket deaktivert.',
         'prayer.subtitle': 'Bær hverandres byrder, og oppfyll på den måte Kristi lov.',
         'prayer.btnWrite': 'Skriv bønneemne',
         'prayer.anonymous': 'Anonym søster/bror',
@@ -290,7 +292,9 @@ const minsideTranslations = {
         'prayer.editModalTitle': 'Rediger bønneemne',
         'prayer.editModalSave': 'Lagre endringer',
         'prayer.editModalSaving': 'Lagrer...',
-        'prayer.errUpdate': 'Kunne ikke oppdatere bønneemnet: '
+        'prayer.errUpdate': 'Kunne ikke oppdatere bønneemnet: ',
+        'prayer.disabledTitle': 'Bønneveggen er deaktivert',
+        'prayer.disabledMsg': 'Bønneveggen er for øyeblikket ikke tilgjengelig.'
     },
     en: {
         'common.loading': 'Loading',
@@ -554,6 +558,8 @@ const minsideTranslations = {
         
         // Prayer Wall
         'prayer.title': 'Prayer Wall',
+        'prayer.disabledTitle': 'Deactivated',
+        'prayer.disabledMsg': 'The Prayer Wall is currently deactivated.',
         'prayer.subtitle': 'Bear one another\'s burdens, and so fulfill the law of Christ.',
         'prayer.btnWrite': 'Share Prayer Request',
         'prayer.anonymous': 'Anonymous sister/brother',
@@ -578,7 +584,9 @@ const minsideTranslations = {
         'prayer.editModalTitle': 'Edit Prayer Request',
         'prayer.editModalSave': 'Save Changes',
         'prayer.editModalSaving': 'Saving...',
-        'prayer.errUpdate': 'Could not update prayer request: '
+        'prayer.errUpdate': 'Could not update prayer request: ',
+        'prayer.disabledTitle': 'Prayer Wall is disabled',
+        'prayer.disabledMsg': 'The prayer wall is currently not available.'
     },
     es: {
         'common.loading': 'Cargando',
@@ -842,6 +850,8 @@ const minsideTranslations = {
         
         // Prayer Wall
         'prayer.title': 'Muro de Oración',
+        'prayer.disabledTitle': 'Desactivado',
+        'prayer.disabledMsg': 'El Muro de Oración está actualmente desactivado.',
         'prayer.subtitle': 'Sobrellevad los unos las cargas de los otros, y cumplid así la ley de Cristo.',
         'prayer.btnWrite': 'Escribir Petición',
         'prayer.anonymous': 'Hermana/hermano anónimo',
@@ -866,7 +876,9 @@ const minsideTranslations = {
         'prayer.editModalTitle': 'Editar petición de oración',
         'prayer.editModalSave': 'Guardar cambios',
         'prayer.editModalSaving': 'Guardando...',
-        'prayer.errUpdate': 'No se pudo actualizar la petición de oración: '
+        'prayer.errUpdate': 'No se pudo actualizar la petición de oración: ',
+        'prayer.disabledTitle': 'El Muro de Oración está desactivado',
+        'prayer.disabledMsg': 'El muro de oración no está disponible actualmente.'
     }
 };
 
@@ -965,6 +977,7 @@ class MinSideManager {
     constructor() {
         this.currentUser = null;
         this.profileData = {};
+        this.prayerWallEnabled = false;
 
         this.views = {
             overview: this.renderOverview,
@@ -1000,6 +1013,32 @@ class MinSideManager {
             try {
                 if (user) {
                     this.currentUser = user;
+
+                    // Load features config
+                    let prayerWallEnabled = false;
+                    try {
+                        const featuresDoc = await firebase.firestore().collection('content').doc('settings_features').get();
+                        if (featuresDoc.exists) {
+                            prayerWallEnabled = !!featuresDoc.data().prayerWallEnabled;
+                        }
+                    } catch (err) {
+                        console.error("Error loading features config:", err);
+                    }
+                    this.prayerWallEnabled = prayerWallEnabled;
+
+                    // Apply visibility on navigation links
+                    document.querySelectorAll('[data-view="prayer-wall"]').forEach(el => {
+                        if (prayerWallEnabled) {
+                            el.style.display = '';
+                            const li = el.closest('.nav-item');
+                            if (li) li.style.display = '';
+                        } else {
+                            el.style.display = 'none';
+                            const li = el.closest('.nav-item');
+                            if (li) li.style.display = 'none';
+                        }
+                    });
+
                     await this.syncUserProfile(user);
                     await this.syncProfileFromGoogleProvider();
                     this.profileData = await this.getMergedProfile(user);
@@ -1109,6 +1148,9 @@ class MinSideManager {
     }
 
     loadView(viewId) {
+        if (viewId === 'prayer-wall' && !this.prayerWallEnabled) {
+            viewId = 'overview';
+        }
         if (!this.views[viewId]) viewId = 'overview';
         window.location.hash = viewId;
 
@@ -1881,21 +1923,28 @@ class MinSideManager {
         // Parallel fetches
         const uid = user?.uid;
         try {
-            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap] = await Promise.all([
+            const promises = [
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).where('read', '==', false).get(),
                 this._fetchCurrentUserDonations(),
                 firebase.firestore().collection('teaching').get(),
                 firebase.firestore().collection('user_notifications')
-                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get(),
-                firebase.firestore().collection('prayers').get()
-            ]);
+                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get()
+            ];
+            if (this.prayerWallEnabled) {
+                promises.push(firebase.firestore().collection('prayers').get());
+            } else {
+                promises.push(Promise.resolve({ docs: [] }));
+            }
+
+            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap] = await Promise.all(promises);
 
             // Prayers preview rendering
             const ovPrayerCard = document.getElementById('ov-prayer-preview-card');
             const ovPrayerFeed = document.getElementById('ov-prayer-feed-preview');
             if (ovPrayerCard && ovPrayerFeed) {
-                ovPrayerCard.style.display = 'block';
+                if (this.prayerWallEnabled) {
+                    ovPrayerCard.style.display = 'block';
                 
                 const prayers = prayersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 prayers.sort((a, b) => {
@@ -1930,6 +1979,9 @@ class MinSideManager {
                             Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.
                         </div>
                     `;
+                }
+                } else {
+                    ovPrayerCard.style.display = 'none';
                 }
             }
 
@@ -5684,6 +5736,22 @@ class MinSideManager {
     }
 
     async renderPrayerWall(container) {
+        if (!this.prayerWallEnabled) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">block</span>
+                    <h3>${t('prayer.disabledTitle')}</h3>
+                    <p>${t('prayer.disabledMsg')}</p>
+                </div>
+            `;
+            setTimeout(() => {
+                if (window.location.hash === '#prayer-wall') {
+                    this.loadView('overview');
+                }
+            }, 2500);
+            return;
+        }
+
         const uid = this.currentUser?.uid;
         if (!uid) {
             container.innerHTML = `
@@ -6129,12 +6197,18 @@ class MinSideManager {
             try {
                 const uid = this.currentUser?.uid;
                 const db = firebase.firestore();
-                const [coursesSnap, plansSnap, notesSnap, prayersSnap] = await Promise.all([
+                const promises = [
                     db.collection('teaching').get(),
                     db.collection('reading_plans').get(),
-                    uid ? db.collection('personal_notes').where('userId', '==', uid).get() : Promise.resolve({ empty: true }),
-                    db.collection('prayers').get()
-                ]);
+                    uid ? db.collection('personal_notes').where('userId', '==', uid).get() : Promise.resolve({ empty: true })
+                ];
+                if (this.prayerWallEnabled) {
+                    promises.push(db.collection('prayers').get());
+                } else {
+                    promises.push(Promise.resolve({ empty: true, docs: [] }));
+                }
+
+                const [coursesSnap, plansSnap, notesSnap, prayersSnap] = await Promise.all(promises);
 
                 searchCache.courses = coursesSnap.empty ? [] : coursesSnap.docs.map(d => ({ id: d.id, type: 'course', title: d.data().title || '', desc: d.data().description || '' }));
                 searchCache.readingPlans = plansSnap.empty ? [] : plansSnap.docs.map(d => ({ id: d.id, type: 'reading-plan', title: d.data().title || '', desc: d.data().description || '' }));
