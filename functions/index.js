@@ -18,7 +18,7 @@ const paypalClientIdParam = defineSecret('PAYPAL_CLIENT_ID');
 const paypalClientSecretParam = defineSecret('PAYPAL_CLIENT_SECRET');
 
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -6025,36 +6025,6 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
         youtubeItems.map(v => `- Tittel: ${v.title}\n  URL: ${v.link}\n  Bilde: ${v.thumbnail}`).join("\n");
     }
 
-    const systemPrompt = `
-      Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
-      
-      DIN HOVEDOPPGAVE: Hjelp besøkende med å finne innhold fra His Kingdom Ministry (HKM). Du har tilgang til blogginnlegg, undervisning, podcast-episoder, arrangementer og produkter nedenfor.
-      
-      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål.
-      
-      KONTEKST-INFORMASJON (Dette er innholdet du har tilgang til - bruk det for å svare og oppsummere):
-      ${eventsContext}
-      ${blogContext}
-      ${teachingContext}
-      ${podcastContext}
-      ${productsContext}
-      ${youtubeContext}
-
-      REGLER FOR SVAR:
-      1. Svar alltid på norsk. 
-      2. Vær varm, oppmuntrende og spirituelt veiledende.
-      3. Når du anbefaler eller nevner noe, skal du ALLTID inkludere:
-         - En kort oppsummering/beskrivelse basert på informasjonen over.
-         - En direkte lenke (URL).
-         - Et bilde ved å bruke Markdown-formatet: ![Beskrivelse](Bilde-URL) hvis bilde-URL er tilgjengelig.
-      4. Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
-      5. Linker til YouTube-videoer kan gå direkte til YouTube, eller du kan henvise til vår samleside: https://www.hiskingdomministry.no/youtube.html
-      6. YouTube-kanalen vår finner du her: https://www.youtube.com/@hiskingdomministry
-      7. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
-      6. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
-      7. Aldri nevn tekniske detaljer om systemet.
-      8. ISRAEL-PRODUKTER: Fortell gjerne besøkende at vi har flotte, autentiske produkter fra Israel i butikken vår. Vi er stolte av å støtte Israel og tilby disse varene. Du kan henvise dem til: https://www.hiskingdomministry.no/category/israel for å se utvalget.`;
-
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
@@ -6087,6 +6057,84 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     } catch (err) {
       console.warn("[ChatAI] Kunne ikke hente samtalehistorikk:", err.message);
     }
+
+    // --- 1. RAG retrieval using Firestore Vector Search ---
+    let retrievedContexts = [];
+    let isRagUsed = false;
+    try {
+      const genAIForVector = new GoogleGenerativeAI(cleanKey);
+      const embedModel = genAIForVector.getGenerativeModel({ model: "text-embedding-004" });
+      const embedResult = await embedModel.embedContent(userMessage);
+      const queryVector = embedResult.embedding.values;
+      const queryVectorValue = admin.firestore.FieldValue.vector(queryVector);
+
+      const vectorQuerySnap = await db.collection("embeddings_archive")
+        .where("lang", "==", "no") // Default til norsk
+        .findNearest({
+          vectorField: "embedding",
+          queryVector: queryVectorValue,
+          distanceMeasure: "COSINE",
+          limit: 4
+        })
+        .get();
+
+      if (!vectorQuerySnap.empty) {
+        vectorQuerySnap.forEach(doc => {
+          const data = doc.data();
+          const url = `https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(data.sourceId)}`;
+          retrievedContexts.push({
+            title: data.title,
+            url: url,
+            text: data.text
+          });
+        });
+        isRagUsed = true;
+        console.log(`[ChatAI] Vellykket RAG hentet ${retrievedContexts.length} kilder via Vector Search.`);
+      }
+    } catch (vectorErr) {
+      console.warn("[ChatAI] Vektorsøk feilet (kanskje indeks ikke er bygget ennå):", vectorErr.message);
+    }
+
+    // --- 2. Build Context prompt ---
+    let RAGContext = "";
+    if (isRagUsed) {
+      RAGContext = "\nRELEVANTE KILDER FRA VÅRT ARKIV (Bruk disse som din primærkilde):\n" + 
+        retrievedContexts.map((ctx, idx) => `[Kilde ${idx + 1}] Tittel: ${ctx.title}\nLink: ${ctx.url}\nTekst: ${ctx.text}`).join("\n\n");
+    } else {
+      RAGContext = `
+      ${eventsContext}
+      ${blogContext}
+      ${teachingContext}
+      ${podcastContext}
+      ${productsContext}
+      ${youtubeContext}
+      `;
+    }
+
+    const systemPrompt = `
+      Du er en teologisk AI-assistent for ${siteTitle} (HKM). 
+      
+      DIN HOVEDOPPGAVE: Svar på spørsmål og hjelp besøkende med å finne innhold fra His Kingdom Ministry (HKM). Du har tilgang til blogginnlegg, undervisning, podcast-episoder, arrangementer og produkter nedenfor.
+      
+      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål.
+      
+      KONTEKST-INFORMASJON:
+      ${RAGContext}
+
+      REGLER FOR SVAR:
+      1. Svar alltid på norsk. 
+      2. Vær varm, oppmuntrende og spirituelt veiledende.
+      3. Når du anbefaler eller nevner noe, skal du ALLTID inkludere:
+         - En kort oppsummering/beskrivelse basert på kildene over.
+         - En direkte lenke (URL) som du finner i kildene.
+         - Et bilde ved å bruke Markdown-formatet: ![Beskrivelse](Bilde-URL) hvis bilde-URL er tilgjengelig.
+      4. Hvis du bruker informasjon fra kildene over, legg til en kildehenvisning med klikkbar markdown-lenke på slutten av avsnittet (f.eks: "Les mer i artikkelen [Tittel](URL)").
+      5. Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
+      6. Linker til YouTube-videoer kan gå direkte til YouTube, eller du kan henvise til vår samleside: https://www.hiskingdomministry.no/youtube.html
+      7. YouTube-kanalen vår finner du her: https://www.youtube.com/@hiskingdomministry
+      8. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
+      9. Aldri nevn tekniske detaljer om systemet.
+      10. ISRAEL-PRODUKTER: Fortell gjerne besøkende at vi har flotte, autentiske produkter fra Israel i butikken vår. Vi er stolte av å støtte Israel og tilby disse varene. Du kan henvise dem til: https://www.hiskingdomministry.no/category/israel for å se utvalget.`;
 
     const finalSystemPrompt = `${systemPrompt}\n${historyContext}\n\nNy melding fra Besøkende: ${userMessage}`;
 
@@ -8007,4 +8055,100 @@ exports.onNotificationCreated = onDocumentCreated({
   } catch (err) {
     console.error("Feil under behandling av varsling:", err);
   }
+});
+
+// Helper for chunking text (GEO/SEO vector embeddings)
+function chunkText(text, size = 1000, overlap = 200) {
+  const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const chunks = [];
+  let index = 0;
+
+  while (index < cleanText.length) {
+    const chunk = cleanText.substring(index, index + size);
+    chunks.push(chunk);
+    index += (size - overlap);
+  }
+  return chunks;
+}
+
+exports.indexContentForVectorSearch = onDocumentWritten({
+  document: "content/{collectionId}/items/{itemId}",
+  secrets: [geminiApiKeyParam]
+}, async (event) => {
+  const change = event.data;
+  if (!change) return;
+
+  const collectionId = event.params.collectionId;
+  const itemId = event.params.itemId;
+
+  // Indekserer kun blogger og undervisning
+  if (!["collection_blog", "collection_teaching"].includes(collectionId)) return;
+
+  // Slett gamle chunks hvis dokumentet ble slettet
+  if (!change.after.exists) {
+    const oldChunks = await db.collection("embeddings_archive")
+      .where("sourceId", "==", itemId)
+      .get();
+    
+    const batch = db.batch();
+    oldChunks.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    console.log(`[Indexer] Slettet gamle chunks for slettet dokument: ${itemId}`);
+    return;
+  }
+
+  const data = change.after.data() || {};
+  const content = data.content || data.description || "";
+  const title = data.title || "";
+  const language = data.lang || "no";
+
+  if (!content) return;
+
+  const chunks = chunkText(content, 1000, 200);
+  console.log(`[Indexer] Genererer embeddings for ${chunks.length} chunks av "${title}"`);
+
+  const geminiApiKey = getGeminiApiKey();
+  if (!geminiApiKey) {
+    console.warn("[Indexer] Mangler GEMINI_API_KEY. Indeksering avbrutt.");
+    return;
+  }
+
+  const genAI = new GoogleGenerativeAI(geminiApiKey.trim());
+  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+
+  const batch = db.batch();
+
+  // Slett eksisterende chunks
+  const existingDocs = await db.collection("embeddings_archive")
+    .where("sourceId", "==", itemId)
+    .get();
+  existingDocs.forEach(doc => batch.delete(doc.ref));
+
+  // Generer nye embeddings
+  for (let i = 0; i < chunks.length; i++) {
+    const chunkTextVal = chunks[i];
+    
+    try {
+      const result = await model.embedContent(chunkTextVal);
+      const vectorValues = result.embedding.values;
+
+      const chunkDocRef = db.collection("embeddings_archive").doc();
+      batch.set(chunkDocRef, {
+        sourceId: itemId,
+        sourceType: collectionId === "collection_blog" ? "blog" : "teaching",
+        title: title,
+        text: chunkTextVal,
+        lang: language,
+        chunkIndex: i,
+        // Bruk native FieldValue.vector
+        embedding: admin.firestore.FieldValue.vector(vectorValues),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (err) {
+      console.error(`[Indexer] Feilet under generering av embedding for chunk ${i}:`, err.message);
+    }
+  }
+
+  await batch.commit();
+  console.log(`[Indexer] Vellykket indeksering av "${title}" (${chunks.length} embeddings lagret).`);
 });
