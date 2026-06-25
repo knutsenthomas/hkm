@@ -5444,7 +5444,7 @@ class MinSideManager {
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
                                 <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber for dette</span></div>
                                 
-                                <button class="btn ${hasPrayed ? 'btn-secondary' : 'btn-primary'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;"' : 'style="background: #1B4965; border-color: #1B4965; color: #ffffff; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px; position: relative; top: 1px !important; line-height: 1; display: inline-block;">favorite</span><span style="line-height: 1; display: inline-block;">${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span></button>
+                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled' : ''} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px; position: relative; top: 1px !important; line-height: 1; display: inline-block;">favorite</span><span style="line-height: 1; display: inline-block;">${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span></button>
                             </div>
                         </div>
                     </div>
@@ -5453,12 +5453,12 @@ class MinSideManager {
 
             container.innerHTML = `
                 <div style="padding: 16px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6" style="margin-bottom: 24px; width: 100%;">
+                    <div class="prayer-wall-header">
                         <div>
-                            <h3 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
-                            <p style="font-size: 13.5px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
+                            <h3>Bønneveggen</h3>
+                            <p>Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
                         </div>
-                        <button class="btn btn-primary w-auto" id="btn-write-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 8px 16px !important; font-size: 13px !important; min-height: 0 !important; line-height: 1.2 !important; height: auto !important;">
+                        <button class="btn-write-prayer-style" id="btn-write-prayer">
                             <span class="material-symbols-outlined" style="font-size: 18px !important;">edit_note</span> Skriv bønneemne
                         </button>
                     </div>
