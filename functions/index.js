@@ -7866,3 +7866,115 @@ exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) =>
     console.error("Feil under kjøring av leseplanvarslinger:", err);
   }
 });
+
+/**
+ * Trigger som sender push og e-post når et nytt varsel opprettes i 'user_notifications'.
+ */
+exports.onNotificationCreated = onDocumentCreated({
+  document: "user_notifications/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const notifData = snapshot.data();
+  const userId = notifData.userId;
+  const title = notifData.title || "Nytt varsel";
+  const message = notifData.message || "";
+  const type = notifData.type || "";
+
+  if (!userId) return;
+
+  try {
+    // 1. Hent brukerens profil
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      console.log(`Bruker ${userId} finnes ikke.`);
+      return;
+    }
+    const userData = userDoc.data();
+    const email = userData.email;
+    const name = userData.displayName || userData.fullName || "venn";
+
+    // 2. Sjekk samtykke / preferanser
+    const wantPush = userData.pushEnabled !== false;
+    const wantEmail = userData.emailConsent !== false && email;
+
+    // 3. Send Push-varsel hvis aktivert og har tokens
+    if (wantPush && userData.fcmTokens && userData.fcmTokens.length > 0) {
+      console.log(`Sender push-varsel til bruker ${userId}...`);
+      for (const token of userData.fcmTokens) {
+        try {
+          const pushMessage = {
+            token: token,
+            notification: {
+              title: title,
+              body: message
+            },
+            data: {
+              click_action: `https://www.hiskingdomministry.no/minside/`,
+              type: type
+            }
+          };
+          await admin.messaging().send(pushMessage);
+          console.log(`Push-varsel sendt til token for bruker ${userId}`);
+        } catch (pushErr) {
+          console.warn(`Kunne ikke sende push til token for bruker ${userId}:`, pushErr.message);
+        }
+      }
+    }
+
+    // 4. Send e-post hvis aktivert
+    if (wantEmail) {
+      console.log(`Sender varsel e-post til bruker ${userId} (${email})...`);
+      
+      const subject = `Nytt varsel: ${title}`;
+      
+      // En kjempefin HTML-mal i stil med HKM
+      const html = `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; margin: 0 auto; max-width: 600px; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" style="height: 60px; width: auto;">
+          </div>
+          
+          <div style="background-color: #ffffff; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
+            <h2 style="color: #1B4965; font-size: 20px; font-weight: 700; margin: 0 0 16px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
+              ${title}
+            </h2>
+            
+            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">
+              Hei ${name},
+            </p>
+            
+            <div style="background-color: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.6; font-weight: 500;">
+                ${message}
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px;">
+              <a href="https://www.hiskingdomministry.no/minside/" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+                Gå til Min Side
+              </a>
+            </div>
+          </div>
+          
+          <div style="text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; padding: 0 16px;">
+            <p style="margin: 0 0 8px 0;">Dette er et automatisk varsel sendt til deg fra His Kingdom Ministry.</p>
+            <p style="margin: 0;">Du kan endre dine varslingsinnstillinger under Profil på Min Side.</p>
+          </div>
+        </div>
+      `;
+
+      await sendEmail({
+        to: email,
+        subject: subject,
+        html: html,
+        fromName: "His Kingdom Ministry"
+      });
+      console.log(`Varsel e-post sendt til ${email}`);
+    }
+
+  } catch (err) {
+    console.error("Feil under behandling av varsling:", err);
+  }
+});
