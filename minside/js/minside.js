@@ -854,6 +854,16 @@ class MinSideManager {
                     // Translate immediately on auth state change
                     translateStaticHTML();
 
+                    // Load and apply bottom navigation items from settings_design
+                    try {
+                        const designSettings = await window.firebaseService.getPageContent('settings_design');
+                        if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
+                            this.applyBottomNavSettings(designSettings.minsideBottomNav);
+                        }
+                    } catch (e) {
+                        console.warn("Failed to load design settings for bottom nav:", e);
+                    }
+
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
                 } else {
@@ -1056,6 +1066,20 @@ class MinSideManager {
         }
         
         if (photoURL) el.dataset.photoUrl = photoURL;
+    }
+
+    applyBottomNavSettings(activeIds) {
+        if (!Array.isArray(activeIds)) return;
+        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item').forEach(el => {
+            const view = el.getAttribute('data-view');
+            if (view) {
+                if (activeIds.includes(view)) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+        });
     }
 
     _roleLabel(role) {

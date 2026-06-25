@@ -540,6 +540,16 @@ const initAdminHeader = () => {
             const photoURL = (userProfile && userProfile.photoURL) || user.photoURL || '';
             renderIdentity(displayName, photoURL);
             writeCachedIdentity(displayName, photoURL);
+
+            // Fetch and apply bottom nav settings
+            try {
+                const designSettings = await firebaseService.getPageContent('settings_design');
+                if (designSettings && Array.isArray(designSettings.adminBottomNav)) {
+                    applyAdminBottomNavSettings(designSettings.adminBottomNav);
+                }
+            } catch (e) {
+                console.warn('[admin-header] Failed to load design settings for bottom nav:', e);
+            }
         });
     };
 
@@ -732,6 +742,32 @@ const initAdminHeader = () => {
             }
         }
     });
+
+    const applyAdminBottomNavSettings = (activeIds) => {
+        if (!Array.isArray(activeIds)) return;
+        bottomNavItems.forEach(item => {
+            const href = item.getAttribute('href') || '';
+            const section = item.getAttribute('data-section') || '';
+            let id = '';
+            if (section === 'overview' || href.includes('#overview')) {
+                id = 'overview';
+            } else if (href.includes('kommunikasjon')) {
+                id = 'contacts';
+            } else if (href.includes('minside')) {
+                id = 'minside';
+            } else if (section === 'settings' || href.includes('#settings')) {
+                id = 'settings';
+            }
+
+            if (id) {
+                if (activeIds.includes(id)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        });
+    };
 
     // Sidebar scroll memory (keep left menu position on refresh/navigation)
     const sidebarNavScroller = document.querySelector('.sidebar .sidebar-nav') || document.querySelector('.sidebar-nav');

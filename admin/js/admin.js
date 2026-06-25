@@ -12886,6 +12886,69 @@ class AdminManager {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="design-ui-panel" style="margin-top: 24px;">
+                            <div class="design-ui-panel-header">
+                                <div class="design-ui-panel-header-icon">
+                                    <span class="material-symbols-outlined">phone_android</span>
+                                </div>
+                                <div>
+                                    <h3 class="design-ui-panel-title">Mobil bunn-meny (Bottom Nav)</h3>
+                                    <p class="design-ui-panel-subtitle">Velg hvilke snarveier og ikoner som skal være synlige i navigasjonslinjen på mobil.</p>
+                                </div>
+                            </div>
+                            <div class="design-ui-panel-body">
+                                <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Min Side bunn-meny</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Oversikt</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-profile" value="profile" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Profil</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-courses" value="courses" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Kurs</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-reading-plans" value="reading-plans" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Leseplaner</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-giving" value="giving" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Gaver</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-minside-notifications" value="notifications" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Varslinger</span>
+                                    </label>
+                                </div>
+
+                                <div class="design-ui-divider" style="margin: 20px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main); font-size: 15px;">Admin bunn-meny</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-overview" value="overview" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Oversikt</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-contacts" value="contacts" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Kontakter</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-minside" value="minside" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Min Side</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 14px; color: var(--text-main);">
+                                        <input type="checkbox" id="nav-admin-settings" value="settings" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color, #d17d39);">
+                                        <span>Innstillinger</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -13188,12 +13251,24 @@ class AdminManager {
 
                 updateLivePreview();
 
+                // Reset checkboxes in UI
+                ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'].forEach(id => {
+                    const el = document.getElementById(`nav-minside-${id}`);
+                    if (el) el.checked = true;
+                });
+                ['overview', 'contacts', 'minside', 'settings'].forEach(id => {
+                    const el = document.getElementById(`nav-admin-${id}`);
+                    if (el) el.checked = true;
+                });
+
                 const resetData = {
                     ...DEFAULT_THEME,
                     logoUrl: document.getElementById('site-logo-url')?.value || '',
                     faviconUrl: document.getElementById('site-favicon-url')?.value || '',
                     logoText: document.getElementById('site-logo-text')?.value || '',
                     siteTitle: document.getElementById('site-title-seo')?.value || '',
+                    minsideBottomNav: ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'],
+                    adminBottomNav: ['overview', 'contacts', 'minside', 'settings'],
                     updatedAt: new Date().toISOString()
                 };
 
@@ -13244,6 +13319,20 @@ class AdminManager {
                 syncDataRange('fontSizeBodyDesktop', 'font-size-body-desktop');
                 syncDataRange('fontSizeBodyMobile', 'font-size-body-mobile');
 
+                // Load bottom nav checkboxes
+                const minsideItems = data.minsideBottomNav || ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'];
+                const adminItems = data.adminBottomNav || ['overview', 'contacts', 'minside', 'settings'];
+
+                ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'].forEach(id => {
+                    const el = document.getElementById(`nav-minside-${id}`);
+                    if (el) el.checked = minsideItems.includes(id);
+                });
+
+                ['overview', 'contacts', 'minside', 'settings'].forEach(id => {
+                    const el = document.getElementById(`nav-admin-${id}`);
+                    if (el) el.checked = adminItems.includes(id);
+                });
+
                 applyPaletteToInputs(data);
                 updateLivePreview();
             }
@@ -13255,6 +13344,17 @@ class AdminManager {
         document.getElementById('save-design-settings').onclick = async () => {
             const btn = document.getElementById('save-design-settings');
             const palette = getPaletteFromInputs();
+
+            const minsideBottomNav = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'].filter(id => {
+                const el = document.getElementById(`nav-minside-${id}`);
+                return el ? el.checked : false;
+            });
+
+            const adminBottomNav = ['overview', 'contacts', 'minside', 'settings'].filter(id => {
+                const el = document.getElementById(`nav-admin-${id}`);
+                return el ? el.checked : false;
+            });
+
             const data = {
                 ...palette,
                 logoUrl: document.getElementById('site-logo-url').value,
@@ -13269,6 +13369,8 @@ class AdminManager {
                 fontSizeH1Mobile: Number(document.getElementById('font-size-h1-mobile').value),
                 fontSizeH2Desktop: Number(document.getElementById('font-size-h2-desktop').value),
                 fontSizeH2Mobile: Number(document.getElementById('font-size-h2-mobile').value),
+                minsideBottomNav,
+                adminBottomNav,
                 updatedAt: new Date().toISOString()
             };
 
