@@ -173,6 +173,7 @@ const initAdminHeader = () => {
             if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
 
             if (photoURL && photoURL.trim().length > 5) {
+                adminAvatar.classList.remove('has-initials');
                 // Show actual photo
                 const img = document.createElement('img');
                 img.src = photoURL;
@@ -180,12 +181,14 @@ const initAdminHeader = () => {
                 
                 // Fallback if image fails to load
                 img.onerror = () => {
+                    adminAvatar.classList.add('has-initials');
                     adminAvatar.innerHTML = '';
                     adminAvatar.textContent = getInitials(safeName);
                 };
                 
                 adminAvatar.appendChild(img);
             } else {
+                adminAvatar.classList.add('has-initials');
                 // Fallback: Use initials
                 adminAvatar.textContent = getInitials(safeName);
             }

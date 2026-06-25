@@ -1041,8 +1041,10 @@ class MinSideManager {
         if (!el) return;
         
         if (photoURL) {
+            el.classList.remove('has-initials');
             el.innerHTML = `<img src="${photoURL}" alt="${name}" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">`;
         } else {
+            el.classList.add('has-initials');
             const initials = (name || '?')
                 .split(' ')
                 .filter(n => n.length > 0)

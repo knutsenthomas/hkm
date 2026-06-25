@@ -5009,8 +5009,8 @@ body.builder-active .user-avatar,
 [id="ph-avatar"] {
   width: 42px !important;
   height: 42px !important;
-  background: var(--admin-orange-gradient) !important;
-  color: #ffffff !important;
+  background: var(--admin-border, #e2e8f0) !important;
+  color: var(--admin-text-muted, #64748b) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5024,6 +5024,16 @@ body.builder-active .user-avatar,
   opacity: 1 !important;
   flex-shrink: 0 !important;
   margin-left: 8px !important;
+}
+
+body.admin-body .user-avatar.has-initials,
+body.minside-body .user-avatar.has-initials,
+body.crm-body .user-avatar.has-initials,
+body.builder-active .user-avatar.has-initials,
+[id="admin-avatar"].has-initials,
+[id="ph-avatar"].has-initials {
+  background: var(--admin-orange-gradient) !important;
+  color: #ffffff !important;
 }
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
@@ -5432,14 +5442,26 @@ body.builder-active .main-header [id="admin-avatar"] {
   justify-content: center !important;
   border-radius: 12px !important;
   border: 2px solid rgba(255, 255, 255, 0.72) !important;
-  background: var(--admin-orange-gradient) !important;
-  color: #ffffff !important;
+  background: var(--admin-border, #e2e8f0) !important;
+  color: var(--admin-text-muted, #64748b) !important;
   box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
   font-size: 16px !important;
   font-weight: 900 !important;
   line-height: 42px !important;
   text-align: center !important;
   text-transform: uppercase !important;
+}
+
+body.admin-body .main-header .user-avatar.has-initials,
+body.minside-body .main-header .user-avatar.has-initials,
+body.crm-body .main-header .user-avatar.has-initials,
+body.builder-active .main-header .user-avatar.has-initials,
+body.admin-body .main-header [id="admin-avatar"].has-initials,
+body.minside-body .main-header [id="ph-avatar"].has-initials,
+body.crm-body .main-header [id="admin-avatar"].has-initials,
+body.builder-active .main-header [id="admin-avatar"].has-initials {
+  background: var(--admin-orange-gradient) !important;
+  color: #ffffff !important;
 }
 
 @media (min-width: 1101px) {
