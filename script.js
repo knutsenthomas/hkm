@@ -3625,28 +3625,6 @@ window.addEventListener('load', () => {
 
         // Keep chat closed on first load.
         setOpen(false, false);
-
-        // Trigger a wiggle animation on the toggle button 3.5 seconds after page load to make the widget feel alive
-        setTimeout(() => {
-            const toggleBtn = root.querySelector('.hkm-chat-toggle');
-            if (toggleBtn) {
-                toggleBtn.classList.add('animate-wobble');
-                setTimeout(() => toggleBtn.classList.remove('animate-wobble'), 1200);
-            }
-        }, 3500);
-
-        // Re-trigger every 20 seconds to keep attracting attention
-        const wobbleIntervalId = setInterval(() => {
-            const toggleBtn = root.querySelector('.hkm-chat-toggle');
-            if (toggleBtn && !root.classList.contains('open')) {
-                toggleBtn.classList.add('animate-wobble');
-                setTimeout(() => toggleBtn.classList.remove('animate-wobble'), 1200);
-            }
-        }, 20000);
-
-        window.addEventListener('beforeunload', () => {
-            window.clearInterval(wobbleIntervalId);
-        }, { once: true });
     }
 
     function injectChatStyles() {
@@ -3788,17 +3766,9 @@ window.addEventListener('load', () => {
                 transform: translateY(0) scale(1) !important;
                 animation: hkmSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .hkm-chat-toggle.animate-wobble {
-                animation: hkmWobble 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-            }
             @keyframes hkmSlideUp {
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes hkmWobble {
-                0%, 100% { transform: scale(1) translateY(0); }
-                10%, 30%, 50%, 70%, 90% { transform: scale(1.08) translateY(-6px); }
-                20%, 40%, 60%, 80% { transform: scale(1.04) translateY(2px); }
             }
             @keyframes hkmPulse {
                 0% {
