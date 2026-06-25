@@ -5405,7 +5405,7 @@ class MinSideManager {
 
             container.innerHTML = `
                 <div style="padding: 16px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style="margin-bottom: 24px; width: 100%;">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6" style="margin-bottom: 24px; width: 100%;">
                         <div>
                             <h3 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 4px 0;">Bønneveggen</h3>
                             <p style="font-size: 13.5px; color: #64748b; margin: 0;">Bær hverandres byrder, og oppfyll på den måte Kristi lov.</p>
