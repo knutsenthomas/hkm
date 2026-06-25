@@ -2520,8 +2520,9 @@ window.addEventListener('load', () => {
                         </div>
                         <div>
                             <h3>HKM Assistent</h3>
-                            <div class="hkm-chat-online-status">
+                            <div class="hkm-chat-online-status" style="display: flex; align-items: center; gap: 4px;">
                                 <span class="status-dot"></span>
+                                <span class="status-text" style="font-size: 11px; opacity: 0.85;">AI-svar</span>
                             </div>
                         </div>
                     </div>
@@ -2529,7 +2530,7 @@ window.addEventListener('load', () => {
                 </header>
                 
                 <div class="hkm-chat-closed-notice hkm-chat-hidden" aria-live="polite" aria-atomic="true"></div>
-                <nav class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus">
+                <nav class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus" style="display: none !important;">
                     <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="AI-assistent" title="AI-assistent">
                         <span class="hkm-chat-mode-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2965,6 +2966,16 @@ window.addEventListener('load', () => {
                 btn.classList.toggle('active', isActive);
                 btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
             });
+
+            if (headerStatusText) {
+                if (activeMode === 'ai') {
+                    headerStatusText.textContent = 'AI-svar';
+                } else if (activeMode === 'google_chat') {
+                    headerStatusText.textContent = 'Live Chat';
+                } else if (activeMode === 'email') {
+                    headerStatusText.textContent = 'E-post';
+                }
+            }
 
             const modeMeta = modeCopy[activeMode] || modeCopy.ai;
             const isEmailMode = activeMode === 'email';
@@ -3519,33 +3530,40 @@ window.addEventListener('load', () => {
             humanRequested = true;
             humanBridge.classList.add('hkm-chat-hidden');
             
-            requestHumanBtn.disabled = true;
-            requestHumanBtn.textContent = 'Varsler teamet...';
-            
-            try {
-                await setActiveMode('google_chat');
+            const isOpen = isWithinNorwegianBusinessHours();
+            if (isOpen) {
+                requestHumanBtn.disabled = true;
+                requestHumanBtn.textContent = 'Varsler teamet...';
                 
-                // Set metadata
-                await db.collection('visitorChats').doc(chatId).set({
-                    requestHuman: true,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
+                try {
+                    await setActiveMode('google_chat');
+                    
+                    // Set metadata
+                    await db.collection('visitorChats').doc(chatId).set({
+                        requestHuman: true,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
 
-                // Add a message to trigger the backend Google Chat webhook
-                await db.collection('visitorChats').doc(chatId).collection('messages').add({
-                    sender: 'visitor',
-                    text: '⚠ Besøkende ber om menneskelig hjelp.',
-                    targetMode: 'google_chat',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                addSystemMessage('Teamet er nå varslet i Google Chat og vil svare deg her så snart de er ledige.');
-            } catch (error) {
-                console.error('Error requesting human:', error);
-                humanRequested = false;
-                humanBridge.classList.remove('hkm-chat-hidden');
-                requestHumanBtn.disabled = false;
-                requestHumanBtn.textContent = 'Be om menneskelig hjelp';
+                    // Add a message to trigger the backend Google Chat webhook
+                    await db.collection('visitorChats').doc(chatId).collection('messages').add({
+                        sender: 'visitor',
+                        text: '⚠ Besøkende ber om menneskelig hjelp.',
+                        targetMode: 'google_chat',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    addSystemMessage('En veileder er varslet og vil svare deg her i chatten om kort tid.');
+                } catch (error) {
+                    console.error('Error requesting human:', error);
+                    humanRequested = false;
+                    humanBridge.classList.remove('hkm-chat-hidden');
+                    requestHumanBtn.disabled = false;
+                    requestHumanBtn.textContent = 'Be om menneskelig hjelp';
+                }
+            } else {
+                // Stengt -> Vis e-post-panel automatisk
+                await setActiveMode('email');
+                addSystemMessage('Vi har stengt akkurat nå. Fyll ut kontaktskjemaet under for å få svar på e-post.');
             }
         });
 
