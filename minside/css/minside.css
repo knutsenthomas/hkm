@@ -2919,3 +2919,14 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
   background-color: #2d1e18 !important;
   color: #ffffff !important;
 }
+
+/* Prayer wall write-button responsive alignment */
+#btn-write-prayer {
+  align-self: flex-end !important;
+}
+@media (min-width: 640px) {
+  #btn-write-prayer {
+    align-self: center !important;
+  }
+}
+
