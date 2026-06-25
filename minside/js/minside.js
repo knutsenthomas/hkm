@@ -2228,8 +2228,14 @@ class MinSideManager {
                 );
                 
                 // Show immediate visual confirmation on button
-                if (btn) { 
-                    btn.textContent = '✓ Lagret!'; 
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    btn.style.width = `${rect.width}px`;
+                    btn.style.height = `${rect.height}px`;
+                    btn.style.display = 'inline-flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px !important;">check_circle</span> ${t('common.saved')}`;
                 }
                 
                 const successMsg = "Preferansene dine ble lagret!";
@@ -2252,6 +2258,11 @@ class MinSideManager {
 
                 setTimeout(() => { 
                     if (btn) { 
+                        btn.style.width = '';
+                        btn.style.height = '';
+                        btn.style.display = '';
+                        btn.style.alignItems = '';
+                        btn.style.justifyContent = '';
                         btn.disabled = false; 
                         btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}`; 
                     } 
