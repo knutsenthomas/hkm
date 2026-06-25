@@ -2526,7 +2526,15 @@ window.addEventListener('load', () => {
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="hkm-chat-close" aria-label="Lukk chat">×</button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button type="button" class="hkm-chat-history-toggle" aria-label="Vis historikk" title="Vis samtalelogg" style="background: transparent; border: none; color: #fff; opacity: 0.65; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; transition: opacity 0.2s;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </button>
+                        <button type="button" class="hkm-chat-close" aria-label="Lukk chat" style="background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; line-height: 1;">×</button>
+                    </div>
                 </header>
                 
                 <div class="hkm-chat-closed-notice hkm-chat-hidden" aria-live="polite" aria-atomic="true"></div>
@@ -2643,6 +2651,8 @@ window.addEventListener('load', () => {
 	        const toggleDot = root.querySelector('.hkm-chat-dot');
 	        const headerStatusDot = root.querySelector('.status-dot');
 	        const headerStatusText = root.querySelector('.status-text');
+	        const historyToggleBtn = root.querySelector('.hkm-chat-history-toggle');
+	        let showAllHistory = false;
 	        const OSLO_TZ = 'Europe/Oslo';
 	        const sessionStartTime = Date.now();
 
@@ -3020,10 +3030,13 @@ window.addEventListener('load', () => {
 
             // Skjul meldinger fra forrige økt når man er i AI-modus for å starte med et rent chatvindu,
             // men behold meldingshistorikken for live support (google_chat) for kontinuitet.
+            // Hvis brukeren trykker på historikk-knappen (showAllHistory === true), viser vi alt.
             if (mode === 'ai') {
-                const msgTime = data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime()) : Date.now();
-                if (msgTime < sessionStartTime - 5000) {
-                    return false;
+                if (!showAllHistory) {
+                    const msgTime = data.createdAt ? (data.createdAt.toMillis ? data.createdAt.toMillis() : new Date(data.createdAt).getTime()) : Date.now();
+                    if (msgTime < sessionStartTime - 5000) {
+                        return false;
+                    }
                 }
                 return (sender === 'visitor' && targetMode === 'ai') || source === 'ai_gemini';
             }
@@ -3587,6 +3600,19 @@ window.addEventListener('load', () => {
                 addSystemMessage('Vi har stengt akkurat nå. Fyll ut kontaktskjemaet under for å få svar på e-post.');
             }
         });
+
+        if (historyToggleBtn) {
+            historyToggleBtn.addEventListener('click', () => {
+                showAllHistory = !showAllHistory;
+                historyToggleBtn.style.opacity = showAllHistory ? '1' : '0.65';
+                if (showAllHistory) {
+                    historyToggleBtn.style.color = '#ff9800'; // Lys oransje for aktiv tilstand
+                } else {
+                    historyToggleBtn.style.color = '#fff';
+                }
+                renderMessages();
+            });
+        }
 
         applyAvailabilityIndicators();
         const availabilityIntervalId = window.setInterval(applyAvailabilityIndicators, 60000);
