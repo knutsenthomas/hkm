@@ -778,22 +778,44 @@ class ContentManager {
         const itemId = urlParams.get('id');
 
         if (itemId) {
-            const [blogData, teachingData] = await Promise.all([
-                this.getContentDoc('collection_blog', { silent: true }),
-                this.getContentDoc('collection_teaching', { silent: true })
-            ]);
-            const allItems = [
-                ...this.getDedupedBlogItems(blogData),
-                ...this.getCollectionItems(teachingData)
-            ];
-            const item = this.findContentItemById(allItems, itemId);
-            const localizedItem = item ? this.getLocalizedContentItem(item) : null;
-            if (localizedItem && (localizedItem.seoTitle || localizedItem.seoDescription || localizedItem.geoPosition)) {
-                itemSEO = {
-                    title: localizedItem.seoTitle,
-                    description: localizedItem.seoDescription,
-                    geoPosition: localizedItem.geoPosition
-                };
+            if (this.pageId === 'arrangement-detaljer') {
+                try {
+                    const allEvents = await this.loadEvents();
+                    const event = allEvents.find(e => this.getEventKey(e) === itemId || encodeURIComponent(this.getEventKey(e)) === itemId);
+                    if (event) {
+                        let plainDesc = event.description || event.content || '';
+                        plainDesc = plainDesc.replace(/<[^>]*>/g, '').substring(0, 160).trim();
+                        itemSEO = {
+                            title: event.title,
+                            description: plainDesc,
+                            geoPosition: event.location || ''
+                        };
+                    }
+                } catch (e) {
+                    console.warn('[ContentManager] Event SEO loading failed:', e);
+                }
+            } else {
+                const [blogData, teachingData] = await Promise.all([
+                    this.getContentDoc('collection_blog', { silent: true }),
+                    this.getContentDoc('collection_teaching', { silent: true })
+                ]);
+                const allItems = [
+                    ...this.getDedupedBlogItems(blogData),
+                    ...this.getCollectionItems(teachingData)
+                ];
+                const item = this.findContentItemById(allItems, itemId);
+                const localizedItem = item ? this.getLocalizedContentItem(item) : null;
+                if (localizedItem) {
+                    let plainDesc = localizedItem.seoDescription || localizedItem.description || '';
+                    if (!plainDesc && localizedItem.content) {
+                        plainDesc = String(localizedItem.content).replace(/<[^>]*>/g, '').substring(0, 160).trim();
+                    }
+                    itemSEO = {
+                        title: localizedItem.seoTitle || localizedItem.title,
+                        description: plainDesc,
+                        geoPosition: localizedItem.geoPosition
+                    };
+                }
             }
         }
         this.applySEO(seoSettings, itemSEO);
