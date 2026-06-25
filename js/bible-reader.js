@@ -2593,9 +2593,8 @@ class BibleReader {
 
         // Search YouTube
         try {
-            const YT_API_KEY = 'AIza' + 'SyD622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
             const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
-            const ytUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YT_CHANNEL_ID}&q=${encodeURIComponent(term)}&type=video&maxResults=5&key=${YT_API_KEY}`;
+            const ytUrl = `/api/youtube?action=channel&channelId=${YT_CHANNEL_ID}&q=${encodeURIComponent(term)}&maxResults=5`;
             const resp = await fetch(ytUrl);
             const data = await resp.json();
             if (data.items) {

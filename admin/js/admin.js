@@ -5418,11 +5418,8 @@ class AdminManager {
     }
 
     async fetchYouTubeStats() {
-        const _adminYt1 = 'AIza' + 'Sy';
-        const _adminYt2 = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
-        const YT_API_KEY = _adminYt1 + _adminYt2;
         const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
-        const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YT_CHANNEL_ID}&key=${YT_API_KEY}`;
+        const url = `/api/youtube?action=stats&channelId=${YT_CHANNEL_ID}`;
 
         try {
             const response = await fetch(url);

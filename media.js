@@ -236,14 +236,8 @@ async function initYouTubeAPI(channelId, playlistsRaw = "", settings = null) {
     // Funksjon for å hente og vise videoer fra valgt kategori/playlist
 
     // YouTube Data API v3
-    // [EDIT HERE] YouTube API Key (Hentet fra prosjektinnstillinger i Firebase)
-    // Denne nøkkelen brukes for å hente spesifikke spillelister (kategorier)
-    const _ytKeyA = 'AIza' + 'Sy';
-    const _ytKeyB = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
-    let YT_API_KEY = _ytKeyA + _ytKeyB;
-    if (settings && settings.youtubeApiKey) {
-        YT_API_KEY = settings.youtubeApiKey;
-    }
+    // API-nøkkel hentes fra innstillinger (om den finnes), ellers håndteres fallback på serveren (api/youtube.js)
+    let YT_API_KEY = (settings && settings.youtubeApiKey) ? settings.youtubeApiKey : '';
     // [EDIT HERE] YouTube Channel ID
     const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
 
@@ -306,7 +300,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "", settings = null) {
         let videos = [];
         let nextPageToken = '';
         do {
-            let url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YT_API_KEY}`;
+            let url = `/api/youtube?action=playlist&playlistId=${playlistId}&key=${YT_API_KEY}`;
             if (nextPageToken) url += `&pageToken=${nextPageToken}`;
             const resp = await fetch(url);
             const data = await resp.json();
@@ -354,7 +348,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "", settings = null) {
         let nextPageToken = '';
         let count = 0;
         do {
-            let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&maxResults=50&type=video&key=${YT_API_KEY}`;
+            let url = `/api/youtube?action=channel&channelId=${channelId}&key=${YT_API_KEY}`;
             if (nextPageToken) url += `&pageToken=${nextPageToken}`;
 
             const resp = await fetch(url);
