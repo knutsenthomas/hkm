@@ -2263,12 +2263,381 @@ function normalizeBlogItemForDisplay(item) {
   };
 }
 
+const VISITOR_CHAT_RETENTION_DAYS = 7;
 
+function cleanGoogleChatCommandText(rawText) {
+  if (typeof rawText !== "string") return "";
+  return rawText
+      .replace(/<users\/[^>]+>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+}
 
+function parseGoogleChatReplyCommand(rawText) {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return null;
 
+  const match = text.match(/^(reply|svar)\s+([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/i);
+  if (!match) return null;
 
+  return {
+    chatId: match[2],
+    replyText: clampText(match[3], 4000),
+  };
+}
 
+function parseGoogleChatReplyArgs(rawText) {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return null;
 
+  const match = text.match(/^([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/);
+  if (!match) return null;
+
+  return {
+    chatId: match[1],
+    replyText: clampText(match[2], 4000),
+  };
+}
+
+function stripGoogleChatReplyPrefix(rawText, knownChatId = "") {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return "";
+
+  let stripped = text.replace(/^\/?(reply|svar)\s+/i, "").trim();
+  if (knownChatId) {
+    const escapedChatId = knownChatId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    stripped = stripped.replace(new RegExp(`^${escapedChatId}\\s+`), "").trim();
+  }
+  return clampText(stripped, 4000);
+}
+
+function makeGoogleChatResponse(message, isWorkspaceAddon = false) {
+  if (!isWorkspaceAddon) return message;
+  return {
+    hostAppDataAction: {
+      chatDataAction: {
+        createMessageAction: {
+          message,
+        },
+      },
+    },
+  };
+}
+
+function makeGoogleChatMappingId(spaceName, threadName) {
+  return crypto
+      .createHash("sha256")
+      .update(`${spaceName}_${threadName}`)
+      .digest("hex");
+}
+
+function extractGoogleChatSpaceNameFromWebhookUrl(webhookUrl) {
+  if (typeof webhookUrl !== "string" || !webhookUrl.trim()) return "";
+  try {
+    const parsed = new URL(webhookUrl.trim());
+    const match = parsed.pathname.match(/\/v1\/spaces\/([^/]+)\/messages$/);
+    if (match && match[1]) return `spaces/${match[1]}`;
+  } catch (error) {
+    return "";
+  }
+  return "";
+}
+
+async function saveGoogleChatThreadMapping({ spaceName, threadName, chatId }) {
+  if (!spaceName || !threadName || !chatId) return;
+
+  const mappingId = makeGoogleChatMappingId(spaceName, threadName);
+  await db.collection("googleChatThreadMappings").doc(mappingId).set({
+    spaceName,
+    threadName,
+    chatId,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+async function saveGoogleChatSpaceFallback({ spaceName, chatId }) {
+  if (!spaceName || !chatId) return;
+
+  const fallbackId = crypto
+      .createHash("sha256")
+      .update(spaceName)
+      .digest("hex");
+
+  await db.collection("googleChatSpaceFallback").doc(fallbackId).set({
+    spaceName,
+    chatId,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+async function inferChatIdFromGooglePayload(payload) {
+  const payloadMessage = payload && payload.message ? payload.message : {};
+  const spaceName = (
+    (payload && payload.space && payload.space.name) ||
+    (payloadMessage.space && payloadMessage.space.name) ||
+    ""
+  ).trim();
+  const threadName = (
+    (payloadMessage.thread && payloadMessage.thread.name) ||
+    ""
+  ).trim();
+
+  if (spaceName && threadName) {
+    const mappingId = makeGoogleChatMappingId(spaceName, threadName);
+    const mappingSnap = await db.collection("googleChatThreadMappings").doc(mappingId).get();
+    if (mappingSnap.exists) {
+      const data = mappingSnap.data() || {};
+      if (data.chatId) return String(data.chatId);
+    }
+  }
+
+  if (spaceName) {
+    const fallbackId = crypto
+        .createHash("sha256")
+        .update(spaceName)
+        .digest("hex");
+    const fallbackSnap = await db.collection("googleChatSpaceFallback").doc(fallbackId).get();
+    if (fallbackSnap.exists) {
+      const data = fallbackSnap.data() || {};
+      if (data.chatId) return String(data.chatId);
+    }
+  }
+
+  return "";
+}
+
+function parseGoogleChatEventPayload(req) {
+  if (req && req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
+    return req.body;
+  }
+
+  let rawText = "";
+  if (req && typeof req.rawBody === "string") {
+    rawText = req.rawBody;
+  } else if (req && Buffer.isBuffer(req.rawBody)) {
+    rawText = req.rawBody.toString("utf8");
+  } else if (req && typeof req.body === "string") {
+    rawText = req.body;
+  }
+  rawText = (rawText || "").trim();
+  if (!rawText) return {};
+
+  try {
+    const parsed = JSON.parse(rawText);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (error) {
+    // Fallback below
+  }
+
+  try {
+    const form = new URLSearchParams(rawText);
+    const embedded = (form.get("payload") || "").trim();
+    if (embedded) {
+      const parsed = JSON.parse(embedded);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
+  } catch (error) {
+    // Ignore
+  }
+
+  return {};
+}
+
+function pickFirstNonEmptyString(values = []) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return "";
+}
+
+function extractGoogleChatEventFields(payload) {
+  const chat = payload && typeof payload.chat === "object" ? payload.chat : {};
+  const msgPayload = chat && typeof chat.messagePayload === "object" ? chat.messagePayload : {};
+  const msgInPayload = msgPayload && typeof msgPayload.message === "object" ? msgPayload.message : {};
+  const topMessage = payload && typeof payload.message === "object" ? payload.message : {};
+  const chatMessage = chat && typeof chat.message === "object" ? chat.message : {};
+  const appCommandPayload = chat && typeof chat.appCommandPayload === "object" ? chat.appCommandPayload : {};
+  const appCommandMessage = appCommandPayload && typeof appCommandPayload.message === "object" ?
+    appCommandPayload.message :
+    {};
+  const appCommandSpace = appCommandPayload && typeof appCommandPayload.space === "object" ?
+    appCommandPayload.space :
+    {};
+  const appCommandThread = appCommandPayload && typeof appCommandPayload.thread === "object" ?
+    appCommandPayload.thread :
+    {};
+  const appCommandMetadata = appCommandPayload && typeof appCommandPayload.appCommandMetadata === "object" ?
+    appCommandPayload.appCommandMetadata :
+    {};
+
+  const rawText = pickFirstNonEmptyString([
+    topMessage.argumentText,
+    topMessage.text,
+    payload && payload.text,
+    chatMessage.argumentText,
+    chatMessage.text,
+    msgInPayload.argumentText,
+    msgInPayload.text,
+    msgPayload.argumentText,
+    msgPayload.text,
+    appCommandMessage.argumentText,
+    appCommandMessage.text,
+  ]);
+
+  const eventType = pickFirstNonEmptyString([
+    payload && payload.type,
+    payload && payload.eventType,
+    chat && chat.type,
+    chat && chat.eventType,
+    msgPayload && msgPayload.type,
+  ]);
+
+  const userType = pickFirstNonEmptyString([
+    payload && payload.user && payload.user.type,
+    chat && chat.user && chat.user.type,
+    msgInPayload && msgInPayload.sender && msgInPayload.sender.type,
+  ]);
+
+  const userDisplayName = pickFirstNonEmptyString([
+    payload && payload.user && payload.user.displayName,
+    chat && chat.user && chat.user.displayName,
+    msgInPayload && msgInPayload.sender && msgInPayload.sender.displayName,
+  ]);
+
+  const spaceName = pickFirstNonEmptyString([
+    payload && payload.space && payload.space.name,
+    payload && payload.message && payload.message.space && payload.message.space.name,
+    chat && chat.space && chat.space.name,
+    chatMessage && chatMessage.space && chatMessage.space.name,
+    msgInPayload && msgInPayload.space && msgInPayload.space.name,
+    appCommandMessage && appCommandMessage.space && appCommandMessage.space.name,
+    appCommandSpace && appCommandSpace.name,
+  ]);
+
+  const threadName = pickFirstNonEmptyString([
+    payload && payload.message && payload.message.thread && payload.message.thread.name,
+    chatMessage && chatMessage.thread && chatMessage.thread.name,
+    msgInPayload && msgInPayload.thread && msgInPayload.thread.name,
+    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.name,
+    appCommandThread && appCommandThread.name,
+  ]);
+
+  const threadKey = pickFirstNonEmptyString([
+    payload && payload.message && payload.message.thread && payload.message.thread.threadKey,
+    chatMessage && chatMessage.thread && chatMessage.thread.threadKey,
+    msgInPayload && msgInPayload.thread && msgInPayload.thread.threadKey,
+    appCommandPayload && appCommandPayload.thread && appCommandPayload.thread.threadKey,
+    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.threadKey,
+    appCommandThread && appCommandThread.threadKey,
+  ]);
+
+  const appCommandId = pickFirstNonEmptyString([
+    appCommandMetadata && appCommandMetadata.appCommandId,
+  ]);
+
+  const appCommandType = pickFirstNonEmptyString([
+    appCommandMetadata && appCommandMetadata.appCommandType,
+  ]);
+
+  const normalizedPayload = {
+    type: eventType,
+    user: { type: userType, displayName: userDisplayName },
+    space: { name: spaceName },
+    message: {
+      argumentText: rawText,
+      text: rawText,
+      thread: {
+        name: threadName,
+        threadKey,
+      },
+    },
+  };
+
+  return {
+    eventType,
+    userType,
+    userDisplayName,
+    rawText,
+    spaceName,
+    threadName,
+    threadKey,
+    appCommandId,
+    appCommandType,
+    normalizedPayload,
+    payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
+    chatKeys: chat && typeof chat === "object" ? Object.keys(chat).slice(0, 12) : [],
+    msgPayloadKeys: msgPayload && typeof msgPayload === "object" ? Object.keys(msgPayload).slice(0, 12) : [],
+  };
+}
+
+async function deleteQuerySnapshotDocs(querySnapshot) {
+  if (!querySnapshot || querySnapshot.empty) return 0;
+
+  let deletedCount = 0;
+  let batch = db.batch();
+  let ops = 0;
+  const commits = [];
+
+  querySnapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+    ops += 1;
+    deletedCount += 1;
+
+    if (ops === 450) {
+      commits.push(batch.commit());
+      batch = db.batch();
+      ops = 0;
+    }
+  });
+
+  if (ops > 0) {
+    commits.push(batch.commit());
+  }
+
+  await Promise.all(commits);
+
+  return deletedCount;
+}
+
+async function deleteVisitorChatById(chatId) {
+  if (!chatId) return { messagesDeleted: 0, mappingsDeleted: 0 };
+
+  let messagesDeleted = 0;
+  let lastDoc = null;
+
+  do {
+    let query = db.collection("visitorChats")
+        .doc(chatId)
+        .collection("messages")
+        .orderBy(admin.firestore.FieldPath.documentId())
+        .limit(400);
+
+    if (lastDoc) {
+      query = query.startAfter(lastDoc);
+    }
+
+    const snapshot = await query.get();
+    if (snapshot.empty) break;
+
+    messagesDeleted += await deleteQuerySnapshotDocs(snapshot);
+    lastDoc = snapshot.docs[snapshot.docs.length - 1];
+  } while (lastDoc);
+
+  const threadMappingsSnap = await db.collection("googleChatThreadMappings")
+      .where("chatId", "==", chatId)
+      .get();
+  const mappingsDeleted = await deleteQuerySnapshotDocs(threadMappingsSnap);
+
+  await db.collection("visitorChats").doc(chatId).delete();
+
+  return {
+    messagesDeleted,
+    mappingsDeleted,
+  };
+}
 
 /**
  * Sletter gamle visitor chats for å begrense lagringstid av samtaler.
@@ -4574,7 +4943,7 @@ exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailP
       console.log(`Fant ${emails.length} e-postadresser å sende til.`);
 
       // For now, lets send in parallel. If there are many users, a batching queue would be better.
-      const emailPromises = emails.map(email => {
+      const emailPromises = emails.map(async (email) => {
         const html = `
                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                     <div style="margin-bottom: 20px;">
@@ -4586,12 +4955,24 @@ exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailP
                     </div>
                   </div>
                 `;
-        return sendEmail({ to: email, subject, html, text: message, fromName });
+        try {
+          await sendEmail({ to: email, subject, html, text: message, fromName });
+          return { email, success: true };
+        } catch (err) {
+          console.error(`Kunne ikke sende e-post til ${email}:`, err);
+          return { email, success: false, error: err.message };
+        }
       });
 
-      await Promise.all(emailPromises);
+      const results = await Promise.all(emailPromises);
+      const successfulCount = results.filter(r => r.success).length;
+      const failedCount = results.length - successfulCount;
 
-      res.status(200).send({ success: true, message: `E-poster er sendt til ${emails.length} brukere.` });
+      res.status(200).send({
+        success: true,
+        message: `E-post-utsendelse fullført. ${successfulCount} vellykket, ${failedCount} feilet.`,
+        results: results.map(r => ({ email: r.email, success: r.success }))
+      });
 
     } catch (error) {
       console.error("Feil ved masseutsendelse av e-post:", error);
@@ -4668,10 +5049,11 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
       console.log(`Fant ${tokens.length} tokens å sende til.`);
 
       const message = {
+        tokens: tokens,
         notification: {
           title,
           body,
-          icon: icon || '/img/logo-hkm.png',
+          imageUrl: icon || '/img/logo-hkm.png',
         },
         webpush: {
           fcm_options: {
@@ -4680,16 +5062,15 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
         }
       };
 
-      const response = await admin.messaging().sendToDevice(tokens, message);
-      let failureCount = 0;
-      let successCount = 0;
+      const response = await admin.messaging().sendEachForMulticast(message);
+      let failureCount = response.failureCount || 0;
+      let successCount = response.successCount || 0;
 
       const tokensToClean = [];
 
-      response.results.forEach((result, index) => {
-        const error = result.error;
+      response.responses.forEach((resItem, index) => {
+        const error = resItem.error;
         if (error) {
-          failureCount++;
           console.error('Failure sending notification to', tokens[index], error);
           // Cleanup the tokens that are not registered anymore.
           if (error.code === 'messaging/registration-token-not-registered' ||
@@ -4697,24 +5078,40 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
             const token = tokens[index];
             tokensToClean.push(token);
           }
-        } else {
-          successCount++;
         }
       });
 
       if (tokensToClean.length > 0) {
         console.log(`Cleaning ${tokensToClean.length} invalid tokens.`);
-        const cleanupPromises = tokensToClean.map(async (token) => {
+        
+        // Group tokens by userId to prevent concurrent write contention
+        const userTokensMap = new Map();
+        tokensToClean.forEach(token => {
           const userId = tokenUserMap.get(token);
           if (userId) {
-            const userRef = db.collection('users').doc(userId);
-            return userRef.update({
-              fcmTokens: admin.firestore.FieldValue.arrayRemove(token)
-            });
+            if (!userTokensMap.has(userId)) {
+              userTokensMap.set(userId, []);
+            }
+            userTokensMap.get(userId).push(token);
           }
         });
-        await Promise.all(cleanupPromises);
-        console.log("Token cleanup complete.");
+
+        try {
+          const cleanupPromises = Array.from(userTokensMap.entries()).map(async ([userId, userTokens]) => {
+            try {
+              const userRef = db.collection('users').doc(userId);
+              await userRef.update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...userTokens)
+              });
+            } catch (err) {
+              console.warn(`Kunne ikke fjerne utgåtte tokens for bruker ${userId}:`, err);
+            }
+          });
+          await Promise.all(cleanupPromises);
+          console.log("Token cleanup complete.");
+        } catch (cleanupErr) {
+          console.error("Feil under fjerning av utgåtte tokens:", cleanupErr);
+        }
       }
 
       console.log(`Successfully sent message to ${successCount} devices. Failed for ${failureCount} devices.`);
@@ -7176,7 +7573,8 @@ exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) =>
     console.log(`Fant ${usersSnap.size} brukere i databasen.`);
 
     for (const userDoc of usersSnap.docs) {
-      const userData = userDoc.data();
+      try {
+        const userData = userDoc.data();
       const userId = userDoc.id;
 
       // Sjekk om denne timen matcher brukerens foretrukne time (standard er 7)
@@ -7459,7 +7857,10 @@ exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) =>
           }
         }
       }
+    } catch (userErr) {
+      console.error(`Feil under behandling av varsling for bruker ${userDoc.id}:`, userErr);
     }
+  }
     console.log("Daglig kjøring av leseplanvarslinger fullført.");
   } catch (err) {
     console.error("Feil under kjøring av leseplanvarslinger:", err);

@@ -17,10 +17,19 @@ export class InteractionsManager {
     }
     
     _getOrGenerateUserId() {
-        let uid = localStorage.getItem('hkm_anon_user_id');
+        let uid = null;
+        try {
+            uid = localStorage.getItem('hkm_anon_user_id');
+        } catch (e) {
+            console.warn('[Interactions] Failed to read from localStorage:', e);
+        }
         if (!uid) {
             uid = 'anon_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            localStorage.setItem('hkm_anon_user_id', uid);
+            try {
+                localStorage.setItem('hkm_anon_user_id', uid);
+            } catch (e) {
+                console.warn('[Interactions] Failed to write to localStorage:', e);
+            }
         }
         return uid;
     }
@@ -104,7 +113,12 @@ export class InteractionsManager {
         `;
         
         // Restore name from localStorage if exists
-        const savedName = localStorage.getItem('hkm_comment_name');
+        let savedName = null;
+        try {
+            savedName = localStorage.getItem('hkm_comment_name');
+        } catch (e) {
+            console.warn('[Interactions] Failed to read from localStorage:', e);
+        }
         if (savedName) {
             const nameInput = document.getElementById('comment-name');
             if (nameInput) nameInput.value = savedName;
@@ -175,7 +189,11 @@ export class InteractionsManager {
         if (!name || !text) return;
         
         // Save name for next time
-        localStorage.setItem('hkm_comment_name', name);
+        try {
+            localStorage.setItem('hkm_comment_name', name);
+        } catch (e) {
+            console.warn('[Interactions] Failed to write to localStorage:', e);
+        }
         
         try {
             submitBtn.disabled = true;

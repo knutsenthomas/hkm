@@ -3,7 +3,10 @@ import path from 'path';
 
 // Firebase Firestore REST API configuration
 const PROJECT_ID = 'his-kingdom-ministry';
-const API_KEY = process.env.FIREBASE_API_KEY || ('AIzaSy' + 'AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE');
+const API_KEY = process.env.FIREBASE_API_KEY;
+if (!API_KEY) {
+  console.warn("Warning: FIREBASE_API_KEY is not defined in the environment variables.");
+}
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
 // Helper to decode Firestore REST fields to standard JSON objects
@@ -86,7 +89,6 @@ function findContentItemById(items = [], itemId) {
 
 export default async function handler(req, res) {
   // CORS Headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader(
@@ -304,7 +306,7 @@ export default async function handler(req, res) {
     }
 
     // Strip HTML tags from description if any
-    const cleanDesc = description.replace(/<[^>]*>?/gm, '').trim();
+    const cleanDesc = typeof description === 'string' ? description.replace(/<[^>]*>?/gm, '').trim() : '';
     // Limit description length for social composer
     const limitDesc = cleanDesc.length > 250 ? cleanDesc.slice(0, 247) + '...' : cleanDesc;
 

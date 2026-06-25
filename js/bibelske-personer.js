@@ -62,6 +62,11 @@ function renderDetails(container, lang) {
         return;
     }
     
+    if (!biblicalCharacters || !Array.isArray(biblicalCharacters)) {
+        showError(container, lang, 'Data missing');
+        return;
+    }
+    
     const char = biblicalCharacters.find(c => c.id === charId.toLowerCase());
     if (!char) {
         showError(container, lang, 'Not found');
@@ -106,12 +111,21 @@ function renderDetails(container, lang) {
     
     // Generate verses badges
     const biblePath = lang === 'no' ? '/bibel' : `/${lang}/bibel`;
-    const versesHtml = char.verses.map(v => `
-        <a href="${biblePath}?ref=${encodeURIComponent(v)}" class="verse-badge">
-            <i class="fas fa-book-open"></i>
-            ${v}
-        </a>
-    `).join('');
+    const versesHtml = (char.verses && Array.isArray(char.verses))
+        ? char.verses.map(v => `
+            <a href="${biblePath}?ref=${encodeURIComponent(v)}" class="verse-badge">
+                <i class="fas fa-book-open"></i>
+                ${v}
+            </a>
+        `).join('')
+        : '';
+        
+    const storyHtml = (story && typeof story === 'string') 
+        ? story.split('\n').map(p => `<p class="detail-paragraph">${p}</p>`).join('') 
+        : '';
+    const theologyHtml = (theology && typeof theology === 'string') 
+        ? theology.split('\n').map(p => `<p class="detail-paragraph">${p}</p>`).join('') 
+        : '';
     
     const html = `
         <div class="detail-main-card">
@@ -121,14 +135,14 @@ function renderDetails(container, lang) {
                     ${summary}
                 </p>
                 <div class="detail-paragraph-body">
-                    ${story.split('\n').map(p => `<p class="detail-paragraph">${p}</p>`).join('')}
+                    ${storyHtml}
                 </div>
             </div>
             
             <div class="detail-section">
                 <h2 class="detail-section-title">${significanceTitle}</h2>
                 <div class="detail-paragraph-body">
-                    ${theology.split('\n').map(p => `<p class="detail-paragraph">${p}</p>`).join('')}
+                    ${theologyHtml}
                 </div>
             </div>
         </div>

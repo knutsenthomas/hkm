@@ -219,6 +219,35 @@ class BibleReader {
         return new Date();
     }
 
+    safeSetLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            console.warn(`[BibleReader] Failed to set localStorage for "${key}":`, e);
+            return false;
+        }
+    }
+
+    safeGetLocalStorage(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn(`[BibleReader] Failed to get localStorage for "${key}":`, e);
+            return null;
+        }
+    }
+
+    safeRemoveLocalStorage(key) {
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (e) {
+            console.warn(`[BibleReader] Failed to remove localStorage for "${key}":`, e);
+            return false;
+        }
+    }
+
     constructor() {
         this.bibles = [];
         this.books = [];
@@ -227,24 +256,48 @@ class BibleReader {
         let defaultBible = 'OPENBIBLE_NB';
         if (activeLang === 'en') defaultBible = 'WEB';
         else if (activeLang === 'es') defaultBible = 'RV1960';
-        this.selectedBibleId = localStorage.getItem(`hkm_bible_translation_${activeLang}`) || defaultBible;
+        this.selectedBibleId = this.safeGetLocalStorage(`hkm_bible_translation_${activeLang}`) || defaultBible;
         this.selectedBookId = '';
         this.selectedChapterId = '';
         this.activeChapterData = null;
-        this.bookmarks = JSON.parse(localStorage.getItem('hkm_bible_bookmarks')) || [];
-        this.history = JSON.parse(localStorage.getItem('hkm_bible_history')) || [];
+        
+        let bookmarks = [];
+        try {
+            const rawBookmarks = this.safeGetLocalStorage('hkm_bible_bookmarks');
+            if (rawBookmarks) bookmarks = JSON.parse(rawBookmarks) || [];
+        } catch (e) {
+            console.warn("[BibleReader] Failed to parse bookmarks:", e);
+        }
+        this.bookmarks = bookmarks;
+
+        let history = [];
+        try {
+            const rawHistory = this.safeGetLocalStorage('hkm_bible_history');
+            if (rawHistory) history = JSON.parse(rawHistory) || [];
+        } catch (e) {
+            console.warn("[BibleReader] Failed to parse history:", e);
+        }
+        this.history = history;
+
         this.selectedVerses = [];
 
         // UI Settings
-        this.settings = JSON.parse(localStorage.getItem('hkm_bible_settings')) || {
+        let settings = {
             fontSize: 18,
             fontFamily: 'serif', // 'serif' | 'sans'
             lineHeight: 1.6,
             theme: 'cream' // 'light' | 'cream' | 'dark'
         };
+        try {
+            const rawSettings = this.safeGetLocalStorage('hkm_bible_settings');
+            if (rawSettings) settings = JSON.parse(rawSettings) || settings;
+        } catch (e) {
+            console.warn("[BibleReader] Failed to parse settings:", e);
+        }
+        this.settings = settings;
 
         // Sync with global dark mode theme
-        const activeGlobalTheme = localStorage.getItem('hkm_theme') || 'light';
+        const activeGlobalTheme = this.safeGetLocalStorage('hkm_theme') || 'light';
         if (activeGlobalTheme === 'dark') {
             this.settings.theme = 'dark';
         } else if (this.settings.theme === 'dark') {
@@ -257,7 +310,7 @@ class BibleReader {
         this.audioVerses = [];
         this.currentAudioIndex = 0;
         this.audioSpeed = 1.0;
-        this.audioVoice = localStorage.getItem('hkm_bible_audio_voice') || 'onyx';
+        this.audioVoice = this.safeGetLocalStorage('hkm_bible_audio_voice') || 'onyx';
         this.activeUtterance = null;
 
         // Cache for loaded books/chapters
@@ -496,13 +549,13 @@ class BibleReader {
             this.dom.translationSelect.addEventListener('change', async (e) => {
                 this.selectedBibleId = e.target.value;
                 const currentLang = document.documentElement.lang || 'no';
-                localStorage.setItem(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
+                this.safeSetLocalStorage(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
                 const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
                 if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
                 await this.loadBooks();
                 // Re-navigate to current book/chapter if possible
                 const activeBookId = this.selectedBookId;
-                const activeChapterNum = this.selectedChapterId.split('_')[1] || '1';
+                const activeChapterNum = (this.selectedChapterId && this.selectedChapterId.includes('_')) ? this.selectedChapterId.split('_')[1] : '1';
                 await this.selectBook(activeBookId);
                 await this.selectChapter(`${activeBookId}_${activeChapterNum}`);
             });
@@ -514,12 +567,12 @@ class BibleReader {
             mobileTransSelect.addEventListener('change', async (e) => {
                 this.selectedBibleId = e.target.value;
                 const currentLang = document.documentElement.lang || 'no';
-                localStorage.setItem(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
+                this.safeSetLocalStorage(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
                 if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
                 await this.loadBooks();
                 // Re-navigate to current book/chapter if possible
                 const activeBookId = this.selectedBookId;
-                const activeChapterNum = this.selectedChapterId.split('_')[1] || '1';
+                const activeChapterNum = (this.selectedChapterId && this.selectedChapterId.includes('_')) ? this.selectedChapterId.split('_')[1] : '1';
                 await this.selectBook(activeBookId);
                 await this.selectChapter(`${activeBookId}_${activeChapterNum}`);
             });
@@ -581,7 +634,7 @@ class BibleReader {
 
                 // Sync to global theme
                 const globalTheme = btn.dataset.theme === 'dark' ? 'dark' : 'light';
-                localStorage.setItem('hkm_theme', globalTheme);
+                this.safeSetLocalStorage('hkm_theme', globalTheme);
                 document.documentElement.setAttribute('data-theme', globalTheme);
 
                 // Sync toggle button icon
@@ -643,7 +696,7 @@ class BibleReader {
                 e.preventDefault();
                 const refStr = mobileSearchInput.value.trim();
                 if (refStr) {
-                    await this.jumpToReference(refStr);
+                    await this.parseAndNavigateToReference(refStr);
                     // Close the left sidebar on mobile after navigating
                     if (this.dom.sidebar) this.dom.sidebar.classList.remove('active');
                 }
@@ -892,7 +945,7 @@ class BibleReader {
                         });
                     }
 
-                    localStorage.setItem('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
+                    this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
                     this.renderBookmarksList();
                     this.restoreHighlights();
                     this.clearSelection();
@@ -1195,7 +1248,7 @@ class BibleReader {
     }
 
     applySettings() {
-        localStorage.setItem('hkm_bible_settings', JSON.stringify(this.settings));
+        this.safeSetLocalStorage('hkm_bible_settings', JSON.stringify(this.settings));
         
         // Font Size
         if (this.dom.fontSizeDisplay) this.dom.fontSizeDisplay.innerText = `${this.settings.fontSize}px`;
@@ -1372,6 +1425,7 @@ class BibleReader {
             try {
                 const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/books/${bookId}/chapters`);
                 const payload = await res.json();
+                if (this.selectedBookId !== bookId) return;
                 this.chapters = payload.data || [];
                 this.cache.chapters[cacheKey] = this.chapters;
             } catch (e) {
@@ -1439,6 +1493,7 @@ class BibleReader {
         try {
             const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
             const payload = await res.json();
+            if (this.selectedChapterId !== chapterId) return;
             this.activeChapterData = payload.data;
 
             if (this.activeChapterData) {
@@ -1825,9 +1880,11 @@ class BibleReader {
     }
 
     getCurrentReferenceText() {
-        const book = this.books.find(b => b.id === this.selectedBookId);
-        const chapterNum = this.selectedChapterId.split('_')[1];
-        return `${book ? book.name : ''} ${chapterNum}`;
+        const book = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+        const chapterNum = (this.selectedChapterId && this.selectedChapterId.includes('_'))
+            ? this.selectedChapterId.split('_')[1]
+            : '1';
+        return `${book ? book.name : ''} ${chapterNum}`.trim();
     }
 
     async lookupWord(word, contextText, refText) {
@@ -2058,7 +2115,7 @@ class BibleReader {
             paragraphElement.classList.add('highlighted');
         }
 
-        localStorage.setItem('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
+        this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
         this.renderBookmarksList();
     }
 
@@ -2098,7 +2155,7 @@ class BibleReader {
         // Max history 20 items
         if (this.history.length > 20) this.history.pop();
 
-        localStorage.setItem('hkm_bible_history', JSON.stringify(this.history));
+        this.safeSetLocalStorage('hkm_bible_history', JSON.stringify(this.history));
         this.renderHistoryList();
     }
 
@@ -2126,7 +2183,7 @@ class BibleReader {
                     e.stopPropagation();
                     const bId = e.target.dataset.id;
                     this.bookmarks = this.bookmarks.filter(b => b.id !== bId);
-                    localStorage.setItem('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
+                    this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
                     this.restoreHighlights();
                     this.renderBookmarksList();
                     return;
@@ -2223,7 +2280,13 @@ class BibleReader {
             }
         } else {
             // Load from localStorage
-            this.notes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+            let localNotesRaw = null;
+            try {
+                localNotesRaw = this.safeGetLocalStorage('hkm_bible_notes');
+            } catch (e) {
+                console.warn("[BibleReader] Failed to read local notes:", e);
+            }
+            this.notes = localNotesRaw ? (JSON.parse(localNotesRaw) || []) : [];
             // Parse dates
             this.notes = this.notes.map(n => ({
                 ...n,
@@ -2398,7 +2461,13 @@ class BibleReader {
                 }
             } else {
                 // Save to localStorage
-                const localNotes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+                let localNotes = [];
+                try {
+                    const rawNotes = this.safeGetLocalStorage('hkm_bible_notes');
+                    if (rawNotes) localNotes = JSON.parse(rawNotes) || [];
+                } catch (e) {
+                    console.warn("[BibleReader] Failed to parse local notes:", e);
+                }
                 if (isEdit) {
                     const existingIdx = localNotes.findIndex(n => n.id === note.id);
                     if (existingIdx !== -1) {
@@ -2415,7 +2484,7 @@ class BibleReader {
                     };
                     localNotes.push(newNote);
                 }
-                localStorage.setItem('hkm_bible_notes', JSON.stringify(localNotes));
+                this.safeSetLocalStorage('hkm_bible_notes', JSON.stringify(localNotes));
             }
 
             this.loadNotes();
@@ -2434,9 +2503,15 @@ class BibleReader {
                 alert('Feil ved sletting: ' + e.message);
             }
         } else {
-            let localNotes = JSON.parse(localStorage.getItem('hkm_bible_notes')) || [];
+            let localNotes = [];
+            try {
+                const rawNotes = this.safeGetLocalStorage('hkm_bible_notes');
+                if (rawNotes) localNotes = JSON.parse(rawNotes) || [];
+            } catch (e) {
+                console.warn("[BibleReader] Failed to parse local notes for deletion:", e);
+            }
             localNotes = localNotes.filter(n => n.id !== noteId);
-            localStorage.setItem('hkm_bible_notes', JSON.stringify(localNotes));
+            this.safeSetLocalStorage('hkm_bible_notes', JSON.stringify(localNotes));
         }
 
         this.loadNotes();
@@ -2963,8 +3038,10 @@ class BibleReader {
         let expectedDay = currentDayNum;
         if (startedAt) {
             const startedAtDate = startedAt.toDate ? startedAt.toDate() : new Date(startedAt);
-            const diffTime = new Date() - startedAtDate;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const startMidnight = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate());
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            const diffDays = Math.max(0, Math.round((todayMidnight.getTime() - startMidnight.getTime()) / (1000 * 60 * 60 * 24)));
             expectedDay = Math.min(diffDays + 1, totalDays);
         }
 
@@ -3108,7 +3185,7 @@ class BibleReader {
                 // Update localStorage cache
                 const pwaKey = `hkm_reading_plan_progress_${planId}`;
                 try {
-                    const pwaData = localStorage.getItem(pwaKey);
+                    const pwaData = this.safeGetLocalStorage(pwaKey);
                     let parsed = pwaData ? JSON.parse(pwaData) : null;
                     if (!parsed) {
                         parsed = {
@@ -3120,7 +3197,7 @@ class BibleReader {
                     } else {
                         parsed.currentDay = expectedDay;
                     }
-                    localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                    this.safeSetLocalStorage(pwaKey, JSON.stringify(parsed));
                 } catch (localErr) {
                     console.warn("Failed to update PWA progress localstorage:", localErr);
                 }
@@ -3153,8 +3230,16 @@ class BibleReader {
         }
         
         // Check localStorage for guest progress
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
+        let localKeys = [];
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k) localKeys.push(k);
+            }
+        } catch (e) {
+            console.warn("[BibleReader] Failed to list localStorage keys:", e);
+        }
+        for (const key of localKeys) {
             if (key && key.startsWith('hkm_reading_plan_progress_')) {
                 const planId = key.substring('hkm_reading_plan_progress_'.length);
                 startedPlanIds.add(planId);
@@ -3400,7 +3485,7 @@ class BibleReader {
                     this.userPlanProgress = userPlanDoc.data();
                     
                     // Merge local guest progress if exists
-                    const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                    const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
                     if (localProgress) {
                         try {
                             const localData = JSON.parse(localProgress);
@@ -3439,7 +3524,7 @@ class BibleReader {
                                     .doc(planId)
                                     .set(this.userPlanProgress, { merge: true });
                             }
-                            localStorage.removeItem('hkm_reading_plan_progress_' + planId);
+                            this.safeRemoveLocalStorage('hkm_reading_plan_progress_' + planId);
                         } catch (err) {
                             console.warn("[BibleReader] Failed to merge local progress:", err);
                         }
@@ -3450,7 +3535,7 @@ class BibleReader {
                     }
                 } else {
                     // Migrate local progress if it exists
-                    const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                    const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
                     if (localProgress) {
                         try {
                             this.userPlanProgress = JSON.parse(localProgress);
@@ -3460,7 +3545,7 @@ class BibleReader {
                                 .collection('reading_plans')
                                 .doc(planId)
                                 .set(this.userPlanProgress, { merge: true });
-                            localStorage.removeItem('hkm_reading_plan_progress_' + planId);
+                            this.safeRemoveLocalStorage('hkm_reading_plan_progress_' + planId);
                         } catch (err) {
                             console.warn("[BibleReader] Failed to migrate local progress:", err);
                         }
@@ -3478,9 +3563,13 @@ class BibleReader {
                 }
             } else {
                 // Guest progress from localStorage
-                const localProgress = localStorage.getItem('hkm_reading_plan_progress_' + planId);
+                const localProgress = this.safeGetLocalStorage('hkm_reading_plan_progress_' + planId);
                 if (localProgress) {
-                    this.userPlanProgress = JSON.parse(localProgress);
+                    try {
+                        this.userPlanProgress = JSON.parse(localProgress);
+                    } catch (e) {
+                        console.warn("[BibleReader] Failed to parse guest progress:", e);
+                    }
                 } else {
                     this.userPlanProgress = {
                         planId: planId,
@@ -4152,7 +4241,7 @@ class BibleReader {
                 await ref.set(this.userPlanProgress, { merge: true });
             }
         } else {
-            localStorage.setItem('hkm_reading_plan_progress_' + this.activePlanId, JSON.stringify(this.userPlanProgress));
+            this.safeSetLocalStorage('hkm_reading_plan_progress_' + this.activePlanId, JSON.stringify(this.userPlanProgress));
         }
     }
 
@@ -4689,6 +4778,8 @@ class BibleReader {
         
         if (this.bibleAudio) {
             this.bibleAudio.pause();
+            this.bibleAudio.onended = null;
+            this.bibleAudio.onerror = null;
             this.bibleAudio = null;
         }
         
@@ -4780,7 +4871,7 @@ class BibleReader {
                 const newVoice = e.target.value;
                 if (newVoice !== this.audioVoice) {
                     this.audioVoice = newVoice;
-                    localStorage.setItem('hkm_bible_audio_voice', newVoice);
+                    this.safeSetLocalStorage('hkm_bible_audio_voice', newVoice);
                     if (this.audioIsPlaying) {
                         this.stopAudioPlayback();
                         this.startAudioPlayback();
