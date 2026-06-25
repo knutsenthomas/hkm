@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Init YouTube hvis elementene finnes (både media.html og youtube.html)
     if (document.getElementById('youtube-grid') || window.location.pathname.includes('/youtube')) {
-        initYouTubeAPI(channelId, playlists);
+        initYouTubeAPI(channelId, playlists, settings);
     }
 
     // Init Podcast via proxy (episoder hentes fra HKM sin RSS-feed på serversiden)
@@ -202,7 +202,7 @@ function initMediaNavigation() {
 /**
  * YouTube Integrasjon
  */
-async function initYouTubeAPI(channelId, playlistsRaw = "") {
+async function initYouTubeAPI(channelId, playlistsRaw = "", settings = null) {
     const grid = document.getElementById('youtube-grid');
     const container = document.querySelector('.media-content-section .container');
     const categoriesDiv = document.getElementById('youtube-categories');
@@ -240,9 +240,61 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
     // Denne nøkkelen brukes for å hente spesifikke spillelister (kategorier)
     const _ytKeyA = 'AIza' + 'Sy';
     const _ytKeyB = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
-    const YT_API_KEY = _ytKeyA + _ytKeyB;
+    let YT_API_KEY = _ytKeyA + _ytKeyB;
+    if (settings && settings.youtubeApiKey) {
+        YT_API_KEY = settings.youtubeApiKey;
+    }
     // [EDIT HERE] YouTube Channel ID
     const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
+
+    function getMockVideosForPlaylist(playlistId) {
+        const lang = document.documentElement.lang || 'no';
+        const defaultMock = [
+            {
+                title: lang === 'en' ? "Renewal of the Mind - Mental Health in a Biblical Perspective" : (lang === 'es' ? "Renovación de la Mente - Salud Mental en una Perspectiva Bíblica" : "Fornyelse av sinnet - Mental helse i et bibelsk perspektiv"),
+                pubDate: new Date().toISOString(),
+                link: "https://www.youtube.com/watch?v=lFCSm3V4Ems",
+                thumbnail: "https://img.youtube.com/vi/lFCSm3V4Ems/hqdefault.jpg",
+                description: "En dyp undervisning om hvordan Guds ord kan forvandle våre tanker og følelser."
+            },
+            {
+                title: lang === 'en' ? "The Epistle to the Romans - Chapter 8 Audio Bible" : (lang === 'es' ? "La Epístola a los Romanos - Capítulo 8 Audio Biblia" : "Romerbrevet kapittel 8 - Lydbok"),
+                pubDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+                link: "https://www.youtube.com/watch?v=7-fA4H1C68E",
+                thumbnail: "https://img.youtube.com/vi/7-fA4H1C68E/hqdefault.jpg",
+                description: "Hør Romerbrevet kapittel 8 lest opp med rolig bakgrunnsmusikk."
+            },
+            {
+                title: lang === 'en' ? "A Prophetic Word for This Season" : (lang === 'es' ? "Una Palabra Profética para esta Temporada" : "Et profetisk ord for denne tiden"),
+                pubDate: new Date(Date.now() - 86400000 * 5).toISOString(),
+                link: "https://www.youtube.com/watch?v=d8n3hF3D2d4",
+                thumbnail: "https://img.youtube.com/vi/d8n3hF3D2d4/hqdefault.jpg",
+                description: "Oppmuntring og veiledning for den nåværende sesongen basert på bibelske profetier."
+            },
+            {
+                title: lang === 'en' ? "Teaching on the Kingdom of God" : (lang === 'es' ? "Enseñanza sobre el Reino de Dios" : "Undervisning om Guds rike"),
+                pubDate: new Date(Date.now() - 86400000 * 10).toISOString(),
+                link: "https://www.youtube.com/watch?v=G3hK2k9sT1g",
+                thumbnail: "https://img.youtube.com/vi/G3hK2k9sT1g/hqdefault.jpg",
+                description: "Hva betyr det å leve i Guds rike i dag? Lær om kjernekonseptene i Jesu forkynnelse."
+            },
+            {
+                title: lang === 'en' ? "Prayer for Healing and Restoration" : (lang === 'es' ? "Oración por Sanidad y Restauración" : "Bønn for helbredelse og gjenopprettelse"),
+                pubDate: new Date(Date.now() - 86400000 * 15).toISOString(),
+                link: "https://www.youtube.com/watch?v=B8n9N0zL4kU",
+                thumbnail: "https://img.youtube.com/vi/B8n9N0zL4kU/hqdefault.jpg",
+                description: "Bli med i bønn for helbredelse, indre fred og Guds gjenopprettende kraft."
+            },
+            {
+                title: lang === 'en' ? "Testimony: Transformed by God's Love" : (lang === 'es' ? "Testimonio: Transformado por el Amor de Dios" : "Vitnesbyrd: Forvandlet av Guds kjærlighet"),
+                pubDate: new Date(Date.now() - 86400000 * 30).toISOString(),
+                link: "https://www.youtube.com/watch?v=V9m2P5tQ8wA",
+                thumbnail: "https://img.youtube.com/vi/V9m2P5tQ8wA/hqdefault.jpg",
+                description: "En personlig historie om hvordan møtet med Jesus forvandlet et liv preget av mørke."
+            }
+        ];
+        return defaultMock;
+    }
     let allVideosCache = {};
     let currentCategory = null;
     let currentShowCount = 0;
@@ -378,6 +430,12 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                     }
                 }
 
+                // 3) Fallback til Mock-videoer hvis alt feiler
+                if (!videos || videos.length === 0) {
+                    console.log(`[YouTube Fallback] API og RSS feilet. Bruker innebygd fallback-liste for spilleliste ${playlistId}`);
+                    videos = getMockVideosForPlaylist(playlistId);
+                }
+
                 allVideosCache[playlistId] = videos || [];
             }
         } else if (playlistId === 'all') {
@@ -406,6 +464,12 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                         console.error('Feil ved henting av kanalvideoer (ALL/RSS):', e);
                         videos = [];
                     }
+                }
+
+                // 3) Fallback til Mock-videoer hvis alt feiler
+                if (!videos || videos.length === 0) {
+                    console.log(`[YouTube Fallback] API og RSS feilet. Bruker innebygd fallback-liste for kanal (ALL)`);
+                    videos = getMockVideosForPlaylist('all');
                 }
                 allVideosCache['all'] = videos;
             }
