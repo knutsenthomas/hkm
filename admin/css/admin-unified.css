@@ -4477,18 +4477,21 @@ body.admin-body #users-section #side-add-user-form .btn-full {
 }
 
 /* Sidebar brand logo: use the raw logo without a boxed badge background */
-body.admin-body .sidebar-header .logo {
+body.admin-body .sidebar-header .logo,
+body.minside-body .sidebar-header .logo {
   display: flex;
   align-items: center;
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-body.admin-body .sidebar-header .logo:hover {
+body.admin-body .sidebar-header .logo:hover,
+body.minside-body .sidebar-header .logo:hover {
   opacity: 0.85 !important;
   transform: translateY(-0.5px) scale(1.02) !important;
 }
 
-body.admin-body .sidebar-header .logo:active {
+body.admin-body .sidebar-header .logo:active,
+body.minside-body .sidebar-header .logo:active {
   transform: scale(0.98) !important;
   opacity: 0.75 !important;
 }
