@@ -6058,7 +6058,37 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
-    const finalSystemPrompt = `${systemPrompt}\n\nBesøkende: ${userMessage}`;
+    // Hent samtalehistorikk for å gi chatbot-en kontekstuell hukommelse
+    let historyContext = "";
+    try {
+      const messagesSnap = await db.collection("visitorChats")
+        .doc(chatId)
+        .collection("messages")
+        .orderBy("createdAt", "desc")
+        .limit(8)
+        .get();
+      
+      const msgs = [];
+      messagesSnap.forEach(doc => {
+        if (doc.id !== messageId) {
+          msgs.push(doc.data());
+        }
+      });
+      // Sorter kronologisk (eldste først)
+      msgs.reverse();
+
+      if (msgs.length > 0) {
+        historyContext = "\nSAMTALEHISTORIKK (Hukommelse over hva dere snakket om tidligere):\n" + 
+          msgs.map(m => {
+            const role = m.sender === "visitor" ? "Besøkende" : "HKM Assistent";
+            return `${role}: ${m.text || ""}`;
+          }).join("\n");
+      }
+    } catch (err) {
+      console.warn("[ChatAI] Kunne ikke hente samtalehistorikk:", err.message);
+    }
+
+    const finalSystemPrompt = `${systemPrompt}\n${historyContext}\n\nNy melding fra Besøkende: ${userMessage}`;
 
     // --- AI Generation Logic with Robust Fallback ---
     let aiText = "";
