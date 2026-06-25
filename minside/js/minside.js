@@ -1730,9 +1730,8 @@ class MinSideManager {
                         <h3>Siste fra Bønneveggen</h3>
                         <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px;">
-                        <span style="display: inline-flex; align-items: center; line-height: 1;">Gå til Bønneveggen</span>
-                        <span class="material-symbols-outlined" style="font-size: 16px; display: inline-flex; align-items: center; line-height: 1;">arrow_forward</span>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: inline-flex; align-items: center; gap: 3px; padding: 6px 12px; height: auto;">
+                        <span style="display: inline-block; line-height: 1;">Gå til Bønneveggen</span><span class="material-symbols-outlined" style="font-size: 16px; display: inline-block; line-height: 1; margin-top: 1.5px;">arrow_forward</span>
                     </button>
                 </div>
                 <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
