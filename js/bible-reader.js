@@ -1260,8 +1260,18 @@ class BibleReader {
                             return this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
                         });
                         
-                        if (this.dom.toolbarBookmarkText) {
-                            this.dom.toolbarBookmarkText.innerText = allBookmarked ? 'Fjern bokmerke' : 'Bokmerk';
+                        if (this.dom.toolbarBtnBookmark) {
+                            const path = window.location.pathname;
+                            let activeText = 'Fjern bokmerke';
+                            let inactiveText = 'Bokmerk';
+                            if (path.includes('/en/')) {
+                                activeText = 'Remove bookmark';
+                                inactiveText = 'Bookmark';
+                            } else if (path.includes('/es/')) {
+                                activeText = 'Quitar favorito';
+                                inactiveText = 'Favorito';
+                            }
+                            this.dom.toolbarBtnBookmark.setAttribute('data-tooltip', allBookmarked ? activeText : inactiveText);
                         }
                         const bookmarkIcon = this.dom.toolbarBtnBookmark ? this.dom.toolbarBtnBookmark.querySelector('.material-symbols-outlined') : null;
                         if (bookmarkIcon) {

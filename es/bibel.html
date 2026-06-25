@@ -1447,6 +1447,95 @@
             background: rgba(27, 73, 101, 0.12) !important;
             border-radius: 4px !important;
         }
+               /* Premium Floating Verse Toolbar */
+        #verse-context-toolbar {
+            background: rgba(27, 73, 101, 0.95) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 8px 16px -8px rgba(0, 0, 0, 0.3) !important;
+            padding: 4px 8px !important;
+            display: none;
+            align-items: center;
+            gap: 4px !important;
+            z-index: 1000;
+            transform: translate(-50%, -125%) !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .toolbar-action-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            transition: all 0.2s ease !important;
+            position: relative !important;
+        }
+
+        .toolbar-action-btn:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .toolbar-action-btn:active {
+            transform: scale(0.92) !important;
+        }
+
+        #toolbar-btn-lookup {
+            color: #fef08a !important; /* Highlight gold color for Lexicon */
+        }
+        #toolbar-btn-lookup:hover {
+            background: rgba(254, 240, 138, 0.15) !important;
+        }
+
+        #toolbar-btn-clear {
+            color: #f87171 !important; /* Soft red for close button */
+        }
+        #toolbar-btn-clear:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+        }
+
+        .toolbar-divider {
+            width: 1px !important;
+            height: 20px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            margin: 0 4px !important;
+        }
+
+        /* Premium CSS Tooltip using data-tooltip */
+        .toolbar-action-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px) scale(0.9);
+            background: rgba(15, 23, 42, 0.95);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1001;
+        }
+
+        .toolbar-action-btn:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px) scale(1);
+        }
 
         /* Mobile adjustment for floating verse toolbar */
         @media (max-width: 768px) {
@@ -2275,40 +2364,30 @@
                 </div>
 
                 <!-- Verse Context Actions Toolbar -->
-                <div id="verse-context-toolbar" style="position: absolute; display: none; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.12); padding: 6px 12px; z-index: 1000; align-items: center; gap: 6px; box-sizing: border-box; transform: translate(-50%, -100%); margin-top: -8px; white-space: nowrap !important; width: max-content !important; flex-wrap: nowrap !important; flex-direction: row !important;">
-                    <button id="toolbar-btn-bookmark" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Favorito">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">bookmark</span>
-                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Favorito</span>
+                <div id="verse-context-toolbar">
+                    <button id="toolbar-btn-bookmark" class="toolbar-action-btn" data-tooltip="Favorito">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">bookmark</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-range" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Seleccionar rango">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">select_all</span>
-                        <span class="toolbar-btn-text" id="toolbar-range-text">Seleccionar rango</span>
+                    <button id="toolbar-btn-range" class="toolbar-action-btn" data-tooltip="Seleccionar rango">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">select_all</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-lookup" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--bible-primary) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Explicar en el Lexicón">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                        <span class="toolbar-btn-text">Explicar en el Lexicón</span>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-lookup" class="toolbar-action-btn" data-tooltip="Explicar en el Lexicón">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-share" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Compartir versículo">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">share</span>
-                        <span class="toolbar-btn-text">Compartir</span>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-share" class="toolbar-action-btn" data-tooltip="Compartir versículo">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-download" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Guardar en tu dispositivo">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
-                        <span class="toolbar-btn-text">Descargar</span>
+                    <button id="toolbar-btn-download" class="toolbar-action-btn" data-tooltip="Guardar localmente">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-save-user" style="background: none !important; border: none !important; cursor: pointer !important; color: var(--text-base) !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Guardar en tu perfil (Mi página)">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">edit_note</span>
-                        <span class="toolbar-btn-text">Guardar en perfil</span>
+                    <button id="toolbar-btn-save-user" class="toolbar-action-btn" data-tooltip="Guardar en Perfil">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
                     </button>
-                    <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
-                    <button id="toolbar-btn-clear" style="background: none !important; border: none !important; cursor: pointer !important; color: #dc2626 !important; font-size: 12px !important; font-weight: 600 !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; padding: 6px 10px !important; border-radius: 20px !important; transition: background 0.2s !important; height: auto !important; line-height: 1 !important; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important;" title="Limpiar selección">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-                        <span class="toolbar-btn-text">Limpiar</span>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-clear" class="toolbar-action-btn" data-tooltip="Limpiar selección">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
                     </button>
                 </div>
             </div>
