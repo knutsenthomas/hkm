@@ -5371,9 +5371,14 @@ class MinSideManager {
                                         </div>
                                     </div>
                                     ${isOwner ? `
-                                        <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
-                                        </button>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #1B4965; padding: 4px; cursor:pointer;" onclick="window.minSideManager.editPrayer('${p.id}')" title="Rediger">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                            </button>
+                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')" title="Slett">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                            </button>
+                                        </div>
                                     ` : ''}
                                 </div>
                                 
@@ -5501,6 +5506,109 @@ class MinSideManager {
             console.error("Delete prayer error:", err);
             alert("Feil under sletting: " + err.message);
         }
+    }
+
+    async editPrayer(prayerId) {
+        try {
+            const doc = await firebase.firestore().collection('prayers').doc(prayerId).get();
+            if (!doc.exists) {
+                alert("Bønneemnet finnes ikke.");
+                return;
+            }
+            const data = doc.data();
+            const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
+            this.openEditPrayerModal(prayerId, data, viewContainer);
+        } catch (err) {
+            console.error("Fetch prayer error:", err);
+            alert("Kunne ikke hente bønneemnet for redigering: " + err.message);
+        }
+    }
+
+    openEditPrayerModal(prayerId, data, container) {
+        let modal = document.getElementById('hkm-prayer-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-prayer-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+            <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
+                <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">Rediger bønneemne</h3>
+                    <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 12px; font-weight: 700; color: #475569; display:block; margin-bottom: 6px;">Hva kan vi be for?</label>
+                    <textarea id="prayer-input-text" style="width:100%; height: 120px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 12px; font-family: inherit; font-size:14px; outline:none; box-sizing:border-box;" placeholder="Skriv ditt bønneemne...">${data.text || ''}</textarea>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; cursor:pointer; user-select:none; margin: 0;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">visibility_off</span>
+                            <span style="font-size:13.5px; font-weight:600; color:#334155;">Post anonymt</span>
+                        </div>
+                        <label class="toggle toggle-sm" style="margin: 0;">
+                            <input type="checkbox" id="prayer-anon-check" ${data.isAnonymous ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+                <div style="display:flex; gap:12px; justify-content:flex-end;">
+                    <button class="btn btn-outline" id="btn-cancel-prayer">Avbryt</button>
+                    <button class="btn btn-primary" id="btn-save-prayer" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border:none;">
+                        Lagre endringer
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Force reflow and add active class for fade-in animation
+        modal.offsetHeight;
+        modal.classList.add('active');
+
+        const closeFn = () => {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 250);
+        };
+
+        const closeBtn = modal.querySelector('.close');
+        const cancelBtn = modal.querySelector('#btn-cancel-prayer');
+        if (closeBtn) closeBtn.onclick = closeFn;
+        if (cancelBtn) cancelBtn.onclick = closeFn;
+
+        modal.querySelector('#btn-save-prayer').onclick = async () => {
+            const text = modal.querySelector('#prayer-input-text').value.trim();
+            const isAnonymous = modal.querySelector('#prayer-anon-check').checked;
+            
+            if (!text) {
+                alert("Bønneemnet kan ikke være tomt.");
+                return;
+            }
+
+            const saveBtn = modal.querySelector('#btn-save-prayer');
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Lagrer...';
+
+            try {
+                await firebase.firestore().collection('prayers').doc(prayerId).update({
+                    text,
+                    isAnonymous,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                closeFn();
+                this.loadPrayerWallFeed(container);
+            } catch (err) {
+                console.error("Update prayer request failed:", err);
+                alert("Kunne ikke oppdatere bønneemnet: " + err.message);
+                saveBtn.disabled = false;
+                saveBtn.innerText = 'Lagre endringer';
+            }
+        };
     }
 
     openCreatePrayerModal(container) {
