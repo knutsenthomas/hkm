@@ -873,7 +873,7 @@ class MinSideManager {
     // NAVIGATION
     // ──────────────────────────────────────────────────────────
     setupNavigation() {
-        document.querySelectorAll('.nav-link[data-view], .mobile-nav-item[data-view]').forEach(link => {
+        document.querySelectorAll('.nav-link[data-view], .mobile-nav-item[data-view], .logo[data-view]').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
                 this.loadView(link.dataset.view);
