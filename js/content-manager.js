@@ -965,6 +965,138 @@ class ContentManager {
             this.renderCauses(causes);
             this.populatePurposeDropdown(causes);
         }
+
+        if (this.pageId === 'om-oss') {
+            await this.loadAndRenderLatestDesigns();
+        }
+    }
+
+    async loadAndRenderLatestDesigns() {
+        const container = document.getElementById('latest-designs-container');
+        if (!container) return;
+
+        const lang = this.getCurrentLanguage(); // 'no', 'en', 'es'
+        
+        let products = [];
+        try {
+            // Fetch live products with abort controller to prevent long waits
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            
+            const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && Array.isArray(data.products)) {
+                    products = data.products.slice(0, 3);
+                }
+            }
+        } catch (err) {
+            console.warn('[ContentManager] Failed to fetch live wix products, attempting Firestore fallback...', err);
+        }
+
+        // Firestore Fallback if live fetch failed or returned no products
+        if (products.length === 0) {
+            try {
+                const doc = await this.getContentDoc('wix_products', { silent: true });
+                if (doc && Array.isArray(doc.items)) {
+                    // Filter inStock products and take first 3 (which are sorted by lastUpdated descending)
+                    products = doc.items.filter(p => p.inStock !== false).slice(0, 3);
+                }
+            } catch (fsErr) {
+                console.error('[ContentManager] Firestore fallback for wix products failed:', fsErr);
+            }
+        }
+
+        // Hardcoded Fallback if everything fails
+        if (products.length === 0) {
+            products = [
+                {
+                    name: "Norgeskoppen - White 12oz Enamel Mug",
+                    price: 249,
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_2e012335b82e4405ba0e4ca09cb6f915~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "En slitesterk og lett emaljekopp som passer perfekt til tur, camping eller morgenkaffen.",
+                    slug: "norgeskoppen-white-12oz-enamel-mug"
+                },
+                {
+                    name: "NORGE Brodert på Økologisk bøttehatt| Beechfield B90N",
+                    price: 365,
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_6fc1d0d498e2415aae57aff3d5de5c99~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "Klassisk økologisk bøttehatt brodert med Norge-motiv. Gir god solbeskyttelse med stil.",
+                    slug: "norge-brodert-pa-okologisk-bottehatt-beechfield-b90n"
+                },
+                {
+                    name: "FAITH OVER FEAR - Classic Matte Paper Poster",
+                    price: 139,
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_74c605681f6c413d929793be3d51d2f3~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "En moderne kunstplakat med et sterkt budskap trykket på matt papir av høy kvalitet.",
+                    slug: "faith-over-fear-classic-matte-paper-poster"
+                }
+            ];
+        }
+
+        // Render products
+        container.innerHTML = products.map((p, idx) => {
+            const slug = p.slug || this.generateSlug(p.name);
+            const url = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+            
+            // Clean up description HTML
+            let rawDesc = p.description || '';
+            // Strip HTML tags for clean card snippet
+            let cleanDesc = rawDesc.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+            // Limit text length
+            if (cleanDesc.length > 120) {
+                cleanDesc = cleanDesc.substring(0, 117) + '...';
+            }
+
+            // Fallback description translations if using hardcoded fallback or if empty
+            if (!cleanDesc && idx === 0) {
+                cleanDesc = lang === 'en' ? "A durable and lightweight enamel mug perfect for hiking, camping or morning coffee." : (lang === 'es' ? "Una taza de esmalte duradera y ligera, perfecta para senderismo, acampadas o el café de la mañana." : "En slitesterk og lett emaljekopp som passer perfekt til tur, camping eller morgenkaffen.");
+            } else if (!cleanDesc && idx === 1) {
+                cleanDesc = lang === 'en' ? "Classic organic bucket hat embroidered with Norway motif. Provides good sun protection with style." : (lang === 'es' ? "Sombrero de pescador de algodón orgánico bordado con el motivo de Noruega. Protege del sol con estilo." : "Klassisk økologisk bøttehatt brodert med Norge-motiv. Gir god solbeskyttelse med stil.");
+            } else if (!cleanDesc && idx === 2) {
+                cleanDesc = lang === 'en' ? "A modern art poster with a powerful message printed on high-quality matte paper." : (lang === 'es' ? "Un póster de arte moderno con un poderoso mensaje impreso en papel mate de alta calidad." : "En moderne kunstplakat med et sterkt budskap trykket på matt papir av høy kvalitet.");
+            }
+
+            // Translate CTA/badge labels
+            const ctaText = lang === 'en' ? "View product" : (lang === 'es' ? "Ver producto" : "Se produkt");
+            const badgeText = idx === 0 ? (lang === 'en' ? "New" : (lang === 'es' ? "Nuevo" : "Nyhet")) : "";
+
+            const badgeHtml = badgeText ? `
+                <span class="absolute top-4 right-4 bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">
+                    ${badgeText}
+                </span>
+            ` : '';
+
+            // Clean price output
+            const priceNok = p.price ? `${p.price} kr` : '';
+
+            return `
+                <a href="${url}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full active:scale-[0.98]">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        ${badgeHtml}
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-1 group-hover:text-[#bd4f2a] transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
+                                ${p.name}
+                            </h3>
+                            ${priceNok ? `<div class="text-[#bd4f2a] font-bold text-base mb-2">${priceNok}</div>` : ''}
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">
+                                ${cleanDesc}
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                ${ctaText} <i class="fas fa-arrow-right text-xs"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }).join('');
     }
 
     async loadCauses() {
