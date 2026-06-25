@@ -5441,19 +5441,10 @@ class MinSideManager {
                                 
                                 <p style="font-size: 14.5px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; white-space: pre-wrap; font-family: inherit;">${p.text}</p>
                             </div>
-                            
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
-                                <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #64748b;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a;">volunteer_activism</span>
-                                    <span>${count} ber for dette</span>
-                                </div>
+                                <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber for dette</span></div>
                                 
-                                <button class="btn ${hasPrayed ? 'btn-secondary' : 'btn-primary'}" 
-                                        ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important;"' : 'style="background: #1B4965; border-color: #1B4965; color: #ffffff;"'} 
-                                        onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
-                                    <span>${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span>
-                                </button>
+                                <button class="btn ${hasPrayed ? 'btn-secondary' : 'btn-primary'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;"' : 'style="background: #1B4965; border-color: #1B4965; color: #ffffff; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px; position: relative; top: 1px !important; line-height: 1; display: inline-block;">favorite</span><span style="line-height: 1; display: inline-block;">${hasPrayed ? 'Jeg har bedt 🙏' : 'Jeg ber 🙏'}</span></button>
                             </div>
                         </div>
                     </div>
