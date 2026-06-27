@@ -8742,13 +8742,5 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     }
 }
 
-/* Pixel-perfect centering for search icon opener in header actions dock */
-#global-search-opener .material-symbols-outlined {
-    display: inline-block !important;
-    line-height: 1 !important;
-    vertical-align: middle !important;
-    transform: translate(1px, 2px) !important;
-}
-
 
 
