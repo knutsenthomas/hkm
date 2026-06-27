@@ -5566,6 +5566,7 @@ ol.block-list {
 .header-actions-dock:focus-within {
     max-width: 320px;
     padding: 3px 16px 3px 3px;
+    overflow: visible;
 }
 
 .header.scrolled .header-actions-dock,
