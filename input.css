@@ -5560,17 +5560,19 @@ ol.block-list {
                 border-color 0.3s ease;
 }
 
-.header-actions-dock:hover,
-.header-actions-dock:focus-within,
-.header-actions-dock.expanded,
-.header-actions-dock:has(.lang-switcher.active) {
-    width: 240px;
-    max-width: 320px;
-    padding: 3px 16px 3px 3px;
-}
+@media (min-width: 992px) {
+    .header-actions-dock:hover,
+    .header-actions-dock:focus-within,
+    .header-actions-dock.expanded,
+    .header-actions-dock:has(.lang-switcher.active) {
+        width: 240px;
+        max-width: 320px;
+        padding: 3px 16px 3px 3px;
+    }
 
-.header-actions-dock:has(.lang-switcher.active) {
-    overflow: visible;
+    .header-actions-dock:has(.lang-switcher.active) {
+        overflow: visible;
+    }
 }
 
 .header.scrolled .header-actions-dock,
@@ -5599,17 +5601,19 @@ body:not(.header-dark-start) .header .header-actions-dock {
     flex-shrink: 0;
 }
 
-.header-actions-dock:hover .header-actions-expandable,
-.header-actions-dock:focus-within .header-actions-expandable,
-.header-actions-dock.expanded .header-actions-expandable {
-    opacity: 1;
-    pointer-events: auto;
-}
+@media (min-width: 992px) {
+    .header-actions-dock:hover .header-actions-expandable,
+    .header-actions-dock:focus-within .header-actions-expandable,
+    .header-actions-dock.expanded .header-actions-expandable {
+        opacity: 1;
+        pointer-events: auto;
+    }
 
-.header-actions-dock:has(.lang-switcher.active) .header-actions-expandable {
-    opacity: 1;
-    pointer-events: auto;
-    overflow: visible;
+    .header-actions-dock:has(.lang-switcher.active) .header-actions-expandable {
+        opacity: 1;
+        pointer-events: auto;
+        overflow: visible;
+    }
 }
 
 /* Remove default border and background for language button inside the dock */

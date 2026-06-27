@@ -364,11 +364,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle search button click/tap
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
-            if (!dock.classList.contains('expanded')) {
-                // If collapsed, expand the dock first
-                e.preventDefault();
-                e.stopPropagation();
-                dock.classList.add('expanded');
+            if (window.innerWidth >= 992) {
+                if (!dock.classList.contains('expanded')) {
+                    // If collapsed, expand the dock first
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dock.classList.add('expanded');
+                }
             }
         });
     }
