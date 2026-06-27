@@ -5582,12 +5582,12 @@ ol.block-list {
     align-items: center;
     gap: 8px;
     width: 170px;
+    margin-left: 8px;
     opacity: 0;
     pointer-events: none;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: opacity 0.3s ease,
-                margin-left 0.4s ease;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-actions-expandable > * {
@@ -5600,7 +5600,6 @@ ol.block-list {
 .header-actions-dock:has(.lang-switcher.active) .header-actions-expandable {
     opacity: 1;
     pointer-events: auto;
-    margin-left: 8px;
     overflow: visible;
 }
 
@@ -5609,6 +5608,11 @@ ol.block-list {
     background: transparent !important;
     border: none !important;
     padding: 6px 12px !important;
+    transition: none !important;
+}
+
+.header-actions-dock .lang-btn * {
+    transition: none !important;
 }
 
 .header-actions-dock .lang-btn:hover {
