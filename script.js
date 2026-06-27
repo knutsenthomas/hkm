@@ -351,29 +351,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================================
-// Expandable Dock State Manager (Safari & Touch support)
+// Expandable Dock State Manager & Language Selector Click Toggle (Safari & Touch support)
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
     const dock = document.querySelector('.header-actions-dock');
     if (!dock) return;
 
     const searchBtn = document.getElementById('global-search-opener');
+    const langBtn = dock.querySelector('.lang-btn');
+    const langSwitcher = dock.querySelector('.lang-switcher');
 
-    // Keep expanded when search button is focused (keyboard accessibility)
+    // Handle search button click/tap
     if (searchBtn) {
-        searchBtn.addEventListener('focus', () => {
-            dock.classList.add('expanded');
-        });
-        searchBtn.addEventListener('blur', () => {
-            setTimeout(() => {
-                const activeEl = document.activeElement;
-                const hasActiveLang = dock.querySelector('.lang-switcher.active');
-                if (!dock.contains(activeEl) && !hasActiveLang) {
-                    dock.classList.remove('expanded');
-                }
-            }, 150);
+        searchBtn.addEventListener('click', (e) => {
+            if (!dock.classList.contains('expanded')) {
+                // If collapsed, expand the dock first
+                e.preventDefault();
+                e.stopPropagation();
+                dock.classList.add('expanded');
+            }
         });
     }
+
+    // Toggle language switcher on click/tap
+    if (langBtn && langSwitcher) {
+        langBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            langSwitcher.classList.toggle('active');
+            dock.classList.add('expanded'); // Keep dock open
+        });
+    }
+
+    // Close everything when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!dock.contains(e.target)) {
+            dock.classList.remove('expanded');
+            if (langSwitcher) langSwitcher.classList.remove('active');
+        }
+    });
+
+    // Handle mouseleave on desktop to auto-collapse when not active
+    dock.addEventListener('mouseleave', () => {
+        setTimeout(() => {
+            if (langSwitcher && !langSwitcher.classList.contains('active')) {
+                dock.classList.remove('expanded');
+            }
+        }, 300);
+    });
 });
 
 
