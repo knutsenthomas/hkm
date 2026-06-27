@@ -5583,11 +5583,16 @@ ol.block-list {
     max-width: 0;
     overflow: hidden;
     pointer-events: none;
+    white-space: nowrap;
     transform: translateX(-10px);
     transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.3s ease,
                 transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 margin-left 0.4s ease;
+}
+
+.header-actions-expandable > * {
+    flex-shrink: 0;
 }
 
 .header-actions-dock:hover .header-actions-expandable,
