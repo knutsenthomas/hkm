@@ -5989,13 +5989,6 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 @media (min-width: 769px) {
     .mega-menu-grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 32px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .mega-menu-grid {
-        grid-template-columns: repeat(5, 1fr);
         gap: 40px;
     }
 }
@@ -6025,12 +6018,12 @@ html[data-theme="dark"] .menu-section-title {
 
 .mega-nav-list li {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
     width: fit-content; /* Shrinks the element to content width for accurate center scaling */
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transform-origin: center;
+    transform-origin: left center;
 }
 
 .mega-nav-list li .material-symbols-outlined {
@@ -6042,6 +6035,7 @@ html[data-theme="dark"] .menu-section-title {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-top: 3px;
 }
 
 html[data-theme="dark"] .mega-nav-list li .material-symbols-outlined {
@@ -6076,11 +6070,33 @@ html[data-theme="dark"] .mega-nav-list a {
     color: var(--primary-orange);
 }
 
+/* Mega Menu Sub-description */
+.mega-menu-desc {
+    font-size: 0.78rem;
+    color: #64748b; /* slate-500 */
+    margin-top: 2px;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    display: block;
+    white-space: normal;
+    max-width: 220px; /* Prevent text from spreading too wide */
+    line-height: 1.4;
+}
+
+html[data-theme="dark"] .mega-menu-desc {
+    color: #94a3b8; /* slate-400 */
+}
+
+.mega-nav-list li:hover .mega-menu-desc {
+    color: var(--primary-orange);
+    opacity: 0.85;
+}
+
 /* Min Side Pill Button in Mega Menu */
 .mega-nav-list li.min-side-pill {
     background-color: #f0f4ff;
-    padding: 6px 16px;
-    border-radius: 9999px;
+    padding: 10px 18px;
+    border-radius: 16px;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
 }
 
