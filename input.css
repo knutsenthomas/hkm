@@ -8742,5 +8742,23 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     }
 }
 
+/* Pixel-perfect visual centering for Material Design search icon inside search opener button */
+#global-search-opener {
+    padding: 0 !important;
+}
+
+#global-search-opener .material-symbols-outlined {
+    display: block !important;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    text-align: center !important;
+    position: relative !important;
+    top: 2px !important;
+    left: 1.5px !important;
+}
+
+
 
 
