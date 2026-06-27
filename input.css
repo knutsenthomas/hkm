@@ -5981,10 +5981,16 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 /* Menu Grid */
 .mega-menu-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* 3 Columns */
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 40px;
     text-align: left;
+}
+
+@media (min-width: 769px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+    }
 }
 
 .menu-section-title {
@@ -6061,6 +6067,37 @@ html[data-theme="dark"] .mega-nav-list a {
 
 .mega-nav-list li:hover a {
     color: var(--primary-orange);
+}
+
+/* Min Side Pill Button in Mega Menu */
+.mega-nav-list li.min-side-pill {
+    background-color: #f0f4ff;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+}
+
+.mega-nav-list li.min-side-pill .material-symbols-outlined {
+    color: var(--primary-orange) !important;
+    opacity: 1 !important;
+}
+
+.mega-nav-list li.min-side-pill a {
+    color: var(--primary-orange) !important;
+    font-weight: 600 !important;
+}
+
+.mega-nav-list li.min-side-pill:hover {
+    background-color: #e0e7ff;
+    transform: scale(1.04) !important;
+}
+
+html[data-theme="dark"] .mega-nav-list li.min-side-pill {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .mega-nav-list li.min-side-pill:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Menu Footer */
