@@ -350,6 +350,36 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
+// ===================================
+// Language Selector Click Toggle (Safari & Touch support)
+// ===================================
+document.addEventListener('DOMContentLoaded', () => {
+    const langSwitchers = document.querySelectorAll('.lang-switcher');
+    
+    langSwitchers.forEach(switcher => {
+        const btn = switcher.querySelector('.lang-btn');
+        if (!btn) return;
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switcher.classList.toggle('active');
+            
+            // Close any other open language selectors
+            langSwitchers.forEach(other => {
+                if (other !== switcher) {
+                    other.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    document.addEventListener('click', () => {
+        langSwitchers.forEach(switcher => {
+            switcher.classList.remove('active');
+        });
+    });
+});
+
 
 // ===================================
 // Global Site Search (Premium Edition)
