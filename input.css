@@ -5766,14 +5766,12 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 .mega-menu {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: #ffffff;
     z-index: 19000;
     /* Lowered to stay below header (20000) */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s, backdrop-filter 0.35s;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -7666,10 +7664,8 @@ html[data-theme="dark"] [style*="rgba(209, 125, 57"] a:hover {
 }
 
 html[data-theme="dark"] .mega-menu {
-    background-color: rgba(15, 23, 42, 0.85) !important;
+    background-color: #0f172a !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
 }
 
 html[data-theme="dark"] .mega-menu-content {
