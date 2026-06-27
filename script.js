@@ -351,68 +351,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================================
-// Expandable Dock State Manager & Language Selector click toggle (Safari & Touch support)
+// Expandable Dock State Manager (Safari & Touch support)
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
     const dock = document.querySelector('.header-actions-dock');
     if (!dock) return;
 
     const searchBtn = document.getElementById('global-search-opener');
-    const langSwitchers = document.querySelectorAll('.lang-switcher');
 
-    // Keep expanded when search button is focused/clicked
+    // Keep expanded when search button is focused (keyboard accessibility)
     if (searchBtn) {
         searchBtn.addEventListener('focus', () => {
             dock.classList.add('expanded');
         });
         searchBtn.addEventListener('blur', () => {
-            // Delay to see if focus moved inside the dock
             setTimeout(() => {
                 const activeEl = document.activeElement;
-                const isLangSwitcherActive = Array.from(langSwitchers).some(s => s.classList.contains('active'));
-                if (!dock.contains(activeEl) && !isLangSwitcherActive) {
+                const hasActiveLang = dock.querySelector('.lang-switcher.active');
+                if (!dock.contains(activeEl) && !hasActiveLang) {
                     dock.classList.remove('expanded');
                 }
             }, 150);
         });
     }
-
-    langSwitchers.forEach(switcher => {
-        const btn = switcher.querySelector('.lang-btn');
-        if (!btn) return;
-        
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            switcher.classList.toggle('active');
-            
-            // Close any other open language selectors
-            langSwitchers.forEach(other => {
-                if (other !== switcher) {
-                    other.classList.remove('active');
-                }
-            });
-
-            // Sync dock expanded state
-            const isAnyActive = Array.from(langSwitchers).some(s => s.classList.contains('active'));
-            if (isAnyActive) {
-                dock.classList.add('expanded');
-            } else {
-                if (!dock.contains(document.activeElement)) {
-                    dock.classList.remove('expanded');
-                }
-            }
-        });
-    });
-
-    // Close everything when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!dock.contains(e.target)) {
-            dock.classList.remove('expanded');
-            langSwitchers.forEach(switcher => {
-                switcher.classList.remove('active');
-            });
-        }
-    });
 });
 
 
