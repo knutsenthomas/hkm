@@ -5544,20 +5544,58 @@ ol.block-list {
 .header-actions-dock {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
+    justify-content: flex-start;
+    width: auto;
+    max-width: 44px;
+    height: 44px;
+    padding: 3px;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 9999px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    transition: all 0.3s ease;
+    overflow: hidden;
+    transition: max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1), 
+                padding 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s ease, 
+                border-color 0.3s ease;
+}
+
+.header-actions-dock:hover,
+.header-actions-dock:focus-within {
+    max-width: 320px;
+    padding: 3px 16px 3px 3px;
 }
 
 .header.scrolled .header-actions-dock,
 .header.menu-open .header-actions-dock {
     background: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Expandable content wrapper */
+.header-actions-expandable {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateX(-10px);
+    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-left 0.4s ease;
+}
+
+.header-actions-dock:hover .header-actions-expandable,
+.header-actions-dock:focus-within .header-actions-expandable {
+    opacity: 1;
+    max-width: 260px;
+    pointer-events: auto;
+    transform: translateX(0);
+    margin-left: 8px;
 }
 
 /* Remove default border and background for language button inside the dock */
