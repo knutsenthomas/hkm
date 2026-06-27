@@ -3362,4 +3362,13 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     }
 }
 
+/* Prevent Material Symbols FOUT (Flash of Unstyled Text) on load */
+html:not(.fonts-loaded) .material-symbols-outlined {
+    visibility: hidden !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-block !important;
+    overflow: hidden !important;
+}
+
 

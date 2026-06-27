@@ -26,8 +26,21 @@
                                 applyTheme();
                             }
                         });
-                    } catch (e2) {}
-                }
+            }
+            
+            // Font loading detector to prevent Material Symbols FOUT (icon names flashing as text)
+            if (document.fonts) {
+                document.fonts.load('24px "Material Symbols Outlined"').then(function() {
+                    document.documentElement.classList.add('fonts-loaded');
+                }).catch(function() {
+                    document.documentElement.classList.add('fonts-loaded');
+                });
+                // Safety timeout in case network request hangs
+                setTimeout(function() {
+                    document.documentElement.classList.add('fonts-loaded');
+                }, 1500);
+            } else {
+                document.documentElement.classList.add('fonts-loaded');
             }
         })();
     </script>
