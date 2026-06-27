@@ -8755,9 +8755,10 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     line-height: 20px !important;
     text-align: center !important;
     position: relative !important;
-    top: 4px !important;
-    left: 4px !important;
+    top: 8px !important;
+    left: 8px !important;
 }
+
 
 
 
