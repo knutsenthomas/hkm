@@ -2355,166 +2355,170 @@ class MinSideManager {
         </div>
 
         <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'}">
-            <!-- Push & Email Notifications Card -->
-            <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
-                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
-                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">notifications_active</span>
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">${t('profile.notificationPreferences')}</h3>
+            <div class="notif-settings-container">
+                
+                <!-- Main Header (Mockup Title and Description) -->
+                <div style="margin-bottom: 28px;">
+                    <h2 style="font-size: 30px; font-weight: 800; color: #1B4965; margin: 0 0 8px 0; letter-spacing: -0.02em;">Varslingsinnstillinger</h2>
+                    <p style="font-size: 13.5px; color: #64748b; margin: 0; line-height: 1.5; font-weight: 500;">
+                        Administrer hvordan du ønsker å motta oppdateringer og undervisning fra oss. Hold deg tilkoblet fellesskapet på dine egne premisser.
+                    </p>
+                </div>
+
+                <!-- CARD 1: Push-varslinger -->
+                <div class="notif-settings-card push">
+                    <div class="notif-card-header">
+                        <div class="notif-icon-circle push">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+                        </div>
+                        <div class="notif-card-title-container">
+                            <h3 class="notif-card-title">Push-varslinger</h3>
+                            <p class="notif-card-description">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
+                        </div>
                     </div>
                     
-                    <div style="padding: 16px 24px;">
-                        
-                        <!-- PUSH SETTINGS GROUP -->
-                        <div style="margin-bottom: 20px;">
-                            <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 16px;">
-                                    <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">send_to_mobile</span>
-                                    <div>
-                                        <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.pushNotifications')}</div>
-                                        <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.pushNotificationsSub')}</div>
-                                    </div>
-                                </div>
-                                <label class="toggle" style="flex-shrink: 0;">
-                                    <input type="checkbox" id="push-toggle" ${p.pushEnabled ? 'checked' : ''}>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            
-                            <!-- SUB-SETTING NESTED CARD -->
-                            <div class="push-sub-settings" id="push-sub-settings" style="margin-top: 8px; margin-left: 12px; border-left: 2px solid #e2e8f0; padding-left: 16px; transition: all 0.3s ease; ${p.pushEnabled ? '' : 'display:none;'}">
-                                
-                                <!-- Ny undervisning -->
-                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">school</span>
-                                        <div>
-                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushTeachings')}</div>
-                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushTeachingsSub')}</div>
-                                        </div>
-                                    </div>
-                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
-                                        <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Ny podcast -->
-                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">podcasts</span>
-                                        <div>
-                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushPodcasts')}</div>
-                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushPodcastsSub')}</div>
-                                        </div>
-                                    </div>
-                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
-                                        <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Nytt blogginnlegg -->
-                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">rate_review</span>
-                                        <div>
-                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushBlogs')}</div>
-                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushBlogsSub')}</div>
-                                        </div>
-                                    </div>
-                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
-                                        <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Bibel- og leseplaner -->
-                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">auto_stories</span>
-                                        <div>
-                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.pushReadingPlans')}</div>
-                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.pushReadingPlansSub')}</div>
-                                        </div>
-                                    </div>
-                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
-                                        <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
+                    <div class="notif-settings-list">
+                        <!-- Ny undervisning -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">school</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">${t('profile.pushTeachings')}</div>
+                                    <div class="notif-setting-description">${t('profile.pushTeachingsSub')}</div>
                                 </div>
                             </div>
+                            <label class="hkm-switch toggle-orange">
+                                <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
                         </div>
                         
-                        <div style="border-top: 1px solid #f1f5f9; margin: 16px 0;"></div>
-                        
-                        <!-- EMAIL SETTINGS GROUP -->
-                        <div style="margin-bottom: 20px;">
-                            <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 16px;">
-                                    <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">mail</span>
-                                    <div>
-                                        <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.emailNotifications')}</div>
-                                        <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.emailNotificationsSub')}</div>
-                                    </div>
-                                </div>
-                                <label class="toggle" style="flex-shrink: 0;">
-                                    <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            
-                            <!-- SUB-SETTING NESTED CARD -->
-                            <div class="email-sub-settings" id="email-sub-settings" style="margin-top: 8px; margin-left: 12px; border-left: 2px solid #e2e8f0; padding-left: 16px; transition: all 0.3s ease; ${p.emailConsent !== false ? '' : 'display:none;'}">
-                                
-                                <!-- Daglige leseplanoppdateringer -->
-                                <div class="setting-row setting-row-sub-item" style="padding: 10px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">today</span>
-                                        <div>
-                                            <div class="setting-row-label" style="font-size: 13.5px; font-weight: 600; color: #334155;">${t('profile.emailReadingPlans')}</div>
-                                            <div class="setting-row-sub" style="font-size: 11.5px; color: #64748b;">${t('profile.emailReadingPlansSub')}</div>
-                                        </div>
-                                    </div>
-                                    <label class="toggle toggle-sm" style="flex-shrink: 0;">
-                                        <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
+                        <!-- Ny podcast -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">podcasts</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">${t('profile.pushPodcasts')}</div>
+                                    <div class="notif-setting-description">${t('profile.pushPodcastsSub')}</div>
                                 </div>
                             </div>
+                            <label class="hkm-switch toggle-orange">
+                                <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
                         </div>
                         
-                        <div style="border-top: 1px solid #f1f5f9; margin: 16px 0;"></div>
-                        
-                        <!-- TIME PICKER GROUP -->
-                        <div class="setting-row" style="padding: 12px 0; border-bottom: none; display: flex; flex-direction: column; align-items: flex-start; gap: 14px;">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <span class="material-symbols-outlined" style="color: #1b4965; font-size: 22px; margin-top: 2px;">schedule</span>
-                                <div>
-                                    <div class="setting-row-label" style="font-size: 14.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">${t('profile.notificationTime')}</div>
-                                    <div class="setting-row-sub" style="font-size: 12px; color: #64748b; line-height: 1.45;">${t('profile.notificationTimeSub')}</div>
+                        <!-- Nytt blogginnlegg -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">rate_review</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">${t('profile.pushBlogs')}</div>
+                                    <div class="notif-setting-description">${t('profile.pushBlogsSub')}</div>
                                 </div>
                             </div>
-                            
-                            <div style="position: relative; width: 130px; margin-left: 34px;">
-                                <select id="notification-time-select" class="form-control" style="width: 100%; height: 42px !important; line-height: 40px !important; border-radius: 10px; border: 1.5px solid #cbd5e1; font-weight: 700; font-size: 14px; color: #1b4965; padding: 0 36px 0 16px !important; cursor: pointer; background-color: #f8fafc; outline: none; -webkit-appearance: none; appearance: none; background-image: url(&quot;data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e&quot;) !important; background-repeat: no-repeat !important; background-position: right 14px center !important; background-size: 12px !important;">
-                                    ${[...Array(24).keys()].map(h => {
-                                        const padHour = String(h).padStart(2, '0');
-                                        const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
-                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
-                                    }).join('')}
-                                </select>
-                            </div>
+                            <label class="hkm-switch toggle-orange">
+                                <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
                         </div>
                         
-                    </div>
-                    
-                    <!-- FOOTER ACTIONS -->
-                    <div style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-start;">
-                        <button class="btn btn-primary" id="save-prefs-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}
-                        </button>
+                        <!-- Bibel- og leseplaner -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">auto_stories</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">${t('profile.pushReadingPlans')}</div>
+                                    <div class="notif-setting-description">${t('profile.pushReadingPlansSub')}</div>
+                                </div>
+                            </div>
+                            <label class="hkm-switch toggle-orange">
+                                <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
+                
+                <!-- CARD 2: E-postvarslinger -->
+                <div class="notif-settings-card email">
+                    <div class="notif-card-header">
+                        <div class="notif-icon-circle email">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+                        </div>
+                        <div class="notif-card-title-container">
+                            <h3 class="notif-card-title">E-postvarslinger</h3>
+                            <p class="notif-card-description">Velg hvilke oppdateringer vi sender til din innboks.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notif-settings-list">
+                        <!-- Nyhetsbrev -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">send</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">Nyhetsbrev</div>
+                                    <div class="notif-setting-description">Motta nyhetsbrev og viktige oppdateringer om vår tjeneste</div>
+                                </div>
+                            </div>
+                            <label class="hkm-switch toggle-slate">
+                                <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Daglige leseplanoppdateringer -->
+                        <div class="notif-setting-item">
+                            <div class="notif-setting-left">
+                                <span class="material-symbols-outlined notif-setting-sub-icon">calendar_today</span>
+                                <div class="notif-setting-text">
+                                    <div class="notif-setting-label">${t('profile.emailReadingPlans')}</div>
+                                    <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
+                                </div>
+                            </div>
+                            <label class="hkm-switch toggle-slate">
+                                <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
+                                <span class="hkm-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CARD 3: Tidspunkt for daglig oppdatering -->
+                <div class="notif-settings-card time">
+                    <div class="notif-card-header">
+                        <div class="notif-icon-circle time">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
+                        </div>
+                        <div class="notif-card-title-container">
+                            <h3 class="notif-card-title">Tidspunkt for daglig oppdatering</h3>
+                            <p class="notif-card-description">Velg hvilken time du vil motta e-post og push-varsel.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notif-settings-list" style="margin-top: -8px;">
+                        <div style="position: relative;">
+                            <select id="notification-time-select" class="notif-time-select">
+                                ${[...Array(24).keys()].map(h => {
+                                    const padHour = String(h).padStart(2, '0');
+                                    const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                    return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                                }).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FOOTER ACTIONS -->
+                <div class="notif-settings-footer">
+                    <p class="notif-footer-text">Dine endringer vil tre i kraft umiddelbart.</p>
+                    <button class="notif-save-btn" id="save-prefs-btn">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Lagre preferanser
+                    </button>
+                </div>
+
+            </div>
         </div>`;
 
         // Tab switching events
@@ -2608,22 +2612,6 @@ class MinSideManager {
             }
         });
 
-        // Push toggle - show/hide sub-settings
-        document.getElementById('push-toggle')?.addEventListener('change', (e) => {
-            const subSettings = document.getElementById('push-sub-settings');
-            if (subSettings) {
-                subSettings.style.display = e.target.checked ? '' : 'none';
-            }
-        });
-
-        // Email toggle - show/hide sub-settings
-        document.getElementById('email-toggle')?.addEventListener('change', (e) => {
-            const subSettings = document.getElementById('email-sub-settings');
-            if (subSettings) {
-                subSettings.style.display = e.target.checked ? '' : 'none';
-            }
-        });
-
         this._wireFamilySearch();
         this._wireAddressAutocomplete();
 
@@ -2634,11 +2622,14 @@ class MinSideManager {
         });
 
         document.getElementById('save-prefs-btn')?.addEventListener('click', async () => {
-            const pushEnabled = document.getElementById('push-toggle')?.checked;
             const pushTeachings = document.getElementById('push-teachings-toggle')?.checked ?? true;
             const pushPodcasts = document.getElementById('push-podcasts-toggle')?.checked ?? true;
             const pushBlogs = document.getElementById('push-blogs-toggle')?.checked ?? true;
             const pushReadingPlans = document.getElementById('push-reading-plans-toggle')?.checked ?? true;
+            
+            // pushEnabled is true if any push sub-toggle is active
+            const pushEnabled = pushTeachings || pushPodcasts || pushBlogs || pushReadingPlans;
+            
             const emailConsent = document.getElementById('email-toggle')?.checked;
             const emailReadingPlans = document.getElementById('email-reading-plans-toggle')?.checked ?? true;
             const readingPlanNotificationHour = parseInt(document.getElementById('notification-time-select')?.value ?? '7', 10);

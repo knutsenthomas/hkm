@@ -8759,6 +8759,277 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     left: 9px !important;
 }
 
+/* ==========================================================================
+   Redesigned Varslingsinnstillinger on Min Side
+   ========================================================================== */
+
+.notif-settings-container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 16px 8px;
+}
+
+.notif-settings-card {
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02), 0 2px 8px rgba(15, 23, 42, 0.01);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.notif-card-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.notif-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-icon-circle.push {
+    background-color: rgba(209, 125, 57, 0.1);
+    color: #bd4f2a;
+}
+
+.notif-icon-circle.email {
+    background-color: rgba(71, 85, 105, 0.08);
+    color: #475569;
+}
+
+.notif-icon-circle.time {
+    background-color: rgba(71, 85, 105, 0.08);
+    color: #475569;
+}
+
+.notif-card-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notif-card-title {
+    font-size: 17.5px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.notif-card-description {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.45;
+}
+
+.notif-settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding-left: 66px;
+}
+
+.notif-setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.notif-setting-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.notif-setting-sub-icon {
+    font-size: 20px !important;
+    flex-shrink: 0;
+}
+
+.notif-settings-card.push .notif-setting-sub-icon {
+    color: #bd4f2a;
+}
+
+.notif-settings-card.email .notif-setting-sub-icon {
+    color: #475569;
+}
+
+.notif-setting-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notif-setting-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.3;
+}
+
+.notif-setting-description {
+    font-size: 11.5px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* Custom Premium Toggle Switch */
+.hkm-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.hkm-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.hkm-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ebf2fa;
+    border-radius: 24px;
+    transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hkm-slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hkm-switch input:checked + .hkm-slider::before {
+    transform: translateX(20px);
+}
+
+.hkm-switch.toggle-orange input:checked + .hkm-slider {
+    background-color: #bd4f2a;
+}
+
+.hkm-switch.toggle-slate input:checked + .hkm-slider {
+    background-color: #475569;
+}
+
+/* Time Picker Select */
+.notif-time-select {
+    background-color: #f0f4f9;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1B4965;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    width: 130px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 12px !important;
+    transition: background-color 0.2s ease;
+}
+
+.notif-time-select:hover {
+    background-color: #e5edf5;
+}
+
+/* Footer Section */
+.notif-settings-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding: 0 8px;
+    gap: 16px;
+}
+
+.notif-footer-text {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0;
+}
+
+.notif-save-btn {
+    background-color: #bd4f2a;
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 13.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 14px rgba(189, 79, 42, 0.3);
+}
+
+.notif-save-btn:hover {
+    background-color: #a74220;
+    transform: translateY(-1px);
+}
+
+.notif-save-btn:active {
+    transform: translateY(0);
+}
+
+.notif-save-btn:disabled {
+    background-color: #cbd5e1;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .notif-settings-card {
+        padding: 22px 20px;
+        gap: 22px;
+    }
+    .notif-settings-list {
+        padding-left: 0;
+    }
+    .notif-settings-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: 24px;
+        gap: 16px;
+    }
+    .notif-save-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 
 
 
