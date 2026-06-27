@@ -5563,7 +5563,8 @@ ol.block-list {
 }
 
 .header-actions-dock:hover,
-.header-actions-dock:focus-within {
+.header-actions-dock:focus-within,
+.header-actions-dock.expanded {
     max-width: 320px;
     padding: 3px 16px 3px 3px;
     overflow: visible;
@@ -5597,7 +5598,8 @@ ol.block-list {
 }
 
 .header-actions-dock:hover .header-actions-expandable,
-.header-actions-dock:focus-within .header-actions-expandable {
+.header-actions-dock:focus-within .header-actions-expandable,
+.header-actions-dock.expanded .header-actions-expandable {
     opacity: 1;
     max-width: 260px;
     pointer-events: auto;

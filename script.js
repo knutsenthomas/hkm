@@ -351,11 +351,32 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================================
-// Language Selector Click Toggle (Safari & Touch support)
+// Expandable Dock State Manager & Language Selector click toggle (Safari & Touch support)
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
+    const dock = document.querySelector('.header-actions-dock');
+    if (!dock) return;
+
+    const searchBtn = document.getElementById('global-search-opener');
     const langSwitchers = document.querySelectorAll('.lang-switcher');
-    
+
+    // Keep expanded when search button is focused/clicked
+    if (searchBtn) {
+        searchBtn.addEventListener('focus', () => {
+            dock.classList.add('expanded');
+        });
+        searchBtn.addEventListener('blur', () => {
+            // Delay to see if focus moved inside the dock
+            setTimeout(() => {
+                const activeEl = document.activeElement;
+                const isLangSwitcherActive = Array.from(langSwitchers).some(s => s.classList.contains('active'));
+                if (!dock.contains(activeEl) && !isLangSwitcherActive) {
+                    dock.classList.remove('expanded');
+                }
+            }, 150);
+        });
+    }
+
     langSwitchers.forEach(switcher => {
         const btn = switcher.querySelector('.lang-btn');
         if (!btn) return;
@@ -370,13 +391,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     other.classList.remove('active');
                 }
             });
+
+            // Sync dock expanded state
+            const isAnyActive = Array.from(langSwitchers).some(s => s.classList.contains('active'));
+            if (isAnyActive) {
+                dock.classList.add('expanded');
+            } else {
+                if (!dock.contains(document.activeElement)) {
+                    dock.classList.remove('expanded');
+                }
+            }
         });
     });
 
-    document.addEventListener('click', () => {
-        langSwitchers.forEach(switcher => {
-            switcher.classList.remove('active');
-        });
+    // Close everything when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!dock.contains(e.target)) {
+            dock.classList.remove('expanded');
+            langSwitchers.forEach(switcher => {
+                switcher.classList.remove('active');
+            });
+        }
     });
 });
 
