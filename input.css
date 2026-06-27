@@ -5989,6 +5989,13 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 @media (min-width: 769px) {
     .mega-menu-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(5, 1fr);
         gap: 40px;
     }
 }
