@@ -5580,6 +5580,7 @@ ol.block-list {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 170px;
     opacity: 0;
     pointer-events: none;
     white-space: nowrap;
