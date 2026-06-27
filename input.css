@@ -5607,6 +5607,7 @@ ol.block-list {
     pointer-events: auto;
     transform: translateX(0);
     margin-left: 8px;
+    overflow: visible;
 }
 
 /* Remove default border and background for language button inside the dock */
