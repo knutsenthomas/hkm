@@ -5802,14 +5802,14 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
         display: none;
     }
     #mega-menu>div {
-        padding-top: 85px !important;
-        padding-bottom: 16px !important;
+        padding-top: 80px !important;
+        padding-bottom: 12px !important;
     }
     .mega-menu-grid {
-        gap: 20px !important;
+        gap: 16px !important;
     }
     .menu-section-title {
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
     }
     .mega-nav-list li {
         margin-bottom: 4px !important;
@@ -5818,9 +5818,9 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
         font-size: 1.05rem;
     }
     .mega-menu-footer {
-        margin-top: 15px !important;
-        padding-top: 15px !important;
-        gap: 10px !important;
+        margin-top: 10px !important;
+        padding-top: 10px !important;
+        gap: 8px !important;
     }
     .mega-menu-footer .btn-large {
         padding: 8px 30px !important;
@@ -5835,33 +5835,33 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 /* For screens with comfortable height (e.g. height >= 800px), make it more spacious & premium */
 @media (min-width: 769px) and (min-height: 800px) {
     #mega-menu>div {
-        padding-top: 120px !important;
-        padding-bottom: 40px !important;
+        padding-top: 90px !important;
+        padding-bottom: 16px !important;
     }
     .mega-menu-grid {
-        gap: 40px !important;
+        gap: 24px !important;
     }
     .menu-section-title {
-        margin-bottom: 16px !important;
-    }
-    .mega-nav-list li {
         margin-bottom: 8px !important;
     }
+    .mega-nav-list li {
+        margin-bottom: 6px !important;
+    }
     .mega-nav-list a {
-        font-size: 1.25rem;
+        font-size: 1.15rem;
     }
     .mega-menu-footer {
-        margin-top: 40px !important;
-        padding-top: 30px !important;
-        gap: 16px !important;
+        margin-top: 16px !important;
+        padding-top: 16px !important;
+        gap: 12px !important;
     }
     .mega-menu-footer .btn-large {
-        padding: 12px 48px !important;
-        font-size: 1.05rem !important;
-        min-width: 260px !important;
+        padding: 10px 40px !important;
+        font-size: 1.02rem !important;
+        min-width: 240px !important;
     }
     .menu-footer-links {
-        gap: 20px !important;
+        gap: 16px !important;
     }
 }
 
