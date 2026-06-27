@@ -5570,7 +5570,7 @@ ol.block-list {
 
 .header.scrolled .header-actions-dock,
 .header.menu-open .header-actions-dock {
-    background: rgba(0, 0, 0, 0.04);
+    background: transparent;
     border-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -5664,14 +5664,29 @@ ol.block-list {
 
 .header.scrolled .menu-toggle,
 .header.menu-open .menu-toggle {
-    background: rgba(0, 0, 0, 0.04) !important;
+    background: transparent !important;
     border-color: rgba(0, 0, 0, 0.08) !important;
+    color: var(--text-dark) !important;
+}
+
+.header.scrolled .menu-toggle *,
+.header.menu-open .menu-toggle * {
     color: var(--text-dark) !important;
 }
 
 .header.scrolled .menu-toggle:hover,
 .header.menu-open .menu-toggle:hover {
-    background: rgba(0, 0, 0, 0.08) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Dock Divider */
+.dock-divider {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.header.scrolled .dock-divider,
+.header.menu-open .dock-divider {
+    background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Menu Toggle Icon Visibility */
