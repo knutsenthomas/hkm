@@ -281,8 +281,9 @@ th {
 }
 
 .lang-switcher:hover .lang-dropdown,
+.lang-switcher:focus-within .lang-dropdown,
 .lang-switcher.active .lang-dropdown {
-    display: block;
+    display: block !important;
     animation: fadeInDown 0.3s ease forwards;
 }
 
