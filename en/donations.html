@@ -2,10 +2,47 @@
 <html lang="en">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/en/donations">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/donasjoner">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/donations">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/donaciones">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/donasjoner">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donations | His Kingdom Ministry</title>
-    <meta name="description" content="Support our work at His Kingdom Ministry. View our active fundraising campaigns.">
+    <title>Donations | Support Our Mission | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Support His Kingdom Ministry's mission to spread the Gospel. Your donations fund missionary trips, teaching resources, and community outreach. Give a gift today.">
+    <meta name="keywords" content="donations, support, charity, christian ministry, give, His Kingdom Ministry, mission work, fundraising">
+    
+    <!-- Internationalization -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/en/donations">
+    <meta property="og:title" content="Donations | His Kingdom Ministry">
+    <meta property="og:description" content="Help us make a difference. Support our active fundraising campaigns today.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/en/donations">
+    <meta property="twitter:title" content="Donations | His Kingdom Ministry">
+    <meta property="twitter:description" content="Join our mission by supporting our work through donations.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,72 +52,99 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="../css/cookie-consent.css">
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
 
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="../css/cookie-consent.css">
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+
     <link rel="stylesheet" href="../css/stripe-checkout.css">
     <script src="https://js.stripe.com/v3/"></script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+        
+    <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
 </head>
 
 <body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search the site">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>EN</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <a href="donasjoner.html"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart text-sm"></i>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/en/donations"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donate</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -88,96 +152,221 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search..."
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../donasjoner.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="donations.html" class="text-sm font-bold text-primary-orange">EN</a>
+                            <a href="/en/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../es/donaciones.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Toggle theme" title="Toggle theme">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <div class="mega-menu-body">
-
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
                     <!-- Column 1: Get Involved -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get Involved</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Get Involved</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donations.html">Support our work</a></li>
-                            <li><a href="regular-donors.html">Become a regular donor</a></li>
-                            <li><a href="for-churches.html">For churches</a></li>
-                            <li><a href="for-businesses.html">For businesses</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/donations" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Support the Work</a>
+                                    <span class="mega-menu-desc">Support our ministry financially.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/regular-donors" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a>
+                                    <span class="mega-menu-desc">Partner with us on a monthly basis.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-churches" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For Churches</a>
+                                    <span class="mega-menu-desc">Resources and teaching for your church.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-businesses" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For Businesses</a>
+                                    <span class="mega-menu-desc">Partnership agreements for companies.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Networking for Christian business leaders.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Get to Know Us -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get to Know Us</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Get to Know Us</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="about.html">About the foundation</a></li>
-                            <li><a href="about.html#history">Our history</a></li>
-                            <li><a href="contact.html">Where we work</a></li>
-                            <li><a href="contact.html">Contact us</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/about" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">About Us</a>
+                                    <span class="mega-menu-desc">Learn about our vision, faith, and values.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/contact" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contact Us</a>
+                                    <span class="mega-menu-desc">Send us a message or reach out.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Resources & Media -->
+                    <!-- Column 3: Resources -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Resources</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="events.html">Events</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">News & Blog</a></li>
-                            <li><a href="../minside/index.html">My Page</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Read the Bible</a>
+                                    <span class="mega-menu-desc">Read the Word of God with our reader.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Store</a>
+                                    <span class="mega-menu-desc">Christian apparel, mugs, and more.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Watch messages and listen to podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/teaching" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Courses</a>
+                                    <span class="mega-menu-desc">Teachings and courses for spiritual growth.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Current Activity -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Current Activity</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Reading Plans</a>
+                                    <span class="mega-menu-desc">Follow our structured reading plans.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/events" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Events</a>
+                                    <span class="mega-menu-desc">Join our seminars and gatherings.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">News & Blog</a>
+                                    <span class="mega-menu-desc">Latest updates and articles.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">My Page</a>
+                                    <span class="mega-menu-desc text-primary-orange opacity-90">Your profile and progress.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
+
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donations.html" class="btn btn-primary btn-large btn-block">Support now <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donations.html#tax-deduction">Tax Deduction</a>
-                        <a href="about.html">About us</a>
-                        <a href="privacy.html">Privacy Policy</a>
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
     <main>
         <!-- Page Hero -->
-        <section class="page-hero" data-content-key="hero.backgroundImage"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
+        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
+            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
             <div class="container">
                 <div class="page-hero-content">
-                    <h1 class="page-title">Donations</h1>
+                    <h1 class="page-title" data-content-key="hero.title">Donations</h1>
                     <div class="breadcrumbs">
-                        <a href="index.html">Home</a>
+                        <a href="/">Home</a>
                         <i class="fas fa-chevron-right"></i>
                         <span>Donations</span>
                     </div>
@@ -207,25 +396,24 @@
             <div class="container">
                 <div class="section-header">
                     <span class="section-label">Become a Regular Donor</span>
-                    <h2 class="section-title">Help Create Lasting Change</h2>
-                    <p class="section-description">As a regular donor, you help ensure predictability in our work, so
+                    <h2 class="section-title" data-content-key="regular_donor.title">Help Create Lasting Change</h2>
+                    <p class="section-description" data-content-key="regular_donor.description">As a regular donor, you help ensure predictability in our work, so
                         that we can plan and carry out more projects for God's kingdom.</p>
                 </div>
 
                 <div
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
-                    <!-- Option 1: Vipps -->
+                    <!-- Option 1: Regular Gift (Vipps/Stripe) -->
                     <div
                         style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
                         <div
                             style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-mobile-alt"></i>
+                            <i class="fas fa-hand-holding-heart"></i>
                         </div>
-                        <h3 style="margin-bottom: 15px;">Regular Gift via Vipps</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;">The easiest way to become a regular
-                            donor. You create a regular agreement directly in the Vipps app.</p>
-                        <a href="https://vipps.no" target="_blank" class="btn btn-outline"
-                            style="color: #FF5B24; border-color: #FF5B24;">Create in Vipps</a>
+                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.recurring.title">Regular Gift (Vipps / Card)</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.recurring.text">The easiest way to become a regular donor. You easily create a regular agreement with Vipps or card.</p>
+                        <a href="/en/regular-donors" class="btn btn-outline"
+                            style="color: #FF5B24; border-color: #FF5B24;" data-content-key="regular_donor.recurring.cta">Create regular gift</a>
                     </div>
 
                     <!-- Option 2: Bank Transfer -->
@@ -235,22 +423,24 @@
                             style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
                             <i class="fas fa-university"></i>
                         </div>
-                        <h3 style="margin-bottom: 15px;">Bank Transfer</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;">Set up a regular transfer in your
+                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Bank Transfer</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Set up a regular transfer in your
                             online bank to our account. This gives us the lowest fees.</p>
                         <div
-                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);">
-                            Account: 3000.66.08759
+                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange); line-height: 1.5;" data-content-key="regular_donor.bank.account">
+                            IBAN: NO72 3000 6608 759<br>
+                            BIC/SWIFT: SPSONO22<br>
+                            Bank: Sparebanken Sør
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 60px; text-align: center; background: var(--bg-light); padding: 30px; border-radius: 15px;"
                     id="tax-deduction">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"
+                    <h4 style="margin-bottom: 10px;" data-content-key="regular_donor.tax.title"><i class="fas fa-info-circle"
                             style="margin-right: 10px; color: var(--primary-orange);"></i>Did you know you get a tax
                         deduction?</h4>
-                    <p style="max-width: 800px; margin: 0 auto;">Gifts to His Kingdom Ministry are eligible for a tax
+                    <p style="max-width: 800px; margin: 0 auto;" data-content-key="regular_donor.tax.description">Gifts to His Kingdom Ministry are eligible for a tax
                         deduction if the total gifts during a calendar year are at least 500 NOK. To receive a
                         deduction, we must have your social security number (11 digits, for Norwegian residents).</p>
                 </div>
@@ -269,7 +459,7 @@
                 </div>
 
                 <div style="max-width: 700px; margin: 0 auto;">
-                    <form class="donation-form-content"
+                    <form name="donation" method="post" action="" class="donation-form-content"
                         style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
                         <!-- Amount Selection -->
                         <div style="margin-bottom: 30px;">
@@ -295,6 +485,14 @@
                                 style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                         </div>
 
+                        <!-- Purpose Selection -->
+                        <div style="margin-bottom: 30px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">What would you like to support?</label>
+                            <select id="donation-purpose" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; background: white; outline: none; cursor: pointer; transition: border-color 0.3s ease;">
+                                <option value="general">General donation (where it is needed most)</option>
+                            </select>
+                        </div>
+
                         <!-- Payment Method -->
                         <div style="margin-bottom: 30px;">
                             <label
@@ -316,6 +514,12 @@
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                                    <input type="radio" name="payment-method" value="paypal" style="margin-right: 10px;">
+                                    <span style="font-weight: 600;"><i class="fab fa-paypal"
+                                            style="margin-right: 8px; color: #003087;"></i>PayPal</span>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
                                     <input type="radio" name="payment-method" value="bank" style="margin-right: 10px;">
                                     <span style="font-weight: 600;"><i class="fas fa-university"
                                             style="margin-right: 8px; color: #2196F3;"></i>Bank</span>
@@ -329,29 +533,43 @@
                                 style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">Your
                                 Information</label>
                             <div style="display: grid; gap: 15px;">
-                                <input type="text" id="donor-name" placeholder="Full Name" required
+                                <label for="donor-name" class="sr-only">Full Name</label>
+                                <input type="text" id="donor-name" name="name" autocomplete="name" placeholder="Full Name" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="email" id="donor-email" placeholder="Email Address" required
+                                <label for="donor-email" class="sr-only">Email Address</label>
+                                <input type="email" id="donor-email" name="email" autocomplete="email" placeholder="Email Address" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="tel" id="donor-phone" placeholder="Mobile Number" required
+                                <label for="donor-phone" class="sr-only">Mobile Number</label>
+                                <input type="tel" id="donor-phone" name="tel" autocomplete="tel" placeholder="Mobile Number" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="text" id="donor-address" placeholder="Address"
+                                <label for="donor-address" class="sr-only">Address</label>
+                                <input type="text" id="donor-address" name="address" autocomplete="street-address" placeholder="Address"
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                                 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
-                                    <input type="text" id="donor-zip" placeholder="Zip code"
-                                        style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                    <input type="text" id="donor-city" placeholder="City"
-                                        style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                                    <div>
+                                        <label for="donor-zip" class="sr-only">Zip code</label>
+                                        <input type="text" id="donor-zip" name="postal-code" autocomplete="postal-code" placeholder="Zip code"
+                                            style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div>
+                                        <label for="donor-city" class="sr-only">City</label>
+                                        <input type="text" id="donor-city" name="city" autocomplete="address-level2" placeholder="City"
+                                            style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                                    </div>
                                 </div>
+                                <label for="donor-message" class="sr-only">Message (optional)</label>
                                 <textarea id="donor-message" placeholder="Message (optional)" rows="4"
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                             </div>
                         </div>
 
+                        <!-- PayPal Button Container -->
+                        <div id="paypal-button-container" style="display: none; margin-bottom: 20px;"></div>
+
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary"
                             style="width: 100%; padding: 18px; font-size: 18px; font-weight: 600;">
-                            <i class="fas fa-heart" style="margin-right: 10px;"></i>Give Gift Now
+                            <i class="fas fa-heart" style="margin-right: 8px;"></i>Give Gift Now
                         </button>
 
                         <p style="text-align: center; margin-top: 20px; color: var(--text-light); font-size: 14px;">
@@ -399,9 +617,9 @@
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/en/" class="logo">
                             <div class="logo-icon">
-                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
@@ -413,28 +631,30 @@
                         <div class="nav-col">
                             <h4>About us</h4>
                             <ul>
-                                <li><a href="index.html">Home</a></li>
-                                <li><a href="about.html">Who are we?</a></li>
-                                <li><a href="about.html#vision">Our vision</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Resources</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Teaching</a></li>
-                                <li><a href="events.html">E-courses</a></li>
-                                <li><a href="blog.html">Books & Blog</a></li>
-                                <li><a href="../minside/index.html">My Page</a></li>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+
+                                <li><a href="/en/events">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
@@ -443,10 +663,10 @@
                         <div class="nav-col">
                             <h4>Involvement</h4>
                             <ul>
-                                <li><a href="events.html">Calendar</a></li>
-                                <li><a href="donations.html">Give a gift</a></li>
-                                <li><a href="privacy.html">Privacy Policy</a></li>
-                                <li><a href="accessibility.html">Accessibility</a></li>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
                             </ul>
                         </div>
                     </div>
@@ -468,7 +688,7 @@
 
                     <div class="footer-card contact-card">
                         <h3>Contact Us</h3>
-                        <a href="contact.html" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
@@ -494,7 +714,7 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -505,21 +725,55 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-    <!-- Firebase Config & Service -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
 
     <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/stripe-checkout.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../js/paypal-checkout.js"></script>
     <script>
         window.addEventListener('load', function () {
             setTimeout(function () {
                 if (typeof initDonationForm === 'function') {
                     initDonationForm();
                 }
+
+                // Toggle PayPal container and default submit button based on selected payment method
+                const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+                const submitBtn = document.querySelector('.donation-form-content button[type="submit"]');
+                const paypalContainer = document.getElementById('paypal-button-container');
+                const stripeContainer = document.getElementById('stripe-checkout-container');
+
+                function handlePaymentMethodChange() {
+                    const selectedMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                    
+                    if (selectedMethod === 'paypal') {
+                        if (submitBtn) submitBtn.style.display = 'none';
+                        if (stripeContainer) stripeContainer.style.display = 'none';
+                        if (paypalContainer) {
+                            paypalContainer.style.display = 'block';
+                            if (typeof window.initPayPalDonation === 'function') {
+                                window.initPayPalDonation();
+                            }
+                        }
+                    } else {
+                        if (submitBtn) submitBtn.style.display = 'block';
+                        if (paypalContainer) paypalContainer.style.display = 'none';
+                    }
+                }
+
+                paymentMethodRadios.forEach(radio => {
+                    radio.addEventListener('change', handlePaymentMethodChange);
+                });
+
+                // Default to card if no method is selected yet
+                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="card"]');
+                if (defaultPaymentMethod && !document.querySelector('input[name="payment-method"]:checked')) {
+                    defaultPaymentMethod.checked = true;
+                }
+
+                // Trigger initial check
+                handlePaymentMethodChange();
 
                 const donationForm = document.querySelector('.donation-form-content');
                 if (donationForm) {
@@ -537,11 +791,18 @@
                         }
 
                         if (amount > 0) {
+                            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+                            if (!selectedPaymentMethod) {
+                                alert("Please choose a payment method.");
+                                return;
+                            }
+
                             const getValue = (id) => {
                                 const el = document.getElementById(id);
                                 return el ? el.value : '';
                             };
 
+                            const fundSelect = document.getElementById('donation-purpose');
                             const customerDetails = {
                                 name: getValue('donor-name'),
                                 email: getValue('donor-email'),
@@ -549,10 +810,22 @@
                                 address: getValue('donor-address'),
                                 zip: getValue('donor-zip'),
                                 city: getValue('donor-city'),
-                                message: getValue('donor-message')
+                                message: getValue('donor-message'),
+                                userId: (window.firebase && firebase.auth && firebase.auth().currentUser) ? firebase.auth().currentUser.uid : null,
+                                fund: fundSelect ? fundSelect.value : 'general'
                             };
 
-                            initializeStripe(amount, customerDetails);
+                            if (selectedPaymentMethod.value === 'vipps') {
+                                if (typeof startVippsPayment !== 'function') {
+                                    alert("Vipps payment is not available right now. Please try again shortly.");
+                                    return;
+                                }
+
+                                startVippsPayment(amount, customerDetails);
+                                return;
+                            }
+
+                            initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Please select or enter an amount.");
                         }
@@ -605,6 +878,31 @@
         });
     </script>
     <script type="module" src="../js/cookie-consent.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Close search">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Search the site</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="What are you looking for? Type for suggestions..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Press 'Enter' for full search.</span>
+            </div>
+
+        </div>
+    </div>
 </body>
 
 </html>

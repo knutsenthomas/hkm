@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/es/detalles-plan-lectura">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/leseplan-detaljer">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/reading-plan-details">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/detalles-plan-lectura">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/leseplan-detaljer">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del plan de lectura | His Kingdom Ministry</title>
+    <meta name="description" content="Información detallada sobre nuestros planes de lectura en His Kingdom Ministry.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../styles.css?v=2026.06.21.0009">
+    <link rel="stylesheet" href="../css/subpage-hero.css">
+    <link rel="stylesheet" href="../css/cookie-consent.css">
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+
+    <style>
+        :root {
+            --primary-orange: #d17d39;
+            --primary-red: #bd4f2a;
+            --primary-blue: #1B4965;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #f1f5f9;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+        }
+
+        html[data-theme="dark"] {
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --bg-light: #0f172a;
+            --bg-white: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: radial-gradient(circle at 10% 20%, rgba(27, 73, 101, 0.02) 0%, rgba(255, 255, 255, 0) 90%), var(--bg-light);
+            margin: 0;
+        }
+
+        .details-layout {
+            padding: 80px 0 120px;
+        }
+
+        .details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        /* Card styles */
+        .card {
+            background: var(--bg-white);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px -10px rgba(27, 73, 101, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-orange), rgba(209, 125, 57, 0.3));
+        }
+
+        .card.no-stripe::before {
+            display: none;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0 0 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .card-title-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--primary-orange);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* About Section */
+        .plan-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* Stats Grid inside the card */
+        .plan-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-light);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        @media (max-width: 768px) {
+            .details-container {
+                padding: 0 12px;
+                gap: 20px;
+            }
+
+            .card {
+                padding: 24px 16px;
+                border-radius: 16px;
+                margin-bottom: 20px;
+            }
+
+            .day-item {
+                padding: 16px;
+                border-radius: 12px;
+                gap: 8px;
+            }
+
+            .day-header-info {
+                gap: 8px;
+            }
+
+            .day-badge-num {
+                padding: 4px 10px;
+                font-size: 0.8rem;
+            }
+
+            .day-verses {
+                font-size: 1rem;
+            }
+
+            .day-prayer {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .plan-stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        .other-plans-section {
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            padding-top: 48px;
+        }
+
+        .section-title-premium {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0 0 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-premium {
+            color: var(--primary-orange);
+            font-size: 2rem;
+        }
+
+        .other-plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .other-plan-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px -6px rgba(27, 73, 101, 0.08);
+            border: 1px solid var(--border);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .other-plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 32px -8px rgba(27, 73, 101, 0.12);
+            border-color: rgba(209, 125, 57, 0.3);
+        }
+
+        .other-plan-image-wrapper {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        .other-plan-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .other-plan-card:hover .other-plan-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .other-plan-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            color: var(--primary-orange);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 2;
+        }
+
+        .other-plan-content {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .other-plan-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .other-plan-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .other-plan-footer {
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .other-plan-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Day Outline List */
+        .day-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .day-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 24px;
+            background: var(--bg-white);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.015);
+        }
+
+        .day-item:hover {
+            border-color: rgba(209, 125, 57, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(209, 125, 57, 0.12), 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .day-header-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .day-badge-num {
+            background: linear-gradient(135deg, rgba(209, 125, 57, 0.1), rgba(189, 79, 42, 0.1));
+            color: var(--primary-red);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(209, 125, 57, 0.15);
+            white-space: nowrap;
+            letter-spacing: 0.03em;
+        }
+
+        .day-verses {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .day-prayer {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-left: 0;
+            border-left: 3px solid var(--primary-orange);
+            background: var(--bg-light);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.6;
+        }
+
+        /* Sidebar Sticky Card */
+        .sidebar-card {
+            position: sticky;
+            top: 120px;
+            background: var(--bg-white);
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 40px -15px rgba(27, 73, 101, 0.08), 0 1px 3px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .sidebar-duration-badge {
+            display: inline-flex;
+            align-self: center;
+            background: #fff7ed;
+            color: var(--primary-orange);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 6px 18px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(209, 125, 57, 0.15);
+        }
+
+        .btn-start-plan {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-red));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 24px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+
+        .btn-start-plan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(209, 125, 57, 0.45);
+            filter: brightness(1.05);
+        }
+
+        .btn-start-plan:active {
+            transform: scale(0.98);
+        }
+
+        /* Sidebar info list */
+        .sidebar-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 24px;
+            margin-top: 8px;
+        }
+
+        .sidebar-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-info-item i {
+            color: var(--primary-blue);
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Error/Loading State */
+        .state-container {
+            text-align: center;
+            padding: 96px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .state-icon {
+            font-size: 3.5rem;
+            color: var(--primary-orange);
+            margin-bottom: 24px;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-bottom-color: var(--primary-orange);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .details-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .sidebar-card {
+                position: static;
+            }
+        }
+
+        .resource-link:hover {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)) !important;
+            color: white !important;
+            border-color: transparent !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
+        }
+
+        .print-only-header {
+            display: none;
+        }
+
+        .hidden-day {
+            display: none !important;
+        }
+
+        /* Felles forbedring av hero-lesbarhet */
+        .page-hero-title {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+        .page-hero-subtitle {
+            color: #f1f5f9 !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        }
+        .hero-breadcrumbs, .hero-breadcrumbs a, .hero-breadcrumbs span {
+            color: #e2e8f0 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+        }
+        .hero-breadcrumbs a:hover {
+            color: #ffffff !important;
+        }
+    </style>
+    <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/es/detalles-plan-lectura">
+    <meta property="og:title" content="Detalles del plan de lectura | His Kingdom Ministry">
+    <meta property="og:description" content="Información detallada sobre nuestros planes de lectura en His Kingdom Ministry.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1504052442567-82d3fe047e35?auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/es/detalles-plan-lectura">
+    <meta property="twitter:title" content="Detalles del plan de lectura | His Kingdom Ministry">
+    <meta property="twitter:description" content="Información detallada sobre nuestros planes de lectura en His Kingdom Ministry.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1504052442567-82d3fe047e35?auto=format&fit=crop&w=1920&q=80">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl text-white">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>ES</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/es/donaciones"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donar</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Involúcrate -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donaciones" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Apoya la obra</a>
+                                    <span class="mega-menu-desc">Apoya nuestro ministerio financieramente.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a>
+                                    <span class="mega-menu-desc">Únete a nosotros con un apoyo mensual.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-iglesias" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">Para iglesias</a>
+                                    <span class="mega-menu-desc">Recursos y enseñanza para tu iglesia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-empresas" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">Para empresas</a>
+                                    <span class="mega-menu-desc">Acuerdos de patrocinio para empresas.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Red para líderes y empresarios cristianos.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Conócenos -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Sobre nosotros</a>
+                                    <span class="mega-menu-desc">Conoce nuestra visión, fe y valores.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/contacto" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contáctanos</a>
+                                    <span class="mega-menu-desc">Envíanos un mensaje o pregunta.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Recursos -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a>
+                                    <span class="mega-menu-desc">Lee la Palabra de Dios con nuestra biblia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Tienda</a>
+                                    <span class="mega-menu-desc">Ropa, tazas y accesorios cristianos.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Mira mensajes y escucha podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a>
+                                    <span class="mega-menu-desc">Enseñanzas y cursos para el crecimiento.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Actividad reciente -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Actividad reciente</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a>
+                                    <span class="mega-menu-desc">Sigue nuestros planes diarios de lectura.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/eventos" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Eventos</a>
+                                    <span class="mega-menu-desc">Únete a nuestros seminarios y reuniones.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Noticias y Blog</a>
+                                    <span class="mega-menu-desc">Últimas actualizaciones y artículos.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Mi página</a>
+                                    <span class="mega-menu-desc text-primary-orange opacity-90">Tu perfil y planes personales.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="page-hero subpage-hero"
+        style="background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1504052442567-82d3fe047e35?auto=format&fit=crop&w=1920&q=80') !important; background-size: cover !important; background-position: center center !important; background-repeat: no-repeat !important;">
+        <div class="container">
+            <h1 class="page-hero-title" id="plan-hero-title">Detalles del plan de lectura</h1>
+            <p class="page-hero-subtitle" id="plan-hero-subtitle" style="display: none; font-size: 1.15rem; opacity: 0.9; margin-top: 8px; font-weight: 500;"></p>
+            <nav class="hero-breadcrumbs">
+                <a href="/es/">Inicio</a>
+                <span class="separator">/</span>
+                <a href="/es/leseplaner.html">Planes de lectura</a>
+                <span class="separator">/</span>
+                <span class="current" id="plan-breadcrumb">Plan de lectura</span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Main Detail Layout -->
+    <main class="details-layout" id="main-content">
+        <div class="details-container" id="details-view" style="display: none;">
+            <!-- Print Only Header -->
+            <div class="print-only-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1B4965; padding-bottom: 8px; margin-bottom: 20px;">
+                    <span style="font-size: 12pt; font-weight: 800; color: #1B4965; letter-spacing: 0.5px;">HIS KINGDOM MINISTRY</span>
+                    <span style="font-size: 9pt; color: #64748b;">hiskingdomministry.no</span>
+                </div>
+                <div class="print-intro" style="margin-bottom: 24px; padding: 12px 16px; background: #f8fafc; border-left: 4px solid #1B4965; border-radius: 4px; font-size: 10pt; line-height: 1.5; color: #334155;">
+                    <strong>Guía de Estudio y Plan de Lectura:</strong> Bienvenido a este plan de lectura de His Kingdom Ministry. Utilice esta guía para la reflexión diaria, la lectura de la Biblia y la oración. Marque cada día a medida que complete su lectura para seguir su progreso.
+                </div>
+                <div id="print-plan-overview" style="margin-bottom: 24px;"></div>
+            </div>
+
+            <!-- Left Side: Content -->
+            <div class="left-content">
+                <!-- Description -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> Acerca del plan de lectura
+                    </h2>
+                    <p class="plan-description" id="plan-description-text">No hay descripción disponible.</p>
+
+                    <!-- Stats Grid -->
+                    <div class="plan-stats-grid">
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">schedule</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Duración</span>
+                                <span class="stat-value" id="stat-duration">0 días</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">menu_book</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Alcance</span>
+                                <span class="stat-value" id="stat-scope">Plan de lectura</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols-outlined stat-icon">speed</span>
+                            <div class="stat-content">
+                                <span class="stat-label">Ritmo diario</span>
+                                <span class="stat-value" id="stat-pace">~10 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Screen Overview Card -->
+                <div id="screen-plan-overview" class="card print:hidden" style="display: none;"></div>
+
+                <!-- Day outline list -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> Contenido del plan
+                    </h2>
+                    <div class="day-list" id="days-list-container">
+                        <!-- Hydrated by Javascript -->
+                    </div>
+                </div>
+
+                <!-- Copyright under print -->
+                <div class="print-only-copyright">
+                    © 2026 His Kingdom Ministry. Todos los derechos reservados.
+                </div>
+            </div>
+
+            <!-- Right Side: Sidebar -->
+            <aside class="right-sidebar">
+                <div class="sidebar-card no-stripe">
+                    <h3 class="sidebar-title" id="sidebar-plan-title">Plan de lectura</h3>
+                    <div class="sidebar-duration-badge" id="plan-duration-badge">0 días</div>
+                    
+                    <div class="sidebar-info-list">
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span><strong>Duración:</strong> <span id="info-duration-text">0 días</span></span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span><strong>Categoría:</strong> Plan de lectura</span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span><strong>Nivel:</strong> Disponible para todos</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-start-plan" id="start-plan-btn">
+                        Comenzar este plan <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-card no-stripe" style="margin-top: 24px;">
+                    <h3 class="sidebar-title" style="font-size: 18px; margin-bottom: 16px;">Compartir y herramientas</h3>
+                    
+                    <div class="tools-buttons" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                        <button class="btn-tool" onclick="window.print()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease;">
+                            <span class="material-symbols-outlined text-lg">print</span>
+                            Imprimir / Guardar PDF
+                        </button>
+                    </div>
+                    
+                    <div class="share-social-grid" style="display: flex; align-items: center; gap: 12px; justify-content: center;">
+                        <a id="share-fb-link" href="#" target="_blank" class="share-btn fb" title="Compartir en Facebook" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #1877f2; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a id="share-tw-link" href="#" target="_blank" class="share-btn tw" title="Compartir en X (Twitter)" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #000000; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: white;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                        </a>
+                        <a id="share-wa-link" href="#" target="_blank" class="share-btn wa" title="Compartir en WhatsApp" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #25d366; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; text-decoration: none;">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <button class="share-btn link" onclick="copyShareLink()" id="copy-link-btn" title="Copiar enlace" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #e2e8f0; color: #475569; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">link</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Other Plans Section -->
+            <div class="other-plans-section" style="grid-column: 1 / -1; margin-top: 48px;">
+                <h2 class="section-title-premium">
+                    <span class="material-symbols-outlined icon-premium">explore</span> Explorar otros planes de lectura
+                </h2>
+                <div class="other-plans-grid" id="other-plans-grid">
+                    <!-- Hydrated by Javascript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="state-container" id="loading-state">
+            <div class="loader"></div>
+            <p style="margin-top: 16px; font-weight: 500; color: var(--text-muted);">Cargando detalles del plan de lectura...</p>
+        </div>
+
+        <!-- Error State -->
+        <div class="state-container" id="error-state" style="display: none;">
+            <span class="material-symbols-outlined state-icon" style="color: #ef4444;">error</span>
+            <h2 style="color: var(--primary-blue); font-weight: 800; margin-bottom: 8px;">Plan de lectura no encontrado</h2>
+            <p style="color: var(--text-muted); margin-bottom: 24px;">El plan de lectura que intenta ver no existe o ha sido eliminado.</p>
+            <a href="/es/leseplaner.html" class="btn-start-plan" style="max-width: 250px; margin: 0 auto;">Volver a los planes de lectura</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="/es/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro
+                            dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes
+                            misioneros.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Sobre nosotros</h4>
+                            <ul>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Recursos</h4>
+                            <ul>
+                                <li><a href="/bibel">Biblia</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Participación</h4>
+                            <ul>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Haz un donativo</a></li>
+                                <li><a href="/es/privacidad">Privacidad</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Síguenos</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contáctanos</h3>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Teléfono:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Nº de cuenta:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- App scripts -->
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
+    <script type="module" src="../js/i18n.js"></script>
+
+    <!-- Fetch & Render Logic -->
+    <script type="module">
+        (async function () {
+            const lang = document.documentElement.lang || 'no';
+            // Wait for firebaseService to be registered on window
+            let service = window.firebaseService;
+            if (!service) {
+                let count = 0;
+                while (!window.firebaseService && count < 80) {
+                    await new Promise(r => setTimeout(r, 50));
+                    count++;
+                }
+                service = window.firebaseService;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('id');
+
+            if (!planId || !service) {
+                showErrorState();
+                return;
+            }
+
+            try {
+                const planData = await service.getDoc('reading_plans', planId);
+                if (!planData) {
+                    showErrorState();
+                    return;
+                }
+
+                let plan = { id: planId, ...planData };
+                if (window.contentManager) {
+                    plan = window.contentManager.getLocalizedContentItem(plan);
+                }
+                renderPlanDetails(plan);
+
+                // Load other reading plans to show at the bottom
+                try {
+                    const rawPlans = await service.getCollection('reading_plans');
+                    const plans = rawPlans.map(p => window.contentManager ? window.contentManager.getLocalizedContentItem(p) : p);
+                    const otherPlans = plans.filter(p => p.id !== planId).slice(0, 3);
+                    renderOtherPlans(otherPlans);
+                } catch (collErr) {
+                    console.error("Error loading other plans:", collErr);
+                }
+            } catch (err) {
+                console.error("Error loading plan details:", err);
+                showErrorState();
+            }
+
+            function renderPlanDetails(plan) {
+                // Populate share links
+                const shareUrl = window.location.href;
+                const encodedUrl = encodeURIComponent(shareUrl);
+                
+                const fbLink = document.getElementById('share-fb-link');
+                if (fbLink) fbLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                
+                const twLink = document.getElementById('share-tw-link');
+                if (twLink) twLink.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent("¡Mira este plan de lectura de His Kingdom Ministry!")}`;
+                
+                const waLink = document.getElementById('share-wa-link');
+                if (waLink) waLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent("¡Mira este plan de lectura de His Kingdom Ministry: " + shareUrl)}`;
+
+                // Intercept share clicks on mobile/modern browsers if Web Share API is available
+                const handleShare = async (e, platform, fallbackUrl) => {
+                    if (navigator.share) {
+                        e.preventDefault();
+                        try {
+                            if (platform === 'fb') {
+                                // Facebook iOS app share extension requires sharing ONLY the URL to trigger rich link previews.
+                                // Passing text/title causes it to fall back to plain-text sharing without generating the card preview.
+                                await navigator.share({
+                                    url: shareUrl
+                                });
+                            } else {
+                                await navigator.share({
+                                    title: plan.title,
+                                    text: plan.description || plan.subtitle || "¡Mira este plan de lectura de His Kingdom Ministry!",
+                                    url: shareUrl
+                                });
+                            }
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                window.open(fallbackUrl, '_blank');
+                            }
+                        }
+                    }
+                };
+
+                if (fbLink) fbLink.addEventListener('click', (e) => handleShare(e, 'fb', fbLink.href));
+                if (twLink) twLink.addEventListener('click', (e) => handleShare(e, 'tw', twLink.href));
+                if (waLink) waLink.addEventListener('click', (e) => handleShare(e, 'wa', waLink.href));
+
+                // Set text fields
+                document.getElementById('plan-hero-title').textContent = plan.title;
+                document.getElementById('plan-breadcrumb').textContent = plan.title;
+                document.getElementById('plan-description-text').textContent = plan.description || 'No hay descripción disponible.';
+                document.getElementById('sidebar-plan-title').textContent = plan.title;
+                document.getElementById('plan-duration-badge').textContent = `${plan.durationDays} días`;
+
+                // Populate print titles
+                const printTitle = document.getElementById('print-plan-title');
+                if (printTitle) printTitle.textContent = plan.title;
+                const printSubtitle = document.getElementById('print-plan-subtitle');
+                if (printSubtitle) printSubtitle.textContent = plan.subtitle || 'Plan de Lectura';
+
+                // Populate stats grid
+                const durationEl = document.getElementById('stat-duration');
+                if (durationEl) durationEl.textContent = `${plan.durationDays} días`;
+
+                const scopeEl = document.getElementById('stat-scope');
+                if (scopeEl) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('historisk') || titleLower.includes('sprint') || titleLower.includes('balansert') || titleLower.includes('chronological')) {
+                        scopeEl.textContent = 'Toda la Biblia';
+                    } else if (titleLower.includes('johannes') || titleLower.includes('john')) {
+                        scopeEl.textContent = 'Evangelio de Juan';
+                    } else if (titleLower.includes('romer') || titleLower.includes('roman')) {
+                        scopeEl.textContent = 'Romanos';
+                    } else if (titleLower.includes('apostlene') || titleLower.includes('acts')) {
+                        scopeEl.textContent = 'Hechos';
+                    } else if (titleLower.includes('ordspråk') || titleLower.includes('proverb')) {
+                        scopeEl.textContent = 'Proverbios';
+                    } else if (titleLower.includes('rut') || titleLower.includes('ester') || titleLower.includes('ruth') || titleLower.includes('esther')) {
+                        scopeEl.textContent = 'Rut y Ester';
+                    } else {
+                        scopeEl.textContent = 'Escrituras seleccionadas';
+                    }
+                }
+
+                const paceEl = document.getElementById('stat-pace');
+                if (paceEl) {
+                    const titleLower = plan.title.toLowerCase();
+                    if (titleLower.includes('sprint')) {
+                        paceEl.textContent = '~30-40 min';
+                    } else if (titleLower.includes('historisk') || titleLower.includes('balansert') || titleLower.includes('chronological')) {
+                        paceEl.textContent = '~15-20 min';
+                    } else {
+                        paceEl.textContent = '~5-10 min';
+                    }
+                }
+                const infoDur = document.getElementById('info-duration-text');
+                if (infoDur) infoDur.textContent = `${plan.durationDays} días`;
+
+                // Subtitle
+                if (plan.subtitle) {
+                    const subtitleEl = document.getElementById('plan-hero-subtitle');
+                    if (subtitleEl) {
+                        subtitleEl.textContent = plan.subtitle;
+                        subtitleEl.style.display = 'block';
+                    }
+                }
+
+                // Hero background image
+                if (plan.imageUrl) {
+                    const heroSection = document.querySelector('.page-hero');
+                    if (heroSection) {
+                        heroSection.style.setProperty('background-image', `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('${plan.imageUrl}')`, 'important');
+                    }
+                }
+
+                // Populate print overview section
+                const printOverview = document.getElementById('print-plan-overview');
+                if (printOverview) {
+                    if (plan.introduction) {
+                        const intro = plan.introduction;
+                        const themesHtml = (intro.themes || []).map(t => `
+                            <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px;">
+                                <strong style="color: #1B4965; font-size: 8.5pt;">${escapeHtml(t.title)}:</strong>
+                                <span style="color: #475569; font-size: 8pt; line-height: 1.4;">${escapeHtml(t.description)}</span>
+                            </div>
+                        `).join('');
+
+                        const timelineHtml = (intro.structure || []).map(s => `
+                            <div style="position: relative; margin-bottom: 8px;">
+                                <div style="position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #1B4965; border: 1px solid white;"></div>
+                                <strong style="color: #1B4965; font-size: 8.5pt; display: block;">${escapeHtml(s.range)}</strong>
+                                <span style="color: #475569; font-size: 8pt; line-height: 1.3;"><strong>${escapeHtml(s.title)}</strong>${s.description ? `: ${escapeHtml(s.description)}` : ''}</span>
+                            </div>
+                        `).join('');
+
+                        const introTitle = intro.title || (lang === 'en' ? 'Introduction' : (lang === 'es' ? 'Introducción' : 'Introduksjon'));
+                        const themesLabel = lang === 'en' ? 'Key Themes:' : (lang === 'es' ? 'Temas Centrales:' : 'Sentrale Temaer:');
+                        const structureLabel = lang === 'en' ? 'Structure of the Plan:' : (lang === 'es' ? 'Estructura del Plan:' : 'Planens Oppbygning:');
+
+                        printOverview.innerHTML = `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
+                                <h3 style="margin: 0 0 12px 0; color: #1B4965; font-size: 13pt; font-weight: 800; border-bottom: 2px solid #1B4965; padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">menu_book</span> ${escapeHtml(introTitle)}
+                                </h3>
+                                <p style="margin: 0 0 16px 0; font-size: 9.5pt; color: #334155; line-height: 1.5;">
+                                    ${escapeHtml(intro.description)}
+                                </p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div style="background: white; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
+                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">${escapeHtml(themesLabel)}</strong>
+                                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                                            ${themesHtml}
+                                        </div>
+                                    </div>
+                                    <div style="background: white; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
+                                        <strong style="display: block; font-size: 10pt; color: #1B4965; border-bottom: 1.5px solid #1B4965; padding-bottom: 4px; margin-bottom: 4px;">${escapeHtml(structureLabel)}</strong>
+                                        <div style="position: relative; padding-left: 12px; display: flex; flex-direction: column; gap: 10px; border-left: 1.5px solid rgba(27, 73, 101, 0.2); margin-left: 6px; margin-top: 4px;">
+                                            ${timelineHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        printOverview.innerHTML = `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 16px;">
+                                <h3 style="margin: 0 0 8px 0; color: #1B4965; font-size: 11pt; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">${lang === 'en' ? 'About the plan' : (lang === 'es' ? 'Sobre el plan' : 'Om leseplanen')}</h3>
+                                <p style="margin: 0; font-size: 9.5pt; color: #334155; line-height: 1.4;">${escapeHtml(plan.description || '')}</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Populate screen overview section
+                const screenOverview = document.getElementById('screen-plan-overview');
+                if (screenOverview) {
+                    if (plan.introduction) {
+                        const intro = plan.introduction;
+                        const themesHtml = (intro.themes || []).map(t => `
+                            <div class="intro-theme-item">
+                                <strong>${escapeHtml(t.title)}</strong>
+                                <p>${escapeHtml(t.description)}</p>
+                            </div>
+                        `).join('');
+
+                        const timelineHtml = (intro.structure || []).map(s => `
+                            <div class="intro-timeline-item">
+                                <div class="intro-timeline-node"></div>
+                                <div class="intro-timeline-content">
+                                    <strong>${escapeHtml(s.range)}</strong>
+                                    <span><strong style="color: var(--text-dark);">${escapeHtml(s.title)}</strong>${s.description ? `: ${escapeHtml(s.description)}` : ''}</span>
+                                </div>
+                            </div>
+                        `).join('');
+
+                        const introTitle = intro.title || (lang === 'en' ? 'Introduction to the Plan' : (lang === 'es' ? 'Introducción al Plan' : 'Introduksjon til leseplanen'));
+                        const bigIdeaLabel = lang === 'en' ? 'The Big Idea' : (lang === 'es' ? 'La Gran Idea' : 'Den Store Ideen');
+                        const themesLabel = lang === 'en' ? 'Key Themes' : (lang === 'es' ? 'Temas Centrales' : 'Sentrale Temaer');
+                        const structureLabel = lang === 'en' ? 'Structure of the Plan' : (lang === 'es' ? 'Estructura del Plan' : 'Planens Oppbygning');
+
+                        screenOverview.innerHTML = `
+                            <h2 class="card-title">
+                                <span class="card-title-icon"><span class="material-symbols-outlined">menu_book</span></span> ${escapeHtml(introTitle)}
+                            </h2>
+                            <div style="background: rgba(209, 125, 57, 0.05); border-left: 4px solid var(--primary-orange); padding: 16px 20px; border-radius: 0 12px 12px 0; margin-bottom: 24px;">
+                                <strong style="color: var(--primary-orange); display: block; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">${escapeHtml(bigIdeaLabel)}</strong>
+                                <p style="margin: 0; color: var(--text-dark); font-size: 1.05rem; line-height: 1.5; font-weight: 500;">${escapeHtml(intro.bigIdea)}</p>
+                            </div>
+                            <p class="plan-description" style="margin-bottom: 24px; color: var(--text-dark); line-height: 1.6;">
+                                ${escapeHtml(intro.description)}
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 intro-grid-container">
+                                <!-- Sentrale Temaer Card -->
+                                <div class="intro-section-card">
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <span class="material-symbols-outlined" style="color: var(--primary-orange); font-size: 20px; vertical-align: middle;">explore</span> ${escapeHtml(themesLabel)}
+                                    </h3>
+                                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                                        ${themesHtml}
+                                    </div>
+                                </div>
+
+                                <!-- Evangeliets Oppbygning Card (Timeline) -->
+                                <div class="intro-section-card">
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-blue); margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <span class="material-symbols-outlined" style="color: var(--primary-blue); font-size: 20px; vertical-align: middle;">account_tree</span> ${escapeHtml(structureLabel)}
+                                    </h3>
+                                    <!-- Timeline Stepper Container -->
+                                    <div class="intro-timeline">
+                                        ${timelineHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        screenOverview.style.display = 'block';
+                    } else {
+                        screenOverview.style.display = 'none';
+                    }
+                }
+
+                // Render day list
+                const daysList = plan.days || [];
+                daysList.sort((a, b) => a.dayNumber - b.dayNumber);
+
+                const container = document.getElementById('days-list-container');
+                if (daysList.length === 0) {
+                    container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">No se han configurado días para este plan de lectura todavía.</p>`;
+                } else {
+                    const maxInitialDays = 5;
+                    const showExpandButton = daysList.length > maxInitialDays;
+                    const storageKey = `hkm_plan_${plan.id}_completed`;
+                    const pwaKey = `hkm_reading_plan_progress_${plan.id}`;
+                    
+                    const getLocalCompleted = () => {
+                        try {
+                            const pwaData = localStorage.getItem(pwaKey);
+                            if (pwaData) {
+                                const parsed = JSON.parse(pwaData);
+                                if (parsed && Array.isArray(parsed.completedDays)) {
+                                    return parsed.completedDays.map(Number);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Failed to parse local PWA progress:", e);
+                        }
+                        try {
+                            const oldData = localStorage.getItem(storageKey);
+                            if (oldData) {
+                                return JSON.parse(oldData).map(Number);
+                            }
+                        } catch (e) {}
+                        return [];
+                    };
+
+                    let completedDays = getLocalCompleted();
+                    
+                    const renderDayItem = (day, index) => {
+                        const resourcesHtml = renderResources(day.resources);
+                        const isChecked = completedDays.includes(day.dayNumber) ? 'checked' : '';
+                        const isHiddenClass = (showExpandButton && index >= maxInitialDays) ? 'day-item-expandable hidden-day' : '';
+                        const versesText = (day.verses || '').trim();
+                        const isReflection = !versesText || versesText.toLowerCase() === 'reflexión' || versesText.toLowerCase() === 'reflexion';
+                        const versesHtml = isReflection 
+                            ? `<span>Reflexión</span>` 
+                            : `<a href="/es/bibel.html?ref=${encodeURIComponent(versesText)}" class="verse-link" style="color: var(--primary-orange); text-decoration: underline; font-weight: 600; cursor: pointer;">${escapeHtml(versesText)}</a>`;
+                        return `
+                            <div class="day-item ${isHiddenClass}">
+                                <div class="day-header-info" style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" class="day-checkbox" data-day="${day.dayNumber}" ${isChecked} style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-orange); margin: 0; flex-shrink: 0;">
+                                    <span class="day-badge-num">Día ${day.dayNumber}</span>
+                                    <span class="day-verses">${versesHtml}</span>
+                                </div>
+                                ${day.prayerFocus ? `<div class="day-prayer"><strong>Enfoque:</strong> ${escapeHtml(day.prayerFocus)}</div>` : ''}
+                                ${resourcesHtml}
+                            </div>
+                        `;
+                    };
+
+                    const html = daysList.map((day, index) => renderDayItem(day, index)).join('');
+                    let containerHtml = html;
+
+                    if (showExpandButton) {
+                        containerHtml += `
+                            <div id="expand-days-container" style="text-align: center; margin-top: 24px;">
+                                <button id="btn-show-all-days" class="btn-start-plan" style="background: none; border: 2px solid var(--primary-orange); color: var(--primary-orange); box-shadow: none; font-size: 0.95rem; padding: 12px 24px; max-width: 250px; margin: 0 auto;">
+                                    Ver los ${daysList.length} días
+                                </button>
+                            </div>
+                        `;
+                    }
+                    container.innerHTML = containerHtml;
+
+                    if (showExpandButton) {
+                        document.getElementById('btn-show-all-days').addEventListener('click', () => {
+                            document.querySelectorAll('.day-item-expandable').forEach(item => {
+                                item.classList.remove('hidden-day');
+                            });
+                            document.getElementById('expand-days-container').style.display = 'none';
+                        });
+                    }
+
+                    // Highlight and scroll to specific day if day parameter is present
+                    const dayParam = urlParams.get('day');
+                    if (dayParam) {
+                        const targetDayNum = parseInt(dayParam, 10);
+                        if (!isNaN(targetDayNum)) {
+                            // Expand the days list if needed
+                            if (showExpandButton && targetDayNum > maxInitialDays) {
+                                const btnShowAll = document.getElementById('btn-show-all-days');
+                                if (btnShowAll) btnShowAll.click();
+                            }
+                            
+                            // Highlight the day item
+                            setTimeout(() => {
+                                const cb = document.querySelector(`.day-checkbox[data-day="${targetDayNum}"]`);
+                                if (cb) {
+                                    const dayItem = cb.closest('.day-item');
+                                    if (dayItem) {
+                                        dayItem.style.border = '2px dashed var(--primary-orange)';
+                                        dayItem.style.backgroundColor = 'rgba(209, 125, 57, 0.04)';
+                                        dayItem.style.borderRadius = '12px';
+                                        dayItem.style.padding = '16px';
+                                        dayItem.style.transition = 'all 0.3s ease';
+                                        dayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }
+                            }, 300);
+                        }
+                    }
+
+                    // Auth Listener to fetch progress from Firestore
+                    if (window.firebase && typeof firebase.auth === 'function') {
+                        firebase.auth().onAuthStateChanged(async (user) => {
+                            if (user) {
+                                try {
+                                    const db = firebase.firestore();
+                                    const userPlanDoc = await db.collection('users')
+                                        .doc(user.uid)
+                                        .collection('reading_plans')
+                                        .doc(plan.id)
+                                        .get();
+                                    
+                                    if (userPlanDoc.exists) {
+                                        const progress = userPlanDoc.data();
+                                        if (progress && Array.isArray(progress.completedDays)) {
+                                            completedDays = progress.completedDays.map(Number);
+                                            document.querySelectorAll('.day-checkbox').forEach(cb => {
+                                                const day = parseInt(cb.dataset.day, 10);
+                                                cb.checked = completedDays.includes(day);
+                                            });
+                                        }
+
+                                        const currentDay = progress.currentDay || 1;
+
+                                        // Update start-plan-btn text and link
+                                        const startBtn = document.getElementById('start-plan-btn');
+                                        if (startBtn) {
+                                            const btnText = lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett');
+                                            const dayLabel = lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag');
+                                            startBtn.style.whiteSpace = 'nowrap';
+                                            startBtn.style.fontSize = '0.95rem';
+                                            startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                                            startBtn.onclick = () => {
+                                                window.location.href = `/bibel.html?plan=${plan.id}&day=${currentDay}`;
+                                            };
+                                        }
+
+                                        // Oppdater meg / Synkroniserings-knapp hvis brukeren ligger bak
+                                        const startedAt = progress.startedAt;
+                                        if (startedAt) {
+                                            const startedAtDate = startedAt.toDate ? startedAt.toDate() : new Date(startedAt);
+                                            const diffTime = new Date() - startedAtDate;
+                                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                                            const expectedDay = Math.min(diffDays + 1, plan.durationDays || plan.days.length);
+
+                                            if (currentDay < expectedDay) {
+                                                let syncContainer = document.getElementById('sync-day-container');
+                                                if (!syncContainer && startBtn) {
+                                                    syncContainer = document.createElement('div');
+                                                    syncContainer.id = 'sync-day-container';
+                                                    syncContainer.style.marginTop = '12px';
+                                                    syncContainer.style.background = 'rgba(209, 125, 57, 0.05)';
+                                                    syncContainer.style.border = '1.5px solid rgba(209, 125, 57, 0.3)';
+                                                    syncContainer.style.borderRadius = '12px';
+                                                    syncContainer.style.padding = '12px';
+                                                    syncContainer.style.display = 'flex';
+                                                    syncContainer.style.flexDirection = 'column';
+                                                    syncContainer.style.gap = '8px';
+
+                                                    startBtn.parentNode.insertBefore(syncContainer, startBtn.nextSibling);
+                                                }
+
+                                                if (syncContainer) {
+                                                    const daysBehind = expectedDay - currentDay;
+                                                    const labelText = lang === 'en' 
+                                                        ? `You are ${daysBehind} days behind schedule.`
+                                                        : (lang === 'es' 
+                                                            ? `Estás ${daysBehind} días atrasado.`
+                                                            : `Du ligger ${daysBehind} dager bak planen.`);
+
+                                                    const btnText = lang === 'en'
+                                                        ? `Update to today's devotion (Day ${expectedDay})`
+                                                        : (lang === 'es'
+                                                            ? `Actualizar al devocional de hoy (Día ${expectedDay})`
+                                                            : `Oppdater til dagens andakt (Dag ${expectedDay})`);
+
+                                                    syncContainer.innerHTML = `
+                                                        <span style="font-size: 12px; color: #b45309; font-weight: 600; text-align: center;">${labelText}</span>
+                                                        <button class="btn-start-plan" id="sync-day-btn" style="background: #c8682a; border: none; font-size: 0.9rem; padding: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                                            <span class="material-symbols-outlined" style="font-size: 18px;">sync</span>
+                                                            ${btnText}
+                                                        </button>
+                                                    `;
+
+                                                    document.getElementById('sync-day-btn').onclick = async () => {
+                                                        const btn = document.getElementById('sync-day-btn');
+                                                        btn.disabled = true;
+                                                        btn.textContent = lang === 'en' ? 'Updating...' : (lang === 'es' ? 'Actualizando...' : 'Oppdaterer...');
+
+                                                        try {
+                                                            await db.collection('users')
+                                                                .doc(user.uid)
+                                                                .collection('reading_plans')
+                                                                .doc(plan.id)
+                                                                .update({
+                                                                    currentDay: expectedDay,
+                                                                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                                });
+
+                                                            const pwaKey = `hkm_reading_plan_progress_${plan.id}`;
+                                                            try {
+                                                                const pwaData = localStorage.getItem(pwaKey);
+                                                                let parsed = pwaData ? JSON.parse(pwaData) : null;
+                                                                if (!parsed) {
+                                                                    parsed = {
+                                                                        planId: plan.id,
+                                                                        currentDay: expectedDay,
+                                                                        completedDays: completedDays,
+                                                                        reflections: {}
+                                                                    };
+                                                                } else {
+                                                                    parsed.currentDay = expectedDay;
+                                                                }
+                                                                localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                                                            } catch (localErr) {
+                                                                console.warn("Failed to update PWA progress localstorage:", localErr);
+                                                            }
+
+                                                            window.location.reload();
+                                                        } catch (err) {
+                                                            console.error("Failed to update progress:", err);
+                                                            alert(lang === 'en' ? 'Could not update plan.' : (lang === 'es' ? 'No se pudo actualizar.' : 'Kunne ikke oppdatere planen.'));
+                                                            btn.disabled = false;
+                                                            btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">sync</span>${btnText}`;
+                                                        }
+                                                    };
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error("Error loading Firestore plan progress:", e);
+                                }
+                            }
+                        });
+                    }
+
+                    // Save checkbox state
+                    container.addEventListener('change', async (e) => {
+                        if (e.target && e.target.classList.contains('day-checkbox')) {
+                            const dayNum = parseInt(e.target.dataset.day, 10);
+                            const isChecked = e.target.checked;
+                            
+                            if (isChecked) {
+                                if (!completedDays.includes(dayNum)) completedDays.push(dayNum);
+                            } else {
+                                completedDays = completedDays.filter(d => d !== dayNum);
+                            }
+                            
+                            localStorage.setItem(storageKey, JSON.stringify(completedDays.map(String)));
+                            
+                            try {
+                                const pwaData = localStorage.getItem(pwaKey);
+                                let parsed = pwaData ? JSON.parse(pwaData) : null;
+                                if (!parsed) {
+                                    parsed = {
+                                        planId: plan.id,
+                                        currentDay: 1,
+                                        completedDays: [],
+                                        reflections: {}
+                                    };
+                                }
+                                parsed.completedDays = completedDays;
+                                localStorage.setItem(pwaKey, JSON.stringify(parsed));
+                            } catch (err) {
+                                console.error("Error updating local PWA progress:", err);
+                            }
+
+                            if (window.firebase && typeof firebase.auth === 'function') {
+                                const user = firebase.auth().currentUser;
+                                if (user) {
+                                    try {
+                                        const db = firebase.firestore();
+                                        const ref = db.collection('users')
+                                            .doc(user.uid)
+                                            .collection('reading_plans')
+                                            .doc(plan.id);
+                                        
+                                        const userPlanDoc = await ref.get();
+                                        let progress = userPlanDoc.exists ? userPlanDoc.data() : null;
+                                        if (!progress) {
+                                            progress = {
+                                                planId: plan.id,
+                                                currentDay: 1,
+                                                completedDays: [],
+                                                reflections: {}
+                                            };
+                                        }
+                                        progress.completedDays = completedDays;
+                                        progress.lastActiveAt = firebase.firestore.FieldValue.serverTimestamp();
+                                        await ref.set(progress);
+                                    } catch (err) {
+                                        console.error("Failed to update Firestore plan progress:", err);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Add button click routing to Bible reader
+                document.getElementById('start-plan-btn').addEventListener('click', () => {
+                    window.location.href = `/es/bibel.html?plan=${plan.id}&day=1`;
+                });
+
+                // Toggle views
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('details-view').style.display = 'grid';
+            }
+
+            function renderResources(resources) {
+                if (!resources || resources.length === 0) return '';
+                
+                const items = resources.map(res => {
+                    let icon = 'fa-link';
+                    if (res.type === 'article') icon = 'fa-file-alt';
+                    else if (res.type === 'video') icon = 'fa-video';
+                    else if (res.type === 'podcast') icon = 'fa-microphone';
+
+                    const title = res.title || 'Recurso';
+                    return `
+                        <div class="resource-item" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <a href="${res.url}" target="_blank" class="resource-link" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; color: var(--primary-orange); background: #fff7ed; border: 1px solid rgba(209,125,57,0.15); padding: 6px 14px; border-radius: 20px; text-decoration: none; transition: all 0.2s ease;">
+                                    <i class="fas ${icon}"></i> ${escapeHtml(title)}
+                                </a>
+                                <button class="qr-toggle-btn hidden md:inline-flex" onclick="toggleQrCode(this)" style="background: none; border: 1px solid #cbd5e1; color: #64748b; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                    <i class="fas fa-qrcode"></i> Ver QR
+                                </button>
+                            </div>
+                            <div class="qr-code-box" style="display: none; align-items: center; gap: 12px; margin-top: 4px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; width: fit-content; box-sizing: border-box;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(res.url)}" alt="Código QR" style="width: 80px; height: 80px; border-radius: 4px; background: white; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" />
+                                <div style="font-size: 0.75rem; color: #475569; line-height: 1.3; text-align: left;">
+                                    <strong style="display: block; margin-bottom: 2px; color: var(--text-dark);">Escanear con el móvil</strong>
+                                    <span>Abre el recurso en tu teléfono.</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="day-resources" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--border); padding-top: 12px; width: 100%;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px; text-align: left;">Recursos:</span>
+                        ${items}
+                    </div>
+                `;
+            }
+
+            function renderOtherPlans(otherPlans) {
+                const otherPlansContainer = document.getElementById('other-plans-grid');
+                if (!otherPlansContainer) return;
+
+                if (!otherPlans || otherPlans.length === 0) {
+                    const sect = document.querySelector('.other-plans-section');
+                    if (sect) sect.style.display = 'none';
+                    return;
+                }
+
+                otherPlansContainer.innerHTML = otherPlans.map(plan => `
+                    <a href="/es/detalles-plan-lectura.html?id=${plan.id}" class="other-plan-card">
+                        <div class="other-plan-image-wrapper">
+                            <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}">
+                            <span class="other-plan-badge">${plan.durationDays} días</span>
+                        </div>
+                        <div class="other-plan-content">
+                            <h3 class="other-plan-title">${escapeHtml(plan.title)}</h3>
+                            <p class="other-plan-desc">${escapeHtml(plan.description || 'No hay descripción disponible.')}</p>
+                        </div>
+                        <div class="other-plan-footer">
+                            <span class="other-plan-link">Ver detalles <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+                        </div>
+                    </a>
+                `).join('');
+            }
+
+            function showErrorState() {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('details-view').style.display = 'none';
+                document.getElementById('error-state').style.display = 'block';
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            window.toggleQrCode = function(btn) {
+                const box = btn.closest('.resource-item').querySelector('.qr-code-box');
+                if (box) {
+                    const isHidden = window.getComputedStyle(box).display === 'none';
+                    if (isHidden) {
+                        box.style.setProperty('display', 'flex', 'important');
+                        btn.innerHTML = '<i class="fas fa-qrcode"></i> Ocultar QR';
+                        btn.style.borderColor = 'var(--primary-orange)';
+                        btn.style.color = 'var(--primary-orange)';
+                    } else {
+                        box.style.setProperty('display', 'none', 'important');
+                        btn.innerHTML = '<i class="fas fa-qrcode"></i> Ver QR';
+                        btn.style.borderColor = '#cbd5e1';
+                        btn.style.color = '#64748b';
+                    }
+                }
+            };
+
+            window.copyShareLink = function() {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const btn = document.getElementById('copy-link-btn');
+                    const origHtml = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; color: #15803d;">check</span>';
+                    btn.style.background = '#dcfce7';
+                    setTimeout(() => {
+                        btn.innerHTML = origHtml;
+                        btn.style.background = '#e2e8f0';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('No se pudo copiar el enlace:', err);
+                });
+            };
+
+            // Auto expand all days for printing
+            window.addEventListener('beforeprint', () => {
+                const btn = document.getElementById('btn-show-all-days');
+                if (btn) {
+                    btn.click();
+                }
+            });
+        })();
+    </script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Cerrar búsqueda">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Buscar en el sitio</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

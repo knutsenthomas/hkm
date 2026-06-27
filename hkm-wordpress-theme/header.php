@@ -41,7 +41,8 @@
                         $languages = pll_the_languages(array('raw' => 1));
                         if ($languages) {
                             foreach ($languages as $lang) {
-                                echo '<a href="' . esc_url($lang['url']) . '" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="' . esc_attr($lang['slug']) . '">' . $lang['flag'] . ' ' . esc_html($lang['name']) . '</a>';
+                                $lang_url = !empty($lang['url']) ? $lang['url'] : pll_home_url($lang['slug']);
+                                echo '<a href="' . esc_url($lang_url) . '" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="' . esc_attr($lang['slug']) . '">' . $lang['flag'] . ' ' . esc_html($lang['name']) . '</a>';
                             }
                         }
                         ?>
@@ -91,7 +92,8 @@
                                 foreach($languages as $lang) {
                                     if($i > 0) echo '<div class="w-px h-3 bg-gray-300"></div>';
                                     $active_class = $lang['current_lang'] ? 'font-bold text-primary-orange' : 'font-semibold text-gray-500 hover:text-primary-orange';
-                                    echo '<a href="' . esc_url($lang['url']) . '" class="text-sm ' . $active_class . '">' . strtoupper(esc_html($lang['slug'])) . '</a>';
+                                    $lang_url = !empty($lang['url']) ? $lang['url'] : pll_home_url($lang['slug']);
+                                    echo '<a href="' . esc_url($lang_url) . '" class="text-sm lang-switch-btn ' . $active_class . '" data-lang="' . esc_attr($lang['slug']) . '">' . strtoupper(esc_html($lang['slug'])) . '</a>';
                                     $i++;
                                 }
                             }

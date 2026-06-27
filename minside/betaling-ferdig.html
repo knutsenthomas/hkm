@@ -2,12 +2,48 @@
 <html lang="no">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyTheme(theme) {
+                const active = theme || (mq.matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', active);
+            }
+            applyTheme(savedTheme);
+            if (!savedTheme) {
+                try {
+                    mq.addEventListener('change', function () {
+                        if (!localStorage.getItem('hkm_theme')) {
+                            applyTheme();
+                        }
+                    });
+                } catch (err) {
+                    try {
+                        mq.addListener(function () {
+                            if (!localStorage.getItem('hkm_theme')) {
+                                applyTheme();
+                            }
+                        });
+                    } catch (e2) {}
+                }
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/minside/betaling-ferdig">
+    <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Betalingsstatus | Min Side</title>
     <!-- Fonts & Icons -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
     <!-- Styles -->
     <style>
         body {
@@ -68,40 +104,127 @@
             margin-bottom: 25px;
         }
 
+        /* Dark mode overrides */
+        html[data-theme="dark"] body {
+            background-color: #0f172a;
+        }
+        html[data-theme="dark"] .status-card {
+            background: #1e293b;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        html[data-theme="dark"] h1 {
+            color: #f8fafc;
+        }
+        html[data-theme="dark"] p {
+            color: #94a3b8;
+        }
+        html[data-theme="dark"] .success {
+            background: #14532d;
+            color: #4ade80;
+        }
+        html[data-theme="dark"] .error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        html[data-theme="dark"] .processing {
+            background: #1e3a8a;
+            color: #60a5fa;
+        }
+
+
         .btn {
             display: inline-block;
             padding: 12px 24px;
-            background: #1B4965;
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.15);
         }
 
         .btn:hover {
-            background: #12344d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(209, 125, 57, 0.3);
+            filter: brightness(1.05);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.15);
+            filter: brightness(0.95);
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
     <script src="https://js.stripe.com/v3/"></script>
 <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-orange': '#f39c12',
+                            'primary-red': '#e74c3c',
+                            'text-dark': '#333333',
+                        }
                     }
                 }
-            }
+            };
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+    <style>
+        .sidebar-nav *, 
+        .mobile-bottom-nav .mobile-nav-item, 
+        .mobile-bottom-nav .mobile-nav-item *, 
+        .nav-link, 
+        .nav-link-wrap, 
+        .nav-item, 
+        .mobile-nav-item, 
+        .mobile-nav-item *,
+        .mega-menu *,
+        .mega-nav-list *,
+        .mega-nav-list a,
+        .menu-footer-links a,
+        #mega-menu a,
+        .header a,
+        #header a {
+            border-bottom: none !important;
+            border-bottom-width: 0px !important;
+            border-bottom-color: transparent !important;
+            border-top: none !important;
+            border-top-width: 0px !important;
+            border-top-color: transparent !important;
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-image: none !important;
+        }
+    </style>
 </head>
 
-<body>
+<body class="cms-loading">
 
     <div class="status-card" id="status-card">
         <div class="icon-circle processing" id="status-icon">
@@ -109,7 +232,7 @@
         </div>
         <h1 id="status-title">Sjekker betaling...</h1>
         <p id="status-message">Vennligst vent mens vi bekrefter betalingen din med banken.</p>
-        <a href="index.html" class="btn hidden" id="action-btn">Tilbake til Min Side</a>
+        <a href="/minside/index.html" class="btn hidden" id="action-btn">Tilbake til Min Side</a>
     </div>
 
     <!-- Firebase SDK (for logging if needed) -->
@@ -163,10 +286,31 @@
                         icon.className = 'icon-circle processing';
                         icon.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
                         title.innerText = "Behandler betaling...";
-                        message.innerText = "Betalingen behandles fortsatt av banken (f.eks. Vipps). Vi oppdaterer statusen snart.";
-                        // Refresh page after 5 seconds to check again
-                        setTimeout(() => location.reload(), 5000);
-                        return; // Don't show button yet
+                        message.innerText = "Betalingen behandles fortsatt av banken. Vi oppdaterer statusen snart.";
+                        
+                        let attempts = 0;
+                        try {
+                            attempts = parseInt(sessionStorage.getItem('payment_check_attempts') || '0', 10);
+                        } catch (e) {}
+
+                        if (attempts < 3) {
+                            try {
+                                sessionStorage.setItem('payment_check_attempts', (attempts + 1).toString());
+                            } catch (e) {}
+                            setTimeout(() => location.reload(), 5000);
+                        } else {
+                            try {
+                                sessionStorage.removeItem('payment_check_attempts');
+                            } catch (e) {}
+                            icon.className = 'icon-circle error';
+                            icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                            title.innerText = "Det tar lengre tid enn normalt";
+                            message.innerText = "Banken din behandler fortsatt denne transaksjonen. Vennligst sjekk om du har mottatt bekreftelse i Vipps/bank-appen din, eller ta kontakt med oss hvis kurset ikke dukker opp innen kort tid.";
+                            btn.innerText = "Gå til Min Side";
+                            btn.href = "index.html";
+                            btn.classList.remove('hidden');
+                        }
+                        return; // Don't show button yet if we are still retrying
 
                     case "requires_payment_method":
                         icon.className = 'icon-circle error';
@@ -174,7 +318,7 @@
                         title.innerText = "Betaling feilet";
                         message.innerText = "Betalingen ble ikke gjennomført. Vennligst prøv en annen betalingsmetode.";
                         btn.innerText = "Prøv igjen";
-                        btn.href = "index.html#payment"; // Adjust link
+                        btn.href = "index.html";
                         break;
 
                     default:
@@ -183,7 +327,7 @@
                         title.innerText = "Noe gikk galt";
                         message.innerText = "Status: " + paymentIntent.status;
                         btn.innerText = "Kontakt Kundeservice";
-                        btn.href = "../kontakt.html";
+                        btn.href = "/kontakt.html";
                         break;
                 }
                 btn.classList.remove('hidden');
@@ -200,6 +344,7 @@
         // Run verification on load
         verifyPayment();
     </script>
+    
 </body>
 
 </html>

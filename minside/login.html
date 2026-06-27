@@ -2,6 +2,37 @@
 <html lang="no">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyTheme(theme) {
+                const active = theme || (mq.matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', active);
+            }
+            applyTheme(savedTheme);
+            if (!savedTheme) {
+                try {
+                    mq.addEventListener('change', function () {
+                        if (!localStorage.getItem('hkm_theme')) {
+                            applyTheme();
+                        }
+                    });
+                } catch (err) {
+                    try {
+                        mq.addListener(function () {
+                            if (!localStorage.getItem('hkm_theme')) {
+                                applyTheme();
+                            }
+                        });
+                    } catch (e2) {}
+                }
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/minside/login">
+    <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logg inn | Min Side</title>
@@ -13,7 +44,7 @@
 
     <!-- Material Symbols -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
 
     <style>
         :root {
@@ -26,6 +57,64 @@
             --card-bg: #ffffff;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
+
+        html[data-theme="dark"] {
+            --main-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        html[data-theme="dark"] .form-control {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .form-control::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="dark"] .btn-google {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .btn-google:hover {
+            background-color: #334155;
+        }
+
+        html[data-theme="dark"] .divider {
+            color: #64748b;
+        }
+
+        html[data-theme="dark"] .divider::before,
+        html[data-theme="dark"] .divider::after {
+            background: #334155;
+        }
+
+        html[data-theme="dark"] .lang-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .lang-dropdown {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .lang-switch-btn {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .lang-switch-btn:hover {
+            background-color: #334155;
+        }
+
 
         * {
             margin: 0;
@@ -212,11 +301,68 @@
             color: #166534;
             border: 1px solid #bbf7d0;
         }
+
+        /* Language Switcher Styling */
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+        .lang-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        .lang-btn:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+        .lang-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            width: 140px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: none;
+            overflow: hidden;
+            padding: 4px 0;
+        }
+        .lang-switcher.active .lang-dropdown {
+            display: block !important;
+        }
+        .lang-switch-btn {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.2s;
+            text-align: left;
+            cursor: pointer;
+        }
+        .lang-switch-btn:hover {
+            background-color: #f8f9fa;
+        }
     </style>
     <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
+        if (window.tailwind) window.tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -228,94 +374,176 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json?v=20260508c">
+    <meta name="theme-color" content="#cc6f2c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+    <!-- PWA Service Worker -->
+    <script type="module">
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            const run = async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registrert for PWA!', reg);
+                } catch (err) {
+                    console.log('Service Worker feilet:', err);
+                }
+            };
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                run();
+            } else {
+                window.addEventListener('load', run);
+            }
+        })();
+    </script>
+    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+    <style>
+        .sidebar-nav *, 
+        .mobile-bottom-nav .mobile-nav-item, 
+        .mobile-bottom-nav .mobile-nav-item *, 
+        .nav-link, 
+        .nav-link-wrap, 
+        .nav-item, 
+        .mobile-nav-item, 
+        .mobile-nav-item *,
+        .mega-menu *,
+        .mega-nav-list *,
+        .mega-nav-list a,
+        .menu-footer-links a,
+        #mega-menu a,
+        .header a,
+        #header a {
+            border-bottom: none !important;
+            border-bottom-width: 0px !important;
+            border-bottom-color: transparent !important;
+            border-top: none !important;
+            border-top-width: 0px !important;
+            border-top-color: transparent !important;
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-image: none !important;
+        }
+    </style>
 </head>
 
-<body>
+<body class="cms-loading">
+    <!-- Language switcher widget -->
+    <div class="lang-switcher">
+        <button class="lang-btn">
+            <span class="material-symbols-outlined" style="font-size: 18px;">language</span>
+            <span>NO</span>
+        </button>
+        <div class="lang-dropdown">
+            <a href="javascript:void(0)" class="lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+            <a href="javascript:void(0)" class="lang-switch-btn" data-lang="en">🇺🇸 English</a>
+            <a href="javascript:void(0)" class="lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+        </div>
+    </div>
+
     <div class="login-card">
         <img src="../img/logo-hkm.png" alt="HKM Logo" class="logo-icon">
-        <h1 class="login-title">Min Side</h1>
-        <p class="login-subtitle">Velkommen til ditt åndelige fellesskap</p>
+        <h1 class="login-title" data-i18n="login.title">Min Side</h1>
+        <p class="login-subtitle" data-i18n="login.subtitle">Velkommen til ditt åndelige fellesskap</p>
 
         <div id="feedback-box" class="feedback-message"></div>
 
         <!-- Mode Buttons -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
             <button id="mode-login" class="btn btn-google btn-mode active"
-                style="font-size: 14px; padding: 8px 16px; width: auto; border-color: var(--primary-orange); color: var(--primary-orange);">Logg
-                inn</button>
+                style="font-size: 14px; padding: 8px 16px; width: auto; border-color: var(--primary-orange); color: var(--primary-orange);" data-i18n="login.modeLogin">Logg inn</button>
             <button id="mode-register" class="btn btn-google btn-mode"
-                style="font-size: 14px; padding: 8px 16px; width: auto;">Ny bruker</button>
+                style="font-size: 14px; padding: 8px 16px; width: auto;" data-i18n="login.modeRegister">Ny bruker</button>
             <button id="mode-magic" class="btn btn-google btn-mode"
-                style="font-size: 14px; padding: 8px 16px; width: auto;">Magisk Link</button>
+                style="font-size: 14px; padding: 8px 16px; width: auto;" data-i18n="login.modeMagic">Magisk Link</button>
         </div>
 
         <!-- Password Login Form -->
         <div id="section-login" class="auth-mode-section active">
-            <form id="login-form">
+            <form id="login-form" method="post" action="">
                 <div class="form-group">
-                    <label>E-post</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="din@epost.no" required>
+                    <label data-i18n="login.emailLabel">E-post</label>
+                    <input type="email" id="login-email" name="email" autocomplete="username" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
                 </div>
                 <div class="form-group">
-                    <label>Passord</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                    <label data-i18n="login.passwordLabel">Passord</label>
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" data-i18n-placeholder="login.passwordPlaceholder" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Logg inn</button>
-                <button type="button" class="toggle-auth-mode"
+                <button type="submit" class="btn btn-primary" data-i18n="login.submitLogin">Logg inn</button>
+                <button type="button" class="toggle-auth-mode" data-i18n="login.forgotPassword"
                     onclick="alert('Glemt passord funksjon kommer snart!')">Glemt passord?</button>
             </form>
         </div>
 
         <!-- Registration Form -->
         <div id="section-register" class="auth-mode-section">
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="login.registerSubtitle">
                 Opprett en profil for å få tilgang til kurs og ressurser.
             </p>
-            <form id="register-form">
+            <form id="register-form" method="post" action="">
                 <div class="form-group">
-                    <label>E-post</label>
-                    <input type="email" id="register-email" class="form-control" placeholder="din@epost.no" required>
+                    <label data-i18n="login.emailLabel">E-post</label>
+                    <input type="email" id="register-email" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
                 </div>
                 <div class="form-group">
-                    <label>Fullt navn</label>
-                    <input type="text" id="register-name" class="form-control" placeholder="Ola Nordmann" required>
+                    <label data-i18n="login.nameLabel">Fullt navn</label>
+                    <input type="text" id="register-name" name="name" autocomplete="name" class="form-control" placeholder="Ola Nordmann" data-i18n-placeholder="login.namePlaceholder" required>
                 </div>
                 <div class="form-group">
-                    <label>Passord</label>
-                    <input type="password" id="register-password" class="form-control" placeholder="Minst 6 tegn"
+                    <label data-i18n="login.passwordLabel">Passord</label>
+                    <input type="password" id="register-password" name="password" autocomplete="new-password" class="form-control" placeholder="Minst 6 tegn" data-i18n-placeholder="login.passwordMinPlaceholder"
                         required minlength="6">
                 </div>
                 <div class="form-group">
-                    <label>Bekreft Passord</label>
-                    <input type="password" id="register-confirm" class="form-control" placeholder="••••••••" required
+                    <label data-i18n="login.confirmPasswordLabel">Bekreft Passord</label>
+                    <input type="password" id="register-confirm" name="confirm-password" autocomplete="new-password" class="form-control" placeholder="••••••••" data-i18n-placeholder="login.passwordPlaceholder" required
                         minlength="6">
                 </div>
-                <button type="submit" class="btn btn-primary">Opprett profil</button>
+                <button type="submit" class="btn btn-primary" data-i18n="login.submitRegister">Opprett profil</button>
             </form>
         </div>
 
         <!-- Magic Link Form -->
         <div id="section-magic" class="auth-mode-section">
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;" data-i18n="login.magicSubtitle">
                 Skriv inn din e-post, så sender vi deg en engangslink for å logge inn uten passord.
             </p>
-            <form id="magic-form">
+            <form id="magic-form" method="post" action="">
                 <div class="form-group">
-                    <label>E-post</label>
-                    <input type="email" id="email-magic" class="form-control" placeholder="din@epost.no" required>
+                    <label data-i18n="login.emailLabel">E-post</label>
+                    <input type="email" id="email-magic" name="email" autocomplete="email" class="form-control" placeholder="din@epost.no" data-i18n-placeholder="login.emailPlaceholder" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Send meg link</button>
+                <button type="submit" class="btn btn-primary" data-i18n="login.submitMagic">Send meg link</button>
             </form>
         </div>
 
-        <div class="divider"><span>eller logg inn med</span></div>
+        <div class="divider"><span data-i18n="login.divider">eller logg inn med</span></div>
 
         <button id="google-login" class="btn btn-google">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
             Google
         </button>
 
-        <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
+        <a href="/index" class="back-link" data-i18n="login.backLink">Tilbake til nettsiden</a>
     </div>
 
     <!-- Firebase SDK (Compat) -->
@@ -327,7 +555,9 @@
     <script type="module" src="../js/firebase-config.js"></script>
     <script type="module" src="../js/user-roles.js"></script>
     <script type="module" src="../js/firebase-service.js"></script>
-    <script type="module" src="js/minside-auth.js"></script>
+    <script type="module" src="js/minside-auth.js?v=20260520_GAUTH2"></script>
+    <script type="module" src="../js/i18n.js"></script>
+    
 </body>
 
 </html>

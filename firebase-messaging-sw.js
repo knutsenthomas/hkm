@@ -9,25 +9,74 @@ const firebaseConfig = {
     apiKey: "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE",
     authDomain: "his-kingdom-ministry.firebaseapp.com",
     projectId: "his-kingdom-ministry",
-    storageBucket: "his-kingdom-ministry.appspot.com",
+    storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",
     appId: "1:791237361706:web:63516ba3d74436f23ac353",
-    measurementId: "G-5CH82CHQ0B"
+    measurementId: "G-28GVKTMCZE"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const messaging = firebase.messaging();
+let messaging = null;
+try {
+    if (firebase.messaging.isSupported()) {
+        messaging = firebase.messaging();
+        // Handler for background messages
+        messaging.onBackgroundMessage((payload) => {
+            console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-// Handler for background messages
-messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
+            // If the payload has a notification object, Firebase SDK will handle showing it automatically.
+            // We only manually show a notification if it is a data-only message (no payload.notification).
+            if (payload.notification) {
+                console.log('[firebase-messaging-sw.js] Notification payload handled automatically by Firebase SDK.');
+                return;
+            }
 
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.image || '/img/logo-hkm.png'
-    };
+            // Fallback for data-only messages
+            if (payload.data && (payload.data.title || payload.data.body)) {
+                const notificationTitle = payload.data.title || 'Ny oppdatering';
+                const notificationOptions = {
+                    body: payload.data.body || '',
+                    icon: payload.data.image || payload.data.icon || '/img/logo-hkm.png',
+                    data: payload.data // Pass along data so notificationclick can read click_action
+                };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+                self.registration.showNotification(notificationTitle, notificationOptions);
+            }
+        });
+    } else {
+        console.warn('[firebase-messaging-sw.js] Firebase Messaging er ikke støttet i denne nettleseren.');
+    }
+} catch (e) {
+    console.warn('[firebase-messaging-sw.js] Kunne ikke initialisere Firebase Messaging i Service Worker:', e);
+}
+
+// Handle notification click and redirect
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    
+    let clickUrl = '/';
+    if (event.notification.data) {
+        if (event.notification.data.click_action) {
+            clickUrl = event.notification.data.click_action;
+        } else if (event.notification.data.url) {
+            clickUrl = event.notification.data.url;
+        }
+    }
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (let client of windowClients) {
+                const clientUrl = new URL(client.url, self.location.origin).pathname;
+                const targetUrl = new URL(clickUrl, self.location.origin).pathname;
+                if (clientUrl === targetUrl && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(clickUrl);
+            }
+        })
+    );
 });
+

@@ -36,12 +36,17 @@ add_action('after_setup_theme', 'hkm_theme_setup');
 
 function hkm_theme_scripts()
 {
+    $theme_version = wp_get_theme()->get('Version');
+    $style_version = file_exists(get_stylesheet_directory() . '/style.css') ?
+        filemtime(get_stylesheet_directory() . '/style.css') :
+        $theme_version;
+
     // Fonts
     wp_enqueue_style('google-fonts-inter', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap', array(), null);
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
 
     // Main Styles
-    wp_enqueue_style('hkm-style', get_stylesheet_uri(), array(), '1.0.0');
+    wp_enqueue_style('hkm-style', get_stylesheet_uri(), array(), $style_version);
     wp_enqueue_style('cookie-consent-style', get_template_directory_uri() . '/css/cookie-consent.css', array(), '1.0.0');
 
     // Tailwind (CDN for now as per key requirement)
@@ -80,6 +85,7 @@ function hkm_theme_scripts()
 
     // Main App Script
     wp_enqueue_script('hkm-script', get_template_directory_uri() . '/js/script.js', array('jquery'), '1.0.0', true); // Copied script.js to js/ folder for consistency or root
+    wp_enqueue_script('hkm-i18n', get_template_directory_uri() . '/js/i18n.js', array(), '1.0.1', true);
 
     // There was a root script.js in the source. I should make sure I copied it or check where it is.
     // The previous run_command copied 'js' folder. The 'script.js' was in the root. 

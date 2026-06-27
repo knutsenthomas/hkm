@@ -130,16 +130,17 @@ async function saveConsent(consent) {
     applyConsent(consent);
 }
 
+/**
+ * Applies the consent choices by enabling/disabling specific scripts
+ * @param {object} consent 
+ */
 function applyConsent(consent) {
     console.log('Applying Cookie Consent:', consent);
 
-    // Nødvendige: Alltid på. Håndteres av applikasjonen selv.
-
     // Statistikk (Analytics)
     if (consent.analytics) {
-        console.log('Analytics Enabled - Loading scripts...');
-        // Her ville vi lastet Google Analytics script dynamisk
-        // loadScript('https://www.googletagmanager.com/gtag/js?id=UA-XXXX');
+        const measurementId = window.firebaseConfig?.measurementId || 'G-5CH82CHQ0B';
+        loadGA4(measurementId);
     }
 
     // Markedsføring
@@ -147,4 +148,35 @@ function applyConsent(consent) {
         console.log('Marketing Enabled - Loading pixel...');
         // Her ville vi lastet Facebook Pixel etc.
     }
+}
+
+/**
+ * Dynamically loads Google Analytics (GA4)
+ * @param {string} measurementId 
+ */
+function loadGA4(measurementId) {
+    if (window.gtagLoaded) return;
+    
+    console.log(`[HKM Consent] Loading Google Analytics (${measurementId})...`);
+
+    // 1. Create the gtag.js script tag
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    document.head.appendChild(script);
+
+    // 2. Initialize the dataLayer and gtag function
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function() {
+        window.dataLayer.push(arguments);
+    };
+
+    // 3. Configure GA4
+    window.gtag('js', new Date());
+    window.gtag('config', measurementId, {
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
+    });
+
+    window.gtagLoaded = true;
 }

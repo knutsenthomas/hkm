@@ -1,0 +1,2859 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/bibel">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/bibel">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/bibel">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/bibel">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/bibel">
+    <meta name="description" content="Les og studer Bibelen online med His Kingdom Ministry. Ressurser for dypere forståelse.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibelen | His Kingdom Ministry</title>
+    
+    <!-- Preferred Language Redirect Guard -->
+    <script>
+        (function() {
+            const prefLang = localStorage.getItem('hkm_preferred_lang');
+            if (prefLang && prefLang !== 'no') {
+                const path = window.location.pathname;
+                if (path === '/bibel' || path === '/bibel.html') {
+                    window.location.replace('/' + prefLang + '/bibel' + window.location.search);
+                }
+            }
+        })();
+    </script>
+
+    <!-- Google Fonts: Inter for hele siden -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css?v=2026.06.23.1">
+    <link rel="stylesheet" href="css/cookie-consent.css">
+    
+    <!-- Firebase Config & Service -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
+    
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
+    <!-- Custom Bible Reader CSS -->
+    <style>
+        :root {
+            --bible-primary: #d17d39;
+            --bible-accent: #1B4965;
+            --bible-accent-grad: linear-gradient(135deg, #1B4965, #0f172a);
+        }
+
+        /* Themes */
+        .bible-theme-light {
+            --bg-base: #ffffff;
+            --bg-sidebar: #f8fafc;
+            --bg-card: #ffffff;
+            --text-base: #1e293b;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --active-bg: #e2e8f0;
+            --highlight-bg: rgba(254, 240, 138, 0.6);
+            --highlight-border: #fef08a;
+        }
+
+        .bible-theme-cream {
+            --bg-base: #fdfbf7;
+            --bg-sidebar: #f7f4ec;
+            --bg-card: #ffffff;
+            --text-base: #2c2720;
+            --text-muted: #70675a;
+            --text-light: #968c7f;
+            --border-color: #e6dfd3;
+            --active-bg: #e6dfd3;
+            --highlight-bg: rgba(253, 224, 71, 0.5);
+            --highlight-border: #fde047;
+        }
+
+        .bible-theme-dark {
+            --bg-base: #121212;
+            --bg-sidebar: #1e1e1e;
+            --bg-card: #262626;
+            --text-base: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-light: #4b5563;
+            --border-color: #2d2d2d;
+            --active-bg: #333333;
+            --highlight-bg: rgba(234, 179, 8, 0.3);
+            --highlight-border: #ca8a04;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: auto;
+            min-height: 100%;
+        }
+
+        /* Force compact header height and dark text on this page to prevent layout gap/overlap and contrast issues */
+        header#header {
+            background: white !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        header#header #header-container {
+            height: 80px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        header#header .logo,
+        header#header .logo span,
+        header#header #global-search-opener,
+        header#header .lang-btn {
+            color: #1e293b !important;
+        }
+        header#header #global-search-opener:hover,
+        header#header .lang-btn:hover {
+            color: #d17d39 !important;
+        }
+        
+        /* Layout - dynamic offset to prevent overlap/gap */
+        .bible-app-container {
+            display: flex;
+            position: relative;
+            height: calc(100vh - var(--hkm-header-height, 80px));
+            height: calc(100dvh - var(--hkm-header-height, 80px));
+            margin-top: var(--hkm-header-height, 80px);
+            overflow: hidden;
+            background: var(--bg-base);
+            color: var(--text-base);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Mobile & Tablet Adjustments */
+        @media (max-width: 1024px) {
+            header#header #header-container {
+                height: 70px !important;
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            .bible-app-container {
+                margin-top: var(--hkm-header-height, 70px);
+                height: calc(100vh - var(--hkm-header-height, 70px));
+                height: calc(100dvh - var(--hkm-header-height, 70px));
+            }
+        }
+
+        /* Sidebar Left (Books) */
+        .bible-sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-mobile-title-row {
+            display: none;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container .icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .search-container input {
+            width: 100%;
+            height: 40px !important;
+            padding: 0 12px 0 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-base);
+            color: var(--text-base);
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-container input:focus {
+            border-color: var(--bible-primary);
+            box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+        }
+
+        .bible-control-input {
+            height: 40px !important;
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-base);
+            font-size: 14px;
+            outline: none;
+            width: 160px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+        }
+
+        .bible-control-input:focus {
+            border-color: var(--bible-primary);
+            box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+        }
+
+        .books-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .books-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 12px 16px 6px;
+            font-weight: 700;
+        }
+
+        .book-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            color: var(--text-base);
+        }
+
+        .book-item:hover {
+            background: var(--active-bg);
+            color: var(--bible-primary);
+        }
+
+        .book-item.active {
+            background: var(--bible-primary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .book-item .icon {
+            font-size: 16px;
+            opacity: 0.6;
+        }
+
+        /* Central Reading Pane */
+        .bible-reading-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Top Bible Control Bar */
+        .bible-controls {
+            padding: 12px 24px;
+            background: var(--bg-base);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .select-wrapper select {
+            height: 40px !important;
+            padding: 0 32px 0 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-base);
+            color: var(--text-base);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            box-sizing: border-box;
+            width: 100%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .select-wrapper {
+            position: relative;
+            flex-shrink: 1;
+            min-width: 120px;
+            max-width: 240px;
+        }
+
+        .select-wrapper::after {
+            content: "expand_more";
+            font-family: 'Material Symbols Outlined';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 16px;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Settings Dropdown Popover */
+        .settings-popover-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .settings-popover-trigger:hover {
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
+        }
+
+        .settings-dropdown {
+            position: absolute;
+            top: 64px;
+            right: 24px;
+            width: 280px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .settings-dropdown.active {
+            display: flex;
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .btn-setting-group {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .btn-setting-group button {
+            background: var(--bg-base);
+            border: none;
+            color: var(--text-base);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-setting-group button:hover {
+            background: var(--active-bg);
+        }
+
+        .btn-setting-group button:not(:last-child) {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .theme-selectors {
+            display: flex;
+            gap: 8px;
+        }
+
+        .theme-option {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .theme-option.active {
+            border-color: var(--bible-primary);
+            transform: scale(1.1);
+        }
+
+        .theme-option[data-theme="light"] { background: #ffffff; border: 1px solid #cbd5e1; }
+        .theme-option[data-theme="cream"] { background: #fdfbf7; border: 1px solid #e6dfd3; }
+        .theme-option[data-theme="dark"] { background: #121212; border: 1px solid #2d2d2d; }
+
+        /* Main Reading Content Pane */
+        .bible-content-pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 24px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .bible-text-container {
+            max-width: 680px;
+            width: 100%;
+        }
+
+        .reference-header {
+            margin-bottom: 32px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .book-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--active-bg);
+            color: var(--text-muted);
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .chapter-number {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--text-base);
+            margin: 0;
+            line-height: 1;
+            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+            text-align: center;
+            transition: color 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .chapter-number {
+                font-size: 80px;
+            }
+        }
+
+        .bible-reading-pane {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 60px;
+            text-align: left;
+        }
+
+        .bible-reading-pane p,
+        .bible-reading-pane p * {
+            display: inline;
+            position: relative;
+            padding: 2px 4px;
+            margin: 0;
+            border-radius: 4px;
+            transition: background 0.2s;
+            cursor: pointer;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            font-size: var(--bible-font-size, inherit) !important;
+        }
+
+        .bible-reading-pane p.highlighted {
+            background: var(--highlight-bg);
+            border-radius: 4px;
+        }
+
+        .bible-reading-pane p:hover {
+            background: rgba(209, 125, 57, 0.08);
+        }
+
+        .bible-reading-pane sup.v {
+            font-size: 0.6em !important;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-right: 4px;
+            margin-left: 6px;
+            vertical-align: baseline;
+            position: relative;
+            top: -0.35em;
+            line-height: 0;
+            user-select: none;
+            padding: 0 !important;
+            cursor: default;
+        }
+
+        .verse-temp-highlight {
+            background: var(--highlight-bg) !important;
+            animation: pulse-highlight 1.5s ease-out forwards;
+            border-radius: 4px;
+        }
+
+        @keyframes pulse-highlight {
+            0% { background: rgba(253, 224, 71, 0.8); }
+            100% { background: var(--highlight-bg); }
+        }
+
+        /* Chapter selectors overlay */
+        .chapter-selector-overlay {
+            position: absolute;
+            top: 64px;
+            left: 24px;
+            width: 320px;
+            max-height: 400px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .chapter-selector-overlay.active {
+            display: flex;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            max-height: 320px;
+            padding-right: 4px;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chapter-item:hover {
+            border-color: var(--bible-primary);
+            background: var(--active-bg);
+        }
+
+        .chapter-item.active {
+            background: var(--bible-primary);
+            color: #ffffff;
+            border-color: var(--bible-primary);
+        }
+
+        /* Next/Prev Navigation Buttons */
+        .navigation-triggers {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 680px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Floating Minimalist Bottom Navigation */
+        .floating-bible-nav {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(0);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            z-index: 140;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.95;
+        }
+
+        .floating-bible-nav:hover {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px) translateZ(0);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .floating-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .floating-nav-btn:hover:not(:disabled) {
+            background: var(--active-bg);
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
+        }
+
+        .floating-nav-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .floating-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .floating-nav-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 90px;
+            user-select: none;
+        }
+
+        #floating-nav-book {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            line-height: 1.1;
+        }
+
+        #floating-nav-chapter {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--bible-primary);
+            line-height: 1.2;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 40px !important;
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-base);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Sidebar Right (Bookmarks & History) */
+        .bible-nav-right {
+            width: 320px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-right-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 8px 20px;
+            background: var(--bg-sidebar);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidebar-right-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-base);
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+        }
+
+        .close-sidebar-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: none; /* Hidden on desktop */
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            padding: 0;
+            margin: 0;
+        }
+
+        .close-sidebar-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-base);
+        }
+
+        .bible-theme-dark .close-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tabs-header {
+            display: flex;
+            background: var(--bg-sidebar);
+            padding: 8px 16px 16px 16px;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            box-sizing: border-box;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs-header::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex: 1;
+            flex-shrink: 0;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-base);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .bible-theme-dark .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--bible-primary) !important;
+            background: rgba(209, 125, 57, 0.08) !important;
+            font-weight: 600;
+        }
+
+        .tabs-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-sidebar-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-sidebar-item:hover {
+            border-color: var(--bible-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .empty-state {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 40px 10px;
+            line-height: 1.5;
+        }
+
+        /* Dictionary Drawer Sidepanel (Sliding from right) */
+        .dictionary-drawer {
+            position: absolute;
+            top: 0;
+            right: -340px;
+            width: 320px;
+            height: 100%;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.08);
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dictionary-drawer.active {
+            right: 0;
+        }
+
+        .dictionary-drawer.expanded {
+            width: 100%;
+        }
+
+        .toggle-expand-dict-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .toggle-expand-dict-btn:hover {
+            color: var(--bible-primary);
+            background: rgba(0,0,0,0.05);
+        }
+
+        html[data-theme="dark"] .toggle-expand-dict-btn:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .dict-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-base);
+        }
+
+        .dict-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--bible-primary);
+            margin: 0;
+        }
+
+        .dict-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+        }
+
+        .dict-word-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-base);
+            text-transform: capitalize;
+        }
+
+        .dict-category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--active-bg);
+            color: var(--bible-primary);
+            margin-bottom: 20px;
+        }
+
+        .dict-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .dict-definition-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-base);
+            margin-bottom: 24px;
+            white-space: normal;
+        }
+
+        .dict-note-box {
+            padding: 14px;
+            background: var(--bg-base);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .greek-word {
+            font-family: 'Gentium Plus', 'Times New Roman', serif;
+            font-weight: 700;
+            color: var(--bible-primary);
+            background: rgba(209, 125, 57, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 1.05em;
+        }
+
+        .hebrew-word {
+            font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif;
+            font-weight: 700;
+            color: #bd4f2a;
+            background: rgba(189, 79, 42, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 1.25em;
+            display: inline-block;
+        }
+
+        .dict-original-term-card {
+            padding: 12px 14px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .dict-original-term-card .language-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(209, 125, 57, 0.1);
+            color: var(--bible-primary);
+            letter-spacing: 0.05em;
+        }
+
+        .dict-original-term-card .language-badge.hebrew {
+            background: rgba(189, 79, 42, 0.1);
+            color: #bd4f2a;
+        }
+
+        .close-dict-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Buttons and Interactive Elements */
+        .nav-btn, .settings-popover-trigger, .close-dict-btn, .chapter-item, .theme-option, .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn:hover:not(:disabled), .settings-popover-trigger:hover, .close-dict-btn:hover {
+            transform: scale(1.03);
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+        }
+
+        .nav-btn:active:not(:disabled), .settings-popover-trigger:active {
+            transform: scale(0.97);
+        }
+
+        /* Gå (Submit) Button Style */
+        .btn-bible-go {
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border: none !important;
+            cursor: pointer;
+            height: 40px !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-bible-go:hover {
+            background: #bd4f2a !important;
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+        }
+
+        .btn-bible-go:active {
+            transform: scale(0.97);
+        }
+                /* Mobile menu toggle */
+        .btn-mobile-sidebar,
+        .btn-mobile-nav-right {
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 40px !important;
+            height: 40px !important;
+            transition: all 0.25s ease;
+            box-sizing: border-box;
+            color: var(--text-base);
+        }
+        
+        .btn-mobile-sidebar:hover,
+        .btn-mobile-nav-right:hover {
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
+        }
+        
+        .btn-mobile-sidebar:active,
+        .btn-mobile-nav-right:active {
+            transform: scale(0.95);
+        }
+
+        /* Show mobile toggles and headers only on screens under 900px */
+        #mobile-sidebar-toggle,
+        #mobile-nav-right-toggle {
+            display: none !important;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            #mobile-sidebar-toggle,
+            #mobile-nav-right-toggle {
+                display: flex !important;
+            }
+
+            .sidebar-mobile-title-row {
+                display: flex !important;
+            }
+
+            .close-sidebar-btn {
+                display: inline-flex !important;
+            }
+
+            .bible-app-container {
+                margin-top: var(--hkm-header-height, 70px);
+                height: calc(100vh - var(--hkm-header-height, 70px));
+                height: calc(100dvh - var(--hkm-header-height, 70px));
+            }
+
+            .bible-sidebar {
+                position: absolute;
+                left: -280px;
+                top: 0;
+                height: 100%;
+                box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+            }
+
+            .bible-sidebar.active {
+                left: 0;
+            }
+
+            .bible-nav-right {
+                position: absolute;
+                right: -320px;
+                top: 0;
+                height: 100%;
+                width: 320px;
+                box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+                z-index: 99;
+                transition: right 0.3s ease;
+                display: flex;
+                border-left: 1px solid var(--border-color);
+            }
+
+            .bible-nav-right.active {
+                right: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .chapter-selector-overlay {
+                left: 16px !important;
+                right: 16px !important;
+                width: auto !important;
+                max-width: calc(100vw - 32px) !important;
+            }
+            .settings-dropdown {
+                left: 16px !important;
+                right: 16px !important;
+                width: auto !important;
+                max-width: calc(100vw - 32px) !important;
+            }
+            .bible-controls {
+                padding: 8px 12px !important;
+                gap: 8px !important;
+            }
+            .controls-left {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            .controls-right {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            .select-wrapper {
+                flex: 1 !important;
+                max-width: none !important;
+                min-width: 80px !important;
+            }
+            #bible-quick-search-form {
+                flex: 1 !important;
+            }
+            .bible-control-input {
+                width: 100% !important;
+                flex: 1 !important;
+            }
+            .bible-content-pane {
+                padding: 24px 16px 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bible-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+            }
+            .bible-sidebar.active {
+                left: 0 !important;
+            }
+            body.reading-mode-active .bible-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+            }
+            body.reading-mode-active .bible-sidebar.active {
+                left: 0 !important;
+            }
+            .bible-nav-right {
+                width: 100% !important;
+                right: -100% !important;
+            }
+            .bible-nav-right.active {
+                right: 0 !important;
+            }
+            .dictionary-drawer {
+                width: 100% !important;
+                right: -100% !important;
+            }
+            .dictionary-drawer.active {
+                right: 0 !important;
+            }
+            .toggle-expand-dict-btn {
+                display: none !important;
+            }
+            
+            /* Simplify buttons on very small screens to fit */
+            #trigger-book-chapter span:not(.material-symbols-outlined) {
+                display: none;
+            }
+            #trigger-book-chapter {
+                width: 40px !important;
+                height: 40px !important;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .navigation-triggers .nav-btn span:not(.material-symbols-outlined) {
+                display: none;
+            }
+            .navigation-triggers .nav-btn {
+                width: 48px !important;
+                height: 48px !important;
+                padding: 0 !important;
+                border-radius: 50% !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
+        .dict-related-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .related-resource-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .related-resource-item:hover {
+            border-color: var(--bible-accent) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .related-resource-thumbnail {
+            position: relative;
+            width: 70px;
+            height: 50px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: var(--active-bg);
+        }
+
+        .related-resource-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .related-resource-play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            opacity: 0.9;
+        }
+
+        .related-resource-play-overlay span {
+            font-size: 20px;
+        }
+
+        .related-resource-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            background: var(--active-bg);
+            color: var(--bible-primary);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .related-resource-icon.youtube {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .related-resource-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .related-resource-type {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--bible-primary);
+        }
+
+        .related-resource-type.youtube {
+            color: #ef4444;
+        }
+
+        .related-resource-title {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            font-weight: 600;
+            color: var(--text-base) !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Reading Mode (Lesemodus) Overrides */
+        body.reading-mode-active #header {
+            display: none !important;
+        }
+        body.reading-mode-active .bible-sidebar {
+            position: absolute !important;
+            left: -280px !important;
+            top: 0 !important;
+            height: 100% !important;
+            z-index: 150 !important;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15) !important;
+            transition: left 0.3s ease !important;
+            display: flex !important;
+        }
+        body.reading-mode-active .bible-sidebar.active {
+            left: 0 !important;
+        }
+        body.reading-mode-active .bible-nav-right {
+            display: none !important;
+        }
+        body.reading-mode-active .bible-app-container {
+            margin-top: 0 !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+        }
+        body.reading-mode-active footer.footer {
+            display: none !important;
+        }
+        body.reading-mode-active #mobile-sidebar-toggle {
+            display: flex !important;
+        }
+        body.reading-mode-active #mobile-nav-right-toggle {
+            display: none !important;
+        }
+        body.reading-mode-active #btn-toggle-reading-mode {
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary) !important;
+        }
+        body.reading-mode-active #hkm-visitor-chat-widget {
+            display: none !important;
+        }
+
+        /* Multi-verse selection styling */
+        .bible-reading-pane p.selected-verse {
+            background: rgba(27, 73, 101, 0.12) !important;
+            border-radius: 4px !important;
+        }        /* Premium Floating Verse Toolbar */
+        #verse-context-toolbar {
+            background: rgba(27, 73, 101, 0.95) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 8px 16px -8px rgba(0, 0, 0, 0.3) !important;
+            padding: 4px 8px !important;
+            display: none;
+            align-items: center;
+            gap: 4px !important;
+            z-index: 1000;
+            transform: translate(-50%, -125%) !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .toolbar-action-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            transition: all 0.2s ease !important;
+            position: relative !important;
+        }
+
+        .toolbar-action-btn:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .toolbar-action-btn:active {
+            transform: scale(0.92) !important;
+        }
+
+        #toolbar-btn-lookup {
+            color: #fef08a !important; /* Highlight gold color for Lexicon */
+        }
+        #toolbar-btn-lookup:hover {
+            background: rgba(254, 240, 138, 0.15) !important;
+        }
+
+        #toolbar-btn-clear {
+            color: #f87171 !important; /* Soft red for close button */
+        }
+        #toolbar-btn-clear:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+        }
+
+        .toolbar-divider {
+            width: 1px !important;
+            height: 20px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            margin: 0 4px !important;
+        }
+
+        /* Premium CSS Tooltip using data-tooltip */
+        .toolbar-action-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px) scale(0.9);
+            background: rgba(15, 23, 42, 0.95);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1001;
+        }
+
+        .toolbar-action-btn:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px) scale(1);
+        }
+
+        /* Mobile adjustment for floating verse toolbar */
+        @media (max-width: 768px) {
+            .toolbar-btn-text {
+                display: none !important;
+            }
+            #verse-context-toolbar {
+                gap: 4px !important;
+                padding: 4px 8px !important;
+            }
+            
+            /* Floating bible navigation on mobile */
+            .floating-bible-nav {
+                opacity: 0.95 !important;
+                bottom: 16px !important;
+                padding: 6px 12px !important;
+                gap: 12px !important;
+                transform: translateX(-50%) translateZ(0) !important;
+            }
+            .floating-bible-nav:hover {
+                transform: translateX(-50%) translateZ(0) !important;
+                opacity: 0.95 !important;
+            }
+            .floating-nav-btn {
+                width: 32px !important;
+                height: 32px !important;
+            }
+            .floating-nav-info {
+                min-width: 80px !important;
+            }
+            #floating-nav-chapter {
+                font-size: 14px !important;
+            }
+        }
+
+        /* Scrollable controls toolbar and layout adjustments under 768px */
+        @media (max-width: 768px) {
+            .bible-controls {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 8px 12px !important;
+                gap: 8px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                justify-content: flex-start !important;
+                scrollbar-width: none !important; /* Firefox */
+                -ms-overflow-style: none !important; /* IE/Edge */
+            }
+            .bible-controls::-webkit-scrollbar {
+                display: none !important; /* Chrome, Safari, Opera */
+            }
+            .controls-left, .controls-right {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                flex-shrink: 0 !important;
+                width: auto !important;
+                gap: 8px !important;
+                justify-content: flex-start !important;
+                flex-wrap: nowrap !important;
+            }
+            .select-wrapper {
+                flex-shrink: 0 !important;
+                width: 130px !important;
+                max-width: none !important;
+                min-width: 0 !important;
+            }
+            #bible-translation-select {
+                width: 100% !important;
+            }
+            #bible-quick-search-form {
+                flex-shrink: 0 !important;
+                width: 150px !important;
+                display: flex !important;
+                gap: 4px !important;
+            }
+            .bible-control-input {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+        }
+
+        /* Unified Mobile/Tablet Sidebar Overrides (under 768px) to fix clipping/overlapping */
+        @media (max-width: 768px) {
+            .bible-sidebar,
+            body.reading-mode-active .bible-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+                position: absolute !important;
+                height: 100% !important;
+                z-index: 200 !important;
+                transition: left 0.3s ease !important;
+            }
+            .bible-sidebar.active,
+            body.reading-mode-active .bible-sidebar.active {
+                left: 0 !important;
+            }
+            .bible-nav-right,
+            body.reading-mode-active .bible-nav-right {
+                width: 100% !important;
+                right: -100% !important;
+                position: absolute !important;
+                height: 100% !important;
+                z-index: 200 !important;
+                transition: right 0.3s ease !important;
+                display: flex !important;
+            }
+            .bible-nav-right.active,
+            body.reading-mode-active .bible-nav-right.active {
+                right: 0 !important;
+            }
+            .dictionary-drawer {
+                width: 100% !important;
+                right: -100% !important;
+                z-index: 200 !important;
+                transition: right 0.3s ease !important;
+            }
+            .dictionary-drawer.active {
+                right: 0 !important;
+            }
+            .toggle-expand-dict-btn {
+                display: none !important;
+            }
+            
+            /* Clean up top toolbar and show mobile controls in sidebar */
+            .sidebar-mobile-controls {
+                display: none;
+            }
+            @media (max-width: 768px) {
+                .sidebar-mobile-controls {
+                    display: flex !important;
+                }
+                /* Hide original toolbar items on mobile */
+                .bible-controls .select-wrapper,
+                .bible-controls #bible-quick-search-form {
+                    display: none !important;
+                }
+                /* Adjust bible-controls layout on mobile to look clean and unscrollable */
+                .bible-controls {
+                    justify-content: space-between !important;
+                    overflow-x: visible !important;
+                    white-space: normal !important;
+                    flex-wrap: nowrap !important;
+                    padding: 8px 16px !important;
+                }
+                .bible-controls .controls-left {
+                    width: auto !important;
+                    flex: 1 !important;
+                    justify-content: flex-start !important;
+                    gap: 12px !important;
+                }
+                .bible-controls .controls-right {
+                    width: auto !important;
+                    flex-shrink: 0 !important;
+                    justify-content: flex-end !important;
+                }
+                .sidebar-mobile-controls .select-wrapper {
+                    width: 100% !important;
+                    max-width: none !important;
+                }
+                .sidebar-mobile-controls select {
+                    padding-left: 32px !important;
+                    height: 38px !important;
+                    font-size: 13px !important;
+                }
+                .sidebar-mobile-controls select:focus,
+                .sidebar-mobile-controls input.bible-control-input:focus {
+                    border-color: var(--bible-primary) !important;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15) !important;
+                }
+                .sidebar-mobile-controls .nav-btn {
+                    background: var(--bg-base) !important;
+                    border: 1px solid var(--border-color) !important;
+                    color: var(--text-base) !important;
+                    height: 36px !important;
+                    border-radius: 8px !important;
+                    font-size: 12px !important;
+                    font-weight: 600 !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 6px !important;
+                }
+                .sidebar-mobile-controls .nav-btn:hover {
+                    background: var(--active-bg) !important;
+                    border-color: var(--bible-primary) !important;
+                    color: var(--bible-primary) !important;
+                }
+                .sidebar-mobile-controls .nav-btn.active {
+                    background: var(--bible-primary) !important;
+                    color: #ffffff !important;
+                    border-color: var(--bible-primary) !important;
+                }
+                .sidebar-mobile-controls .btn-bible-go {
+                    background: var(--bible-primary) !important;
+                    color: #ffffff !important;
+                    border-radius: 8px !important;
+                    height: 36px !important;
+                    font-size: 13px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    border: none !important;
+                }
+                .sidebar-mobile-controls .btn-bible-go:hover {
+                    opacity: 0.9 !important;
+                    transform: scale(1.02) !important;
+                }
+                /* Make sidebar close button look more like a button on mobile */
+                .close-sidebar-mobile-btn,
+                .close-sidebar-btn,
+                .close-dict-btn {
+                    background: var(--bg-base) !important;
+                    border: 1px solid var(--border-color) !important;
+                    color: var(--text-base) !important;
+                    width: 32px !important;
+                    height: 32px !important;
+                    border-radius: 50% !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                .close-sidebar-mobile-btn:hover,
+                .close-sidebar-btn:hover,
+                .close-dict-btn:hover {
+                    background: var(--bg-sidebar) !important;
+                    transform: scale(1.05);
+                }
+                
+                /* Lexicon (dictionary-drawer) adjustments on mobile */
+                .dictionary-drawer .dict-body {
+                    padding-bottom: 140px !important;
+                }
+                .dictionary-drawer .dict-definition-text {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-note-box {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-cross-ref-item {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-cross-ref-item div {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-cross-ref-item div:last-child {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer #dict-related-resources {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .related-resource-title {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .related-resource-type {
+                    font-size: 13px !important;
+                }
+                .dictionary-drawer .dict-search-container input {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-search-container button {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer #dict-welcome-state h4 {
+                    font-size: 18px !important;
+                }
+                .dictionary-drawer #dict-welcome-state p {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer #dict-spinner p {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card div {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card span {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card .hebrew-word {
+                    font-size: 24px !important;
+                }
+                .dictionary-drawer .dict-original-term-card .greek-word {
+                    font-size: 19px !important;
+                }
+
+                /* Bookmarks & History sidebar (bible-nav-right) adjustments on mobile */
+                .bible-nav-right .nav-sidebar-item {
+                    font-size: 16px !important;
+                    padding: 14px 12px !important;
+                }
+                .bible-nav-right .nav-sidebar-item strong {
+                    font-size: 16px !important;
+                }
+                .bible-nav-right .nav-sidebar-item span {
+                    font-size: 13px !important;
+                }
+                .bible-nav-right .empty-state {
+                    font-size: 16px !important;
+                }
+                .bible-nav-right .tabs-content {
+                    padding-bottom: 140px !important;
+                }
+                
+                /* Book list sidebar (bible-sidebar) adjustments on mobile */
+                .bible-sidebar .book-item {
+                    font-size: 15px !important;
+                    padding: 12px 20px !important;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.02) !important;
+                    color: var(--text-base) !important;
+                    font-weight: 500 !important;
+                    transition: all 0.2s ease !important;
+                }
+                .bible-sidebar .book-item:active {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    color: var(--bible-primary) !important;
+                }
+                .bible-sidebar #book-search {
+                    font-size: 14px !important;
+                    height: 38px !important;
+                    border-radius: 8px !important;
+                }
+                .bible-sidebar .books-section-title {
+                    font-size: 11px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.08em !important;
+                    color: var(--text-muted) !important;
+                    padding: 24px 20px 8px !important;
+                    font-weight: 700 !important;
+                    border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+                    margin-top: 8px !important;
+                }
+                .bible-sidebar .books-list-wrapper {
+                    padding-bottom: 140px !important;
+                }
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/bibel">
+    <meta property="og:title" content="Bibelen | His Kingdom Ministry">
+    <meta property="og:description" content="Les og studer Bibelen online med His Kingdom Ministry. Ressurser for dypere forståelse.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/bibel">
+    <meta property="twitter:title" content="Bibelen | His Kingdom Ministry">
+    <meta property="twitter:description" content="Les og studer Bibelen online med His Kingdom Ministry. Ressurser for dypere forståelse.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+</head>
+
+<body class="cms-loading header-always-scrolled">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
+                </div>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                    Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                    English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                    Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-menigheter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-bedrifter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Om oss</a>
+                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Butikk</a>
+                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Aktuell aktivitet -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</h3>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/blogg" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index.html" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
+                                    <span class="mega-menu-desc text-primary-orange opacity-90">Din profil og leseplaner.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bible App Area -->
+    <div class="bible-app-container">
+        
+        <!-- Left Sidebar: Books Selection -->
+        <aside class="bible-sidebar" id="bible-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-mobile-title-row" style="justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: nowrap; width: 100%;">
+                    <span style="font-weight: 700; font-size: 14px; color: var(--text-base); white-space: nowrap !important;">Bibelbøker</span>
+                    <button class="close-sidebar-mobile-btn" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
+                <div class="search-container">
+                    <span class="material-symbols-outlined icon">search</span>
+                    <input type="text" id="book-search" placeholder="Søk etter bibelbok...">
+                </div>
+            </div>
+            
+            <!-- Mobile-only controls in the sidebar -->
+            <div class="sidebar-mobile-controls" id="sidebar-mobile-controls" style="display: none; padding: 16px; border-bottom: 1px solid var(--border-color); flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                <!-- Section Title -->
+                <div id="mobile-settings-header" style="display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; cursor: pointer; user-select: none; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.7;">settings</span>
+                        <span>Verktøy & Innstillinger</span>
+                    </div>
+                    <span class="material-symbols-outlined" id="mobile-settings-chevron" style="font-size: 16px;">expand_more</span>
+                </div>
+                
+                <!-- Unified Settings Card -->
+                <div id="mobile-settings-card" style="background: rgba(27, 73, 101, 0.03); border: 1px solid rgba(27, 73, 101, 0.06); border-radius: 12px; padding: 12px; display: none; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                    
+                    <!-- Translation Selection -->
+                    <div class="select-wrapper" style="width: 100%; position: relative; display: flex; align-items: center;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; font-size: 16px; color: var(--text-muted); pointer-events: none; z-index: 10;">translate</span>
+                        <select id="bible-translation-select-mobile" style="width: 100%; height: 38px !important; padding: 0 32px 0 32px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; cursor: pointer; transition: all 0.2s;">
+                            <!-- Dynamically populated -->
+                        </select>
+                    </div>
+
+                    <!-- Quick Reference Search -->
+                    <form id="bible-quick-search-form-mobile" style="margin: 0; display: flex; gap: 8px; align-items: center; width: 100%; position: relative;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; font-size: 16px; color: var(--text-muted); pointer-events: none; z-index: 10;">search</span>
+                        <input type="text" id="bible-quick-search-mobile" placeholder="Gå til vers (f.eks. Johannes 3:16)" class="bible-control-input" style="flex: 1; min-width: 0; height: 38px !important; padding: 0 12px 0 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box; transition: all 0.2s;">
+                        <button type="submit" class="btn-bible-go" style="height: 38px !important; background: var(--bible-primary); color: white; border: none; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">Gå</button>
+                    </form>
+
+                    <!-- Buttons Row (Bibeleksikon, Lesemodus, Tekstinnstillinger) -->
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <!-- Settings Trigger -->
+                        <button type="button" class="nav-btn" id="mobile-text-settings-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">text_fields</span>
+                            <span>Tekst</span>
+                        </button>
+                        
+                        <!-- Bibeleksikon Trigger -->
+                        <button type="button" class="nav-btn" id="mobile-dict-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>Leksikon</span>
+                        </button>
+                        
+                        <!-- Reading Mode Toggle -->
+                        <button type="button" class="nav-btn" id="mobile-reading-mode-btn" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px !important; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; box-shadow: none !important; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">chrome_reader_mode</span>
+                            <span>Lese</span>
+                        </button>
+                    </div>
+
+                    <!-- Inline Mobile Settings Panel -->
+                    <div id="mobile-settings-panel" style="display: none; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; flex-direction: column; gap: 12px; box-sizing: border-box; width: 100%;">
+                        <!-- Font Size -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Størrelse</span>
+                            <div class="btn-setting-group" style="display: flex; align-items: center;">
+                                <button type="button" id="btn-decrease-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px 0 0 6px; padding: 0; box-shadow: none !important; font-size: 13px; font-weight: bold; border-right: none;">A-</button>
+                                <button type="button" id="font-size-display-mobile" disabled style="border: 1px solid var(--border-color); background: var(--bg-sidebar); color: var(--text-base); height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: default; font-weight: 600; border-radius: 0; box-shadow: none !important;">18px</button>
+                                <button type="button" id="btn-increase-font-mobile" style="border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 0 6px 6px 0; padding: 0; box-shadow: none !important; font-size: 13px; font-weight: bold; border-left: none;">A+</button>
+                            </div>
+                        </div>
+                        <!-- Font Family -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Skrifttype</span>
+                            <div class="select-wrapper">
+                                <select id="settings-font-family-mobile" style="padding: 0 24px 0 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px; outline: none; cursor: pointer;">
+                                    <option value="serif">Serif (Klassisk)</option>
+                                    <option value="sans">Sans-Serif (Moderne)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Theme Selection -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tema</span>
+                            <div class="theme-selectors" style="margin: 0; display: flex; gap: 8px;">
+                                <div class="theme-option" data-theme="cream" title="Kremgul" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #fdf6e3; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="light" title="Lys" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #ffffff; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                                <div class="theme-option" data-theme="dark" title="Mørk" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: #1a1a1a; box-shadow: inset 0 0 2px rgba(0,0,0,0.2); transition: all 0.2s;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="books-list-wrapper">
+                <div class="books-section-title" id="header-gt">Det gamle testamentet</div>
+                <div id="books-list-gt">
+                    <!-- Loaded dynamically -->
+                </div>
+                
+                <div class="books-section-title" id="header-nt">Det nye testamentet</div>
+                <div id="books-list-nt">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Central Reading Area -->
+        <main class="bible-reading-area">
+            
+            <!-- Bible Controls -->
+            <div class="bible-controls">
+                <div class="controls-left">
+                    <!-- Sidebar trigger (Mobile Only) -->
+                    <button class="btn-mobile-sidebar" id="mobile-sidebar-toggle">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">menu</span>
+                    </button>
+
+                    <!-- Translation select -->
+                    <div class="select-wrapper">
+                        <select id="bible-translation-select">
+                            <!-- Loaded dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Book / Chapter triggers for quick overlay select -->
+                    <button class="nav-btn" id="trigger-book-chapter" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">grid_view</span>
+                        <span>Kapittel</span>
+                    </button>
+
+                    <!-- Chapter Grid Overlay -->
+                    <div class="chapter-selector-overlay" id="chapter-selector-overlay">
+                        <div style="font-weight: 700; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Velg kapittel</span>
+                            <span class="material-symbols-outlined" style="cursor: pointer; font-size: 18px;" onclick="document.getElementById('chapter-selector-overlay').classList.remove('active')">close</span>
+                        </div>
+                        <div class="chapter-grid" id="chapter-grid">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-right">
+                    <!-- Quick Reference Search -->
+                    <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 8px; align-items: center;">
+                        <input type="text" id="bible-quick-search" placeholder="f.eks. Johannes 3:16" class="bible-control-input">
+                        <button type="submit" class="btn-bible-go">Gå</button>
+                    </form>
+
+                    <!-- Settings Trigger -->
+                    <div class="settings-popover-trigger" onclick="document.getElementById('settings-dropdown').classList.toggle('active')" title="Tekst-innstillinger">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
+                    </div>
+
+                    <!-- Bibeleksikon Manual Trigger -->
+                    <div class="settings-popover-trigger" id="dict-manual-trigger" title="Åpne Bibeleksikon">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
+                    </div>
+
+                    <!-- Reading Mode Trigger -->
+                    <div class="settings-popover-trigger" id="btn-toggle-reading-mode" title="Aktiver lesemodus">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chrome_reader_mode</span>
+                    </div>
+
+                    <!-- Right Sidebar Toggle Button (Mobile/Tablet Only) -->
+                    <button class="btn-mobile-nav-right" id="mobile-nav-right-toggle">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">bookmarks</span>
+                    </button>
+
+                    <!-- Settings Popover -->
+                    <div class="settings-dropdown" id="settings-dropdown">
+                        <div style="font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">Tekst-innstillinger</div>
+                        
+                        <!-- Font Size -->
+                        <div class="settings-row">
+                            <span class="settings-label">Skriftstørrelse</span>
+                            <div class="btn-setting-group">
+                                <button id="btn-decrease-font">A-</button>
+                                <button id="font-size-display" disabled style="cursor: default;">18px</button>
+                                <button id="btn-increase-font">A+</button>
+                            </div>
+                        </div>
+
+                        <!-- Font Family -->
+                        <div class="settings-row">
+                            <span class="settings-label">Skrifttype</span>
+                            <div class="select-wrapper">
+                                <select id="settings-font-family" style="padding: 4px 24px 4px 8px; font-size: 12px;">
+                                    <option value="serif">Serif (Klassisk)</option>
+                                    <option value="sans">Sans-Serif (Moderne)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Theme Selection -->
+                        <div class="settings-row">
+                            <span class="settings-label">Tema</span>
+                            <div class="theme-selectors">
+                                <div class="theme-option active" data-theme="cream" title="Kremgul"></div>
+                                <div class="theme-option" data-theme="light" title="Lys"></div>
+                                <div class="theme-option" data-theme="dark" title="Mørk"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Content Area -->
+            <div class="bible-content-pane">
+                <div class="bible-text-container">
+                    <div class="reference-header" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="book-badge" id="current-book-badge">MATTEUS</div>
+                        <h1 class="chapter-number" id="current-chapter-number">1</h1>
+                        <span class="translation-badge" id="current-translation-abbr" style="display: none;">OTB-NB</span>
+                        <button id="btn-lookup-chapter" class="nav-btn" style="margin-top: 4px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>Forklar kapittelet i Bibeleksikon</span>
+                        </button>
+                    </div>
+
+                    <!-- The Actual Bible Text -->
+                    <div class="bible-reading-pane" id="bible-reading-pane">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Bottom Chapter Cross References -->
+                    <div id="chapter-cross-references-section" style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border-color); display: none; width: 100%;">
+                        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; justify-content: center; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">link</span>
+                            <span>Relaterte vers & kryssreferanser</span>
+                        </h4>
+                        <div id="chapter-cross-references" style="display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto;">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verse Context Actions Toolbar -->
+                <div id="verse-context-toolbar">
+                    <button id="toolbar-btn-bookmark" class="toolbar-action-btn" data-tooltip="Bokmerk">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">bookmark</span>
+                    </button>
+                    <button id="toolbar-btn-range" class="toolbar-action-btn" data-tooltip="Velg område">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">select_all</span>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-lookup" class="toolbar-action-btn" data-tooltip="Forklar i Bibeleksikon">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-share" class="toolbar-action-btn" data-tooltip="Del vers">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
+                    </button>
+                    <button id="toolbar-btn-download" class="toolbar-action-btn" data-tooltip="Lagre på maskin">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                    </button>
+                    <button id="toolbar-btn-save-user" class="toolbar-action-btn" data-tooltip="Lagre på Min Side">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button id="toolbar-btn-clear" class="toolbar-action-btn" data-tooltip="Nullstill valg">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fly-out Dictionary Drawer -->
+            <aside class="dictionary-drawer" id="dictionary-drawer">
+                <div class="dict-header">
+                    <h3>Bibeleksikon</h3>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="toggle-expand-dict-btn" id="toggle-expand-dict-btn" title="Utvid/Gjør smalere">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">open_in_full</span>
+                        </button>
+                        <button class="close-dict-btn" id="close-dict-btn">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="dict-body">
+                    <!-- Search Input inside Drawer -->
+                    <div class="dict-search-container" style="margin-bottom: 20px; display: flex; gap: 8px;">
+                        <input type="text" id="dict-search-input" placeholder="Søk på ord eller spørsmål..." style="flex: 1; height: 38px !important; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-base); color: var(--text-base); font-size: 13px; outline: none; box-sizing: border-box;">
+                        <button id="dict-search-submit-btn" style="background: var(--bible-primary); color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px !important;">Søk</button>
+                    </div>
+
+                    <!-- Welcome / Info state when nothing is searched yet -->
+                    <div id="dict-welcome-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 10px; color: var(--text-muted);">
+                        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--bible-primary); margin-bottom: 12px; opacity: 0.8;">menu_book</span>
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0 0 6px 0;">Velkommen til Bibeleksikon</h4>
+                        <p style="font-size: 12px; line-height: 1.5; margin: 0;">Søk etter teologiske begreper, personer, hendelser eller still bibelrelaterte spørsmål direkte her.</p>
+                    </div>
+
+                    <!-- Spinner loading -->
+                    <div id="dict-spinner" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: var(--text-muted);">
+                        <div class="spinner" style="margin-bottom: 12px;"></div>
+                        <p style="font-size: 13px;">Slår opp...</p>
+                    </div>
+                    
+                    <div id="dict-content-wrap" style="display: none;">
+                        <h4 class="dict-word-title" id="dict-word-title">Nåde</h4>
+                        <div class="dict-category-badge" id="dict-category">Teologisk begrep</div>
+                        
+                        <div class="dict-section-title">Definisjon / Belysning</div>
+                        <div class="dict-definition-text" id="dict-definition">
+                            Dette er definisjonen...
+                        </div>
+
+                        <!-- Dypere teologisk analyse knapp og innhold -->
+                        <div id="dict-extended-trigger-wrap" style="display: none; margin-bottom: 24px;">
+                            <button id="dict-extended-btn" class="dict-extended-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">psychology</span>
+                                <span id="dict-extended-btn-text">Vis dypere teologisk analyse</span>
+                            </button>
+                        </div>
+                        <div id="dict-extended-section" style="display: none; margin-bottom: 24px; padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div class="dict-section-title" style="margin-top: 0; display: flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--bible-primary);">menu_book</span>
+                                <span id="dict-extended-header-text">Dypere analyse (Gemini & ordbøker)</span>
+                            </div>
+                            <div id="dict-extended-text" style="font-size: 13px; line-height: 1.6; color: var(--text-base); margin-top: 10px;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Grunntekst (Originalspråk) Section -->
+                        <div id="dict-original-words-section" style="display: none; margin-top: 20px; margin-bottom: 24px;">
+                            <div class="dict-section-title">Grunntekst (Originalspråk)</div>
+                            <div id="dict-original-words-list" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="dict-section-title">Kontekst</div>
+                        <div class="dict-note-box" id="dict-contextual-note">
+                            Dette er notatet...
+                        </div>
+
+                        <!-- Bibeleksikon Cross References -->
+                        <div id="dict-cross-refs-section" style="display: none; margin-top: 20px;">
+                            <div class="dict-section-title">Kryssreferanser (Relaterte vers)</div>
+                            <div id="dict-cross-references" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="dict-section-title" style="margin-top: 24px;">Relaterte ressurser fra nettsiden</div>
+                        <div id="dict-related-resources" class="dict-related-box">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Central Reading Area Bottom Floating Navigation -->
+            <div class="floating-bible-nav" id="floating-bible-nav">
+                <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="floating-nav-info">
+                    <span id="floating-nav-book">JOHANNES</span>
+                    <span id="floating-nav-chapter">1</span>
+                </div>
+                <button class="floating-nav-btn" id="floating-next-btn" title="Neste kapittel">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Bookmarks & History -->
+        <aside class="bible-nav-right" id="bible-nav-right">
+            <div class="sidebar-right-header">
+                <span class="sidebar-right-title">Min side & Verktøy</span>
+                <button class="close-sidebar-btn" onclick="document.getElementById('bible-nav-right').classList.remove('active')">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                </button>
+            </div>
+            <div class="tabs-header">
+                <div class="tab-btn active" id="tab-btn-bookmarks" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-bookmarks').classList.add('active');
+                    document.getElementById('bookmarks-list').style.display = 'block';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
+                ">Favoritter</div>
+                <div class="tab-btn" id="tab-btn-history" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-history').classList.add('active');
+                    document.getElementById('history-list').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
+                ">Historikk</div>
+                <div class="tab-btn" id="tab-btn-related" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-related').classList.add('active');
+                    document.getElementById('related-list').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
+                ">Ressurser</div>
+                <div class="tab-btn" id="tab-btn-notes" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-notes').classList.add('active');
+                    document.getElementById('notes-list').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('tab-reading-plan-content').style.display = 'none';
+                ">Notater</div>
+                <div class="tab-btn" id="tab-btn-reading-plan" onclick="
+                    document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('tab-btn-reading-plan').classList.add('active');
+                    document.getElementById('tab-reading-plan-content').style.display = 'block';
+                    document.getElementById('bookmarks-list').style.display = 'none';
+                    document.getElementById('history-list').style.display = 'none';
+                    document.getElementById('related-list').style.display = 'none';
+                    document.getElementById('notes-list').style.display = 'none';
+                ">Leseplan</div>
+            </div>
+
+            <div class="tabs-content">
+                <!-- Bookmarks List -->
+                <div id="bookmarks-list">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- History List -->
+                <div id="history-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Related Resources List -->
+                <div id="related-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Notes List -->
+                <div id="notes-list" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Leseplan Content -->
+                <div id="tab-reading-plan-content" style="display: none;">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt">
+                            </div>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
+                            <ul>
+                                <li><a href="/" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
+                            <ul>
+                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
+                                <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
+                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
+                            <ul>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
+                            <ul>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="/personvern" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h3>
+                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+
+    <!-- JavaScript -->
+    <script type="module" src="script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="js/cookie-consent.js"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.06.20.2"></script>
+    <script type="module" src="js/i18n.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

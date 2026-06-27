@@ -77,7 +77,7 @@ get_header();
         <div class="team-grid">
             <div class="team-member">
                 <div class="team-image">
-                    <img src="<?php echo get_template_directory_uri(); ?>/img/Hilde Karin Knutsen.jpg"
+                    <img src="<?php echo get_template_directory_uri(); ?>/img/Hilde Karin Knutsen.jpg" class="team-photo-focus-hilde"
                         alt="Hilde Karin Knutsen">
                 </div>
                 <div class="team-info">

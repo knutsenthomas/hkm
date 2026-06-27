@@ -1,40 +1,609 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const firebaseService = window.firebaseService;
-    if (!firebaseService) return;
+if (!window.__HKMAdminHeaderInitialized) {
+window.__HKMAdminHeaderInitialized = true;
 
-    firebaseService.onAuthChange(async (user) => {
-        if (!user) return;
+const initAdminHeader = () => {
+    console.log("[admin-header] Initializing admin header...");
+    const adminUtils = window.HKMAdminUtils || {};
+    let pendingAuthRedirect = null;
+    const ADMIN_IDENTITY_CACHE_KEY = 'hkm_admin_identity_cache';
+    const ADMIN_SW_DEV_CLEANUP_KEY = 'hkm_admin_sw_dev_cleanup_done';
+    const ADMIN_SIDEBAR_SCROLL_KEY = 'hkm_admin_sidebar_scroll_top';
 
-        const adminName = document.getElementById('admin-name');
-        const adminAvatar = document.getElementById('admin-avatar');
+    // Premium Progress Bar helper
+    const injectLoadingProgressBar = () => {
+        let bar = document.getElementById('admin-loading-progress');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'admin-loading-progress';
+            document.body.appendChild(bar);
+        }
+        return bar;
+    };
 
-        if (adminName || adminAvatar) {
-            let userProfile = null;
-            try {
-                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                if (userDoc.exists) userProfile = userDoc.data();
-            } catch (e) { }
+    window.triggerProgressAnimation = (durationMs = 450) => {
+        const bar = injectLoadingProgressBar();
+        bar.classList.remove('active');
+        bar.style.width = '0%';
+        bar.style.transition = 'none';
+        
+        // Force reflow
+        bar.offsetHeight;
+        
+        bar.classList.add('active');
+        bar.style.transition = 'width 0.4s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.2s ease';
+        bar.style.width = '100%';
+        
+        setTimeout(() => {
+            bar.style.transition = 'opacity 0.2s ease';
+            bar.classList.remove('active');
+            setTimeout(() => {
+                bar.style.width = '0%';
+            }, 200);
+        }, durationMs);
+    };
 
-            const displayName = (userProfile && userProfile.displayName) || user.displayName || user.email;
-            const photoURL = (userProfile && userProfile.photoURL) || user.photoURL;
-
-            if (adminName) adminName.textContent = displayName;
-            if (adminAvatar) {
-                if (photoURL) {
-                    adminAvatar.innerHTML = `<img src="${photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                } else {
-                    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
-                    adminAvatar.textContent = initials.substring(0, 2);
-                }
+    // Auto-trigger on all navigation clicks
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('.nav-link, .mobile-nav-item, .ov-action-btn, .template-item, .studio-create-card');
+        if (link) {
+            if (typeof window.triggerProgressAnimation === 'function') {
+                window.triggerProgressAnimation();
             }
         }
     });
 
+    window.addEventListener('hashchange', () => {
+        if (typeof window.triggerProgressAnimation === 'function') {
+            window.triggerProgressAnimation();
+        }
+    });
+
+    const stabilizeAdminServiceWorker = async () => {
+        if (!('serviceWorker' in navigator)) return;
+
+        const hostname = window.location.hostname;
+        const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
+
+        if (isLocalDev) {
+            try {
+                if (sessionStorage.getItem(ADMIN_SW_DEV_CLEANUP_KEY) === '1') return;
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.allSettled(regs.map((reg) => reg.unregister()));
+
+                if (window.caches && typeof caches.keys === 'function') {
+                    const keys = await caches.keys();
+                    await Promise.allSettled(
+                        keys.filter((key) => key.startsWith('hkm-admin-')).map((key) => caches.delete(key))
+                    );
+                }
+
+                sessionStorage.setItem(ADMIN_SW_DEV_CLEANUP_KEY, '1');
+                console.info('[admin-header] Local admin SW cache cleared');
+            } catch (e) {
+                console.warn('[admin-header] Local SW cleanup failed:', e);
+            }
+            return;
+        }
+
+        try {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.allSettled(regs.map((reg) => (typeof reg.update === 'function' ? reg.update() : Promise.resolve())));
+        } catch (e) {
+            console.warn('[admin-header] SW update check failed:', e);
+        }
+    };
+
+    stabilizeAdminServiceWorker().catch(() => { });
+
+    const withTimeout = async (promise, timeoutMs = 1500) => {
+        let timerId;
+        try {
+            return await Promise.race([
+                promise,
+                new Promise((resolve) => {
+                    timerId = setTimeout(() => resolve(null), timeoutMs);
+                })
+            ]);
+        } finally {
+            if (timerId) clearTimeout(timerId);
+        }
+    };
+
+    const getIdentityEls = () => ({
+        adminNames: Array.from(document.querySelectorAll('#admin-name, .user-name, .user-name-compact')),
+        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, .user-avatar, .user-avatar-compact'))
+    });
+
+    const readCachedIdentity = () => {
+        try {
+            const raw = localStorage.getItem(ADMIN_IDENTITY_CACHE_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return {
+                displayName: typeof parsed.displayName === 'string' ? parsed.displayName : '',
+                photoURL: typeof parsed.photoURL === 'string' ? parsed.photoURL : ''
+            };
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const writeCachedIdentity = (displayName, photoURL) => {
+        try {
+            localStorage.setItem(ADMIN_IDENTITY_CACHE_KEY, JSON.stringify({
+                displayName: displayName || '',
+                photoURL: photoURL || '',
+                ts: Date.now()
+            }));
+        } catch (e) {
+            // noop
+        }
+    };
+
+    const getInitials = (displayName) => {
+        const safeName = (displayName || '').trim() || 'Administrator';
+        return safeName
+            .split(' ')
+            .map((n) => (n || '').trim())
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2) || 'A';
+    };
+
+    const renderIdentity = (displayName, photoURL) => {
+        const { adminNames, adminAvatars } = getIdentityEls();
+        const safeName = (displayName || '').trim() || 'Administrator';
+
+        adminNames.forEach(adminName => {
+            if (adminName) {
+                adminName.textContent = safeName;
+            }
+        });
+
+        adminAvatars.forEach(adminAvatar => {
+            if (!adminAvatar) return;
+
+            // Clear any previous state
+            adminAvatar.textContent = '';
+            adminAvatar.innerHTML = '';
+            adminAvatar.title = safeName;
+            if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
+
+            if (photoURL && photoURL.trim().length > 5) {
+                adminAvatar.classList.remove('has-initials');
+                // Show actual photo
+                const img = document.createElement('img');
+                img.src = photoURL;
+                img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
+                
+                // Fallback if image fails to load
+                img.onerror = () => {
+                    adminAvatar.classList.add('has-initials');
+                    adminAvatar.innerHTML = '';
+                    adminAvatar.textContent = getInitials(safeName);
+                };
+                
+                adminAvatar.appendChild(img);
+            } else {
+                adminAvatar.classList.add('has-initials');
+                // Fallback: Use initials
+                adminAvatar.textContent = getInitials(safeName);
+            }
+        });
+    };
+
+    const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
+    const cachedIdentity = readCachedIdentity();
+
+    // Inject Favorites Helper styles & listener
+    const injectFavoritesUiHelper = () => {
+        const styleId = 'hkm-admin-favorites-styles';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                body.admin-body .nav-list,
+                body.minside-body .nav-list {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    gap: 4px !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                body.admin-body .nav-item,
+                body.minside-body .nav-item {
+                    width: 100% !important;
+                    display: block !important;
+                    margin-bottom: 4px !important;
+                    margin-top: 0 !important;
+                }
+                body.admin-body .nav-link,
+                body.minside-body .nav-link {
+                    display: flex !important;
+                    align-items: center !important;
+                    width: 100% !important;
+                }
+                .nav-link-wrap {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    position: relative;
+                }
+                .nav-fav-toggle-btn {
+                    opacity: 0;
+                    transition: opacity 0.2s ease, transform 0.2s ease;
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 4px !important;
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 10;
+                }
+                .nav-link-wrap:hover .nav-fav-toggle-btn,
+                .nav-fav-toggle-btn:focus-within {
+                    opacity: 0.5;
+                }
+                .nav-fav-toggle-btn:hover {
+                    opacity: 1 !important;
+                    transform: scale(1.2);
+                }
+                .nav-fav-toggle-btn .star-icon-element {
+                    font-size: 16px !important;
+                    color: #94a3b8;
+                    font-variation-settings: 'FILL' 0;
+                    transition: color 0.2s ease, font-variation-settings 0.2s ease;
+                }
+                .nav-fav-toggle-btn .star-icon-element.active {
+                    color: #fbbf24 !important;
+                    font-variation-settings: 'FILL' 1 !important;
+                    opacity: 1 !important;
+                }
+                .nav-fav-toggle-btn.active-fav {
+                    opacity: 1 !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (sidebarNav && !sidebarNav.dataset.hkmFavsBound) {
+            sidebarNav.dataset.hkmFavsBound = '1';
+            sidebarNav.addEventListener('click', (e) => {
+                const btn = e.target.closest('.nav-fav-toggle-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const label = btn.getAttribute('data-label');
+                    const raw = localStorage.getItem('hkm_admin_sidebar_favorites');
+                    let favorites = raw ? JSON.parse(raw) : [];
+                    
+                    if (favorites.includes(label)) {
+                        favorites = favorites.filter(l => l !== label);
+                    } else {
+                        favorites.push(label);
+                    }
+                    
+                    localStorage.setItem('hkm_admin_sidebar_favorites', JSON.stringify(favorites));
+                    
+                    // Re-render and re-init
+                    normalizeSidebarNavigation(true);
+                    
+                    if (typeof initSidebarCategories === 'function') {
+                        initSidebarCategories();
+                    }
+                }
+            });
+        }
+    };
+
+    const normalizeSidebarNavigation = (force = false) => {
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (!sidebarNav || (sidebarNav.dataset.hkmNormalized === '1' && !force)) return;
+
+        injectFavoritesUiHelper();
+
+        const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
+        const hash = window.location.hash.replace('#', '');
+        const isAdminHome = path.endsWith('/admin/index.html') || path.endsWith('/admin/index.html');
+        const currentSection = hash || (isAdminHome ? 'overview' : '');
+
+        const itemHref = (section) => `/admin/index.html#${section}`;
+        const isActive = (item) => {
+            if (item.path && path.includes(item.path)) return true;
+            if (item.section && currentSection === item.section) return true;
+            return false;
+        };
+
+        const getFavorites = () => {
+            try {
+                const raw = localStorage.getItem('hkm_admin_sidebar_favorites');
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const favorites = getFavorites();
+
+        const renderItem = (item, isFavSection = false) => {
+            const active = isActive(item) ? ' active' : '';
+            const visible = item.alwaysVisible ? ' visible' : '';
+            const hiddenClass = (!isFavSection && item.hidden) ? ' nav-helper-hidden' : '';
+            const hiddenStyle = (!isFavSection && item.hidden) ? ' style="display:none"' : '';
+            const categoryAttr = isFavSection ? ' data-nav-category="favoritter"' : (item.category ? ` data-nav-category="${item.category}"` : ' data-nav-category="all"');
+            const dataSection = item.section ? ` data-section="${item.section}"` : '';
+            const id = (!isFavSection && item.id) ? ` id="${item.id}"` : '';
+            const target = item.target ? ` target="${item.target}"` : '';
+            const rel = item.target === '_blank' ? ' rel="noopener noreferrer"' : '';
+            const href = item.href || (item.section ? itemHref(item.section) : '#');
+
+            const isFav = favorites.includes(item.label);
+
+            return `
+                <li class="nav-item${visible}${hiddenClass}"${hiddenStyle}${categoryAttr}>
+                    <div class="nav-link-wrap">
+                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} style="flex: 1; padding-right: 40px !important;">
+                            <span class="material-symbols-outlined">${item.icon}</span>
+                            <span>${item.label}</span>
+                            ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
+                        </a>
+                        <button class="nav-fav-toggle-btn${isFav ? ' active-fav' : ''}" data-label="${item.label}" title="${isFav ? 'Fjern fra favoritter' : 'Legg til i favoritter'}">
+                            <span class="material-symbols-outlined star-icon-element${isFav ? ' active' : ''}">star</span>
+                        </button>
+                    </div>
+                </li>
+            `;
+        };
+
+        const renderHeader = (category, label) => `
+            <li class="nav-category-header" data-target-category="${category}">
+                <span>${label}</span>
+                <span class="material-symbols-outlined expand-icon">expand_more</span>
+            </li>
+        `;
+
+        const mainItems = [
+            { label: 'Oversikt', icon: 'home', section: 'overview', href: '/admin/index.html#overview', alwaysVisible: true },
+            { label: 'Min Side', icon: 'account_circle', href: '/minside/index.html', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
+            { label: 'Se nettside', icon: 'visibility', href: '/', alwaysVisible: true, target: '_blank' },
+            { header: 'nettsted', label: 'Nettsted' },
+            { label: 'Sideinnhold', icon: 'description', section: 'content', category: 'nettsted' },
+            { label: 'Blogg', icon: 'edit_note', section: 'blog', category: 'nettsted' },
+            { label: 'Media', icon: 'image', section: 'media', category: 'nettsted' },
+            { label: 'Podcast', icon: 'podcasts', section: 'podcast', category: 'nettsted' },
+            { label: 'Hero Slider', icon: 'view_carousel', section: 'hero', category: 'nettsted' },
+            { label: 'Undervisning', icon: 'school', section: 'teaching', category: 'nettsted' },
+            { label: 'Kursadministrasjon', icon: 'menu_book', section: 'courses', category: 'nettsted' },
+            { label: 'Leseplaner', icon: 'auto_stories', section: 'reading-plans', category: 'nettsted' },
+            { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
+            { header: 'kommunikasjon', label: 'Kommunikasjon' },
+            { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
+            { label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon.html', path: 'admin-kommunikasjon', category: 'kommunikasjon' },
+            { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter.html', path: 'admin-segmenter', category: 'kommunikasjon' },
+            { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
+            { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
+            { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
+            { header: 'administrasjon', label: 'Administrasjon' },
+            { label: 'Huskeliste', icon: 'playlist_add_check', section: 'todo', category: 'administrasjon', alwaysVisible: true },
+            { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
+            { label: 'Butikk', icon: 'shopping_cart', section: 'shop', category: 'administrasjon' },
+            { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },
+            { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
+            { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
+            { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
+            { label: 'Integrasjoner', icon: 'hub', section: 'integrations', category: 'administrasjon' },
+            { label: 'Analyse', icon: 'analytics', href: '/admin/admin-analytics.html', path: 'admin-analytics', category: 'administrasjon', alwaysVisible: true },
+            { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
+        ];
+
+        const favoritedItems = mainItems
+            .filter(item => !item.header && favorites.includes(item.label))
+            .sort((a, b) => a.label.localeCompare(b.label, 'no'));
+        let favHtml = '';
+        if (favoritedItems.length > 0) {
+            const favItemsHtml = favoritedItems.map(item => renderItem(item, true)).join('');
+            favHtml = `
+                <li class="nav-category-header" data-target-category="favoritter">
+                    <span>Favoritter</span>
+                    <span class="material-symbols-outlined expand-icon">expand_more</span>
+                </li>
+                ${favItemsHtml}
+            `;
+        }
+
+        const footerItems = [];
+
+        const mainHtml = mainItems.map((item) => (
+            item.header ? renderHeader(item.header, item.label) : renderItem(item)
+        )).join('');
+
+        const footerHtml = footerItems.map(item => renderItem(item)).join('') + `
+            <li class="nav-item visible" data-nav-category="all">
+                <button id="logout-btn" class="nav-link logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Logg ut</span>
+                </button>
+            </li>
+        `;
+
+        sidebarNav.innerHTML = `
+            <div class="nav-group">
+                <ul class="nav-list">
+                    ${favHtml}
+                    ${mainHtml}
+                </ul>
+            </div>
+            <div class="nav-group bottom">
+                <ul class="nav-list">${footerHtml}</ul>
+            </div>
+        `;
+        sidebarNav.dataset.hkmNormalized = '1';
+    };
+
+    console.log("[admin-header] Normalizing sidebar...");
+    normalizeSidebarNavigation();
+
+    // Hydrate cached identity immediately to avoid visible "Laster..." hangs.
+    if (cachedIdentity?.displayName) {
+        console.log("[admin-header] Hydrating cached identity:", cachedIdentity.displayName);
+        renderIdentity(cachedIdentity.displayName, cachedIdentity.photoURL || '');
+    }
+
+    // Final guardrail: never leave the loading placeholder indefinitely.
+    console.log("[admin-header] Scheduling final guardrail timeout...");
+    setTimeout(() => {
+        const { adminNames } = getIdentityEls();
+        const hasLaster = adminNames.some(el => el && el.textContent.trim() === 'Laster...');
+        if (hasLaster) {
+            console.log("[admin-header] Guardrail timeout fired: Name is still loading. Rendering cached or default identity.");
+            renderIdentity(cachedIdentity?.displayName || 'Administrator', cachedIdentity?.photoURL || '');
+        }
+    }, 1500);
+
+    const waitForFirebaseService = async (timeoutMs = 8000) => {
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+            const service = window.firebaseService;
+            if (service && (service.isInitialized || (typeof service.tryAutoInit === 'function' && service.tryAutoInit()))) {
+                return service;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return window.firebaseService || null;
+    };
+
+    const bindHeaderAuth = async () => {
+        const firebaseService = await waitForFirebaseService();
+        if (!firebaseService || !firebaseService.isInitialized) {
+            renderIdentity(cachedIdentity?.displayName || 'Administrator', cachedIdentity?.photoURL || '');
+            return;
+        }
+
+        firebaseService.onAuthChange(async (user) => {
+            if (pendingAuthRedirect) {
+                clearTimeout(pendingAuthRedirect);
+                pendingAuthRedirect = null;
+            }
+
+            if (!user) {
+                // Delay redirect slightly to avoid false positives during transient auth refresh.
+                pendingAuthRedirect = setTimeout(() => {
+                    if (!firebaseService?.auth?.currentUser) {
+                        window.location.href = '/admin/login.html';
+                    }
+                }, 2500);
+                return;
+            }
+
+            let role = 'medlem';
+            try {
+                role = await firebaseService.getUserRole(user.uid, { timeoutMs: 2500 });
+            } catch (e) {
+                console.warn('[admin-header] Could not fetch user role:', e);
+            }
+
+            const isAdmin = typeof adminUtils.isElevatedAdminRole === 'function'
+                ? adminUtils.isElevatedAdminRole(role)
+                : ['admin', 'superadmin'].includes(String(role || '').toLowerCase());
+
+            if (!isAdmin) {
+                const redirect = typeof adminUtils.redirectToMinSideWithAccessDenied === 'function'
+                    ? adminUtils.redirectToMinSideWithAccessDenied
+                    : () => { window.location.href = '/minside/index.html'; };
+                redirect({
+                    path: '/minside/index.html',
+                    message: 'Access Denied: Du har ikke administratorrettigheter til denne siden.'
+                });
+                return;
+            }
+
+            // Render immediately from Auth so UI never stays in "Laster..."
+            renderIdentity(authFallbackName(user), user.photoURL || '');
+            writeCachedIdentity(authFallbackName(user), user.photoURL || '');
+
+            let userProfile = null;
+            try {
+                const userDoc = await withTimeout(firebase.firestore().collection('users').doc(user.uid).get(), 1500);
+                if (userDoc && userDoc.exists) userProfile = userDoc.data();
+            } catch (e) { }
+
+            const displayName = (userProfile && userProfile.displayName) || authFallbackName(user);
+            const photoURL = (userProfile && userProfile.photoURL) || user.photoURL || '';
+            renderIdentity(displayName, photoURL);
+            writeCachedIdentity(displayName, photoURL);
+
+            // Fetch and apply bottom nav settings
+            try {
+                const designSettings = await firebaseService.getPageContent('settings_design');
+                if (designSettings && Array.isArray(designSettings.adminBottomNav)) {
+                    applyAdminBottomNavSettings(designSettings.adminBottomNav);
+                }
+            } catch (e) {
+                console.warn('[admin-header] Failed to load design settings for bottom nav:', e);
+            }
+        });
+    };
+
+    const bindGlobalLogout = async () => {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (!logoutBtn || logoutBtn.dataset.hkmLogoutBound === '1') return;
+        logoutBtn.dataset.hkmLogoutBound = '1';
+
+        logoutBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const originalHtml = logoutBtn.innerHTML;
+            logoutBtn.disabled = true;
+            logoutBtn.innerHTML = '<span class="material-symbols-outlined">sync</span><span>Logger ut...</span>';
+
+            try {
+                const firebaseService = await waitForFirebaseService(3000);
+                if (firebaseService && firebaseService.isInitialized && typeof firebaseService.logout === 'function') {
+                    await firebaseService.logout();
+                } else if (window.firebase && firebase.auth) {
+                    await firebase.auth().signOut();
+                }
+            } catch (error) {
+                console.error('[admin-header] Logout failed:', error);
+            } finally {
+                try {
+                    localStorage.removeItem(ADMIN_IDENTITY_CACHE_KEY);
+                    Object.keys(localStorage)
+                        .filter((key) => key.startsWith('hkm_user_role_cache:'))
+                        .forEach((key) => localStorage.removeItem(key));
+                } catch (e) { }
+                logoutBtn.innerHTML = originalHtml;
+                logoutBtn.disabled = false;
+                window.location.replace('/admin/login.html');
+            }
+        });
+    };
+
+    (async () => {
+        try {
+            await bindGlobalLogout();
+            await bindHeaderAuth();
+        } catch (e) {
+            console.warn('[admin-header] Header auth init failed:', e);
+            renderIdentity(cachedIdentity?.displayName || 'Administrator', cachedIdentity?.photoURL || '');
+        }
+    })();
+
     // Keep profile links as normal navigation (e.g. to ../minside/index.html).
 
 
-    // Mobile Nav Toggle
-    const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+    // Mobile Nav Toggle (Supports both dashboard and builder instances)
+    const mobileNavToggles = document.querySelectorAll('.mobile-nav-toggle');
     const sidebar = document.querySelector('.sidebar');
 
     // Create overlay if missing (for better mobile UX)
@@ -45,7 +614,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(sidebarOverlay);
     }
 
-    if (mobileNavToggle && sidebar) {
+    if (mobileNavToggles.length > 0 && sidebar) {
+        // Set initial title based on state
+        const updateToggleTitle = () => {
+            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+            mobileNavToggles.forEach(toggle => {
+                toggle.setAttribute('title', isCollapsed ? 'Vis meny' : 'Skjul meny');
+            });
+        };
+        updateToggleTitle();
+
         const toggleSidebar = (force) => {
             const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
             sidebar.classList.toggle('active', isActive);
@@ -54,9 +632,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        mobileNavToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleSidebar();
+        mobileNavToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.innerWidth > 1024) {
+                    document.body.classList.toggle('sidebar-collapsed');
+                    updateToggleTitle();
+                } else {
+                    toggleSidebar();
+                }
+            });
         });
 
         if (sidebarOverlay) {
@@ -64,10 +649,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleSidebar(false);
             });
         }
+    }
 
+    // --- Collapsible Sidebar Categories (Hardened) ---
+    const initSidebarCategories = () => {
+        const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
+        if (categoryHeaders.length === 0) return;
+
+        function setCategory(category, shouldBeOpen) {
+            const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
+            const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
+            if (!header) return;
+
+            if (shouldBeOpen) {
+                header.classList.remove('collapsed');
+                items.forEach(item => {
+                    item.classList.remove('nav-cat-hidden');
+                    item.classList.add('visible');
+                    item.style.setProperty('display', 'block', 'important');
+                    item.style.setProperty('visibility', 'visible', 'important');
+                    item.style.setProperty('opacity', '1', 'important');
+                });
+            } else {
+                header.classList.add('collapsed');
+                items.forEach(item => {
+                    item.classList.add('nav-cat-hidden');
+                    item.classList.remove('visible');
+                    item.style.setProperty('display', 'none', 'important');
+                });
+            }
+        }
+
+        categoryHeaders.forEach(header => {
+            const cat = header.getAttribute('data-target-category');
+            
+            // All categories are open as standard on page load
+            setCategory(cat, true);
+
+            // Use direct onclick to ensure it's not blocked by other listeners
+            header.onclick = (e) => {
+                e.preventDefault();
+                const currentlyCollapsed = header.classList.contains('collapsed');
+                setCategory(cat, currentlyCollapsed);
+            };
+        });
+    };
+
+    // Run immediately and also on DOMContentLoaded just in case
+    initSidebarCategories();
+    document.addEventListener('DOMContentLoaded', initSidebarCategories);
+
+    // Mobile Sidebar Close Button
+    const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+    if (mobileSidebarClose && sidebar) {
+        mobileSidebarClose.onclick = () => {
+            sidebar.classList.remove('active');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        };
+    }
+
+    // --- Global Search Handler (Visual Only) ---
+    if (sidebar) {
         // Close when clicking outside
         document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== mobileNavToggle) {
+            const isClickingToggle = Array.from(mobileNavToggles).some(toggle => toggle.contains(e.target) || toggle === e.target);
+            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !isClickingToggle) {
+                const toggleSidebar = (force) => {
+                    const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
+                    sidebar.classList.toggle('active', isActive);
+                    if (sidebarOverlay) {
+                        sidebarOverlay.classList.toggle('active', isActive);
+                    }
+                };
                 toggleSidebar(false);
             }
         });
@@ -82,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href && href !== '#' && currentPath.includes(href)) {
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-        } else if (href === '#' && (currentPath.endsWith('index.html') || currentPath.endsWith('admin/'))) {
+        } else if (href === '#' && (currentPath.endsWith('/admin/index.html') || currentPath.endsWith('admin/'))) {
             // Oversikt fallback
             if (item.getAttribute('data-section') === 'overview') {
                 item.classList.add('active');
@@ -90,5 +743,94 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const applyAdminBottomNavSettings = (activeIds) => {
+        if (!Array.isArray(activeIds)) return;
+        bottomNavItems.forEach(item => {
+            const href = item.getAttribute('href') || '';
+            const section = item.getAttribute('data-section') || '';
+            let id = '';
+            if (section === 'overview' || href.includes('#overview')) {
+                id = 'overview';
+            } else if (href.includes('kommunikasjon')) {
+                id = 'contacts';
+            } else if (href.includes('minside')) {
+                id = 'minside';
+            } else if (section === 'settings' || href.includes('#settings')) {
+                id = 'settings';
+            }
+
+            if (id) {
+                if (activeIds.includes(id)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        });
+    };
+
+    // Sidebar scroll memory (keep left menu position on refresh/navigation)
+    const sidebarNavScroller = document.querySelector('.sidebar .sidebar-nav') || document.querySelector('.sidebar-nav');
+
+    const saveSidebarScrollPosition = () => {
+        if (!sidebarNavScroller) return;
+        try {
+            sessionStorage.setItem(ADMIN_SIDEBAR_SCROLL_KEY, String(Math.max(0, Math.round(sidebarNavScroller.scrollTop || 0))));
+        } catch (e) {
+            // noop
+        }
+    };
+
+    const restoreSidebarScrollPosition = () => {
+        if (!sidebarNavScroller) return;
+        let target = 0;
+        try {
+            const raw = sessionStorage.getItem(ADMIN_SIDEBAR_SCROLL_KEY);
+            if (!raw) return;
+            target = Math.max(0, parseInt(raw, 10) || 0);
+        } catch (e) {
+            return;
+        }
+
+        // Apply multiple times because some pages alter sidebar layout after DOMContentLoaded.
+        let attempts = 0;
+        const apply = () => {
+            attempts += 1;
+            sidebarNavScroller.scrollTop = target;
+            if (attempts < 6) requestAnimationFrame(apply);
+        };
+        requestAnimationFrame(apply);
+        setTimeout(() => { sidebarNavScroller.scrollTop = target; }, 120);
+        setTimeout(() => { sidebarNavScroller.scrollTop = target; }, 320);
+    };
+
+    if (sidebarNavScroller) {
+        let scrollSaveRaf = 0;
+        sidebarNavScroller.addEventListener('scroll', () => {
+            if (scrollSaveRaf) cancelAnimationFrame(scrollSaveRaf);
+            scrollSaveRaf = requestAnimationFrame(() => {
+                scrollSaveRaf = 0;
+                saveSidebarScrollPosition();
+            });
+        }, { passive: true });
+
+        document.querySelectorAll('.sidebar .nav-link').forEach((link) => {
+            link.addEventListener('click', () => {
+                saveSidebarScrollPosition();
+            });
+        });
+
+        window.addEventListener('pagehide', saveSidebarScrollPosition);
+        window.addEventListener('beforeunload', saveSidebarScrollPosition);
+        restoreSidebarScrollPosition();
+    }
+
     // Sidebar Category logic is now handled in the main dashboard script in index.html
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminHeader);
+} else {
+    initAdminHeader();
+}
+}
