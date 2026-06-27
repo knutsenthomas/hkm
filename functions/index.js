@@ -7747,7 +7747,10 @@ exports.getBibleChapterAudio = onCall({
  * Daglig planlagt jobb for å sende leseplanpåminnelser (både push-varsel og e-post).
  * Kjører hver dag klokken 07:00.
  */
-exports.scheduledReadingNotifications = onSchedule("0 * * * *", async (event) => {
+exports.scheduledReadingNotifications = onSchedule({
+  schedule: "0 * * * *",
+  secrets: [emailUserParam, emailPassParam]
+}, async (event) => {
   const osloHour = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Oslo" })).getHours();
   console.log(`⏰ Starter kjøring av leseplanvarslinger for time ${osloHour}:00 (Oslo-tid)...`);
 
