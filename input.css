@@ -5581,13 +5581,10 @@ ol.block-list {
     align-items: center;
     gap: 8px;
     opacity: 0;
-    max-width: 0;
-    overflow: hidden;
     pointer-events: none;
     white-space: nowrap;
     transform: translateX(-10px);
-    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.3s ease,
+    transition: opacity 0.3s ease,
                 transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 margin-left 0.4s ease;
 }
@@ -5601,7 +5598,6 @@ ol.block-list {
 .header-actions-dock.expanded .header-actions-expandable,
 .header-actions-dock:has(.lang-switcher.active) .header-actions-expandable {
     opacity: 1;
-    max-width: 260px;
     pointer-events: auto;
     transform: translateX(0);
     margin-left: 8px;
