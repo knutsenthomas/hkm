@@ -5802,7 +5802,7 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
         display: none;
     }
     #mega-menu>div {
-        padding-top: 80px !important;
+        padding-top: 120px !important;
         padding-bottom: 12px !important;
     }
     .mega-menu-grid {
@@ -5835,7 +5835,7 @@ body:not(.header-dark-start) .header .menu-toggle:hover {
 /* For screens with comfortable height (e.g. height >= 800px), make it more spacious & premium */
 @media (min-width: 769px) and (min-height: 800px) {
     #mega-menu>div {
-        padding-top: 90px !important;
+        padding-top: 136px !important;
         padding-bottom: 16px !important;
     }
     .mega-menu-grid {
