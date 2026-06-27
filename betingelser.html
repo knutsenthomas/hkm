@@ -99,49 +99,55 @@
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
-                    <span class="material-symbols-outlined text-2xl">search</span>
-                </button>
-                <a href="/bibel" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
-                    <span class="material-symbols-outlined text-2xl">menu_book</span>
-                </a>
-                <a href="/leseplaner" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
-                    <span class="material-symbols-outlined text-2xl">calendar_today</span>
-                </a>
-
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global"
-                            data-content-key="header.currentLanguage">NO</span>
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
-                            Norsk</a>
-                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
-                            English</a>
-                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
-                            Español</a>
+                    <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                        <span class="material-symbols-outlined text-xl">menu_book</span>
+                    </a>
+                    <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                        <span class="material-symbols-outlined text-xl">calendar_today</span>
+                    </a>
+                    
+                    <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+
+                    <!-- Language Switcher in same styling -->
+                    <div class="lang-switcher relative group">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                            <span class="material-symbols-outlined text-lg">language</span>
+                            <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                        </button>
+                        <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                            <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                Norsk</a>
+                            <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                English</a>
+                            <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                Español</a>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
                 <a href="/donasjoner"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span> <i
-                        class="fas fa-heart heart text-sm btn-heart-icon"></i>
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-lg flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
                     id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
                     data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
                     data-content-attr="aria-label">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -160,22 +166,28 @@
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/" class="text-sm font-bold text-primary-orange"
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/en/index"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/index"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -188,16 +200,31 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.engage.title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/donasjoner" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
-                            <li><a href="/bli-fast-giver" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
-                            <li><a href="/for-menigheter" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
-                            <li><a href="/for-bedrifter" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
-                            <li><a href="/bnn" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <a href="/donasjoner" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <a href="/for-menigheter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <a href="/for-bedrifter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <a href="/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -206,10 +233,16 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/om-oss" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.about">Om oss</a></li>
-                            <li><a href="/kontakt" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <a href="/om-oss" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <a href="/kontakt" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -218,19 +251,43 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.resources.title">Ressurser</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a></li>
-                            <li><a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a></li>
-                            <li><a href="/butikk" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
-                            <li><a href="/arrangementer" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
-                            <li><a href="/media" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
-                            <li><a href="/blogg" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
-                            <li><a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a></li>
-                            <li><a href="/minside/index.html" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <a href="/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">person</span>
+                                <a href="/minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -241,7 +298,7 @@
                             data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
                             class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="/butikk" data-content-doc="settings_global"
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
                             data-content-key="menu.footer.store">Butikk</a>
                         <a href="/donasjoner" data-content-doc="settings_global"
                             data-content-key="menu.footer.taxDeduction">Skattefradrag</a>

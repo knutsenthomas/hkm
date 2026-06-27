@@ -99,41 +99,48 @@
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Buscar en el sitio">
-                    <span class="material-symbols-outlined text-2xl">search</span>
-                </button>
-                <a href="/es/bibel" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
-                    <span class="material-symbols-outlined text-2xl">menu_book</span>
-                </a>
-                <a href="/es/leseplaner" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
-                    <span class="material-symbols-outlined text-2xl">calendar_today</span>
-                </a>
-                <!-- Desktop Language Switcher -->
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>ES</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
-                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
-                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                    <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
+                        <span class="material-symbols-outlined text-xl">menu_book</span>
+                    </a>
+                    <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
+                        <span class="material-symbols-outlined text-xl">calendar_today</span>
+                    </a>
+                    
+                    <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+
+                    <!-- Language Switcher in same styling -->
+                    <div class="lang-switcher relative group">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                            <span class="material-symbols-outlined text-lg">language</span>
+                            <span>ES</span>
+                        </button>
+                        <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                            <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                            <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                            <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
                 <a href="/es/donaciones"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Donar <i class="fas fa-heart text-sm"></i>
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donar</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
                     id="menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -152,22 +159,29 @@
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/es/../index" class="text-sm font-bold text-primary-orange"
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/../en/index"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
                                 data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -180,16 +194,31 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.engage.title">Involúcrate</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/donaciones" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.supportWork">Apoya la obra</a></li>
-                            <li><a href="/es/donantes-regulares" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a></li>
-                            <li><a href="/es/para-iglesias" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.churches">Para iglesias</a></li>
-                            <li><a href="/es/para-empresas" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.businesses">Para empresas</a></li>
-                            <li><a href="/es/bnn" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <a href="/es/donaciones" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Apoya la obra</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <a href="/es/para-iglesias" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">Para iglesias</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <a href="/es/para-empresas" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">Para empresas</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <a href="/es/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -198,10 +227,16 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/sobre-nosotros" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.about">Sobre nosotros</a></li>
-                            <li><a href="/es/contacto" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.contact">Contáctanos</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Sobre nosotros</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <a href="/es/contacto" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contáctanos</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -210,19 +245,43 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a></li>
-                            <li><a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a></li>
-                            <li><a href="/es/../butikk" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.store">Tienda</a></li>
-                            <li><a href="/es/eventos" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.events">Eventos</a></li>
-                            <li><a href="/es/media" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
-                            <li><a href="/es/blog" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.blog">Noticias y Blog</a></li>
-                            <li><a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a></li>
-                            <li><a href="/es/../minside/index" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.resources.myPage">Mi página</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <a href="/es/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Tienda</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <a href="/es/eventos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Eventos</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <a href="/es/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <a href="/es/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Noticias y Blog</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">person</span>
+                                <a href="/es/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Mi página</a>
+                            </li>
                         </ul>
                     </div>
                 </div>

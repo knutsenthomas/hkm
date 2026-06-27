@@ -1917,41 +1917,48 @@
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Buscar en el sitio">
-                    <span class="material-symbols-outlined text-2xl">search</span>
-                </button>
-                <a href="/es/bibel" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
-                    <span class="material-symbols-outlined text-2xl">menu_book</span>
-                </a>
-                <a href="/es/leseplaner" class="hidden md:flex items-center hover:text-primary-orange transition-colors header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
-                    <span class="material-symbols-outlined text-2xl">calendar_today</span>
-                </a>
-                <!-- Desktop Language Switcher -->
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>ES</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
-                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
-                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                    <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
+                        <span class="material-symbols-outlined text-xl">menu_book</span>
+                    </a>
+                    <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
+                        <span class="material-symbols-outlined text-xl">calendar_today</span>
+                    </a>
+                    
+                    <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+
+                    <!-- Language Switcher in same styling -->
+                    <div class="lang-switcher relative group">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                            <span class="material-symbols-outlined text-lg">language</span>
+                            <span>ES</span>
+                        </button>
+                        <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                            <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                            <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                            <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
                 <a href="/es/donaciones"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Donar <i class="fas fa-heart text-sm"></i>
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donar</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
                     id="menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
