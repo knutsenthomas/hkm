@@ -8718,3 +8718,28 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     to { transform: rotate(360deg); }
 }
 
+/* Promo Cards Accordion Effect */
+.promo-accordion-container {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.promo-card {
+    flex: 1;
+    min-width: 0;
+    transition: flex 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: block;
+}
+
+@media (min-width: 769px) {
+    .promo-accordion-container:hover .promo-card {
+        flex: 0.75;
+    }
+    
+    .promo-accordion-container .promo-card:hover {
+        flex: 1.75;
+    }
+}
+
+
