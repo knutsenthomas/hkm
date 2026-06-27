@@ -5583,6 +5583,7 @@ ol.block-list {
     opacity: 0;
     pointer-events: none;
     white-space: nowrap;
+    flex-shrink: 0;
     transform: translateX(-10px);
     transition: opacity 0.3s ease,
                 transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
