@@ -5546,18 +5546,18 @@ ol.block-list {
     align-items: center;
     gap: 8px;
     padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 9999px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: all 0.3s ease;
 }
 
 .header.scrolled .header-actions-dock,
 .header.menu-open .header-actions-dock {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Remove default border and background for language button inside the dock */
@@ -5568,13 +5568,13 @@ ol.block-list {
 }
 
 .header-actions-dock .lang-btn:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: var(--primary-orange) !important;
 }
 
 .header.scrolled .header-actions-dock .lang-btn:hover,
 .header.menu-open .header-actions-dock .lang-btn:hover {
-    background: rgba(0, 0, 0, 0.05) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
 }
 
 /* Donate Button in Header */
@@ -5600,8 +5600,8 @@ ol.block-list {
 
 /* Hamburger Button */
 .menu-toggle {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     width: 44px !important;
     height: 44px !important;
     border-radius: 50% !important;
@@ -5615,7 +5615,7 @@ ol.block-list {
 }
 
 .menu-toggle:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: rgba(0, 0, 0, 0.4) !important;
     transform: scale(1.05);
 }
 
@@ -5625,14 +5625,14 @@ ol.block-list {
 
 .header.scrolled .menu-toggle,
 .header.menu-open .menu-toggle {
-    background: rgba(0, 0, 0, 0.05) !important;
-    border-color: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
     color: var(--text-dark) !important;
 }
 
 .header.scrolled .menu-toggle:hover,
 .header.menu-open .menu-toggle:hover {
-    background: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Menu Toggle Icon Visibility */
