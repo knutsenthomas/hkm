@@ -7893,7 +7893,7 @@ exports.scheduledReadingNotifications = onSchedule({
   </div>
 
   <div style="text-align: center; margin: 32px 0;">
-    <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+    <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 20px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
       Fortsett lesingen i nettleser
     </a>
   </div>
