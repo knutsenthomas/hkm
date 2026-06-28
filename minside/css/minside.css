@@ -3466,14 +3466,44 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 }
 
 .hkm-devotional-text-serif {
-    font-family: 'Georgia', serif;
-    font-size: 18px;
-    line-height: 1.7;
-    color: #1e293b;
-    margin-bottom: 24px;
-    overflow-y: auto;
-    max-height: 40vh;
-    padding-right: 8px;
+    font-family: 'Georgia', serif !important;
+    font-size: 18px !important;
+    line-height: 1.8 !important;
+    color: #1e293b !important;
+    margin-bottom: 24px !important;
+    overflow-y: auto !important;
+    max-height: 40vh !important;
+    padding-right: 8px !important;
+    text-align: left !important;
+}
+
+.hkm-devotional-text-serif p {
+    display: inline !important;
+    position: relative !important;
+    padding: 2px 4px !important;
+    margin: 0 !important;
+    border-radius: 4px !important;
+    font-size: 18px !important;
+    line-height: 1.8 !important;
+    box-decoration-break: clone !important;
+    -webkit-box-decoration-break: clone !important;
+    font-family: 'Georgia', serif !important;
+}
+
+.hkm-devotional-text-serif sup.v {
+    font-size: 0.6em !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    margin-right: 4px !important;
+    margin-left: 6px !important;
+    vertical-align: baseline !important;
+    position: relative !important;
+    top: -0.35em !important;
+    line-height: 0 !important;
+    user-select: none !important;
+    padding: 0 !important;
+    cursor: default !important;
+    display: inline !important;
 }
 
 .hkm-devotional-prayer-box {
