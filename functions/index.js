@@ -7868,75 +7868,43 @@ exports.scheduledReadingNotifications = onSchedule({
         if (wantEmail) {
           console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
 
-          const defaultFallbackBody = `<style>
-  @media only screen and (max-width: 600px) {
-    .hkm-email-container {
-      padding: 16px 12px !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .hkm-email-card {
-      width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .hkm-email-header {
-      padding: 24px 20px 16px 20px !important;
-    }
-    .hkm-email-body {
-      padding: 24px 20px !important;
-    }
-    .hkm-email-footer {
-      padding: 24px 20px !important;
-    }
-    .hkm-reading-title {
-      font-size: 20px !important;
-    }
-  }
-</style>
-<div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-  <div class="hkm-email-card" style="background: #ffffff; text-align: left;">
-    
-    <!-- Header -->
-    <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-      <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-      <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
-    </div>
+          const defaultFallbackBody = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px; color: #334155; font-size: 15px; line-height: 1.6; text-align: left;">
+  <!-- Header -->
+  <div style="text-align: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px; margin-bottom: 24px;">
+    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em; line-height: 1.2;">His Kingdom Ministry</h1>
+  </div>
 
-    <!-- Body -->
-    <div class="hkm-email-body" style="padding: 32px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
-      <h2>Hei {{name}}!</h2>
-      <p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
+  <!-- Greeting & Intro -->
+  <h2 style="font-size: 20px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Hei {{name}}!</h2>
+  <p style="margin: 0 0 24px 0; color: #475569;">Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
 
-      <!-- Dagens lesing -->
-      <div style="margin: 24px 0; text-align: left;">
-        <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-        <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
-        <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
+  <!-- Dagens lesing -->
+  <div style="margin: 0 0 24px 0;">
+    <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
+    <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
+    <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
+  </div>
 
-        <!-- Devotional Content -->
-        <div style="margin-bottom: 32px; text-align: left;">
-          <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
-          <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
-        </div>
+  <!-- Devotional Content -->
+  <div style="margin-bottom: 32px;">
+    <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
+    <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
+  </div>
 
-        <div style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
-          <a href="https://www.hiskingdomministry.no/leseplan-detaljer?id={{planId}}&day={{day}}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
-            Fortsett lesingen i nettleser
-          </a>
-        </div>
-      </div>
+  <div style="text-align: center; margin: 32px 0;">
+    <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+      Fortsett lesingen i nettleser
+    </a>
+  </div>
 
-      <p>Ha en velsignet dag!</p>
-      <p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>
-    </div>
+  <p>Ha en velsignet dag!</p>
+  <p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>
 
-    <!-- Footer -->
-    <div class="hkm-email-footer" style="background-color: #ffffff; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
-      <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
-      <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
-    </div>
+  <!-- Footer -->
+  <div class="hkm-email-footer" style="padding-top: 24px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+    <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+    <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
   </div>
 </div>`;
 

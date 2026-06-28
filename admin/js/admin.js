@@ -25009,51 +25009,17 @@ class AdminManager {
                                 .replace("{{reading_content}}", readingContentHtml);
                             
                             testHtml = `
-                                <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-                                    <style>
-                                        @media only screen and (max-width: 600px) {
-                                            .hkm-email-container {
-                                                padding: 16px 12px !important;
-                                                width: 100% !important;
-                                                max-width: 100% !important;
-                                                box-sizing: border-box !important;
-                                            }
-                                            .hkm-email-card {
-                                                width: 100% !important;
-                                                max-width: 100% !important;
-                                                box-sizing: border-box !important;
-                                            }
-                                            .hkm-email-header {
-                                                padding: 24px 20px 16px 20px !important;
-                                            }
-                                            .hkm-email-body {
-                                                padding: 24px 20px !important;
-                                            }
-                                            .hkm-email-footer {
-                                                padding: 24px 20px !important;
-                                            }
-                                            .hkm-reading-title {
-                                                font-size: 20px !important;
-                                            }
-                                        }
-                                    </style>
-                                    <div class="hkm-email-card" style="background: #ffffff; text-align: left;">
-                                        <!-- Header -->
-                                        <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                                            <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-                                            <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
-                                        </div>
-
-                                        <!-- Body -->
-                                        <div class="hkm-email-body" style="padding: 32px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
-                                            ${emailBody}
-                                        </div>
-
-                                        <!-- Footer -->
-                                        <div class="hkm-email-footer" style="background-color: #ffffff; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
-                                            <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
-                                            <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
-                                        </div>
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px; color: #334155; font-size: 15px; line-height: 1.6; text-align: left;">
+                                    <!-- Header -->
+                                    <div style="text-align: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px; margin-bottom: 24px;">
+                                        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em; line-height: 1.2;">His Kingdom Ministry</h1>
+                                    </div>
+                                    ${emailBody}
+                                    <!-- Footer -->
+                                    <div class="hkm-email-footer" style="padding-top: 24px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5; margin-top: 32px;">
+                                        <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                                        <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
                                     </div>
                                 </div>
                             `;
@@ -25070,7 +25036,7 @@ class AdminManager {
                     } else {
                         // Fallback simple wrap
                         testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
                                 ${body}
                             </div>
                         `;
