@@ -3185,7 +3185,7 @@ class BibleReader {
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
-                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
                 .hkm-devotional-content { background: #ffffff !important; width: 90% !important; max-width: 600px !important; border-radius: 24px !important; padding: 32px !important; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important; display: block !important; position: relative !important; animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
                 .hkm-devotional-step-title { font-size: 20px; font-weight: 700; color: #1B4965; margin-bottom: 16px; }
                 .hkm-devotional-text-serif { font-family: 'Georgia', serif; font-size: 18px; line-height: 1.7; color: #1e293b; margin-bottom: 24px; overflow-y: auto; max-height: 40vh; padding-right: 8px; }
@@ -3196,6 +3196,13 @@ class BibleReader {
                 @keyframes hkmFadeIn {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
+                }
+                @media (max-width: 768px) {
+                    .hkm-devotional-overlay { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+                    .hkm-devotional-content { width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) 16px !important; display: flex !important; flex-direction: column !important; box-shadow: none !important; animation: none !important; }
+                    .hkm-devotional-text-serif { flex: 1 !important; max-height: none !important; overflow-y: auto !important; margin-bottom: 16px !important; }
+                    .hkm-devotional-prayer-box { flex: 1 !important; margin-bottom: 16px !important; overflow-y: auto !important; }
+                    .hkm-devotional-reflection-textarea { flex: 1 !important; min-height: 150px !important; margin-bottom: 16px !important; }
                 }
             `;
             document.head.appendChild(style);
