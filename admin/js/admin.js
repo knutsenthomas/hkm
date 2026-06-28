@@ -24950,7 +24950,7 @@ class AdminManager {
                         const htmlBody = body.replace("{{name}}", "Test-bruker");
                         testSubject = emailSubject;
                         testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
                                 ${htmlBody}
                                 <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
                                     Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
@@ -24962,7 +24962,7 @@ class AdminManager {
                         const htmlBody = body.replace("{{email}}", email);
                         testSubject = emailSubject;
                         testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
                                 ${htmlBody}
                                 <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
                                     Du kan melde deg av når som helst ved å svare på denne e-posten.
