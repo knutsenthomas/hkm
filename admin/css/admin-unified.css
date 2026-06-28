@@ -2057,6 +2057,8 @@ body.admin-body .welcome-subtitle {
 @media (max-width: 1024px) {
   html {
     height: 100% !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
   }
 
   body.admin-body,
