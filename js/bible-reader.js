@@ -3199,7 +3199,7 @@ class BibleReader {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                @media (max-width: 768px) {
+                @media (max-width: 1024px) {
                     .hkm-devotional-overlay { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
                     .hkm-devotional-content { width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) 16px !important; display: flex !important; flex-direction: column !important; box-shadow: none !important; animation: none !important; }
                     .hkm-devotional-text-serif { flex: 1 !important; max-height: none !important; overflow-y: auto !important; margin-bottom: 16px !important; }

@@ -3555,7 +3555,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .hkm-devotional-overlay {
         background: #ffffff !important;
         backdrop-filter: none !important;
