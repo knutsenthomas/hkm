@@ -7895,8 +7895,8 @@ exports.scheduledReadingNotifications = onSchedule({
     }
   }
 </style>
-<div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-  <div class="hkm-email-card" style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+<div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
+  <div class="hkm-email-card" style="background: #ffffff; text-align: left;">
     
     <!-- Header -->
     <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
@@ -7933,7 +7933,7 @@ exports.scheduledReadingNotifications = onSchedule({
     </div>
 
     <!-- Footer -->
-    <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+    <div class="hkm-email-footer" style="background-color: #ffffff; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
       <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
       <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
     </div>
@@ -7983,8 +7983,8 @@ exports.scheduledReadingNotifications = onSchedule({
                   }
                 }
               </style>
-              <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-                <div class="hkm-email-card" style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
+              <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
+                <div class="hkm-email-card" style="background: #ffffff; text-align: left;">
                   <!-- Header -->
                   <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
                     <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
@@ -7997,7 +7997,7 @@ exports.scheduledReadingNotifications = onSchedule({
                   </div>
 
                   <!-- Footer -->
-                  <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                  <div class="hkm-email-footer" style="background-color: #ffffff; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
                     <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
                     <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
                   </div>
@@ -8102,12 +8102,12 @@ exports.onNotificationCreated = onDocumentCreated({
       
       // En kjempefin HTML-mal i stil med HKM
       const html = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; margin: 0 auto; max-width: 600px; border-radius: 12px; border: 1px solid #e2e8f0; box-sizing: border-box;">
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; margin: 0 auto; max-width: 600px; box-sizing: border-box;">
           <div style="text-align: center; margin-bottom: 24px;">
             <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry" style="height: 60px; width: auto;">
           </div>
           
-          <div style="background-color: #ffffff; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
+          <div style="background-color: #ffffff; padding: 24px; margin-bottom: 24px;">
             <h2 style="color: #1B4965; font-size: 20px; font-weight: 700; margin: 0 0 16px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
               ${title}
             </h2>
