@@ -40,7 +40,13 @@ export default async function handler(req, res) {
       return;
     }
 
-    const response = await fetch(url);
+    const referer = req.headers.referer || req.headers.referrer;
+    const fetchHeaders = {};
+    if (referer) {
+      fetchHeaders['Referer'] = referer;
+    }
+
+    const response = await fetch(url, { headers: fetchHeaders });
     const data = await response.json();
 
     if (!response.ok) {
