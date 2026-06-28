@@ -533,8 +533,31 @@
             text-align: left;
         }
 
-        .bible-reading-pane p,
-        .bible-reading-pane p * {
+        /* Default to Verse-by-Verse (vanlig modus) */
+        .bible-reading-pane p {
+            display: block;
+            position: relative;
+            padding: 6px 12px;
+            margin: 0 0 8px 0;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+            font-size: var(--bible-font-size, inherit) !important;
+            line-height: 1.6;
+        }
+
+        .bible-reading-pane p.highlighted {
+            background: var(--highlight-bg);
+            border-radius: 8px;
+        }
+
+        .bible-reading-pane p:hover {
+            background: rgba(209, 125, 57, 0.05);
+        }
+
+        /* Løpende tekst (Paragraph layout) override */
+        .bible-reading-pane.layout-paragraph p,
+        .bible-reading-pane.layout-paragraph p * {
             display: inline;
             position: relative;
             padding: 2px 4px;
@@ -545,14 +568,15 @@
             box-decoration-break: clone;
             -webkit-box-decoration-break: clone;
             font-size: var(--bible-font-size, inherit) !important;
+            line-height: 1.8;
         }
-
-        .bible-reading-pane p.highlighted {
+        
+        .bible-reading-pane.layout-paragraph p.highlighted {
             background: var(--highlight-bg);
             border-radius: 4px;
         }
 
-        .bible-reading-pane p:hover {
+        .bible-reading-pane.layout-paragraph p:hover {
             background: rgba(209, 125, 57, 0.08);
         }
 
@@ -2291,6 +2315,16 @@
                                 </select>
                             </div>
                         </div>
+                        <!-- Visning Mode (Layout) Mobile -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Visning</span>
+                            <div class="select-wrapper">
+                                <select id="settings-layout-mobile" style="padding: 0 24px 0 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px; outline: none; cursor: pointer;">
+                                    <option value="verse">Vers for vers</option>
+                                    <option value="paragraph">Løpende tekst</option>
+                                </select>
+                            </div>
+                        </div>
                         <!-- Theme Selection -->
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tema</span>
@@ -2401,6 +2435,17 @@
                                 <select id="settings-font-family" style="padding: 4px 24px 4px 8px; font-size: 12px;">
                                     <option value="serif">Serif (Klassisk)</option>
                                     <option value="sans">Sans-Serif (Moderne)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Visning Mode (Layout) -->
+                        <div class="settings-row">
+                            <span class="settings-label">Visning</span>
+                            <div class="select-wrapper">
+                                <select id="settings-layout" style="padding: 4px 24px 4px 8px; font-size: 12px;">
+                                    <option value="verse">Vers for vers</option>
+                                    <option value="paragraph">Løpende tekst</option>
                                 </select>
                             </div>
                         </div>

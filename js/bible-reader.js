@@ -287,11 +287,15 @@ class BibleReader {
             fontSize: 18,
             fontFamily: 'serif', // 'serif' | 'sans'
             lineHeight: 1.6,
-            theme: 'cream' // 'light' | 'cream' | 'dark'
+            theme: 'cream', // 'light' | 'cream' | 'dark'
+            layout: 'verse' // 'verse' | 'paragraph'
         };
         try {
             const rawSettings = this.safeGetLocalStorage('hkm_bible_settings');
-            if (rawSettings) settings = JSON.parse(rawSettings) || settings;
+            if (rawSettings) {
+                const parsed = JSON.parse(rawSettings);
+                settings = { ...settings, ...parsed };
+            }
         } catch (e) {
             console.warn("[BibleReader] Failed to parse settings:", e);
         }
@@ -485,6 +489,7 @@ class BibleReader {
             decreaseFontBtn: document.getElementById('btn-decrease-font'),
             increaseFontBtn: document.getElementById('btn-increase-font'),
             fontFamilySelect: document.getElementById('settings-font-family'),
+            layoutSelect: document.getElementById('settings-layout'),
             themeSelectors: document.querySelectorAll('.theme-option'),
             
             // Navigation trigger/mobile
@@ -624,6 +629,12 @@ class BibleReader {
         if (this.dom.fontFamilySelect) {
             this.dom.fontFamilySelect.addEventListener('change', (e) => {
                 this.settings.fontFamily = e.target.value;
+                this.applySettings();
+            });
+        }
+        if (this.dom.layoutSelect) {
+            this.dom.layoutSelect.addEventListener('change', (e) => {
+                this.settings.layout = e.target.value;
                 this.applySettings();
             });
         }
@@ -770,6 +781,13 @@ class BibleReader {
         if (fontFamilySelectMobile) {
             fontFamilySelectMobile.addEventListener('change', (e) => {
                 this.settings.fontFamily = e.target.value;
+                this.applySettings();
+            });
+        }
+        const layoutSelectMobile = document.getElementById('settings-layout-mobile');
+        if (layoutSelectMobile) {
+            layoutSelectMobile.addEventListener('change', (e) => {
+                this.settings.layout = e.target.value;
                 this.applySettings();
             });
         }
@@ -1420,11 +1438,24 @@ class BibleReader {
             } else {
                 this.dom.readingPane.style.fontFamily = 'Inter, system-ui, -apple-system, sans-serif';
             }
+
+            // Layout
+            if (this.settings.layout === 'paragraph') {
+                this.dom.readingPane.classList.add('layout-paragraph');
+                this.dom.readingPane.classList.remove('layout-verse');
+            } else {
+                this.dom.readingPane.classList.add('layout-verse');
+                this.dom.readingPane.classList.remove('layout-paragraph');
+            }
         }
 
         if (this.dom.fontFamilySelect) this.dom.fontFamilySelect.value = this.settings.fontFamily;
         const fontFamilySelectMobile = document.getElementById('settings-font-family-mobile');
         if (fontFamilySelectMobile) fontFamilySelectMobile.value = this.settings.fontFamily;
+
+        if (this.dom.layoutSelect) this.dom.layoutSelect.value = this.settings.layout;
+        const layoutSelectMobile = document.getElementById('settings-layout-mobile');
+        if (layoutSelectMobile) layoutSelectMobile.value = this.settings.layout;
 
         // Theme classes
         document.body.classList.remove('bible-theme-light', 'bible-theme-cream', 'bible-theme-dark');
