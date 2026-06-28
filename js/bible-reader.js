@@ -3905,6 +3905,20 @@ class BibleReader {
                     flex-direction: column;
                     gap: 16px;
                 }
+                .hkm-rp-day-navigator {
+                    width: 100%;
+                    justify-content: space-between;
+                    box-sizing: border-box;
+                }
+            }
+            @media (max-width: 480px) {
+                .hkm-rp-day-navigator .hkm-nav-btn span:not(.material-symbols-outlined) {
+                    display: none;
+                }
+                .hkm-rp-day-navigator {
+                    gap: 8px;
+                    padding: 8px 12px;
+                }
             }
             .hkm-rp-header-info {
                 flex: 1;
@@ -3960,6 +3974,8 @@ class BibleReader {
                 padding: 6px 12px;
                 border-radius: 8px;
                 transition: all 0.2s ease;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
             .bible-theme-dark .hkm-nav-btn {
                 color: #94a3b8;
