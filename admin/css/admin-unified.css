@@ -2538,6 +2538,10 @@ body.crm-body .crm-table .btn-delete-message:hover {
   transition: all 0.2s;
 }
 
+.icon-btn .material-symbols-outlined {
+  font-size: 18px !important;
+}
+
 .icon-btn:hover {
   border-color: var(--accent-color, #f97316);
   color: var(--accent-color, #f97316);

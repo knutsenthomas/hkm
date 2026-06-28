@@ -2326,6 +2326,10 @@ textarea.form-control {
     color: var(--text-muted);
 }
 
+.icon-btn .material-symbols-outlined {
+    font-size: 18px !important;
+}
+
 .icon-btn:hover {
     color: var(--accent-color);
     border-color: var(--accent-color);
