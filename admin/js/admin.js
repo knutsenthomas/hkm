@@ -5418,24 +5418,60 @@ class AdminManager {
     }
 
     async fetchYouTubeStats() {
-        const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
-        const url = `/api/youtube?action=stats&channelId=${YT_CHANNEL_ID}`;
+        let YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
+        let apiKey = '';
+
+        try {
+            const mediaSettings = await firebaseService.getPageContent('settings_media');
+            if (mediaSettings) {
+                if (mediaSettings.youtubeChannelId) YT_CHANNEL_ID = mediaSettings.youtubeChannelId;
+                if (mediaSettings.youtubeApiKey) apiKey = mediaSettings.youtubeApiKey;
+            }
+        } catch (e) {
+            console.warn('[BibleReader] Error loading media settings for YouTube stats:', e);
+        }
+
+        let url = `/api/youtube?action=stats&channelId=${YT_CHANNEL_ID}`;
+        if (apiKey) {
+            url += `&key=${encodeURIComponent(apiKey)}`;
+        }
 
         try {
             const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`YouTube API returned status ${response.status}`);
+            }
             const data = await response.json();
             if (data.items && data.items.length > 0) {
                 const stats = data.items[0].statistics;
-                return {
+                const statsObj = {
                     subscribers: stats.subscriberCount,
                     videos: stats.videoCount,
                     views: stats.viewCount
                 };
+                try {
+                    localStorage.setItem('hkm_youtube_stats_cache', JSON.stringify(statsObj));
+                } catch (cacheErr) {
+                    console.warn('Failed to cache YouTube stats to localStorage:', cacheErr);
+                }
+                return statsObj;
             }
         } catch (error) {
-            console.error('Error fetching YouTube stats:', error);
-            throw error; // Rethrow to be caught in renderOverview
+            console.warn('Error fetching YouTube stats from API, trying cache:', error);
         }
+
+        // Fallback: Try to read last successfully fetched stats from cache
+        try {
+            const cachedData = localStorage.getItem('hkm_youtube_stats_cache');
+            if (cachedData) {
+                const stats = JSON.parse(cachedData);
+                console.log('Successfully recovered YouTube stats from cache:', stats);
+                return stats;
+            }
+        } catch (e) {
+            console.warn('Failed to parse cached YouTube stats:', e);
+        }
+
         return null;
     }
 
