@@ -4051,6 +4051,7 @@ class BibleReader {
                 gap: 8px;
                 box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
                 transition: all 0.2s ease;
+                white-space: nowrap;
             }
             .hkm-btn-complete:hover {
                 transform: translateY(-2px);
@@ -4062,6 +4063,22 @@ class BibleReader {
             }
             .hkm-btn-complete.completed:hover {
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+            }
+            @media (max-width: 600px) {
+                .hkm-rp-actions {
+                    flex-direction: column-reverse;
+                    align-items: stretch;
+                    gap: 12px;
+                }
+                .hkm-btn-complete {
+                    width: 100%;
+                    justify-content: center;
+                }
+                .hkm-rp-actions .hkm-nav-btn {
+                    justify-content: center;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
             }
             .hkm-rp-sidebar-wrapper {
                 display: flex;
