@@ -7817,19 +7817,19 @@ exports.scheduledReadingNotifications = onSchedule({
 
         // Bygg HTML-kortet for dagens lesing
         const readingContentHtml = `
-          <div class="hkm-reading-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin: 20px 0; text-align: left;">
+          <div style="margin: 24px 0; text-align: left;">
             <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-            <h3 class="hkm-reading-title" style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dag \${currentDayNum} - \${planTitle}</h3>
-            <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: \${verses}</p>
+            <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag \${currentDayNum} - \${planTitle}</h3>
+            <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: \${verses}</p>
 
-            <!-- Devotional Box -->
-            <div class="hkm-devotional-box" style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 32px; text-align: left;">
-              <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dagens Andakt & Bønn</strong>
-              <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
+            <!-- Devotional Content -->
+            <div style="margin-bottom: 32px; text-align: left;">
+              <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
+              <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
             </div>
 
-            <div style="text-align: center; margin-top: 24px;">
-              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+            <div style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
+              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
                 Fortsett lesingen i nettleser
               </a>
             </div>
@@ -7885,21 +7885,11 @@ exports.scheduledReadingNotifications = onSchedule({
     .hkm-email-body {
       padding: 20px 12px !important;
     }
-    .hkm-reading-card {
-      padding: 12px !important;
-      margin: 12px 0 !important;
-      border-radius: 8px !important;
-    }
-    .hkm-devotional-box {
-      padding: 12px !important;
-      margin-bottom: 20px !important;
-      border-radius: 0 8px 8px 0 !important;
-    }
     .hkm-email-footer {
       padding: 24px 16px !important;
     }
     .hkm-reading-title {
-      font-size: 18px !important;
+      font-size: 20px !important;
     }
   }
 </style>
@@ -7917,20 +7907,20 @@ exports.scheduledReadingNotifications = onSchedule({
       <h2>Hei {{name}}!</h2>
       <p>Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
 
-      <!-- Dagens lesekort -->
-      <div class="hkm-reading-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin: 20px 0; text-align: left;">
+      <!-- Dagens lesing -->
+      <div style="margin: 24px 0; text-align: left;">
         <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-        <h3 class="hkm-reading-title" style="margin: 0 0 4px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
-        <p style="margin: 0 0 16px 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
+        <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
+        <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
 
-        <!-- Devotional Box -->
-        <div class="hkm-devotional-box" style="background-color: #f8fafc; border-left: 5px solid #d17d39; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 32px; text-align: left;">
-          <strong style="color: #d17d39; display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; line-height: 1.2; word-break: normal; overflow-wrap: break-word;">Dagens Andakt & Bønn</strong>
-          <p style="margin: 0; color: #334155; font-size: 15.5px; line-height: 1.65; font-weight: 500; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
+        <!-- Devotional Content -->
+        <div style="margin-bottom: 32px; text-align: left;">
+          <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
+          <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
         </div>
 
-        <div style="text-align: center; margin-top: 24px;">
-          <a href="https://www.hiskingdomministry.no/leseplan-detaljer?id={{planId}}&day={{day}}" style="background-color: #c8682a; color: #ffffff; padding: 12px 28px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+        <div style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
+          <a href="https://www.hiskingdomministry.no/leseplan-detaljer?id={{planId}}&day={{day}}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
             Fortsett lesingen i nettleser
           </a>
         </div>
@@ -7981,21 +7971,11 @@ exports.scheduledReadingNotifications = onSchedule({
                   .hkm-email-body {
                     padding: 20px 12px !important;
                   }
-                  .hkm-reading-card {
-                    padding: 12px !important;
-                    margin: 12px 0 !important;
-                    border-radius: 8px !important;
-                  }
-                  .hkm-devotional-box {
-                    padding: 12px !important;
-                    margin-bottom: 20px !important;
-                    border-radius: 0 8px 8px 0 !important;
-                  }
                   .hkm-email-footer {
                     padding: 24px 16px !important;
                   }
                   .hkm-reading-title {
-                    font-size: 18px !important;
+                    font-size: 20px !important;
                   }
                 }
               </style>
