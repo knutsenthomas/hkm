@@ -7828,9 +7828,9 @@ exports.scheduledReadingNotifications = onSchedule({
               <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
             </div>
 
-            <div style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
-              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
-                Fortsett lesingen i nettleser
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 20px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+                Les plan
               </a>
             </div>
           </div>
@@ -7894,7 +7894,7 @@ exports.scheduledReadingNotifications = onSchedule({
 
   <div style="text-align: center; margin: 32px 0;">
     <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 20px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
-      Fortsett lesingen i nettleser
+      Les plan
     </a>
   </div>
 
