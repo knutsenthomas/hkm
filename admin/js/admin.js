@@ -24983,13 +24983,13 @@ class AdminManager {
                                 <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: \${verses}</p>
 
                                 <!-- Devotional Content -->
-                                <div style="margin-bottom: 32px; text-align: left;">
+                                                                <div style="margin-bottom: 32px; text-align: left;">
                                     <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
-                                    <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
+                                    <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">${prayerFocus}</p>
                                 </div>
 
                                 <div style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
-                                    <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+                                    <a href="https://www.hiskingdomministry.no/bibel.html?plan=${planId}&day=${currentDayNum}" style="background-color: #c8682a; color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
                                         Fortsett lesingen i nettleser
                                     </a>
                                 </div>
@@ -25009,32 +25009,34 @@ class AdminManager {
                                 .replace("{{reading_content}}", readingContentHtml);
                             
                             testHtml = `
-                                <style>
-                                    @media only screen and (max-width: 600px) {
-                                        .hkm-email-container {
-                                            padding: 0 !important;
-                                        }
-                                        .hkm-email-card {
-                                            border-radius: 0 !important;
-                                            border-left: none !important;
-                                            border-right: none !important;
-                                            box-shadow: none !important;
-                                        }
-                                        .hkm-email-header {
-                                            padding: 24px 16px 16px 16px !important;
-                                        }
-                                        .hkm-email-body {
-                                            padding: 20px 12px !important;
-                                        }
-                                        .hkm-email-footer {
-                                            padding: 24px 16px !important;
-                                        }
-                                        .hkm-reading-title {
-                                            font-size: 20px !important;
-                                        }
-                                    }
-                                </style>
                                 <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
+                                    <style>
+                                        @media only screen and (max-width: 600px) {
+                                            .hkm-email-container {
+                                                padding: 16px 12px !important;
+                                                width: 100% !important;
+                                                max-width: 100% !important;
+                                                box-sizing: border-box !important;
+                                            }
+                                            .hkm-email-card {
+                                                width: 100% !important;
+                                                max-width: 100% !important;
+                                                box-sizing: border-box !important;
+                                            }
+                                            .hkm-email-header {
+                                                padding: 24px 20px 16px 20px !important;
+                                            }
+                                            .hkm-email-body {
+                                                padding: 24px 20px !important;
+                                            }
+                                            .hkm-email-footer {
+                                                padding: 24px 20px !important;
+                                            }
+                                            .hkm-reading-title {
+                                                font-size: 20px !important;
+                                            }
+                                        }
+                                    </style>
                                     <div class="hkm-email-card" style="background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: left;">
                                         <!-- Header -->
                                         <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">

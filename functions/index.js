@@ -7871,22 +7871,24 @@ exports.scheduledReadingNotifications = onSchedule({
           const defaultFallbackBody = `<style>
   @media only screen and (max-width: 600px) {
     .hkm-email-container {
-      padding: 0 !important;
+      padding: 16px 12px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
     .hkm-email-card {
-      border-radius: 0 !important;
-      border-left: none !important;
-      border-right: none !important;
-      box-shadow: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
     .hkm-email-header {
-      padding: 24px 16px 16px 16px !important;
+      padding: 24px 20px 16px 20px !important;
     }
     .hkm-email-body {
-      padding: 20px 12px !important;
+      padding: 24px 20px !important;
     }
     .hkm-email-footer {
-      padding: 24px 16px !important;
+      padding: 24px 20px !important;
     }
     .hkm-reading-title {
       font-size: 20px !important;
@@ -7957,22 +7959,24 @@ exports.scheduledReadingNotifications = onSchedule({
               <style>
                 @media only screen and (max-width: 600px) {
                   .hkm-email-container {
-                    padding: 0 !important;
+                    padding: 16px 12px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
                   }
                   .hkm-email-card {
-                    border-radius: 0 !important;
-                    border-left: none !important;
-                    border-right: none !important;
-                    box-shadow: none !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
                   }
                   .hkm-email-header {
-                    padding: 24px 16px 16px 16px !important;
+                    padding: 24px 20px 16px 20px !important;
                   }
                   .hkm-email-body {
-                    padding: 20px 12px !important;
+                    padding: 24px 20px !important;
                   }
                   .hkm-email-footer {
-                    padding: 24px 16px !important;
+                    padding: 24px 20px !important;
                   }
                   .hkm-reading-title {
                     font-size: 20px !important;
