@@ -5305,7 +5305,7 @@ class BibleReader {
             </div>
             
             <!-- 3. Mobile Combined Card (Visible on mobile/tablet, hidden on desktop) -->
-            <div class="hkm-rp-header-card-v2 lg:hidden block" id="progress-card">
+            <div class="hkm-rp-header-card-v2 lg:hidden" id="progress-card">
                 <!-- Circular progress & Status on the left -->
                 <div class="hkm-rp-progress-row-v2">
                     <div class="hkm-rp-progress-info-v2">
