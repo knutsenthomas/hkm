@@ -4138,14 +4138,27 @@ class BibleReader {
             }
             .hkm-rp-actions {
                 display: flex;
+                flex-wrap: wrap;
                 justify-content: space-between;
                 align-items: center;
+                gap: 16px 12px;
                 margin-top: 16px;
                 border-top: 1px solid var(--border-color, #e2e8f0);
                 padding-top: 16px;
             }
             .bible-theme-dark .hkm-rp-actions {
                 border-top-color: #333333;
+            }
+            @media (max-width: 1350px) {
+                .hkm-rp-actions {
+                    justify-content: center;
+                    gap: 16px 12px;
+                }
+                .hkm-rp-day-navigator {
+                    width: 100%;
+                    justify-content: center;
+                    order: -1;
+                }
             }
             .hkm-btn-complete {
                 background: linear-gradient(135deg, #d17d39, #bd4f2a);
