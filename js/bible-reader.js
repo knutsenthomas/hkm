@@ -4049,11 +4049,31 @@ class BibleReader {
             .hkm-btn-complete-v2.completed:hover {
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
             }
-            .hkm-rp-progress-v2 {
+            .hkm-rp-progress-container-v2 {
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+                width: 100%;
+            }
+            .progress-side-label {
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748b;
+                margin-top: 2px;
+                white-space: nowrap;
+                min-width: 60px;
+            }
+            .progress-side-label.left {
+                text-align: left;
+            }
+            .progress-side-label.right {
+                text-align: right;
+            }
+            .progress-bar-ticks-wrapper-v2 {
                 display: flex;
                 flex-direction: column;
                 gap: 8px;
-                width: 100%;
+                flex: 1;
             }
             .hkm-rp-progress-bar-v2 {
                 height: 6px;
@@ -4074,31 +4094,16 @@ class BibleReader {
             .bible-theme-dark .hkm-rp-progress-fill-v2 {
                 background: #38bdf8;
             }
-            .hkm-rp-progress-labels-v2 {
+            .progress-ticks-v2 {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 width: 100%;
             }
-            .hkm-rp-progress-labels-v2 span,
-            .hkm-rp-progress-labels-v2 .tick-number {
+            .progress-ticks-v2 .tick-number {
                 font-size: 11px;
                 font-weight: 500;
                 color: #64748b;
-                white-space: nowrap;
-            }
-            .bible-theme-dark .hkm-rp-progress-labels-v2 span,
-            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number {
-                color: #94a3b8;
-            }
-            .progress-left-label, .progress-right-label {
-                color: #64748b;
-            }
-            .bible-theme-dark .progress-left-label, 
-            .bible-theme-dark .progress-right-label {
-                color: #94a3b8;
-            }
-            .hkm-rp-progress-labels-v2 .tick-number {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
@@ -4107,22 +4112,25 @@ class BibleReader {
                 border-radius: 4px;
                 box-sizing: border-box;
             }
-            .hkm-rp-progress-labels-v2 .tick-number.current-tick {
+            .bible-theme-dark .progress-ticks-v2 .tick-number {
+                color: #94a3b8;
+            }
+            .progress-ticks-v2 .tick-number.current-tick {
                 background: rgba(27, 73, 101, 0.08);
                 color: #1B4965;
                 font-weight: 700;
             }
-            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number.current-tick {
+            .bible-theme-dark .progress-ticks-v2 .tick-number.current-tick {
                 background: rgba(56, 189, 248, 0.15);
                 color: #38bdf8;
             }
-            .hkm-rp-progress-labels-v2 .tick-number.end-tick {
+            .progress-ticks-v2 .tick-number.end-tick {
                 background: #fdfbf7;
                 border: 1px solid #e6dfd3;
                 color: #b45309;
                 font-weight: 700;
             }
-            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number.end-tick {
+            .bible-theme-dark .progress-ticks-v2 .tick-number.end-tick {
                 background: #1e1b4b;
                 border-color: #312e81;
                 color: #a5f3fc;
@@ -4179,7 +4187,7 @@ class BibleReader {
                 color: #94a3b8;
             }
             @media (max-width: 480px) {
-                .hkm-rp-progress-labels-v2 .tick-number {
+                .progress-ticks-v2 {
                     display: none !important;
                 }
             }
