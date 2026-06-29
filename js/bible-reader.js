@@ -4169,7 +4169,7 @@ class BibleReader {
             .hkm-rp-toolbelt-v2 {
                 display: flex;
                 justify-content: center;
-                gap: 32px;
+                gap: 16px;
                 width: 100%;
             }
             .hkm-rp-toolbelt-btn-v2 {
@@ -4180,13 +4180,17 @@ class BibleReader {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
+                text-align: center;
                 gap: 4px;
                 font-size: 11px;
-                font-weight: 500;
+                font-weight: 600;
                 transition: all 0.2s ease;
-                padding: 4px 8px;
+                padding: 6px 8px;
                 border-radius: 8px;
                 position: relative;
+                width: 110px;
+                box-sizing: border-box;
             }
             .bible-theme-dark .hkm-rp-toolbelt-btn-v2 {
                 color: #94a3b8;
