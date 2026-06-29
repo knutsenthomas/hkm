@@ -5265,7 +5265,6 @@ class BibleReader {
         const dayTitle = dayConfig.title || (lang === 'en' ? 'Day ' + currentDayNum : (lang === 'es' ? 'Día ' + currentDayNum : 'Dag ' + currentDayNum));
 
         container.className = 'hkm-rp-header-wrapper';
-        container.id = 'progress-card-wrapper';
 
         container.innerHTML = `
             <!-- 1. Premium Hero Image Card -->
