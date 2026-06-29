@@ -4695,8 +4695,7 @@ class BibleReader {
 
     renderTopHeaderPanel(container, globalPlan, userPlan, currentDayNum, dayConfig) {
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
-        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
-        const progressPct = Math.round((completedDaysCount / totalDays) * 100);
+        const progressPct = totalDays > 1 ? Math.round(((currentDayNum - 1) / (totalDays - 1)) * 100) : 100;
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
         const isPrayerApp = globalPlan.title && (
@@ -4730,15 +4729,17 @@ class BibleReader {
             </button>
             
             <!-- Progress section -->
-            <div class="hkm-rp-progress-v2">
-                <div class="hkm-rp-progress-bar-v2">
-                    <div class="hkm-rp-progress-fill-v2" style="width: ${progressPct}%;"></div>
+            <div class="hkm-rp-progress-container-v2">
+                <span class="progress-side-label left">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum}</span>
+                <div class="progress-bar-ticks-wrapper-v2">
+                    <div class="hkm-rp-progress-bar-v2">
+                        <div class="hkm-rp-progress-fill-v2" style="width: ${progressPct}%;"></div>
+                    </div>
+                    <div class="progress-ticks-v2">
+                        ${this.renderProgressTicks(totalDays, currentDayNum)}
+                    </div>
                 </div>
-                <div class="hkm-rp-progress-labels-v2">
-                    <span class="progress-left-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum}</span>
-                    ${this.renderProgressTicks(totalDays, currentDayNum)}
-                    <span class="progress-right-label">${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</span>
-                </div>
+                <span class="progress-side-label right">${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</span>
             </div>
             
             <!-- Horizontal Divider -->
