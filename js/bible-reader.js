@@ -301,6 +301,18 @@ class BibleReader {
         }
         this.settings = settings;
 
+        // Migration: Force paragraph layout by default once for all users
+        try {
+            const migrated = this.safeGetLocalStorage('hkm_layout_migrated_v2');
+            if (!migrated) {
+                this.settings.layout = 'paragraph';
+                this.safeSetLocalStorage('hkm_bible_settings', JSON.stringify(this.settings));
+                this.safeSetLocalStorage('hkm_layout_migrated_v2', 'true');
+            }
+        } catch (e) {
+            console.warn("[BibleReader] Migration failed:", e);
+        }
+
         // Sync with global dark mode theme
         const activeGlobalTheme = this.safeGetLocalStorage('hkm_theme') || 'light';
         if (activeGlobalTheme === 'dark') {
