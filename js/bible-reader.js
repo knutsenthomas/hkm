@@ -3994,7 +3994,7 @@ class BibleReader {
                 flex-direction: column;
                 gap: 20px;
                 transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-                overflow: hidden;
+                overflow: visible;
                 flex-shrink: 0;
             }
             .bible-theme-dark .hkm-rp-header-card-v2 {
