@@ -3979,222 +3979,210 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            .hkm-rp-header-card {
+            .hkm-rp-header-card-v2 {
                 background: #ffffff;
                 border: 1px solid var(--border-color, #e2e8f0);
                 border-radius: 16px;
                 padding: 24px;
                 margin: 0 0 24px 0;
                 box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
                 width: 100%;
                 max-width: 680px;
                 box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .hkm-rp-header-card.collapsed {
-                padding: 12px 24px;
-            }
-            .hkm-rp-header-card.collapsed .hkm-rp-header-top,
-            .hkm-rp-header-card.collapsed .hkm-rp-progress-section {
-                display: none !important;
-            }
-            .hkm-rp-header-card.collapsed .hkm-rp-actions {
-                border-top: none !important;
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-            }
-            .bible-theme-dark .hkm-rp-header-card {
+            .bible-theme-dark .hkm-rp-header-card-v2 {
                 background: #242424;
                 border-color: #333333;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             }
-            .hkm-rp-header-top {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                gap: 24px;
-                margin-bottom: 20px;
-            }
-            @media (max-width: 768px) {
-                .hkm-rp-header-top {
-                    flex-direction: column;
-                    gap: 16px;
-                }
-                .hkm-rp-day-navigator {
-                    width: 100%;
-                    justify-content: space-between;
-                    box-sizing: border-box;
-                }
-            }
-            @media (max-width: 480px) {
-                .hkm-rp-day-navigator .hkm-nav-btn span:not(.material-symbols-outlined) {
-                    display: none;
-                }
-                .hkm-rp-day-navigator {
-                    gap: 8px;
-                    padding: 8px 12px;
-                }
-            }
-            .hkm-rp-header-info {
-                flex: 1;
-            }
-            .hkm-rp-badge {
-                display: inline-block;
+            .hkm-rp-badge-pill {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #ffffff;
+                border: 1px solid var(--border-color, #e2e8f0);
+                border-radius: 99px;
+                padding: 4px 16px;
                 font-size: 11px;
                 font-weight: 700;
-                color: #bd4f2a;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                margin-bottom: 8px;
-            }
-            .hkm-rp-title {
-                font-size: 24px;
-                font-weight: 800;
-                color: #1B4965;
-                margin: 0 0 8px 0 !important;
-                line-height: 1.2;
-            }
-            .bible-theme-dark .hkm-rp-title {
-                color: #e2e8f0;
-            }
-            .hkm-rp-desc {
-                font-size: 14px;
-                color: var(--text-muted, #64748b);
-                margin: 0;
-                line-height: 1.5;
-            }
-            .hkm-rp-day-navigator {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                background: rgba(27, 73, 101, 0.03);
-                padding: 8px 16px;
-                border-radius: 12px;
-                border: 1px solid rgba(27, 73, 101, 0.06);
-            }
-            .bible-theme-dark .hkm-rp-day-navigator {
-                background: rgba(255, 255, 255, 0.02);
-                border-color: rgba(255, 255, 255, 0.05);
-            }
-            .hkm-nav-btn {
-                background: none;
-                border: none;
-                cursor: pointer;
-                color: #1B4965;
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-                font-weight: 600;
-                font-size: 13px;
-                padding: 6px 12px;
-                border-radius: 8px;
-                transition: all 0.2s ease;
-                white-space: nowrap;
-                flex-shrink: 0;
-            }
-            .bible-theme-dark .hkm-nav-btn {
-                color: #94a3b8;
-            }
-            .hkm-nav-btn:hover:not(:disabled) {
-                background: rgba(27, 73, 101, 0.08);
-                color: #bd4f2a;
-            }
-            .hkm-nav-btn:disabled {
-                opacity: 0.3;
-                cursor: not-allowed;
-            }
-            .hkm-nav-day-label {
-                font-size: 14px;
-                font-weight: 700;
-                color: #1B4965;
-                white-space: nowrap;
-            }
-            .bible-theme-dark .hkm-nav-day-label {
-                color: #cbd5e1;
-            }
-            .hkm-rp-progress-section {
-                margin-bottom: 20px;
-            }
-            .hkm-rp-progress-text {
-                display: flex;
-                justify-content: space-between;
-                font-size: 13px;
-                font-weight: 600;
                 color: #475569;
-                margin-bottom: 8px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                white-space: nowrap;
             }
-            .bible-theme-dark .hkm-rp-progress-text {
+            .bible-theme-dark .hkm-rp-badge-pill {
+                background: #242424;
+                border-color: #333333;
                 color: #94a3b8;
             }
-            .hkm-rp-progress-bar {
-                height: 8px;
-                background: #e2e8f0;
-                border-radius: 99px;
-                overflow: hidden;
-            }
-            .bible-theme-dark .hkm-rp-progress-bar {
-                background: #333333;
-            }
-            .hkm-rp-progress-fill {
-                height: 100%;
-                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-                border-radius: 99px;
-                transition: width 0.4s ease;
-            }
-            .hkm-rp-actions {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                align-items: center;
-                gap: 16px 12px;
-                margin-top: 16px;
-                border-top: 1px solid var(--border-color, #e2e8f0);
-                padding-top: 16px;
-            }
-            .bible-theme-dark .hkm-rp-actions {
-                border-top-color: #333333;
-            }
-            .hkm-btn-complete {
+            .hkm-btn-complete-v2 {
                 background: linear-gradient(135deg, #d17d39, #bd4f2a);
                 color: white;
                 border: none;
                 border-radius: 12px;
-                padding: 12px 24px;
+                padding: 14px 24px;
                 font-weight: 700;
                 cursor: pointer;
-                font-size: 14px;
-                display: inline-flex;
+                font-size: 15px;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 gap: 8px;
                 box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
                 transition: all 0.2s ease;
-                white-space: nowrap;
+                width: 100%;
+                box-sizing: border-box;
             }
-            .hkm-btn-complete:hover {
-                transform: translateY(-2px);
+            .hkm-btn-complete-v2:hover {
+                transform: translateY(-1px);
                 box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
             }
-            .hkm-btn-complete.completed {
+            .hkm-btn-complete-v2.completed {
                 background: #10b981;
                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
             }
-            .hkm-btn-complete.completed:hover {
+            .hkm-btn-complete-v2.completed:hover {
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
             }
-            @media (max-width: 600px) {
-                .hkm-rp-actions {
-                    flex-direction: column-reverse;
-                    align-items: stretch;
-                    gap: 12px;
-                }
-                .hkm-btn-complete {
-                    width: 100%;
-                    justify-content: center;
-                }
-                .hkm-rp-actions > .hkm-nav-btn {
-                    justify-content: center;
-                    width: 100%;
-                    box-sizing: border-box;
+            .hkm-rp-progress-v2 {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            .hkm-rp-progress-bar-v2 {
+                height: 6px;
+                background: #f1f5f9;
+                border-radius: 99px;
+                overflow: hidden;
+                width: 100%;
+            }
+            .bible-theme-dark .hkm-rp-progress-bar-v2 {
+                background: #333333;
+            }
+            .hkm-rp-progress-fill-v2 {
+                height: 100%;
+                background: #1B4965;
+                border-radius: 99px;
+                transition: width 0.4s ease;
+            }
+            .bible-theme-dark .hkm-rp-progress-fill-v2 {
+                background: #38bdf8;
+            }
+            .hkm-rp-progress-labels-v2 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+                color: #64748b;
+                width: 100%;
+            }
+            .bible-theme-dark .hkm-rp-progress-labels-v2 {
+                color: #94a3b8;
+            }
+            .progress-left-label, .progress-right-label {
+                font-weight: 700;
+                white-space: nowrap;
+                color: #1B4965;
+            }
+            .bible-theme-dark .progress-left-label, 
+            .bible-theme-dark .progress-right-label {
+                color: #cbd5e1;
+            }
+            .progress-ticks-v2 {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                justify-content: center;
+                flex: 1;
+                margin: 0 16px;
+            }
+            .tick-number {
+                font-size: 11px;
+                font-weight: 600;
+                color: #94a3b8;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+            .tick-number.current-tick {
+                background: rgba(27, 73, 101, 0.08);
+                color: #1B4965;
+                font-weight: 700;
+            }
+            .bible-theme-dark .tick-number.current-tick {
+                background: rgba(56, 189, 248, 0.15);
+                color: #38bdf8;
+            }
+            .tick-number.end-tick {
+                background: #fdfbf7;
+                border: 1px solid #e6dfd3;
+                color: #b45309;
+                font-weight: 700;
+            }
+            .bible-theme-dark .tick-number.end-tick {
+                background: #1e1b4b;
+                border-color: #312e81;
+                color: #a5f3fc;
+            }
+            .hkm-rp-divider-v2 {
+                height: 1px;
+                background: var(--border-color, #e2e8f0);
+                width: 100%;
+            }
+            .bible-theme-dark .hkm-rp-divider-v2 {
+                background: #333333;
+            }
+            .hkm-rp-nav-row-v2 {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+            .hkm-rp-nav-link-v2 {
+                background: none;
+                border: none;
+                color: #1B4965;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 700;
+                font-size: 13px;
+                transition: all 0.2s ease;
+                padding: 6px 12px;
+                border-radius: 8px;
+            }
+            .bible-theme-dark .hkm-rp-nav-link-v2 {
+                color: #38bdf8;
+            }
+            .hkm-rp-nav-link-v2:hover:not(:disabled) {
+                background: rgba(27, 73, 101, 0.05);
+                color: #bd4f2a;
+            }
+            .bible-theme-dark .hkm-rp-nav-link-v2:hover:not(:disabled) {
+                background: rgba(255, 255, 255, 0.05);
+                color: #f97316;
+            }
+            .hkm-rp-nav-link-v2:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+            .hkm-rp-nav-label-v2 {
+                font-size: 14px;
+                font-weight: 700;
+                color: #475569;
+            }
+            .bible-theme-dark .hkm-rp-nav-label-v2 {
+                color: #94a3b8;
+            }
+            @media (max-width: 480px) {
+                .progress-ticks-v2 {
+                    display: none;
                 }
             }
             .hkm-rp-sidebar-wrapper {
@@ -4665,6 +4653,40 @@ class BibleReader {
         }
     }
 
+    renderProgressTicks(totalDays, currentDayNum) {
+        let ticks = [];
+        let step = 1;
+        if (totalDays > 30) {
+            step = 5;
+        } else if (totalDays > 10) {
+            step = 2; // Show odd days
+        }
+        
+        for (let i = 1; i <= totalDays; i += step) {
+            ticks.push(i);
+        }
+        if (!ticks.includes(totalDays)) {
+            ticks.push(totalDays);
+        }
+        if (!ticks.includes(currentDayNum)) {
+            ticks.push(currentDayNum);
+            ticks.sort((a, b) => a - b);
+        }
+
+        let html = '';
+        ticks.forEach(tick => {
+            const isCurrent = tick === currentDayNum;
+            const isEnd = tick === totalDays;
+            
+            let classes = 'tick-number';
+            if (isCurrent) classes += ' current-tick';
+            else if (isEnd) classes += ' end-tick';
+            
+            html += `<span class="${classes}">${tick}</span>`;
+        });
+        return html;
+    }
+
     renderTopHeaderPanel(container, globalPlan, userPlan, currentDayNum, dayConfig) {
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
         const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
@@ -4678,25 +4700,13 @@ class BibleReader {
         );
         const lang = document.documentElement.lang || 'no';
 
-        const badgeLabel = isPrayerApp 
-            ? (lang === 'en' ? 'Active Prayer App' : (lang === 'es' ? 'Aplicación de oración activa' : 'Aktiv Bønneapp'))
-            : (lang === 'en' ? 'Active Reading Plan' : (lang === 'es' ? 'Plan de Lectura Activo' : 'Aktiv Leseplan'));
-
-        const backLabel = lang === 'en' ? 'Back' : (lang === 'es' ? 'Volver' : 'Tilbake');
-
         const completeLabel = isCurrentDayCompleted 
-            ? (isPrayerApp ? (lang === 'en' ? 'Prayed' : (lang === 'es' ? 'Orado' : 'Bedt')) : (lang === 'en' ? 'Completed' : (lang === 'es' ? 'Completado' : 'Fullført')))
-            : (isPrayerApp ? (lang === 'en' ? 'Pray' : (lang === 'es' ? 'Orar' : 'Marker bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
+            ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!')))
+            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
 
-        const progressLabel = isPrayerApp
-            ? (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'))
-            : (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'));
+        const badgeLabel = globalPlan.title || '';
 
-        const progressSuffix = isPrayerApp
-            ? (lang === 'en' ? `prayers completed` : (lang === 'es' ? `oraciones completadas` : `dager fullført`))
-            : (lang === 'en' ? `days completed` : (lang === 'es' ? `días completados` : `dager fullført`));
-
-        container.className = 'hkm-rp-header-card';
+        container.className = 'hkm-rp-header-card-v2';
         if (isPrayerApp) {
             container.classList.add('prayer-app-mode');
         } else {
@@ -4704,70 +4714,47 @@ class BibleReader {
         }
         
         container.innerHTML = `
-            <div class="hkm-rp-header-top">
-                <div class="hkm-rp-header-info">
-                    <span class="hkm-rp-badge">${badgeLabel}</span>
-                    <h1 class="hkm-rp-title">${globalPlan.title}</h1>
-                    <p class="hkm-rp-desc">${globalPlan.description || ''}</p>
+            <!-- Floating badge pill on top border -->
+            <div class="hkm-rp-badge-pill">${badgeLabel}</div>
+            
+            <!-- Huge full-width complete button -->
+            <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
+                <span class="material-symbols-outlined" style="font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                <span>${completeLabel}</span>
+            </button>
+            
+            <!-- Progress section -->
+            <div class="hkm-rp-progress-v2">
+                <div class="hkm-rp-progress-bar-v2">
+                    <div class="hkm-rp-progress-fill-v2" style="width: ${progressPct}%;"></div>
+                </div>
+                <div class="hkm-rp-progress-labels-v2">
+                    <span class="progress-left-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum}</span>
+                    <div class="progress-ticks-v2">
+                        ${this.renderProgressTicks(totalDays, currentDayNum)}
+                    </div>
+                    <span class="progress-right-label">${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</span>
                 </div>
             </div>
             
-            <div class="hkm-rp-progress-section">
-                <div class="hkm-rp-progress-text">
-                    <span>${progressLabel}</span>
-                    <span>${progressPct}% (${completedDaysCount} av ${totalDays} ${progressSuffix})</span>
-                </div>
-                <div class="hkm-rp-progress-bar">
-                    <div class="hkm-rp-progress-fill" style="width: ${progressPct}%;"></div>
-                </div>
-            </div>
-
-            <div class="hkm-rp-actions">
-                <a href="/leseplaner.html" class="hkm-nav-btn" style="padding-left: 0;">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                    <span>${backLabel}</span>
-                </a>
+            <!-- Horizontal Divider -->
+            <div class="hkm-rp-divider-v2"></div>
+            
+            <!-- Navigation row -->
+            <div class="hkm-rp-nav-row-v2">
+                <button class="hkm-rp-nav-link-v2 prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                    <span>${lang === 'en' ? 'Go back' : (lang === 'es' ? 'Volver' : 'Gå tilbake')}</span>
+                </button>
                 
-                <div class="hkm-rp-day-navigator">
-                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn" style="padding: 6px 8px;">
-                        <span class="material-symbols-outlined">chevron_left</span>
-                    </button>
-                    <div class="hkm-nav-day-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
-                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn" style="padding: 6px 8px;">
-                        <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
-                </div>
+                <div class="hkm-rp-nav-label-v2">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
                 
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn" style="margin: 0; padding: 10px 18px; font-size: 13px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                        <span>${completeLabel}</span>
-                    </button>
-                    
-                    <button id="rp-header-toggle-btn" class="hkm-nav-btn" style="background: rgba(27, 73, 101, 0.05); padding: 8px; border-radius: 50%; min-width: unset; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>
-                    </button>
-                </div>
+                <button class="hkm-rp-nav-link-v2 next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
+                    <span>${lang === 'en' ? 'Next day' : (lang === 'es' ? 'Siguiente día' : 'Neste dag')}</span>
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                </button>
             </div>
         `;
-
-        // Collapse preference check
-        const toggleBtn = container.querySelector('#rp-header-toggle-btn');
-        const isCollapsed = localStorage.getItem('hkm_rp_header_collapsed') === 'true';
-        if (isCollapsed) {
-            container.classList.add('collapsed');
-            toggleBtn.querySelector('.material-symbols-outlined').innerText = 'expand_more';
-        } else {
-            container.classList.remove('collapsed');
-            toggleBtn.querySelector('.material-symbols-outlined').innerText = 'expand_less';
-        }
-
-        toggleBtn.onclick = (e) => {
-            e.stopPropagation();
-            const nowCollapsed = container.classList.toggle('collapsed');
-            localStorage.setItem('hkm_rp_header_collapsed', nowCollapsed ? 'true' : 'false');
-            toggleBtn.querySelector('.material-symbols-outlined').innerText = nowCollapsed ? 'expand_more' : 'expand_less';
-        };
 
         // Wire up buttons
         container.querySelector('#rp-prev-day-btn').onclick = () => {
