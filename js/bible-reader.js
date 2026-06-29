@@ -4090,10 +4090,12 @@ class BibleReader {
             .hkm-rp-buttons-row-v2 {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
                 justify-content: center;
                 flex-shrink: 0;
                 flex-wrap: nowrap;
+                width: 100%;
+                max-width: 300px;
             }
             .hkm-rp-btn-nav-v2 {
                 background: none;
@@ -4132,7 +4134,7 @@ class BibleReader {
                 color: white;
                 border: none;
                 border-radius: 12px;
-                padding: 12px 24px;
+                padding: 12px 16px;
                 font-weight: 700;
                 cursor: pointer;
                 font-size: 14px;
@@ -4142,9 +4144,11 @@ class BibleReader {
                 gap: 8px;
                 box-shadow: 0 4px 12px rgba(198, 99, 56, 0.2);
                 transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-                min-width: 160px;
                 box-sizing: border-box;
                 height: 44px;
+                flex: 1;
+                max-width: 180px;
+                min-width: 100px;
             }
             .hkm-btn-complete-v2:hover {
                 background: #994119;
