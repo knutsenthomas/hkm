@@ -3015,8 +3015,15 @@ class BibleReader {
                         <span class="material-symbols-outlined" style="font-size: 18px; color: #ff0000;">play_circle</span>
                         <span>${label}</span>
                     </h3>
-                    <div class="bp-video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; border: 1px solid var(--border-color); margin-bottom:16px; background: #000000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                        <iframe src="https://www.youtube.com/embed/${bpVideo.id}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
+                    <div class="hkm-rp-sidebar-card no-stripe" style="margin: 0; padding: 0; box-shadow: none; border: none; overflow: hidden; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                        <div class="relative h-36 overflow-hidden group cursor-pointer" onclick="window.open('https://www.youtube.com/watch?v=${bpVideo.id}', '_blank')">
+                            <img src="https://img.youtube.com/vi/${bpVideo.id}/0.jpg" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" class="group-hover:scale-105" />
+                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: all 0.3s;" class="group-hover:bg-black/40">
+                                <div style="width: 40px; height: 40px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s;" class="group-hover:scale-110">
+                                    <span class="material-symbols-outlined" style="color: #d17d39; font-variation-settings: 'FILL' 1; font-size: 24px;">play_arrow</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
