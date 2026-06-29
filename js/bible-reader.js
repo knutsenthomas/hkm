@@ -5279,30 +5279,6 @@ class BibleReader {
                 </div>
             </div>
             
-            <!-- 2. Desktop Navigation Bar -->
-            <div class="hkm-rp-desktop-nav-v2 lg:flex hidden">
-                <button class="hkm-rp-nav-btn-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum - 1})" ${currentDayNum <= 1 ? 'style="visibility: hidden;"' : ''}>
-                    <span class="material-symbols-outlined">chevron_left</span>
-                    <span>Dag ${currentDayNum - 1}</span>
-                </button>
-                
-                <div class="hkm-rp-nav-tools-v2">
-                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-size" title="${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Tamaño' : 'Skriftstørrelse')}">
-                        <span class="material-symbols-outlined">text_fields</span>
-                    </button>
-                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-audio" title="${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}">
-                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">headphones</span>
-                    </button>
-                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-bookmark" title="${lang === 'en' ? 'Bookmark' : (lang === 'es' ? 'Bokmerk' : 'Bokmerk')}">
-                        <span class="material-symbols-outlined">bookmark_border</span>
-                    </button>
-                </div>
-                
-                <button class="hkm-rp-nav-btn-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum + 1})" ${currentDayNum >= totalDays ? 'style="visibility: hidden;"' : ''}>
-                    <span>Dag ${currentDayNum + 1}</span>
-                    <span class="material-symbols-outlined">chevron_right</span>
-                </button>
-            </div>
             
             <!-- 3. Mobile Combined Card (Visible on mobile/tablet, hidden on desktop) -->
             <div class="hkm-rp-header-card-v2 lg:hidden" id="progress-card">
