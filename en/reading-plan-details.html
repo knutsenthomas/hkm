@@ -1216,6 +1216,8 @@
             }
 
             function renderPlanDetails(plan) {
+                const isPrayerApp = plan && plan.title && (plan.title.toLowerCase().includes('bønn') || plan.title.toLowerCase().includes('prayer'));
+
                 // Populate share links
                 const shareUrl = window.location.href;
                 const encodedUrl = encodeURIComponent(shareUrl);
@@ -1271,6 +1273,60 @@
                 if (printTitle) printTitle.textContent = plan.title;
                 const printSubtitle = document.getElementById('print-plan-subtitle');
                 if (printSubtitle) printSubtitle.textContent = plan.subtitle || 'Reading Plan';
+
+                // Customize labels and text dynamically for Prayer App Mode
+                if (isPrayerApp) {
+                    document.body.classList.add('prayer-app-mode');
+                    
+                    // Update sidebar title
+                    const sidebarPlanTitle = document.getElementById('sidebar-plan-title');
+                    if (sidebarPlanTitle) sidebarPlanTitle.textContent = 'Prayer App';
+
+                    // Update sidebar category
+                    const categorySpan = document.querySelector('.sidebar-info-item .fa-book-open + span') || document.querySelector('.sidebar-info-item i.fa-book-open + span');
+                    if (categorySpan) {
+                        categorySpan.innerHTML = `<strong>Category:</strong> Prayer App`;
+                    }
+
+                    // Update breadcrumbs parent folder name
+                    const breadcrumbCategory = document.querySelector('.hero-breadcrumbs a[href="/en/reading-plans.html"]') || document.querySelector('.hero-breadcrumbs a[href="/en/reading-plans"]');
+                    if (breadcrumbCategory) {
+                        breadcrumbCategory.textContent = 'Prayer Apps';
+                    }
+
+                    // Update stats headings/labels in the page body
+                    const statsLabels = document.querySelectorAll('.stat-item .stat-label');
+                    statsLabels.forEach(lbl => {
+                        if (lbl.textContent.trim() === 'Scope') {
+                            lbl.textContent = 'Topic';
+                        }
+                    });
+
+                    // Update card titles robustly
+                    document.querySelectorAll('.card .card-title').forEach(titleEl => {
+                        const txt = titleEl.textContent.trim().toLowerCase();
+                        if (txt.includes('about the plan') || txt.includes('about reading plan')) {
+                            titleEl.innerHTML = `<span class="card-title-icon"><span class="material-symbols-outlined">info</span></span> About the prayer app`;
+                        } else if (txt.includes('plan content') || txt.includes('content')) {
+                            titleEl.innerHTML = `<span class="card-title-icon"><span class="material-symbols-outlined">favorite</span></span> Daily prayers`;
+                        }
+                    });
+
+                    // Update print layout description block
+                    const printIntro = document.querySelector('.print-intro');
+                    if (printIntro) {
+                        printIntro.innerHTML = `<strong>Study Guide & Prayer App:</strong> Welcome to this prayer app from His Kingdom Ministry. Use this guide for daily reflection, bible reading, and prayer. Check the boxes for each day as you complete the prayers to track your progress.`;
+                    }
+
+                    // Change category in print titles if it exists
+                    if (printSubtitle) printSubtitle.textContent = plan.subtitle || 'Prayer App';
+
+                    // Update start button text initially
+                    const startBtn = document.getElementById('start-plan-btn');
+                    if (startBtn) {
+                        startBtn.innerHTML = `Start this prayer app <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
+                    }
+                }
 
                 // Populate stats grid
                 const durationEl = document.getElementById('stat-duration');
@@ -1494,6 +1550,40 @@
                         const isChecked = completedDays.includes(day.dayNumber) ? 'checked' : '';
                         const isHiddenClass = (showExpandButton && index >= maxInitialDays) ? 'day-item-expandable hidden-day' : '';
                         const versesText = (day.verses || '').trim();
+
+                        if (isPrayerApp) {
+                            // Custom layout for Prayer App / Bønneapp
+                            const versesHtml = versesText 
+                                ? `<div class="day-verses-prayer-mode" style="margin-top: 10px; font-size: 0.92rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                                     <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">menu_book</span>
+                                     <strong>Bible Verse:</strong> <a href="/en/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="verse-link" style="color: #bd4f2a; text-decoration: underline; font-weight: 600; cursor: pointer;">${escapeHtml(versesText)}</a>
+                                   </div>` 
+                                : '';
+                            
+                            const prayerContentHtml = day.prayerFocus 
+                                ? `<div class="day-prayer" style="margin-top: 8px;">
+                                     <div style="font-weight: 700; color: #bd4f2a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                                       <span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; fill: 1;">favorite</span> Today's Prayer Focus
+                                     </div>
+                                     <div style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">${escapeHtml(day.prayerFocus)}</div>
+                                   </div>` 
+                                : `<div class="day-prayer" style="margin-top: 8px; font-style: italic; color: var(--text-muted);">Silent prayer and reflection.</div>`;
+
+                            return `
+                                <div class="day-item ${isHiddenClass}" style="position: relative; padding: 24px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg-white); transition: all 0.3s; margin-bottom: 16px;">
+                                    <div class="day-header-info" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <input type="checkbox" class="day-checkbox" data-day="${day.dayNumber}" ${isChecked} style="width: 20px; height: 20px; cursor: pointer; accent-color: #bd4f2a; margin: 0; flex-shrink: 0;">
+                                            <span class="day-badge-num" style="background: linear-gradient(135deg, rgba(209, 125, 57, 0.15), rgba(189, 79, 42, 0.15)); color: #bd4f2a; font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(209, 125, 57, 0.25);">Day ${day.dayNumber}</span>
+                                        </div>
+                                    </div>
+                                    ${prayerContentHtml}
+                                    ${versesHtml}
+                                    ${resourcesHtml}
+                                </div>
+                            `;
+                        }
+
                         const isReflection = !versesText || versesText.toLowerCase() === 'reflection';
                         const versesHtml = isReflection 
                             ? `<span>Reflection</span>` 
@@ -1590,7 +1680,9 @@
                                         // Update start-plan-btn text and link
                                         const startBtn = document.getElementById('start-plan-btn');
                                         if (startBtn) {
-                                            const btnText = lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett');
+                                            const btnText = isPrayerApp 
+                                                ? (lang === 'en' ? 'Open prayer' : (lang === 'es' ? 'Abrir oración' : 'Åpne dagens bønn'))
+                                                : (lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett'));
                                             const dayLabel = lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag');
                                             startBtn.style.whiteSpace = 'nowrap';
                                             startBtn.style.fontSize = '0.95rem';
