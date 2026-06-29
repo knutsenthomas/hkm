@@ -4030,8 +4030,9 @@ class BibleReader {
                 justify-content: space-between;
                 gap: 20px;
                 width: 100%;
+                flex-wrap: wrap;
             }
-            @media (max-width: 600px) {
+            @media (max-width: 768px) {
                 .hkm-rp-progress-row-v2 {
                     flex-direction: column;
                     align-items: center;
@@ -4043,8 +4044,9 @@ class BibleReader {
                 display: flex;
                 align-items: center;
                 gap: 16px;
+                flex-shrink: 0;
             }
-            @media (max-width: 600px) {
+            @media (max-width: 768px) {
                 .hkm-rp-progress-info-v2 {
                     flex-direction: column;
                 }
@@ -4060,6 +4062,7 @@ class BibleReader {
             .progress-info-text-v2 {
                 display: flex;
                 flex-direction: column;
+                white-space: nowrap;
             }
             .progress-info-text-v2 p.title {
                 font-size: 14px;
@@ -4088,8 +4091,9 @@ class BibleReader {
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                flex-wrap: wrap;
                 justify-content: center;
+                flex-shrink: 0;
+                flex-wrap: nowrap;
             }
             .hkm-rp-btn-nav-v2 {
                 background: none;
@@ -4202,6 +4206,17 @@ class BibleReader {
             }
             .bible-theme-dark .hkm-rp-toolbelt-btn-v2:hover {
                 color: #f97316;
+            }
+            @media (max-width: 480px) {
+                .hkm-rp-toolbelt-v2 {
+                    gap: 8px;
+                }
+                .hkm-rp-toolbelt-btn-v2 {
+                    width: auto;
+                    flex: 1;
+                    font-size: 10px;
+                    padding: 6px 4px;
+                }
             }
             .particle {
                 position: absolute;
