@@ -4057,7 +4057,7 @@ class BibleReader {
             }
             .hkm-rp-progress-bar-v2 {
                 height: 6px;
-                background: #f1f5f9;
+                background: #f0e5d8;
                 border-radius: 99px;
                 overflow: hidden;
                 width: 100%;
@@ -4078,53 +4078,51 @@ class BibleReader {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                font-size: 12px;
-                color: #64748b;
                 width: 100%;
             }
-            .bible-theme-dark .hkm-rp-progress-labels-v2 {
+            .hkm-rp-progress-labels-v2 span,
+            .hkm-rp-progress-labels-v2 .tick-number {
+                font-size: 11px;
+                font-weight: 500;
+                color: #64748b;
+                white-space: nowrap;
+            }
+            .bible-theme-dark .hkm-rp-progress-labels-v2 span,
+            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number {
                 color: #94a3b8;
             }
             .progress-left-label, .progress-right-label {
-                font-weight: 700;
-                white-space: nowrap;
-                color: #1B4965;
+                color: #64748b;
             }
             .bible-theme-dark .progress-left-label, 
             .bible-theme-dark .progress-right-label {
-                color: #cbd5e1;
+                color: #94a3b8;
             }
-            .progress-ticks-v2 {
-                display: flex;
-                gap: 12px;
+            .hkm-rp-progress-labels-v2 .tick-number {
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                flex: 1;
-                margin: 0 16px;
-            }
-            .tick-number {
-                font-size: 11px;
-                font-weight: 600;
-                color: #94a3b8;
-                padding: 2px 6px;
+                min-width: 20px;
+                height: 20px;
                 border-radius: 4px;
+                box-sizing: border-box;
             }
-            .tick-number.current-tick {
+            .hkm-rp-progress-labels-v2 .tick-number.current-tick {
                 background: rgba(27, 73, 101, 0.08);
                 color: #1B4965;
                 font-weight: 700;
             }
-            .bible-theme-dark .tick-number.current-tick {
+            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number.current-tick {
                 background: rgba(56, 189, 248, 0.15);
                 color: #38bdf8;
             }
-            .tick-number.end-tick {
+            .hkm-rp-progress-labels-v2 .tick-number.end-tick {
                 background: #fdfbf7;
                 border: 1px solid #e6dfd3;
                 color: #b45309;
                 font-weight: 700;
             }
-            .bible-theme-dark .tick-number.end-tick {
+            .bible-theme-dark .hkm-rp-progress-labels-v2 .tick-number.end-tick {
                 background: #1e1b4b;
                 border-color: #312e81;
                 color: #a5f3fc;
@@ -4181,8 +4179,8 @@ class BibleReader {
                 color: #94a3b8;
             }
             @media (max-width: 480px) {
-                .progress-ticks-v2 {
-                    display: none;
+                .hkm-rp-progress-labels-v2 .tick-number {
+                    display: none !important;
                 }
             }
             .hkm-rp-sidebar-wrapper {
@@ -4730,9 +4728,7 @@ class BibleReader {
                 </div>
                 <div class="hkm-rp-progress-labels-v2">
                     <span class="progress-left-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum}</span>
-                    <div class="progress-ticks-v2">
-                        ${this.renderProgressTicks(totalDays, currentDayNum)}
-                    </div>
+                    ${this.renderProgressTicks(totalDays, currentDayNum)}
                     <span class="progress-right-label">${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</span>
                 </div>
             </div>
