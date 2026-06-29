@@ -7818,18 +7818,22 @@ exports.scheduledReadingNotifications = onSchedule({
         // Bygg HTML-kortet for dagens lesing
         const readingContentHtml = `
           <div style="margin: 24px 0; text-align: left;">
-            <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-            <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag \${currentDayNum} - \${planTitle}</h3>
-            <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: \${verses}</p>
-
-            <!-- Devotional Content -->
-            <div style="margin-bottom: 32px; text-align: left;">
-              <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
-              <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
+            <!-- Dagens lesing block -->
+            <div style="margin: 0 0 28px 0; background-color: #f8fafc; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; border-top: 1px solid #edf2f7; border-right: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7;">
+              <span style="display: inline-block; font-size: 10px; font-weight: 800; color: #1B4965; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; background-color: #e2e8f0; padding: 4px 8px; border-radius: 4px; line-height: 1;">Dagens lesing</span>
+              <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.3; word-break: normal; overflow-wrap: break-word;">Dag \${currentDayNum} - \${planTitle}</h3>
+              <p style="margin: 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">📖 Bibeltekst: \${verses}</p>
             </div>
 
+            <!-- Devotional Content -->
+            <div style="margin: 0 0 32px 0; background-color: #fdf8f5; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 20px 24px; border-top: 1px solid #fbf0e8; border-right: 1px solid #fbf0e8; border-bottom: 1px solid #fbf0e8; text-align: left;">
+              <span style="display: inline-block; font-size: 10px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; background-color: #faebd7; padding: 4px 8px; border-radius: 4px; line-height: 1;">Dagens andakt & bønn</span>
+              <p style="margin: 0; color: #334155; font-size: 15px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">\${prayerFocus}</p>
+            </div>
+
+            <!-- CTA Button -->
             <div style="text-align: center; margin: 32px 0;">
-              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 20px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
+              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; box-shadow: 0 6px 20px rgba(200, 104, 42, 0.25); text-align: center;">
                 Les plan
               </a>
             </div>
@@ -7868,41 +7872,51 @@ exports.scheduledReadingNotifications = onSchedule({
         if (wantEmail) {
           console.log(`Sender daglig leseplan-epost til bruker ${userId} (${userData.email})...`);
 
-          const defaultFallbackBody = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px; color: #334155; font-size: 15px; line-height: 1.6; text-align: left;">
+          const defaultFallbackBody = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(27, 73, 101, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02); border: 1px solid #edf2f7; text-align: left;">
+  <!-- Top bar color decoration -->
+  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+
   <!-- Header -->
-  <div style="text-align: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px; margin-bottom: 24px;">
-    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em; line-height: 1.2;">His Kingdom Ministry</h1>
+  <div style="text-align: center; border-bottom: 1px solid #f1f5f9; padding: 32px 24px 24px 24px;">
+    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 52px; width: auto; margin-bottom: 12px; display: inline-block;" alt="His Kingdom Ministry Logo">
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #1B4965; letter-spacing: -0.01em; text-transform: uppercase; line-height: 1.2;">His Kingdom Ministry</h1>
   </div>
 
-  <!-- Greeting & Intro -->
-  <h2 style="font-size: 20px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Hei {{name}}!</h2>
-  <p style="margin: 0 0 24px 0; color: #475569;">Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
+  <!-- Main Content Wrapper -->
+  <div style="padding: 32px 32px 24px 32px;">
+    <!-- Greeting & Intro -->
+    <h2 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0 0 12px 0;">Hei {{name}}! 👋</h2>
+    <p style="margin: 0 0 32px 0; color: #475569; font-size: 15px; line-height: 1.6;">Her er dagens oppdatering for din aktive leseplan. Vi ber om at dagens ord må være til velsignelse og styrke for deg.</p>
 
-  <!-- Dagens lesing -->
-  <div style="margin: 0 0 24px 0;">
-    <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens lesing</span>
-    <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 22px; font-weight: 800; line-height: 1.25; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
-    <p style="margin: 0 0 24px 0; color: #475569; font-weight: 600; font-size: 16px; word-break: normal; overflow-wrap: break-word;">Bibeltekst: {{passage}}</p>
+    <!-- Dagens lesing -->
+    <div style="margin: 0 0 28px 0; background-color: #f8fafc; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; border-top: 1px solid #edf2f7; border-right: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7;">
+      <span style="display: inline-block; font-size: 10px; font-weight: 800; color: #1B4965; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; background-color: #e2e8f0; padding: 4px 8px; border-radius: 4px; line-height: 1;">Dagens lesing</span>
+      <h3 class="hkm-reading-title" style="margin: 0 0 6px 0; color: #1B4965; font-size: 20px; font-weight: 800; line-height: 1.3; word-break: normal; overflow-wrap: break-word;">Dag {{day}} - {{title}}</h3>
+      <p style="margin: 0; color: #475569; font-weight: 600; font-size: 15px; word-break: normal; overflow-wrap: break-word;">📖 Bibeltekst: {{passage}}</p>
+    </div>
+
+    <!-- Devotional Content -->
+    <div style="margin: 0 0 32px 0; background-color: #fdf8f5; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 20px 24px; border-top: 1px solid #fbf0e8; border-right: 1px solid #fbf0e8; border-bottom: 1px solid #fbf0e8;">
+      <span style="display: inline-block; font-size: 10px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; background-color: #faebd7; padding: 4px 8px; border-radius: 4px; line-height: 1;">Dagens andakt & bønn</span>
+      <p style="margin: 0; color: #334155; font-size: 15px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
+    </div>
+
+    <!-- CTA Button -->
+    <div style="text-align: center; margin: 32px 0 40px 0;">
+      <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 32px; border-radius: 9999px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; box-shadow: 0 6px 20px rgba(200, 104, 42, 0.25); text-align: center;">
+        Les plan
+      </a>
+    </div>
+
+    <!-- Sign-off -->
+    <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; color: #475569; font-size: 15px; line-height: 1.6;">
+      <p style="margin: 0 0 4px 0;">Ha en velsignet dag!</p>
+      <p style="margin: 0; font-weight: 600; color: #1B4965;">Vennlig hilsen,<br>His Kingdom Ministry</p>
+    </div>
   </div>
-
-  <!-- Devotional Content -->
-  <div style="margin-bottom: 32px;">
-    <span style="display: block; font-size: 11px; font-weight: 800; color: #d17d39; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; line-height: 1;">Dagens andakt & bønn</span>
-    <p style="margin: 0; color: #334155; font-size: 16px; line-height: 1.6; font-weight: 400; word-break: normal; overflow-wrap: break-word;">{{devotional}}</p>
-  </div>
-
-  <div style="text-align: center; margin: 32px 0;">
-    <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 12px 20px; border-radius: 9999px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; box-shadow: 0 4px 12px rgba(200, 104, 42, 0.2);">
-      Les plan
-    </a>
-  </div>
-
-  <p>Ha en velsignet dag!</p>
-  <p>Vennlig hilsen,<br><strong>His Kingdom Ministry</strong></p>
 
   <!-- Footer -->
-  <div class="hkm-email-footer" style="padding-top: 24px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+  <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 24px 32px; border-top: 1px solid #edf2f7; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
     <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
     <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
   </div>
@@ -7927,45 +7941,40 @@ exports.scheduledReadingNotifications = onSchedule({
               <style>
                 @media only screen and (max-width: 600px) {
                   .hkm-email-container {
-                    padding: 16px 12px !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
+                    padding: 16px 8px !important;
                   }
                   .hkm-email-card {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
+                    border-radius: 12px !important;
                   }
                   .hkm-email-header {
-                    padding: 24px 20px 16px 20px !important;
+                    padding: 24px 16px 16px 16px !important;
                   }
                   .hkm-email-body {
-                    padding: 24px 20px !important;
+                    padding: 24px 16px !important;
                   }
                   .hkm-email-footer {
-                    padding: 24px 20px !important;
-                  }
-                  .hkm-reading-title {
-                    font-size: 20px !important;
+                    padding: 20px 16px !important;
                   }
                 }
               </style>
-              <div class="hkm-email-container" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; padding: 24px 12px; text-align: center; margin: 0 auto; max-width: 600px;">
-                <div class="hkm-email-card" style="background: #ffffff; text-align: left;">
+              <div class="hkm-email-container" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; padding: 40px 16px; text-align: center; margin: 0 auto; max-width: 600px;">
+                <div class="hkm-email-card" style="background: #ffffff; text-align: left; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(27, 73, 101, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02); border: 1px solid #edf2f7;">
+                  <!-- Top bar color decoration -->
+                  <div style="height: 4px; background: linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%);"></div>
+
                   <!-- Header -->
                   <div class="hkm-email-header" style="background-color: #ffffff; padding: 32px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-                    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 50px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
-                    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1B4965; letter-spacing: -0.02em;">His Kingdom Ministry</h1>
+                    <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" style="height: 52px; width: auto; margin-bottom: 12px; display: inline-block; vertical-align: middle;" alt="His Kingdom Ministry Logo">
+                    <h1 style="margin: 0; font-size: 20px; font-weight: 800; color: #1B4965; letter-spacing: -0.01em; text-transform: uppercase; line-height: 1.2;">His Kingdom Ministry</h1>
                   </div>
 
                   <!-- Body -->
-                  <div class="hkm-email-body" style="padding: 32px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
-                    ${html}
+                  <div class="hkm-email-body" style="padding: 32px 32px 24px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+                    \${html}
                   </div>
 
                   <!-- Footer -->
-                  <div class="hkm-email-footer" style="background-color: #ffffff; padding: 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
+                  <div class="hkm-email-footer" style="background-color: #f8fafc; padding: 24px 32px; border-top: 1px solid #edf2f7; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5;">
                     <p style="margin: 0 0 8px 0; font-weight: 500;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
                     <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/minside" style="color: #1B4965; text-decoration: underline; font-weight: 600;">Endre dine varslingsinnstillinger</a></p>
                   </div>
