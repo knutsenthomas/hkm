@@ -101,7 +101,44 @@ document.addEventListener('DOMContentLoaded', () => {
             observers.forEach(obs => obs.disconnect());
         });
     }
+
+    updateReadingPlanLinks();
 });
+
+function updateReadingPlanLinks() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = urlParams.get('plan');
+    const idParam = urlParams.get('id');
+    const pathname = window.location.pathname;
+
+    let planUrl = null;
+    
+    if (planParam && (pathname.includes('/bibel') || pathname.endsWith('/bibel.html'))) {
+        planUrl = pathname + window.location.search;
+    } else if (idParam && (pathname.includes('leseplan-detaljer') || pathname.includes('reading-plan-details') || pathname.includes('detalles-plan-lectura'))) {
+        planUrl = pathname + window.location.search;
+    }
+
+    if (planUrl) {
+        try {
+            localStorage.setItem('hkm_last_reading_plan_url', planUrl);
+        } catch (e) {
+            console.warn('Failed to save last reading plan URL to localStorage:', e);
+        }
+    }
+
+    try {
+        const lastPlanUrl = localStorage.getItem('hkm_last_reading_plan_url');
+        if (lastPlanUrl) {
+            const calendarLinks = document.querySelectorAll('.header-reading-plans-btn');
+            calendarLinks.forEach(link => {
+                link.href = lastPlanUrl;
+            });
+        }
+    } catch (e) {
+        console.warn('Failed to update reading plan links in header:', e);
+    }
+}
 
 window.addEventListener('load', applySubpageHeroCentering);
 

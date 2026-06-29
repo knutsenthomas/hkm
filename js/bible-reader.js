@@ -3965,6 +3965,7 @@ class BibleReader {
 
             // Render reading plan UI
             await this.setupReadingPlanUI();
+            this.updateUrlParams();
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         }
@@ -4814,6 +4815,14 @@ class BibleReader {
         url.searchParams.set('plan', this.activePlanId);
         url.searchParams.set('day', this.activePlanDay);
         window.history.pushState({}, '', url.toString());
+
+        const relativeUrl = url.pathname + url.search;
+        this.safeSetLocalStorage('hkm_last_reading_plan_url', relativeUrl);
+
+        const calendarLinks = document.querySelectorAll('.header-reading-plans-btn');
+        calendarLinks.forEach(link => {
+            link.href = relativeUrl;
+        });
     }
 
     async saveProgress() {
