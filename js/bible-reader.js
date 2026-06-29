@@ -4191,7 +4191,7 @@ class BibleReader {
                     width: 100%;
                     justify-content: center;
                 }
-                .hkm-rp-actions .hkm-nav-btn {
+                .hkm-rp-actions > .hkm-nav-btn {
                     justify-content: center;
                     width: 100%;
                     box-sizing: border-box;
