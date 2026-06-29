@@ -4160,6 +4160,7 @@ class BibleReader {
                 height: 1px;
                 background: var(--border-color, #e2e8f0);
                 width: 100%;
+                margin: 4px 0;
             }
             .bible-theme-dark .hkm-rp-divider-v2 {
                 background: #333333;
