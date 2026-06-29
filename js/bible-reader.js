@@ -3979,6 +3979,14 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
+            .hkm-rp-header-wrapper {
+                width: 100%;
+                max-width: 680px;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 24px;
+                flex-shrink: 0;
+            }
             .hkm-rp-header-card-v2 {
                 background: #ffffff;
                 border: 1px solid var(--border-color, #e2e8f0);
@@ -3988,7 +3996,6 @@ class BibleReader {
                 box-shadow: 0 10px 30px rgba(30, 58, 76, 0.05);
                 position: relative;
                 width: 100%;
-                max-width: 680px;
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
@@ -4150,8 +4157,7 @@ class BibleReader {
             }
             .hkm-btn-complete-v2:hover {
                 background: #994119;
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(198, 99, 56, 0.35);
+                box-shadow: 0 6px 16px rgba(153, 65, 25, 0.3);
             }
             .hkm-btn-complete-v2.completed {
                 background-color: #466275 !important;
@@ -4354,6 +4360,169 @@ class BibleReader {
                 text-align: right;
             }
             
+            /* Premium layout 3-column elements */
+            .hkm-rp-hero-card-v2 {
+                position: relative;
+                width: 100%;
+                height: 220px;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 10px 25px rgba(30,58,76,0.08);
+                margin-bottom: 20px;
+            }
+            .hkm-rp-hero-bg-v2 {
+                position: absolute;
+                inset: 0;
+                background-size: cover;
+                background-position: center;
+                transition: transform 10s ease;
+            }
+            .hkm-rp-hero-card-v2:hover .hkm-rp-hero-bg-v2 {
+                transform: scale(1.05);
+            }
+            .hkm-rp-hero-overlay-v2 {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+            }
+            .hkm-rp-hero-content-v2 {
+                position: absolute;
+                bottom: 20px;
+                left: 24px;
+                right: 24px;
+                color: #ffffff;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            }
+            .hkm-rp-hero-badge-v2 {
+                background: #c66338;
+                color: #ffffff;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 4px 12px;
+                border-radius: 99px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                display: inline-block;
+                margin-bottom: 8px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            }
+            .hkm-rp-hero-title-v2 {
+                font-size: 28px;
+                font-weight: 800;
+                margin: 0 0 4px 0;
+                line-height: 1.2;
+            }
+            .hkm-rp-hero-subtitle-v2 {
+                font-size: 13px;
+                opacity: 0.9;
+                margin: 0;
+            }
+            
+            .hkm-rp-desktop-nav-v2 {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: #ffffff;
+                border: 1px solid var(--border-color, #e2e8f0);
+                border-radius: 12px;
+                padding: 8px 16px;
+                width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 20px;
+            }
+            .bible-theme-dark .hkm-rp-desktop-nav-v2 {
+                background: #242424;
+                border-color: #333333;
+            }
+            .hkm-rp-nav-btn-v2 {
+                background: none;
+                border: none;
+                color: #1B4965;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                transition: all 0.2s ease;
+                padding: 6px 12px;
+                border-radius: 8px;
+            }
+            .bible-theme-dark .hkm-rp-nav-btn-v2 {
+                color: #38bdf8;
+            }
+            .hkm-rp-nav-btn-v2:hover {
+                background: rgba(27, 73, 101, 0.05);
+            }
+            .bible-theme-dark .hkm-rp-nav-btn-v2:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+            .hkm-rp-nav-tools-v2 {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+            .hkm-rp-tool-icon-btn-v2 {
+                background: none;
+                border: none;
+                color: #466275;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+            }
+            .bible-theme-dark .hkm-rp-tool-icon-btn-v2 {
+                color: #94a3b8;
+            }
+            .hkm-rp-tool-icon-btn-v2:hover {
+                background: rgba(27, 73, 101, 0.05);
+                color: #bd4f2a;
+            }
+            .bible-theme-dark .hkm-rp-tool-icon-btn-v2:hover {
+                background: rgba(255, 255, 255, 0.05);
+                color: #f97316;
+            }
+            
+            .hkm-rp-day-bubble {
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                font-weight: 700;
+                border-radius: 50%;
+                border: 1px solid var(--border-color, #e2e8f0);
+                background: #ffffff;
+                color: #466275;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                padding: 0;
+            }
+            .bible-theme-dark .hkm-rp-day-bubble {
+                background: #242424;
+                border-color: #333333;
+                color: #cbd5e1;
+            }
+            .hkm-rp-day-bubble.completed {
+                background: #c66338;
+                border-color: #c66338;
+                color: #ffffff !important;
+            }
+            .hkm-rp-day-bubble.active {
+                border-color: #bd4f2a;
+                box-shadow: 0 0 0 2px rgba(189, 79, 42, 0.25);
+                font-weight: 800;
+            }
+            .hkm-rp-day-bubble:hover {
+                transform: scale(1.15);
+                border-color: #c66338;
+            }
+            
             /* Prayer app overrides */
             body.prayer-app-mode .hkm-rp-badge {
                 color: #bd4f2a !important;
@@ -4455,7 +4624,7 @@ class BibleReader {
                 : (lang === 'en' ? 'Daily devotion' : (lang === 'es' ? 'Devocional diario' : 'Dagens andakt'));
         }
 
-        // 2. Render left sidebar content (devotional details)
+        // 2. Render left sidebar content (progress grid & devotional)
         let planSidebar = document.getElementById('reading-plan-sidebar-content');
         if (!planSidebar) {
             planSidebar = document.createElement('div');
@@ -4465,9 +4634,32 @@ class BibleReader {
         }
         planSidebar.style.display = 'block';
 
-        this.renderLeftSidebarDevotional(planSidebar, dayConfig);
+        this.renderLeftSidebarReadingPlan(planSidebar, globalPlan, userPlan, currentDayNum, dayConfig);
 
-        // 3. Render top header panel in central column
+        // 3. Render right sidebar content (reflections, cross references, video)
+        if (this.dom.navRight) {
+            const rightTabsHeader = this.dom.navRight.querySelector('.tabs-header');
+            if (rightTabsHeader) rightTabsHeader.style.display = 'none';
+            const rightTabsContent = this.dom.navRight.querySelector('.tabs-content');
+            if (rightTabsContent) rightTabsContent.style.display = 'none';
+            
+            let rightPlanSidebar = document.getElementById('reading-plan-right-sidebar-content');
+            if (!rightPlanSidebar) {
+                rightPlanSidebar = document.createElement('div');
+                rightPlanSidebar.id = 'reading-plan-right-sidebar-content';
+                rightPlanSidebar.style.cssText = 'padding: 16px; overflow-y: auto; height: calc(100% - 60px);';
+                this.dom.navRight.appendChild(rightPlanSidebar);
+            }
+            rightPlanSidebar.style.display = 'block';
+            this.renderRightSidebarReadingPlan(rightPlanSidebar, dayConfig);
+            
+            // Force open right sidebar on desktop for side-by-side
+            if (window.innerWidth > 1024) {
+                this.dom.navRight.classList.add('active');
+            }
+        }
+
+        // 4. Render top header panel in central column
         let planHeader = document.getElementById('reading-plan-header-panel');
         if (!planHeader) {
             planHeader = document.createElement('div');
@@ -4480,19 +4672,6 @@ class BibleReader {
         }
         planHeader.style.display = 'block';
         this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
-
-        // 4. Force Ressurser tab active in right sidebar
-        const relatedTabBtn = document.getElementById('tab-btn-related');
-        if (relatedTabBtn) {
-            relatedTabBtn.click();
-        }
-        
-        // Force open right sidebar on desktop/tablet for side-by-side
-        if (window.innerWidth > 1024) {
-            if (this.dom.navRight) {
-                this.dom.navRight.classList.add('active');
-            }
-        }
 
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
@@ -4524,9 +4703,108 @@ class BibleReader {
         }
     }
 
-    renderLeftSidebarDevotional(container, dayConfig) {
-        container.innerHTML = '';
+    renderLeftSidebarReadingPlan(container, globalPlan, userPlan, currentDayNum, dayConfig) {
+        const lang = document.documentElement.lang || 'no';
+        const isPrayerApp = globalPlan.title && (
+            globalPlan.title.toLowerCase().includes('bønn') ||
+            globalPlan.title.toLowerCase().includes('prayer') ||
+            globalPlan.title.toLowerCase().includes('oración')
+        );
 
+        const totalDays = globalPlan.durationDays || globalPlan.days.length;
+        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
+        const progressPct = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
+        const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
+
+        const completeLabel = isCurrentDayCompleted 
+            ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!')))
+            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
+
+        const t = {
+            no: {
+                defaultPrayer: isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.'
+            },
+            en: {
+                defaultPrayer: isPrayerApp ? 'Pray over the scriptures you read today.' : 'Reflect on the words you read today.'
+            },
+            es: {
+                defaultPrayer: isPrayerApp ? 'Ora sobre las escrituras que leas hoy.' : 'Reflexiona sobre las palabras que leíste hoy.'
+            }
+        }[lang] || { defaultPrayer: 'Reflekter over ordene du har lest.' };
+
+        // Generate Days Grid
+        let daysGridHtml = '';
+        globalPlan.days.forEach(d => {
+            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d.dayNumber);
+            const isActive = d.dayNumber === currentDayNum;
+            const completedClass = isCompleted ? 'completed' : '';
+            const activeClass = isActive ? 'active' : '';
+            daysGridHtml += `
+                <button class="hkm-rp-day-bubble ${completedClass} ${activeClass}" onclick="window.bibleReader.selectReadingPlanDay(${d.dayNumber})">
+                    ${d.dayNumber}
+                </button>
+            `;
+        });
+
+        container.innerHTML = `
+            <div class="hkm-rp-sidebar-wrapper">
+                <!-- Progress overview card -->
+                <div class="hkm-rp-sidebar-card">
+                    <div class="card-header">
+                        <span class="material-symbols-outlined icon">trending_up</span>
+                        <h3>${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
+                    </div>
+                    
+                    <!-- Circular Progress Inline -->
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="relative flex items-center justify-center transition-transform duration-300 hover:scale-105" style="width: 56px; height: 56px;">
+                            <svg style="width: 56px; height: 56px;" class="glow-effect">
+                                <circle class="text-outline-variant" cx="28" cy="28" r="24" fill="transparent" stroke="currentColor" stroke-width="3" style="color: var(--border-color, #e2e8f0);"></circle>
+                                <circle cx="28" cy="28" r="24" fill="transparent" stroke="#c66338" stroke-width="3"
+                                        stroke-dasharray="150.8" stroke-dashoffset="${150.8 * (1 - progressPct / 100)}"
+                                        stroke-linecap="round" style="transition: stroke-dashoffset 1s ease; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                            </svg>
+                            <span style="position: absolute; font-size: 11px; font-weight: 800; color: var(--text-base);">${progressPct}%</span>
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-size: 13px; font-weight: 700; color: var(--bible-primary);">${completedDaysCount} av ${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</p>
+                            <p style="margin: 2px 0 0; font-size: 10px; color: var(--text-muted); font-weight: 600; line-height: 1.2;">${globalPlan.title}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Days Grid -->
+                    <div class="hkm-rp-days-grid-v2" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px;">
+                        ${daysGridHtml}
+                    </div>
+                    
+                    <!-- Complete Day Button -->
+                    <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
+                        <span>${completeLabel}</span>
+                    </button>
+                </div>
+                
+                <!-- Devotional text card -->
+                <div class="hkm-rp-sidebar-card">
+                    <div class="card-header">
+                        <span class="material-symbols-outlined icon">lightbulb</span>
+                        <h3>${isPrayerApp ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus')) : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional diario' : 'Dagens andakt'))}</h3>
+                    </div>
+                    <p style="font-size: 13px; line-height: 1.6; color: var(--text-base); margin: 0;">${dayConfig.prayerFocus || t.defaultPrayer}</p>
+                </div>
+            </div>
+        `;
+
+        // Wire up complete day button
+        const completeBtn = container.querySelector('#rp-sidebar-complete-btn');
+        if (completeBtn) {
+            completeBtn.onclick = () => {
+                this.toggleActivePlanDayCompletion(completeBtn);
+            };
+        }
+    }
+
+    renderRightSidebarReadingPlan(container, dayConfig) {
         const lang = document.documentElement.lang || 'no';
         const isPrayer = this.activePlanData && this.activePlanData.title && (
             this.activePlanData.title.toLowerCase().includes('bønn') ||
@@ -4536,24 +4814,18 @@ class BibleReader {
 
         const titles = {
             no: {
-                prayerFocus: isPrayer ? 'Bønnefokus' : 'Dagens andakt',
-                defaultPrayer: isPrayer ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.',
                 resources: 'Ressurser',
                 reflections: 'Dine refleksjoner',
                 placeholder: 'Skriv ned hva Gud talte til deg i dag...',
                 saveBtn: 'Lagre refleksjoner'
             },
             en: {
-                prayerFocus: isPrayer ? 'Prayer Focus' : 'Today\'s Devotional',
-                defaultPrayer: isPrayer ? 'Pray over the scriptures you read today.' : 'Reflect on the words you read today.',
                 resources: 'Resources',
                 reflections: 'Your Reflections',
                 placeholder: 'Write down what God spoke to you today...',
                 saveBtn: 'Save reflections'
             },
             es: {
-                prayerFocus: isPrayer ? 'Enfoque de oración' : 'Devocional de hoy',
-                defaultPrayer: isPrayer ? 'Ora por las escrituras que lees hoy.' : 'Reflexiona sobre las palabras que leíste hoy.',
                 resources: 'Recursos',
                 reflections: 'Tus reflexiones',
                 placeholder: 'Escribe lo que Dios te habló hoy...',
@@ -4562,149 +4834,305 @@ class BibleReader {
         };
         const t = titles[lang] || titles['en'];
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'hkm-rp-sidebar-wrapper';
-        container.appendChild(wrapper);
-
-        // Prayer Focus Card
-        const prayerCard = document.createElement('div');
-        prayerCard.className = 'hkm-rp-sidebar-card';
-        prayerCard.innerHTML = `
-            <div class="card-header">
-                <span class="material-symbols-outlined icon">${isPrayer ? 'favorite' : 'menu_book'}</span>
-                <h3>${t.prayerFocus}</h3>
+        container.innerHTML = `
+            <div class="hkm-rp-sidebar-wrapper">
+                <!-- Reflection Notepad Card -->
+                <div class="hkm-rp-sidebar-card">
+                    <div class="card-header">
+                        <span class="material-symbols-outlined icon">edit_note</span>
+                        <h3>${t.reflections}</h3>
+                    </div>
+                    <textarea id="rp-reflection-input" placeholder="${t.placeholder}"></textarea>
+                    <button id="rp-save-reflection-btn" class="hkm-btn-complete-v2" style="width: 100%; display: flex; justify-content: center; height: 38px !important; padding: 0 !important; font-size: 13px !important; border-radius: 8px !important;">
+                        <span>${t.saveBtn}</span>
+                    </button>
+                    <div id="rp-save-status" class="save-status" style="font-size: 11px; margin-top: 4px; text-align: center; color: var(--text-muted);"></div>
+                </div>
+                
+                <!-- Related Verses (Kryssreferanser) -->
+                <div class="hkm-rp-sidebar-card" id="rp-sidebar-cross-refs" style="display: none;">
+                    <div class="card-header">
+                        <span class="material-symbols-outlined icon">link</span>
+                        <h3>${lang === 'en' ? 'Cross References' : (lang === 'es' ? 'Referencias cruzadas' : 'Kryssreferanser')}</h3>
+                    </div>
+                    <div class="cross-refs-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Video / Resources Card -->
+                <div class="hkm-rp-sidebar-card" id="rp-sidebar-resources" style="display: none;">
+                    <div class="card-header">
+                        <span class="material-symbols-outlined icon">video_library</span>
+                        <h3>${t.resources}</h3>
+                    </div>
+                    <div class="resources-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
             </div>
-            <p>${dayConfig.prayerFocus || t.defaultPrayer}</p>
         `;
-        wrapper.appendChild(prayerCard);
 
-        // Resources Card
-        if (dayConfig.resources && dayConfig.resources.length > 0) {
-            const resourcesCard = document.createElement('div');
-            resourcesCard.className = 'hkm-rp-sidebar-card';
-            
-            let resourcesListHtml = '';
-            dayConfig.resources.forEach(res => {
-                let iconName = 'article';
-                if (res.type === 'video') iconName = 'play_circle';
-                else if (res.type === 'podcast') iconName = 'podcasts';
+        // 1. Populate textarea and setup save logic
+        const textarea = container.querySelector('#rp-reflection-input');
+        const saveBtn = container.querySelector('#rp-save-reflection-btn');
+        const saveStatus = container.querySelector('#rp-save-status');
 
-                resourcesListHtml += `
-                    <a href="${res.url || '#'}" target="_blank" class="hkm-rp-resource-item">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">${iconName}</span>
-                        <span>${res.title}</span>
-                    </a>
-                `;
-            });
-
-            resourcesCard.innerHTML = `
-                <div class="card-header">
-                    <span class="material-symbols-outlined icon">link</span>
-                    <h3>${t.resources}</h3>
-                </div>
-                <div class="resources-list">
-                    ${resourcesListHtml}
-                </div>
-            `;
-            wrapper.appendChild(resourcesCard);
-        }
-
-        // Reflection Notepad Card
-        const reflectionCard = document.createElement('div');
-        reflectionCard.className = 'hkm-rp-sidebar-card';
-        
         const currentReflection = (this.userPlanProgress.reflections && this.userPlanProgress.reflections[this.activePlanDay]) || '';
-        
-        reflectionCard.innerHTML = `
-            <div class="card-header">
-                <span class="material-symbols-outlined icon">edit_note</span>
-                <h3>${t.reflections}</h3>
-            </div>
-            <textarea id="rp-reflection-input" placeholder="${t.placeholder}">${currentReflection}</textarea>
-            <button id="rp-save-reflection-btn" class="hkm-btn-complete" style="width: 100%; display: flex; justify-content: center; height: 38px !important; padding: 0 !important; font-size: 13px !important; border-radius: 8px !important;">
-                <span>${t.saveBtn}</span>
-            </button>
-            <div id="rp-save-status" class="save-status"></div>
-        `;
-        wrapper.appendChild(reflectionCard);
-
-        const textarea = reflectionCard.querySelector('#rp-reflection-input');
-        const saveBtn = reflectionCard.querySelector('#rp-save-reflection-btn');
-        const saveStatus = reflectionCard.querySelector('#rp-save-status');
+        if (textarea) textarea.value = currentReflection;
 
         if (!this.currentUser) {
-            textarea.placeholder = lang === 'no' 
-                ? "Logg inn på Min Side for å skrive og lagre refleksjoner permanent."
-                : lang === 'es'
-                    ? "Inicia sesión en Mi cuenta para escribir y guardar reflexiones de forma permanente."
-                    : "Log in to My Account to write and save reflections permanently.";
-            textarea.disabled = true;
-            saveBtn.disabled = true;
-            saveBtn.style.opacity = '0.5';
-            saveStatus.innerText = lang === 'no'
-                ? "Gjestemodus - Refleksjoner er deaktivert."
-                : lang === 'es'
-                    ? "Modo invitado - Las reflexiones están desactivadas."
-                    : "Guest mode - Reflections are disabled.";
-        } else {
-            saveBtn.onclick = async () => {
+            if (textarea) {
+                textarea.placeholder = lang === 'no' 
+                    ? "Logg inn på Min Side for å skrive og lagre refleksjoner permanent."
+                    : lang === 'es'
+                        ? "Inicia sesión en Mi cuenta para escribir y guardar reflexiones de forma permanente."
+                        : "Log in to My Account to write and save reflections permanently.";
+                textarea.disabled = true;
+            }
+            if (saveBtn) {
                 saveBtn.disabled = true;
-                saveStatus.innerText = lang === 'no' ? "Lagrer..." : lang === 'es' ? "Guardando..." : "Saving...";
-                
-                try {
-                    const text = textarea.value.trim();
-                    this.userPlanProgress.reflections = this.userPlanProgress.reflections || {};
-                    this.userPlanProgress.reflections[this.activePlanDay] = text;
+                saveBtn.style.opacity = '0.5';
+            }
+            if (saveStatus) {
+                saveStatus.innerText = lang === 'no'
+                    ? "Gjestemodus - Refleksjoner er deaktivert."
+                    : lang === 'es'
+                        ? "Modo invitado - Las reflexiones están desactivadas."
+                        : "Guest mode - Reflections are disabled.";
+            }
+        } else {
+            if (saveBtn) {
+                saveBtn.onclick = async () => {
+                    saveBtn.disabled = true;
+                    saveStatus.innerText = lang === 'no' ? "Lagrer..." : lang === 'es' ? "Guardando..." : "Saving...";
                     
-                    await this.saveProgress();
+                    try {
+                        const text = textarea.value.trim();
+                        this.userPlanProgress.reflections = this.userPlanProgress.reflections || {};
+                        this.userPlanProgress.reflections[this.activePlanDay] = text;
+                        
+                        await this.saveProgress();
 
-                    // Also save/update in generic personal notes, and reload Notes list
-                    const db = this.getFirestore();
-                    if (db) {
-                        const snap = await db.collection('personal_notes')
-                            .where('userId', '==', this.currentUser.uid)
-                            .where('readingPlanId', '==', this.activePlanId)
-                            .where('dayNumber', '==', this.activePlanDay)
-                            .get();
+                        // Also save/update in generic personal notes
+                        const db = this.getFirestore();
+                        if (db) {
+                            const snap = await db.collection('personal_notes')
+                                .where('userId', '==', this.currentUser.uid)
+                                .where('readingPlanId', '==', this.activePlanId)
+                                .where('dayNumber', '==', this.activePlanDay)
+                                .get();
 
-                        if (!snap.empty) {
-                            // Update existing note
-                            const docId = snap.docs[0].id;
-                            await db.collection('personal_notes').doc(docId).update({
-                                text: text,
-                                createdAt: this.getServerTimestamp()
-                            });
-                        } else {
-                            // Add new note
-                            await db.collection('personal_notes').add({
-                                userId: this.currentUser.uid,
-                                title: lang === 'no' 
-                                    ? `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`
-                                    : lang === 'es'
-                                        ? `Plan de lectura: ${this.activePlanData.title} - Día ${this.activePlanDay}`
-                                        : `Reading Plan: ${this.activePlanData.title} - Day ${this.activePlanDay}`,
-                                text: text,
-                                createdAt: this.getServerTimestamp(),
-                                isReadingPlanNote: true,
-                                readingPlanId: this.activePlanId,
-                                dayNumber: this.activePlanDay
-                            });
+                            if (!snap.empty) {
+                                const docId = snap.docs[0].id;
+                                await db.collection('personal_notes').doc(docId).update({
+                                    text: text,
+                                    createdAt: this.getServerTimestamp()
+                                });
+                            } else {
+                                await db.collection('personal_notes').add({
+                                    userId: this.currentUser.uid,
+                                    title: lang === 'no' 
+                                        ? `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`
+                                        : lang === 'es'
+                                            ? `Plan de lectura: ${this.activePlanData.title} - Día ${this.activePlanDay}`
+                                            : `Reading Plan: ${this.activePlanData.title} - Day ${this.activePlanDay}`,
+                                    text: text,
+                                    readingPlanId: this.activePlanId,
+                                    dayNumber: this.activePlanDay,
+                                    createdAt: this.getServerTimestamp()
+                                });
+                            }
                         }
-
-                        // Reload Notes tab dynamically
-                        await this.loadNotes();
+                        
+                        saveStatus.innerText = lang === 'no' ? "Lagret!" : lang === 'es' ? "¡Guardado!" : "Saved!";
+                        setTimeout(() => { saveStatus.innerText = ''; }, 3000);
+                    } catch (err) {
+                        console.error("Error saving reflections:", err);
+                        saveStatus.innerText = lang === 'no' ? "Feil ved lagring" : "Error saving";
+                    } finally {
+                        saveBtn.disabled = false;
                     }
-
-                    saveStatus.innerText = lang === 'no' ? "Lagret i dine notater!" : lang === 'es' ? "¡Guardado en tus notas!" : "Saved in your notes!";
-                    setTimeout(() => { saveStatus.innerText = ''; }, 3000);
-                } catch (err) {
-                    console.error("Failed to save reflection:", err);
-                    saveStatus.innerText = (lang === 'no' ? "Kunne ikke lagre: " : lang === 'es' ? "No se pudo guardar: " : "Failed to save: ") + err.message;
-                } finally {
-                    saveBtn.disabled = false;
-                }
-            };
+                };
+            }
         }
+
+        // 2. Populate cross references
+        const crossRefsContainer = container.querySelector('#rp-sidebar-cross-refs');
+        if (crossRefsContainer) {
+            let crossRefsHtml = '';
+            
+            if (dayConfig.crossReferences && dayConfig.crossReferences.length > 0) {
+                dayConfig.crossReferences.forEach(ref => {
+                    crossRefsHtml += `
+                        <a href="#" class="hkm-rp-resource-item hover:scale-[1.02] transition-all" onclick="window.bibleReader.showScriptureRef('${ref.reference || ref}'); return false;" style="display: block; padding: 8px 12px; border-radius: 8px; background: rgba(27,73,101,0.03); border: 1px solid var(--border-color); text-decoration: none; color: inherit; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--bible-primary);">${ref.reference || ref}</span>
+                                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--text-muted);">open_in_new</span>
+                            </div>
+                            ${ref.text ? `<p style="margin: 0; font-size: 11px; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${ref.text}</p>` : ''}
+                        </a>
+                    `;
+                });
+            }
+            
+            if (crossRefsHtml) {
+                crossRefsContainer.querySelector('.cross-refs-list').innerHTML = crossRefsHtml;
+                crossRefsContainer.style.display = 'block';
+            } else {
+                crossRefsContainer.style.display = 'none';
+            }
+        }
+
+        // 3. Populate resources (video & extra links)
+        const resourcesContainer = container.querySelector('#rp-sidebar-resources');
+        if (resourcesContainer) {
+            let resourcesHtml = '';
+            
+            const bpVideo = this.getBibleProjectVideo(this.selectedBookId, lang);
+            if (bpVideo) {
+                const label = lang === 'no' ? 'Introduksjon til ' + this.selectedBookId : (lang === 'es' ? 'Introducción a ' + this.selectedBookId : 'Introduction to ' + this.selectedBookId);
+                resourcesHtml += `
+                    <div class="hkm-rp-sidebar-card no-stripe" style="margin: 0; padding: 0; box-shadow: none; border: none; overflow: hidden; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); margin-bottom: 8px;">
+                        <div class="relative h-28 overflow-hidden group cursor-pointer" onclick="window.open('https://www.youtube.com/watch?v=${bpVideo.id}', '_blank')">
+                            <img src="https://img.youtube.com/vi/${bpVideo.id}/0.jpg" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" class="group-hover:scale-105" />
+                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: all 0.3s;" class="group-hover:bg-black/40">
+                                <div style="width: 32px; height: 32px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;" class="group-hover:scale-110">
+                                    <span class="material-symbols-outlined" style="color: #c66338; font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 8px 10px;">
+                            <span style="font-size: 8px; font-weight: 700; color: #c66338; text-transform: uppercase; tracking: 0.05em; display: block; margin-bottom: 2px;">BIBLEPROJECT</span>
+                            <h4 style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-base);">${label}</h4>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (dayConfig.resources && dayConfig.resources.length > 0) {
+                dayConfig.resources.forEach(res => {
+                    let iconName = 'article';
+                    if (res.type === 'video') iconName = 'play_circle';
+                    else if (res.type === 'podcast') iconName = 'podcasts';
+                    
+                    resourcesHtml += `
+                        <a href="${res.url || '#'}" target="_blank" class="hkm-rp-resource-item hover:scale-[1.02] transition-all" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(27,73,101,0.03); border: 1px solid var(--border-color); text-decoration: none; color: inherit; margin-bottom: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 16px; color: #c66338;">${iconName}</span>
+                            <span style="font-size: 11px; font-weight: 600; color: var(--text-base);">${res.title}</span>
+                        </a>
+                    `;
+                });
+            }
+            
+            if (resourcesHtml) {
+                resourcesContainer.querySelector('.resources-list').innerHTML = resourcesHtml;
+                resourcesContainer.style.display = 'block';
+            } else {
+                resourcesContainer.style.display = 'none';
+            }
+        }
+    }
+
+    async selectReadingPlanDay(dayNum) {
+        this.activePlanDay = dayNum;
+        
+        // Update URL search param
+        const url = new URL(window.location.href);
+        url.searchParams.set('day', dayNum);
+        window.history.pushState({}, '', url.toString());
+
+        await this.setupReadingPlanUI();
+    }
+
+    async toggleActivePlanDayCompletion(btnElement) {
+        const globalPlan = this.activePlanData;
+        const userPlan = this.userPlanProgress;
+        const currentDayNum = this.activePlanDay;
+        const totalDays = globalPlan.durationDays || globalPlan.days.length;
+        const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
+        const lang = document.documentElement.lang || 'no';
+
+        userPlan.completedDays = userPlan.completedDays || [];
+        if (isCurrentDayCompleted) {
+            userPlan.completedDays = userPlan.completedDays.filter(d => d !== currentDayNum);
+            
+            userPlan.lastActiveAt = this.getServerTimestamp();
+            await this.saveProgress();
+            
+            this.setupReadingPlanUI();
+            this.loadReadingPlan();
+        } else {
+            if (!userPlan.completedDays.includes(currentDayNum)) {
+                userPlan.completedDays.push(currentDayNum);
+            }
+            
+            // Celebration particles from the button coordinates
+            if (btnElement) {
+                this.createCelebrationParticles(btnElement);
+            }
+            
+            // Visual feedback on the buttons (if present)
+            const sidebarBtn = document.getElementById('rp-sidebar-complete-btn');
+            const mobileBtn = document.getElementById('rp-complete-day-btn');
+            
+            [sidebarBtn, mobileBtn].forEach(btn => {
+                if (!btn) return;
+                btn.classList.add('completed');
+                const textSpan = btn.querySelector('#btn-text') || btn.querySelector('span:not(.material-symbols-outlined)');
+                const iconSpan = btn.querySelector('#btn-icon') || btn.querySelector('.material-symbols-outlined');
+                if (textSpan) textSpan.innerText = lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!');
+                if (iconSpan) {
+                    iconSpan.innerText = 'check_circle';
+                    iconSpan.style.transform = 'scale(1.2) rotate(360deg)';
+                }
+            });
+
+            const progressCircle = document.getElementById('progress-circle');
+            const progressText = document.getElementById('progress-text');
+            const progressStatus = document.getElementById('progress-status');
+            
+            const completedDaysCount = userPlan.completedDays.length;
+            const progressPct = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
+            
+            if (progressCircle) {
+                const circ = parseFloat(progressCircle.getAttribute('stroke-dasharray') || '175.92');
+                progressCircle.style.strokeDashoffset = circ * (1 - progressPct / 100);
+            }
+            if (progressText) {
+                progressText.innerText = progressPct + "%";
+            }
+            if (progressStatus) {
+                progressStatus.innerText = lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!');
+                progressStatus.classList.add('completed-status');
+            }
+            
+            if (currentDayNum < totalDays) {
+                let nextDay = currentDayNum + 1;
+                while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
+                    nextDay++;
+                }
+                if (nextDay <= totalDays) {
+                    userPlan.currentDay = nextDay;
+                }
+            } else {
+                userPlan.completed = true;
+            }
+            
+            userPlan.lastActiveAt = this.getServerTimestamp();
+            await this.saveProgress();
+            
+            // Reload UI after a short delay for the celebration animation to shine!
+            setTimeout(() => {
+                this.setupReadingPlanUI();
+                this.loadReadingPlan();
+            }, 1200);
+        }
+    }
+
+    async showScriptureRef(ref) {
+        await this.showDayVerses(ref);
+        this.applyReadingPlanHighlights();
     }
 
     createCelebrationParticles(button) {
@@ -4812,99 +5240,117 @@ class BibleReader {
             ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!')))
             : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
 
-        const badgeLabel = globalPlan.title || '';
+        const planCoverImage = globalPlan.image || globalPlan.imageUrl || globalPlan.coverImage || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
+        const dayTitle = dayConfig.title || (lang === 'en' ? 'Day ' + currentDayNum : (lang === 'es' ? 'Día ' + currentDayNum : 'Dag ' + currentDayNum));
 
-        container.className = 'hkm-rp-header-card-v2';
-        container.id = 'progress-card';
-        if (isPrayerApp) {
-            container.classList.add('prayer-app-mode');
-        } else {
-            container.classList.remove('prayer-app-mode');
-        }
-        
+        container.className = 'hkm-rp-header-wrapper';
+        container.id = 'progress-card-wrapper';
+
         container.innerHTML = `
-            <!-- Floating badge pill on top border -->
-            <div class="hkm-rp-badge-pill">${badgeLabel}</div>
-            
-            <!-- Progress & Actions Row -->
-            <div class="hkm-rp-progress-row-v2">
-                <!-- Circular Progress Column -->
-                <div class="hkm-rp-progress-info-v2">
-                    <div class="relative flex items-center justify-center cursor-help group transition-transform duration-300 hover:scale-105" style="position: relative; display: flex; align-items: center; justify-content: center;">
-                        <svg class="w-16 h-16 glow-effect" style="width: 64px; height: 64px;">
-                            <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--border-color, #e2e8f0)" stroke-width="4"></circle>
-                            <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#c66338" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
-                        </svg>
-                        <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
-                    </div>
-                    <div class="progress-info-text-v2">
-                        <p class="title">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Fremdrift')}</p>
-                        <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status">
-                            ${isCurrentDayCompleted 
-                                ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
-                                : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!'))
-                            }
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Navigation & Completion Buttons Column -->
-                <div class="hkm-rp-buttons-row-v2">
-                    <button class="hkm-rp-btn-nav-v2" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn" title="${lang === 'en' ? 'Previous day' : (lang === 'es' ? 'Día anterior' : 'Forrige dag')}">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-                    </button>
-                    
-                    <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
-                        <span class="material-symbols-outlined transition-transform duration-300" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                        <span id="btn-text">${completeLabel}</span>
-                    </button>
-                    
-                    <button class="hkm-rp-btn-nav-v2" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn" title="${lang === 'en' ? 'Next day' : (lang === 'es' ? 'Siguiente día' : 'Neste dag')}">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-                    </button>
+            <!-- 1. Premium Hero Image Card -->
+            <div class="hkm-rp-hero-card-v2">
+                <div class="hkm-rp-hero-bg-v2" style="background-image: url('${planCoverImage}');"></div>
+                <div class="hkm-rp-hero-overlay-v2"></div>
+                <div class="hkm-rp-hero-content-v2">
+                    <span class="hkm-rp-hero-badge-v2">${globalPlan.title}</span>
+                    <h1 class="hkm-rp-hero-title-v2">${dayTitle}</h1>
+                    <p class="hkm-rp-hero-subtitle-v2">Dag ${currentDayNum} av ${totalDays} • Reise gjennom ${globalPlan.title}</p>
                 </div>
             </div>
             
-            <!-- Horizontal Divider -->
-            <div class="hkm-rp-divider-v2"></div>
+            <!-- 2. Desktop Navigation Bar -->
+            <div class="hkm-rp-desktop-nav-v2 lg:flex hidden">
+                <button class="hkm-rp-nav-btn-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum - 1})" ${currentDayNum <= 1 ? 'style="visibility: hidden;"' : ''}>
+                    <span class="material-symbols-outlined">chevron_left</span>
+                    <span>Dag ${currentDayNum - 1}</span>
+                </button>
+                
+                <div class="hkm-rp-nav-tools-v2">
+                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-size" title="${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Tamaño' : 'Skriftstørrelse')}">
+                        <span class="material-symbols-outlined">text_fields</span>
+                    </button>
+                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-audio" title="${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">headphones</span>
+                    </button>
+                    <button class="hkm-rp-tool-icon-btn-v2" id="desktop-rp-tool-bookmark" title="${lang === 'en' ? 'Bookmark' : (lang === 'es' ? 'Bokmerk' : 'Bokmerk')}">
+                        <span class="material-symbols-outlined">bookmark_border</span>
+                    </button>
+                </div>
+                
+                <button class="hkm-rp-nav-btn-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum + 1})" ${currentDayNum >= totalDays ? 'style="visibility: hidden;"' : ''}>
+                    <span>Dag ${currentDayNum + 1}</span>
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
             
-            <!-- Quick Access Toolbelt -->
-            <div class="hkm-rp-toolbelt-v2">
-                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-trans">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
-                    <span>${lang === 'en' ? 'Translation' : (lang === 'es' ? 'Traducción' : 'Oversettelse')}</span>
-                    <select id="rp-toolbelt-trans-select" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"></select>
-                </button>
+            <!-- 3. Mobile Combined Card (Visible on mobile/tablet, hidden on desktop) -->
+            <div class="hkm-rp-header-card-v2 lg:hidden block" id="progress-card">
+                <!-- Circular progress & Status on the left -->
+                <div class="hkm-rp-progress-row-v2">
+                    <div class="hkm-rp-progress-info-v2">
+                        <div class="relative flex items-center justify-center cursor-help group transition-transform duration-300 hover:scale-105" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                            <svg class="w-16 h-16 glow-effect" style="width: 64px; height: 64px;">
+                                <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--border-color, #e2e8f0)" stroke-width="4"></circle>
+                                <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#c66338" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
+                            </svg>
+                            <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
+                        </div>
+                        <div class="progress-info-text-v2">
+                            <p class="title">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Fremdrift')}</p>
+                            <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status">
+                                ${isCurrentDayCompleted 
+                                    ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
+                                    : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!'))
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Prev, Complete, Next on the right -->
+                    <div class="hkm-rp-buttons-row-v2">
+                        <button class="hkm-rp-btn-nav-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum - 1})" ${currentDayNum <= 1 ? 'disabled' : ''}>
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        
+                        <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
+                            <span class="material-symbols-outlined transition-transform duration-300" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                            <span id="btn-text">${completeLabel}</span>
+                        </button>
+                        
+                        <button class="hkm-rp-btn-nav-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum + 1})" ${currentDayNum >= totalDays ? 'disabled' : ''}>
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
                 
-                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-size">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
-                    <span>${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Size' : 'Skriftstørrelse')}</span>
-                </button>
+                <!-- Divider -->
+                <div class="hkm-rp-divider-v2"></div>
                 
-                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-audio">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">headphones</span>
-                    <span>${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}</span>
-                </button>
+                <!-- Toolbelt -->
+                <div class="hkm-rp-toolbelt-v2">
+                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-trans">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
+                        <span>${lang === 'en' ? 'Translation' : (lang === 'es' ? 'Traducción' : 'Oversettelse')}</span>
+                        <select id="rp-toolbelt-trans-select" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"></select>
+                    </button>
+                    
+                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-size">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
+                        <span>${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Size' : 'Skriftstørrelse')}</span>
+                    </button>
+                    
+                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-audio">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">headphones</span>
+                        <span>${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}</span>
+                    </button>
+                </div>
             </div>
         `;
 
-        // Wire up buttons
-        container.querySelector('#rp-prev-day-btn').onclick = () => {
-            this.activePlanDay = Math.max(1, currentDayNum - 1);
-            this.updateUrlParams();
-            this.setupReadingPlanUI();
-        };
-
-        container.querySelector('#rp-next-day-btn').onclick = () => {
-            this.activePlanDay = Math.min(totalDays, currentDayNum + 1);
-            this.updateUrlParams();
-            this.setupReadingPlanUI();
-        };
-
-        // Wire up toolbelt size change
-        const sizeBtn = container.querySelector('#rp-toolbelt-size');
-        if (sizeBtn) {
-            sizeBtn.onclick = () => {
+        // Wire up desktop tool size change
+        const desktopSizeBtn = container.querySelector('#desktop-rp-tool-size');
+        if (desktopSizeBtn) {
+            desktopSizeBtn.onclick = () => {
                 const currentSize = this.settings.fontSize || 18;
                 const newSize = currentSize >= 24 ? 16 : currentSize + 2;
                 this.settings.fontSize = newSize;
@@ -4917,7 +5363,88 @@ class BibleReader {
             };
         }
 
-        // Wire up toolbelt translation selection
+        // Wire up desktop tool audio play
+        const desktopAudioBtn = container.querySelector('#desktop-rp-tool-audio');
+        if (desktopAudioBtn) {
+            desktopAudioBtn.onclick = () => {
+                this.toggleAudioPlayback();
+            };
+        }
+
+        // Wire up desktop tool bookmark
+        const desktopBookmarkBtn = container.querySelector('#desktop-rp-tool-bookmark');
+        if (desktopBookmarkBtn) {
+            const isBookmarked = this.bookmarks && this.bookmarks.some(b => b.chapterId === this.selectedChapterId);
+            const bookmarkIcon = desktopBookmarkBtn.querySelector('.material-symbols-outlined');
+            if (bookmarkIcon) {
+                bookmarkIcon.innerText = isBookmarked ? 'bookmark' : 'bookmark_border';
+                if (isBookmarked) {
+                    bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+                    desktopBookmarkBtn.style.color = '#bd4f2a';
+                }
+            }
+            
+            desktopBookmarkBtn.onclick = () => {
+                const activeBook = this.books.find(b => b.id === this.selectedBookId);
+                const bookName = activeBook ? activeBook.name : '';
+                const fullRef = `${bookName} ${this.selectedChapterNum}`;
+                
+                const existingIdx = this.bookmarks.findIndex(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
+                if (existingIdx > -1) {
+                    this.bookmarks.splice(existingIdx, 1);
+                } else {
+                    this.bookmarks.push({
+                        id: 'bm_' + Date.now(),
+                        ref: fullRef,
+                        bibleId: this.selectedBibleId,
+                        chapterId: this.selectedChapterId,
+                        bookId: this.selectedBookId,
+                        chapter: this.selectedChapterNum,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
+                this.renderBookmarksList();
+                
+                const nowBookmarked = this.bookmarks.some(b => b.chapterId === this.selectedChapterId);
+                if (bookmarkIcon) {
+                    bookmarkIcon.innerText = nowBookmarked ? 'bookmark' : 'bookmark_border';
+                    if (nowBookmarked) {
+                        bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+                        desktopBookmarkBtn.style.color = '#bd4f2a';
+                    } else {
+                        bookmarkIcon.style.fontVariationSettings = "'FILL' 0";
+                        desktopBookmarkBtn.style.color = '';
+                    }
+                }
+            };
+        }
+
+        // Wire up mobile tool size change
+        const mobileSizeBtn = container.querySelector('#rp-toolbelt-size');
+        if (mobileSizeBtn) {
+            mobileSizeBtn.onclick = () => {
+                const currentSize = this.settings.fontSize || 18;
+                const newSize = currentSize >= 24 ? 16 : currentSize + 2;
+                this.settings.fontSize = newSize;
+                this.dom.readingPane.style.setProperty('--bible-font-size', `${newSize}px`);
+                const fontSizeDisp = document.getElementById('font-size-display');
+                if (fontSizeDisp) fontSizeDisp.innerText = `${newSize}px`;
+                const fontSizeDispMobile = document.getElementById('font-size-display-mobile');
+                if (fontSizeDispMobile) fontSizeDispMobile.innerText = `${newSize}px`;
+                this.saveSettings();
+            };
+        }
+
+        // Wire up mobile tool audio play
+        const mobileAudioBtn = container.querySelector('#rp-toolbelt-audio');
+        if (mobileAudioBtn) {
+            mobileAudioBtn.onclick = () => {
+                this.toggleAudioPlayback();
+            };
+        }
+
+        // Wire up translation selects (both desktop and mobile if present)
         const transSelect = container.querySelector('#rp-toolbelt-trans-select');
         if (transSelect && this.bibles) {
             let optionsHtml = '';
@@ -4942,82 +5469,13 @@ class BibleReader {
             };
         }
 
-        // Wire up toolbelt audio play
-        const audioBtn = container.querySelector('#rp-toolbelt-audio');
-        if (audioBtn) {
-            audioBtn.onclick = () => {
-                this.toggleAudioPlayback();
+        // Wire up mobile complete day button
+        const mobileCompleteBtn = container.querySelector('#rp-complete-day-btn');
+        if (mobileCompleteBtn) {
+            mobileCompleteBtn.onclick = () => {
+                this.toggleActivePlanDayCompletion(mobileCompleteBtn);
             };
         }
-
-        const completeBtn = container.querySelector('#rp-complete-day-btn');
-        completeBtn.onclick = async () => {
-            userPlan.completedDays = userPlan.completedDays || [];
-            if (isCurrentDayCompleted) {
-                userPlan.completedDays = userPlan.completedDays.filter(d => d !== currentDayNum);
-                
-                userPlan.lastActiveAt = this.getServerTimestamp();
-                await this.saveProgress();
-                
-                this.setupReadingPlanUI();
-                this.loadReadingPlan();
-            } else {
-                if (!userPlan.completedDays.includes(currentDayNum)) {
-                    userPlan.completedDays.push(currentDayNum);
-                }
-                
-                // Play circular progress celebration animation
-                const progressCircle = container.querySelector('#progress-circle');
-                const progressText = container.querySelector('#progress-text');
-                const progressStatus = container.querySelector('#progress-status');
-                const btnText = completeBtn.querySelector('#btn-text') || completeBtn.querySelector('span:not(.material-symbols-outlined)');
-                const btnIcon = completeBtn.querySelector('#btn-icon') || completeBtn.querySelector('.material-symbols-outlined');
-                
-                if (progressCircle) progressCircle.style.strokeDashoffset = "0";
-                if (progressText) {
-                    let count = progressPct;
-                    const interval = setInterval(() => {
-                        count = Math.min(100, count + 2);
-                        progressText.innerText = count + "%";
-                        if (count >= 100) clearInterval(interval);
-                    }, 10);
-                }
-                
-                completeBtn.classList.add('completed');
-                if (btnText) btnText.innerText = lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!');
-                if (btnIcon) {
-                    btnIcon.innerText = 'check_circle';
-                    btnIcon.style.transform = 'scale(1.2) rotate(360deg)';
-                }
-                if (progressStatus) {
-                    progressStatus.innerText = lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!');
-                    progressStatus.classList.add('completed-status');
-                }
-                
-                this.createCelebrationParticles(completeBtn);
-                
-                if (currentDayNum < totalDays) {
-                    let nextDay = currentDayNum + 1;
-                    while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
-                        nextDay++;
-                    }
-                    if (nextDay <= totalDays) {
-                        userPlan.currentDay = nextDay;
-                    }
-                } else {
-                    userPlan.completed = true;
-                }
-                
-                userPlan.lastActiveAt = this.getServerTimestamp();
-                await this.saveProgress();
-                
-                // Delay reload so celebration displays fully
-                setTimeout(() => {
-                    this.setupReadingPlanUI();
-                    this.loadReadingPlan();
-                }, 1200);
-            }
-        };
     }
 
     updateUrlParams() {
