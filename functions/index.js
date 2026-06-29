@@ -7927,6 +7927,18 @@ exports.scheduledReadingNotifications = onSchedule({
             body: defaultFallbackBody
           };
           const template = await getEmailTemplate("daily_bible_reading", defaultFallback);
+          if (template && template.body && template.body.includes('font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;')) {
+            console.log("Updating old email template in Firestore to the new premium design...");
+            try {
+              await db.collection("email_templates").doc("daily_bible_reading").set({
+                body: defaultFallbackBody,
+                updatedAt: new Date().toISOString()
+              }, { merge: true });
+              template.body = defaultFallbackBody;
+            } catch (updateErr) {
+              console.warn("Kunne ikke oppdatere mal i Firestore:", updateErr);
+            }
+          }
 
           const name = userData.displayName || "bibelleser";
           const emailSubject = template.subject
