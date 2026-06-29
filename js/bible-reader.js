@@ -3972,10 +3972,12 @@ class BibleReader {
     }
 
     injectReadingPlanStyles() {
-        if (document.getElementById('hkm-rp-workspace-styles')) return;
-
-        const style = document.createElement('style');
-        style.id = 'hkm-rp-workspace-styles';
+        let style = document.getElementById('hkm-rp-workspace-styles');
+        if (!style) {
+            style = document.createElement('style');
+            style.id = 'hkm-rp-workspace-styles';
+            document.head.appendChild(style);
+        }
         style.innerHTML = `
             .hkm-rp-header-card {
                 background: #ffffff;
