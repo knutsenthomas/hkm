@@ -3902,6 +3902,19 @@ class BibleReader {
                 padding: 24px;
                 margin: 16px;
                 box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .hkm-rp-header-card.collapsed {
+                padding: 12px 24px;
+            }
+            .hkm-rp-header-card.collapsed .hkm-rp-header-top,
+            .hkm-rp-header-card.collapsed .hkm-rp-progress-section {
+                display: none !important;
+            }
+            .hkm-rp-header-card.collapsed .hkm-rp-actions {
+                border-top: none !important;
+                padding-top: 0 !important;
+                margin-top: 0 !important;
             }
             .bible-theme-dark .hkm-rp-header-card {
                 background: #242424;
@@ -4609,17 +4622,6 @@ class BibleReader {
                     <h1 class="hkm-rp-title">${globalPlan.title}</h1>
                     <p class="hkm-rp-desc">${globalPlan.description || ''}</p>
                 </div>
-                <div class="hkm-rp-day-navigator">
-                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
-                        <span class="material-symbols-outlined">chevron_left</span>
-                        <span>${lang === 'en' ? 'Prev' : (lang === 'es' ? 'Anterior' : 'Forrige')}</span>
-                    </button>
-                    <div class="hkm-nav-day-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
-                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
-                        <span>${lang === 'en' ? 'Next' : (lang === 'es' ? 'Siguiente' : 'Neste')}</span>
-                        <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
-                </div>
             </div>
             
             <div class="hkm-rp-progress-section">
@@ -4637,12 +4639,49 @@ class BibleReader {
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>${backLabel}</span>
                 </a>
-                <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
-                    <span class="material-symbols-outlined">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                    <span>${completeLabel}</span>
-                </button>
+                
+                <div class="hkm-rp-day-navigator">
+                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                        <span>${lang === 'en' ? 'Prev' : (lang === 'es' ? 'Anterior' : 'Forrige')}</span>
+                    </button>
+                    <div class="hkm-nav-day-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
+                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
+                        <span>${lang === 'en' ? 'Next' : (lang === 'es' ? 'Siguiente' : 'Neste')}</span>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn" style="margin: 0;">
+                        <span class="material-symbols-outlined">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                        <span>${completeLabel}</span>
+                    </button>
+                    
+                    <button id="rp-header-toggle-btn" class="hkm-nav-btn" style="background: rgba(27, 73, 101, 0.05); padding: 8px; border-radius: 50%; min-width: unset; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>
+                    </button>
+                </div>
             </div>
         `;
+
+        // Collapse preference check
+        const toggleBtn = container.querySelector('#rp-header-toggle-btn');
+        const isCollapsed = localStorage.getItem('hkm_rp_header_collapsed') === 'true';
+        if (isCollapsed) {
+            container.classList.add('collapsed');
+            toggleBtn.querySelector('.material-symbols-outlined').innerText = 'expand_more';
+        } else {
+            container.classList.remove('collapsed');
+            toggleBtn.querySelector('.material-symbols-outlined').innerText = 'expand_less';
+        }
+
+        toggleBtn.onclick = (e) => {
+            e.stopPropagation();
+            const nowCollapsed = container.classList.toggle('collapsed');
+            localStorage.setItem('hkm_rp_header_collapsed', nowCollapsed ? 'true' : 'false');
+            toggleBtn.querySelector('.material-symbols-outlined').innerText = nowCollapsed ? 'expand_more' : 'expand_less';
+        };
 
         // Wire up buttons
         container.querySelector('#rp-prev-day-btn').onclick = () => {
