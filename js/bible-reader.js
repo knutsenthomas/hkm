@@ -4027,8 +4027,8 @@ class BibleReader {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                justify-content: space-between;
-                gap: 20px;
+                justify-content: center;
+                gap: 24px;
                 width: 100%;
                 flex-wrap: wrap;
             }
@@ -4094,8 +4094,6 @@ class BibleReader {
                 justify-content: center;
                 flex-shrink: 0;
                 flex-wrap: nowrap;
-                width: 100%;
-                max-width: 300px;
             }
             .hkm-rp-btn-nav-v2 {
                 background: none;
