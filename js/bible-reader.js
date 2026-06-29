@@ -4486,10 +4486,16 @@ class BibleReader {
                 background: rgba(255, 255, 255, 0.05);
                 color: #f97316;
             }
-            
+            .hkm-rp-days-grid-v2 {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 4px;
+                margin-bottom: 16px;
+                justify-items: center;
+            }
             .hkm-rp-day-bubble {
-                width: 28px;
-                height: 28px;
+                width: 26px;
+                height: 26px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -4773,7 +4779,7 @@ class BibleReader {
                     </div>
                     
                     <!-- Days Grid -->
-                    <div class="hkm-rp-days-grid-v2" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px;">
+                    <div class="hkm-rp-days-grid-v2">
                         ${daysGridHtml}
                     </div>
                     
