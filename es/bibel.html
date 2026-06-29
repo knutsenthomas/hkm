@@ -78,8 +78,9 @@
             --text-light: #94a3b8;
             --border-color: #e2e8f0;
             --active-bg: #e2e8f0;
-            --highlight-bg: rgba(254, 240, 138, 0.6);
-            --highlight-border: #fef08a;
+            --highlight-bg: rgba(15, 23, 42, 0.05);
+            --highlight-border: #cbd5e1;
+            --highlight-pulse-start: rgba(15, 23, 42, 0.15);
         }
 
         .bible-theme-cream {
@@ -91,8 +92,9 @@
             --text-light: #968c7f;
             --border-color: #e6dfd3;
             --active-bg: #e6dfd3;
-            --highlight-bg: rgba(253, 224, 71, 0.5);
-            --highlight-border: #fde047;
+            --highlight-bg: rgba(44, 39, 32, 0.05);
+            --highlight-border: #cbd5e1;
+            --highlight-pulse-start: rgba(44, 39, 32, 0.15);
         }
 
         .bible-theme-dark {
@@ -104,8 +106,9 @@
             --text-light: #4b5563;
             --border-color: #2d2d2d;
             --active-bg: #333333;
-            --highlight-bg: rgba(234, 179, 8, 0.3);
-            --highlight-border: #ca8a04;
+            --highlight-bg: rgba(255, 255, 255, 0.06);
+            --highlight-border: #3f3f46;
+            --highlight-pulse-start: rgba(255, 255, 255, 0.15);
         }
 
         html, body {
@@ -565,7 +568,7 @@
         }
 
         @keyframes pulse-highlight {
-            0% { background: rgba(253, 224, 71, 0.8); }
+            0% { background: var(--highlight-pulse-start); }
             100% { background: var(--highlight-bg); }
         }
 

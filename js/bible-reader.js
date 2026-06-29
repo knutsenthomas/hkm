@@ -286,9 +286,9 @@ class BibleReader {
         let settings = {
             fontSize: 18,
             fontFamily: 'serif', // 'serif' | 'sans'
-            lineHeight: 1.6,
+            lineHeight: 1.8,
             theme: 'cream', // 'light' | 'cream' | 'dark'
-            layout: 'verse' // 'verse' | 'paragraph'
+            layout: 'paragraph' // 'verse' | 'paragraph'
         };
         try {
             const rawSettings = this.safeGetLocalStorage('hkm_bible_settings');
