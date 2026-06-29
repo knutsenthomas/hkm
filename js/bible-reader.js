@@ -4167,11 +4167,12 @@ class BibleReader {
                 box-shadow: 0 6px 16px rgba(153, 65, 25, 0.3);
             }
             .hkm-btn-complete-v2.completed {
-                background-color: #466275 !important;
-                box-shadow: 0 4px 12px rgba(70, 98, 117, 0.2);
+                background-color: #10b981 !important;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
             }
             .hkm-btn-complete-v2.completed:hover {
-                box-shadow: 0 6px 16px rgba(70, 98, 117, 0.3);
+                background-color: #059669 !important;
+                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
             }
             
             /* Divider */
