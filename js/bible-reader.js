@@ -4142,7 +4142,7 @@ class BibleReader {
             }
             
             .hkm-btn-complete-v2 {
-                background: #c66338;
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: white;
                 border: none;
                 border-radius: 12px;
@@ -4154,7 +4154,7 @@ class BibleReader {
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
-                box-shadow: 0 4px 12px rgba(198, 99, 56, 0.2);
+                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
                 transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
                 box-sizing: border-box;
                 height: 44px;
@@ -4163,8 +4163,8 @@ class BibleReader {
                 min-width: 100px;
             }
             .hkm-btn-complete-v2:hover {
-                background: #994119;
-                box-shadow: 0 6px 16px rgba(153, 65, 25, 0.3);
+                filter: brightness(1.1);
+                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
             }
             .hkm-btn-complete-v2.completed {
                 background-color: #10b981 !important;
@@ -4402,7 +4402,7 @@ class BibleReader {
                 text-shadow: 0 2px 4px rgba(0,0,0,0.4);
             }
             .hkm-rp-hero-badge-v2 {
-                background: #c66338;
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: #ffffff;
                 font-size: 10px;
                 font-weight: 700;
@@ -4523,8 +4523,8 @@ class BibleReader {
                 color: #cbd5e1;
             }
             .hkm-rp-day-bubble.completed {
-                background: #c66338;
-                border-color: #c66338;
+                background: #d17d39;
+                border-color: #d17d39;
                 color: #ffffff !important;
             }
             .hkm-rp-day-bubble.active {
@@ -4534,7 +4534,7 @@ class BibleReader {
             }
             .hkm-rp-day-bubble:hover {
                 transform: scale(1.15);
-                border-color: #c66338;
+                border-color: #d17d39;
             }
             
             /* Prayer app overrides */
@@ -4782,7 +4782,7 @@ class BibleReader {
                         <div class="relative flex items-center justify-center transition-transform duration-300 hover:scale-105" style="width: 56px; height: 56px;">
                             <svg style="width: 56px; height: 56px;" class="glow-effect">
                                 <circle class="text-outline-variant" cx="28" cy="28" r="24" fill="transparent" stroke="currentColor" stroke-width="3" style="color: var(--border-color, #e2e8f0);"></circle>
-                                <circle cx="28" cy="28" r="24" fill="transparent" stroke="#c66338" stroke-width="3"
+                                <circle cx="28" cy="28" r="24" fill="transparent" stroke="#d17d39" stroke-width="3"
                                         stroke-dasharray="150.8" stroke-dashoffset="${150.8 * (1 - progressPct / 100)}"
                                         stroke-linecap="round" style="transition: stroke-dashoffset 1s ease; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
                             </svg>
@@ -5020,12 +5020,12 @@ class BibleReader {
                             <img src="https://img.youtube.com/vi/${bpVideo.id}/0.jpg" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" class="group-hover:scale-105" />
                             <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: all 0.3s;" class="group-hover:bg-black/40">
                                 <div style="width: 32px; height: 32px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;" class="group-hover:scale-110">
-                                    <span class="material-symbols-outlined" style="color: #c66338; font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
+                                    <span class="material-symbols-outlined" style="color: #d17d39; font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
                                 </div>
                             </div>
                         </div>
                         <div style="padding: 8px 10px;">
-                            <span style="font-size: 8px; font-weight: 700; color: #c66338; text-transform: uppercase; tracking: 0.05em; display: block; margin-bottom: 2px;">BIBLEPROJECT</span>
+                            <span style="font-size: 8px; font-weight: 700; color: #d17d39; text-transform: uppercase; tracking: 0.05em; display: block; margin-bottom: 2px;">BIBLEPROJECT</span>
                             <h4 style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-base);">${label}</h4>
                         </div>
                     </div>
@@ -5040,7 +5040,7 @@ class BibleReader {
                     
                     resourcesHtml += `
                         <a href="${res.url || '#'}" target="_blank" class="hkm-rp-resource-item hover:scale-[1.02] transition-all" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(27,73,101,0.03); border: 1px solid var(--border-color); text-decoration: none; color: inherit; margin-bottom: 4px;">
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #c66338;">${iconName}</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">${iconName}</span>
                             <span style="font-size: 11px; font-weight: 600; color: var(--text-base);">${res.title}</span>
                         </a>
                     `;
@@ -5167,7 +5167,7 @@ class BibleReader {
         }
 
         const rect = button.getBoundingClientRect();
-        const colors = ['#ffffff', '#ffdbce', '#c66338', '#ffd700', '#1B4965'];
+        const colors = ['#ffffff', '#ffdbce', '#d17d39', '#ffd700', '#1B4965'];
         const count = 40;
         
         for (let i = 0; i < count; i++) {
@@ -5312,7 +5312,7 @@ class BibleReader {
                         <div class="relative flex items-center justify-center cursor-help group transition-transform duration-300 hover:scale-105" style="position: relative; display: flex; align-items: center; justify-content: center;">
                             <svg class="w-16 h-16 glow-effect" style="width: 64px; height: 64px;">
                                 <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--border-color, #e2e8f0)" stroke-width="4"></circle>
-                                <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#c66338" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
+                                <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#d17d39" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
                             </svg>
                             <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
                         </div>
