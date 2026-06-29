@@ -3982,10 +3982,10 @@ class BibleReader {
             .hkm-rp-header-card-v2 {
                 background: #ffffff;
                 border: 1px solid var(--border-color, #e2e8f0);
-                border-radius: 16px;
+                border-radius: 24px;
                 padding: 24px;
                 margin: 0 0 24px 0;
-                box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
+                box-shadow: 0 10px 30px rgba(30, 58, 76, 0.05);
                 position: relative;
                 width: 100%;
                 max-width: 680px;
@@ -3993,12 +3993,13 @@ class BibleReader {
                 display: flex;
                 flex-direction: column;
                 gap: 20px;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+                overflow: hidden;
             }
             .bible-theme-dark .hkm-rp-header-card-v2 {
                 background: #242424;
                 border-color: #333333;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             }
             .hkm-rp-badge-pill {
                 position: absolute;
@@ -4014,127 +4015,146 @@ class BibleReader {
                 color: #475569;
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
                 white-space: nowrap;
+                z-index: 10;
             }
             .bible-theme-dark .hkm-rp-badge-pill {
                 background: #242424;
                 border-color: #333333;
                 color: #94a3b8;
             }
-            .hkm-btn-complete-v2 {
-                background: linear-gradient(135deg, #d17d39, #bd4f2a);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                padding: 14px 24px;
-                font-weight: 700;
-                cursor: pointer;
-                font-size: 15px;
+            .hkm-rp-progress-row-v2 {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                width: 100%;
+            }
+            @media (max-width: 600px) {
+                .hkm-rp-progress-row-v2 {
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    gap: 16px;
+                }
+            }
+            .hkm-rp-progress-info-v2 {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                gap: 8px;
-                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
-                transition: all 0.2s ease;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            .hkm-btn-complete-v2:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
-            }
-            .hkm-btn-complete-v2.completed {
-                background: #10b981;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-            }
-            .hkm-btn-complete-v2.completed:hover {
-                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-            }
-            .hkm-rp-progress-container-v2 {
-                display: flex;
-                align-items: flex-start;
                 gap: 16px;
-                width: 100%;
             }
-            .progress-side-label {
-                font-size: 13px;
-                font-weight: 600;
-                color: #64748b;
-                margin-top: 2px;
-                white-space: nowrap;
-                min-width: 60px;
+            @media (max-width: 600px) {
+                .hkm-rp-progress-info-v2 {
+                    flex-direction: column;
+                }
             }
-            .progress-side-label.left {
-                text-align: left;
+            .glow-effect {
+                filter: drop-shadow(0 0 8px rgba(198, 99, 56, 0.2));
             }
-            .progress-side-label.right {
-                text-align: right;
+            .progress-ring__circle {
+                transition: stroke-dashoffset 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
             }
-            .progress-bar-ticks-wrapper-v2 {
+            .progress-info-text-v2 {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
-                flex: 1;
             }
-            .hkm-rp-progress-bar-v2 {
-                height: 6px;
-                background: #f0e5d8;
-                border-radius: 99px;
-                overflow: hidden;
-                width: 100%;
+            .progress-info-text-v2 p.title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #1B4965;
+                margin: 0;
             }
-            .bible-theme-dark .hkm-rp-progress-bar-v2 {
-                background: #333333;
+            .bible-theme-dark .progress-info-text-v2 p.title {
+                color: #cbd5e1;
             }
-            .hkm-rp-progress-fill-v2 {
-                height: 100%;
-                background: #1B4965;
-                border-radius: 99px;
-                transition: width 0.4s ease;
-            }
-            .bible-theme-dark .hkm-rp-progress-fill-v2 {
-                background: #38bdf8;
-            }
-            .progress-ticks-v2 {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
-            .progress-ticks-v2 .tick-number {
-                font-size: 11px;
-                font-weight: 500;
+            .progress-info-text-v2 p.status {
+                font-size: 13px;
                 color: #64748b;
+                margin: 4px 0 0 0;
+            }
+            .bible-theme-dark .progress-info-text-v2 p.status {
+                color: #94a3b8;
+            }
+            .progress-info-text-v2 p.status.completed-status {
+                color: #10b981;
+                font-weight: 700;
+            }
+            
+            /* Buttons row */
+            .hkm-rp-buttons-row-v2 {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .hkm-rp-btn-nav-v2 {
+                background: none;
+                border: 1px solid var(--border-color, #e2e8f0);
+                border-radius: 12px;
+                padding: 12px;
+                color: #1B4965;
+                cursor: pointer;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                min-width: 20px;
-                height: 20px;
-                border-radius: 4px;
+                width: 44px;
+                height: 44px;
+                transition: all 0.2s ease;
                 box-sizing: border-box;
             }
-            .bible-theme-dark .progress-ticks-v2 .tick-number {
-                color: #94a3b8;
-            }
-            .progress-ticks-v2 .tick-number.current-tick {
-                background: rgba(27, 73, 101, 0.08);
-                color: #1B4965;
-                font-weight: 700;
-            }
-            .bible-theme-dark .progress-ticks-v2 .tick-number.current-tick {
-                background: rgba(56, 189, 248, 0.15);
+            .bible-theme-dark .hkm-rp-btn-nav-v2 {
+                border-color: #333333;
                 color: #38bdf8;
             }
-            .progress-ticks-v2 .tick-number.end-tick {
-                background: #fdfbf7;
-                border: 1px solid #e6dfd3;
-                color: #b45309;
+            .hkm-rp-btn-nav-v2:hover:not(:disabled) {
+                background: rgba(27, 73, 101, 0.05);
+                border-color: #1B4965;
+            }
+            .bible-theme-dark .hkm-rp-btn-nav-v2:hover:not(:disabled) {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: #38bdf8;
+            }
+            .hkm-rp-btn-nav-v2:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+            
+            .hkm-btn-complete-v2 {
+                background: #c66338;
+                color: white;
+                border: none;
+                border-radius: 12px;
+                padding: 12px 24px;
                 font-weight: 700;
+                cursor: pointer;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                box-shadow: 0 4px 12px rgba(198, 99, 56, 0.2);
+                transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+                min-width: 160px;
+                box-sizing: border-box;
+                height: 44px;
             }
-            .bible-theme-dark .progress-ticks-v2 .tick-number.end-tick {
-                background: #1e1b4b;
-                border-color: #312e81;
-                color: #a5f3fc;
+            .hkm-btn-complete-v2:hover {
+                background: #994119;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(198, 99, 56, 0.35);
             }
+            .hkm-btn-complete-v2.completed {
+                background-color: #466275 !important;
+                box-shadow: 0 4px 12px rgba(70, 98, 117, 0.2);
+            }
+            .hkm-btn-complete-v2.completed:hover {
+                box-shadow: 0 6px 16px rgba(70, 98, 117, 0.3);
+            }
+            
+            /* Divider */
             .hkm-rp-divider-v2 {
                 height: 1px;
                 background: var(--border-color, #e2e8f0);
@@ -4143,40 +4163,45 @@ class BibleReader {
             .bible-theme-dark .hkm-rp-divider-v2 {
                 background: #333333;
             }
-            .hkm-rp-nav-row-v2 {
+            
+            /* Toolbelt */
+            .hkm-rp-toolbelt-v2 {
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
+                justify-content: center;
+                gap: 32px;
                 width: 100%;
             }
-            .hkm-rp-nav-link-v2 {
+            .hkm-rp-toolbelt-btn-v2 {
                 background: none;
                 border: none;
-                color: #1B4965;
+                color: #466275;
                 cursor: pointer;
-                display: inline-flex;
+                display: flex;
+                flex-direction: column;
                 align-items: center;
-                gap: 6px;
-                font-weight: 700;
-                font-size: 13px;
+                gap: 4px;
+                font-size: 11px;
+                font-weight: 500;
                 transition: all 0.2s ease;
-                padding: 6px 12px;
+                padding: 4px 8px;
                 border-radius: 8px;
+                position: relative;
             }
-            .bible-theme-dark .hkm-rp-nav-link-v2 {
-                color: #38bdf8;
+            .bible-theme-dark .hkm-rp-toolbelt-btn-v2 {
+                color: #94a3b8;
             }
-            .hkm-rp-nav-link-v2:hover:not(:disabled) {
-                background: rgba(27, 73, 101, 0.05);
+            .hkm-rp-toolbelt-btn-v2:hover {
+                transform: translateY(-2px);
                 color: #bd4f2a;
             }
-            .bible-theme-dark .hkm-rp-nav-link-v2:hover:not(:disabled) {
-                background: rgba(255, 255, 255, 0.05);
+            .bible-theme-dark .hkm-rp-toolbelt-btn-v2:hover {
                 color: #f97316;
             }
-            .hkm-rp-nav-link-v2:disabled {
-                opacity: 0.3;
-                cursor: not-allowed;
+            .particle {
+                position: absolute;
+                border-radius: 50%;
+                pointer-events: none;
+                opacity: 0;
             }
             .hkm-rp-nav-label-v2 {
                 font-size: 14px;
@@ -4659,6 +4684,59 @@ class BibleReader {
         }
     }
 
+    createCelebrationParticles(button) {
+        let container = document.getElementById('particle-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'particle-container';
+            container.style.cssText = 'position: fixed; inset: 0; pointer-events: none; z-index: 9999;';
+            document.body.appendChild(container);
+        }
+
+        const rect = button.getBoundingClientRect();
+        const colors = ['#ffffff', '#ffdbce', '#c66338', '#ffd700', '#1B4965'];
+        const count = 40;
+        
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            const size = Math.random() * 6 + 4;
+            
+            particle.style.cssText = `
+                position: fixed;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                left: ${rect.left + rect.width / 2}px;
+                top: ${rect.top + rect.height / 2}px;
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+                transition: transform 0.8s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.8s ease-out;
+            `;
+            
+            container.appendChild(particle);
+            
+            // Random destination
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 150 + 50;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            // Trigger transition on next frame
+            requestAnimationFrame(() => {
+                particle.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+                particle.style.opacity = '0';
+            });
+            
+            // Clean up
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
+    }
+
     renderProgressTicks(totalDays, currentDayNum) {
         let ticks = [];
         let step = 1;
@@ -4695,7 +4773,9 @@ class BibleReader {
 
     renderTopHeaderPanel(container, globalPlan, userPlan, currentDayNum, dayConfig) {
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
-        const progressPct = totalDays > 1 ? Math.round(((currentDayNum - 1) / (totalDays - 1)) * 100) : 100;
+        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
+        const progressPct = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
+        const dashOffset = 175.92 * (1 - progressPct / 100);
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
         const isPrayerApp = globalPlan.title && (
@@ -4712,6 +4792,7 @@ class BibleReader {
         const badgeLabel = globalPlan.title || '';
 
         container.className = 'hkm-rp-header-card-v2';
+        container.id = 'progress-card';
         if (isPrayerApp) {
             container.classList.add('prayer-app-mode');
         } else {
@@ -4722,41 +4803,64 @@ class BibleReader {
             <!-- Floating badge pill on top border -->
             <div class="hkm-rp-badge-pill">${badgeLabel}</div>
             
-            <!-- Huge full-width complete button -->
-            <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
-                <span class="material-symbols-outlined" style="font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                <span>${completeLabel}</span>
-            </button>
-            
-            <!-- Progress section -->
-            <div class="hkm-rp-progress-container-v2">
-                <span class="progress-side-label left">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum}</span>
-                <div class="progress-bar-ticks-wrapper-v2">
-                    <div class="hkm-rp-progress-bar-v2">
-                        <div class="hkm-rp-progress-fill-v2" style="width: ${progressPct}%;"></div>
+            <!-- Progress & Actions Row -->
+            <div class="hkm-rp-progress-row-v2">
+                <!-- Circular Progress Column -->
+                <div class="hkm-rp-progress-info-v2">
+                    <div class="relative flex items-center justify-center cursor-help group transition-transform duration-300 hover:scale-105" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                        <svg class="w-16 h-16 glow-effect" style="width: 64px; height: 64px;">
+                            <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--border-color, #e2e8f0)" stroke-width="4"></circle>
+                            <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#c66338" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
+                        </svg>
+                        <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
                     </div>
-                    <div class="progress-ticks-v2">
-                        ${this.renderProgressTicks(totalDays, currentDayNum)}
+                    <div class="progress-info-text-v2">
+                        <p class="title">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Fremdrift')}</p>
+                        <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status">
+                            ${isCurrentDayCompleted 
+                                ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
+                                : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!'))
+                            }
+                        </p>
                     </div>
                 </div>
-                <span class="progress-side-label right">${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</span>
+
+                <!-- Navigation & Completion Buttons Column -->
+                <div class="hkm-rp-buttons-row-v2">
+                    <button class="hkm-rp-btn-nav-v2" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn" title="${lang === 'en' ? 'Previous day' : (lang === 'es' ? 'Día anterior' : 'Forrige dag')}">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
+                    </button>
+                    
+                    <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
+                        <span class="material-symbols-outlined transition-transform duration-300" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                        <span id="btn-text">${completeLabel}</span>
+                    </button>
+                    
+                    <button class="hkm-rp-btn-nav-v2" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn" title="${lang === 'en' ? 'Next day' : (lang === 'es' ? 'Siguiente día' : 'Neste dag')}">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
+                    </button>
+                </div>
             </div>
             
             <!-- Horizontal Divider -->
             <div class="hkm-rp-divider-v2"></div>
             
-            <!-- Navigation row -->
-            <div class="hkm-rp-nav-row-v2">
-                <button class="hkm-rp-nav-link-v2 prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-                    <span>${lang === 'en' ? 'Go back' : (lang === 'es' ? 'Volver' : 'Gå tilbake')}</span>
+            <!-- Quick Access Toolbelt -->
+            <div class="hkm-rp-toolbelt-v2">
+                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-trans">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
+                    <span>${lang === 'en' ? 'Translation' : (lang === 'es' ? 'Traducción' : 'Oversettelse')}</span>
+                    <select id="rp-toolbelt-trans-select" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"></select>
                 </button>
                 
-                <div class="hkm-rp-nav-label-v2">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
+                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-size">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
+                    <span>${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Size' : 'Skriftstørrelse')}</span>
+                </button>
                 
-                <button class="hkm-rp-nav-link-v2 next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
-                    <span>${lang === 'en' ? 'Next day' : (lang === 'es' ? 'Siguiente día' : 'Neste dag')}</span>
-                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-audio">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">headphones</span>
+                    <span>${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}</span>
                 </button>
             </div>
         `;
@@ -4774,15 +4878,100 @@ class BibleReader {
             this.setupReadingPlanUI();
         };
 
+        // Wire up toolbelt size change
+        const sizeBtn = container.querySelector('#rp-toolbelt-size');
+        if (sizeBtn) {
+            sizeBtn.onclick = () => {
+                const currentSize = this.settings.fontSize || 18;
+                const newSize = currentSize >= 24 ? 16 : currentSize + 2;
+                this.settings.fontSize = newSize;
+                this.dom.readingPane.style.setProperty('--bible-font-size', `${newSize}px`);
+                const fontSizeDisp = document.getElementById('font-size-display');
+                if (fontSizeDisp) fontSizeDisp.innerText = `${newSize}px`;
+                const fontSizeDispMobile = document.getElementById('font-size-display-mobile');
+                if (fontSizeDispMobile) fontSizeDispMobile.innerText = `${newSize}px`;
+                this.saveSettings();
+            };
+        }
+
+        // Wire up toolbelt translation selection
+        const transSelect = container.querySelector('#rp-toolbelt-trans-select');
+        if (transSelect && this.bibles) {
+            let optionsHtml = '';
+            this.bibles.forEach(b => {
+                optionsHtml += `<option value="${b.id}" ${b.id === this.selectedBibleId ? 'selected' : ''}>${b.abbreviation} - ${b.name}</option>`;
+            });
+            transSelect.innerHTML = optionsHtml;
+            transSelect.onchange = async (e) => {
+                const newTrans = e.target.value;
+                this.selectedBibleId = newTrans;
+                this.safeSetLocalStorage(`hkm_bible_translation_${lang}`, newTrans);
+                if (this.dom.translationSelect) {
+                    this.dom.translationSelect.value = newTrans;
+                }
+                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                if (mobileTransSelect) {
+                    mobileTransSelect.value = newTrans;
+                }
+                await this.loadChapterText();
+                this.updateUrlParams();
+                this.setupReadingPlanUI();
+            };
+        }
+
+        // Wire up toolbelt audio play
+        const audioBtn = container.querySelector('#rp-toolbelt-audio');
+        if (audioBtn) {
+            audioBtn.onclick = () => {
+                this.toggleAudioPlayback();
+            };
+        }
+
         const completeBtn = container.querySelector('#rp-complete-day-btn');
         completeBtn.onclick = async () => {
             userPlan.completedDays = userPlan.completedDays || [];
             if (isCurrentDayCompleted) {
                 userPlan.completedDays = userPlan.completedDays.filter(d => d !== currentDayNum);
+                
+                userPlan.lastActiveAt = this.getServerTimestamp();
+                await this.saveProgress();
+                
+                this.setupReadingPlanUI();
+                this.loadReadingPlan();
             } else {
                 if (!userPlan.completedDays.includes(currentDayNum)) {
                     userPlan.completedDays.push(currentDayNum);
                 }
+                
+                // Play circular progress celebration animation
+                const progressCircle = container.querySelector('#progress-circle');
+                const progressText = container.querySelector('#progress-text');
+                const progressStatus = container.querySelector('#progress-status');
+                const btnText = completeBtn.querySelector('#btn-text') || completeBtn.querySelector('span:not(.material-symbols-outlined)');
+                const btnIcon = completeBtn.querySelector('#btn-icon') || completeBtn.querySelector('.material-symbols-outlined');
+                
+                if (progressCircle) progressCircle.style.strokeDashoffset = "0";
+                if (progressText) {
+                    let count = progressPct;
+                    const interval = setInterval(() => {
+                        count = Math.min(100, count + 2);
+                        progressText.innerText = count + "%";
+                        if (count >= 100) clearInterval(interval);
+                    }, 10);
+                }
+                
+                completeBtn.classList.add('completed');
+                if (btnText) btnText.innerText = lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!');
+                if (btnIcon) {
+                    btnIcon.innerText = 'check_circle';
+                    btnIcon.style.transform = 'scale(1.2) rotate(360deg)';
+                }
+                if (progressStatus) {
+                    progressStatus.innerText = lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!');
+                    progressStatus.classList.add('completed-status');
+                }
+                
+                this.createCelebrationParticles(completeBtn);
                 
                 if (currentDayNum < totalDays) {
                     let nextDay = currentDayNum + 1;
@@ -4795,13 +4984,16 @@ class BibleReader {
                 } else {
                     userPlan.completed = true;
                 }
+                
+                userPlan.lastActiveAt = this.getServerTimestamp();
+                await this.saveProgress();
+                
+                // Delay reload so celebration displays fully
+                setTimeout(() => {
+                    this.setupReadingPlanUI();
+                    this.loadReadingPlan();
+                }, 1200);
             }
-
-            userPlan.lastActiveAt = this.getServerTimestamp();
-            await this.saveProgress();
-            
-            this.setupReadingPlanUI();
-            this.loadReadingPlan();
         };
     }
 
