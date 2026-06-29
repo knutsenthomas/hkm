@@ -462,14 +462,21 @@ class BibleReader {
 
         if (planParam) {
             await this.initReadingPlanMode(planParam, dayParam);
-        } else if (refParam) {
-            await this.parseAndNavigateToReference(refParam);
         } else {
-            // Load default (John 1 or first book)
-            const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
-            if (defaultBook) {
-                await this.selectBook(defaultBook.id);
-                await this.selectChapter(`${defaultBook.id}_1`);
+            // Hide Leseplan tab button by default
+            const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+            if (rpTabBtn) {
+                rpTabBtn.style.display = 'none';
+            }
+            if (refParam) {
+                await this.parseAndNavigateToReference(refParam);
+            } else {
+                // Load default (John 1 or first book)
+                const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
+                if (defaultBook) {
+                    await this.selectBook(defaultBook.id);
+                    await this.selectChapter(`${defaultBook.id}_1`);
+                }
             }
         }
 
@@ -4642,22 +4649,30 @@ class BibleReader {
 
         this.renderLeftSidebarReadingPlan(planSidebar, globalPlan, userPlan, currentDayNum, dayConfig);
 
-        // 3. Render right sidebar content (reflections, cross references, video)
+        // 3. Render right sidebar content inside existing "Leseplan" tab content
         if (this.dom.navRight) {
+            // Restore visibility of standard tabs in reading plan mode
             const rightTabsHeader = this.dom.navRight.querySelector('.tabs-header');
-            if (rightTabsHeader) rightTabsHeader.style.display = 'none';
+            if (rightTabsHeader) rightTabsHeader.style.display = '';
             const rightTabsContent = this.dom.navRight.querySelector('.tabs-content');
-            if (rightTabsContent) rightTabsContent.style.display = 'none';
+            if (rightTabsContent) rightTabsContent.style.display = '';
             
-            let rightPlanSidebar = document.getElementById('reading-plan-right-sidebar-content');
-            if (!rightPlanSidebar) {
-                rightPlanSidebar = document.createElement('div');
-                rightPlanSidebar.id = 'reading-plan-right-sidebar-content';
-                rightPlanSidebar.style.cssText = 'padding: 16px; overflow-y: auto; height: calc(100% - 60px);';
-                this.dom.navRight.appendChild(rightPlanSidebar);
+            // Hide custom sidebar container if it was left from previous versions
+            const oldRightPlanSidebar = document.getElementById('reading-plan-right-sidebar-content');
+            if (oldRightPlanSidebar) oldRightPlanSidebar.style.display = 'none';
+
+            const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+            const rpTabContent = document.getElementById('tab-reading-plan-content');
+            
+            if (rpTabBtn && rpTabContent) {
+                rpTabBtn.style.display = 'block';
+                
+                // Render our custom widgets directly into the standard Leseplan tab content div
+                this.renderRightSidebarReadingPlan(rpTabContent, dayConfig);
+                
+                // Click Leseplan tab to activate it
+                rpTabBtn.click();
             }
-            rightPlanSidebar.style.display = 'block';
-            this.renderRightSidebarReadingPlan(rightPlanSidebar, dayConfig);
             
             // Force open right sidebar on desktop for side-by-side
             if (window.innerWidth > 1024) {
