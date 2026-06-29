@@ -3985,6 +3985,8 @@ class BibleReader {
                 margin: 16px;
                 box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                container-type: inline-size;
+                container-name: rpcard;
             }
             .hkm-rp-header-card.collapsed {
                 padding: 12px 24px;
@@ -4179,7 +4181,7 @@ class BibleReader {
             .hkm-complete-text-short, .hkm-back-text-short {
                 display: none;
             }
-            @media (max-width: 1280px) {
+            @container rpcard (max-width: 820px) {
                 .hkm-complete-text-full, .hkm-back-text-full {
                     display: none;
                 }
@@ -4194,7 +4196,7 @@ class BibleReader {
                     padding: 6px 12px;
                 }
             }
-            @media (max-width: 600px) {
+            @container rpcard (max-width: 520px) {
                 .hkm-rp-actions {
                     flex-direction: column-reverse;
                     align-items: stretch;
