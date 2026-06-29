@@ -3814,6 +3814,10 @@ class BibleReader {
         this.activePlanMode = true;
         this.activePlanId = planId;
         
+        // Force running text layout (paragraph) for reading plans / prayer apps
+        this.settings.layout = 'paragraph';
+        this.applySettings();
+        
         // Inject styles dynamically
         this.injectReadingPlanStyles();
 
