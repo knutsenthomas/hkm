@@ -2937,36 +2937,41 @@ class BibleReader {
                 </div>
             `;
         }
+        const isPrayer = this.activePlanData && this.activePlanData.title && (
+            this.activePlanData.title.toLowerCase().includes('bønn') ||
+            this.activePlanData.title.toLowerCase().includes('prayer') ||
+            this.activePlanData.title.toLowerCase().includes('oración')
+        );
         const sectionTitles = {
             no: {
-                planResources: 'Dagens leseplan-ressurser',
+                planResources: isPrayer ? 'Dagens bønneressurser' : 'Dagens leseplan-ressurser',
                 prayerFocus: 'Bønnefokus',
                 defaultPrayer: 'Be over skriftstedene du leser i dag.',
                 noPlanResources: 'Ingen ekstra ressurser tilknyttet denne dagen.',
                 crossRefs: 'Kryssreferanser',
                 generalResources: `Generelle ressurser for ${currentBook.name}`,
                 noGeneralResources: 'Ingen relaterte ressurser funnet.',
-                planResTag: 'LESEPLAN RESSURS'
+                planResTag: isPrayer ? 'BØNNEAPP RESSURS' : 'LESEPLAN RESSURS'
             },
             en: {
-                planResources: "Today's Reading Plan Resources",
+                planResources: isPrayer ? "Today's Prayer Resources" : "Today's Reading Plan Resources",
                 prayerFocus: 'Prayer Focus',
                 defaultPrayer: 'Pray over the scriptures you read today.',
                 noPlanResources: 'No extra resources connected to this day.',
                 crossRefs: 'Cross References',
                 generalResources: `General Resources for ${currentBook.name}`,
                 noGeneralResources: 'No related resources found.',
-                planResTag: 'READING PLAN RESOURCE'
+                planResTag: isPrayer ? 'PRAYER APP RESOURCE' : 'READING PLAN RESOURCE'
             },
             es: {
-                planResources: 'Recursos del Plan de Lectura de Hoy',
+                planResources: isPrayer ? 'Recursos de oración de hoy' : 'Recursos del Plan de Lectura de Hoy',
                 prayerFocus: 'Enfoque de Oración',
                 defaultPrayer: 'Ora sobre las escrituras que leas hoy.',
                 noPlanResources: 'No hay recursos adicionales relacionados con este día.',
                 crossRefs: 'Referencias Cruzadas',
                 generalResources: `Recursos Generales para ${currentBook.name}`,
                 noGeneralResources: 'No se encontraron recursos relacionados.',
-                planResTag: 'RECURSO DEL PLAN'
+                planResTag: isPrayer ? 'RECURSO DE ORACIÓN' : 'RECURSO DEL PLAN'
             }
         };
 
@@ -3125,57 +3130,62 @@ class BibleReader {
 
     getTranslation(key, fallback) {
         const lang = document.documentElement.lang || 'no';
+        const isPrayer = this.activePlanData && this.activePlanData.title && (
+            this.activePlanData.title.toLowerCase().includes('bønn') ||
+            this.activePlanData.title.toLowerCase().includes('prayer') ||
+            this.activePlanData.title.toLowerCase().includes('oración')
+        );
         const dict = {
             no: {
-                loading_plan: 'Laster leseplan...',
-                active_plan: 'Aktiv leseplan',
+                loading_plan: isPrayer ? 'Laster bønneapp...' : 'Laster leseplan...',
+                active_plan: isPrayer ? 'Aktiv bønneapp' : 'Aktiv leseplan',
                 progress: 'Fremgang',
                 day: 'Dag',
                 show_verses: 'Vis dagens vers',
-                open_devotional: 'Åpne dagens andakt',
+                open_devotional: isPrayer ? 'Åpne dagens bønn' : 'Åpne dagens andakt',
                 days_outline: 'Oversikt over dager',
                 completed: 'Fullført',
-                all_plans: 'Tilgjengelige leseplaner',
-                start_plan_btn: 'Start denne planen',
-                continue_plan_btn: 'Fortsett leseplan',
+                all_plans: isPrayer ? 'Tilgjengelige bønneapper' : 'Tilgjengelige leseplaner',
+                start_plan_btn: isPrayer ? 'Start denne bønneappen' : 'Start denne planen',
+                continue_plan_btn: isPrayer ? 'Fortsett bønneapp' : 'Fortsett leseplan',
                 log_in_to_save: 'Logg inn på Min Side for å lagre din fremgang.',
                 login_btn: 'Logg inn',
                 days: 'dager',
-                sync_devotion: 'Oppdater til dagens andakt'
+                sync_devotion: isPrayer ? 'Oppdater til dagens bønn' : 'Oppdater til dagens andakt'
             },
             en: {
-                loading_plan: 'Loading reading plan...',
-                active_plan: 'Active Reading Plan',
+                loading_plan: isPrayer ? 'Loading prayer app...' : 'Loading reading plan...',
+                active_plan: isPrayer ? 'Active Prayer App' : 'Active Reading Plan',
                 progress: 'Progress',
                 day: 'Day',
                 show_verses: "Show today's verses",
-                open_devotional: "Open today's devotional",
+                open_devotional: isPrayer ? "Open today's prayer" : "Open today's devotional",
                 days_outline: 'Days Outline',
                 completed: 'Completed',
-                all_plans: 'Available Reading Plans',
-                start_plan_btn: 'Start this plan',
-                continue_plan_btn: 'Continue reading plan',
+                all_plans: isPrayer ? 'Available Prayer Apps' : 'Available Reading Plans',
+                start_plan_btn: isPrayer ? 'Start this prayer app' : 'Start this plan',
+                continue_plan_btn: isPrayer ? 'Continue prayer app' : 'Continue reading plan',
                 log_in_to_save: 'Log in to save your progress.',
                 login_btn: 'Log in',
                 days: 'days',
-                sync_devotion: "Update to today's devotion"
+                sync_devotion: isPrayer ? "Update to today's prayer" : "Update to today's devotion"
             },
             es: {
-                loading_plan: 'Cargando plan de lectura...',
-                active_plan: 'Plan de Lectura Activo',
+                loading_plan: isPrayer ? 'Cargando aplicación de oración...' : 'Cargando plan de lectura...',
+                active_plan: isPrayer ? 'Aplicación de Oración Activa' : 'Plan de Lectura Activo',
                 progress: 'Progreso',
                 day: 'Día',
                 show_verses: 'Ver versículos de hoy',
-                open_devotional: 'Abrir devocional de hoy',
+                open_devotional: isPrayer ? 'Abrir oración de hoy' : 'Abrir devocional de hoy',
                 days_outline: 'Resumen de los días',
                 completed: 'Completado',
-                all_plans: 'Planes de Lectura Disponibles',
-                start_plan_btn: 'Comenzar este plan',
-                continue_plan_btn: 'Continuar plan de lectura',
+                all_plans: isPrayer ? 'Aplicaciones de Oración Disponibles' : 'Planes de Lectura Disponibles',
+                start_plan_btn: isPrayer ? 'Comenzar esta aplicación de oración' : 'Comenzar este plan',
+                continue_plan_btn: isPrayer ? 'Continuar aplicación de oración' : 'Continuar plan de lectura',
                 log_in_to_save: 'Inicia sesión para guardar tu progreso.',
                 login_btn: 'Iniciar sesión',
                 days: 'días',
-                sync_devotion: 'Actualizar al devocional de hoy'
+                sync_devotion: isPrayer ? 'Actualizar a la oración de hoy' : 'Actualizar al devocional de hoy'
             }
         };
         return dict[lang]?.[key] || dict['no']?.[key] || fallback;
@@ -3336,23 +3346,36 @@ class BibleReader {
         const t_syncDevotion = this.getTranslation('sync_devotion', 'Oppdater til dagens andakt');
         
         if (this.activePlanMode) {
+            const isPrayerApp = globalPlan.title && (
+                globalPlan.title.toLowerCase().includes('bønn') ||
+                globalPlan.title.toLowerCase().includes('prayer') ||
+                globalPlan.title.toLowerCase().includes('oración')
+            );
+            const daysTitle = isPrayerApp
+                ? (lang === 'en' ? 'Prayer App: Days' : (lang === 'es' ? 'Aplicación de oración: Días' : 'Bønneapp: Dager'))
+                : (lang === 'en' ? 'Reading Plan: Days' : (lang === 'es' ? 'Plan de lectura: Días' : 'Leseplan: Dager'));
+            const switchPlanLabel = isPrayerApp 
+                ? (lang === 'en' ? 'Switch app' : (lang === 'es' ? 'Cambiar aplicación' : 'Bytt bønneapp'))
+                : (lang === 'en' ? 'Switch plan' : (lang === 'es' ? 'Cambiar plan' : 'Bytt plan'));
+
             // Render only checklist of days for clean 3rd column
             container.innerHTML = `
                 <div style="padding: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 8px;">
-                        <span style="font-size: 13px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.05em;">Leseplan: Dager</span>
-                        <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.location.href='/leseplaner.html'">Bytt plan</button>
+                        <span style="font-size: 13px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.05em;">${daysTitle}</span>
+                        <button class="hkm-btn-secondary" style="height: 26px !important; padding: 2px 10px !important; font-size: 11px !important; border-radius: 6px !important;" onclick="window.location.href='/leseplaner.html'">${switchPlanLabel}</button>
                     </div>
                     
                     <div style="display: flex; flex-direction: column;">
                         ${globalPlan.days.map(d => {
                             const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d.dayNumber);
                             const isActive = d.dayNumber === currentDayNum;
+                            const subtitleText = isPrayerApp ? (d.prayerFocus || d.verses || '') : (d.verses || d.prayerFocus || '');
                             return `
                             <div class="hkm-rp-day-item ${isActive ? 'active' : ''}" onclick="window.bibleReader.selectReadingPlanDay(${d.dayNumber})">
                                 <div style="flex: 1; min-width: 0; padding-right: 8px;">
                                     <div style="font-size: 12px; font-weight: 700; color: ${isActive ? '#bd4f2a' : '#475569'};">Dag ${d.dayNumber}</div>
-                                    <div style="font-size: 13px; color: ${isActive ? '#d17d39' : '#0f172a'}; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.verses}</div>
+                                    <div style="font-size: 13px; color: ${isActive ? '#d17d39' : '#0f172a'}; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${subtitleText}</div>
                                 </div>
                                 <div class="hkm-rp-day-checkbox ${isCompleted ? 'completed' : ''}">
                                     ${isCompleted ? '<span class="material-symbols-outlined">check</span>' : ''}
@@ -4194,6 +4217,40 @@ class BibleReader {
                 margin-top: 6px;
                 text-align: right;
             }
+            
+            /* Prayer app overrides */
+            body.prayer-app-mode .hkm-rp-badge {
+                color: #bd4f2a !important;
+                background: linear-gradient(135deg, rgba(209, 125, 57, 0.15), rgba(189, 79, 42, 0.15)) !important;
+                padding: 4px 12px !important;
+                border-radius: 20px !important;
+                border: 1px solid rgba(209, 125, 57, 0.25) !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete {
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+                box-shadow: 0 4px 12px rgba(189, 79, 42, 0.2) !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete.completed {
+                background: #10b981 !important;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+            }
+            body.prayer-app-mode .hkm-rp-day-item.active {
+                border-color: #bd4f2a !important;
+                background: rgba(189, 79, 42, 0.03) !important;
+            }
+            body.prayer-app-mode .hkm-rp-day-item.active .hkm-rp-day-checkbox {
+                border-color: #bd4f2a !important;
+            }
+            body.prayer-app-mode .hkm-rp-day-checkbox.completed {
+                background: #bd4f2a !important;
+                border-color: #bd4f2a !important;
+            }
+            body.prayer-app-mode .hkm-rp-progress-fill {
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+            }
+            body.prayer-app-mode .hkm-rp-sidebar-card .card-header .icon {
+                color: #bd4f2a !important;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -4203,6 +4260,19 @@ class BibleReader {
         const userPlan = this.userPlanProgress;
         const currentDayNum = this.activePlanDay;
         const dayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
+
+        const isPrayerApp = globalPlan.title && (
+            globalPlan.title.toLowerCase().includes('bønn') ||
+            globalPlan.title.toLowerCase().includes('prayer') ||
+            globalPlan.title.toLowerCase().includes('oración')
+        );
+        const lang = document.documentElement.lang || 'no';
+        
+        if (isPrayerApp) {
+            document.body.classList.add('prayer-app-mode');
+        } else {
+            document.body.classList.remove('prayer-app-mode');
+        }
 
         // 1. Hide books list and search in left sidebar
         const booksListWrapper = document.querySelector('.books-list-wrapper');
@@ -4238,7 +4308,15 @@ class BibleReader {
 
         const titleSpan = titleRow ? titleRow.querySelector('span') : null;
         if (titleSpan) {
-            titleSpan.innerText = 'Dagens andakt';
+            const isPrayerApp = globalPlan.title && (
+                globalPlan.title.toLowerCase().includes('bønn') ||
+                globalPlan.title.toLowerCase().includes('prayer') ||
+                globalPlan.title.toLowerCase().includes('oración')
+            );
+            const lang = document.documentElement.lang || 'no';
+            titleSpan.innerText = isPrayerApp 
+                ? (lang === 'en' ? 'Daily prayer' : (lang === 'es' ? 'Oración diaria' : 'Dagens bønn'))
+                : (lang === 'en' ? 'Daily devotion' : (lang === 'es' ? 'Devocional diario' : 'Dagens andakt'));
         }
 
         // 2. Render left sidebar content (devotional details)
@@ -4451,22 +4529,55 @@ class BibleReader {
         const progressPct = Math.round((completedDaysCount / totalDays) * 100);
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
+        const isPrayerApp = globalPlan.title && (
+            globalPlan.title.toLowerCase().includes('bønn') ||
+            globalPlan.title.toLowerCase().includes('prayer') ||
+            globalPlan.title.toLowerCase().includes('oración')
+        );
+        const lang = document.documentElement.lang || 'no';
+
+        const badgeLabel = isPrayerApp 
+            ? (lang === 'en' ? 'Active Prayer App' : (lang === 'es' ? 'Aplicación de oración activa' : 'Aktiv Bønneapp'))
+            : (lang === 'en' ? 'Active Reading Plan' : (lang === 'es' ? 'Plan de Lectura Activo' : 'Aktiv Leseplan'));
+
+        const backLabel = isPrayerApp
+            ? (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'))
+            : (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'));
+
+        const completeLabel = isCurrentDayCompleted 
+            ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Day completed!' : (lang === 'es' ? '¡Día completado!' : 'Dag fullført!')))
+            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Mark day as completed' : (lang === 'es' ? 'Marcar día como completado' : 'Merk dag som fullført')));
+
+        const progressLabel = isPrayerApp
+            ? (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'))
+            : (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'));
+
+        const progressSuffix = isPrayerApp
+            ? (lang === 'en' ? `prayers completed` : (lang === 'es' ? `oraciones completadas` : `dager fullført`))
+            : (lang === 'en' ? `days completed` : (lang === 'es' ? `días completados` : `dager fullført`));
+
         container.className = 'hkm-rp-header-card';
+        if (isPrayerApp) {
+            container.classList.add('prayer-app-mode');
+        } else {
+            container.classList.remove('prayer-app-mode');
+        }
+        
         container.innerHTML = `
             <div class="hkm-rp-header-top">
                 <div class="hkm-rp-header-info">
-                    <span class="hkm-rp-badge">Aktiv Leseplan</span>
+                    <span class="hkm-rp-badge">${badgeLabel}</span>
                     <h1 class="hkm-rp-title">${globalPlan.title}</h1>
                     <p class="hkm-rp-desc">${globalPlan.description || ''}</p>
                 </div>
                 <div class="hkm-rp-day-navigator">
                     <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
                         <span class="material-symbols-outlined">chevron_left</span>
-                        <span>Forrige</span>
+                        <span>${lang === 'en' ? 'Prev' : (lang === 'es' ? 'Anterior' : 'Forrige')}</span>
                     </button>
-                    <div class="hkm-nav-day-label">Dag ${currentDayNum} av ${totalDays}</div>
+                    <div class="hkm-nav-day-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
                     <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
-                        <span>Neste</span>
+                        <span>${lang === 'en' ? 'Next' : (lang === 'es' ? 'Siguiente' : 'Neste')}</span>
                         <span class="material-symbols-outlined">chevron_right</span>
                     </button>
                 </div>
@@ -4474,8 +4585,8 @@ class BibleReader {
             
             <div class="hkm-rp-progress-section">
                 <div class="hkm-rp-progress-text">
-                    <span>Din fremgang</span>
-                    <span>${progressPct}% (${completedDaysCount} av ${totalDays} dager fullført)</span>
+                    <span>${progressLabel}</span>
+                    <span>${progressPct}% (${completedDaysCount} av ${totalDays} ${progressSuffix})</span>
                 </div>
                 <div class="hkm-rp-progress-bar">
                     <div class="hkm-rp-progress-fill" style="width: ${progressPct}%;"></div>
@@ -4485,11 +4596,11 @@ class BibleReader {
             <div class="hkm-rp-actions">
                 <a href="/leseplaner.html" class="hkm-nav-btn" style="padding-left: 0;">
                     <span class="material-symbols-outlined">arrow_back</span>
-                    <span>Tilbake til oversikten</span>
+                    <span>${backLabel}</span>
                 </a>
                 <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    <span>${isCurrentDayCompleted ? 'Dag fullført!' : 'Merk dag som fullført'}</span>
+                    <span class="material-symbols-outlined">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                    <span>${completeLabel}</span>
                 </button>
             </div>
         `;
@@ -4889,14 +5000,32 @@ class BibleReader {
             confetti.innerHTML = '🎉';
             stepContainer.appendChild(confetti);
 
+            const isPrayerApp = plan.title && (
+                plan.title.toLowerCase().includes('bønn') ||
+                plan.title.toLowerCase().includes('prayer') ||
+                plan.title.toLowerCase().includes('oración')
+            );
+            const lang = document.documentElement.lang || 'no';
+
             const title = document.createElement('h3');
             title.className = 'hkm-celebration-title';
-            title.innerText = 'Andakt fullført!';
+            title.innerText = isPrayerApp 
+                ? (lang === 'en' ? 'Prayer completed!' : (lang === 'es' ? '¡Oración completada!' : 'Bønn fullført!'))
+                : (lang === 'en' ? 'Devotional completed!' : (lang === 'es' ? '¡Devocional completado!' : 'Andakt fullført!'));
             stepContainer.appendChild(title);
 
             const desc = document.createElement('p');
             desc.className = 'hkm-celebration-desc';
-            desc.innerText = `Kjempebra jobbet! Du har fullført dag ${dayNumber} av leseplanen "${plan.title}".`;
+            
+            const planTypeWord = isPrayerApp 
+                ? (lang === 'en' ? 'prayer app' : (lang === 'es' ? 'aplicación de oración' : 'bønneappen'))
+                : (lang === 'en' ? 'reading plan' : (lang === 'es' ? 'plan de lectura' : 'leseplanen'));
+            
+            desc.innerText = lang === 'en' 
+                ? `Great job! You have completed day ${dayNumber} of the ${planTypeWord} "${plan.title}".`
+                : (lang === 'es' 
+                    ? `¡Buen trabajo! Has completado el día ${dayNumber} de la ${planTypeWord} "${plan.title}".`
+                    : `Kjempebra jobbet! Du har fullført dag ${dayNumber} av ${planTypeWord} "${plan.title}".`);
             stepContainer.appendChild(desc);
 
             const actions = document.createElement('div');

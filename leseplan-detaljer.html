@@ -614,23 +614,181 @@
             color: #bd4f2a !important;
             border-color: rgba(209, 125, 57, 0.25) !important;
         }
-        .prayer-app-mode .day-item {
-            border-left: 4px solid transparent;
+        
+        /* New Premium Prayer Card Styling */
+        .prayer-app-mode .prayer-day-card {
+            position: relative;
+            padding: 32px;
+            border-radius: 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+            border-left: 4px solid transparent;
         }
-        .prayer-app-mode .day-item:hover {
+        
+        .prayer-app-mode .prayer-day-card:hover {
+            transform: translateY(-4px);
             border-left-color: #d17d39 !important;
             border-color: rgba(209, 125, 57, 0.3) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -10px rgba(209, 125, 57, 0.12), 0 2px 4px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 20px 35px -10px rgba(209, 125, 57, 0.1), 0 2px 8px rgba(0, 0, 0, 0.02);
         }
-        .prayer-app-mode .day-prayer {
-            border-left: 4px solid #bd4f2a !important;
-            background: rgba(209, 125, 57, 0.04) !important;
-            padding: 16px 20px !important;
-            border-radius: 8px !important;
+        
+        .prayer-app-mode .prayer-day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 16px;
+        }
+        
+        .prayer-app-mode .prayer-day-title-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .prayer-app-mode .prayer-day-card .day-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #bd4f2a;
+            margin: 0;
+            flex-shrink: 0;
+            border-radius: 6px;
+            transition: transform 0.2s;
+        }
+        
+        .prayer-app-mode .prayer-day-card .day-checkbox:hover {
+            transform: scale(1.1);
+        }
+        
+        .prayer-app-mode .prayer-icon-right {
+            color: rgba(189, 79, 42, 0.2);
+            font-size: 24px;
+            font-variation-settings: 'FILL' 1;
+            transition: color 0.3s;
+        }
+        
+        .prayer-app-mode .prayer-day-card:hover .prayer-icon-right {
+            color: rgba(189, 79, 42, 0.6);
+        }
+        
+        /* Elegant outline/quote style for Prayer Focus */
+        .prayer-app-mode .prayer-focus-quote {
+            position: relative;
+            background: linear-gradient(135deg, rgba(209, 125, 57, 0.03), rgba(189, 79, 42, 0.03));
+            border-left: 4px solid #bd4f2a;
+            padding: 24px 24px 24px 40px;
+            border-radius: 0 16px 16px 0;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.01);
+        }
+        
+        .prayer-app-mode .quote-mark {
+            position: absolute;
+            left: 12px;
+            top: 2px;
+            font-size: 4rem;
+            line-height: 1;
+            font-family: Georgia, serif;
+            color: rgba(189, 79, 42, 0.12);
+            user-select: none;
+        }
+        
+        .prayer-app-mode .prayer-focus-text {
+            margin: 0;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            font-weight: 500;
+            color: var(--text-dark);
             font-style: italic;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Bible Verse as a secondary reading tip */
+        .prayer-app-mode .prayer-bible-tip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            width: fit-content;
+            margin-top: 8px;
+        }
+        
+        .prayer-app-mode .prayer-bible-tip .material-symbols-outlined {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+        
+        .prayer-app-mode .prayer-bible-tip .tip-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        .prayer-app-mode .prayer-bible-tip .verse-link {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #bd4f2a;
+            text-decoration: none;
+            transition: color 0.2s, text-decoration 0.2s;
+        }
+        
+        .prayer-app-mode .prayer-bible-tip .verse-link:hover {
+            color: #d17d39;
+            text-decoration: underline;
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .prayer-app-mode .prayer-day-card {
+                padding: 24px;
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+            .prayer-app-mode .prayer-focus-quote {
+                padding: 16px 16px 16px 32px;
+            }
+            .prayer-app-mode .prayer-focus-text {
+                font-size: 1.05rem;
+            }
+            .prayer-app-mode .quote-mark {
+                font-size: 3rem;
+                left: 8px;
+            }
+            .prayer-app-mode .prayer-bible-tip {
+                padding: 8px 16px;
+                gap: 8px;
+            }
+        }
+        
+        /* Mobile Landscape Guard */
+        @media (max-height: 480px) and (orientation: landscape) {
+            .prayer-app-mode .prayer-day-card {
+                padding: 16px;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .prayer-app-mode .prayer-focus-quote {
+                padding: 8px 8px 8px 24px;
+            }
+            .prayer-app-mode .prayer-focus-text {
+                font-size: 0.95rem;
+            }
+            .prayer-app-mode .quote-mark {
+                font-size: 2rem;
+                left: 8px;
+            }
+            .prayer-app-mode .prayer-bible-tip {
+                padding: 8px 8px;
+                gap: 8px;
+            }
         }
     </style>
     <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
@@ -1284,6 +1442,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const planId = urlParams.get('id');
+            let isPrayerApp = false;
 
             if (!planId || !service) {
                 showErrorState();
@@ -1318,7 +1477,7 @@
             }
 
             function renderPlanDetails(plan) {
-                const isPrayerApp = plan.title.toLowerCase().includes('bønn') || plan.title.toLowerCase().includes('prayer') || plan.title.toLowerCase().includes('oración');
+                isPrayerApp = plan.title.toLowerCase().includes('bønn') || plan.title.toLowerCase().includes('prayer') || plan.title.toLowerCase().includes('oración');
                 // Populate share links
                 const shareUrl = window.location.href;
                 const encodedUrl = encodeURIComponent(shareUrl);
@@ -1654,32 +1813,26 @@
 
                         if (isPrayerApp) {
                             // Custom layout for Prayer App / Bønneapp
-                            const versesHtml = versesText 
-                                ? `<div class="day-verses-prayer-mode" style="margin-top: 10px; font-size: 0.92rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-                                     <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">menu_book</span>
-                                     <strong>Bibelord:</strong> <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="verse-link" style="color: #bd4f2a; text-decoration: underline; font-weight: 600; cursor: pointer;">${escapeHtml(versesText)}</a>
-                                   </div>` 
-                                : '';
-                            
-                            const prayerContentHtml = day.prayerFocus 
-                                ? `<div class="day-prayer" style="margin-top: 8px;">
-                                     <div style="font-weight: 700; color: #bd4f2a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
-                                       <span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; fill: 1;">favorite</span> Dagens Bønnefokus
-                                     </div>
-                                     <div style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">${escapeHtml(day.prayerFocus)}</div>
-                                   </div>` 
-                                : `<div class="day-prayer" style="margin-top: 8px; font-style: italic; color: var(--text-muted);">Stille bønn og refleksjon.</div>`;
-
                             return `
-                                <div class="day-item ${isHiddenClass}" style="position: relative; padding: 24px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg-white); transition: all 0.3s; margin-bottom: 16px;">
-                                    <div class="day-header-info" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed var(--border); padding-bottom: 12px; margin-bottom: 12px;">
-                                        <div style="display: flex; align-items: center; gap: 12px;">
-                                            <input type="checkbox" class="day-checkbox" data-day="${day.dayNumber}" ${isChecked} style="width: 20px; height: 20px; cursor: pointer; accent-color: #bd4f2a; margin: 0; flex-shrink: 0;">
-                                            <span class="day-badge-num" style="background: linear-gradient(135deg, rgba(209, 125, 57, 0.15), rgba(189, 79, 42, 0.15)); color: #bd4f2a; font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(209, 125, 57, 0.25);">Dag ${day.dayNumber}</span>
+                                <div class="day-item prayer-day-card ${isHiddenClass}">
+                                    <div class="prayer-day-header">
+                                        <div class="prayer-day-title-group">
+                                            <input type="checkbox" class="day-checkbox" data-day="${day.dayNumber}" ${isChecked}>
+                                            <span class="day-badge-num">Dag ${day.dayNumber}</span>
                                         </div>
+                                        <span class="material-symbols-outlined prayer-icon-right">favorite</span>
                                     </div>
-                                    ${prayerContentHtml}
-                                    ${versesHtml}
+                                    <div class="prayer-focus-quote">
+                                        <span class="quote-mark">“</span>
+                                        <p class="prayer-focus-text">${escapeHtml(day.prayerFocus || 'Stille bønn og refleksjon.')}</p>
+                                    </div>
+                                    ${versesText ? `
+                                    <div class="prayer-bible-tip">
+                                        <span class="material-symbols-outlined">menu_book</span>
+                                        <span class="tip-label">Dagens bibelord:</span>
+                                        <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="verse-link">${escapeHtml(versesText)}</a>
+                                    </div>
+                                    ` : ''}
                                     ${resourcesHtml}
                                 </div>
                             `;
@@ -1744,10 +1897,10 @@
                                 if (cb) {
                                     const dayItem = cb.closest('.day-item');
                                     if (dayItem) {
-                                        dayItem.style.border = '2px dashed var(--primary-orange)';
-                                        dayItem.style.backgroundColor = 'rgba(209, 125, 57, 0.04)';
-                                        dayItem.style.borderRadius = '12px';
-                                        dayItem.style.padding = '16px';
+                                        dayItem.style.border = isPrayerApp ? '2px dashed #bd4f2a' : '2px dashed var(--primary-orange)';
+                                        dayItem.style.backgroundColor = isPrayerApp ? 'rgba(189, 79, 42, 0.04)' : 'rgba(209, 125, 57, 0.04)';
+                                        dayItem.style.borderRadius = isPrayerApp ? '20px' : '12px';
+                                        dayItem.style.padding = isPrayerApp ? '32px' : '16px';
                                         dayItem.style.transition = 'all 0.3s ease';
                                         dayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     }
@@ -1783,7 +1936,9 @@
                                         // Update start-plan-btn text and link
                                         const startBtn = document.getElementById('start-plan-btn');
                                         if (startBtn) {
-                                            const btnText = lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett');
+                                            const btnText = isPrayerApp 
+                                                ? (lang === 'en' ? 'Open prayer' : (lang === 'es' ? 'Abrir oración' : 'Åpne dagens bønn'))
+                                                : (lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett'));
                                             const dayLabel = lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag');
                                             startBtn.style.whiteSpace = 'nowrap';
                                             startBtn.style.fontSize = '0.95rem';
@@ -1999,7 +2154,7 @@
 
                 return `
                     <div class="day-resources" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--border); padding-top: 12px; width: 100%;">
-                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px; text-align: left;">Ressurser:</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); width: 100%; display: block; margin-bottom: 4px; text-align: left;">${isPrayerApp ? 'Tilknyttet bønneressurs:' : 'Ressurser:'}</span>
                         ${items}
                     </div>
                 `;
