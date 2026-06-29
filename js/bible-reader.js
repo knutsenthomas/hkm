@@ -3006,20 +3006,12 @@ class BibleReader {
                     dayResourcesHtml = `<div style="font-size: 13px; color: var(--text-muted); padding: 4px 8px;">${tSec.noPlanResources}</div>`;
                 }
 
-                const prayerFocus = dayConfig.prayerFocus || tSec.defaultPrayer;
                 planResourcesHtml = `
                     <div class="hkm-resources-section" style="margin-bottom: 24px;">
                         <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 0;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">menu_book</span>
                             <span>${tSec.planResources}</span>
                         </h3>
-                        <div style="background: var(--active-bg); border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border-color);">
-                            <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--bible-primary); font-size: 11px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">favorite</span>
-                                <span>${tSec.prayerFocus}</span>
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-base); line-height: 1.4;">${prayerFocus}</div>
-                        </div>
                         <div class="day-resources-list" style="display: flex; flex-direction: column; gap: 4px;">
                             ${dayResourcesHtml}
                         </div>
@@ -4390,6 +4382,41 @@ class BibleReader {
     renderLeftSidebarDevotional(container, dayConfig) {
         container.innerHTML = '';
 
+        const lang = document.documentElement.lang || 'no';
+        const isPrayer = this.activePlanData && this.activePlanData.title && (
+            this.activePlanData.title.toLowerCase().includes('bønn') ||
+            this.activePlanData.title.toLowerCase().includes('prayer') ||
+            this.activePlanData.title.toLowerCase().includes('oración')
+        );
+
+        const titles = {
+            no: {
+                prayerFocus: isPrayer ? 'Bønnefokus' : 'Dagens andakt',
+                defaultPrayer: isPrayer ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.',
+                resources: 'Ressurser',
+                reflections: 'Dine refleksjoner',
+                placeholder: 'Skriv ned hva Gud talte til deg i dag...',
+                saveBtn: 'Lagre refleksjoner'
+            },
+            en: {
+                prayerFocus: isPrayer ? 'Prayer Focus' : 'Today\'s Devotional',
+                defaultPrayer: isPrayer ? 'Pray over the scriptures you read today.' : 'Reflect on the words you read today.',
+                resources: 'Resources',
+                reflections: 'Your Reflections',
+                placeholder: 'Write down what God spoke to you today...',
+                saveBtn: 'Save reflections'
+            },
+            es: {
+                prayerFocus: isPrayer ? 'Enfoque de oración' : 'Devocional de hoy',
+                defaultPrayer: isPrayer ? 'Ora por las escrituras que lees hoy.' : 'Reflexiona sobre las palabras que leíste hoy.',
+                resources: 'Recursos',
+                reflections: 'Tus reflexiones',
+                placeholder: 'Escribe lo que Dios te habló hoy...',
+                saveBtn: 'Guardar reflexiones'
+            }
+        };
+        const t = titles[lang] || titles['en'];
+
         const wrapper = document.createElement('div');
         wrapper.className = 'hkm-rp-sidebar-wrapper';
         container.appendChild(wrapper);
@@ -4399,10 +4426,10 @@ class BibleReader {
         prayerCard.className = 'hkm-rp-sidebar-card';
         prayerCard.innerHTML = `
             <div class="card-header">
-                <span class="material-symbols-outlined icon">favorite</span>
-                <h3>Bønnefokus</h3>
+                <span class="material-symbols-outlined icon">${isPrayer ? 'favorite' : 'menu_book'}</span>
+                <h3>${t.prayerFocus}</h3>
             </div>
-            <p>${dayConfig.prayerFocus || 'Be over skriftstedene du leser i dag.'}</p>
+            <p>${dayConfig.prayerFocus || t.defaultPrayer}</p>
         `;
         wrapper.appendChild(prayerCard);
 
@@ -4428,7 +4455,7 @@ class BibleReader {
             resourcesCard.innerHTML = `
                 <div class="card-header">
                     <span class="material-symbols-outlined icon">link</span>
-                    <h3>Ressurser</h3>
+                    <h3>${t.resources}</h3>
                 </div>
                 <div class="resources-list">
                     ${resourcesListHtml}
@@ -4446,11 +4473,11 @@ class BibleReader {
         reflectionCard.innerHTML = `
             <div class="card-header">
                 <span class="material-symbols-outlined icon">edit_note</span>
-                <h3>Dine refleksjoner</h3>
+                <h3>${t.reflections}</h3>
             </div>
-            <textarea id="rp-reflection-input" placeholder="Skriv ned hva Gud talte til deg i dag...">${currentReflection}</textarea>
+            <textarea id="rp-reflection-input" placeholder="${t.placeholder}">${currentReflection}</textarea>
             <button id="rp-save-reflection-btn" class="hkm-btn-complete" style="width: 100%; display: flex; justify-content: center; height: 38px !important; padding: 0 !important; font-size: 13px !important; border-radius: 8px !important;">
-                <span>Lagre refleksjoner</span>
+                <span>${t.saveBtn}</span>
             </button>
             <div id="rp-save-status" class="save-status"></div>
         `;
@@ -4461,15 +4488,23 @@ class BibleReader {
         const saveStatus = reflectionCard.querySelector('#rp-save-status');
 
         if (!this.currentUser) {
-            textarea.placeholder = "Logg inn på Min Side for å skrive og lagre refleksjoner permanent.";
+            textarea.placeholder = lang === 'no' 
+                ? "Logg inn på Min Side for å skrive og lagre refleksjoner permanent."
+                : lang === 'es'
+                    ? "Inicia sesión en Mi cuenta para escribir y guardar reflexiones de forma permanente."
+                    : "Log in to My Account to write and save reflections permanently.";
             textarea.disabled = true;
             saveBtn.disabled = true;
             saveBtn.style.opacity = '0.5';
-            saveStatus.innerText = "Gjestemodus - Refleksjoner er deaktivert.";
+            saveStatus.innerText = lang === 'no'
+                ? "Gjestemodus - Refleksjoner er deaktivert."
+                : lang === 'es'
+                    ? "Modo invitado - Las reflexiones están desactivadas."
+                    : "Guest mode - Reflections are disabled.";
         } else {
             saveBtn.onclick = async () => {
                 saveBtn.disabled = true;
-                saveStatus.innerText = "Lagrer...";
+                saveStatus.innerText = lang === 'no' ? "Lagrer..." : lang === 'es' ? "Guardando..." : "Saving...";
                 
                 try {
                     const text = textarea.value.trim();
@@ -4498,7 +4533,11 @@ class BibleReader {
                             // Add new note
                             await db.collection('personal_notes').add({
                                 userId: this.currentUser.uid,
-                                title: `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`,
+                                title: lang === 'no' 
+                                    ? `Leseplan: ${this.activePlanData.title} - Dag ${this.activePlanDay}`
+                                    : lang === 'es'
+                                        ? `Plan de lectura: ${this.activePlanData.title} - Día ${this.activePlanDay}`
+                                        : `Reading Plan: ${this.activePlanData.title} - Day ${this.activePlanDay}`,
                                 text: text,
                                 createdAt: this.getServerTimestamp(),
                                 isReadingPlanNote: true,
@@ -4511,11 +4550,11 @@ class BibleReader {
                         await this.loadNotes();
                     }
 
-                    saveStatus.innerText = "Lagret i dine notater!";
+                    saveStatus.innerText = lang === 'no' ? "Lagret i dine notater!" : lang === 'es' ? "¡Guardado en tus notas!" : "Saved in your notes!";
                     setTimeout(() => { saveStatus.innerText = ''; }, 3000);
                 } catch (err) {
                     console.error("Failed to save reflection:", err);
-                    saveStatus.innerText = "Kunne ikke lagre: " + err.message;
+                    saveStatus.innerText = (lang === 'no' ? "Kunne ikke lagre: " : lang === 'es' ? "No se pudo guardar: " : "Failed to save: ") + err.message;
                 } finally {
                     saveBtn.disabled = false;
                 }
