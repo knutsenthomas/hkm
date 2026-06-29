@@ -5013,7 +5013,9 @@ class BibleReader {
             
             const bpVideo = this.getBibleProjectVideo(this.selectedBookId, lang);
             if (bpVideo) {
-                const label = lang === 'no' ? 'Introduksjon til ' + this.selectedBookId : (lang === 'es' ? 'Introducción a ' + this.selectedBookId : 'Introduction to ' + this.selectedBookId);
+                const activeBook = this.books ? this.books.find(b => String(b.id) === String(this.selectedBookId)) : null;
+                const bookName = activeBook ? activeBook.name : this.selectedBookId;
+                const label = lang === 'no' ? 'Introduksjon til ' + bookName : (lang === 'es' ? 'Introducción a ' + bookName : 'Introduction to ' + bookName);
                 resourcesHtml += `
                     <div class="hkm-rp-sidebar-card no-stripe" style="margin: 0; padding: 0; box-shadow: none; border: none; overflow: hidden; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); margin-bottom: 8px;">
                         <div class="relative h-28 overflow-hidden group cursor-pointer" onclick="window.open('https://www.youtube.com/watch?v=${bpVideo.id}', '_blank')">
