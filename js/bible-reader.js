@@ -4149,17 +4149,6 @@ class BibleReader {
             .bible-theme-dark .hkm-rp-actions {
                 border-top-color: #333333;
             }
-            @media (max-width: 1350px) {
-                .hkm-rp-actions {
-                    justify-content: center;
-                    gap: 16px 12px;
-                }
-                .hkm-rp-day-navigator {
-                    width: 100%;
-                    justify-content: center;
-                    order: -1;
-                }
-            }
             .hkm-btn-complete {
                 background: linear-gradient(135deg, #d17d39, #bd4f2a);
                 color: white;
@@ -4187,6 +4176,24 @@ class BibleReader {
             .hkm-btn-complete.completed:hover {
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
             }
+            .hkm-complete-text-short, .hkm-back-text-short {
+                display: none;
+            }
+            @media (max-width: 1280px) {
+                .hkm-complete-text-full, .hkm-back-text-full {
+                    display: none;
+                }
+                .hkm-complete-text-short, .hkm-back-text-short {
+                    display: inline;
+                }
+                .hkm-rp-day-navigator .hkm-nav-btn span:not(.material-symbols-outlined) {
+                    display: none;
+                }
+                .hkm-rp-day-navigator {
+                    gap: 8px;
+                    padding: 6px 12px;
+                }
+            }
             @media (max-width: 600px) {
                 .hkm-rp-actions {
                     flex-direction: column-reverse;
@@ -4201,6 +4208,12 @@ class BibleReader {
                     justify-content: center;
                     width: 100%;
                     box-sizing: border-box;
+                }
+                .hkm-complete-text-full, .hkm-back-text-full {
+                    display: inline !important;
+                }
+                .hkm-complete-text-short, .hkm-back-text-short {
+                    display: none !important;
                 }
             }
             .hkm-rp-sidebar-wrapper {
@@ -4688,13 +4701,17 @@ class BibleReader {
             ? (lang === 'en' ? 'Active Prayer App' : (lang === 'es' ? 'Aplicación de oración activa' : 'Aktiv Bønneapp'))
             : (lang === 'en' ? 'Active Reading Plan' : (lang === 'es' ? 'Plan de Lectura Activo' : 'Aktiv Leseplan'));
 
-        const backLabel = isPrayerApp
+        const backLabelFull = isPrayerApp
             ? (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'))
             : (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'));
+        const backLabelShort = lang === 'en' ? 'Back' : (lang === 'es' ? 'Volver' : 'Tilbake');
 
-        const completeLabel = isCurrentDayCompleted 
+        const completeLabelFull = isCurrentDayCompleted 
             ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Day completed!' : (lang === 'es' ? '¡Día completado!' : 'Dag fullført!')))
-            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Mark day as completed' : (lang === 'es' ? 'Marcar día como completado' : 'Merk dag som fullført')));
+            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Mark day as completed' : (lang === 'es' ? 'Marcar día som completado' : 'Merk dag som fullført')));
+        const completeLabelShort = isCurrentDayCompleted
+            ? (isPrayerApp ? (lang === 'en' ? 'Prayed' : (lang === 'es' ? 'Orado' : 'Bedt')) : (lang === 'en' ? 'Completed' : (lang === 'es' ? 'Completado' : 'Fullført')))
+            : (isPrayerApp ? (lang === 'en' ? 'Pray' : (lang === 'es' ? 'Orar' : 'Bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Fullfør' : 'Fullfør')));
 
         const progressLabel = isPrayerApp
             ? (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'))
@@ -4733,7 +4750,8 @@ class BibleReader {
             <div class="hkm-rp-actions">
                 <a href="/leseplaner.html" class="hkm-nav-btn" style="padding-left: 0;">
                     <span class="material-symbols-outlined">arrow_back</span>
-                    <span>${backLabel}</span>
+                    <span class="hkm-back-text-full">${backLabelFull}</span>
+                    <span class="hkm-back-text-short">${backLabelShort}</span>
                 </a>
                 
                 <div class="hkm-rp-day-navigator">
@@ -4751,7 +4769,8 @@ class BibleReader {
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn" style="margin: 0;">
                         <span class="material-symbols-outlined">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                        <span>${completeLabel}</span>
+                        <span class="hkm-complete-text-full">${completeLabelFull}</span>
+                        <span class="hkm-complete-text-short">${completeLabelShort}</span>
                     </button>
                     
                     <button id="rp-header-toggle-btn" class="hkm-nav-btn" style="background: rgba(27, 73, 101, 0.05); padding: 8px; border-radius: 50%; min-width: unset; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px;">
