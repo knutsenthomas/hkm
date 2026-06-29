@@ -5343,28 +5343,6 @@ class BibleReader {
                         </button>
                     </div>
                 </div>
-                
-                <!-- Divider -->
-                <div class="hkm-rp-divider-v2"></div>
-                
-                <!-- Toolbelt -->
-                <div class="hkm-rp-toolbelt-v2">
-                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-trans">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
-                        <span>${lang === 'en' ? 'Translation' : (lang === 'es' ? 'Traducción' : 'Oversettelse')}</span>
-                        <select id="rp-toolbelt-trans-select" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;"></select>
-                    </button>
-                    
-                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-size">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
-                        <span>${lang === 'en' ? 'Text size' : (lang === 'es' ? 'Size' : 'Skriftstørrelse')}</span>
-                    </button>
-                    
-                    <button class="hkm-rp-toolbelt-btn-v2" id="rp-toolbelt-audio">
-                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">headphones</span>
-                        <span>${lang === 'en' ? 'Listen' : (lang === 'es' ? 'Escuchar' : 'Lytt')}</span>
-                    </button>
-                </div>
             </div>
         `;
 
