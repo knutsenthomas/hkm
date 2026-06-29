@@ -1784,6 +1784,9 @@ class BibleReader {
         // Restore bookmarks highlight
         this.restoreHighlights();
 
+        // Highlight reading plan verses if in plan mode
+        this.applyReadingPlanHighlights();
+
         // Inject Audio Play Button dynamically next to Lookup Chapter button
         if (this.dom.btnLookupChapter) {
             let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
@@ -2331,6 +2334,68 @@ class BibleReader {
                 }
             }
         });
+    }
+
+    parseVersesFromRef(refString) {
+        if (!refString) return [];
+        const parts = refString.split(':');
+        if (parts.length < 2) return []; // No verses specified (whole chapter)
+        
+        const versePart = parts[1].trim();
+        const verses = [];
+        
+        // Split by comma
+        const subparts = versePart.split(',');
+        for (const sub of subparts) {
+            const rangeMatch = sub.match(/(\d+)\s*[-–]\s*(\d+)/);
+            if (rangeMatch) {
+                const start = parseInt(rangeMatch[1], 10);
+                const end = parseInt(rangeMatch[2], 10);
+                for (let i = start; i <= end; i++) {
+                    verses.push(i);
+                }
+            } else {
+                const singleMatch = sub.match(/(\d+)/);
+                if (singleMatch) {
+                    verses.push(parseInt(singleMatch[1], 10));
+                }
+            }
+        }
+        return verses;
+    }
+
+    applyReadingPlanHighlights() {
+        if (!this.dom.readingPane) return;
+        
+        // Always clear previous plan highlights first
+        this.dom.readingPane.querySelectorAll('.plan-highlighted').forEach(el => {
+            el.classList.remove('plan-highlighted');
+        });
+
+        if (!this.activePlanMode || !this.activePlanData || !this.activePlanDay) return;
+
+        const dayConfig = this.activePlanData.days.find(d => d.dayNumber === this.activePlanDay);
+        if (!dayConfig || !dayConfig.verses) return;
+
+        // Parse book name and chapter number of the current day Config to make sure it matches the current view
+        const currentRef = this.getCurrentReferenceText().toLowerCase().replace(/[\.\s]/g, '');
+        const targetRef = dayConfig.verses.split(':')[0].toLowerCase().replace(/[\.\s]/g, '');
+        
+        if (currentRef !== targetRef) return; // Not the same book/chapter
+
+        const versesToHighlight = this.parseVersesFromRef(dayConfig.verses);
+        if (versesToHighlight.length === 0) return;
+
+        const paragraphs = this.dom.readingPane.querySelectorAll('p');
+        for (const p of paragraphs) {
+            const sup = p.querySelector('sup.v');
+            if (sup) {
+                const verseNum = parseInt(sup.innerText.trim(), 10);
+                if (versesToHighlight.includes(verseNum)) {
+                    p.classList.add('plan-highlighted');
+                }
+            }
+        }
     }
 
     addToHistory() {
@@ -4365,7 +4430,8 @@ class BibleReader {
 
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
-            this.showDayVerses(dayConfig.verses);
+            await this.showDayVerses(dayConfig.verses);
+            this.applyReadingPlanHighlights();
         }
     }
 

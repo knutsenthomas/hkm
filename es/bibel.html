@@ -523,8 +523,36 @@
             text-align: left;
         }
 
-        .bible-reading-pane p,
-        .bible-reading-pane p * {
+        /* Default to Verse-by-Verse (vanlig modus) */
+        .bible-reading-pane p {
+            display: block;
+            position: relative;
+            padding: 6px 12px;
+            margin: 0 0 8px 0;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+            font-size: var(--bible-font-size, inherit) !important;
+            line-height: 1.6;
+        }
+
+        .bible-reading-pane p.highlighted {
+            background: var(--highlight-bg);
+            border-radius: 8px;
+        }
+
+        .bible-reading-pane p.plan-highlighted {
+            background: var(--highlight-bg) !important;
+            border-radius: 8px;
+        }
+
+        .bible-reading-pane p:hover {
+            background: rgba(209, 125, 57, 0.05);
+        }
+
+        /* Løpende tekst (Paragraph layout) override */
+        .bible-reading-pane.layout-paragraph p,
+        .bible-reading-pane.layout-paragraph p * {
             display: inline;
             position: relative;
             padding: 2px 4px;
@@ -535,14 +563,20 @@
             box-decoration-break: clone;
             -webkit-box-decoration-break: clone;
             font-size: var(--bible-font-size, inherit) !important;
+            line-height: 1.8;
         }
-
-        .bible-reading-pane p.highlighted {
+        
+        .bible-reading-pane.layout-paragraph p.highlighted {
             background: var(--highlight-bg);
             border-radius: 4px;
         }
 
-        .bible-reading-pane p:hover {
+        .bible-reading-pane.layout-paragraph p.plan-highlighted {
+            background: var(--highlight-bg) !important;
+            border-radius: 4px;
+        }
+
+        .bible-reading-pane.layout-paragraph p:hover {
             background: rgba(209, 125, 57, 0.08);
         }
 
