@@ -3982,9 +3982,12 @@ class BibleReader {
                 border: 1px solid var(--border-color, #e2e8f0);
                 border-radius: 16px;
                 padding: 24px;
-                margin: 16px;
+                margin: 0 0 24px 0;
                 box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 100%;
+                max-width: 680px;
+                box-sizing: border-box;
             }
             .hkm-rp-header-card.collapsed {
                 padding: 12px 24px;
