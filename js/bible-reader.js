@@ -3985,8 +3985,6 @@ class BibleReader {
                 margin: 16px;
                 box-shadow: 0 4px 20px rgba(27, 73, 101, 0.05);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                container-type: inline-size;
-                container-name: rpcard;
             }
             .hkm-rp-header-card.collapsed {
                 padding: 12px 24px;
@@ -4178,25 +4176,7 @@ class BibleReader {
             .hkm-btn-complete.completed:hover {
                 box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
             }
-            .hkm-complete-text-short, .hkm-back-text-short {
-                display: none;
-            }
-            @container rpcard (max-width: 820px) {
-                .hkm-complete-text-full, .hkm-back-text-full {
-                    display: none;
-                }
-                .hkm-complete-text-short, .hkm-back-text-short {
-                    display: inline;
-                }
-                .hkm-rp-day-navigator .hkm-nav-btn span:not(.material-symbols-outlined) {
-                    display: none;
-                }
-                .hkm-rp-day-navigator {
-                    gap: 8px;
-                    padding: 6px 12px;
-                }
-            }
-            @container rpcard (max-width: 520px) {
+            @media (max-width: 600px) {
                 .hkm-rp-actions {
                     flex-direction: column-reverse;
                     align-items: stretch;
@@ -4210,12 +4190,6 @@ class BibleReader {
                     justify-content: center;
                     width: 100%;
                     box-sizing: border-box;
-                }
-                .hkm-complete-text-full, .hkm-back-text-full {
-                    display: inline !important;
-                }
-                .hkm-complete-text-short, .hkm-back-text-short {
-                    display: none !important;
                 }
             }
             .hkm-rp-sidebar-wrapper {
@@ -4703,17 +4677,11 @@ class BibleReader {
             ? (lang === 'en' ? 'Active Prayer App' : (lang === 'es' ? 'Aplicación de oración activa' : 'Aktiv Bønneapp'))
             : (lang === 'en' ? 'Active Reading Plan' : (lang === 'es' ? 'Plan de Lectura Activo' : 'Aktiv Leseplan'));
 
-        const backLabelFull = isPrayerApp
-            ? (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'))
-            : (lang === 'en' ? 'Back to overview' : (lang === 'es' ? 'Volver a la vista general' : 'Tilbake til oversikten'));
-        const backLabelShort = lang === 'en' ? 'Back' : (lang === 'es' ? 'Volver' : 'Tilbake');
+        const backLabel = lang === 'en' ? 'Back' : (lang === 'es' ? 'Volver' : 'Tilbake');
 
-        const completeLabelFull = isCurrentDayCompleted 
-            ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Day completed!' : (lang === 'es' ? '¡Día completado!' : 'Dag fullført!')))
-            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Mark day as completed' : (lang === 'es' ? 'Marcar día som completado' : 'Merk dag som fullført')));
-        const completeLabelShort = isCurrentDayCompleted
+        const completeLabel = isCurrentDayCompleted 
             ? (isPrayerApp ? (lang === 'en' ? 'Prayed' : (lang === 'es' ? 'Orado' : 'Bedt')) : (lang === 'en' ? 'Completed' : (lang === 'es' ? 'Completado' : 'Fullført')))
-            : (isPrayerApp ? (lang === 'en' ? 'Pray' : (lang === 'es' ? 'Orar' : 'Bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Fullfør' : 'Fullfør')));
+            : (isPrayerApp ? (lang === 'en' ? 'Pray' : (lang === 'es' ? 'Orar' : 'Marker bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
 
         const progressLabel = isPrayerApp
             ? (lang === 'en' ? 'Your progress' : (lang === 'es' ? 'Tu progreso' : 'Din fremgang'))
@@ -4752,27 +4720,23 @@ class BibleReader {
             <div class="hkm-rp-actions">
                 <a href="/leseplaner.html" class="hkm-nav-btn" style="padding-left: 0;">
                     <span class="material-symbols-outlined">arrow_back</span>
-                    <span class="hkm-back-text-full">${backLabelFull}</span>
-                    <span class="hkm-back-text-short">${backLabelShort}</span>
+                    <span>${backLabel}</span>
                 </a>
                 
                 <div class="hkm-rp-day-navigator">
-                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn">
+                    <button class="hkm-nav-btn prev" ${currentDayNum === 1 ? 'disabled' : ''} id="rp-prev-day-btn" style="padding: 6px 8px;">
                         <span class="material-symbols-outlined">chevron_left</span>
-                        <span>${lang === 'en' ? 'Prev' : (lang === 'es' ? 'Anterior' : 'Forrige')}</span>
                     </button>
                     <div class="hkm-nav-day-label">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} ${lang === 'en' ? 'of' : (lang === 'es' ? 'de' : 'av')} ${totalDays}</div>
-                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn">
-                        <span>${lang === 'en' ? 'Next' : (lang === 'es' ? 'Siguiente' : 'Neste')}</span>
+                    <button class="hkm-nav-btn next" ${currentDayNum === totalDays ? 'disabled' : ''} id="rp-next-day-btn" style="padding: 6px 8px;">
                         <span class="material-symbols-outlined">chevron_right</span>
                     </button>
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn" style="margin: 0;">
-                        <span class="material-symbols-outlined">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                        <span class="hkm-complete-text-full">${completeLabelFull}</span>
-                        <span class="hkm-complete-text-short">${completeLabelShort}</span>
+                    <button class="hkm-btn-complete ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn" style="margin: 0; padding: 10px 18px; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                        <span>${completeLabel}</span>
                     </button>
                     
                     <button id="rp-header-toggle-btn" class="hkm-nav-btn" style="background: rgba(27, 73, 101, 0.05); padding: 8px; border-radius: 50%; min-width: unset; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px;">
