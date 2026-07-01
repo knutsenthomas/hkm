@@ -2181,7 +2181,7 @@ body.hero-animate .slide-buttons {
     flex-shrink: 0;
 }
 
-.about-feature-text h4 {
+.about-feature-text h3, .about-feature-text h4 {
     font-size: 18px;
     font-weight: 700;
     color: #0F172A;
@@ -8201,7 +8201,7 @@ html[data-theme="dark"] .about-feature-icon-box {
     box-shadow: none !important;
 }
 
-html[data-theme="dark"] .about-feature-text h4 {
+html[data-theme="dark"] .about-feature-text h3, html[data-theme="dark"] .about-feature-text h4 {
     color: #f8fafc !important;
 }
 
