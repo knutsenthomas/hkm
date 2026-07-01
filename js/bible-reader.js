@@ -2935,7 +2935,7 @@ class BibleReader {
                         es: 'biblia línea de tiempo historia creación caída noé abrahán moisés david jesús iglesia'
                     },
                     link: lang === 'no' ? '/ressurser/bibelsk-tidslinje.html' : `/${lang}/ressurser/bibelsk-tidslinje.html`,
-                    thumbnail: '/img/bible-timeline-hero.png'
+                    thumbnail: '/img/bible-timeline-hero.webp'
                 },
                 {
                     id: 'tidslinje-imperier',
@@ -2950,7 +2950,7 @@ class BibleReader {
                         es: 'imperio línea de tiempo historia reinos babilonia persia grecia roma'
                     },
                     link: lang === 'no' ? '/ressurser/tidslinje-imperier.html' : `/${lang}/ressurser/tidslinje-imperier.html`,
-                    thumbnail: '/img/empires-hero.png'
+                    thumbnail: '/img/empires-hero.webp'
                 }
             ];
 
