@@ -116,7 +116,7 @@
                         <div class="blog-card">
                             <h3>${item.title}</h3>
                             <div class="blog-image">
-                                <img src="${item.imageUrl}" alt="${item.title}" onerror="this.style.border='5px solid red'; this.parentNode.innerHTML += '<br>BILDE FEILET: ' + this.src">
+                                <img src="${item.imageUrl}" alt="${item.title}" onerror="this.style.border='5px solid red'; this.parentNode.innerHTML += '<br loading="lazy">BILDE FEILET: ' + this.src">
                             </div>
                             <div class="debug-info">
                                 <strong>URL:</strong> <a href="${item.imageUrl}" target="_blank">${item.imageUrl}</a><br>

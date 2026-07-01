@@ -755,7 +755,7 @@
                 grid.innerHTML = plansList.map(plan => `
                     <div class="plan-card" data-id="${plan.id}">
                         <div class="plan-image-wrapper">
-                            <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}">
+                            <img src="${plan.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80'}" alt="${escapeHtml(plan.title)}" loading="lazy">
                             <span class="duration-badge">${plan.durationDays} días</span>
                         </div>
                         <div class="plan-content-wrapper">
@@ -808,7 +808,7 @@
                     <div class="footer-brand">
                         <a href="/es/" class="logo">
                             <div class="logo-icon">
-                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>

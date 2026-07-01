@@ -1180,7 +1180,7 @@ class ContentManager {
             return `
             <div class="cause-card">
                 <div class="cause-image">
-                    <img src="${imageUrl}" alt="${title}">
+                    <img src="${imageUrl}" alt="${title}" loading="lazy">
                     ${cause.tag ? `<span class="cause-tag">${cause.tag}</span>` : ''}
                 </div>
                 <div class="cause-content">
@@ -1623,7 +1623,7 @@ class ContentManager {
                                     <div class="blog-image cms-related-image">
                                         <img src="${this.getContentItemImage(post) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
                                              alt="${post.title}" 
-                                             class="cms-related-image-el">
+                                             class="cms-related-image-el" loading="lazy">
                                         ${post.category ? `<span class="cms-related-category">${post.category}</span>` : ''}
                                     </div>
                                     <div class="blog-content cms-related-content">
@@ -2236,7 +2236,7 @@ class ContentManager {
                         <a href="${detailsUrl}" class="event-card">
                             <div class="event-image">
                                 <div class="event-image-zoom">
-                                    <img src="${imageSrc}" alt="${imageAlt}">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
                                 </div>
                                 <div class="event-date">
                                     <span class="month">${monthUpper}</span>
@@ -2403,7 +2403,7 @@ class ContentManager {
         const testimonialsMarkup = testimonials.map((t, idx) => `
             <div class="testimonial-card ${idx === 0 ? 'active' : ''}">
                 <div class="testimonial-image">
-                    <img src="${t.imageUrl || 'https://via.placeholder.com/150'}" alt="${t.name}">
+                    <img src="${t.imageUrl || 'https://via.placeholder.com/150'}" alt="${t.name}" loading="lazy">
                 </div>
                 <p class="testimonial-text">"${t.text || ''}"</p>
                 <h4 class="testimonial-name">${t.name || ''}</h4>
@@ -2724,7 +2724,7 @@ class ContentManager {
             overlay.innerHTML = `
                 <div class="event-modal">
                     <div class="event-modal-image-wrap cms-hidden">
-                        <img class="event-modal-image" alt="">
+                        <img class="event-modal-image" alt="" loading="lazy">
                     </div>
                     <div class="event-modal-header">
                         <h3 class="event-modal-title"></h3>
@@ -3572,7 +3572,7 @@ class ContentManager {
                 return `
                 <article class="blog-card">
                     <div class="blog-image">
-                        <img src="${postImage}" alt="${post.title}">
+                        <img src="${postImage}" alt="${post.title}" loading="lazy">
                         ${post.category ? `<span class="blog-category cms-blog-category-badge">${post.category}</span>` : ''}
                     </div>
                     <div class="blog-content cms-blog-content">
@@ -3761,7 +3761,7 @@ class ContentManager {
                 const featuredMarkup = `
                     <article class="featured-post-card">
                         <div class="featured-image">
-                            <img src="${postImage}" alt="${featuredPost.title}">
+                            <img src="${postImage}" alt="${featuredPost.title}" loading="lazy">
                             ${categoryBadge}
                         </div>
                         <div class="featured-content">
@@ -3806,7 +3806,7 @@ class ContentManager {
             return `
                 <article class="blog-card" style="opacity: 0; transform: translateY(20px); animation: fadeInUp 0.5s ${delay}s forwards;">
                     <div class="blog-image">
-                        <img src="${postImage}" alt="${post.title}">
+                        <img src="${postImage}" alt="${post.title}" loading="lazy">
                         ${categoryBadge}
                     </div>
                     <div class="blog-content">
@@ -3859,7 +3859,7 @@ class ContentManager {
                 return `
                 <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card cms-media-card-link">
                     <div class="media-thumbnail">
-                        <img src="${itemImage}" alt="${item.title}">
+                        <img src="${itemImage}" alt="${item.title}" loading="lazy">
                         ${item.category ? `<span class="media-duration cms-media-duration-badge">${item.category}</span>` : ''}
                     </div>
                     <div class="media-content">
@@ -4173,7 +4173,7 @@ class ContentManager {
 
             return `
                 <div class="recent-event-item">
-                    <img src="${img}" alt="${event.title}" class="recent-event-img">
+                    <img src="${img}" alt="${event.title}" class="recent-event-img" loading="lazy">
                     <div class="recent-event-info">
                         <h4><a href="${this.getLocalizedLink('arrangement-detaljer.html')}?id=${key}">${event.title}</a></h4>
                         <span class="recent-event-date">${dateStr}</span>
@@ -4706,7 +4706,7 @@ class ContentManager {
                             const imageUrl = data?.file?.url || data?.url || '';
                             if (!imageUrl) return '';
                             const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
-                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}">${caption}</figure>`;
+                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}" loading="lazy">${caption}</figure>`;
                         }
                         case 'quote':
                             return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>${data.caption}</cite>` : ''}</blockquote>`;
