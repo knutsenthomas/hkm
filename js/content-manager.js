@@ -3543,7 +3543,7 @@ class ContentManager {
                         </div>
                         <h3 class="blog-title cms-blog-title">${post.title}</h3>
                         <p class="blog-excerpt cms-blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
-                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link cms-blog-link" aria-label="${this.getTranslation('read_more')} - ${post.title.replace(/"/g, '&quot;')}">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
                     </div>
                 </article>
             `;
@@ -3735,7 +3735,7 @@ class ContentManager {
                                 <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}">${featuredPost.title}</a>
                             </h2>
                             <p class="featured-excerpt">${this.generateExcerpt(featuredPost.content, featuredPost.title)}...</p>
-                            <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="featured-link">
+                            <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="featured-link" aria-label="${readMoreText} - ${featuredPost.title.replace(/"/g, '&quot;')}">
                                 ${readMoreText} <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
@@ -3778,7 +3778,7 @@ class ContentManager {
                         </div>
                         <h3 class="blog-title">${post.title}</h3>
                         <p class="blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
-                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link">
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link" aria-label="${readMoreText} - ${post.title.replace(/"/g, '&quot;')}">
                             ${readMoreText} <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
