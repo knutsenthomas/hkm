@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Podcast</title>
+  <desc id="desc">Illustrasjon av podcast med mikrofon, lydbolger og samtale.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#101417"/>
+      <stop offset="100%" stop-color="#18222a"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e7edf4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <circle cx="185" cy="185" r="120" fill="#d17d39" opacity="0.12"/>
+  <circle cx="645" cy="820" r="150" fill="#d17d39" opacity="0.08"/>
+  <rect x="100" y="135" width="600" height="730" rx="44" fill="#162028" stroke="#2b3a45" stroke-width="2"/>
+  <rect x="145" y="188" width="510" height="624" rx="34" fill="url(#panel)"/>
+  <g>
+    <rect x="340" y="300" width="120" height="210" rx="60" fill="#d17d39"/>
+    <rect x="380" y="495" width="40" height="120" rx="20" fill="#1b252d"/>
+    <rect x="320" y="615" width="160" height="26" rx="13" fill="#1b252d"/>
+    <path d="M278 402c0 66 54 120 122 120s122-54 122-120" fill="none" stroke="#1b252d" stroke-linecap="round" stroke-width="22"/>
+    <path d="M235 402c0 90 74 164 165 164s165-74 165-164" fill="none" stroke="#d17d39" stroke-linecap="round" stroke-width="14" opacity="0.8"/>
+    <path d="M195 402c0 112 92 204 205 204s205-92 205-204" fill="none" stroke="#ced7e2" stroke-linecap="round" stroke-width="10"/>
+  </g>
+  <g fill="#c3ced9">
+    <rect x="210" y="700" width="70" height="58" rx="16"/>
+    <rect x="300" y="676" width="70" height="82" rx="16"/>
+    <rect x="390" y="642" width="70" height="116" rx="16"/>
+    <rect x="480" y="688" width="70" height="70" rx="16"/>
+    <rect x="570" y="718" width="40" height="40" rx="12"/>
+  </g>
+  <g>
+    <rect x="205" y="225" width="176" height="18" rx="9" fill="#d17d39" opacity="0.9"/>
+    <rect x="205" y="254" width="290" height="14" rx="7" fill="#c8d0d9"/>
+    <rect x="205" y="278" width="245" height="14" rx="7" fill="#c8d0d9"/>
+  </g>
+</svg>

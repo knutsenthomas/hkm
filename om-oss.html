@@ -2,83 +2,439 @@
 <html lang="no">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/om-oss">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/om-oss">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/about">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/sobre-nosotros">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/om-oss">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Om Oss | His Kingdom Ministry</title>
+    <title>Om Oss | Visjon & Team | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Lær mer om His Kingdom Ministry, vår visjon om å utruste mennesker til et dypere liv med Gud, og møt teamet bak tjenesten.">
+    <meta name="keywords" content="om oss, visjon, team, His Kingdom Ministry, Hilde Karin Knutsen, Thomas Knutsen, Mandal">
+    
+    <!-- Internationalization -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/om-oss">
+    <meta property="og:title" content="Om Oss | His Kingdom Ministry">
+    <meta property="og:description" content="Møt teamet og les om vår visjon for å spre Guds rike.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/om-oss">
+    <meta property="twitter:title" content="Om Oss | His Kingdom Ministry">
+    <meta property="twitter:description" content="Lær mer om hvem vi er og hva vi gjør.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
 
     <!-- Google Fonts: Inter for hele siden -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome (Deferred) -->
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"></noscript>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2026.04.22.09.36">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
 
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Loader Safety Net -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
-                    }
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
                 }
-            }
-        }
+            }, 4000);
+        })();
     </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+        
+    <link rel="stylesheet" href="css/search-v2.css?v=1.0.3">
+    <style>
+        /* ===================================
+           Premium Design Overrides for Om Oss
+           =================================== */
+
+        /* 1. Hero Section */
+        .page-hero.subpage-hero {
+            background-attachment: scroll !important;
+            padding: 140px 0 100px 0 !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .page-hero.subpage-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(209, 125, 57, 0.15) 0%, transparent 60%) !important;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 2. Circular Image video block */
+        .about-image {
+            position: relative !important;
+        }
+        .circular-image {
+            border: 8px solid var(--bg-white, #ffffff) !important;
+            box-shadow: 0 30px 60px -15px rgba(27, 73, 101, 0.18) !important;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-image:hover .circular-image {
+            transform: scale(1.02) !important;
+        }
+        .play-button {
+            width: 72px !important;
+            height: 72px !important;
+            font-size: 22px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 12px 28px rgba(189, 79, 42, 0.35) !important;
+        }
+        .play-button::before {
+            background: rgba(189, 79, 42, 0.3) !important;
+            animation: pulse-ring 2s infinite !important;
+        }
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+        }
+
+        /* 3. About Features (Oppdrag / Historie) */
+        .about-feature-item {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            border-radius: 18px !important;
+            padding: 20px !important;
+            box-shadow: 0 10px 30px -15px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-feature-item:hover {
+            background: #ffffff !important;
+            border-color: rgba(209, 125, 57, 0.25) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 16px 36px -12px rgba(27, 73, 101, 0.08) !important;
+        }
+        .about-feature-icon-box {
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            color: #ffffff !important;
+            font-size: 18px !important;
+            box-shadow: 0 6px 14px rgba(189, 79, 42, 0.2) !important;
+        }
+        .about-feature-text h4 {
+            color: #1B4965 !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+        }
+        .about-feature-text p {
+            color: #475569 !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        /* 4. Hva Vi Står For Value Cards */
+        .vision-values {
+            background: linear-gradient(to bottom, #f8fafc, #ffffff) !important;
+            padding: 100px 0 !important;
+        }
+        .values-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+            gap: 28px !important;
+            margin-top: 60px !important;
+        }
+        .value-card {
+            text-align: left !important;
+            padding: 40px 32px !important;
+            border-radius: 24px !important;
+            background: #ffffff !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 10px 35px -12px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d17d39, #bd4f2a);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .value-card:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 24px 48px -15px rgba(27, 73, 101, 0.12) !important;
+            border-color: rgba(27, 73, 101, 0.12) !important;
+        }
+        .value-card:hover::before {
+            opacity: 1;
+        }
+        .value-icon {
+            margin: 0 0 24px 0 !important;
+            width: 56px !important;
+            height: 56px !important;
+            background: linear-gradient(135deg, #1B4965, #2c6e95) !important;
+            border-radius: 14px !important;
+            font-size: 22px !important;
+            box-shadow: 0 8px 20px rgba(27, 73, 101, 0.15) !important;
+            color: #ffffff !important;
+        }
+        .value-card:nth-child(even) .value-icon {
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 8px 20px rgba(189, 79, 42, 0.15) !important;
+        }
+        .value-card h3 {
+            font-size: 19px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 14px !important;
+            letter-spacing: -0.02em !important;
+        }
+        .value-card p {
+            font-size: 14.5px !important;
+            line-height: 1.65 !important;
+            color: #475569 !important;
+            margin: 0 !important;
+        }
+
+        /* 5. Team Section */
+        .team-section {
+            padding: 100px 0 !important;
+        }
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+            gap: 32px !important;
+            margin-top: 60px !important;
+        }
+        .team-member {
+            background: #ffffff !important;
+            border-radius: 28px !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 12px 40px -15px rgba(27, 73, 101, 0.04) !important;
+            padding: 40px 32px !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+        .team-member:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 24px 50px -15px rgba(27, 73, 101, 0.08) !important;
+            border-color: rgba(209, 125, 57, 0.15) !important;
+        }
+        .team-image {
+            width: 148px !important;
+            height: 148px !important;
+            border-radius: 50% !important;
+            border: 6px solid #ffffff !important;
+            box-shadow: 0 10px 25px rgba(27, 73, 101, 0.08) !important;
+            margin-bottom: 24px !important;
+            overflow: hidden !important;
+            transition: transform 0.4s ease !important;
+        }
+        .team-member:hover .team-image {
+            transform: scale(1.03) !important;
+        }
+        .team-name {
+            font-size: 21px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 6px !important;
+        }
+        .team-role {
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #bd4f2a !important;
+            margin-bottom: 20px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+        }
+        .team-bio {
+            font-size: 14.5px !important;
+            line-height: 1.7 !important;
+            color: #475569 !important;
+            text-align: left !important;
+            margin-top: 0 !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
+            padding-top: 20px !important;
+        }
+        .team-toggle {
+            background: rgba(189, 79, 42, 0.06) !important;
+            border: none !important;
+            color: #bd4f2a !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            margin-top: 16px !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            transition: all 0.2s !important;
+        }
+        .team-toggle:hover {
+            background: #bd4f2a !important;
+            color: #ffffff !important;
+        }
+        .team-social {
+            margin-top: 24px !important;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 16px !important;
+        }
+        .team-social a {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            background: #f8fafc !important;
+            border: 1px solid rgba(0, 0, 0, 0.02) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #475569 !important;
+            font-size: 15px !important;
+            transition: all 0.25s ease !important;
+        }
+        .team-social a:hover {
+            background: #1B4965 !important;
+            color: #ffffff !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 12px rgba(27, 73, 101, 0.15) !important;
+        }
+        .team-social a[href*="instagram"]:hover {
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7) !important;
+        }
+        .team-social a[href*="youtube"]:hover {
+            background: #ff0000 !important;
+        }
+        .team-social a[href*="facebook"]:hover {
+            background: #1877f2 !important;
+        }
+    </style>
 </head>
 
 <body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
-            id="header-container">
+        <div class="header-content" id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
-                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
                 </div>
-                <span class="text-xl">His Kingdom Ministry</span>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Søk i nettsiden">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Les Bibelen" title="Les Bibelen">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Leseplaner" title="Leseplaner">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span data-content-doc="settings_global" data-content-key="header.currentLanguage">NO</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                                    Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                                    English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                                    data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                                    Español</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <a href="donasjoner.html"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/donasjoner"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -86,29 +442,39 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Søk..."
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="om-oss.html" class="text-sm font-bold text-primary-orange">NO</a>
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="en/about.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="es/sobre-nosotros.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -118,56 +484,178 @@
                 <div class="mega-menu-grid">
                     <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</div>
                         <ul class="mega-nav-list">
-                            <li><a href="donasjoner.html">Støtt arbeidet</a></li>
-                            <li><a href="bli-fast-giver.html">Bli fast giver</a></li>
-                            <li><a href="for-menigheter.html">For menigheter</a></li>
-                            <li><a href="for-bedrifter.html">For bedrifter</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a>
+                                    <span class="mega-menu-desc">Bidra økonomisk til vår tjeneste.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/bli-fast-giver" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a>
+                                    <span class="mega-menu-desc">Støtt oss månedlig for langsiktig arbeid.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-menigheter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For menigheter</a>
+                                    <span class="mega-menu-desc">Ressurser og undervisning for din kirke.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/for-bedrifter" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For bedrifter</a>
+                                    <span class="mega-menu-desc">Samarbeidsavtaler for næringslivet.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Nettverk for kristne ledere og gründere.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</div>
                         <ul class="mega-nav-list">
-                            <li><a href="om-oss.html">Om oss</a></li>
-                            <li><a href="kontakt.html">Kontakt oss</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Om oss</a>
+                                    <span class="mega-menu-desc">Lær mer om vår visjon, tro og verdier.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Kontakt oss</a>
+                                    <span class="mega-menu-desc">Send oss en melding eller still spørsmål.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Ressurser & Media -->
+                    <!-- Column 3: Ressurser -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Ressurser</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</div>
                         <ul class="mega-nav-list">
-                            <li><a href="arrangementer.html">Arrangementer</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blogg.html">Nyheter & Blogg</a></li>
-                            <li><a href="minside/index.html">Min Side</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a>
+                                    <span class="mega-menu-desc">Les Guds ord med vår bibelleser.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Butikk</a>
+                                    <span class="mega-menu-desc">Kristne klær, kopper og tilbehør.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Se taler og lytt til våre podcaster.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a>
+                                    <span class="mega-menu-desc">Undervisning og kurs for vekst.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Aktuell aktivitet -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Aktuell aktivitet</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a>
+                                    <span class="mega-menu-desc">Følg våre daglige leseplaner.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Arrangementer</a>
+                                    <span class="mega-menu-desc">Bli med på seminarer og samlinger.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/blogg" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a>
+                                    <span class="mega-menu-desc">Siste oppdateringer og artikler.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index.html" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Min Side</a>
+                                    <span class="mega-menu-desc">Din profil og leseplaner.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block">Støtt nå <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
-                        <a href="om-oss.html">Om oss</a>
-                        <a href="personvern.html">Personvern</a>
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Page Hero -->
     <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
-        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-        <div>
+        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;">
+        <div class="container">
             <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">Om Oss</h1>
             <p class="page-hero-subtitle" data-content-key="hero.subtitle">Lær mer om vår visjon, oppdrag og historie
             </p>
@@ -180,9 +668,9 @@
             <div class="about-grid">
                 <div class="about-image">
                     <div class="circular-image">
-                        <img src="https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg"
-                            alt="Hilde og Thomas">
-                        <a class="play-button" href="https://www.youtube.com/watch?v=Z3jXbw0yC5E" target="_blank"
+                        <img data-content-key="intro.image" data-content-attr="src" src="https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg"
+                            alt="Hilde og Thomas" loading="lazy">
+                        <a data-content-key="intro.videoUrl" data-content-attr="href" class="play-button" href="https://www.youtube.com/watch?v=Z3jXbw0yC5E" target="_blank"
                             rel="noopener" aria-label="Se video om His Kingdom Ministry">
                             <i class="fas fa-play"></i>
                         </a>
@@ -190,13 +678,41 @@
                 </div>
 
                 <div class="about-content">
-                    <span class="section-label" data-content-key="intro.label">Velkommen til Fellesskapet</span>
-                    <h2 class="section-title" data-content-key="intro.title">Vi er en Non-Profit Organisasjon</h2>
+                    <div class="about-label-wrapper">
+                        <span class="section-label" data-content-key="intro.label">Velkommen til fellesskapet</span>
+                    </div>
+                    <h2 class="section-title" data-content-key="intro.title">Vi er en Non-profit organisasjon</h2>
                     <p class="section-text" data-content-key="intro.text">His Kingdom Ministry driver med åndelig
                         samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å
                         være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.</p>
 
-                    <a href="kontakt.html" class="btn btn-primary">Kontakt oss</a>
+                    <div class="about-features">
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon-box">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="about-feature-text">
+                                <h3 data-content-key="about.features.mission.title">Vårt oppdrag</h3>
+                                <p data-content-key="about.features.mission.text">Å utruste og inspirere mennesker til
+                                    et dypere liv med Gud gjennom undervisning,
+                                    fellesskap og bønn.</p>
+                            </div>
+                        </div>
+
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon-box">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="about-feature-text">
+                                <h3 data-content-key="about.features.story.title">Vår historie</h3>
+                                <p data-content-key="about.features.story.text">Startet med en visjon om å samle
+                                    mennesker i åndelig vekst, har vi vokst til et
+                                    levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/kontakt" class="btn btn-primary" data-content-key="intro.btnText">Kontakt oss</a>
                 </div>
             </div>
         </div>
@@ -207,10 +723,42 @@
         <div class="container">
             <div class="section-header center">
                 <span class="section-label" data-content-key="values.label">Om oss</span>
-                <h2 class="section-title" data-content-key="values.title">Hva Vi Står For</h2>
+                <h2 class="section-title" data-content-key="values.title">Vår Historie & Fundament</h2>
             </div>
-            <p class="section-description" data-content-key="values.bible.text">Vi forankrer alt vi gjør i Guds ord og
-                søker å leve etter Bibelens prinsipper.</p>
+            <div class="values-grid">
+                <!-- Card 1: Fundament -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-bible"></i>
+                    </div>
+                    <h3>Vårt fundament</h3>
+                    <p>His Kingdom Ministry fokuserer på misjon, å utruste de hellige, bibelundervisning, bønn, forbønn, helbredelse og utfrielse, samt å vokse i de profetiske nådegavene. Alt vi gjør skal være basert på bibelske standarder og Guds ledelse.</p>
+                </div>
+                <!-- Card 2: Historien bak -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Historien bak</h3>
+                    <p>Hilde Karin startet med misjon og bibelsmugling som 14-åring, og har vært misjonær i Midtøsten, Afrika og Spania. I mai 2022 kalte Gud henne hjem, der hun møtte Thomas. De giftet seg 2. desember 2023. Thomas har 16 år i kirkeadministrasjon/regnskap. Sammen har de besøkt 9 land for å nå de tapte.</p>
+                </div>
+                <!-- Card 3: Tjeneste 2.0 -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-level-up-alt"></i>
+                    </div>
+                    <h3>Tjeneste 2.0</h3>
+                    <p>Før Hilde Karin møtte Thomas, drev hun <i>His Kingdom Foundation</i>, som hun fikk navnet på i bønn i 2008. <i>His Kingdom Ministry</i> ble registrert under bryllupsreisen som en «2.0-oppgradering», fundert på Guds rikes prinsipper, bibelske standarder og Guds ledelse.</p>
+                </div>
+                <!-- Card 4: Creative Work -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>His Kingdom Designs</h3>
+                    <p>Vi driver nettbutikken <i>His Kingdom Designs</i> med gaver og evangeliseringsprodukter på norsk, engelsk og spansk. Butikken finansierer tjenesten. Hilde Karin designer produktene, Thomas er webdesigner. Vår visjon er å løfte frem andre designere og velsigne mange!</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -218,19 +766,20 @@
     <section class="team-section">
         <div class="container">
             <div class="section-header center">
-                <span class="section-label">Vårt team</span>
-                <h2 class="section-title">Møt hjertene bak His Kingdom Ministry</h2>
+                <span class="section-label" data-content-key="team.label">Vårt team</span>
+                <h2 class="section-title" data-content-key="team.title">Møt hjertene bak His Kingdom Ministry</h2>
             </div>
 
             <div class="team-grid">
                 <div class="team-member">
                     <div class="team-image">
-                        <img src="img/Hilde%20Karin%20Knutsen.jpg" alt="Hilde Karin Knutsen">
+                        <img data-content-key="team.hilde.image" data-content-attr="src" src="img/Hilde%20Karin%20Knutsen.jpg" class="team-photo-focus-hilde" alt="Hilde Karin Knutsen" loading="lazy">
                     </div>
                     <div class="team-info">
-                        <h3 class="team-name">Hilde Karin Knutsen</h3>
-                        <p class="team-role">Profetisk forbeder og underviser</p>
-                        <p class="team-bio">Velkommen til siden min. Jeg heter Hilde Karin. Jeg er gift med Thomas. Vi
+                        <h3 class="team-name" data-content-key="team.hilde.name">Hilde Karin Knutsen</h3>
+                        <p class="team-role" data-content-key="team.hilde.role">Profetisk forbeder og underviser</p>
+                        <p class="team-bio" data-content-key="team.hilde.bio">Velkommen til siden min. Jeg heter Hilde
+                            Karin. Jeg er gift med Thomas. Vi
                             bor i Norge. Jeg har reist som misjonær og profetisk forbeder mer enn halve livet mitt. Ved
                             Guds nåde, gjennom Bibelens prinsipper og ved Den Hellige Ånds ledelse er jeg en profetisk
                             stemme klar til å hjelpe deg å vokse i ditt personlige forhold til Jesus Kristus og utruste
@@ -242,13 +791,13 @@
                             klarere og se bønnene dine besvart.</p>
                         <button class="team-toggle" type="button">Les mer</button>
                         <div class="team-social">
-                            <a href="https://www.instagram.com/freedomisathand/" aria-label="Instagram"><i
+                            <a data-content-key="team.hilde.instagram" data-content-attr="href" href="https://www.instagram.com/freedomisathand/" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO"
+                            <a data-content-key="team.hilde.facebook" data-content-attr="href" href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO"
                                 aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" aria-label="YouTube"><i
+                            <a data-content-key="team.hilde.youtube" data-content-attr="href" href="https://www.youtube.com/@HisKingdomMinistry" aria-label="YouTube"><i
                                     class="fab fa-youtube"></i></a>
-                            <a href="https://www.tiktok.com/@hilde707" aria-label="TikTok"><i
+                            <a data-content-key="team.hilde.tiktok" data-content-attr="href" href="https://www.tiktok.com/@hilde707" aria-label="TikTok"><i
                                     class="fab fa-tiktok"></i></a>
                         </div>
                     </div>
@@ -256,28 +805,99 @@
 
                 <div class="team-member">
                     <div class="team-image">
-                        <img src="img/Thomas.jpeg" class="team-photo-focus" alt="Thomas Knutsen">
+                        <img data-content-key="team.thomas.image" data-content-attr="src" src="img/Thomas.jpeg" class="team-photo-focus" alt="Thomas Knutsen" loading="lazy">
                     </div>
                     <div class="team-info">
-                        <h3 class="team-name">Thomas Knutsen</h3>
-                        <p class="team-role">Daglig leder og Lovsang</p>
-                        <p class="team-bio">Hei og velkommen til siden vår. Vi er så glade for at du kom inn på vår
+                        <h3 class="team-name" data-content-key="team.thomas.name">Thomas Knutsen</h3>
+                        <p class="team-role" data-content-key="team.thomas.role">Daglig leder og Lovsang</p>
+                        <p class="team-bio" data-content-key="team.thomas.bio">Hei og velkommen til siden vår. Vi er så
+                            glade for at du kom inn på vår
                             tjenesteside. Jeg har ikke reist rundt i verden. Jeg har jobbet og bodd stort sett i samme
                             by hele livet. Jeg jobbet i samme kirke i 15 år før jeg møtte Hilde. Vi koblet sammen med en
-                            gang og er så velsignet at Gud forente livene våre sammen. Jeg har jobbet i mange
+                            gang og er så velsignet at Gud forente livene våre sammen. Jeg har jobbet i many
                             forskjellige avdelinger i kirken, som barn, ungdom, gudstjeneste og administrasjon. Jeg har
                             vært tilbedelsesleder siden jeg var 15 år gammel og elsker å tilbe Gud. Jeg er ansvarlig for
                             alt teknisk i hans rikes tjeneste fra nettside til redigering av video og podcast. Jeg tror
                             at Gud vil forandre mange liv gjennom denne tjenesten.</p>
                         <button class="team-toggle" type="button">Les mer</button>
                         <div class="team-social">
-                            <a href="https://www.instagram.com/tkdesignandmusic/" aria-label="Instagram"><i
+                            <a data-content-key="team.thomas.instagram" data-content-attr="href" href="https://www.instagram.com/tkdesignandmusic/" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.facebook.com/thomas.knutsen.75/?locale=nb_NO" aria-label="Facebook"><i
-                                    class="fab fa-facebook-f"></i></a>
+                            <a data-content-key="team.thomas.facebook" data-content-attr="href" href="https://www.facebook.com/thomas.knutsen.75/?locale=nb_NO"
+                                aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Showcase Section -->
+    <section class="shop-showcase py-16 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
+        <div class="container max-w-6xl mx-auto px-4">
+            <div class="section-header center mb-12">
+                <span class="section-label" data-content-key="shop.showcase.label">His Kingdom Designs</span>
+                <h2 class="section-title text-[#1B4965]" data-content-key="shop.showcase.title">Kreative produkter for troen</h2>
+                <p class="section-description mt-2" data-content-key="shop.showcase.subtitle">Besøk vår nettbutikk for å se hele utvalget av gaver, kunst og verktøy til evangelisering.</p>
+            </div>
+            
+            <div id="latest-designs-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=500&q=80" alt="Gave og Trosprodukter" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <span class="absolute top-4 right-4 bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Mest Populær</span>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product1.title">Evangeliseringsprodukter</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product1.desc">Vakre kort, plakater og gaver designet for å dele evangeliet på en naturlig og innbydende måte.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Se produkter <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 2 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=500&q=80" alt="Bøker og Notater" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product2.title">Notatbøker & Rekvisita</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product2.desc">Stilrene notatbøker og studiesett for bibelstudie, bønn og personlige refleksjoner.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Se produkter <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 3 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=500&q=80" alt="Dekor og Design" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <span class="absolute top-4 right-4 bg-[#1B4965] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Unik</span>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product3.title">Bibelvers Plakater</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product3.desc">Moderne vegghandverk og kunstplakater med bibelvers på norsk, engelsk og spansk.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Se produkter <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-300">
+                    <span data-content-key="shop.showcase.btn">Besøk His Kingdom Designs</span>
+                    <i class="fas fa-shopping-bag"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -286,11 +906,13 @@
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
-                <h2>Bli Med i Fellesskapet</h2>
-                <p>Vi ønsker å være et sted der du kan vokse i din tro og oppleve Guds nærvær.</p>
+                <h2 data-content-key="cta.title">Bli Med i Fellesskapet</h2>
+                <p data-content-key="cta.text">Vi ønsker å være et sted der du kan vokse i din tro og oppleve Guds
+                    nærvær.</p>
                 <div class="cta-buttons">
-                    <a href="arrangementer.html" class="btn btn-primary">Se arrangementer</a>
-                    <a href="kontakt.html" class="btn btn-primary">Kontakt oss</a>
+                    <a href="/arrangementer" class="btn btn-primary" data-content-key="cta.btn1">Se
+                        arrangementer</a>
+                    <a href="/kontakt" class="btn btn-primary" data-content-key="cta.btn2">Kontakt oss</a>
                 </div>
             </div>
         </div>
@@ -304,57 +926,88 @@
                 <div class="footer-left">
                     <!-- Brand / Intro -->
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/" class="logo">
                             <div class="logo-icon">
-                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt" loading="lazy">
                             </div>
-                            <span class="logo-text">His Kingdom Ministry</span>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
                             åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
                     </div>
 
                     <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Om oss</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
                             <ul>
-                                <li><a href="index.html#hjem">Hjem</a></li>
-                                <li><a href="om-oss.html">Om oss</a></li>
-                                <li><a href="om-oss.html#visjon">Vår visjon</a></li>
-                                <li><a href="kontakt.html">Kontakt oss</a></li>
+                                <li><a href="/" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Ressurser</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Undervisning</a></li>
-                                <li><a href="arrangementer.html">E-kurs</a></li>
-                                <li><a href="blogg.html">Bøker & Blogg</a></li>
-                                <li><a href="minside/index.html">Min Side</a></li>
+                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
+                                <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
+                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Media</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videoer</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Involvering</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
                             <ul>
-                                <li><a href="arrangementer.html">Kalender</a></li>
-                                <li><a href="donasjoner.html">Gi en gave</a></li>
-                                <li><a href="personvern.html">Personvern</a></li>
-                                <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
-                                <li><a href="#"
-                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="/personvern" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
                                 </li>
                             </ul>
                         </div>
@@ -365,38 +1018,46 @@
                 <div class="footer-right">
                     <!-- Follow Us Card -->
                     <div class="footer-card">
-                        <h3>Følg oss</h3>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank" aria-label="Facebook"><i
                                     class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
                                     class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
-                        <h3>Kontakt oss</h3>
-                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h3>
+                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong>E-post:</strong>
-                                <p>post@hiskingdomministry.no</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Telefon:</strong>
-                                <p>+47 930 94 615</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Vipps:</strong>
-                                <p>938361</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Konto nr.:</strong>
-                                <p>3000.66.08759</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -404,28 +1065,133 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
-                <a href="admin/login.html" class="admin-link">Admin</a>
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
             </div>
         </div>
     </footer>
 
     <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-    <!-- Firebase Config & Service -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/firebase-service.js"></script>
 
     <!-- App Scripts -->
-    <script type="module" src="script.js"></script>
-    <script src="js/notifications.js"></script>
+    <script type="module" src="script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="js/notifications.js"></script>
     <script type="module" src="js/i18n.js"></script>
-    <script type="module" src="js/content-manager.js?v=author"></script>
     <script type="module" src="js/cookie-consent.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Hva leter du etter? Skriv for forslag..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Trykk 'Enter' for fullstendig søk.</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Video Lightbox Modal -->
+    <div id="video-lightbox" class="video-lightbox" aria-hidden="true" role="dialog">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content-wrapper">
+            <button class="lightbox-close" aria-label="Lukk video">&times;</button>
+            <div class="lightbox-video-container">
+                <iframe id="lightbox-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lightbox video player logic
+            const playButton = document.querySelector('.play-button');
+            const lightbox = document.getElementById('video-lightbox');
+            const iframe = document.getElementById('lightbox-iframe');
+            const closeBtn = document.querySelector('.lightbox-close');
+            const overlay = document.querySelector('.lightbox-overlay');
+
+            if (playButton && lightbox && iframe) {
+                const videoUrl = playButton.getAttribute('href');
+                
+                // Extract video ID from youtube URL
+                let videoId = '';
+                if (videoUrl.includes('v=')) {
+                    videoId = videoUrl.split('v=')[1].split('&')[0];
+                } else if (videoUrl.includes('youtu.be/')) {
+                    videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+                }
+
+                if (videoId) {
+                    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                    
+                    playButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        iframe.setAttribute('src', embedUrl);
+                        lightbox.classList.add('active');
+                        lightbox.setAttribute('aria-hidden', 'false');
+                        document.body.style.overflow = 'hidden';
+                    });
+                }
+            }
+
+            const closeLightbox = () => {
+                if (lightbox && iframe) {
+                    lightbox.classList.remove('active');
+                    lightbox.setAttribute('aria-hidden', 'true');
+                    iframe.setAttribute('src', '');
+                    document.body.style.overflow = '';
+                }
+            };
+
+            if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+            if (overlay) overlay.addEventListener('click', closeLightbox);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeLightbox();
+            });
+
+            // Accessibility upgrades for team toggle buttons
+            const teamMembers = document.querySelectorAll('.team-member');
+            teamMembers.forEach(member => {
+                const btn = member.querySelector('.team-toggle');
+                const bio = member.querySelector('.team-bio');
+                if (btn && bio) {
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Vis mer biografi');
+                    
+                    const updateAria = () => {
+                        const isExpanded = member.classList.contains('expanded');
+                        btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                        btn.setAttribute('aria-label', isExpanded ? 'Vis mindre biografi' : 'Vis mer biografi');
+                    };
+
+                    btn.addEventListener('click', () => {
+                        setTimeout(updateAria, 50);
+                    });
+                    
+                    const name = member.querySelector('.team-name');
+                    const img = member.querySelector('.team-image');
+                    if (name) name.addEventListener('click', () => setTimeout(updateAria, 50));
+                    if (img) img.addEventListener('click', () => setTimeout(updateAria, 50));
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

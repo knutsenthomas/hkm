@@ -155,7 +155,7 @@ class FirebaseService {
 
     async getUserRole(uid) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const fallbackSuperadmins = ['thomas@hiskingdomministry.no'];
+        const fallbackSuperadmins = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
         const currentUser = this.auth && this.auth.currentUser ? this.auth.currentUser : null;
         if (currentUser && fallbackSuperadmins.includes((currentUser.email || '').toLowerCase())) {
             return 'superadmin';

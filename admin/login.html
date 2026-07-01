@@ -2,6 +2,35 @@
 <html lang="no">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyTheme(theme) {
+                const active = theme || (mq.matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', active);
+            }
+            applyTheme(savedTheme);
+            if (!savedTheme) {
+                try {
+                    mq.addEventListener('change', function () {
+                        if (!localStorage.getItem('hkm_theme')) {
+                            applyTheme();
+                        }
+                    });
+                } catch (err) {
+                    try {
+                        mq.addListener(function () {
+                            if (!localStorage.getItem('hkm_theme')) {
+                                applyTheme();
+                            }
+                        });
+                    } catch (e2) {}
+                }
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logg inn | HKM Admin</title>
@@ -27,6 +56,26 @@
             --card-bg: #ffffff;
             --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
+
+        html[data-theme="dark"] {
+            --main-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        html[data-theme="dark"] .form-control {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .form-control::placeholder {
+            color: #64748b;
+        }
+
 
         * {
             margin: 0;
@@ -143,24 +192,92 @@
             display: none;
         }
     </style>
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module">
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            const hostname = window.location.hostname;
+            const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
+            if (!isLocalDev) return;
+
+            window.addEventListener('load', async () => {
+                try {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.allSettled(regs.map((reg) => reg.unregister()));
+                    if (window.caches && typeof caches.keys === 'function') {
+                        const keys = await caches.keys();
+                        await Promise.allSettled(
+                            keys.filter((key) => key.startsWith('hkm-admin-')).map((key) => caches.delete(key))
+                        );
                     }
+                    console.info('[HKM] Local admin service workers/caches cleared');
+                } catch (err) {
+                    console.warn('[HKM] Could not clear local admin service worker cache:', err);
                 }
-            }
-        }
+            });
+        })();
     </script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <!-- Admin PWA -->
+    <link rel="manifest" href="/admin/manifest.webmanifest">
+    <meta name="theme-color" content="#cc6f2c">
+    <meta name="application-name" content="HKM Admin">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="HKM Admin">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+    <script type="module" src="js/admin-pwa.js?v=20260520_PWA2"></script>
+
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+    <style>
+        .sidebar-nav *, 
+        .mobile-bottom-nav .mobile-nav-item, 
+        .mobile-bottom-nav .mobile-nav-item *, 
+        .nav-link, 
+        .nav-link-wrap, 
+        .nav-item, 
+        .mobile-nav-item, 
+        .mobile-nav-item *,
+        .mega-menu *,
+        .mega-nav-list *,
+        .mega-nav-list a,
+        .menu-footer-links a,
+        #mega-menu a,
+        .header a,
+        #header a {
+            border-bottom: none !important;
+            border-bottom-width: 0px !important;
+            border-bottom-color: transparent !important;
+            border-top: none !important;
+            border-top-width: 0px !important;
+            border-top-color: transparent !important;
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-image: none !important;
+        }
+    </style>
 </head>
 
-<body>
+<body class="cms-loading">
     <div class="login-card">
         <span class="material-symbols-outlined logo-icon">dashboard_customize</span>
         <h1 class="login-title">Velkommen tilbake</h1>
@@ -168,14 +285,14 @@
 
         <div id="error-box" class="error-message">Feil e-post eller passord. Vennegod forsøk igjen.</div>
 
-        <form id="login-form">
+        <form id="login-form" method="post" action="">
             <div class="form-group">
                 <label>E-post</label>
-                <input type="email" id="email" class="form-control" placeholder="thomas@hiskingdomministry.no" required>
+                <input type="email" id="email" name="email" autocomplete="username" class="form-control" placeholder="knutsenthomas@gmail.com" required>
             </div>
             <div class="form-group">
                 <label>Passord</label>
-                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                <input type="password" id="password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn-login">Logg inn</button>
             <div style="margin: 20px 0; display: flex; align-items: center; color: var(--text-muted); font-size: 13px;">
@@ -190,19 +307,17 @@
             </button>
         </form>
 
-        <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
+        <a href="/" class="back-link">Tilbake til nettsiden</a>
     </div>
 
-    <script src="../js/notifications.js"></script>
+    <script type="module" src="../js/notifications.js"></script>
+    <script type="module" src="../js/admin-utils.js?v=20260602_V3"></script>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-    <!-- Firebase Config & Service -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
     <script type="module" src="../js/user-roles.js"></script>
 
     <!-- Auth Logic -->
@@ -214,22 +329,38 @@
                     const service = window.firebaseService;
                     const user = firebase.auth().currentUser;
                     if (!user || !service) {
-                        window.location.href = 'index.html';
+                        window.location.href = '/admin/index.html';
                         return;
                     }
 
                     let role = 'medlem';
+                    let roleLookupFailed = false;
                     try {
-                        role = await service.getUserRole(user.uid);
+                        role = await service.getUserRole(user.uid, { timeoutMs: 2500 });
                     } catch (err) {
+                        roleLookupFailed = true;
                         console.warn('Kunne ikke hente rolle:', err);
+                        if (typeof showToast === 'function') {
+                            showToast('Innlogging er OK, men rolleverifisering er treg. Åpner admin og prøver igjen der.', 'warning', 4500);
+                        }
                     }
 
-                    const canAccessAdmin = window.HKM_PERMISSIONS
-                        && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                        && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+                    if (roleLookupFailed) {
+                        // Let admin dashboard perform the final RBAC check to avoid false "medlem" redirects on slow Firestore.
+                        window.location.href = '/admin/index.html';
+                        return;
+                    }
 
-                    window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
+                    const adminUtils = window.HKMAdminUtils || {};
+                    const canAccessAdmin = typeof adminUtils.isElevatedAdminRole === 'function'
+                        ? adminUtils.isElevatedAdminRole(role)
+                        : ['admin', 'superadmin'].includes(String(role || '').toLowerCase());
+
+                    if (!canAccessAdmin && typeof adminUtils.pushFlashNotice === 'function') {
+                        adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
+                    }
+
+                    window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
                 }
 
                 const loginForm = document.getElementById('login-form');
@@ -278,22 +409,49 @@
                 const googleBtn = document.getElementById('google-login');
                 if (googleBtn) {
                     googleBtn.addEventListener('click', async () => {
+                        const adminUtils = window.HKMAdminUtils || {};
                         const service = window.firebaseService;
                         if (!service || !service.isInitialized) {
                             showToast("⚠️ Tjenesten er ikke klar!", "error");
                             return;
                         }
 
-                        try {
-                            await service.loginWithGoogle();
-                            await routeByRole();
-                        } catch (err) {
-                            console.error("[HKM] Google login error:", err);
+                        const loginFlow = async () => {
+                            try {
+                                await service.loginWithGoogle();
+                                await routeByRole();
+                            } catch (err) {
+                                 console.error("[HKM] Google login error:", err);
+                                 if (typeof showToast === 'function') {
+                                     let msg = 'Kunne ikke logge inn med Google. Prøv igjen.';
+                                     if (err.code === 'auth/unauthorized-domain') {
+                                         msg = 'Denne domenen (vercel.app) er ikke lagt til i "Authorized Domains" i Firebase Console. Kontakt administrator.';
+                                     } else if (err.code === 'auth/popup-closed-by-user') {
+                                         msg = 'Innloggingsvinduet ble lukket før fullføring.';
+                                     }
+                                     showToast(msg, 'error', 7000);
+                                 }
+                            }
+                        };
+
+                        if (typeof adminUtils.withButtonLoading === 'function') {
+                            await adminUtils.withButtonLoading(googleBtn, loginFlow, { loadingText: 'Logger inn...' });
+                        } else {
+                            const originalText = googleBtn.innerHTML;
+                            googleBtn.disabled = true;
+                            googleBtn.innerHTML = 'Logger inn...';
+                            try {
+                                await loginFlow();
+                            } finally {
+                                googleBtn.disabled = false;
+                                googleBtn.innerHTML = originalText;
+                            }
                         }
                     });
                 }
             })();
     </script>
+    
 </body>
 
 </html>

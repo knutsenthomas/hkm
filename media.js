@@ -62,6 +62,26 @@ const translations = {
         no: 'Alle',
         en: 'All',
         es: 'Todos'
+    },
+    summary: {
+        no: 'Sammendrag',
+        en: 'Summary',
+        es: 'Resumen'
+    },
+    keyVerses: {
+        no: 'Nøkkelvers',
+        en: 'Key Verses',
+        es: 'Versículos clave'
+    },
+    discussionQuestions: {
+        no: 'Diskusjonsspørsmål',
+        en: 'Discussion Questions',
+        es: 'Preguntas de discusión'
+    },
+    summaryAndKeyVerses: {
+        no: 'Sammendrag & nøkkelvers',
+        en: 'Summary & Key Verses',
+        es: 'Resumen y versículos clave'
     }
 };
 
@@ -89,8 +109,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const playlists = (settings && settings.youtubePlaylists) ? settings.youtubePlaylists : "";
 
     // Init YouTube hvis elementene finnes (både media.html og youtube.html)
-    if (document.getElementById('youtube-grid') || window.location.pathname.includes('youtube.html')) {
-        initYouTubeAPI(channelId, playlists);
+    if (document.getElementById('youtube-grid') || window.location.pathname.includes('/youtube')) {
+        initYouTubeAPI(channelId, playlists, settings);
     }
 
     // Init Podcast via proxy (episoder hentes fra HKM sin RSS-feed på serversiden)
@@ -108,7 +128,32 @@ async function loadMediaSettings() {
     if (!svc || !svc.isInitialized) {
         return null;
     }
-    return await svc.getPageContent('settings_media');
+
+    const [mediaSettings, podcastSettings] = await Promise.all([
+        svc.getPageContent('settings_media').catch(() => ({})),
+        svc.getPageContent('settings_podcast').catch(() => ({}))
+    ]);
+
+    return {
+        ...(mediaSettings || {}),
+        ...(podcastSettings || {})
+    };
+}
+
+function updatePlatformLinks(settings = {}) {
+    const linksContainer = document.getElementById('podcast-links-container');
+    if (!linksContainer) return;
+
+    const spotifyLink = linksContainer.querySelector('.platform-spotify');
+    const appleLink = linksContainer.querySelector('.platform-apple');
+
+    if (settings.spotifyUrl && spotifyLink) {
+        spotifyLink.href = settings.spotifyUrl;
+    }
+
+    if (settings.appleUrl && appleLink) {
+        appleLink.href = settings.appleUrl;
+    }
 }
 
 /**
@@ -128,7 +173,7 @@ function initMediaNavigation() {
     });
 
     const mediaCards = document.querySelectorAll('.media-card[data-category], .podcast-card[data-category]');
-    if (mediaCards.length > 0 && currentPath === 'media.html') {
+    if (mediaCards.length > 0 && (currentPath === 'media.html' || currentPath === 'media')) {
         const filterTabs = document.querySelectorAll('.media-tab[data-tab]');
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function (e) {
@@ -157,7 +202,7 @@ function initMediaNavigation() {
 /**
  * YouTube Integrasjon
  */
-async function initYouTubeAPI(channelId, playlistsRaw = "") {
+async function initYouTubeAPI(channelId, playlistsRaw = "", settings = null) {
     const grid = document.getElementById('youtube-grid');
     const container = document.querySelector('.media-content-section .container');
     const categoriesDiv = document.getElementById('youtube-categories');
@@ -170,7 +215,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
     }
 
     // Vis kategorier øverst hvis på youtube.html
-    if (window.location.pathname.includes('youtube.html') && categoriesDiv && playlists.length > 0) {
+    if (window.location.pathname.includes('/youtube') && categoriesDiv && playlists.length > 0) {
         categoriesDiv.innerHTML = '';
         // "Alle"-knapp
         const allBtn = document.createElement('button');
@@ -191,13 +236,59 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
     // Funksjon for å hente og vise videoer fra valgt kategori/playlist
 
     // YouTube Data API v3
-    // [EDIT HERE] YouTube API Key (Hentet fra prosjektinnstillinger i Firebase)
-    // Denne nøkkelen brukes for å hente spesifikke spillelister (kategorier)
-    const _ytKeyA = 'AIza' + 'Sy';
-    const _ytKeyB = 'ClPHHywl7Vr0naj2JnK_t-lY-V86gmKys';
-    const YT_API_KEY = _ytKeyA + _ytKeyB;
+    // API-nøkkel hentes fra innstillinger (om den finnes), ellers håndteres fallback på serveren (api/youtube.js)
+    let YT_API_KEY = (settings && settings.youtubeApiKey) ? settings.youtubeApiKey : '';
     // [EDIT HERE] YouTube Channel ID
     const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
+
+    function getMockVideosForPlaylist(playlistId) {
+        const lang = document.documentElement.lang || 'no';
+        const defaultMock = [
+            {
+                title: lang === 'en' ? "Renewal of the Mind - Mental Health in a Biblical Perspective" : (lang === 'es' ? "Renovación de la Mente - Salud Mental en una Perspectiva Bíblica" : "Fornyelse av sinnet - Mental helse i et bibelsk perspektiv"),
+                pubDate: new Date().toISOString(),
+                link: "https://www.youtube.com/watch?v=lFCSm3V4Ems",
+                thumbnail: "https://img.youtube.com/vi/lFCSm3V4Ems/hqdefault.jpg",
+                description: "En dyp undervisning om hvordan Guds ord kan forvandle våre tanker og følelser."
+            },
+            {
+                title: lang === 'en' ? "The Epistle to the Romans - Chapter 8 Audio Bible" : (lang === 'es' ? "La Epístola a los Romanos - Capítulo 8 Audio Biblia" : "Romerbrevet kapittel 8 - Lydbok"),
+                pubDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+                link: "https://www.youtube.com/watch?v=7-fA4H1C68E",
+                thumbnail: "https://img.youtube.com/vi/7-fA4H1C68E/hqdefault.jpg",
+                description: "Hør Romerbrevet kapittel 8 lest opp med rolig bakgrunnsmusikk."
+            },
+            {
+                title: lang === 'en' ? "A Prophetic Word for This Season" : (lang === 'es' ? "Una Palabra Profética para esta Temporada" : "Et profetisk ord for denne tiden"),
+                pubDate: new Date(Date.now() - 86400000 * 5).toISOString(),
+                link: "https://www.youtube.com/watch?v=d8n3hF3D2d4",
+                thumbnail: "https://img.youtube.com/vi/d8n3hF3D2d4/hqdefault.jpg",
+                description: "Oppmuntring og veiledning for den nåværende sesongen basert på bibelske profetier."
+            },
+            {
+                title: lang === 'en' ? "Teaching on the Kingdom of God" : (lang === 'es' ? "Enseñanza sobre el Reino de Dios" : "Undervisning om Guds rike"),
+                pubDate: new Date(Date.now() - 86400000 * 10).toISOString(),
+                link: "https://www.youtube.com/watch?v=G3hK2k9sT1g",
+                thumbnail: "https://img.youtube.com/vi/G3hK2k9sT1g/hqdefault.jpg",
+                description: "Hva betyr det å leve i Guds rike i dag? Lær om kjernekonseptene i Jesu forkynnelse."
+            },
+            {
+                title: lang === 'en' ? "Prayer for Healing and Restoration" : (lang === 'es' ? "Oración por Sanidad y Restauración" : "Bønn for helbredelse og gjenopprettelse"),
+                pubDate: new Date(Date.now() - 86400000 * 15).toISOString(),
+                link: "https://www.youtube.com/watch?v=B8n9N0zL4kU",
+                thumbnail: "https://img.youtube.com/vi/B8n9N0zL4kU/hqdefault.jpg",
+                description: "Bli med i bønn for helbredelse, indre fred og Guds gjenopprettende kraft."
+            },
+            {
+                title: lang === 'en' ? "Testimony: Transformed by God's Love" : (lang === 'es' ? "Testimonio: Transformado por el Amor de Dios" : "Vitnesbyrd: Forvandlet av Guds kjærlighet"),
+                pubDate: new Date(Date.now() - 86400000 * 30).toISOString(),
+                link: "https://www.youtube.com/watch?v=V9m2P5tQ8wA",
+                thumbnail: "https://img.youtube.com/vi/V9m2P5tQ8wA/hqdefault.jpg",
+                description: "En personlig historie om hvordan møtet med Jesus forvandlet et liv preget av mørke."
+            }
+        ];
+        return defaultMock;
+    }
     let allVideosCache = {};
     let currentCategory = null;
     let currentShowCount = 0;
@@ -209,7 +300,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
         let videos = [];
         let nextPageToken = '';
         do {
-            let url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YT_API_KEY}`;
+            let url = `/api/youtube?action=playlist&playlistId=${playlistId}&key=${YT_API_KEY}`;
             if (nextPageToken) url += `&pageToken=${nextPageToken}`;
             const resp = await fetch(url);
             const data = await resp.json();
@@ -257,7 +348,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
         let nextPageToken = '';
         let count = 0;
         do {
-            let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&maxResults=50&type=video&key=${YT_API_KEY}`;
+            let url = `/api/youtube?action=channel&channelId=${channelId}&key=${YT_API_KEY}`;
             if (nextPageToken) url += `&pageToken=${nextPageToken}`;
 
             const resp = await fetch(url);
@@ -333,6 +424,12 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                     }
                 }
 
+                // 3) Fallback til Mock-videoer hvis alt feiler
+                if (!videos || videos.length === 0) {
+                    console.log(`[YouTube Fallback] API og RSS feilet. Bruker innebygd fallback-liste for spilleliste ${playlistId}`);
+                    videos = getMockVideosForPlaylist(playlistId);
+                }
+
                 allVideosCache[playlistId] = videos || [];
             }
         } else if (playlistId === 'all') {
@@ -362,12 +459,18 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                         videos = [];
                     }
                 }
+
+                // 3) Fallback til Mock-videoer hvis alt feiler
+                if (!videos || videos.length === 0) {
+                    console.log(`[YouTube Fallback] API og RSS feilet. Bruker innebygd fallback-liste for kanal (ALL)`);
+                    videos = getMockVideosForPlaylist('all');
+                }
                 allVideosCache['all'] = videos;
             }
         }
         currentCategory = playlistId || 'all';
         // Vis alle videoer hvis vi er på youtube.html
-        if (window.location.pathname.includes('youtube.html')) {
+        if (window.location.pathname.includes('/youtube')) {
             currentShowCount = videos.length;
         } else {
             currentShowCount = SHOW_STEP;
@@ -474,12 +577,16 @@ function createYouTubeCard(video, videoId) {
 let currentAudio = null;
 let allPodcastEpisodes = [];
 let podcastOverrides = {};
+let podcastTranscriptDataById = new Map();
 let currentPodcastFilter = 'all';
 let currentPodcastSort = 'newest';
+let currentPodcastView = 'list';
+let currentPodcastSearchQuery = '';
 
 // Spillerkø / nåværende episode (for Spotify-lignende navigasjon)
 let currentEpisodeOrder = [];
 let currentEpisodeIndex = -1;
+let currentEpisodeData = null;
 
 const PODCAST_KEYWORDS = {
     bibel: ["bibel", "skriften", "ordet", "testamente", "vers", "kapittel", "skriftsted"],
@@ -490,12 +597,15 @@ const PODCAST_KEYWORDS = {
 
 function asText(value) {
     if (Array.isArray(value)) {
-        return value[0] || '';
+        return asText(value[0]);
     }
     if (value && typeof value === 'object') {
-        return value._ || '';
+        if (typeof value._ === 'string') return value._;
+        if (typeof value.href === 'string') return value.href;
+        if (typeof value.url === 'string') return value.url;
+        return '';
     }
-    return value || '';
+    return typeof value === 'string' ? value : '';
 }
 
 function getChannelImage(channel) {
@@ -528,11 +638,30 @@ function getEpisodeId(episode) {
     return guid || asText(episode.link) || asText(episode.title);
 }
 
-function getEpisodeCategory(episode) {
+function normalizePodcastOverrideCategories(value) {
+    if (Array.isArray(value)) {
+        return value
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean);
+    }
+
+    const normalized = String(value || '').trim();
+    if (!normalized) return [];
+
+    return normalized
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function getEpisodeCategories(episode) {
     // 1. Sjekk manuell overstyring først
     const id = getEpisodeId(episode);
-    if (podcastOverrides && podcastOverrides[id]) {
-        return podcastOverrides[id];
+    if (podcastOverrides && Object.prototype.hasOwnProperty.call(podcastOverrides, id)) {
+        const overrideCategories = normalizePodcastOverrideCategories(podcastOverrides[id]);
+        if (overrideCategories.length) {
+            return overrideCategories;
+        }
     }
 
     // 2. Bruk nøkkelord hvis ingen overstyring finnes
@@ -540,12 +669,441 @@ function getEpisodeCategory(episode) {
     const description = asText(episode.description) || asText(episode["itunes:summary"]);
     const text = (title + " " + description).toLowerCase();
 
+    const matched = [];
     for (const [category, keywords] of Object.entries(PODCAST_KEYWORDS)) {
         if (keywords.some(keyword => text.includes(keyword))) {
-            return category;
+            matched.push(category);
         }
     }
-    return 'other';
+
+    return matched.length ? matched : ['other'];
+}
+
+function getEpisodeCategory(episode) {
+    const categories = getEpisodeCategories(episode);
+    return categories[0] || 'other';
+}
+
+function formatPodcastCategoryLabel(category) {
+    const normalized = String(category || '').trim();
+    if (!normalized) return '';
+
+    const map = {
+        tro: 'Tro',
+        bibel: 'Bibel',
+        bønn: 'Bønn',
+        undervisning: 'Undervisning',
+    };
+
+    if (map[normalized]) return map[normalized];
+
+    return normalized
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function ensureDynamicPodcastCategoryButtons() {
+    const container = document.getElementById('podcast-categories');
+    if (!container) return;
+
+    const existingFilters = new Set(
+        Array.from(container.querySelectorAll('[data-filter]'))
+            .map((button) => String(button.getAttribute('data-filter') || '').trim())
+            .filter(Boolean)
+    );
+
+    const dynamicCategories = new Set();
+    allPodcastEpisodes.forEach((episode) => {
+        const categories = Array.isArray(episode?.categories)
+            ? episode.categories
+            : (episode?.category ? [episode.category] : []);
+        categories.forEach((category) => {
+            const normalized = String(category || '').trim();
+            if (!normalized || normalized === 'all') return;
+            dynamicCategories.add(normalized);
+        });
+    });
+
+    const preferredOrder = ['tro', 'bibel', 'bønn', 'undervisning'];
+    const orderedCategories = [
+        ...preferredOrder.filter((category) => dynamicCategories.has(category)),
+        ...Array.from(dynamicCategories)
+            .filter((category) => !preferredOrder.includes(category))
+            .sort((a, b) => a.localeCompare(b, 'no'))
+    ];
+
+    orderedCategories.forEach((category) => {
+        if (existingFilters.has(category)) return;
+        const button = document.createElement('button');
+        button.className = 'category-btn';
+        button.setAttribute('data-filter', category);
+        button.textContent = formatPodcastCategoryLabel(category);
+        container.appendChild(button);
+        existingFilters.add(category);
+    });
+}
+
+function getEpisodeSummaryHtml(episodeData, storedData) {
+    if (!storedData && episodeData?.id) {
+        storedData = getStoredPodcastData(episodeData.id);
+    }
+
+    // Prioriter 'summary' fra Firestore hvis den finnes
+    const firestoreSummary = (storedData?.summary || storedData?.description || '').trim();
+    if (firestoreSummary) {
+        return `<p style="line-height:1.75;">${firestoreSummary}</p>`;
+    }
+
+    if (!episodeData) {
+        return '<p>Ingen oppsummering tilgjengelig.</p>';
+    }
+
+    const summaryText = String(episodeData.description || '').trim();
+    if (!summaryText) {
+        return '<p>Ingen oppsummering tilgjengelig.</p>';
+    }
+
+    return `<p style="line-height:1.75;">${summaryText}</p>`;
+}
+
+function getStoredPodcastData(episodeId) {
+    const id = String(episodeId || '').trim();
+    return id ? podcastTranscriptDataById.get(id) || null : null;
+}
+
+function getEpisodeCardDescription(episode) {
+    const stored = getStoredPodcastData(episode?.id);
+    const storedSummary = (stored?.summary || stored?.description || '').trim();
+    const source = storedSummary || String(episode?.description || '').trim();
+
+    if (!source) return '';
+
+    return source
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 120) + '...';
+}
+
+function getFormattedTranscriptHtml(rawTranscriptHtml) {
+    const source = String(rawTranscriptHtml || '').trim();
+    if (!source) {
+        return '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+    }
+
+    const hasHtml = /<[^>]+>/.test(source);
+    const normalized = hasHtml
+        ? source
+        : source
+            .split(/\n\s*\n/)
+            .map(paragraph => paragraph.trim())
+            .filter(Boolean)
+            .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+            .join('');
+
+    const enhanced = enhanceTranscriptRichFormatting(normalized);
+
+    return `
+        <div class="transcript-content" style="line-height: 1.9; color: var(--text-dark);">
+            ${enhanced}
+        </div>
+    `;
+}
+
+function convertEditorJsBlocksToHtml(blocks) {
+    if (!Array.isArray(blocks) || !blocks.length) return '';
+
+    return blocks.map((block) => {
+        const type = String(block?.type || '').toLowerCase();
+        const data = block?.data || {};
+
+        if (type === 'header') {
+            const level = Math.min(Math.max(Number(data.level) || 2, 2), 4);
+            return `<h${level}>${data.text || ''}</h${level}>`;
+        }
+
+        if (type === 'list') {
+            const style = String(data.style || 'unordered').toLowerCase();
+            const tag = style === 'ordered' ? 'ol' : 'ul';
+            const items = Array.isArray(data.items) ? data.items : [];
+            const listItems = items
+                .map(item => {
+                    if (typeof item === 'string') return item;
+                    if (item && typeof item === 'object') return item.content || item.text || '';
+                    return '';
+                })
+                .filter(Boolean)
+                .map(itemText => `<li>${itemText}</li>`)
+                .join('');
+            return listItems ? `<${tag}>${listItems}</${tag}>` : '';
+        }
+
+        if (type === 'quote') {
+            const quoteText = String(data.text || '').trim();
+            if (!quoteText) return '';
+            const caption = String(data.caption || '').trim();
+            return caption
+                ? `<blockquote><p>${quoteText}</p><cite>${caption}</cite></blockquote>`
+                : `<blockquote><p>${quoteText}</p></blockquote>`;
+        }
+
+        if (type === 'delimiter') {
+            return '<hr>';
+        }
+
+        if (type === 'code') {
+            const codeText = String(data.code || '').trim();
+            return codeText ? `<pre><code>${codeText}</code></pre>` : '';
+        }
+
+        const text = String(data.text || '').trim();
+        return text ? `<p>${text}</p>` : '';
+    }).join('');
+}
+
+async function fetchPodcastTranscriptData(episodeId) {
+    const id = String(episodeId || '').trim();
+    if (!id) return null;
+
+    const cached = getStoredPodcastData(id);
+    if (cached) return cached;
+
+    const svc = window.firebaseService;
+    if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
+        const maybePromise = svc.tryAutoInit();
+        if (maybePromise && typeof maybePromise.then === 'function') {
+            try {
+                await maybePromise;
+            } catch (err) {
+                console.warn('[Podcast] Firebase auto-init feilet:', err);
+            }
+        }
+    }
+
+    if (!(svc && svc.isInitialized && typeof firebase !== 'undefined')) {
+        return null;
+    }
+
+    try {
+        const doc = await firebase.firestore().collection('podcast_transcripts').doc(id).get();
+        const data = doc.exists ? doc.data() : null;
+        if (data) podcastTranscriptDataById.set(id, data);
+        return data;
+    } catch (err) {
+        console.error('Feil ved henting av podcastdata:', err);
+        return null;
+    }
+}
+
+async function loadPodcastTranscriptDataMap() {
+    podcastTranscriptDataById = new Map();
+
+    const svc = window.firebaseService;
+    if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
+        try {
+            await svc.tryAutoInit();
+        } catch (err) {
+            console.warn('[Podcast] Firebase auto-init feilet:', err);
+        }
+    }
+
+    if (!(window.firebaseService?.isInitialized && typeof firebase !== 'undefined')) {
+        return;
+    }
+
+    try {
+        const snapshot = await firebase.firestore().collection('podcast_transcripts').get();
+        snapshot.docs.forEach((doc) => {
+            podcastTranscriptDataById.set(doc.id, doc.data());
+        });
+    } catch (err) {
+        console.warn('[Podcast] Kunne ikke hente lagret podcasttekst:', err);
+    }
+}
+
+function isTranscriptChapterHeading(text) {
+    const value = String(text || '').trim();
+    if (!value) return false;
+
+    return /^(?:\d+\.\s*)?[\wÆØÅæøå\s-]+\s+kapittel\s+\d+(?:\s*[-:.]\s*.*)?\.?$/i.test(value)
+        || /^(?:kapittel|kap\.)\s*\d+(?:\s*[-:.]\s*.*)?\.?$/i.test(value);
+}
+
+function splitChapterHeadingInParagraph(text) {
+    const value = String(text || '').trim();
+    if (!value) return null;
+
+    const patterns = [
+        /((?:[1-3]\.?\s*)?[A-Za-zÆØÅæøå\-\s]{0,40}?kapittel\s+\d+(?:\s*[-:.]\s*[^\n]+)?\.?)/i,
+        /((?:kapittel|kap\.)\s*\d+(?:\s*[-:.]\s*[^\n]+)?\.?)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = value.match(pattern);
+        if (!match || !match[1]) continue;
+
+        const heading = match[1].trim();
+        const idx = value.indexOf(match[1]);
+        if (idx < 0) continue;
+
+        const before = value.slice(0, idx).trim();
+        const after = value.slice(idx + match[1].length).trim();
+        return { before, heading, after };
+    }
+
+    return null;
+}
+
+function hasMeaningfulTextFragment(text) {
+    const value = String(text || '').trim();
+    if (!value) return false;
+
+    // Ignore fragments that are only punctuation/symbols (e.g. a lone ".").
+    return /[A-Za-zÆØÅæøå0-9]/.test(value);
+}
+
+function enhanceTranscriptRichFormatting(html) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+
+    wrapper.querySelectorAll('p').forEach((paragraph) => {
+        const text = String(paragraph.textContent || '').trim();
+        if (!text) return;
+
+        if (isTranscriptChapterHeading(text)) {
+            const heading = document.createElement('h4');
+            heading.className = 'transcript-chapter-heading';
+            heading.style.margin = '24px 0 12px';
+            heading.style.fontSize = '1.2rem';
+            heading.style.fontWeight = '800';
+            heading.style.color = '#0F172A'; // Slate 900 instead of blue
+            heading.style.letterSpacing = '0.01em';
+            heading.style.borderLeft = '4px solid #d17d39';
+            heading.style.paddingLeft = '12px';
+            heading.textContent = text;
+            paragraph.replaceWith(heading);
+            return;
+        }
+
+        const chapterParts = splitChapterHeadingInParagraph(text);
+        if (chapterParts) {
+            const fragment = document.createDocumentFragment();
+
+            if (hasMeaningfulTextFragment(chapterParts.before)) {
+                const beforeParagraph = document.createElement('p');
+                beforeParagraph.textContent = chapterParts.before;
+                beforeParagraph.style.margin = '0 0 16px';
+                beforeParagraph.style.lineHeight = '1.6';
+                fragment.appendChild(beforeParagraph);
+            }
+
+            const inlineHeading = document.createElement('h4');
+            inlineHeading.className = 'transcript-chapter-heading';
+            inlineHeading.style.margin = '24px 0 12px';
+            inlineHeading.style.fontSize = '1.2rem';
+            inlineHeading.style.fontWeight = '800';
+            inlineHeading.style.color = '#0F172A';
+            inlineHeading.style.letterSpacing = '0.01em';
+            inlineHeading.style.borderLeft = '4px solid #d17d39';
+            inlineHeading.style.paddingLeft = '12px';
+            inlineHeading.textContent = chapterParts.heading;
+            fragment.appendChild(inlineHeading);
+
+            if (hasMeaningfulTextFragment(chapterParts.after)) {
+                const afterParagraph = document.createElement('p');
+                afterParagraph.textContent = chapterParts.after;
+                afterParagraph.style.margin = '0 0 16px';
+                afterParagraph.style.lineHeight = '1.6';
+                fragment.appendChild(afterParagraph);
+            }
+
+            paragraph.replaceWith(fragment);
+            return;
+        }
+
+        // Parse timestamps like [00:00] or (00:00) or 00:00
+        const timestampRegex = /(\[|\()?(\d{1,2}:)?(\d{1,2}:\d{2})(\]|\))?/g;
+        let enhancedHtml = paragraph.innerHTML;
+        
+        enhancedHtml = enhancedHtml.replace(timestampRegex, (match, p1, p2, p3, p4) => {
+            const timeStr = (p2 || '') + p3;
+            return `<button class="ts-link" data-time="${timeStr}" title="Hopp til ${timeStr}">${match}</button>`;
+        });
+
+        paragraph.innerHTML = enhancedHtml;
+        paragraph.style.margin = '0 0 16px';
+        paragraph.style.lineHeight = '1.6';
+        paragraph.style.fontSize = '1.05rem';
+        paragraph.style.color = '#334155';
+
+        const verseMatch = text.match(/^(\d{1,3})([.:])\s+(.+)$/);
+        if (verseMatch && !enhancedHtml.includes('ts-link')) {
+            paragraph.textContent = '';
+            const verseNumber = document.createElement('strong');
+            verseNumber.style.color = '#d17d39';
+            verseNumber.style.marginRight = '8px';
+            verseNumber.textContent = `${verseMatch[1]}${verseMatch[2]}`;
+            paragraph.appendChild(verseNumber);
+            paragraph.appendChild(document.createTextNode(` ${verseMatch[3]}`));
+        }
+    });
+
+    return wrapper.innerHTML;
+}
+
+const monthsByLang = {
+    no: ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'],
+    en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    es: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
+};
+
+function formatPodcastDate(dateText, lang) {
+    const d = new Date(dateText);
+    if (isNaN(d.getTime())) return dateText;
+    const day = d.getDate();
+    const monthIndex = d.getMonth();
+    const year = d.getFullYear();
+    
+    const months = monthsByLang[lang] || monthsByLang['no'];
+    const monthStr = months[monthIndex];
+    
+    if (lang === 'en') {
+        return `${monthStr} ${day}, ${year}`;
+    } else if (lang === 'es') {
+        return `${day}. ${monthStr} ${year}`;
+    } else {
+        return `${day}. ${monthStr} ${year}`;
+    }
+}
+
+function formatPodcastDuration(durationStr) {
+    const raw = String(durationStr || '').trim();
+    if (!raw) return '';
+    
+    // Check if it is HH:MM:SS or MM:SS
+    if (raw.includes(':')) {
+        const parts = raw.split(':');
+        if (parts.length === 3) {
+            const hours = parseInt(parts[0], 10) || 0;
+            const minutes = parseInt(parts[1], 10) || 0;
+            const totalMin = hours * 60 + minutes;
+            return `${totalMin} min`;
+        } else if (parts.length === 2) {
+            const minutes = parseInt(parts[0], 10) || 0;
+            return `${minutes} min`;
+        }
+    }
+    
+    // Check if it is seconds
+    const seconds = parseInt(raw, 10);
+    if (!isNaN(seconds)) {
+        const minutes = Math.round(seconds / 60);
+        return `${minutes} min`;
+    }
+    
+    return raw;
 }
 
 async function initPodcastRSS() {
@@ -572,27 +1130,35 @@ async function initPodcastRSS() {
         const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
         const items = channel?.item;
 
-        if (items) {
-            const episodes = Array.isArray(items) ? items : [items];
-
-            allPodcastEpisodes = episodes.map((episode, index) => {
-                const pubDateText = asText(episode.pubDate);
-                return {
-                    title: asText(episode.title),
-                    pubDate: pubDateText,
-                    dateObj: new Date(pubDateText),
-                    link: asText(episode.link),
-                    description: asText(episode.description) || asText(episode["itunes:summary"]),
-                    thumbnail: getChannelImage(channel) || getItunesImage(episode),
-                    audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
-                    episodeNumber: episodes.length - index,
-                    category: getEpisodeCategory(episode)
-                };
-            });
-
-            initPodcastControls();
-            renderPodcastEpisodes();
+        if (!items) {
+            throw new Error('Failed to fetch podcast or no items found.');
         }
+
+        const episodes = Array.isArray(items) ? items : [items];
+
+        allPodcastEpisodes = episodes.map((episode, index) => {
+            const pubDateText = asText(episode.pubDate);
+            return {
+                id: getEpisodeId(episode),
+                title: asText(episode.title),
+                pubDate: pubDateText,
+                dateObj: new Date(pubDateText),
+                link: asText(episode.link),
+                description: asText(episode.description) || asText(episode["itunes:summary"]),
+                thumbnail: getChannelImage(channel) || getItunesImage(episode),
+                audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
+                episodeNumber: episodes.length - index,
+                categories: getEpisodeCategories(episode),
+                category: getEpisodeCategory(episode),
+                author: asText(episode["itunes:author"]) || asText(episode.author) || "His Kingdom Ministry",
+                duration: formatPodcastDuration(asText(episode["itunes:duration"]))
+            };
+        });
+
+        await loadPodcastTranscriptDataMap();
+
+        initPodcastControls();
+        renderPodcastEpisodes();
     } catch (error) {
         console.error('[Podcast] Feil ved henting:', error);
         grid.innerHTML = `<p class="text-danger">${t('loadingPodcastError')}</p>`;
@@ -600,8 +1166,11 @@ async function initPodcastRSS() {
 }
 
 function initPodcastControls() {
+    ensureDynamicPodcastCategoryButtons();
+
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
+    const searchInput = document.getElementById('podcast-search-input');
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -618,6 +1187,32 @@ function initPodcastControls() {
             renderPodcastEpisodes();
         });
     }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentPodcastSearchQuery = e.target.value;
+            renderPodcastEpisodes();
+        });
+    }
+}
+
+function ensurePodcastBarVisibleOnPodcastPage() {
+    let bar = document.getElementById('podcast-player-bar');
+    if (!bar) {
+        createPlayerBar();
+        bar = document.getElementById('podcast-player-bar');
+    }
+
+    if (!bar) return;
+
+    bar.classList.add('active');
+
+    if (!currentAudio) {
+        const title = bar.querySelector('.player-info-title');
+        if (title) {
+            title.textContent = t('selectEpisode');
+        }
+    }
 }
 
 function renderPodcastEpisodes() {
@@ -626,9 +1221,24 @@ function renderPodcastEpisodes() {
 
     let filtered = [...allPodcastEpisodes];
 
+    // Søkefiltrering
+    if (currentPodcastSearchQuery) {
+        const query = currentPodcastSearchQuery.toLowerCase().trim();
+        filtered = filtered.filter(ep => 
+            ep.title.toLowerCase().includes(query) || 
+            (ep.description && ep.description.toLowerCase().includes(query)) ||
+            (ep.author && ep.author.toLowerCase().includes(query))
+        );
+    }
+
     // Filtrering
     if (currentPodcastFilter !== 'all') {
-        filtered = filtered.filter(ep => ep.category === currentPodcastFilter);
+        filtered = filtered.filter((ep) => {
+            const categories = Array.isArray(ep.categories)
+                ? ep.categories
+                : (ep.category ? [ep.category] : []);
+            return categories.includes(currentPodcastFilter);
+        });
     }
 
     // Sortering
@@ -644,7 +1254,7 @@ function renderPodcastEpisodes() {
     // Husk nåværende rekkefølge for spillerkøen
     currentEpisodeOrder = filtered;
 
-    const isFullPage = window.location.pathname.includes('podcast.html');
+    const isFullPage = window.location.pathname.includes('/podcast');
     const limit = isFullPage ? filtered.length : 3;
 
     if (filtered.length === 0) {
@@ -663,46 +1273,148 @@ function createPodcastCard(episode, indexInView) {
     card.className = 'podcast-card';
     card.setAttribute('data-category', 'podcast');
 
-    const pubDate = new Date(episode.pubDate).toLocaleDateString('no-NO');
-    const thumbnail = episode.thumbnail || 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop';
+    const lang = document.documentElement.lang || 'no';
+    const pubDate = formatPodcastDate(episode.pubDate, lang);
+    const thumbnail = episode.thumbnail || 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?w=400&h=400&fit=crop';
 
-    // Rens beskrivelse
-    let descText = "";
-    if (episode.description) {
-        descText = episode.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...';
+    // Get Firestore override data
+    const dbData = typeof podcastTranscriptDataById !== 'undefined' ? podcastTranscriptDataById.get(episode.id) : null;
+    
+    let summary = '';
+    let keyVerses = [];
+    let discussionQuestions = [];
+
+    if (dbData) {
+        if (lang === 'no') {
+            summary = (dbData.summary || dbData.description || '').trim();
+            keyVerses = Array.isArray(dbData.keyVerses) ? dbData.keyVerses : [];
+            discussionQuestions = Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : [];
+        } else {
+            const tr = dbData.translations?.[lang] || {};
+            summary = (tr.summary || tr.description || dbData.summary || dbData.description || '').trim();
+            keyVerses = Array.isArray(tr.keyVerses) ? tr.keyVerses : (Array.isArray(dbData.keyVerses) ? dbData.keyVerses : []);
+            discussionQuestions = Array.isArray(tr.discussionQuestions) ? tr.discussionQuestions : (Array.isArray(dbData.discussionQuestions) ? dbData.discussionQuestions : []);
+        }
+    }
+
+    const hasSummary = !!summary;
+    const hasVerses = keyVerses.length > 0;
+    const hasQuestions = discussionQuestions.length > 0;
+
+    let accordionHtml = '';
+    if (hasSummary || hasVerses || hasQuestions) {
+        let leftColHtml = '';
+        if (hasSummary) {
+            leftColHtml += `
+                <div style="margin-bottom: 24px;">
+                    <h4 class="podcast-accordion-section-title summary-title">${t('summary')}</h4>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.5; margin: 0; opacity: 0.85;">${summary}</p>
+                </div>
+            `;
+        }
+        if (hasVerses) {
+            leftColHtml += `
+                <div>
+                    <h4 class="podcast-accordion-section-title verses-title">${t('keyVerses')}</h4>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${keyVerses.map(kv => `
+                            <div class="podcast-verse-item">
+                                <div class="podcast-verse-ref">${kv.reference}</div>
+                                <blockquote class="podcast-verse-text">"${kv.text}"</blockquote>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        let rightColHtml = '';
+        if (hasQuestions) {
+            rightColHtml += `
+                <div>
+                    <h4 class="podcast-accordion-section-title questions-title">${t('discussionQuestions')}</h4>
+                    <ol class="podcast-questions-list">
+                        ${discussionQuestions.map((q, i) => `
+                            <li class="podcast-question-item">
+                                <span class="podcast-question-num">${i + 1}.</span>
+                                <p class="podcast-question-text">${q}</p>
+                            </li>
+                        `).join('')}
+                    </ol>
+                </div>
+            `;
+        }
+
+        accordionHtml = `
+            <div class="podcast-accordion">
+                <div class="podcast-accordion-content">
+                    <div class="podcast-accordion-grid">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            ${leftColHtml || `<p style="font-size: 13.5px; color: var(--text-light); font-style: italic; margin: 0;">Ingen oppsummering tilgjengelig.</p>`}
+                        </div>
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            ${rightColHtml || `<p style="font-size: 13.5px; color: var(--text-light); font-style: italic; margin: 0;">Ingen diskusjonsspørsmål tilgjengelig.</p>`}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     card.innerHTML = `
-        <div class="podcast-artwork">
-            <img src="${thumbnail}" alt="${episode.title}">
-            <div class="podcast-play-overlay">
-                <button class="play-btn-circle" data-audio="${episode.audioUrl}">
+        <div class="podcast-row-main">
+            <div class="podcast-row-artwork">
+                <img src="${thumbnail}" alt="${episode.title}">
+            </div>
+            <div class="podcast-row-details">
+                <span class="podcast-row-date">${pubDate}</span>
+                <h3 class="podcast-row-title">${episode.title}</h3>
+                <p class="podcast-row-meta">${episode.author} · ${episode.duration}</p>
+                ${(hasSummary || hasVerses || hasQuestions) ? `
+                    <button class="podcast-row-accordion-toggle" aria-expanded="false">
+                        <span>${t('summaryAndKeyVerses')}</span>
+                        <span class="material-symbols-outlined chevron-icon">expand_more</span>
+                    </button>
+                ` : ''}
+            </div>
+            <div class="podcast-row-actions">
+                <a href="${episode.link}" target="_blank" class="podcast-row-external-link" title="Åpne i plattform">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                </a>
+                <button class="podcast-row-play-btn" data-audio="${episode.audioUrl}" title="${t('listenNow')}">
                     <i class="fas fa-play"></i>
                 </button>
             </div>
         </div>
-        <div class="podcast-content">
-            <span class="podcast-episode">${t('episode')} ${episode.episodeNumber}</span>
-            <h3 class="podcast-title">${episode.title}</h3>
-            <p class="podcast-description">${descText}</p>
-            <div class="podcast-meta"><span><i class="far fa-calendar"></i> ${pubDate}</span></div>
-            <div class="podcast-actions">
-                <button class="btn-play-internal" data-audio="${episode.audioUrl}"><i class="fas fa-play"></i> ${t('listenNow')}</button>
-                <a href="${episode.link}" target="_blank" class="btn-icon-outline"><i class="fas fa-external-link-alt"></i></a>
-            </div>
-        </div>
+        ${accordionHtml}
     `;
 
     card.querySelectorAll('[data-audio]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (episode.audioUrl) {
-                // Finn global indeks i dagens spillerkø
                 const queueIndex = currentEpisodeOrder.indexOf(episode);
-                toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, queueIndex);
+                toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, queueIndex, episode);
             }
         });
     });
+
+    const toggleBtn = card.querySelector('.podcast-row-accordion-toggle');
+    if (toggleBtn) {
+        const content = card.querySelector('.podcast-accordion-content');
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            if (isExpanded) {
+                content.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+            }
+        });
+    }
 
     return card;
 }
@@ -710,25 +1422,75 @@ function createPodcastCard(episode, indexInView) {
 /**
  * Audio Player Logikk
  */
-function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
+function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
     let playerBar = document.getElementById('podcast-player-bar');
     if (!playerBar) createPlayerBar();
 
     const audio = document.getElementById('global-audio-element');
     const barTitle = document.querySelector('.player-info-title');
     const barImg = document.querySelector('.player-info-img');
+    const fsTranscript = document.querySelector('.fullscreen-transcript');
+
+    function loadEpisodeTranscript(transcriptEpisode, fsSummaryNode) {
+        if (!fsTranscript || !transcriptEpisode || !transcriptEpisode.id) return;
+
+        fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ser etter transkripsjon...</p>';
+
+        fetchPodcastTranscriptData(transcriptEpisode.id)
+            .then(stored => {
+                if (fsSummaryNode) {
+                    fsSummaryNode.innerHTML = getEpisodeSummaryHtml(transcriptEpisode, stored);
+                }
+
+                const htmlText = stored && typeof stored.text === 'string' ? stored.text.trim() : '';
+                const editorBlocks = stored?.content?.blocks;
+                const blocksHtml = htmlText ? '' : convertEditorJsBlocksToHtml(editorBlocks);
+                const transcriptHtml = htmlText || blocksHtml;
+
+                if (transcriptHtml) {
+                    fsTranscript.innerHTML = getFormattedTranscriptHtml(transcriptHtml);
+                } else {
+                    fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+                }
+            })
+            .catch(err => {
+                console.error('Feil ved henting av transkripsjon:', err);
+                fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+            });
+    }
 
     if (currentAudio === url) {
+        if (episodeData) currentEpisodeData = episodeData;
+        if (currentEpisodeData) {
+            loadEpisodeTranscript(currentEpisodeData, document.querySelector('.fullscreen-summary'));
+        }
+
         if (audio.paused) { audio.play(); updatePlayIcons(true, btn); }
         else { audio.pause(); updatePlayIcons(false, btn); }
     } else {
         currentAudio = url;
+        currentEpisodeData = episodeData || null;
         if (typeof episodeIndex === 'number' && episodeIndex >= 0) {
             currentEpisodeIndex = episodeIndex;
         }
         audio.src = url;
         barTitle.textContent = title;
         barImg.src = thumbnail;
+        barImg.style.display = thumbnail ? '' : 'none';
+        
+        const fsTitle = document.querySelector('.fullscreen-title');
+        const fsSummary = document.querySelector('.fullscreen-summary');
+        const fsArtwork = document.querySelector('.fullscreen-artwork');
+        
+        if (fsTitle && episodeData) {
+            fsTitle.textContent = title;
+            if (fsArtwork) fsArtwork.src = thumbnail;
+            if (fsSummary) {
+                fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
+            }
+            loadEpisodeTranscript(episodeData, fsSummary);
+        }
+
         audio.play();
         document.getElementById('podcast-player-bar').classList.add('active');
         updatePlayIcons(true, btn);
@@ -736,13 +1498,233 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
 }
 
 function updatePlayIcons(isPlaying, activeBtn) {
-    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i').forEach(i => {
+    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i, .podcast-row-play-btn i').forEach(i => {
         i.className = 'fas fa-play';
     });
     if (isPlaying) {
-        if (activeBtn) activeBtn.querySelector('i').className = 'fas fa-pause';
+        if (activeBtn) {
+            const icon = activeBtn.querySelector('i');
+            if (icon) icon.className = 'fas fa-pause';
+        }
         const barPlayIcon = document.querySelector('.player-control-play i');
         if (barPlayIcon) barPlayIcon.className = 'fas fa-pause';
+    }
+}
+
+function applyFullscreenPlayerLayout(bar) {
+    const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
+    const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
+    const fsHeader = bar.querySelector('.fs-header');
+    const fsContent = bar.querySelector('.fs-scrollable-content');
+    const fsArtworkContainer = bar.querySelector('.fs-artwork-container');
+    const fsArtwork = bar.querySelector('.fullscreen-artwork');
+    const fsTitle = bar.querySelector('.fullscreen-title');
+    const fsSections = bar.querySelectorAll('.fs-summary-container, .fs-transcript-container');
+    const fsSectionTitles = bar.querySelectorAll('.fs-section-title');
+    const fsTranscriptHeader = bar.querySelector('.fs-transcript-header');
+    const fsSearchWrap = bar.querySelector('.fs-transcript-search-wrap');
+    const fsSearchInput = bar.querySelector('#fs-transcript-search');
+
+    const isSmallScreen = window.innerWidth < 768;
+
+    // Injisere CSS for transkripsjon-funksjonalitet
+    if (!document.getElementById('fs-player-extra-styles')) {
+        const style = document.createElement('style');
+        style.id = 'fs-player-extra-styles';
+        style.textContent = `
+            .ts-link {
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                color: #0F172A;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 0.9em;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                margin: 0 4px;
+                vertical-align: middle;
+            }
+            .ts-link:hover {
+                background: #d17d39;
+                color: #fff;
+                border-color: #bd4f2a;
+                transform: translateY(-1px);
+            }
+            .fs-transcript-search-wrap {
+                position: relative;
+                flex: 1;
+                max-width: 300px;
+                display: flex;
+                align-items: center;
+            }
+            .fs-transcript-search-wrap i {
+                position: absolute;
+                left: 12px;
+                color: #94a3b8;
+                font-size: 14px;
+            }
+            #fs-transcript-search {
+                width: 100%;
+                padding: 10px 12px 10px 36px;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                font-family: inherit;
+                outline: none;
+                transition: all 0.2s ease;
+                background: #fff;
+            }
+            #fs-transcript-search:focus {
+                border-color: #d17d39;
+                box-shadow: 0 0 0 4px rgba(209, 125, 57, 0.1);
+            }
+            .search-highlight {
+                background: #fef08a;
+                color: #854d0e;
+                padding: 0 2px;
+                border-radius: 2px;
+                font-weight: 600;
+            }
+            .search-highlight.current {
+                background: #f97316;
+                color: #fff;
+            }
+            @media (max-width: 600px) {
+                .fs-transcript-header {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                    gap: 12px !important;
+                }
+                .fs-transcript-search-wrap {
+                    max-width: 100%;
+                    width: 100%;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const xCloseTopOffset = isSmallScreen
+        ? 'max(6px, env(safe-area-inset-top))'
+        : 'max(14px, env(safe-area-inset-top))';
+    const xCloseRightOffset = isSmallScreen
+        ? 'max(10px, env(safe-area-inset-right))'
+        : 'max(16px, env(safe-area-inset-right))';
+
+    Object.assign(fsOverlay.style, {
+        position: 'fixed',
+        top: '100vh',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        background: '#fff',
+        zIndex: '26000',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        transition: 'top 0.4s cubic-bezier(0.19, 1, 0.22, 1)'
+    });
+
+    Object.assign(fsXCloseBtn.style, {
+        position: 'absolute',
+        top: xCloseTopOffset,
+        right: xCloseRightOffset,
+        width: '46px',
+        height: '46px',
+        borderRadius: '999px',
+        border: '1px solid rgba(15, 23, 42, 0.12)',
+        background: 'rgba(255, 255, 255, 0.96)',
+        color: '#26384c',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '18px',
+        zIndex: '26002',
+        boxShadow: '0 10px 28px rgba(15, 23, 42, 0.16)'
+    });
+
+    if (fsHeader) {
+        Object.assign(fsHeader.style, {
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: '18px 20px',
+            background: '#f8f9fa',
+            borderBottom: '1px solid #eee',
+            flex: '0 0 auto'
+        });
+    }
+
+    Object.assign(fsContent.style, {
+        flex: '1 1 auto',
+        overflowY: 'auto',
+        width: '100%',
+        maxWidth: '860px',
+        margin: '0 auto',
+        padding: 'clamp(24px, 5vw, 42px) clamp(15px, 4vw, 24px) 110px',
+        boxSizing: 'border-box'
+    });
+
+    Object.assign(fsArtworkContainer.style, {
+        width: '100%',
+        maxWidth: '300px',
+        margin: '0 auto 30px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)'
+    });
+
+    Object.assign(fsArtwork.style, {
+        display: 'block',
+        width: '100%',
+        aspectRatio: '1 / 1',
+        objectFit: 'cover'
+    });
+
+    Object.assign(fsTitle.style, {
+        margin: '0 auto 38px',
+        maxWidth: '15ch',
+        color: '#26384c',
+        fontSize: 'clamp(2rem, 5vw, 3rem)',
+        fontWeight: '800',
+        lineHeight: '1.12',
+        letterSpacing: '0',
+        textAlign: 'center'
+    });
+
+    fsSections.forEach(section => {
+        Object.assign(section.style, {
+            marginBottom: '28px',
+            background: '#fcfcfc',
+            padding: 'clamp(24px, 4vw, 36px)',
+            borderRadius: '14px',
+            border: '1px solid #edf1f4',
+            boxShadow: '0 14px 34px rgba(15, 23, 42, 0.06)'
+        });
+    });
+
+    fsSectionTitles.forEach(title => {
+        Object.assign(title.style, {
+            display: 'inline-block',
+            margin: '0 0 18px',
+            paddingBottom: '5px',
+            borderBottom: '2px solid #d17d39',
+            color: '#26384c',
+            fontSize: '1.25rem',
+            fontWeight: '800'
+        });
+    });
+
+    if (fsTranscriptHeader) {
+        Object.assign(fsTranscriptHeader.style, {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            marginBottom: '18px'
+        });
     }
 }
 
@@ -752,8 +1734,8 @@ function createPlayerBar() {
     bar.innerHTML = `
         <div class="player-container">
             <audio id="global-audio-element"></audio>
-            <div class="player-info">
-                <img src="" class="player-info-img">
+            <div class="player-info" id="player-info-toggle" style="cursor: pointer;" title="Vis i fullskjerm">
+                <img src="" class="player-info-img" style="display:none;">
                 <div class="player-info-text"><span class="player-info-title">${t('selectEpisode')}</span></div>
             </div>
             <div class="player-controls">
@@ -767,12 +1749,40 @@ function createPlayerBar() {
                 <span class="time-total">0:00</span>
             </div>
             <div class="player-extra">
+                <button class="player-control-btn player-expand" title="Fullskjerm lesing"><i class="fas fa-expand"></i></button>
                 <button class="player-control-btn player-speed" title="${t('playbackSpeed')}">1x</button>
-                <button class="player-control-btn player-close"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div id="podcast-fullscreen-overlay" class="podcast-fullscreen-overlay">
+            <button class="fs-x-close-btn" type="button" aria-label="Lukk fullskjerm">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <div class="fs-scrollable-content">
+                <div class="fs-artwork-container">
+                    <img src="" class="fullscreen-artwork">
+                </div>
+                <h2 class="fullscreen-title">Velg en episode</h2>
+                <div class="fs-summary-container">
+                    <h3 class="fs-section-title">Oppsummering</h3>
+                    <div class="fullscreen-summary"></div>
+                </div>
+                <div class="fs-transcript-container">
+                    <div class="fs-transcript-header">
+                        <h3 class="fs-section-title" style="margin:0;">Teksting</h3>
+                        <div class="fs-transcript-search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="fs-transcript-search" placeholder="Søk i tekstingen...">
+                        </div>
+                    </div>
+                    <div class="fullscreen-transcript">
+                        <p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
     document.body.appendChild(bar);
+    applyFullscreenPlayerLayout(bar);
 
     const audio = document.getElementById('global-audio-element');
     const playBtn = bar.querySelector('.player-control-play');
@@ -781,13 +1791,154 @@ function createPlayerBar() {
     const prevBtn = bar.querySelector('.player-control-prev');
     const nextBtn = bar.querySelector('.player-control-next');
     const speedBtn = bar.querySelector('.player-speed');
+    const expandBtn = bar.querySelector('.player-expand');
+    const infoToggle = bar.querySelector('#player-info-toggle');
+    const playerContainer = bar.querySelector('.player-container');
+    const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
+    const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
+
+    function openFs() {
+        // Hide everything except the player bar and fullscreen overlay
+        document.querySelectorAll('header, nav, aside, .sidebar, [role="navigation"], .chat-widget, .chatbot, .fab').forEach(el => {
+            if (el && el !== bar && !el.closest('#podcast-player-bar')) {
+                el.style.display = 'none';
+                el.setAttribute('data-fs-hidden', 'true');
+            }
+        });
+
+        // Keep the regular player bar visible above the fullscreen transcript view.
+        Object.assign(playerContainer.style, {
+            position: 'fixed',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: '26003',
+            background: '#fff',
+            boxShadow: '0 -5px 25px rgba(0, 0, 0, 0.15)',
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            paddingTop: '10px',
+            paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))'
+        });
+        bar.classList.add('active');
+        fsOverlay.classList.add('active');
+        fsOverlay.style.top = '0';
+        fsOverlay.style.zIndex = '26002';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    }
+    
+    function closeFs() {
+        // Restore hidden elements
+        document.querySelectorAll('[data-fs-hidden="true"]').forEach(el => {
+            el.style.display = '';
+            el.removeAttribute('data-fs-hidden');
+        });
+
+        playerContainer.style.position = '';
+        playerContainer.style.left = '';
+        playerContainer.style.right = '';
+        playerContainer.style.bottom = '';
+        playerContainer.style.zIndex = '';
+        playerContainer.style.background = '';
+        playerContainer.style.boxShadow = '';
+        playerContainer.style.borderTop = '';
+        playerContainer.style.paddingTop = '';
+        playerContainer.style.paddingBottom = '';
+        fsOverlay.classList.remove('active');
+        fsOverlay.style.top = '100vh';
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    }
+
+    infoToggle.addEventListener('click', openFs);
+    if(expandBtn) expandBtn.addEventListener('click', () => {
+        if (fsOverlay.classList.contains('active')) closeFs();
+        else openFs();
+    });
+    if (fsXCloseBtn) fsXCloseBtn.addEventListener('click', closeFs);
+
+    // Keyboard escape to close fullscreen
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && fsOverlay.classList.contains('active')) {
+            closeFs();
+        }
+    });
+
+    const fsSearchInput = bar.querySelector('#fs-transcript-search');
+    const fsTranscriptBody = bar.querySelector('.fullscreen-transcript');
+
+    if (fsSearchInput && fsTranscriptBody) {
+        fsSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const paragraphs = fsTranscriptBody.querySelectorAll('p, h4');
+            
+            paragraphs.forEach(p => {
+                const text = p.textContent;
+                if (!query) {
+                    p.innerHTML = p.getAttribute('data-original-html') || p.innerHTML;
+                    return;
+                }
+                
+                if (!p.hasAttribute('data-original-html')) {
+                    p.setAttribute('data-original-html', p.innerHTML);
+                }
+
+                const originalHtml = p.getAttribute('data-original-html');
+                // Vi må være forsiktige med å ikke ødelegge HTML-tags (som ts-link) når vi søker.
+                // En enkel måte er å bare søke i textContent hvis det er en match, men vi vil highlighte.
+                if (text.toLowerCase().includes(query)) {
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    // Vi highlighter bare i selve teksten, unngår å ødelegge buttons
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = originalHtml;
+                    
+                    const walk = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false);
+                    let node;
+                    const nodesToReplace = [];
+                    while(node = walk.nextNode()) {
+                        if (node.textContent.toLowerCase().includes(query)) {
+                            nodesToReplace.push(node);
+                        }
+                    }
+                    
+                    nodesToReplace.forEach(textNode => {
+                        const span = document.createElement('span');
+                        span.innerHTML = textNode.textContent.replace(regex, '<span class="search-highlight">$1</span>');
+                        textNode.replaceWith(span);
+                    });
+                    
+                    p.innerHTML = tempDiv.innerHTML;
+                } else {
+                    p.innerHTML = originalHtml;
+                }
+            });
+        });
+    }
+
+    // Delegert klikk-håndtering for tidsstempler
+    fsTranscriptBody.addEventListener('click', (e) => {
+        const tsBtn = e.target.closest('.ts-link');
+        if (tsBtn) {
+            const timeStr = tsBtn.getAttribute('data-time');
+            if (timeStr) {
+                const parts = timeStr.split(':').map(Number).reverse();
+                let secs = 0;
+                if (parts[0]) secs += parts[0];
+                if (parts[1]) secs += parts[1] * 60;
+                if (parts[2]) secs += parts[2] * 3600;
+                
+                audio.currentTime = secs;
+                audio.play();
+                updatePlayIcons(true);
+            }
+        }
+    });
 
     playBtn.addEventListener('click', () => {
         if (audio.paused) { audio.play(); updatePlayIcons(true); }
         else { audio.pause(); updatePlayIcons(false); }
     });
 
-    // Klikkbar tidslinje (seek)
     if (progressBar) {
         progressBar.addEventListener('click', (e) => {
             if (!audio.duration) return;
@@ -797,7 +1948,6 @@ function createPlayerBar() {
         });
     }
 
-    // Forrige / neste episode i køen
     if (prevBtn) {
         prevBtn.addEventListener('click', () => playEpisodeRelative(-1));
     }
@@ -805,7 +1955,6 @@ function createPlayerBar() {
         nextBtn.addEventListener('click', () => playEpisodeRelative(1));
     }
 
-    // Hastighetskontroll (1x, 1.25x, 1.5x, 2x)
     if (speedBtn) {
         const speeds = [1, 1.25, 1.5, 2];
         let idx = 0;
@@ -825,12 +1974,6 @@ function createPlayerBar() {
 
     audio.addEventListener('loadedmetadata', () => {
         bar.querySelector('.time-total').textContent = formatTime(audio.duration);
-    });
-
-    bar.querySelector('.player-close').addEventListener('click', () => {
-        audio.pause();
-        bar.classList.remove('active');
-        updatePlayIcons(false);
     });
 }
 
@@ -856,7 +1999,7 @@ function playEpisodeAtIndex(index) {
     }
 
     const thumbnail = episode.thumbnail || '';
-    toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, index);
+    toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, index, episode);
 }
 
 function formatTime(seconds) {

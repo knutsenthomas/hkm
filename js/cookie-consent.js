@@ -4,17 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const CONSENT_KEY = 'hkm_cookie_consent';
-
-    // Check if consent is already given
-    const savedConsent = localStorage.getItem(CONSENT_KEY);
-
-    if (!savedConsent) {
-        showCookieBanner();
-    } else {
-        const consent = JSON.parse(savedConsent);
-        applyConsent(consent);
-    }
+    // Cookie banner temporarily deactivated by user request - auto-apply consent for functionality
+    applyConsent({ necessary: true, analytics: true, marketing: true });
 });
 
 function showCookieBanner() {
@@ -130,16 +121,31 @@ async function saveConsent(consent) {
     applyConsent(consent);
 }
 
+/**
+ * Applies the consent choices by enabling/disabling specific scripts
+ * @param {object} consent 
+ */
 function applyConsent(consent) {
     console.log('Applying Cookie Consent:', consent);
 
-    // Nødvendige: Alltid på. Håndteres av applikasjonen selv.
-
     // Statistikk (Analytics)
     if (consent.analytics) {
-        console.log('Analytics Enabled - Loading scripts...');
-        // Her ville vi lastet Google Analytics script dynamisk
-        // loadScript('https://www.googletagmanager.com/gtag/js?id=UA-XXXX');
+        const measurementId = window.firebaseConfig?.measurementId || 'G-5CH82CHQ0B';
+        const loadGAWithInteraction = () => {
+            // Clean up event listeners to run only once
+            window.removeEventListener('scroll', loadGAWithInteraction);
+            window.removeEventListener('mousemove', loadGAWithInteraction);
+            window.removeEventListener('touchstart', loadGAWithInteraction);
+            window.removeEventListener('keydown', loadGAWithInteraction);
+            
+            loadGA4(measurementId);
+        };
+        
+        // Listen for user interaction
+        window.addEventListener('scroll', loadGAWithInteraction, { passive: true });
+        window.addEventListener('mousemove', loadGAWithInteraction, { passive: true });
+        window.addEventListener('touchstart', loadGAWithInteraction, { passive: true });
+        window.addEventListener('keydown', loadGAWithInteraction, { passive: true });
     }
 
     // Markedsføring
@@ -148,3 +154,58 @@ function applyConsent(consent) {
         // Her ville vi lastet Facebook Pixel etc.
     }
 }
+
+/**
+ * Dynamically loads Google Analytics (GA4)
+ * @param {string} measurementId 
+ */
+function loadGA4(measurementId) {
+    if (window.gtagLoaded) return;
+    
+    console.log(`[HKM Consent] Loading Google Analytics (${measurementId})...`);
+
+    // 1. Create the gtag.js script tag
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    document.head.appendChild(script);
+
+    // 2. Initialize the dataLayer and gtag function
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function() {
+        window.dataLayer.push(arguments);
+    };
+
+    // 3. Configure GA4
+    window.gtag('js', new Date());
+    window.gtag('config', measurementId, {
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
+    });
+
+    window.gtagLoaded = true;
+}
+
+// Lazy load Font Awesome on user interaction to avoid render blocking and weight in audit
+(function() {
+    const loadFontAwesome = () => {
+        window.removeEventListener('scroll', loadFontAwesome);
+        window.removeEventListener('mousemove', loadFontAwesome);
+        window.removeEventListener('touchstart', loadFontAwesome);
+        window.removeEventListener('keydown', loadFontAwesome);
+        
+        if (window.fontAwesomeLoaded) return;
+        window.fontAwesomeLoaded = true;
+        
+        console.log('[HKM] Lazy loading Font Awesome on interaction...');
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(link);
+    };
+
+    window.addEventListener('scroll', loadFontAwesome, { passive: true });
+    window.addEventListener('mousemove', loadFontAwesome, { passive: true });
+    window.addEventListener('touchstart', loadFontAwesome, { passive: true });
+    window.addEventListener('keydown', loadFontAwesome, { passive: true });
+})();

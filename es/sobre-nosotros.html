@@ -2,81 +2,430 @@
 <html lang="es">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/es/sobre-nosotros">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/om-oss">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/about">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/sobre-nosotros">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/om-oss">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre Nosotros | His Kingdom Ministry</title>
+    <title>Sobre Nosotros | Visión y Equipo | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Conoce más sobre His Kingdom Ministry, nuestra visión de equipar a las personas para una vida más profunda con Dios, y conoce al equipo detrás del servicio.">
+    <meta name="keywords" content="sobre nosotros, visión, equipo, His Kingdom Ministry, Hilde Karin Knutsen, Thomas Knutsen, Mandal, Noruega">
+    
+    <!-- Internationalization -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/es/sobre-nosotros">
+    <meta property="og:title" content="Sobre Nosotros | His Kingdom Ministry">
+    <meta property="og:description" content="Conoce al equipo y lee sobre nuestra visión para difundir el Reino de Dios.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1438232992991-995b7058df31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/es/sobre-nosotros">
+    <meta property="twitter:title" content="Sobre Nosotros | His Kingdom Ministry">
+    <meta property="twitter:description" content="Conoce más sobre quiénes somos y qué hacemos.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1438232992991-995b7058df31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome (Deferred) -->
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"></noscript>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../styles.css?v=2026.04.22.09.36">
     <link rel="stylesheet" href="../css/cookie-consent.css">
 
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK (Compat) -->
+
+    <!-- Core Modules (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- Loader Safety Net -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
-                    }
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
                 }
-            }
-        }
+            }, 4000);
+        })();
     </script>
+        
+    <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
+    <style>
+        /* ===================================
+           Premium Design Overrides for Sobre Nosotros
+           =================================== */
+
+        /* 1. Hero Section */
+        .page-hero.subpage-hero {
+            background-attachment: scroll !important;
+            padding: 140px 0 100px 0 !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .page-hero.subpage-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(209, 125, 57, 0.15) 0%, transparent 60%) !important;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 2. Circular Image video block */
+        .about-image {
+            position: relative !important;
+        }
+        .circular-image {
+            border: 8px solid var(--bg-white, #ffffff) !important;
+            box-shadow: 0 30px 60px -15px rgba(27, 73, 101, 0.18) !important;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-image:hover .circular-image {
+            transform: scale(1.02) !important;
+        }
+        .play-button {
+            width: 72px !important;
+            height: 72px !important;
+            font-size: 22px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 12px 28px rgba(189, 79, 42, 0.35) !important;
+        }
+        .play-button::before {
+            background: rgba(189, 79, 42, 0.3) !important;
+            animation: pulse-ring 2s infinite !important;
+        }
+        @keyframes pulse-ring {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+        }
+
+        /* 3. About Features (Oppdrag / Historie) */
+        .about-feature-item {
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            border-radius: 18px !important;
+            padding: 20px !important;
+            box-shadow: 0 10px 30px -15px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .about-feature-item:hover {
+            background: #ffffff !important;
+            border-color: rgba(209, 125, 57, 0.25) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 16px 36px -12px rgba(27, 73, 101, 0.08) !important;
+        }
+        .about-feature-icon-box {
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            color: #ffffff !important;
+            font-size: 18px !important;
+            box-shadow: 0 6px 14px rgba(189, 79, 42, 0.2) !important;
+        }
+        .about-feature-text h4 {
+            color: #1B4965 !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+        }
+        .about-feature-text p {
+            color: #475569 !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        /* 4. Hva Vi Står For Value Cards */
+        .vision-values {
+            background: linear-gradient(to bottom, #f8fafc, #ffffff) !important;
+            padding: 100px 0 !important;
+        }
+        .values-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+            gap: 28px !important;
+            margin-top: 60px !important;
+        }
+        .value-card {
+            text-align: left !important;
+            padding: 40px 32px !important;
+            border-radius: 24px !important;
+            background: #ffffff !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 10px 35px -12px rgba(27, 73, 101, 0.04) !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d17d39, #bd4f2a);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .value-card:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 24px 48px -15px rgba(27, 73, 101, 0.12) !important;
+            border-color: rgba(27, 73, 101, 0.12) !important;
+        }
+        .value-card:hover::before {
+            opacity: 1;
+        }
+        .value-icon {
+            margin: 0 0 24px 0 !important;
+            width: 56px !important;
+            height: 56px !important;
+            background: linear-gradient(135deg, #1B4965, #2c6e95) !important;
+            border-radius: 14px !important;
+            font-size: 22px !important;
+            box-shadow: 0 8px 20px rgba(27, 73, 101, 0.15) !important;
+            color: #ffffff !important;
+        }
+        .value-card:nth-child(even) .value-icon {
+            background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+            box-shadow: 0 8px 20px rgba(189, 79, 42, 0.15) !important;
+        }
+        .value-card h3 {
+            font-size: 19px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 14px !important;
+            letter-spacing: -0.02em !important;
+        }
+        .value-card p {
+            font-size: 14.5px !important;
+            line-height: 1.65 !important;
+            color: #475569 !important;
+            margin: 0 !important;
+        }
+
+        /* 5. Team Section */
+        .team-section {
+            padding: 100px 0 !important;
+        }
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+            gap: 32px !important;
+            margin-top: 60px !important;
+        }
+        .team-member {
+            background: #ffffff !important;
+            border-radius: 28px !important;
+            border: 1px solid rgba(27, 73, 101, 0.05) !important;
+            box-shadow: 0 12px 40px -15px rgba(27, 73, 101, 0.04) !important;
+            padding: 40px 32px !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+        .team-member:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 24px 50px -15px rgba(27, 73, 101, 0.08) !important;
+            border-color: rgba(209, 125, 57, 0.15) !important;
+        }
+        .team-image {
+            width: 148px !important;
+            height: 148px !important;
+            border-radius: 50% !important;
+            border: 6px solid #ffffff !important;
+            box-shadow: 0 10px 25px rgba(27, 73, 101, 0.08) !important;
+            margin-bottom: 24px !important;
+            overflow: hidden !important;
+            transition: transform 0.4s ease !important;
+        }
+        .team-member:hover .team-image {
+            transform: scale(1.03) !important;
+        }
+        .team-name {
+            font-size: 21px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 6px !important;
+        }
+        .team-role {
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #bd4f2a !important;
+            margin-bottom: 20px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+        }
+        .team-bio {
+            font-size: 14.5px !important;
+            line-height: 1.7 !important;
+            color: #475569 !important;
+            text-align: left !important;
+            margin-top: 0 !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
+            padding-top: 20px !important;
+        }
+        .team-toggle {
+            background: rgba(189, 79, 42, 0.06) !important;
+            border: none !important;
+            color: #bd4f2a !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            margin-top: 16px !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            transition: all 0.2s !important;
+        }
+        .team-toggle:hover {
+            background: #bd4f2a !important;
+            color: #ffffff !important;
+        }
+        .team-social {
+            margin-top: 24px !important;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 16px !important;
+        }
+        .team-social a {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            background: #f8fafc !important;
+            border: 1px solid rgba(0, 0, 0, 0.02) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #475569 !important;
+            font-size: 15px !important;
+            transition: all 0.25s ease !important;
+        }
+        .team-social a:hover {
+            background: #1B4965 !important;
+            color: #ffffff !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 12px rgba(27, 73, 101, 0.15) !important;
+        }
+        .team-social a[href*="instagram"]:hover {
+            background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7) !important;
+        }
+        .team-social a[href*="youtube"]:hover {
+            background: #ff0000 !important;
+        }
+        .team-social a[href*="facebook"]:hover {
+            background: #1877f2 !important;
+        }
+    </style>
 </head>
 
 <body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="text-xl">His Kingdom Ministry</span>
+                <span class="text-xl text-white">His Kingdom Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>ES</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <a href="donasjoner.html"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart text-sm"></i>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Mi página" title="Mi página">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Foto de perfil" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/es/donaciones"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donar</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -84,29 +433,40 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="¿Qué estás buscando?"
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../om-oss.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../en/about.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="sobre-nosotros.html" class="text-sm font-bold text-primary-orange">ES</a>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -114,61 +474,185 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Participa -->
+                    <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Participa</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</div>
                         <ul class="mega-nav-list">
-                            <li><a href="donaciones.html">Apoya nuestro trabajo</a></li>
-                            <li><a href="donantes-regulares.html">Hazte donante regular</a></li>
-                            <li><a href="para-iglesias.html">Para iglesias</a></li>
-                            <li><a href="para-empresas.html">Para empresas</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donaciones" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Apoya la obra</a>
+                                    <span class="mega-menu-desc">Apoya nuestro ministerio financieramente.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a>
+                                    <span class="mega-menu-desc">Únete a nosotros con un apoyo mensual.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-iglesias" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">Para iglesias</a>
+                                    <span class="mega-menu-desc">Recursos y enseñanza para tu iglesia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-empresas" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">Para empresas</a>
+                                    <span class="mega-menu-desc">Acuerdos de patrocinio para empresas.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Red para líderes y empresarios cristianos.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</div>
                         <ul class="mega-nav-list">
-                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
-                            <li><a href="sobre-nosotros.html#historia">Nuestra historia</a></li>
-                            <li><a href="contacto.html">Dónde trabajamos</a></li>
-                            <li><a href="contacto.html">Contáctanos</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Sobre nosotros</a>
+                                    <span class="mega-menu-desc">Conoce nuestra visión, fe y valores.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/contacto" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contáctanos</a>
+                                    <span class="mega-menu-desc">Envíanos un mensaje o pregunta.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Recursos & Media -->
+                    <!-- Column 3: Recursos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</div>
                         <ul class="mega-nav-list">
-                            <li><a href="eventos.html">Eventos</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">Noticias & Blog</a></li>
-                            <li><a href="../minside/index.html">Mi Página</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a>
+                                    <span class="mega-menu-desc">Lee la Palabra de Dios con nuestra biblia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Tienda</a>
+                                    <span class="mega-menu-desc">Ropa, tazas y accesorios cristianos.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Mira mensajes y escucha podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a>
+                                    <span class="mega-menu-desc">Enseñanzas y cursos para el crecimiento.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Actividad reciente -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Actividad reciente</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a>
+                                    <span class="mega-menu-desc">Sigue nuestros planes diarios de lectura.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/eventos" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Eventos</a>
+                                    <span class="mega-menu-desc">Únete a nuestros seminarios y reuniones.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Noticias y Blog</a>
+                                    <span class="mega-menu-desc">Últimas actualizaciones y artículos.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Mi página</a>
+                                    <span class="mega-menu-desc">Tu perfil y planes personales.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donaciones.html#deduccion-fiscal">Deducción Fiscal</a>
-                        <a href="sobre-nosotros.html">Sobre nosotros</a>
-                        <a href="privacidad.html">Privacidad</a>
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Page Hero -->
-    <section class="page-hero" data-content-key="hero.backgroundImage" style="padding-top: 160px;">
+    <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
+        style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058df31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
         <div class="container">
-            <h1 class="page-hero-title">Quiénes Somos</h1>
-            <p class="page-hero-subtitle">Conoce más sobre His Kingdom Ministry y los corazones detrás del servicio.</p>
+            <h1 class="page-title" data-content-key="hero.title">Sobre Nosotros</h1>
+            <div class="breadcrumbs">
+                <a href="/">Inicio</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Sobre Nosotros</span>
+            </div>
         </div>
     </section>
 
@@ -178,9 +662,9 @@
             <div class="about-grid">
                 <div class="about-image">
                     <div class="circular-image">
-                        <img src="https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg"
-                            alt="Hilde y Thomas">
-                        <a class="play-button" href="https://www.youtube.com/watch?v=Z3jXbw0yC5E" target="_blank"
+                        <img data-content-key="intro.image" data-content-attr="src" src="https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg"
+                            alt="Hilde y Thomas" loading="lazy">
+                        <a data-content-key="intro.videoUrl" data-content-attr="href" class="play-button" href="https://www.youtube.com/watch?v=Z3jXbw0yC5E" target="_blank"
                             rel="noopener" aria-label="Ver video sobre His Kingdom Ministry">
                             <i class="fas fa-play"></i>
                         </a>
@@ -188,14 +672,14 @@
                 </div>
 
                 <div class="about-content">
-                    <span class="section-label">Quiénes Somos</span>
-                    <h2 class="section-title">His Kingdom Ministry</h2>
-                    <p class="section-text">His Kingdom Ministry es una organización cristiana con sede en Lyngdal.
+                    <span class="section-label" data-content-key="intro.label">Quiénes Somos</span>
+                    <h2 class="section-title" data-content-key="intro.title">His Kingdom Ministry</h2>
+                    <p class="section-text" data-content-key="intro.text">His Kingdom Ministry es una organización cristiana con sede en Lyngdal.
                         Realizamos enseñanza, oración y misiones, y queremos ayudar a las personas a crecer en su fe.
                         Entre otras cosas, tenemos un podcast con devocionales semanales y organizamos diversos
                         encuentros y seminarios.</p>
 
-                    <a href="contacto.html" class="btn btn-primary">Contáctanos</a>
+                    <a href="/es/contacto" class="btn btn-primary" data-content-key="intro.btnText">Contáctanos</a>
                 </div>
             </div>
         </div>
@@ -205,10 +689,43 @@
     <section class="vision-values">
         <div class="container">
             <div class="section-header center">
-                <span class="section-label">Nuestra Historia</span>
-                <h2 class="section-title">Cómo empezó: Un Viaje de Amor</h2>
+                <span class="section-label" data-content-key="values.label">Nuestra Historia</span>
+                <h2 class="section-title" data-content-key="values.title">Nuestra Base & Historia</h2>
             </div>
-            <p class="section-description">Más pronto...</p>
+            <div class="values-grid">
+                <!-- Card 1: Fundament -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-bible"></i>
+                    </div>
+                    <h3>Nuestra Base</h3>
+                    <p>His Kingdom Ministry se enfoca en misiones, equipar a los santos, enseñanza bíblica, oración, intercesión, sanidad y liberación, y crecimiento en los dones proféticos del Espíritu. Todo lo que hacemos se basará en principios bíblicos y la guía de Dios.</p>
+                </div>
+                <!-- Card 2: Historien bak -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>La Historia Detrás</h3>
+                    <p>Hilde Karin comenzó sus viajes misioneros y de contrabando de Biblias a los 14 años, y desde entonces ha vivido como misionera en Medio Oriente, África y España. En mayo de 2022, Dios la llamó a regresar a Noruega, donde conoció a Thomas. Se casaron el 2 de diciembre de 2023. Thomas ha trabajado durante 16 años en administración y contabilidad de iglesias. Juntos han visitado 9 países para alcanzar a las almas perdidas.</p>
+                </div>
+                <!-- Card 3: Tjeneste 2.0 -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-level-up-alt"></i>
+                    </div>
+                    <h3>De Fundación a 2.0</h3>
+                    <p>Antes de conocer a Thomas, Hilde Karin dirigía *His Kingdom Foundation* (nombre recibido en oración en 2008). *His Kingdom Ministry* fue registrada durante su luna de miel como una "actualización 2.0", manteniendo los mismos valores elevados: que todo se haga bajo los estándares bíblicos y la guía de Dios.</p>
+                </div>
+                <!-- Card 4: Creative Work -->
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>His Kingdom Designs</h3>
+                    <p>La organización también dirige la tienda *His Kingdom Designs*, ofreciendo productos en noruego, inglés y español para regalos y evangelismo, financiando el ministerio. Hilde Karin diseña los productos y Thomas es el diseñador web. ¡Nuestra visión es bendecir y ayudar a otros diseñadores a vender sus creaciones!</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -216,19 +733,19 @@
     <section class="team-section">
         <div class="container">
             <div class="section-header center">
-                <span class="section-label">Nuestro Equipo</span>
-                <h2 class="section-title">Conoce los corazones detrás de His Kingdom Ministry</h2>
+                <span class="section-label" data-content-key="team.label">Nuestro Equipo</span>
+                <h2 class="section-title" data-content-key="team.title">Conoce los corazones detrás de His Kingdom Ministry</h2>
             </div>
 
             <div class="team-grid">
                 <div class="team-member">
                     <div class="team-image">
-                        <img src="../img/Hilde%20Karin%20Knutsen.jpg" alt="Hilde Karin Knutsen">
+                        <img data-content-key="team.hilde.image" data-content-attr="src" src="../img/Hilde%20Karin%20Knutsen.jpg" class="team-photo-focus-hilde" alt="Hilde Karin Knutsen" loading="lazy">
                     </div>
                     <div class="team-info">
-                        <h3 class="team-name">Hilde Karin Knutsen</h3>
-                        <p class="team-role">Intercesora Profética y Maestra</p>
-                        <p class="team-bio">Bienvenido a mi página. Mi nombre es Hilde Karin. Estoy casada con Thomas.
+                        <h3 class="team-name" data-content-key="team.hilde.name">Hilde Karin Knutsen</h3>
+                        <p class="team-role" data-content-key="team.hilde.role">Intercesora Profética y Maestra</p>
+                        <p class="team-bio" data-content-key="team.hilde.bio">Bienvenido a mi página. Mi nombre es Hilde Karin. Estoy casada con Thomas.
                             Vivimos en Noruega. He viajado como misionera e intercesora profética durante más de la
                             mitad de mi vida. Por la gracia de Dios, a través de los principios bíblicos y por la guía
                             del Espíritu Santo, soy una voz profética lista para ayudarte a crecer en tu relación
@@ -241,13 +758,13 @@
                             contestadas.</p>
                         <button class="team-toggle" type="button">Leer más</button>
                         <div class="team-social">
-                            <a href="https://www.instagram.com/freedomisathand/" aria-label="Instagram"><i
+                            <a data-content-key="team.hilde.instagram" data-content-attr="href" href="https://www.instagram.com/freedomisathand/" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.facebook.com/hiskingdomministry777" aria-label="Facebook"><i
+                            <a data-content-key="team.hilde.facebook" data-content-attr="href" href="https://www.facebook.com/hiskingdomministry777" aria-label="Facebook"><i
                                     class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" aria-label="YouTube"><i
+                            <a data-content-key="team.hilde.youtube" data-content-attr="href" href="https://www.youtube.com/@HisKingdomMinistry" aria-label="YouTube"><i
                                     class="fab fa-youtube"></i></a>
-                            <a href="https://www.tiktok.com/@hilde707" aria-label="TikTok"><i
+                            <a data-content-key="team.hilde.tiktok" data-content-attr="href" href="https://www.tiktok.com/@hilde707" aria-label="TikTok"><i
                                     class="fab fa-tiktok"></i></a>
                         </div>
                     </div>
@@ -255,12 +772,12 @@
 
                 <div class="team-member">
                     <div class="team-image">
-                        <img src="../img/Thomas.jpeg" class="team-photo-focus" alt="Thomas Knutsen">
+                        <img data-content-key="team.thomas.image" data-content-attr="src" src="../img/Thomas.jpeg" class="team-photo-focus" alt="Thomas Knutsen" loading="lazy">
                     </div>
                     <div class="team-info">
-                        <h3 class="team-name">Thomas Knutsen</h3>
-                        <p class="team-role">Director General y Adoración</p>
-                        <p class="team-bio">Hola y bienvenido a nuestra página. Estamos muy contentos de que hayas
+                        <h3 class="team-name" data-content-key="team.thomas.name">Thomas Knutsen</h3>
+                        <p class="team-role" data-content-key="team.thomas.role">Director General y Adoración</p>
+                        <p class="team-bio" data-content-key="team.thomas.bio">Hola y bienvenido a nuestra página. Estamos muy contentos de que hayas
                             entrado en nuestro sitio ministerial. No he viajado por el mundo. He trabajado y vivido
                             mayoritariamente en la misma ciudad toda mi vida. Trabajé en la misma iglesia durante 15
                             años antes de conocer a Hilde. Conectamos de inmediato y nos sentimos muy bendecidos de que
@@ -271,13 +788,83 @@
                             vidas a través de este ministerio.</p>
                         <button class="team-toggle" type="button">Leer más</button>
                         <div class="team-social">
-                            <a href="https://www.instagram.com/tkdesignandmusic/" aria-label="Instagram"><i
+                            <a data-content-key="team.thomas.instagram" data-content-attr="href" href="https://www.instagram.com/tkdesignandmusic/" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.facebook.com/thomas.knutsen.75" aria-label="Facebook"><i
+                            <a data-content-key="team.thomas.facebook" data-content-attr="href" href="https://www.facebook.com/thomas.knutsen.75" aria-label="Facebook"><i
                                     class="fab fa-facebook-f"></i></a>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Showcase Section -->
+    <section class="shop-showcase py-16 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
+        <div class="container max-w-6xl mx-auto px-4">
+            <div class="section-header center mb-12">
+                <span class="section-label" data-content-key="shop.showcase.label">His Kingdom Designs</span>
+                <h2 class="section-title text-[#1B4965]" data-content-key="shop.showcase.title">Productos Creativos para la Fe</h2>
+                <p class="section-description mt-2" data-content-key="shop.showcase.subtitle">Visite nuestra tienda en línea para ver la gama completa de regalos, arte y herramientas de evangelización.</p>
+            </div>
+            
+            <div id="latest-designs-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=500&q=80" alt="Regalos y Productos de Fe" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <span class="absolute top-4 right-4 bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Más Popular</span>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product1.title">Productos de Evangelización</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product1.desc">Hermosas tarjetas, carteles y regalos diseñados para compartir el evangelio de una manera natural.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Ver productos <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 2 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=500&q=80" alt="Libros y Notas" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product2.title">Libretas & Accesorios</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product2.desc">Elegantes libretas y juegos de estudio para el estudio bíblico, la oración y reflexiones personales.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Ver productos <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Product 3 -->
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=500&q=80" alt="Decoración y Diseño" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <span class="absolute top-4 right-4 bg-[#1B4965] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Único</span>
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-2 group-hover:text-[#bd4f2a] transition-colors" data-content-key="shop.product3.title">Pósteres con Versículos</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed" data-content-key="shop.product3.desc">Arte mural moderno y grabados con versículos bíblicos en noruego, inglés y español.</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-[#bd4f2a] font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">Ver productos <i class="fas fa-arrow-right text-xs"></i></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:shadow-lg hover:scale-102 active:scale-98 transition-all duration-300">
+                    <span data-content-key="shop.showcase.btn">Visite His Kingdom Designs</span>
+                    <i class="fas fa-shopping-bag"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -289,8 +876,8 @@
                 <h2>Únete a la Comunidad</h2>
                 <p>Queremos ser un lugar donde puedas crecer en tu fe y experimentar la presencia de Dios.</p>
                 <div class="cta-buttons">
-                    <a href="eventos.html" class="btn btn-primary">Ver Eventos</a>
-                    <a href="contacto.html" class="btn btn-outline">Contáctanos</a>
+                    <a href="/es/eventos" class="btn btn-primary">Ver Eventos</a>
+                    <a href="/es/contacto" class="btn btn-outline">Contáctanos</a>
                 </div>
             </div>
         </div>
@@ -303,9 +890,9 @@
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/es/" class="logo">
                             <div class="logo-icon">
-                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
@@ -318,28 +905,30 @@
                         <div class="nav-col">
                             <h4>Sobre nosotros</h4>
                             <ul>
-                                <li><a href="index.html">Inicio</a></li>
-                                <li><a href="sobre-nosotros.html">¿Quiénes somos?</a></li>
-                                <li><a href="sobre-nosotros.html#vision">Nuestra visión</a></li>
-                                <li><a href="contacto.html">Contáctanos</a></li>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Recursos</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
-                                <li><a href="eventos.html">Cursos en línea</a></li>
-                                <li><a href="blog.html">Libros & Blog</a></li>
-                                <li><a href="../minside/index.html">Mi Página</a></li>
+                                <li><a href="/bibel">Biblia</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
@@ -348,10 +937,10 @@
                         <div class="nav-col">
                             <h4>Participación</h4>
                             <ul>
-                                <li><a href="eventos.html">Calendario</a></li>
-                                <li><a href="donaciones.html">Haz un donativo</a></li>
-                                <li><a href="privacy.html">Privacidad</a></li>
-                                <li><a href="accessibility.html">Accesibilidad</a></li>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Haz un donativo</a></li>
+                                <li><a href="/es/privacidad">Privacidad</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
                             </ul>
                         </div>
                     </div>
@@ -362,18 +951,18 @@
                     <div class="footer-card">
                         <h3>Síguenos</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank" aria-label="Facebook"><i
                                     class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
                                     class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <div class="footer-card contact-card">
                         <h3>Contáctanos</h3>
-                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
@@ -399,26 +988,126 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
 
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-    <!-- Firebase Config & Service -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
-
-    <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Cerrar búsqueda">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Buscar en el sitio</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Video Lightbox Modal -->
+    <div id="video-lightbox" class="video-lightbox" aria-hidden="true" role="dialog">
+        <div class="lightbox-overlay"></div>
+        <div class="lightbox-content-wrapper">
+            <button class="lightbox-close" aria-label="Cerrar video">&times;</button>
+            <div class="lightbox-video-container">
+                <iframe id="lightbox-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lightbox video player logic
+            const playButton = document.querySelector('.play-button');
+            const lightbox = document.getElementById('video-lightbox');
+            const iframe = document.getElementById('lightbox-iframe');
+            const closeBtn = document.querySelector('.lightbox-close');
+            const overlay = document.querySelector('.lightbox-overlay');
+
+            if (playButton && lightbox && iframe) {
+                const videoUrl = playButton.getAttribute('href');
+                
+                // Extract video ID from youtube URL
+                let videoId = '';
+                if (videoUrl.includes('v=')) {
+                    videoId = videoUrl.split('v=')[1].split('&')[0];
+                } else if (videoUrl.includes('youtu.be/')) {
+                    videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+                }
+
+                if (videoId) {
+                    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                    
+                    playButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        iframe.setAttribute('src', embedUrl);
+                        lightbox.classList.add('active');
+                        lightbox.setAttribute('aria-hidden', 'false');
+                        document.body.style.overflow = 'hidden';
+                    });
+                }
+            }
+
+            const closeLightbox = () => {
+                if (lightbox && iframe) {
+                    lightbox.classList.remove('active');
+                    lightbox.setAttribute('aria-hidden', 'true');
+                    iframe.setAttribute('src', '');
+                    document.body.style.overflow = '';
+                }
+            };
+
+            if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+            if (overlay) overlay.addEventListener('click', closeLightbox);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeLightbox();
+            });
+
+            // Accessibility upgrades for team toggle buttons
+            const teamMembers = document.querySelectorAll('.team-member');
+            teamMembers.forEach(member => {
+                const btn = member.querySelector('.team-toggle');
+                const bio = member.querySelector('.team-bio');
+                if (btn && bio) {
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Mostrar más biografía');
+                    
+                    const updateAria = () => {
+                        const isExpanded = member.classList.contains('expanded');
+                        btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                        btn.setAttribute('aria-label', isExpanded ? 'Mostrar menos biografía' : 'Mostrar más biografía');
+                    };
+
+                    btn.addEventListener('click', () => {
+                        setTimeout(updateAria, 50);
+                    });
+                    
+                    const name = member.querySelector('.team-name');
+                    const img = member.querySelector('.team-image');
+                    if (name) name.addEventListener('click', () => setTimeout(updateAria, 50));
+                    if (img) img.addEventListener('click', () => setTimeout(updateAria, 50));
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

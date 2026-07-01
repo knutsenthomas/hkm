@@ -1,0 +1,36 @@
+# World-class robots.txt for His Kingdom Ministry
+# Optimized for Search Engine Optimization (SEO) and Generative Engine Optimization (GEO)
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+Disallow: /api/
+
+# Explicitly allow AI Generative Search crawlers to index public pages for citations and references
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /minside/
+
+Sitemap: https://www.hiskingdomministry.no/sitemap.xml

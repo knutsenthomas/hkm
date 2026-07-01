@@ -278,7 +278,7 @@ ul {
 }
 
 .page-hero-title {
-    font-size: 3.5rem;
+    font-size: 2.25rem;
     font-weight: 800;
     margin-bottom: 1rem;
 }
@@ -2824,7 +2824,7 @@ body {
 }
 
 .page-hero-title {
-    font-size: 3.5rem;
+    font-size: 2.25rem;
     font-weight: 900;
     margin-bottom: 1rem;
     position: relative;
@@ -3038,7 +3038,11 @@ body {
 }
 
 .team-photo-focus {
-    object-position: center 25%;
+    object-position: center 18%;
+}
+
+.team-photo-focus-hilde {
+    object-position: center 18%;
 }
 
 .team-name {
@@ -3196,7 +3200,7 @@ body {
     }
 
     .page-hero-title {
-        font-size: 2.5rem;
+        font-size: 1.75rem;
     }
 
     .page-hero-subtitle {
@@ -4278,11 +4282,13 @@ ol.block-list {
 }
 
 .hero-nav.prev {
-    right: 100px;
+    left: 40px;
+    right: auto;
 }
 
 .hero-nav.next {
-    right: 40px;
+    left: 100px;
+    right: auto;
 }
 
 @media (max-width: 768px) {
@@ -4294,16 +4300,23 @@ ol.block-list {
     }
 
     .hero-nav {
-        bottom: 30px;
+        bottom: 96px;
+    }
+
+    @media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: fullscreen) {
+        .hero-nav {
+            bottom: 32px;
+        }
     }
 
     .hero-nav.prev {
-        right: auto;
         left: 20px;
+        right: auto;
     }
 
     .hero-nav.next {
-        right: 20px;
+        left: 74px;
+        right: auto;
     }
 }
 
@@ -4448,6 +4461,30 @@ ol.block-list {
 .mega-menu.active {
     opacity: 1;
     visibility: visible;
+}
+
+#mega-menu>div {
+    padding-top: 148px !important;
+}
+
+@media (min-width: 769px) {
+    .mega-menu {
+        bottom: auto !important;
+        height: auto !important;
+        max-height: 90vh !important;
+        border-bottom: 1px solid #f0f0f0;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+    }
+    #mega-menu>div {
+        padding-top: 148px !important;
+        padding-bottom: 48px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #mega-menu>div {
+        padding-top: 132px !important;
+    }
 }
 
 
@@ -4842,5 +4879,84 @@ ol.block-list {
     .header-actions .header-donate-btn,
     .header-actions .lang-switcher {
         display: none !important;
+    }
+}
+
+/* Unified subpage hero sizing and centering */
+:root {
+    --subpage-hero-height-desktop: 540px;
+    --subpage-hero-height-mobile: 320px;
+}
+
+.page-hero,
+.page-hero.subpage-hero,
+#blog-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Explicit lock for key pages requested by user */
+body.page-template-page-bli-fast-giver-php .page-hero,
+body.page-template-page-donasjoner-php .page-hero,
+body.page-template-page-bnn-php .page-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+}
+
+.page-hero .container,
+.page-hero-content {
+    width: 100%;
+    text-align: center;
+    height: 100%;
+}
+
+.page-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero-title,
+.page-hero-subtitle,
+.page-hero .page-title,
+.page-hero .breadcrumbs {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .page-hero,
+    .page-hero.subpage-hero,
+    #blog-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
+    }
+
+    body.page-template-page-bli-fast-giver-php .page-hero,
+    body.page-template-page-donasjoner-php .page-hero,
+    body.page-template-page-bnn-php .page-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
     }
 }

@@ -2,6 +2,25 @@
 <html lang="es">
 
 <head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/es/donantes-regulares">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/bli-fast-giver">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/regular-donors">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/donantes-regulares">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/bli-fast-giver">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hazte Donante Regular | His Kingdom Ministry</title>
@@ -11,17 +30,24 @@
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome (Deferred) -->
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"></noscript>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
+    <link rel="stylesheet" href="../css/stripe-checkout.css">
+    <script src="https://js.stripe.com/v3/"></script>
 
     <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -35,52 +61,365 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    
+    <style>
+        /* Premium Fast Giver Kort */
+        .donor-card {
+            background: #ffffff !important;
+            padding: 40px 32px !important;
+            border-radius: 24px !important;
+            text-align: center !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 10px 32px -12px rgba(0, 0, 0, 0.04) !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            height: 100% !important;
+        }
+
+        .donor-card:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: 0 20px 40px -16px rgba(27, 73, 101, 0.12) !important;
+            border-color: rgba(27, 73, 101, 0.15) !important;
+        }
+
+        .donor-card-icon {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 24px !important;
+            color: white !important;
+            font-size: 32px !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .donor-card:hover .donor-card-icon {
+            transform: scale(1.1) rotate(5deg) !important;
+        }
+
+        .donor-card-title {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #1B4965 !important;
+            margin-bottom: 16px !important;
+        }
+
+        .donor-card-text {
+            color: #5a6e7f !important;
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 24px !important;
+            flex-grow: 1 !important;
+        }
+
+        .donor-card-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            padding: 16px 24px !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 16px !important;
+            border: 2px solid transparent !important;
+        }
+
+        /* Knappefarger og glød */
+        .btn-vipps-premium {
+            border-color: #FF5B24 !important;
+            color: #FF5B24 !important;
+            background: transparent !important;
+        }
+        .btn-vipps-premium:hover {
+            background: #FF5B24 !important;
+            color: white !important;
+            box-shadow: 0 8px 24px rgba(255, 91, 36, 0.25) !important;
+        }
+        .btn-vipps-premium:active {
+            transform: scale(0.98) !important;
+        }
+
+        .btn-stripe-premium {
+            border-color: #1B4965 !important;
+            color: #1B4965 !important;
+            background: transparent !important;
+        }
+        .btn-stripe-premium:hover {
+            background: #1B4965 !important;
+            color: white !important;
+            box-shadow: 0 8px 24px rgba(27, 73, 101, 0.25) !important;
+        }
+        .btn-stripe-premium:active {
+            transform: scale(0.98) !important;
+        }
+
+        .btn-paypal-premium {
+            border-color: #003087 !important;
+            color: #003087 !important;
+            background: transparent !important;
+        }
+        .btn-paypal-premium:hover {
+            background: #003087 !important;
+            color: white !important;
+            box-shadow: 0 8px 24px rgba(0, 48, 135, 0.2) !important;
+        }
+        .btn-paypal-premium:active {
+            transform: scale(0.98) !important;
+        }
+
+        .btn-bank-premium {
+            border-color: #2196F3 !important;
+            color: #2196F3 !important;
+            background: transparent !important;
+        }
+        .btn-bank-premium:hover {
+            background: #2196F3 !important;
+            color: white !important;
+            box-shadow: 0 8px 24px rgba(33, 150, 243, 0.25) !important;
+        }
+        .btn-bank-premium:active {
+            transform: scale(0.98) !important;
+        }
+
+        /* Bankoverføring Detaljer */
+        .bank-details-box {
+            background: #f8fafc !important;
+            border: 1px dashed rgba(27, 73, 101, 0.2) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            text-align: left !important;
+            font-size: 13px !important;
+            color: #334155 !important;
+            margin-bottom: 16px !important;
+        }
+
+        .bank-detail-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 8px !important;
+            padding-bottom: 8px !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .bank-detail-row:last-child {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+            border-bottom: none !important;
+        }
+
+        .bank-detail-label {
+            font-weight: 600 !important;
+            color: #64748b !important;
+        }
+
+        .bank-detail-value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+
+        .copy-btn {
+            border: none !important;
+            background: none !important;
+            color: #1B4965 !important;
+            cursor: pointer !important;
+            padding: 4px 6px !important;
+            border-radius: 6px !important;
+            transition: all 0.2s !important;
+            font-size: 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .copy-btn:hover {
+            background: rgba(27, 73, 101, 0.08) !important;
+            color: #FF5B24 !important;
+        }
+
+        .donor-card-subtext {
+            font-size: 12px !important;
+            color: #64748b !important;
+            line-height: 1.5 !important;
+        }
+
+        .donor-card-subtext a {
+            color: #1B4965 !important;
+            text-decoration: underline !important;
+        }
+
+        .donor-card-subtext a:hover {
+            color: #FF5B24 !important;
+        }
+
+        /* Safe zone if hero is missing or hidden */
+        main > .regular-donor:first-child,
+        .subpage-hero.hidden + .regular-donor,
+        .subpage-hero[style*="display: none"] + .regular-donor {
+            padding-top: 160px !important;
+        }
+
+        /* Hover Reveal animasjon */
+        .donor-card-details {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        @media (hover: hover) {
+            .donor-card-details {
+                max-height: 0 !important;
+                opacity: 0 !important;
+                overflow: hidden !important;
+                transform: translateY(10px) !important;
+            }
+
+            .donor-card:hover .donor-card-details {
+                max-height: 300px !important;
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                margin-top: 16px !important;
+            }
+
+            .btn-bank-premium {
+                opacity: 1 !important;
+                max-height: 60px !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+
+            .donor-card:hover .btn-bank-premium {
+                opacity: 0 !important;
+                max-height: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+                border-width: 0 !important;
+                pointer-events: none !important;
+            }
+        }
+
+        @media (hover: none) {
+            .btn-bank-premium {
+                display: none !important;
+            }
+            .donor-card-details {
+                max-height: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                margin-top: 16px !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../css/search-v2.css?v=1.0.3">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/es/donantes-regulares">
+    <meta property="og:title" content="Hazte Donante Regular | His Kingdom Ministry">
+    <meta property="og:description" content="Hazte donante regular y apoya nuestro trabajo en His Kingdom Ministry para crear un cambio duradero.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/es/donantes-regulares">
+    <meta property="twitter:title" content="Hazte Donante Regular | His Kingdom Ministry">
+    <meta property="twitter:description" content="Hazte donante regular y apoya nuestro trabajo en His Kingdom Ministry para crear un cambio duradero.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
 </head>
 
-<body>
+<body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="text-xl">His Kingdom Ministry</span>
+                <span class="text-xl text-white">His Kingdom Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
-                <div class="lang-switcher relative group">
-                    <button
-                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>ES</span>
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
                     </button>
-                    <div
-                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="../bli-fast-giver.html"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴
-                            Norsk</a>
-                        <a href="../en/regular-donors.html"
-                            class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸
-                            English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Leer la Biblia" title="Leer la Biblia">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Planes de lectura" title="Planes de lectura">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>ES</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <a href="donaciones.html"
-                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Hacer donación <i class="fas fa-heart text-sm"></i>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Mi página" title="Mi página">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Foto de perfil" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
 
-                <!-- Unified Toggle Button -->
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/es/donaciones"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donar</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
                 <button
-                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle menú">
-                    <i class="fas fa-bars text-lg open-icon"></i>
-                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
                 </button>
             </div>
         </div>
@@ -88,29 +427,40 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="¿Qué estás buscando?"
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Mobile Language Selector (Pill Style) -->
-                <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                <!-- Mobile Language Selector & Theme Toggle (Pill Style) -->
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../bli-fast-giver.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="no"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../en/regular-donors.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="en"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="donantes-regulares.html" class="text-sm font-bold text-primary-orange">ES</a>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Cambiar tema" title="Cambiar tema">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -118,61 +468,188 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Participa -->
+                    <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Participa</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</div>
                         <ul class="mega-nav-list">
-                            <li><a href="donaciones.html">Apoya nuestro trabajo</a></li>
-                            <li><a href="donantes-regulares.html">Hazte donante regular</a></li>
-                            <li><a href="para-iglesias.html">Para iglesias</a></li>
-                            <li><a href="para-empresas.html">Para empresas</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donaciones" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Apoya la obra</a>
+                                    <span class="mega-menu-desc">Apoya nuestro ministerio financieramente.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a>
+                                    <span class="mega-menu-desc">Únete a nosotros con un apoyo mensual.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-iglesias" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">Para iglesias</a>
+                                    <span class="mega-menu-desc">Recursos y enseñanza para tu iglesia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/para-empresas" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">Para empresas</a>
+                                    <span class="mega-menu-desc">Acuerdos de patrocinio para empresas.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Red para líderes y empresarios cristianos.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</div>
                         <ul class="mega-nav-list">
-                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
-                            <li><a href="contacto.html">Contáctanos</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">Sobre nosotros</a>
+                                    <span class="mega-menu-desc">Conoce nuestra visión, fe y valores.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/contacto" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contáctanos</a>
+                                    <span class="mega-menu-desc">Envíanos un mensaje o pregunta.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Recursos & Media -->
+                    <!-- Column 3: Recursos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</div>
                         <ul class="mega-nav-list">
-                            <li><a href="eventos.html">Eventos</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">Noticias & Blog</a></li>
-                            <li><a href="../minside/index.html">Mi Página</a></li>
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a>
+                                    <span class="mega-menu-desc">Lee la Palabra de Dios con nuestra biblia.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Tienda</a>
+                                    <span class="mega-menu-desc">Ropa, tazas y accesorios cristianos.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Mira mensajes y escucha podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a>
+                                    <span class="mega-menu-desc">Enseñanzas y cursos para el crecimiento.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Actividad reciente -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Actividad reciente</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a>
+                                    <span class="mega-menu-desc">Sigue nuestros planes diarios de lectura.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/eventos" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Eventos</a>
+                                    <span class="mega-menu-desc">Únete a nuestros seminarios y reuniones.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">Noticias y Blog</a>
+                                    <span class="mega-menu-desc">Últimas actualizaciones y artículos.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/es/../minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">Mi página</a>
+                                    <span class="mega-menu-desc">Tu perfil y planes personales.</span>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donaciones.html#deduccion-fiscal">Deducción Fiscal</a>
-                        <a href="sobre-nosotros.html">Sobre nosotros</a>
-                        <a href="privacy.html">Privacidad</a>
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
     <main>
         <!-- Page Hero -->
-        <section class="page-hero" data-content-key="hero.backgroundImage"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
+            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
             <div class="container">
-                <div class="page-hero-content">
-                    <h1 class="page-hero-title" data-content-key="hero.title">Conviértete en donante regular</h1>
+                <h1 class="page-title" data-content-key="hero.title">Hazte Donante Regular</h1>
+                <div class="breadcrumbs">
+                    <a href="/">Inicio</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="/es/donaciones">Apóyanos</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Donante Regular</span>
                 </div>
             </div>
         </section>
@@ -182,51 +659,120 @@
             <div class="container">
                 <div class="section-header">
                     <span class="section-label">Hazte Donante Regular</span>
-                    <h2 class="section-title">Ayuda a Crear un Cambio Duradero</h2>
-                    <p class="section-description">Como donante regular, usted ayuda a asegurar la previsibilidad en
+                    <h2 class="section-title" data-content-key="regular_donor.title">Ayuda a Crear un Cambio Duradero</h2>
+                    <p class="section-description" data-content-key="regular_donor.description">Como donante regular, usted ayuda a asegurar la previsibilidad en
                         nuestro trabajo, de modo que podamos planificar y llevar a cabo más proyectos para el reino de
                         Dios.</p>
                 </div>
 
-                <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
                     <!-- Option 1: Vipps -->
-                    <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-mobile-alt"></i>
+                    <div class="donor-card">
+                        <div>
+                            <div class="donor-card-icon" style="background: #FF5B24;">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 class="donor-card-title" data-content-key="regular_donor.vipps.title">Donación Regular vía Vipps</h3>
+                            <p class="donor-card-text" data-content-key="regular_donor.vipps.text">La forma más fácil de ser donante regular. Creas un acuerdo directamente en la aplicación Vipps.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;">Donación Regular vía Vipps</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;">La forma más fácil de ser donante
-                            regular. Creas un acuerdo directamente en la aplicación Vipps.</p>
-                        <a href="https://vipps.no" target="_blank" class="btn btn-outline"
-                            style="color: #FF5B24; border-color: #FF5B24;">Crear en Vipps</a>
+                        <div>
+                            <a href="javascript:void(0)" class="donor-card-btn btn-vipps-premium"
+                                data-content-key="regular_donor.vipps.cta" id="vipps-recurring-trigger">Crear en Vipps</a>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.vipps.subtext">Sin período de compromiso. El acuerdo se puede cancelar fácilmente en Vipps o por correo electrónico. Consulte nuestros <a href="/betingelser">términos para pagos regulares</a>.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Option 2: Transferencia Bancaria -->
-                    <div
-                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
-                        <div
-                            style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
-                            <i class="fas fa-university"></i>
+                    <!-- Option 2: Pago con Tarjeta (Stripe) -->
+                    <div class="donor-card">
+                        <div>
+                            <div class="donor-card-icon" style="background: #1B4965;">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <h3 class="donor-card-title" data-content-key="regular_donor.stripe.title">Donación Regular con Tarjeta</h3>
+                            <p class="donor-card-text" data-content-key="regular_donor.stripe.text">Apóyenos con una deducción mensual de su tarjeta de crédito (Visa o Mastercard) a través de Stripe.</p>
                         </div>
-                        <h3 style="margin-bottom: 15px;">Transferencia Bancaria</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;">Configure una transferencia regular en
-                            su banco en línea a nuestra cuenta. Esto nos genera las comisiones más bajas.</p>
-                        <div
-                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);">
-                            Cuenta: 3000.66.08759
+                        <div>
+                            <a href="javascript:void(0)" class="donor-card-btn btn-stripe-premium"
+                                data-content-key="regular_donor.stripe.cta" id="stripe-recurring-trigger">Crear con tarjeta</a>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.stripe.subtext">Sin período de compromiso. El acuerdo se puede cancelar fácilmente por correo electrónico o Mi Página. Consulte nuestros <a href="/betingelser">términos para pagos regulares</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Donación Regular con PayPal -->
+                    <div class="donor-card">
+                        <div>
+                            <div class="donor-card-icon" style="background: #FFC439;">
+                                <i class="fab fa-paypal"></i>
+                            </div>
+                            <h3 class="donor-card-title" data-content-key="regular_donor.paypal.title">Donación Regular con PayPal</h3>
+                            <p class="donor-card-text" data-content-key="regular_donor.paypal.text">Cree una donación automática mensual a través de su cuenta de PayPal.</p>
+                        </div>
+                        <div>
+                            <a href="javascript:void(0)" class="donor-card-btn btn-paypal-premium"
+                                data-content-key="regular_donor.paypal.cta" id="paypal-recurring-trigger">Crear con PayPal</a>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.paypal.subtext">Sin período de compromiso. Se puede cancelar fácilmente en PayPal o por correo electrónico. Consulte nuestros <a href="/betingelser">términos para pagos regulares</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 4: Transferencia Bancaria -->
+                    <div class="donor-card">
+                        <div>
+                            <div class="donor-card-icon" style="background: #2196F3;">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h3 class="donor-card-title" data-content-key="regular_donor.bank.title">Transferencia Bancaria</h3>
+                            <p class="donor-card-text" data-content-key="regular_donor.bank.text">Configure una transferencia regular en su banco en línea a nuestra cuenta. Esto nos genera las comisiones más bajas.</p>
+                        </div>
+                        <div>
+                            <div class="donor-card-btn btn-bank-premium">Ver detalles bancarios</div>
+                            <div class="donor-card-details">
+                                <div class="bank-details-box">
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">Cuenta</span>
+                                        <span class="bank-detail-value">
+                                            3000.66.08759
+                                            <button class="copy-btn" onclick="copyToClipboard('3000.66.08759', this)" title="Copiar cuenta">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">IBAN</span>
+                                        <span class="bank-detail-value">
+                                            NO7230006608759
+                                            <button class="copy-btn" onclick="copyToClipboard('NO7230006608759', this)" title="Copiar IBAN">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">SWIFT/BIC</span>
+                                        <span class="bank-detail-value">
+                                            SPSONO22
+                                            <button class="copy-btn" onclick="copyToClipboard('SPSONO22', this)" title="Copiar SWIFT/BIC">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="donor-card-subtext">Banco: Sparebanken Sør. Puede marcar la transferencia con «Donación» y su nombre como referencia.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 60px; text-align: center; background: var(--bg-light); padding: 30px; border-radius: 15px;"
                     id="deduccion-fiscal">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"
+                    <h4 style="margin-bottom: 10px;" data-content-key="regular_donor.tax.title"><i class="fas fa-info-circle"
                             style="margin-right: 10px; color: var(--primary-orange);"></i>¿Sabía que obtiene una
                         deducción fiscal?</h4>
-                    <p style="max-width: 800px; margin: 0 auto;">Las donaciones a His Kingdom Ministry son elegibles
+                    <p style="max-width: 800px; margin: 0 auto;" data-content-key="regular_donor.tax.description">Las donaciones a His Kingdom Ministry son elegibles
                         para una deducción fiscal si las donaciones totales durante un año calendario son de al menos
                         500 NOK. Para recibir la deducción, debemos tener su número de seguridad social (11 dígitos,
                         para residentes en Noruega).</p>
@@ -238,13 +784,13 @@
         <section class="newsletter">
             <div class="container">
                 <div class="newsletter-content">
-                    <h2 class="newsletter-title">Manténgase Informado</h2>
-                    <p class="newsletter-text">Suscríbase a nuestro boletín para recibir las últimas noticias
+                    <h2 class="newsletter-title" data-content-key="newsletter.title">Manténgase Informado</h2>
+                    <p class="newsletter-text" data-content-key="newsletter.text">Suscríbase a nuestro boletín para recibir las últimas noticias
                         directamente en su bandeja de entrada.</p>
 
                     <form class="newsletter-form">
-                        <input type="email" class="newsletter-input" placeholder="Su correo electrónico" required>
-                        <button type="submit" class="btn btn-primary">Suscribirse</button>
+                        <input type="email" class="newsletter-input" placeholder="Su correo electrónico" data-content-key="newsletter.placeholder" data-content-attr="placeholder" required>
+                        <button type="submit" class="btn btn-primary" data-content-key="newsletter.btnText">Suscribirse</button>
                     </form>
                 </div>
             </div>
@@ -258,9 +804,9 @@
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/es/" class="logo">
                             <div class="logo-icon">
-                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
@@ -273,28 +819,30 @@
                         <div class="nav-col">
                             <h4>Sobre nosotros</h4>
                             <ul>
-                                <li><a href="index.html">Inicio</a></li>
-                                <li><a href="sobre-nosotros.html">¿Quiénes somos?</a></li>
-                                <li><a href="sobre-nosotros.html#vision">Nuestra visión</a></li>
-                                <li><a href="contacto.html">Contáctanos</a></li>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Recursos</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
-                                <li><a href="eventos.html">Cursos en línea</a></li>
-                                <li><a href="blog.html">Libros & Blog</a></li>
-                                <li><a href="../minside/index.html">Mi Página</a></li>
+                                <li><a href="/bibel">Biblia</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
@@ -303,10 +851,10 @@
                         <div class="nav-col">
                             <h4>Participación</h4>
                             <ul>
-                                <li><a href="eventos.html">Calendario</a></li>
-                                <li><a href="donaciones.html">Haz un donativo</a></li>
-                                <li><a href="privacy.html">Privacidad</a></li>
-                                <li><a href="accessibility.html">Accesibilidad</a></li>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Haz un donativo</a></li>
+                                <li><a href="/es/privacidad">Privacidad</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
                             </ul>
                         </div>
                     </div>
@@ -317,18 +865,18 @@
                     <div class="footer-card">
                         <h3>Síguenos</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank" aria-label="Facebook"><i
                                     class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
                                     class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
                                     class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <div class="footer-card contact-card">
                         <h3>Contáctanos</h3>
-                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
@@ -354,25 +902,63 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
 
     <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
 
     <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+    <script type="module" src="../js/stripe-checkout.js"></script>
+    <script type="module" src="../js/vipps-recurring.js"></script>
+    <script>
+        function copyToClipboard(text, btnElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fas fa-check" style="color: #10B981;"></i>';
+                btnElement.title = "Copiado!";
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.title = "Copiar";
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+            });
+        }
+    </script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Cerrar búsqueda">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Buscar en el sitio</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="¿Qué estás buscando? Escribe para sugerencias..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Presione 'Enter' para búsqueda completa.</span>
+            </div>
+
+        </div>
+    </div>
     <script type="module" src="../js/cookie-consent.js"></script>
 </body>
 

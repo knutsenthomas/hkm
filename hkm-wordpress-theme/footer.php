@@ -94,7 +94,7 @@
                         </div>
                         <div class="detail-item">
                             <strong>Vipps:</strong>
-                            <p>938361</p>
+                            <p>993486</p>
                         </div>
                         <div class="detail-item">
                             <strong>Konto nr.:</strong>
