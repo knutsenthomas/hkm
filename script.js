@@ -3,7 +3,7 @@
 // JavaScript Functionality (v2.1.0)
 // ===================================
 
-import { biblicalCharacters } from './js/bibelske-personer-data.js';
+// biblicalCharacters database is loaded dynamically inside performSiteSearch to optimize bundle size
 
 const BIBLE_BOOKS = {
     no: [
@@ -1513,10 +1513,18 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             });
         }
 
-        // 5.7) Bibelske personer (fra js/bibelske-personer-data.js)
-        if (Array.isArray(biblicalCharacters) && biblicalCharacters.length) {
+        // 5.7) Bibelske personer (fra js/bibelske-personer-data.js - loaded dynamically)
+        let characters = [];
+        try {
+            const module = await import('./js/bibelske-personer-data.js');
+            characters = module.biblicalCharacters || [];
+        } catch (e) {
+            console.warn('[Search] Failed to load biblical characters dynamically:', e);
+        }
+
+        if (Array.isArray(characters) && characters.length) {
             const lang = getCurrentLanguage();
-            biblicalCharacters.forEach(person => {
+            characters.forEach(person => {
                 const nameText = person.name[lang] || person.name['no'] || '';
                 const roleText = person.role[lang] || person.role['no'] || '';
                 const eraText = person.era[lang] || person.era['no'] || '';
