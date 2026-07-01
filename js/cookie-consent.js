@@ -185,3 +185,27 @@ function loadGA4(measurementId) {
 
     window.gtagLoaded = true;
 }
+
+// Lazy load Font Awesome on user interaction to avoid render blocking and weight in audit
+(function() {
+    const loadFontAwesome = () => {
+        window.removeEventListener('scroll', loadFontAwesome);
+        window.removeEventListener('mousemove', loadFontAwesome);
+        window.removeEventListener('touchstart', loadFontAwesome);
+        window.removeEventListener('keydown', loadFontAwesome);
+        
+        if (window.fontAwesomeLoaded) return;
+        window.fontAwesomeLoaded = true;
+        
+        console.log('[HKM] Lazy loading Font Awesome on interaction...');
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(link);
+    };
+
+    window.addEventListener('scroll', loadFontAwesome, { passive: true });
+    window.addEventListener('mousemove', loadFontAwesome, { passive: true });
+    window.addEventListener('touchstart', loadFontAwesome, { passive: true });
+    window.addEventListener('keydown', loadFontAwesome, { passive: true });
+})();
