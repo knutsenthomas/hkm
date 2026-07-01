@@ -4573,3 +4573,78 @@ window.addEventListener('load', () => {
     }
 })();
 
+// Header Dynamic Profile Button Implementation
+(function() {
+    async function initHeaderProfile() {
+        let count = 0;
+        // Wait for firebaseService and firebase auth to load
+        while ((!window.firebaseService || !window.firebaseService.isInitialized || typeof firebase === 'undefined') && count < 100) {
+            await new Promise(r => setTimeout(r, 50));
+            count++;
+        }
+
+        const profileLink = document.getElementById('header-profile-link');
+        if (!profileLink) return;
+
+        const profileImg = document.getElementById('header-profile-img');
+        const profileIcon = profileLink.querySelector('.material-symbols-outlined');
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user || user.isAnonymous) {
+                profileLink.classList.add('hidden');
+                if (profileImg) profileImg.classList.add('hidden');
+                if (profileIcon) profileIcon.classList.remove('hidden');
+                return;
+            }
+
+            // User is logged in, show the profile button
+            profileLink.classList.remove('hidden');
+
+            // Determine destination link based on role
+            let role = 'medlem';
+            try {
+                role = await window.firebaseService.getUserRole(user.uid);
+            } catch (err) {
+                console.warn('Kunne ikke hente rolle for profil-lenke:', err);
+            }
+            const canAccessAdmin = window.HKM_PERMISSIONS
+                && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+            
+            profileLink.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+
+            // Check if user has a profile picture in Firestore or Auth profile
+            let photoURL = user.photoURL;
+
+            try {
+                const userDoc = await window.firebaseService.db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    if (userData.photoURL) {
+                        photoURL = userData.photoURL;
+                    } else if (userData.profileImage) {
+                        photoURL = userData.profileImage;
+                    }
+                }
+            } catch (docErr) {
+                console.warn('Kunne ikke hente brukerprofil for bilde:', docErr);
+            }
+
+            if (photoURL && profileImg) {
+                profileImg.src = photoURL;
+                profileImg.classList.remove('hidden');
+                if (profileIcon) profileIcon.classList.add('hidden');
+            } else {
+                if (profileImg) profileImg.classList.add('hidden');
+                if (profileIcon) profileIcon.classList.remove('hidden');
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeaderProfile);
+    } else {
+        initHeaderProfile();
+    }
+})();
+
