@@ -823,12 +823,9 @@ class ContentManager {
 
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
-            const [heroData, events, blogData, teachingData, causes] = await Promise.all([
+            const [heroData, events] = await Promise.all([
                 this.getContentDoc('hero_slides', { silent: true }),
-                this.loadEvents(),
-                this.getContentDoc('collection_blog', { silent: true }),
-                this.getContentDoc('collection_teaching', { silent: true }),
-                this.loadCauses()
+                this.loadEvents()
             ]);
 
             if (heroData && heroData.slides) {
@@ -846,29 +843,36 @@ class ContentManager {
                 });
             }
 
-            // 4. Testimonials
-            const testimonialsData = await this.getContentDoc('collection_testimonials', { silent: true });
-            const testimonials = this.getCollectionItems(testimonialsData);
-            this.renderTestimonials(testimonials);
-
-            const blogItems = this.getDedupedBlogItems(blogData);
-            const localizedBlogItems = this.localizeBlogItems(blogItems);
-            if (localizedBlogItems.length > 0) {
-                // NO uses #blogg, EN/ES use #blog
-                this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
-            }
-
-            const teachingItems = this.getCollectionItems(teachingData);
-            const frontTeachingContainer = document.getElementById('siste-undervisning');
-            if (teachingItems.length > 0 && frontTeachingContainer) {
-                // Show up to 3 most recent teachings
-                frontTeachingContainer.style.display = 'block';
-                this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
-            }
-
-            this.renderCauses(causes);
-
             this.enableHeroAnimations();
+
+            // Defer loading of heavy below-the-fold content (1.5 MB of data!)
+            // this keeps FCP/LCP extremely fast!
+            setTimeout(async () => {
+                const [blogData, teachingData, causes, testimonialsData] = await Promise.all([
+                    this.getContentDoc('collection_blog', { silent: true }),
+                    this.getContentDoc('collection_teaching', { silent: true }),
+                    this.loadCauses(),
+                    this.getContentDoc('collection_testimonials', { silent: true })
+                ]);
+
+                const testimonials = this.getCollectionItems(testimonialsData);
+                this.renderTestimonials(testimonials);
+
+                const blogItems = this.getDedupedBlogItems(blogData);
+                const localizedBlogItems = this.localizeBlogItems(blogItems);
+                if (localizedBlogItems.length > 0) {
+                    this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+                }
+
+                const teachingItems = this.getCollectionItems(teachingData);
+                const frontTeachingContainer = document.getElementById('siste-undervisning');
+                if (teachingItems.length > 0 && frontTeachingContainer) {
+                    frontTeachingContainer.style.display = 'block';
+                    this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
+                }
+
+                this.renderCauses(causes);
+            }, 100);
         }
 
         if (this.pageId === 'blogg-post') {
