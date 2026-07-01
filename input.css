@@ -6098,6 +6098,9 @@ html[data-theme="dark"] .mega-menu-desc {
     border: 1px solid #edf2f7;
     padding: 10px 18px;
     border-radius: 16px;
+    margin-left: -18px; /* Align icon vertically with upper items */
+    margin-top: -6px; /* Offset the extra top padding */
+    margin-bottom: 18px; /* Offset bottom padding to keep spacing even */
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
