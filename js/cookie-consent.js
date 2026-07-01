@@ -131,7 +131,21 @@ function applyConsent(consent) {
     // Statistikk (Analytics)
     if (consent.analytics) {
         const measurementId = window.firebaseConfig?.measurementId || 'G-5CH82CHQ0B';
-        loadGA4(measurementId);
+        const loadGAWithInteraction = () => {
+            // Clean up event listeners to run only once
+            window.removeEventListener('scroll', loadGAWithInteraction);
+            window.removeEventListener('mousemove', loadGAWithInteraction);
+            window.removeEventListener('touchstart', loadGAWithInteraction);
+            window.removeEventListener('keydown', loadGAWithInteraction);
+            
+            loadGA4(measurementId);
+        };
+        
+        // Listen for user interaction
+        window.addEventListener('scroll', loadGAWithInteraction, { passive: true });
+        window.addEventListener('mousemove', loadGAWithInteraction, { passive: true });
+        window.addEventListener('touchstart', loadGAWithInteraction, { passive: true });
+        window.addEventListener('keydown', loadGAWithInteraction, { passive: true });
     }
 
     // Markedsføring
