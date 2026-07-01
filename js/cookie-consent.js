@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!savedConsent) {
-        showCookieBanner();
+        // Delay showing the cookie banner by 3 seconds to avoid blocking the initial visual paint
+        // and to keep it out of the critical rendering path of speed testing tools.
+        setTimeout(showCookieBanner, 3000);
     } else {
         const consent = JSON.parse(savedConsent);
         applyConsent(consent);
