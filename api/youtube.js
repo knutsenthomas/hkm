@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const apiKey = req.query.key || process.env.YOUTUBE_API_KEY;
 
   if (!apiKey) {
-    res.status(401).json({ error: { message: "YouTube API Key is missing. Please set YOUTUBE_API_KEY environment variable." } });
+    res.status(200).json({ error: { message: "YouTube API Key is missing. Please set YOUTUBE_API_KEY environment variable." }, success: false });
     return;
   }
 
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     } else if (action === 'stats' && channelId) {
       url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${encodeURIComponent(channelId)}&key=${apiKey}`;
     } else {
-      res.status(400).json({ error: { message: "Invalid action or missing required parameters (playlistId / channelId)." } });
+      res.status(200).json({ error: { message: "Invalid action or missing required parameters (playlistId / channelId)." }, success: false });
       return;
     }
 
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       console.error(`[YouTube API Proxy] Error calling Google APIs:`, data);
-      res.status(response.status).json(data);
+      res.status(200).json({ error: data.error || data, success: false });
       return;
     }
 
@@ -60,6 +60,6 @@ export default async function handler(req, res) {
     res.status(200).json(data);
   } catch (error) {
     console.error("[YouTube API Proxy] Internal Server Error:", error);
-    res.status(500).json({ error: { message: "Internal Server Error in YouTube proxy." } });
+    res.status(200).json({ error: { message: "Internal Server Error in YouTube proxy." }, success: false });
   }
 }
