@@ -4600,18 +4600,8 @@ window.addEventListener('load', () => {
             // User is logged in, show the profile button
             profileLink.classList.remove('hidden');
 
-            // Determine destination link based on role
-            let role = 'medlem';
-            try {
-                role = await window.firebaseService.getUserRole(user.uid);
-            } catch (err) {
-                console.warn('Kunne ikke hente rolle for profil-lenke:', err);
-            }
-            const canAccessAdmin = window.HKM_PERMISSIONS
-                && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
-            
-            profileLink.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+            // Always point the profile link in the header directly to Min Side
+            profileLink.href = '/minside/index.html';
 
             // Check if user has a profile picture in Firestore or Auth profile
             let photoURL = user.photoURL;
