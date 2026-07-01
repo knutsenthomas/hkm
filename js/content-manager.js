@@ -847,7 +847,7 @@ class ContentManager {
 
             // Defer loading of heavy below-the-fold content (1.5 MB of data!)
             // this keeps FCP/LCP extremely fast!
-            const triggerEl = document.getElementById('siste-undervisning') || document.getElementById('blogg') || document.getElementById('blog');
+            const triggerEl = document.getElementById('blogg') || document.getElementById('blog');
             const loadDeferredContent = async () => {
                 if (window.deferredContentLoaded) return;
                 window.deferredContentLoaded = true;
