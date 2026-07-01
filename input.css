@@ -8781,6 +8781,41 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     left: 9px !important;
 }
 
+/* Header Profile Link styling */
+#header-profile-link {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+#header-profile-link:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.05);
+}
+#header-profile-link:active {
+    transform: scale(0.95);
+}
+.header.scrolled #header-profile-link,
+.header.menu-open #header-profile-link,
+body:not(.header-dark-start) .header #header-profile-link {
+    border-color: rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.03);
+    color: #1B4965 !important;
+}
+.header.scrolled #header-profile-link:hover,
+.header.menu-open #header-profile-link:hover,
+body:not(.header-dark-start) .header #header-profile-link:hover {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="dark"] #header-profile-link {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #f1f5f9 !important;
+}
+html[data-theme="dark"] #header-profile-link:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
 
 
 
