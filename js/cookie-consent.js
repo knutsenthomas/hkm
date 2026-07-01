@@ -4,32 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const CONSENT_KEY = 'hkm_cookie_consent';
-
-    // Check if consent is already given
-    const savedConsent = localStorage.getItem(CONSENT_KEY);
-    const userAgent = navigator.userAgent;
-    const isLighthouse = userAgent.includes('Chrome-Lighthouse') || 
-                         userAgent.includes('Lighthouse') || 
-                         userAgent.includes('Google-PageSpeed') || 
-                         userAgent.includes('PageSpeed') ||
-                         userAgent.includes('Pingdom') ||
-                         userAgent.includes('GTmetrix');
-
-    if (isLighthouse) {
-        // Automatically apply all cookies for Lighthouse to test page performance without modal occlusion
-        applyConsent({ necessary: true, analytics: true, marketing: true });
-        return;
-    }
-
-    if (!savedConsent) {
-        // Delay showing the cookie banner by 3 seconds to avoid blocking the initial visual paint
-        // and to keep it out of the critical rendering path of speed testing tools.
-        setTimeout(showCookieBanner, 3000);
-    } else {
-        const consent = JSON.parse(savedConsent);
-        applyConsent(consent);
-    }
+    // Cookie banner temporarily deactivated by user request - auto-apply consent for functionality
+    applyConsent({ necessary: true, analytics: true, marketing: true });
 });
 
 function showCookieBanner() {
