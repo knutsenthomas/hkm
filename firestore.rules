@@ -39,7 +39,8 @@ service cloud.firestore {
     function selfEmailAligned() {
       return !hasKey(request.resource.data, 'email') ||
         (request.auth.token.email is string &&
-         request.resource.data.email == request.auth.token.email);
+         request.resource.data.email is string &&
+         request.resource.data.email.lower() == request.auth.token.email.lower());
     }
 
     function selfRoleSafeOnCreate() {

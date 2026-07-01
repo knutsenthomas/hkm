@@ -1630,7 +1630,7 @@ class MinSideManager {
             const doc = await ref.get();
             if (!doc.exists) {
                 await ref.set({
-                    email: user.email || '',
+                    email: (user.email || '').toLowerCase().trim(),
                     displayName: user.displayName || '',
                     photoURL: user.photoURL || '',
                     role: 'medlem',

@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (userDoc && !userDoc.exists) {
             await firebase.firestore().collection('users').doc(user.uid).set({
-                email: user.email,
+                email: (user.email || '').toLowerCase().trim(),
                 displayName: user.displayName || '',
                 photoURL: user.photoURL || '',
                 role: 'medlem',
