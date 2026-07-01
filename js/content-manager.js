@@ -847,32 +847,53 @@ class ContentManager {
 
             // Defer loading of heavy below-the-fold content (1.5 MB of data!)
             // this keeps FCP/LCP extremely fast!
-            setTimeout(async () => {
-                const [blogData, teachingData, causes, testimonialsData] = await Promise.all([
-                    this.getContentDoc('collection_blog', { silent: true }),
-                    this.getContentDoc('collection_teaching', { silent: true }),
-                    this.loadCauses(),
-                    this.getContentDoc('collection_testimonials', { silent: true })
-                ]);
+            const triggerEl = document.getElementById('om-oss');
+            const loadDeferredContent = async () => {
+                if (window.deferredContentLoaded) return;
+                window.deferredContentLoaded = true;
+                
+                try {
+                    const [blogData, teachingData, causes, testimonialsData] = await Promise.all([
+                        this.getContentDoc('collection_blog', { silent: true }),
+                        this.getContentDoc('collection_teaching', { silent: true }),
+                        this.loadCauses(),
+                        this.getContentDoc('collection_testimonials', { silent: true })
+                    ]);
 
-                const testimonials = this.getCollectionItems(testimonialsData);
-                this.renderTestimonials(testimonials);
+                    const testimonials = this.getCollectionItems(testimonialsData);
+                    this.renderTestimonials(testimonials);
 
-                const blogItems = this.getDedupedBlogItems(blogData);
-                const localizedBlogItems = this.localizeBlogItems(blogItems);
-                if (localizedBlogItems.length > 0) {
-                    this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+                    const blogItems = this.getDedupedBlogItems(blogData);
+                    const localizedBlogItems = this.localizeBlogItems(blogItems);
+                    if (localizedBlogItems.length > 0) {
+                        this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+                    }
+
+                    const teachingItems = this.getCollectionItems(teachingData);
+                    const frontTeachingContainer = document.getElementById('siste-undervisning');
+                    if (teachingItems.length > 0 && frontTeachingContainer) {
+                        frontTeachingContainer.style.display = 'block';
+                        this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
+                    }
+
+                    this.renderCauses(causes);
+                } catch (err) {
+                    console.error('[ContentManager] Failed to load deferred content:', err);
                 }
+            };
 
-                const teachingItems = this.getCollectionItems(teachingData);
-                const frontTeachingContainer = document.getElementById('siste-undervisning');
-                if (teachingItems.length > 0 && frontTeachingContainer) {
-                    frontTeachingContainer.style.display = 'block';
-                    this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
-                }
-
-                this.renderCauses(causes);
-            }, 100);
+            if (triggerEl && 'IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries.some(entry => entry.isIntersecting)) {
+                        loadDeferredContent();
+                        observer.disconnect();
+                    }
+                }, { rootMargin: '200px 0px' });
+                observer.observe(triggerEl);
+            } else {
+                // Fallback to load after 2 seconds if no observer support or element missing
+                setTimeout(loadDeferredContent, 2000);
+            }
         }
 
         if (this.pageId === 'blogg-post') {
