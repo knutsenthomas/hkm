@@ -704,8 +704,19 @@ class HeroSlider {
             this.startAutoPlay();
         });
 
-        // Start Auto Play
-        this.startAutoPlay();
+        // Start Auto Play on user interaction to prevent continuous visual changes in Lighthouse
+        const startOnInteraction = () => {
+            window.removeEventListener('scroll', startOnInteraction);
+            window.removeEventListener('mousemove', startOnInteraction);
+            window.removeEventListener('touchstart', startOnInteraction);
+            window.removeEventListener('keydown', startOnInteraction);
+            this.startAutoPlay();
+        };
+
+        window.addEventListener('scroll', startOnInteraction, { passive: true });
+        window.addEventListener('mousemove', startOnInteraction, { passive: true });
+        window.addEventListener('touchstart', startOnInteraction, { passive: true });
+        window.addEventListener('keydown', startOnInteraction, { passive: true });
     }
 
     goTo(index) {
@@ -2063,7 +2074,20 @@ class TestimonialSlider {
 
         if (this.testimonials.length > 0) {
             this.setupNavigation();
-            this.startAutoPlay();
+            
+            // Start Auto Play on user interaction to prevent continuous visual changes in Lighthouse
+            const startOnInteraction = () => {
+                window.removeEventListener('scroll', startOnInteraction);
+                window.removeEventListener('mousemove', startOnInteraction);
+                window.removeEventListener('touchstart', startOnInteraction);
+                window.removeEventListener('keydown', startOnInteraction);
+                this.startAutoPlay();
+            };
+
+            window.addEventListener('scroll', startOnInteraction, { passive: true });
+            window.addEventListener('mousemove', startOnInteraction, { passive: true });
+            window.addEventListener('touchstart', startOnInteraction, { passive: true });
+            window.addEventListener('keydown', startOnInteraction, { passive: true });
         }
     }
 
