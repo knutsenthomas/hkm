@@ -882,17 +882,31 @@ class ContentManager {
                 }
             };
 
-            if (triggerEl && 'IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries) => {
-                    if (entries.some(entry => entry.isIntersecting)) {
-                        loadDeferredContent();
-                        observer.disconnect();
-                    }
-                }, { rootMargin: '100px 0px' });
-                observer.observe(triggerEl);
+            const setupObserver = () => {
+                if (triggerEl && 'IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        if (entries.some(entry => entry.isIntersecting)) {
+                            loadDeferredContent();
+                            observer.disconnect();
+                        }
+                    }, { rootMargin: '100px 0px' });
+                    
+                    // Delay actual observation to ensure CSS is loaded and layout is stabilized
+                    setTimeout(() => {
+                        if (!window.deferredContentLoaded) {
+                            observer.observe(triggerEl);
+                        }
+                    }, 800);
+                } else {
+                    // Fallback to load after 4 seconds if no observer support or element missing
+                    setTimeout(loadDeferredContent, 4000);
+                }
+            };
+
+            if (document.readyState === 'complete') {
+                setupObserver();
             } else {
-                // Fallback to load after 2 seconds if no observer support or element missing
-                setTimeout(loadDeferredContent, 2000);
+                window.addEventListener('load', setupObserver);
             }
         }
 
