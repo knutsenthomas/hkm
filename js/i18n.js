@@ -71,12 +71,16 @@ const i18nManager = {
 
         const observer = new MutationObserver((mutations) => {
             for (const m of mutations) {
-                const targetEl = m.target && m.target.nodeType === 1
-                    ? m.target
-                    : m.target?.parentElement;
-                if (targetEl && targetEl.closest && targetEl.closest('.lang-switcher')) {
-                    scheduleSync();
-                    return;
+                if (m.type === 'childList' && m.addedNodes.length > 0) {
+                    for (let i = 0; i < m.addedNodes.length; i++) {
+                        const node = m.addedNodes[i];
+                        if (node.nodeType === 1) { // Node.ELEMENT_NODE
+                            if (node.classList.contains('lang-switcher') || node.querySelector('.lang-switcher')) {
+                                scheduleSync();
+                                return;
+                            }
+                        }
+                    }
                 }
             }
         });
