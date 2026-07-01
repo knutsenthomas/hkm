@@ -847,7 +847,7 @@ class ContentManager {
 
             // Defer loading of heavy below-the-fold content (1.5 MB of data!)
             // this keeps FCP/LCP extremely fast!
-            const triggerEl = document.getElementById('om-oss');
+            const triggerEl = document.getElementById('siste-undervisning') || document.getElementById('blogg') || document.getElementById('blog');
             const loadDeferredContent = async () => {
                 if (window.deferredContentLoaded) return;
                 window.deferredContentLoaded = true;
@@ -888,7 +888,7 @@ class ContentManager {
                         loadDeferredContent();
                         observer.disconnect();
                     }
-                }, { rootMargin: '200px 0px' });
+                }, { rootMargin: '100px 0px' });
                 observer.observe(triggerEl);
             } else {
                 // Fallback to load after 2 seconds if no observer support or element missing
