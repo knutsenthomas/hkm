@@ -100,6 +100,41 @@ class FirebaseService {
         return null;
     }
 
+    _lazyLoadFirebaseSDK() {
+        if (typeof window === 'undefined' || window.firebaseSDKLoading || typeof firebase !== 'undefined') return;
+        window.firebaseSDKLoading = true;
+        
+        console.log('[FirebaseService] Lazy loading Firebase SDK compat libraries...');
+        const scripts = [
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
+            'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js'
+        ];
+        
+        let index = 0;
+        const loadNext = () => {
+            if (index >= scripts.length) {
+                console.log('[FirebaseService] Firebase SDK compat libraries loaded successfully.');
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = scripts[index++];
+            s.async = true;
+            s.onload = loadNext;
+            document.head.appendChild(s);
+        };
+
+        const triggerLoad = () => {
+            setTimeout(loadNext, 1500); // 1.5 seconds delay after page is interactive
+        };
+
+        if (document.readyState === 'complete') {
+            triggerLoad();
+        } else {
+            window.addEventListener('load', triggerLoad);
+        }
+    }
+
     tryAutoInit() {
         if (this.isInitialized) return true;
 
@@ -110,6 +145,7 @@ class FirebaseService {
 
         // Check if firebase is available globally (from script tag)
         if (typeof firebase === 'undefined') {
+            this._lazyLoadFirebaseSDK();
             if (typeof window !== 'undefined' && !this._retryRegistered) {
                 this._retryRegistered = true;
                 const retryInit = () => {
