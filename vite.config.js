@@ -42,6 +42,9 @@ export default defineConfig({
             input: getHtmlEntries(__dirname),
             output: {
                 manualChunks(id) {
+                    if (id.includes('js/cookie-consent.js')) {
+                        return 'cookie-consent-only';
+                    }
                     if (id.includes('node_modules')) {
                         if (id.includes('firebase')) {
                             return 'vendor-firebase';

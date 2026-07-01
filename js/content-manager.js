@@ -3456,11 +3456,11 @@ class ContentManager {
                                 <div class="hero-video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);"></div>
                             </div>
                         ` : (hasVideo ? `
-                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${slide.imageUrl}">
+                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 600 : 1200 })}">
                                 <source src="${videoUrl}" type="video/mp4">
                             </video>
                         ` : `
-                            <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                            <div class="hero-bg" style="background-image: url('${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 600 : 1200 })}')"></div>
                         `)}
                         <div class="container hero-container">
                             <div class="hero-content">
@@ -4375,11 +4375,44 @@ class ContentManager {
         return '';
     }
 
+    optimizeDynamicImageUrl(url, options = {}) {
+        if (typeof url !== 'string' || !url.trim()) return '';
+        let cleanUrl = url.trim();
+        
+        // 1. Unsplash URL Optimization
+        if (cleanUrl.includes('images.unsplash.com')) {
+            try {
+                const u = new URL(cleanUrl);
+                
+                // Determine target width
+                let targetWidth = options.width || (window.innerWidth < 768 ? 600 : 1200);
+                u.searchParams.set('w', String(targetWidth));
+                
+                // Set default format & quality
+                if (!u.searchParams.has('auto')) {
+                    u.searchParams.set('auto', 'format');
+                }
+                if (!u.searchParams.has('q')) {
+                    u.searchParams.set('q', String(options.quality || 70));
+                }
+                if (!u.searchParams.has('fit')) {
+                    u.searchParams.set('fit', 'crop');
+                }
+                
+                return u.toString();
+            } catch (e) {
+                return cleanUrl;
+            }
+        }
+        
+        return cleanUrl;
+    }
+
     normalizePublicImageUrl(value) {
         if (typeof value !== 'string') return '';
         const url = value.trim();
         if (!url) return '';
-        return url;
+        return this.optimizeDynamicImageUrl(url);
     }
 
     isRenderableImageUrl(value) {
