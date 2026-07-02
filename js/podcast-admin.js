@@ -15,12 +15,26 @@ window.podcastAdmin = {
 
 // Funksjon for å vise admin-grensesnittet kun for admin
 export function showPodcastAdminIfAdmin() {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user && user.email && user.email.endsWith('@hiskingdomministry.no')) {
-            // Kjør admin-funksjonalitet
-            window.podcastAdmin.renderPodcastSection();
+    const setupAuth = () => {
+        if (window.firebase && typeof firebase.auth === 'function') {
+            firebase.auth().onAuthStateChanged(user => {
+                if (user && user.email && (user.email.endsWith('@hiskingdomministry.no') || user.email === 'knutsenthomas@gmail.com')) {
+                    // Kjør admin-funksjonalitet
+                    window.podcastAdmin.renderPodcastSection();
+                }
+            });
+            return true;
         }
-    });
+        return false;
+    };
+
+    if (!setupAuth() && window.firebaseService) {
+        window.firebaseService.waitForInitialization(30000).then(initialized => {
+            if (initialized) {
+                setupAuth();
+            }
+        });
+    }
 }
 
 // Kall denne funksjonen fra podcast.html hvis admin

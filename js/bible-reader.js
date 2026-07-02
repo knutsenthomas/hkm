@@ -414,31 +414,44 @@ class BibleReader {
         this.bindEvents();
         this.setupSwipeGestures();
         
-        // Listen to Firebase auth state for synchronizing notes
-        let authInitialized = false;
-        if (window.firebase && typeof firebase.auth === 'function') {
-            try {
-                if (!firebase.apps.length && window.firebaseConfig) {
-                    firebase.initializeApp(window.firebaseConfig);
-                }
-                firebase.auth().onAuthStateChanged(user => {
-                    this.currentUser = user;
-                    this.loadNotes();
-                    this.loadReadingPlan();
-                    if (this.activePlanMode && this.activePlanId) {
-                        this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+        // Listen to Firebase auth state for synchronizing notes (supports lazy-loaded Firebase SDK)
+        const setupAuthObserver = () => {
+            if (window.firebase && typeof firebase.auth === 'function') {
+                try {
+                    if (!firebase.apps.length && window.firebaseConfig) {
+                        firebase.initializeApp(window.firebaseConfig);
                     }
-                });
-                authInitialized = true;
-            } catch (e) {
-                console.warn("[BibleReader] firebase.auth setup failed:", e);
+                    firebase.auth().onAuthStateChanged(user => {
+                        this.currentUser = user;
+                        this.loadNotes();
+                        this.loadReadingPlan();
+                        if (this.activePlanMode && this.activePlanId) {
+                            this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+                        }
+                    });
+                    return true;
+                } catch (e) {
+                    console.warn("[BibleReader] firebase.auth setup failed:", e);
+                }
             }
-        }
+            return false;
+        };
+
+        let authObserverSet = setupAuthObserver();
         
-        if (!authInitialized) {
+        if (!authObserverSet) {
             this.currentUser = null;
             this.loadNotes();
             this.loadReadingPlan();
+            
+            // Wait for lazy-loaded Firebase to initialize and set up listener
+            if (window.firebaseService) {
+                window.firebaseService.waitForInitialization(30000).then(initialized => {
+                    if (initialized) {
+                        setupAuthObserver();
+                    }
+                });
+            }
         }
         
         await this.loadTranslations();
