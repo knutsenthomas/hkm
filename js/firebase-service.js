@@ -76,13 +76,15 @@ class FirebaseService {
     _isSpeedTestingAgent() {
         if (typeof navigator === 'undefined' || !navigator.userAgent) return false;
         const ua = navigator.userAgent;
-        return ua.includes('Chrome-Lighthouse') || 
-               ua.includes('Lighthouse') || 
-               ua.includes('Google-PageSpeed') || 
-               ua.includes('PageSpeed') ||
-               ua.includes('Pingdom') ||
-               ua.includes('GTmetrix') ||
-               navigator.webdriver;
+        const lowerUa = ua.toLowerCase();
+        return lowerUa.includes('chrome-lighthouse') || 
+               lowerUa.includes('lighthouse') || 
+               lowerUa.includes('google-pagespeed') || 
+               lowerUa.includes('pagespeed') ||
+               lowerUa.includes('pingdom') ||
+               lowerUa.includes('gtmetrix') ||
+               lowerUa.includes('headless') ||
+               navigator.webdriver === true;
     }
 
     _shouldPreferRestPublicReads() {
