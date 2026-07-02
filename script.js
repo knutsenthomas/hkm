@@ -4613,6 +4613,31 @@ window.addEventListener('load', () => {
 // Header Dynamic Profile Button Implementation
 (function() {
     async function initHeaderProfile() {
+        const profileLink = document.getElementById('header-profile-link');
+        if (!profileLink) return;
+
+        const profileImg = document.getElementById('header-profile-img');
+        const profileIcon = profileLink.querySelector('.material-symbols-outlined');
+
+        // Immediately render avatar from cache if user was logged in previously to avoid UX flicker
+        try {
+            const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+            if (cachedUserRaw) {
+                const cachedUser = JSON.parse(cachedUserRaw);
+                if (cachedUser && cachedUser.uid) {
+                    profileLink.classList.remove('hidden');
+                    profileLink.href = '/minside/index.html';
+                    if (cachedUser.photoURL && profileImg) {
+                        profileImg.src = cachedUser.photoURL;
+                        profileImg.classList.remove('hidden');
+                        if (profileIcon) profileIcon.classList.add('hidden');
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[ProfileCache] Failed to load cached profile:', e);
+        }
+
         let count = 0;
         // Wait for firebaseService and firebase auth to load
         while ((!window.firebaseService || !window.firebaseService.isInitialized || typeof firebase === 'undefined') && count < 100) {
@@ -4620,17 +4645,12 @@ window.addEventListener('load', () => {
             count++;
         }
 
-        const profileLink = document.getElementById('header-profile-link');
-        if (!profileLink) return;
-
-        const profileImg = document.getElementById('header-profile-img');
-        const profileIcon = profileLink.querySelector('.material-symbols-outlined');
-
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user || user.isAnonymous) {
                 profileLink.classList.add('hidden');
                 if (profileImg) profileImg.classList.add('hidden');
                 if (profileIcon) profileIcon.classList.remove('hidden');
+                localStorage.removeItem('hkm_public_user_cache');
                 return;
             }
 
@@ -4655,6 +4675,16 @@ window.addEventListener('load', () => {
                 }
             } catch (docErr) {
                 console.warn('Kunne ikke hente brukerprofil for bilde:', docErr);
+            }
+
+            // Update cache for instant render next time
+            try {
+                localStorage.setItem('hkm_public_user_cache', JSON.stringify({
+                    uid: user.uid,
+                    photoURL: photoURL || ''
+                }));
+            } catch (cacheErr) {
+                // noop
             }
 
             if (photoURL && profileImg) {

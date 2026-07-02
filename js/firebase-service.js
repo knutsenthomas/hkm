@@ -23,6 +23,16 @@ class FirebaseService {
         this._userRoleCacheKeyPrefix = 'hkm_user_role_cache:';
         this._retryRegistered = false;
         this.isLazy = true; // Indicates Firebase is deferred to user interaction
+        
+        // Bypass lazy-loading if the user is already cached as logged in (public or admin) to avoid UX flicker
+        const hasPublicCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_public_user_cache');
+        const hasAdminCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_admin_identity_cache');
+        const isAdminRoute = typeof window !== 'undefined' && (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/minside'));
+        
+        if (hasPublicCache || hasAdminCache || isAdminRoute) {
+            this.isLazy = false;
+        }
+        
         this.tryAutoInit();
     }
 
@@ -137,6 +147,12 @@ class FirebaseService {
             };
             loadNext();
         };
+
+        // If not lazy (e.g. cached logged-in user), trigger load immediately
+        if (!this.isLazy) {
+            loadFirebaseWithInteraction();
+            return;
+        }
 
         // Listen for user interaction
         window.addEventListener('scroll', loadFirebaseWithInteraction, { passive: true });
