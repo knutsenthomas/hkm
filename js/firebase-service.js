@@ -22,6 +22,7 @@ class FirebaseService {
         this._userRoleCacheTtlMs = 10 * 60 * 1000; // 10 min fallback cache for auth/routing stability
         this._userRoleCacheKeyPrefix = 'hkm_user_role_cache:';
         this._retryRegistered = false;
+        this.isLazy = true; // Indicates Firebase is deferred to user interaction
         this.tryAutoInit();
     }
 

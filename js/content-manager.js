@@ -694,7 +694,8 @@ class ContentManager {
             && typeof window.firebaseService.canReadPublicContent === 'function'
             && window.firebaseService.canReadPublicContent()
         );
-        if (!service || (!service.isInitialized && !canReadPublicContent())) {
+        const isLazy = window.firebaseService && window.firebaseService.isLazy;
+        if (!isLazy && (!service || (!service.isInitialized && !canReadPublicContent()))) {
             // Wait for firebase module (increased timeout to 4s total)
             let count = 0;
             while (
