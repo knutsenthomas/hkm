@@ -836,6 +836,7 @@ class ContentManager {
 
             this.renderEvents(events || []);
 
+            const service = window.firebaseService;
             const isSpeedTest = service && typeof service._isSpeedTestingAgent === 'function' && service._isSpeedTestingAgent();
             if (!isSpeedTest) {
                 this.loadFacebookFeed().catch(error => {
