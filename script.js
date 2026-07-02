@@ -4614,10 +4614,56 @@ window.addEventListener('load', () => {
 (function() {
     async function initHeaderProfile() {
         const profileLink = document.getElementById('header-profile-link');
-        if (!profileLink) return;
+        const mobileProfileLink = document.getElementById('mobile-menu-profile-link');
+        if (!profileLink && !mobileProfileLink) return;
 
         const profileImg = document.getElementById('header-profile-img');
-        const profileIcon = profileLink.querySelector('.material-symbols-outlined');
+        const profileIcon = profileLink ? profileLink.querySelector('.material-symbols-outlined') : null;
+        const mobileProfileImg = document.getElementById('mobile-menu-profile-img');
+        const mobileProfileIcon = mobileProfileLink ? mobileProfileLink.querySelector('.material-symbols-outlined') : null;
+
+        // Helper to update DOM states for both desktop and mobile profile elements
+        const updateProfileDOM = (photoURL) => {
+            // Update Desktop header profile
+            if (profileLink) {
+                profileLink.classList.remove('hidden');
+                profileLink.href = '/minside/index.html';
+                if (photoURL && profileImg) {
+                    profileImg.src = photoURL;
+                    profileImg.classList.remove('hidden');
+                    if (profileIcon) profileIcon.classList.add('hidden');
+                } else {
+                    if (profileImg) profileImg.classList.add('hidden');
+                    if (profileIcon) profileIcon.classList.remove('hidden');
+                }
+            }
+            // Update Mobile menu profile
+            if (mobileProfileLink) {
+                mobileProfileLink.classList.remove('hidden');
+                mobileProfileLink.href = '/minside/index.html';
+                if (photoURL && mobileProfileImg) {
+                    mobileProfileImg.src = photoURL;
+                    mobileProfileImg.classList.remove('hidden');
+                    if (mobileProfileIcon) mobileProfileIcon.classList.add('hidden');
+                } else {
+                    if (mobileProfileImg) mobileProfileImg.classList.add('hidden');
+                    if (mobileProfileIcon) mobileProfileIcon.classList.remove('hidden');
+                }
+            }
+        };
+
+        const hideProfileDOM = () => {
+            if (profileLink) {
+                profileLink.classList.add('hidden');
+                if (profileImg) profileImg.classList.add('hidden');
+                if (profileIcon) profileIcon.classList.remove('hidden');
+            }
+            if (mobileProfileLink) {
+                mobileProfileLink.classList.add('hidden');
+                if (mobileProfileImg) mobileProfileImg.classList.add('hidden');
+                if (mobileProfileIcon) mobileProfileIcon.classList.remove('hidden');
+            }
+        };
 
         // Immediately render avatar from cache if user was logged in previously to avoid UX flicker
         try {
@@ -4625,13 +4671,7 @@ window.addEventListener('load', () => {
             if (cachedUserRaw) {
                 const cachedUser = JSON.parse(cachedUserRaw);
                 if (cachedUser && cachedUser.uid) {
-                    profileLink.classList.remove('hidden');
-                    profileLink.href = '/minside/index.html';
-                    if (cachedUser.photoURL && profileImg) {
-                        profileImg.src = cachedUser.photoURL;
-                        profileImg.classList.remove('hidden');
-                        if (profileIcon) profileIcon.classList.add('hidden');
-                    }
+                    updateProfileDOM(cachedUser.photoURL);
                 }
             }
         } catch (e) {
@@ -4647,20 +4687,12 @@ window.addEventListener('load', () => {
 
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user || user.isAnonymous) {
-                profileLink.classList.add('hidden');
-                if (profileImg) profileImg.classList.add('hidden');
-                if (profileIcon) profileIcon.classList.remove('hidden');
+                hideProfileDOM();
                 localStorage.removeItem('hkm_public_user_cache');
                 return;
             }
 
-            // User is logged in, show the profile button
-            profileLink.classList.remove('hidden');
-
-            // Always point the profile link in the header directly to Min Side
-            profileLink.href = '/minside/index.html';
-
-            // Check if user has a profile picture in Firestore or Auth profile
+            // User is logged in, resolve profile photo
             let photoURL = user.photoURL;
 
             try {
@@ -4687,14 +4719,7 @@ window.addEventListener('load', () => {
                 // noop
             }
 
-            if (photoURL && profileImg) {
-                profileImg.src = photoURL;
-                profileImg.classList.remove('hidden');
-                if (profileIcon) profileIcon.classList.add('hidden');
-            } else {
-                if (profileImg) profileImg.classList.add('hidden');
-                if (profileIcon) profileIcon.classList.remove('hidden');
-            }
+            updateProfileDOM(photoURL);
         });
     }
 
