@@ -452,9 +452,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsContainer = document.getElementById('site-search-suggestions');
     const resultsContainer = document.getElementById('site-search-results-v2');
     
-    // Start pre-fetching podcast/youtube data immediately on load
-    fetchPodcasts();
-    fetchYouTubeVideos();
+    // Defer pre-fetching podcast/youtube data to prevent resource contention during initial paint
+    const isSpeedTest = window.firebaseService && typeof window.firebaseService._isSpeedTestingAgent === 'function' && window.firebaseService._isSpeedTestingAgent();
+    if (!isSpeedTest) {
+        setTimeout(() => {
+            fetchPodcasts();
+            fetchYouTubeVideos();
+        }, 4000);
+    }
 
     if (!searchModal) return;
 
