@@ -3405,18 +3405,24 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
-        // Skip slider modifications for translated pages (EN/ES)
-        const lang = document.documentElement.lang || 'no';
-        if (lang !== 'no') {
-            console.log('[ContentManager] Skipping renderHeroSlides for translated page:', lang);
-            return;
-        }
-
+        const lang = this.getCurrentLanguage(); // 'no', 'en', 'es'
         const sliderContainer = document.querySelector('.slider-container');
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
-            const normalizedIncomingSlides = slides.map(slide => ({
+            // Localize slides on the fly
+            const localizedSlides = slides.map(slide => {
+                if (lang === 'no') return slide;
+                const t = slide.translations && slide.translations[lang] ? slide.translations[lang] : {};
+                return {
+                    ...slide,
+                    title: t.title && t.title.trim() ? t.title.trim() : slide.title,
+                    subtitle: t.subtitle && t.subtitle.trim() ? t.subtitle.trim() : slide.subtitle,
+                    btnText: t.btnText && t.btnText.trim() ? t.btnText.trim() : slide.btnText
+                };
+            });
+
+            const normalizedIncomingSlides = localizedSlides.map(slide => ({
                 title: (slide.title || '').trim(),
                 subtitle: (slide.subtitle || '').trim(),
                 imageUrl: (slide.imageUrl || '').trim(),
@@ -3442,7 +3448,7 @@ class ContentManager {
             }));
 
             // Compare incoming slides data with what is currently in the DOM
-            const isDifferent = slides.length !== currentSlides.length || slides.some((slide, i) => {
+            const isDifferent = localizedSlides.length !== currentSlides.length || localizedSlides.some((slide, i) => {
                 const current = currentSlides[i];
                 if (!current) return true;
 
@@ -3474,7 +3480,7 @@ class ContentManager {
                 console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
                 document.body.classList.remove('hero-animate');
 
-                const heroMarkup = slides.map((slide, index) => {
+                const heroMarkup = localizedSlides.map((slide, index) => {
                     const videoUrl = (slide.videoUrl || '').trim();
                     const youtubeId = (slide.youtubeId || '').trim();
                     const hasYoutube = !!youtubeId;

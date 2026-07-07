@@ -20821,6 +20821,47 @@ class AdminManager {
                             <label>Knapp-lenke</label>
                             <input type="text" id="hero-btn-link" class="form-control" value="${safeSlideBtnLink}">
                         </div>
+
+                        <!-- English Translation Section -->
+                        <div class="form-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
+                            <h4 style="color:#d17d39; margin-bottom: 12px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">translate</span>
+                                Engelsk oversettelse (Valgfritt)
+                            </h4>
+                            <div class="form-group">
+                                <label>Overskrift (EN)</label>
+                                <input type="text" id="hero-title-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.title || '')}" placeholder="Leave blank to use Norwegian">
+                            </div>
+                            <div class="form-group">
+                                <label>Undertekst (EN)</label>
+                                <textarea id="hero-subtitle-en" class="form-control" style="height: 60px;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.en?.subtitle || '')}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Knapptekst (EN)</label>
+                                <input type="text" id="hero-btn-text-en" class="form-control" value="${this.escapeHtml(slide.translations?.en?.btnText || '')}" placeholder="Leave blank to use Norwegian">
+                            </div>
+                        </div>
+
+                        <!-- Spanish Translation Section -->
+                        <div class="form-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
+                            <h4 style="color:#bd4f2a; margin-bottom: 12px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">translate</span>
+                                Spansk oversettelse (Valgfritt)
+                            </h4>
+                            <div class="form-group">
+                                <label>Overskrift (ES)</label>
+                                <input type="text" id="hero-title-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.title || '')}" placeholder="Leave blank to use Norwegian">
+                            </div>
+                            <div class="form-group">
+                                <label>Undertekst (ES)</label>
+                                <textarea id="hero-subtitle-es" class="form-control" style="height: 60px;" placeholder="Leave blank to use Norwegian">${this.escapeHtml(slide.translations?.es?.subtitle || '')}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Knapptekst (ES)</label>
+                                <input type="text" id="hero-btn-text-es" class="form-control" value="${this.escapeHtml(slide.translations?.es?.btnText || '')}" placeholder="Leave blank to use Norwegian">
+                            </div>
+                        </div>
+
                         <div style="margin-top: 24px;">
                             <button class="btn-primary" style="width: 100%;" id="hero-save-btn">Lagre slide</button>
                         </div>
@@ -20973,6 +21014,19 @@ class AdminManager {
             const rawVideo = modal.querySelector('#hero-video-url').value;
             const ytId = this.extractYoutubeId(rawVideo);
             
+            const translations = {
+                en: {
+                    title: modal.querySelector('#hero-title-en').value.trim(),
+                    subtitle: modal.querySelector('#hero-subtitle-en').value.trim(),
+                    btnText: modal.querySelector('#hero-btn-text-en').value.trim()
+                },
+                es: {
+                    title: modal.querySelector('#hero-title-es').value.trim(),
+                    subtitle: modal.querySelector('#hero-subtitle-es').value.trim(),
+                    btnText: modal.querySelector('#hero-btn-text-es').value.trim()
+                }
+            };
+
             const updatedSlide = {
                 imageUrl: imgInput.value,
                 youtubeId: ytId || '',
@@ -20981,7 +21035,8 @@ class AdminManager {
                 subtitle: modal.querySelector('#hero-subtitle').value,
                 btnText: modal.querySelector('#hero-btn-text').value,
                 btnLink: modal.querySelector('#hero-btn-link').value,
-                duration: parseFloat(modal.querySelector('#hero-duration').value) || 8
+                duration: parseFloat(modal.querySelector('#hero-duration').value) || 8,
+                translations: translations
             };
 
             if (isNew) {
