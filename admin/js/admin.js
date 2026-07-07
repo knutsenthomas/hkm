@@ -20822,6 +20822,13 @@ class AdminManager {
                             <input type="text" id="hero-btn-link" class="form-control" value="${safeSlideBtnLink}">
                         </div>
 
+                        <div style="display:flex; justify-content:flex-end; margin-top:15px; margin-bottom:-5px;">
+                            <button type="button" class="btn-secondary" id="hero-auto-translate-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; font-size:12px; padding:6px 12px;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">g_translate</span>
+                                Oversett automatisk nå
+                            </button>
+                        </div>
+
                         <!-- English Translation Section -->
                         <div class="form-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
                             <h4 style="color:#d17d39; margin-bottom: 12px; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
@@ -20879,8 +20886,54 @@ class AdminManager {
         const uploadStatus = modal.querySelector('#hero-upload-status');
         const saveBtn = modal.querySelector('#hero-save-btn');
         const closeBtn = modal.querySelector('#hero-close-modal');
+        const autoTranslateBtn = modal.querySelector('#hero-auto-translate-btn');
 
         closeBtn.onclick = () => modal.remove();
+
+        if (autoTranslateBtn) {
+            autoTranslateBtn.onclick = async () => {
+                autoTranslateBtn.disabled = true;
+                const originalText = autoTranslateBtn.innerHTML;
+                autoTranslateBtn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Oversetter...';
+                
+                const slideToTranslate = {
+                    title: modal.querySelector('#hero-title').value,
+                    subtitle: modal.querySelector('#hero-subtitle').value,
+                    btnText: modal.querySelector('#hero-btn-text').value,
+                    translations: {
+                        en: {
+                            title: modal.querySelector('#hero-title-en').value.trim(),
+                            subtitle: modal.querySelector('#hero-subtitle-en').value.trim(),
+                            btnText: modal.querySelector('#hero-btn-text-en').value.trim()
+                        },
+                        es: {
+                            title: modal.querySelector('#hero-title-es').value.trim(),
+                            subtitle: modal.querySelector('#hero-subtitle-es').value.trim(),
+                            btnText: modal.querySelector('#hero-btn-text-es').value.trim()
+                        }
+                    }
+                };
+
+                try {
+                    const finalTranslations = await this._translateSlide(slideToTranslate);
+                    modal.querySelector('#hero-title-en').value = finalTranslations.en.title || '';
+                    modal.querySelector('#hero-subtitle-en').value = finalTranslations.en.subtitle || '';
+                    modal.querySelector('#hero-btn-text-en').value = finalTranslations.en.btnText || '';
+                    
+                    modal.querySelector('#hero-title-es').value = finalTranslations.es.title || '';
+                    modal.querySelector('#hero-subtitle-es').value = finalTranslations.es.subtitle || '';
+                    modal.querySelector('#hero-btn-text-es').value = finalTranslations.es.btnText || '';
+                    
+                    this.showToast('✅ Oversettelse fullført!', 'success');
+                } catch (err) {
+                    console.error("Auto translation error:", err);
+                    this.showToast('❌ Kunne ikke oversette automatisk.', 'error');
+                } finally {
+                    autoTranslateBtn.disabled = false;
+                    autoTranslateBtn.innerHTML = originalText;
+                }
+            };
+        }
 
         // Image Trigger Logic
         imgTrigger.onclick = () => fileInput.click();
@@ -21014,6 +21067,11 @@ class AdminManager {
             const rawVideo = modal.querySelector('#hero-video-url').value;
             const ytId = this.extractYoutubeId(rawVideo);
             
+            const slideTitle = modal.querySelector('#hero-title').value;
+            const slideSubtitle = modal.querySelector('#hero-subtitle').value;
+            const slideBtnText = modal.querySelector('#hero-btn-text').value;
+            const slideBtnLink = modal.querySelector('#hero-btn-link').value;
+
             const translations = {
                 en: {
                     title: modal.querySelector('#hero-title-en').value.trim(),
@@ -21027,16 +21085,40 @@ class AdminManager {
                 }
             };
 
+            const slideToTranslate = {
+                title: slideTitle,
+                subtitle: slideSubtitle,
+                btnText: slideBtnText,
+                translations: translations
+            };
+
+            let finalTranslations = translations;
+            const needsTranslation = (!translations.en.title && slideTitle) || 
+                                     (!translations.en.subtitle && slideSubtitle) || 
+                                     (!translations.en.btnText && slideBtnText) ||
+                                     (!translations.es.title && slideTitle) || 
+                                     (!translations.es.subtitle && slideSubtitle) || 
+                                     (!translations.es.btnText && slideBtnText);
+
+            if (needsTranslation) {
+                this.showToast('Oversetter slide til engelsk og spansk...', 'info', 3000);
+                try {
+                    finalTranslations = await this._translateSlide(slideToTranslate);
+                } catch (err) {
+                    console.error("Slide translation error on save:", err);
+                }
+            }
+
             const updatedSlide = {
                 imageUrl: imgInput.value,
                 youtubeId: ytId || '',
                 videoUrl: !ytId ? rawVideo : '', // Store as generic video if not YT
-                title: modal.querySelector('#hero-title').value,
-                subtitle: modal.querySelector('#hero-subtitle').value,
-                btnText: modal.querySelector('#hero-btn-text').value,
-                btnLink: modal.querySelector('#hero-btn-link').value,
+                title: slideTitle,
+                subtitle: slideSubtitle,
+                btnText: slideBtnText,
+                btnLink: slideBtnLink,
                 duration: parseFloat(modal.querySelector('#hero-duration').value) || 8,
-                translations: translations
+                translations: finalTranslations
             };
 
             if (isNew) {
@@ -21057,6 +21139,47 @@ class AdminManager {
                 saveBtn.textContent = 'Lagre slide';
             }
         };
+    }
+
+    async _translateSlide(slide) {
+        const translated = {
+            en: { ...slide.translations?.en },
+            es: { ...slide.translations?.es }
+        };
+
+        const langs = ['en', 'es'];
+        for (const targetLang of langs) {
+            translated[targetLang] = translated[targetLang] || {};
+            
+            // Translate Title if empty
+            if (!translated[targetLang].title && slide.title) {
+                try {
+                    translated[targetLang].title = await this._translateTextChunk(slide.title, targetLang, 'no');
+                } catch (e) {
+                    console.warn(`[AdminManager] Slide title translation to ${targetLang} failed`, e);
+                }
+            }
+            
+            // Translate Subtitle if empty
+            if (!translated[targetLang].subtitle && slide.subtitle) {
+                try {
+                    translated[targetLang].subtitle = await this._translateTextChunk(slide.subtitle, targetLang, 'no');
+                } catch (e) {
+                    console.warn(`[AdminManager] Slide subtitle translation to ${targetLang} failed`, e);
+                }
+            }
+            
+            // Translate Button Text if empty
+            if (!translated[targetLang].btnText && slide.btnText) {
+                try {
+                    translated[targetLang].btnText = await this._translateTextChunk(slide.btnText, targetLang, 'no');
+                } catch (e) {
+                    console.warn(`[AdminManager] Slide btnText translation to ${targetLang} failed`, e);
+                }
+            }
+        }
+
+        return translated;
     }
 
     async deleteHeroSlide(index) {
