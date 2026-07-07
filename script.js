@@ -1967,10 +1967,9 @@ function initScrollToTop() {
     // Fjern på mobil
     if (window.innerWidth < 768) return;
 
-    // Create button
     const btn = document.createElement('button');
     btn.className = 'scroll-to-top';
-    btn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    btn.innerHTML = '<span class="material-symbols-outlined flex items-center justify-center h-full w-full" style="font-size: 24px;">expand_less</span>';
     btn.setAttribute('aria-label', 'Til toppen');
     document.body.appendChild(btn);
 
