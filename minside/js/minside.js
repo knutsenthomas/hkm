@@ -4384,6 +4384,44 @@ class MinSideManager {
             </div>
         ` : '';
 
+        let syncBannerHtml = '';
+        if (userPlan.startedAt && !userPlan.isPreview) {
+            const startedAtDate = userPlan.startedAt.toDate ? userPlan.startedAt.toDate() : new Date(userPlan.startedAt);
+            const today = new Date();
+            const date1 = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate());
+            const date2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const diffTime = date2 - date1;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const expectedDay = Math.min(diffDays + 1, totalDays);
+
+            if (currentDayNum < expectedDay) {
+                const daysBehind = expectedDay - currentDayNum;
+                syncBannerHtml = `
+                    <div class="ms-rp-sync-banner" style="background: #fffbeb; border: 1.5px solid #fef3c7; border-radius: 20px; padding: 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.05);">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; max-width: 550px;">
+                            <span class="material-symbols-outlined" style="color: #d97706; font-size: 24px; margin-top: 2px;">info</span>
+                            <div style="text-align: left;">
+                                <h4 style="font-size: 15px; font-weight: 700; color: #92400e; margin: 0 0 4px 0;">Du ligger bak tidsplanen</h4>
+                                <p style="font-size: 13.5px; color: #b45309; margin: 0; line-height: 1.5;">
+                                    Du er på <strong>Dag ${currentDayNum}</strong>, men kalenderen din tilsier <strong>Dag ${expectedDay}</strong> (${daysBehind} dager bak).
+                                </p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-outline btn-sm" onclick="window.minSideManager.shiftPlanDates('${globalPlan.id}', ${currentDayNum})" style="border-color: #d97706; color: #d97706; font-size: 12.5px; font-weight: 600; background: #ffffff; display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">restore</span>
+                                Skyv datoer (YouVersion-stil)
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="window.minSideManager.jumpToToday('${globalPlan.id}', ${expectedDay})" style="background: #d97706; border-color: #d97706; color: #ffffff; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">fast_forward</span>
+                                Hopp til i dag
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         const previewBannerHtml = userPlan.isPreview ? `
             <div class="preview-banner" style="background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); padding: 12px 24px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -4397,6 +4435,7 @@ class MinSideManager {
         container.innerHTML = `
             <div class="ms-reading-plan-dashboard">
                 ${previewBannerHtml}
+                ${syncBannerHtml}
                 <!-- Plan Header & Progress Card -->
                 <div class="ms-rp-card-header" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
@@ -4720,6 +4759,54 @@ class MinSideManager {
             this.openDevotionalWizard(globalPlan, dayNum);
         } catch (e) {
             console.error("Failed to switch plan and start:", e);
+        }
+    }
+
+    async shiftPlanDates(planId, currentDay) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        
+        try {
+            const today = new Date();
+            const daysToSubtract = currentDay - 1;
+            const newStartedAt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysToSubtract, 12, 0, 0);
+            
+            const ref = firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .doc(planId);
+                
+            await ref.set({
+                startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
+                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            this.loadView('reading-plans');
+        } catch (e) {
+            console.error("Failed to shift plan dates:", e);
+        }
+    }
+
+    async jumpToToday(planId, expectedDay) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        
+        try {
+            const ref = firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .doc(planId);
+                
+            await ref.set({
+                currentDay: expectedDay,
+                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            this.loadView('reading-plans');
+        } catch (e) {
+            console.error("Failed to jump to expected day:", e);
         }
     }
 
