@@ -2174,7 +2174,7 @@ body.admin-body .btn-full,
         --sidebar-w: 0px;
     }
 
-    .sidebar {
+    body.minside-body .sidebar {
         left: -280px;
         width: 280px;
         box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
@@ -2182,7 +2182,7 @@ body.admin-body .btn-full,
         padding-bottom: 110px !important;
     }
 
-    .sidebar.active {
+    body.minside-body .sidebar.active {
         left: 0;
     }
 
@@ -3727,7 +3727,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
         display: inline-block !important;
     }
 
-    .sidebar-overlay {
+    body.minside-body .sidebar-overlay {
         z-index: 12500 !important;
     }
 }
