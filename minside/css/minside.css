@@ -3732,6 +3732,12 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     }
 }
 
+/* Modal Active Display State */
+.modal.active {
+    display: flex !important;
+    z-index: 20000 !important;
+}
+
 
 
 
