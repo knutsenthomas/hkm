@@ -3128,19 +3128,11 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     flex-shrink: 0;
 }
 
-.notif-icon-circle.push {
+.notif-icon-circle.push,
+.notif-icon-circle.email,
+.notif-icon-circle.time {
     background-color: rgba(209, 125, 57, 0.1);
     color: #bd4f2a;
-}
-
-.notif-icon-circle.email {
-    background-color: rgba(71, 85, 105, 0.08);
-    color: #475569;
-}
-
-.notif-icon-circle.time {
-    background-color: rgba(71, 85, 105, 0.08);
-    color: #475569;
 }
 
 .notif-card-title-container {
@@ -3189,12 +3181,9 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     flex-shrink: 0;
 }
 
-.notif-settings-card.push .notif-setting-sub-icon {
-    color: #bd4f2a;
-}
-
+.notif-settings-card.push .notif-setting-sub-icon,
 .notif-settings-card.email .notif-setting-sub-icon {
-    color: #475569;
+    color: #bd4f2a;
 }
 
 .notif-setting-text {

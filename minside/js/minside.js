@@ -2539,7 +2539,7 @@ class MinSideManager {
                                             <div class="notif-setting-description">Motta nyhetsbrev og oppdateringer om tjenesten.</div>
                                         </div>
                                     </div>
-                                    <label class="hkm-switch toggle-slate">
+                                    <label class="hkm-switch toggle-orange">
                                         <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
                                         <span class="hkm-slider"></span>
                                     </label>
@@ -2554,7 +2554,7 @@ class MinSideManager {
                                             <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
                                         </div>
                                     </div>
-                                    <label class="hkm-switch toggle-slate">
+                                    <label class="hkm-switch toggle-orange">
                                         <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
                                         <span class="hkm-slider"></span>
                                     </label>
