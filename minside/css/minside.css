@@ -3311,7 +3311,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 }
 
 .notif-save-btn {
-    background-color: #1B4965;
+    background-color: #d17d39;
     color: #ffffff;
     border: none;
     border-radius: 30px;
@@ -3323,11 +3323,11 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     gap: 8px;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 14px rgba(27, 73, 101, 0.3);
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);
 }
 
 .notif-save-btn:hover {
-    background-color: #123245;
+    background-color: #bd4f2a;
     transform: translateY(-1px);
 }
 
