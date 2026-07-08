@@ -3096,9 +3096,9 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
    ========================================================================== */
 
 .notif-settings-container {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 16px 8px;
+    max-width: 100%;
+    margin: 0;
+    padding: 20px 0;
 }
 
 .notif-settings-card {
