@@ -2188,9 +2188,9 @@ class MinSideManager {
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">${item.icon}</span>
                         <span style="font-weight: 600; font-size: 13.5px;">${item.label}</span>
                     </div>
-                    <label class="toggle toggle-sm" style="margin: 0;">
+                    <label class="hkm-switch toggle-orange" style="margin: 0;">
                         <input type="checkbox" class="custom-nav-cb" value="${id}" ${checked}>
-                        <span class="toggle-slider"></span>
+                        <span class="hkm-slider"></span>
                     </label>
                 </label>
             `;
