@@ -4875,12 +4875,10 @@ class BibleReader {
                             <span class="material-symbols-outlined icon">trending_up</span>
                             <h3 style="margin: 0;">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
                         </div>
-                        ${!userPlan.isPreview ? `
                         <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; text-decoration: underline; margin-left: auto;">
                             <span class="material-symbols-outlined" style="font-size: 13px;">restore</span>
                             ${lang === 'en' ? 'Adjust' : (lang === 'es' ? 'Ajustar' : 'Tilpass')}
                         </button>
-                        ` : ''}
                     </div>
                     
                     <!-- Circular Progress Inline -->
@@ -5480,12 +5478,10 @@ class BibleReader {
                             <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status" style="${isBehind ? 'color: #d97706 !important;' : ''}">
                                 ${progressStatusText}
                             </p>
-                            ${!userPlan.isPreview ? `
                             <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer; text-decoration: underline; margin-top: 4px;">
                                 <span class="material-symbols-outlined" style="font-size: 12px;">restore</span>
                                 ${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}
                             </button>
-                            ` : ''}
                         </div>
                     </div>
                     

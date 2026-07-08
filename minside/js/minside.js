@@ -4472,12 +4472,10 @@ class MinSideManager {
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span>Din Fremdrift</span>
                             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                ${!userPlan.isPreview ? `
                                 <button onclick="window.minSideManager.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; text-decoration: underline;">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">restore</span>
                                     Tilpass datoer
                                 </button>
-                                ` : ''}
                                 <span>${progressPct}% fullført (${completedDays.length}/${totalDays} dager)</span>
                             </div>
                         </div>
