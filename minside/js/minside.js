@@ -4385,7 +4385,25 @@ class MinSideManager {
         ` : '';
 
         let syncBannerHtml = '';
-        if (userPlan.startedAt && !userPlan.isPreview) {
+        if (!userPlan.isPreview) {
+            // Auto-repair missing startedAt field
+            if (!userPlan.startedAt) {
+                const fallbackDate = userPlan.lastActiveAt ? (userPlan.lastActiveAt.toDate ? userPlan.lastActiveAt.toDate() : new Date(userPlan.lastActiveAt)) : new Date();
+                userPlan.startedAt = fallbackDate;
+                
+                const uid = this.currentUser?.uid;
+                if (uid) {
+                    firebase.firestore()
+                        .collection('users')
+                        .doc(uid)
+                        .collection('reading_plans')
+                        .doc(userPlan.planId || globalPlan.id)
+                        .set({
+                            startedAt: firebase.firestore.Timestamp.fromDate(fallbackDate)
+                        }, { merge: true }).catch(err => console.warn("Failed to set fallback startedAt:", err));
+                }
+            }
+
             const startedAtDate = userPlan.startedAt.toDate ? userPlan.startedAt.toDate() : new Date(userPlan.startedAt);
             const today = new Date();
             const date1 = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate());
