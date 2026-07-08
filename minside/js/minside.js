@@ -1862,7 +1862,7 @@ class MinSideManager {
                 <div class="bento-stat-card bento-blue" onclick="window.minSideManager.loadView('giving')">
                     <div class="bento-card-header">
                         <div class="bento-icon-wrap">
-                            <span class="material-symbols-outlined">savings</span>
+                            <span class="material-symbols-outlined">volunteer_activism</span>
                         </div>
                         <span class="material-symbols-outlined bento-indicator">trending_up</span>
                     </div>
