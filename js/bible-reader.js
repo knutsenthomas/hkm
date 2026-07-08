@@ -3627,12 +3627,14 @@ class BibleReader {
                     .collection('reading_plans')
                     .doc(planId)
                     .update({
+                        currentDay: currentDay,
                         startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
                         lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
                 // Update Local progress object
                 if (this.userPlanProgress && this.userPlanProgress.planId === planId) {
+                    this.userPlanProgress.currentDay = currentDay;
                     this.userPlanProgress.startedAt = newStartedAt;
                 }
 

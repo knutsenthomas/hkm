@@ -4796,6 +4796,7 @@ class MinSideManager {
                 .doc(planId);
                 
             await ref.set({
+                currentDay: currentDay,
                 startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
                 lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
