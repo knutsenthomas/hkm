@@ -3606,5 +3606,47 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     }
 }
 
+/* Bento Search Bar styles */
+.bento-search-bar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    height: 38px;
+    width: 140px;
+    padding: 0 12px;
+    border-radius: 14px;
+    background-color: #fff5f2;
+    border: 1px solid #ffe0d8;
+    color: #5c4033;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
+.bento-search-bar:hover {
+    background-color: #ffe0d8;
+    border-color: #ffd0c4;
+}
+
+/* Mobile search bar adjustments */
+@media (max-width: 640px) {
+    .bento-search-bar {
+        width: 38px;
+        padding: 0;
+        justify-content: center;
+        margin-right: 8px;
+        border-radius: 50%;
+    }
+    .bento-search-bar .bento-search-text {
+        display: none !important;
+    }
+}
+
+
 
 
