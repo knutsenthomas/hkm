@@ -2585,7 +2585,7 @@ class MinSideManager {
                 <div class="notif-settings-footer">
                     <p class="notif-footer-text">Dine endringer vil tre i kraft umiddelbart.</p>
                     <button class="notif-save-btn" id="save-prefs-btn">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Lagre preferanser
+                        <span class="material-symbols-outlined" style="font-size: 18px; transform: translateY(2.5px) !important; display: inline-block !important; line-height: 1 !important; margin: 0 !important;">save</span> Lagre preferanser
                     </button>
                 </div>
 
