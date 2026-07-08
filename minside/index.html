@@ -281,6 +281,12 @@
         .bento-teal .bento-card-desc {
             color: #0f766e !important;
         }
+
+        /* Bento Search Bar */
+        .bento-search-bar:hover {
+            background-color: #ffebe5 !important;
+            border-color: #ffd0c4 !important;
+        }
     </style>
 </head>
 
@@ -346,10 +352,11 @@
                             </div>
 
                             <div class="section-header-actions">
-                                 <!-- Global Search Button -->
-                                 <button id="global-search-btn" class="lang-btn" style="padding: 8px; border-radius: 50%; min-width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--admin-border, #e2e8f0); color: #1B4965; cursor: pointer; transition: all 0.2s; margin-right: 4px;" title="Søk (CMD+K)" aria-label="Velg språk">
-                                     <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
-                                 </button>
+                                 <!-- Global Search Bar -->
+                                 <div id="global-search-btn" class="bento-search-bar" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 14px; background-color: #fff5f2; border: 1px solid #ffe0d8; color: #5c4033; cursor: pointer; transition: all 0.2s; margin-right: 12px; font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 500;" title="Søk (CMD+K)">
+                                     <span class="material-symbols-outlined" style="font-size: 18px; color: #5c4033; font-weight: bold;">search</span>
+                                     <span style="user-select: none;">Søk her...</span>
+                                 </div>
 
                                 <!-- User Profile Link -->
                                 <a href="javascript:void(0)" class="user-profile-link" id="actions-btn">
