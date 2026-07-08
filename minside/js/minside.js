@@ -2436,146 +2436,154 @@ class MinSideManager {
                     </p>
                 </div>
 
-                <!-- CARD 1: Push-varslinger -->
-                <div class="notif-settings-card push">
-                    <div class="notif-card-header">
-                        <div class="notif-icon-circle push">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
-                        </div>
-                        <div class="notif-card-title-container">
-                            <h3 class="notif-card-title">Push-varslinger</h3>
-                            <p class="notif-card-description">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
+                <div class="notif-grid-layout">
+                    <!-- LEFT COLUMN: Push-varslinger -->
+                    <div class="notif-grid-left">
+                        <!-- CARD 1: Push-varslinger -->
+                        <div class="notif-settings-card push" style="margin-bottom: 0;">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle push">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">Push-varslinger</h3>
+                                    <p class="notif-card-description">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notif-settings-list">
+                                <!-- Ny undervisning -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">school</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushTeachings')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushTeachingsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Ny podcast -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">podcasts</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushPodcasts')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushPodcastsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Nytt blogginnlegg -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">rate_review</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushBlogs')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushBlogsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Bibel- og leseplaner -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">auto_stories</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushReadingPlans')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="notif-settings-list">
-                        <!-- Ny undervisning -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">school</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">${t('profile.pushTeachings')}</div>
-                                    <div class="notif-setting-description">${t('profile.pushTeachingsSub')}</div>
+
+                    <!-- RIGHT COLUMN: E-postvarslinger and Tidspunkt -->
+                    <div class="notif-grid-right">
+                        <!-- CARD 2: E-postvarslinger -->
+                        <div class="notif-settings-card email" style="margin-bottom: 0;">
+                            <div class="notif-card-header">
+                                <div class="notif-icon-circle email">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">E-postvarslinger</h3>
+                                    <p class="notif-card-description">Velg hvilke oppdateringer vi sender til din innboks.</p>
                                 </div>
                             </div>
-                            <label class="hkm-switch toggle-orange">
-                                <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
-                        </div>
-                        
-                        <!-- Ny podcast -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">podcasts</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">${t('profile.pushPodcasts')}</div>
-                                    <div class="notif-setting-description">${t('profile.pushPodcastsSub')}</div>
+                            
+                            <div class="notif-settings-list">
+                                <!-- Nyhetsbrev -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">send</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">Nyhetsbrev</div>
+                                            <div class="notif-setting-description">Motta nyhetsbrev og oppdateringer om tjenesten.</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-slate">
+                                        <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Daglige leseplanoppdateringer -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">calendar_today</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.emailReadingPlans')}</div>
+                                            <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-slate">
+                                        <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
                                 </div>
                             </div>
-                            <label class="hkm-switch toggle-orange">
-                                <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
                         </div>
-                        
-                        <!-- Nytt blogginnlegg -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">rate_review</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">${t('profile.pushBlogs')}</div>
-                                    <div class="notif-setting-description">${t('profile.pushBlogsSub')}</div>
+
+                        <!-- CARD 3: Tidspunkt for daglig oppdatering -->
+                        <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important; margin-bottom: 0;">
+                            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 200px;">
+                                <div class="notif-icon-circle time">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title" style="margin: 0;">Tidspunkt</h3>
+                                    <p class="notif-card-description" style="margin: 4px 0 0 0;">Når vil du motta leseplan og push?</p>
                                 </div>
                             </div>
-                            <label class="hkm-switch toggle-orange">
-                                <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
-                        </div>
-                        
-                        <!-- Bibel- og leseplaner -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">auto_stories</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">${t('profile.pushReadingPlans')}</div>
-                                    <div class="notif-setting-description">${t('profile.pushReadingPlansSub')}</div>
-                                </div>
+                            
+                            <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
+                                <select id="notification-time-select" class="notif-time-select">
+                                    ${[...Array(24).keys()].map(h => {
+                                        const padHour = String(h).padStart(2, '0');
+                                        const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                                    }).join('')}
+                                </select>
                             </div>
-                            <label class="hkm-switch toggle-orange">
-                                <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- CARD 2: E-postvarslinger -->
-                <div class="notif-settings-card email">
-                    <div class="notif-card-header">
-                        <div class="notif-icon-circle email">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
-                        </div>
-                        <div class="notif-card-title-container">
-                            <h3 class="notif-card-title">E-postvarslinger</h3>
-                            <p class="notif-card-description">Velg hvilke oppdateringer vi sender til din innboks.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="notif-settings-list">
-                        <!-- Nyhetsbrev -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">send</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">Nyhetsbrev</div>
-                                    <div class="notif-setting-description">Motta nyhetsbrev og viktige oppdateringer om vår tjeneste</div>
-                                </div>
-                            </div>
-                            <label class="hkm-switch toggle-slate">
-                                <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
-                        </div>
-                        
-                        <!-- Daglige leseplanoppdateringer -->
-                        <div class="notif-setting-item">
-                            <div class="notif-setting-left">
-                                <span class="material-symbols-outlined notif-setting-sub-icon">calendar_today</span>
-                                <div class="notif-setting-text">
-                                    <div class="notif-setting-label">${t('profile.emailReadingPlans')}</div>
-                                    <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
-                                </div>
-                            </div>
-                            <label class="hkm-switch toggle-slate">
-                                <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
-                                <span class="hkm-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- CARD 3: Tidspunkt for daglig oppdatering -->
-                <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important;">
-                    <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 280px;">
-                        <div class="notif-icon-circle time">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
-                        </div>
-                        <div class="notif-card-title-container">
-                            <h3 class="notif-card-title" style="margin: 0;">Tidspunkt for daglig oppdatering</h3>
-                            <p class="notif-card-description" style="margin: 4px 0 0 0;">Velg hvilken time du vil motta e-post og push-varsel.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
-                        <select id="notification-time-select" class="notif-time-select">
-                            ${[...Array(24).keys()].map(h => {
-                                const padHour = String(h).padStart(2, '0');
-                                const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
-                                return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
-                            }).join('')}
-                        </select>
                     </div>
                 </div>
                 
