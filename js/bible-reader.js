@@ -3613,6 +3613,41 @@ class BibleReader {
         }
     }
 
+    async shiftPlanDates(planId, currentDay) {
+        const db = this.getFirestore();
+        if (this.currentUser && db) {
+            try {
+                const today = new Date();
+                const daysToSubtract = currentDay - 1;
+                const newStartedAt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysToSubtract, 12, 0, 0);
+
+                // Update Firestore
+                await db.collection('users')
+                    .doc(this.currentUser.uid)
+                    .collection('reading_plans')
+                    .doc(planId)
+                    .update({
+                        startedAt: firebase.firestore.Timestamp.fromDate(newStartedAt),
+                        lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                // Update Local progress object
+                if (this.userPlanProgress && this.userPlanProgress.planId === planId) {
+                    this.userPlanProgress.startedAt = newStartedAt;
+                }
+
+                // Refresh UI
+                this.setupReadingPlanUI();
+            } catch (err) {
+                console.error("Failed to shift plan dates:", err);
+            }
+        }
+    }
+
+    async jumpToToday(planId, expectedDay) {
+        await this.syncToExpectedDay(planId, expectedDay);
+    }
+
     async getStartedPlanIds() {
         const startedPlanIds = new Set();
         const db = this.getFirestore();
@@ -5287,6 +5322,81 @@ class BibleReader {
         const planCoverImage = globalPlan.image || globalPlan.imageUrl || globalPlan.coverImage || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
         const dayTitle = dayConfig.title || (lang === 'en' ? 'Day ' + currentDayNum : (lang === 'es' ? 'Día ' + currentDayNum : 'Dag ' + currentDayNum));
 
+        const db = this.getFirestore();
+        if (db && !userPlan.isPreview) {
+            if (!userPlan.startedAt) {
+                const fallbackDate = userPlan.lastActiveAt ? (userPlan.lastActiveAt.toDate ? userPlan.lastActiveAt.toDate() : new Date(userPlan.lastActiveAt)) : new Date();
+                userPlan.startedAt = fallbackDate;
+                
+                if (this.currentUser) {
+                    db.collection('users')
+                        .doc(this.currentUser.uid)
+                        .collection('reading_plans')
+                        .doc(globalPlan.id)
+                        .set({
+                            startedAt: firebase.firestore.Timestamp.fromDate(fallbackDate)
+                        }, { merge: true }).catch(err => console.warn("Failed to set fallback startedAt in bible-reader:", err));
+                }
+            }
+        }
+
+        const startedAt = userPlan.startedAt;
+        let expectedDay = currentDayNum;
+        if (startedAt) {
+            const startedAtDate = startedAt.toDate ? startedAt.toDate() : new Date(startedAt);
+            const startMidnight = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate());
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            const diffDays = Math.max(0, Math.round((todayMidnight.getTime() - startMidnight.getTime()) / (1000 * 60 * 60 * 24)));
+            expectedDay = Math.min(diffDays + 1, totalDays);
+        }
+
+        const isBehind = currentDayNum < expectedDay;
+        const progressStatusText = isBehind
+            ? (lang === 'en' ? `Behind schedule (Should be on Day ${expectedDay})` : (lang === 'es' ? `Atrasado (Deberías estar en el Día ${expectedDay})` : `Bak tidsplanen! (Skulle vært på Dag ${expectedDay})`))
+            : (isCurrentDayCompleted 
+                ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
+                : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!')));
+
+        const t_daysBehind = {
+            no: `Du ligger ${expectedDay - currentDayNum} dager bak planen (Skulle vært på Dag ${expectedDay}).`,
+            en: `You are ${expectedDay - currentDayNum} days behind schedule (Should be on Day ${expectedDay}).`,
+            es: `Estás ${expectedDay - currentDayNum} días atrasado (Deberías estar en el Día ${expectedDay}).`
+        }[lang] || `Du ligger ${expectedDay - currentDayNum} dager bak planen (Skulle vært på Dag ${expectedDay}).`;
+
+        const t_shiftDates = {
+            no: 'Skyv datoer',
+            en: 'Shift dates',
+            es: 'Mover fechas'
+        }[lang] || 'Skyv datoer';
+
+        const t_jumpToToday = {
+            no: 'Hopp til i dag',
+            en: 'Jump to today',
+            es: 'Ir a hoy'
+        }[lang] || 'Hopp til i dag';
+
+        const syncBannerHtml = isBehind ? `
+            <div class="hkm-rp-sync-banner-bible" style="background: #fffbeb; border: 1.5px solid #fef3c7; border-radius: 16px; padding: 16px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.05); text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px;">info</span>
+                    <span style="font-size: 13px; color: #b45309; font-weight: 600;">
+                        ${t_daysBehind}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="hkm-btn-secondary" onclick="window.bibleReader.shiftPlanDates('${globalPlan.id}', ${currentDayNum})" style="height: 32px !important; padding: 0 12px !important; font-size: 11.5px !important; border-radius: 8px !important; border-color: #d97706 !important; color: #d97706 !important; background: #ffffff !important; display: inline-flex; align-items: center; gap: 4px; box-shadow: none !important; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">restore</span>
+                        ${t_shiftDates}
+                    </button>
+                    <button class="hkm-btn-primary" onclick="window.bibleReader.jumpToToday('${globalPlan.id}', ${expectedDay})" style="height: 32px !important; padding: 0 12px !important; font-size: 11.5px !important; border-radius: 8px !important; background: #d97706 !important; border-color: #d97706 !important; color: #ffffff !important; display: inline-flex; align-items: center; gap: 4px; box-shadow: none !important; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">fast_forward</span>
+                        ${t_jumpToToday}
+                    </button>
+                </div>
+            </div>
+        ` : '';
+
         container.className = 'hkm-rp-header-wrapper';
 
         container.innerHTML = `
@@ -5314,13 +5424,10 @@ class BibleReader {
                             </svg>
                             <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
                         </div>
-                        <div class="progress-info-text-v2">
+                        <div class="progress-info-text-v2 text-left">
                             <p class="title">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Fremdrift')}</p>
-                            <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status">
-                                ${isCurrentDayCompleted 
-                                    ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
-                                    : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!'))
-                                }
+                            <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status" style="${isBehind ? 'color: #d97706 !important;' : ''}">
+                                ${progressStatusText}
                             </p>
                         </div>
                     </div>
@@ -5342,6 +5449,7 @@ class BibleReader {
                     </div>
                 </div>
             </div>
+            ${syncBannerHtml}
         `;
 
         // Wire up desktop tool size change
