@@ -1985,15 +1985,13 @@ class MinSideManager {
             } else {
                 promises.push(Promise.resolve({ docs: [] }));
             }
-            // Fetch reading plan progress
+            // Fetch reading plan progress (no orderBy/limit in query to avoid index requirement)
             promises.push(
                 firebase.firestore()
                     .collection('users')
                     .doc(uid)
                     .collection('reading_plans')
                     .where('completed', '==', false)
-                    .orderBy('lastActiveAt', 'desc')
-                    .limit(1)
                     .get()
             );
 
@@ -2069,7 +2067,15 @@ class MinSideManager {
             let progressPct = 0;
             let progressTitle = 'Ingen aktiv plan';
             if (plansSnap && !plansSnap.empty) {
-                const activeUserPlan = plansSnap.docs[0].data();
+                // Sort active plans in memory by lastActiveAt desc
+                const activePlans = plansSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                activePlans.sort((a, b) => {
+                    const aTime = a.lastActiveAt?.toMillis ? a.lastActiveAt.toMillis() : (a.lastActiveAt?.seconds ? a.lastActiveAt.seconds * 1000 : 0);
+                    const bTime = b.lastActiveAt?.toMillis ? b.lastActiveAt.toMillis() : (b.lastActiveAt?.seconds ? b.lastActiveAt.seconds * 1000 : 0);
+                    return bTime - aTime;
+                });
+                const activeUserPlan = activePlans[0];
+                
                 const globalSnap = await firebase.firestore()
                     .collection('reading_plans')
                     .doc(activeUserPlan.planId)
