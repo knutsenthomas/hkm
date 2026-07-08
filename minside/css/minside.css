@@ -3417,31 +3417,31 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 
 .hkm-devotional-overlay {
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    background: rgba(15, 23, 42, 0.75) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    inset: 0 !important;
+    background: #ffffff !important; /* Pure white background for full immersion */
     z-index: 99999 !important;
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-start !important; /* Top-aligned, scrollable */
     justify-content: center !important;
+    overflow-y: auto !important;
     transform: translateZ(0) !important;
     backface-visibility: hidden !important;
 }
 
 .hkm-devotional-content {
     background: #ffffff !important;
-    width: 90% !important;
-    max-width: 600px !important;
-    border-radius: 24px !important;
-    padding: 32px !important;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important;
-    display: block !important;
+    width: 100% !important;
+    max-width: 800px !important; /* Centered layout for reading focus */
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    padding: 64px 40px !important; /* Generous vertical spacing */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     position: relative !important;
+    box-sizing: border-box !important;
     animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     transform: translateZ(0) !important;
     backface-visibility: hidden !important;
@@ -3456,13 +3456,13 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 
 .hkm-devotional-text-serif {
     font-family: 'Georgia', serif !important;
-    font-size: 18px !important;
+    font-size: 19px !important;
     line-height: 1.8 !important;
     color: #1e293b !important;
-    margin-bottom: 24px !important;
-    overflow-y: auto !important;
-    max-height: 40vh !important;
-    padding-right: 8px !important;
+    margin-bottom: 32px !important;
+    max-height: none !important; /* Let text flow naturally, scrolling the whole page */
+    overflow-y: visible !important;
+    padding-right: 0 !important;
     text-align: left !important;
 }
 
@@ -3544,39 +3544,26 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 1024px) {
-    .hkm-devotional-overlay {
-        background: #ffffff !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-    }
+@media (max-width: 768px) {
     .hkm-devotional-content {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 100% !important;
-        height: 100dvh !important;
-        border-radius: 0 !important;
-        padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) 16px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        box-shadow: none !important;
-        animation: none !important;
+        padding: 32px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px !important;
     }
+    
     .hkm-devotional-text-serif {
-        flex: 1 !important;
-        max-height: none !important;
-        overflow-y: auto !important;
-        margin-bottom: 16px !important;
+        font-size: 17.5px !important;
+        margin-bottom: 24px !important;
     }
+
     .hkm-devotional-prayer-box {
-        flex: 1 !important;
-        margin-bottom: 16px !important;
-        overflow-y: auto !important;
+        padding: 14px !important;
+        font-size: 14px !important;
+        margin-bottom: 20px !important;
     }
+
     .hkm-devotional-reflection-textarea {
-        flex: 1 !important;
         min-height: 150px !important;
-        margin-bottom: 16px !important;
+        padding: 12px !important;
+        margin-bottom: 20px !important;
     }
 }
 
