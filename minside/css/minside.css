@@ -3738,6 +3738,36 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     z-index: 20000 !important;
 }
 
+/* Reading Plan Grid & Cards */
+.ms-rp-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.ms-rp-checklist-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .ms-rp-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .ms-rp-checklist-card {
+        max-height: none;
+        overflow-y: visible;
+    }
+}
+
 
 
 

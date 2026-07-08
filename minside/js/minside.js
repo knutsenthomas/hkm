@@ -4414,7 +4414,7 @@ class MinSideManager {
                 </div>
 
                 <!-- Main Layout Grid: Left Panel (Active Day), Right Panel (Days Checklist) -->
-                <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start;" class="ms-rp-grid">
+                <div class="ms-rp-grid">
                     <!-- Left Column: Dagens Andakt / Active Day details -->
                     <div style="display: flex; flex-direction: column; gap: 24px;">
                         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
@@ -4468,7 +4468,7 @@ class MinSideManager {
                     </div>
 
                     <!-- Right Column: Checklist of days -->
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02); max-height: 80vh; overflow-y: auto;">
+                    <div class="ms-rp-checklist-card">
                         <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Alle dager</h3>
                         
                         <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -4478,8 +4478,8 @@ class MinSideManager {
                                 return `
                                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#1B4965' : '#f1f5f9'}; background: ${isActive ? 'rgba(27, 73, 101, 0.02)' : '#ffffff'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#1B4965' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex; align-items: center; justify-content: center; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0;">
-                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight:bold;">check</span>' : `<span style="font-size: 11px; font-weight:700; color: ${isActive ? '#1B4965' : '#475569'}">${d.dayNumber}</span>`}
+                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#1B4965' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex !important; align-items: center !important; justify-content: center !important; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0; box-sizing: border-box !important;">
+                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">check</span>' : `<span style="font-size: 11px; font-weight: 700; color: ${isActive ? '#1B4965' : '#475569'}; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">${d.dayNumber}</span>`}
                                         </div>
                                         <div>
                                             <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${d.verses}</div>
