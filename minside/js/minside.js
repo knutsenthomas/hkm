@@ -2441,14 +2441,14 @@ class MinSideManager {
                     <div class="notif-grid-left">
                         <!-- CARD 1: Push-varslinger -->
                         <div class="notif-settings-card push" style="margin-bottom: 0;">
-                            <div class="notif-card-header">
-                                <div class="notif-icon-circle push">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
-                                </div>
-                                <div class="notif-card-title-container">
+                            <div>
+                                <div class="notif-card-header" style="display: flex; align-items: center; gap: 18px; margin-bottom: 6px;">
+                                    <div class="notif-icon-circle push">
+                                        <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+                                    </div>
                                     <h3 class="notif-card-title">Push-varslinger</h3>
-                                    <p class="notif-card-description">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
                                 </div>
+                                <p class="notif-card-description" style="margin-left: 66px;">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
                             </div>
                             
                             <div class="notif-settings-list">
@@ -2519,14 +2519,14 @@ class MinSideManager {
                     <div class="notif-grid-right">
                         <!-- CARD 2: E-postvarslinger -->
                         <div class="notif-settings-card email" style="margin-bottom: 0;">
-                            <div class="notif-card-header">
-                                <div class="notif-icon-circle email">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
-                                </div>
-                                <div class="notif-card-title-container">
+                            <div>
+                                <div class="notif-card-header" style="display: flex; align-items: center; gap: 18px; margin-bottom: 6px;">
+                                    <div class="notif-icon-circle email">
+                                        <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+                                    </div>
                                     <h3 class="notif-card-title">E-postvarslinger</h3>
-                                    <p class="notif-card-description">Velg hvilke oppdateringer vi sender til din innboks.</p>
                                 </div>
+                                <p class="notif-card-description" style="margin-left: 66px;">Velg hvilke oppdateringer vi sender til din innboks.</p>
                             </div>
                             
                             <div class="notif-settings-list">
@@ -2564,14 +2564,14 @@ class MinSideManager {
 
                         <!-- CARD 3: Tidspunkt for daglig oppdatering -->
                         <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important; margin-bottom: 0;">
-                            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 200px;">
-                                <div class="notif-icon-circle time">
-                                    <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
-                                </div>
-                                <div class="notif-card-title-container">
+                            <div style="flex: 1; min-width: 200px;">
+                                <div class="notif-card-header" style="display: flex; align-items: center; gap: 18px; margin-bottom: 4px;">
+                                    <div class="notif-icon-circle time">
+                                        <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
+                                    </div>
                                     <h3 class="notif-card-title" style="margin: 0;">Tidspunkt</h3>
-                                    <p class="notif-card-description" style="margin: 4px 0 0 0;">Når vil du motta leseplan og push?</p>
                                 </div>
+                                <p class="notif-card-description" style="margin-left: 66px;">Når vil du motta leseplan og push?</p>
                             </div>
                             
                             <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
