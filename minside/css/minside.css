@@ -3633,6 +3633,16 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     border-color: #ffd0c4;
 }
 
+.bento-search-bar .material-symbols-outlined {
+    font-size: 18px;
+    color: #5c4033;
+    font-weight: bold;
+    transform: translateY(4px);
+    display: inline-block;
+    line-height: 1;
+    margin: 0;
+}
+
 /* Mobile search bar adjustments */
 @media (max-width: 640px) {
     .bento-search-bar {
@@ -3644,6 +3654,9 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     }
     .bento-search-bar .bento-search-text {
         display: none !important;
+    }
+    .bento-search-bar .material-symbols-outlined {
+        transform: translateY(0);
     }
 }
 
