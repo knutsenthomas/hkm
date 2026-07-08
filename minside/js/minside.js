@@ -1843,25 +1843,67 @@ class MinSideManager {
 
             <!-- Stats row -->
             <div class="ms-overview-stats">
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('notifications')">
-                    <div class="stat-chip-label">${t('overview.unreadNotifications')}</div>
-                    <div class="stat-chip-value" id="ov-notif-count">—</div>
-                    <div class="stat-chip-sub">${t('overview.clickToViewAll')}</div>
+                <!-- Uleste Varslinger -->
+                <div class="bento-stat-card bento-orange" onclick="window.minSideManager.loadView('notifications')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">notifications_active</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_flat</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.unreadNotifications')}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-notif-count">—</span>
+                    </div>
+                    <div class="bento-card-desc">${t('overview.clickToViewAll')}</div>
                 </div>
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('giving')">
-                    <div class="stat-chip-label">${t('overview.totalGiven')} ${year}</div>
-                    <div class="stat-chip-value" id="ov-year-total">—</div>
-                    <div class="stat-chip-sub" id="ov-year-sub">${t('overview.seeGivingHistory')}</div>
+
+                <!-- Gitt totalt -->
+                <div class="bento-stat-card bento-blue" onclick="window.minSideManager.loadView('giving')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">savings</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.totalGiven')} ${year}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-year-total">—</span>
+                    </div>
+                    <div class="bento-card-desc" id="ov-year-sub">${t('overview.seeGivingHistory')}</div>
                 </div>
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('courses')">
-                    <div class="stat-chip-label">${t('overview.availableCourses')}</div>
-                    <div class="stat-chip-value" id="ov-courses-count">—</div>
-                    <div class="stat-chip-sub">${t('overview.teachingFromHkm')}</div>
+
+                <!-- Available courses -->
+                <div class="bento-stat-card bento-purple" onclick="window.minSideManager.loadView('courses')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">auto_awesome</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.availableCourses')}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-courses-count">—</span>
+                    </div>
+                    <div class="bento-card-desc">${t('overview.teachingFromHkm')}</div>
                 </div>
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('reading-plans')">
-                    <div class="stat-chip-label">Min fremdrift</div>
-                    <div class="stat-chip-value" id="ov-progress-text">—</div>
-                    <div class="stat-chip-sub" id="ov-progress-sub">...</div>
+
+                <!-- Min fremdrift -->
+                <div class="bento-stat-card bento-teal" onclick="window.minSideManager.loadView('reading-plans')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
+                    <div class="bento-card-label">Min fremdrift</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-progress-text">—</span>
+                        <div class="bento-progress-track">
+                            <div class="bento-progress-bar" id="ov-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="bento-card-desc" id="ov-progress-sub">...</div>
                 </div>
             </div>
 
@@ -2042,8 +2084,10 @@ class MinSideManager {
                 }
             }
             const progressTextEl = document.getElementById('ov-progress-text');
+            const progressBarEl = document.getElementById('ov-progress-bar');
             const progressSubEl = document.getElementById('ov-progress-sub');
             if (progressTextEl) progressTextEl.textContent = `${progressPct}%`;
+            if (progressBarEl) progressBarEl.style.width = `${progressPct}%`;
             if (progressSubEl) progressSubEl.textContent = progressTitle;
 
             // Recent notifications list
