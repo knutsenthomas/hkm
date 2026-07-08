@@ -2416,7 +2416,7 @@ class MinSideManager {
                             ${customNavHtml}
                         </div>
                         <button class="btn btn-primary" id="save-custom-nav-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> Lagre menyvalg
+                            <span class="material-symbols-outlined" style="font-size: 18px; transform: translateY(2.5px) !important; display: inline-block !important; line-height: 1 !important; margin: 0 !important;">save</span> Lagre menyvalg
                         </button>
                     </div>
                 </div>
