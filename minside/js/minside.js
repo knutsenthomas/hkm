@@ -2557,27 +2557,25 @@ class MinSideManager {
                 </div>
                 
                 <!-- CARD 3: Tidspunkt for daglig oppdatering -->
-                <div class="notif-settings-card time">
-                    <div class="notif-card-header">
+                <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important;">
+                    <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 280px;">
                         <div class="notif-icon-circle time">
                             <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
                         </div>
                         <div class="notif-card-title-container">
-                            <h3 class="notif-card-title">Tidspunkt for daglig oppdatering</h3>
-                            <p class="notif-card-description">Velg hvilken time du vil motta e-post og push-varsel.</p>
+                            <h3 class="notif-card-title" style="margin: 0;">Tidspunkt for daglig oppdatering</h3>
+                            <p class="notif-card-description" style="margin: 4px 0 0 0;">Velg hvilken time du vil motta e-post og push-varsel.</p>
                         </div>
                     </div>
                     
-                    <div class="notif-settings-list" style="margin-top: -8px;">
-                        <div style="position: relative;">
-                            <select id="notification-time-select" class="notif-time-select">
-                                ${[...Array(24).keys()].map(h => {
-                                    const padHour = String(h).padStart(2, '0');
-                                    const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
-                                    return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
-                                }).join('')}
-                            </select>
-                        </div>
+                    <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
+                        <select id="notification-time-select" class="notif-time-select">
+                            ${[...Array(24).keys()].map(h => {
+                                const padHour = String(h).padStart(2, '0');
+                                const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                            }).join('')}
+                        </select>
                     </div>
                 </div>
                 
