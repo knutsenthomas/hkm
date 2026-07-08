@@ -4511,12 +4511,34 @@ class MinSideManager {
             this.renderAllAvailablePlans(container);
         };
 
-        container.querySelector('#btn-start-devotional').onclick = () => {
-            if (userPlan.isPreview) {
-                this.switchToPlanAndStart(globalPlan, currentDayNum);
-            } else {
-                this.openDevotionalWizard(globalPlan, currentDayNum);
+        container.querySelector('#btn-start-devotional').onclick = async () => {
+            const lang = document.documentElement.lang || 'no';
+            let bibleUrl = `/bibel.html?plan=${globalPlan.id}&day=${currentDayNum}`;
+            if (lang === 'en') {
+                bibleUrl = `/en/bibel.html?plan=${globalPlan.id}&day=${currentDayNum}`;
+            } else if (lang === 'es') {
+                bibleUrl = `/es/bibel.html?plan=${globalPlan.id}&day=${currentDayNum}`;
             }
+
+            if (userPlan.isPreview) {
+                const uid = this.currentUser?.uid;
+                if (uid) {
+                    try {
+                        const ref = firebase.firestore()
+                            .collection('users')
+                            .doc(uid)
+                            .collection('reading_plans')
+                            .doc(globalPlan.id);
+                            
+                        await ref.set({
+                            lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                    } catch (e) {
+                        console.error("Failed to enroll in preview before redirect:", e);
+                    }
+                }
+            }
+            window.location.href = bibleUrl;
         };
 
         if (container.querySelector('#btn-download-cert')) {
@@ -4753,10 +4775,14 @@ class MinSideManager {
     }
 
     async openDevotionalWizardDirect(planId, dayNumber) {
-        const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
-        if (!snap.exists) return;
-        const plan = snap.data();
-        this.openDevotionalWizard(plan, dayNumber);
+        const lang = document.documentElement.lang || 'no';
+        let bibleUrl = `/bibel.html?plan=${planId}&day=${dayNumber}`;
+        if (lang === 'en') {
+            bibleUrl = `/en/bibel.html?plan=${planId}&day=${dayNumber}`;
+        } else if (lang === 'es') {
+            bibleUrl = `/es/bibel.html?plan=${planId}&day=${dayNumber}`;
+        }
+        window.location.href = bibleUrl;
     }
 
     async openDevotionalWizard(plan, dayNumber) {
