@@ -323,6 +323,20 @@
                         <ul class="nav-list">
                             <li class="nav-item visible"><a href="/admin/index.html#overview" class="nav-link is-hidden" id="sidebar-admin-link"><span class="material-symbols-outlined">dashboard_customize</span><span data-i18n="sidebar.admin">Administrasjon</span></a></li>
                             <li class="nav-item visible">
+                                 <!-- Sidebar Language Switcher (mobile only) -->
+                                 <div class="lang-switcher sidebar-lang-switcher">
+                                     <button class="lang-btn" aria-label="Velg språk">
+                                         <span class="material-symbols-outlined">language</span>
+                                         <span>NO</span>
+                                     </button>
+                                     <div class="lang-dropdown">
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                                     </div>
+                                 </div>
+                            </li>
+                            <li class="nav-item visible">
                                 <button id="sidebar-logout-btn" class="nav-link logout" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
                                     <span class="material-symbols-outlined">logout</span>
                                     <span data-i18n="sidebar.loggut">Logg ut</span>
@@ -358,6 +372,19 @@
                                      <span class="bento-search-text" style="user-select: none; line-height: 1;">Søk her...</span>
                                  </div>
 
+                                 <!-- Language switcher dropdown widget -->
+                                 <div class="lang-switcher header-lang-switcher">
+                                     <button class="lang-btn" aria-label="Velg språk">
+                                         <span class="material-symbols-outlined">language</span>
+                                         <span>NO</span>
+                                     </button>
+                                     <div class="lang-dropdown">
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                         <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                                     </div>
+                                 </div>
+
                                 <!-- User Profile Link -->
                                 <a href="javascript:void(0)" class="user-profile-link" id="actions-btn">
                                     <div class="user-info-text">
@@ -380,22 +407,6 @@
                                         <span class="material-symbols-outlined">logout</span> <span data-i18n="header.logout">Logg ut</span>
                                     </button>
                                 </div>
-
-                                <!-- Language switcher dropdown widget -->
-                                <div class="lang-switcher">
-                                    <button class="lang-btn" aria-label="Velg språk">
-                                        <span class="material-symbols-outlined">language</span>
-                                        <span>NO</span>
-                                    </button>
-                                    <div class="lang-dropdown">
-                                        <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
-                                        <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="en">🇺🇸 English</a>
-                                        <a href="javascript:void(0)" class="actions-item lang-switch-btn" data-lang="es">🇪🇸 Español</a>
-                                    </div>
-                                </div>
-
-
-
                             </div>
                         </div>
                     </div>

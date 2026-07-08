@@ -2179,7 +2179,8 @@ body.admin-body .btn-full,
         left: -280px;
         width: 280px;
         box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
-        z-index: 1200;
+        z-index: 13000 !important;
+        padding-bottom: 110px !important;
     }
 
     .sidebar.active {
@@ -3668,6 +3669,67 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
         margin: 0 !important;
         padding: 0 !important;
         line-height: 1 !important;
+    }
+}
+
+/* Sidebar language switcher custom styling */
+.sidebar-lang-switcher {
+    width: 100%;
+    margin: 4px 0;
+    position: relative;
+    display: none !important; /* hidden on desktop sidebar */
+}
+.sidebar-lang-switcher .lang-btn {
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    color: #475569 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+.sidebar-lang-switcher .lang-btn:hover {
+    background-color: rgba(27, 73, 101, 0.05) !important;
+    color: #1B4965 !important;
+}
+.sidebar-lang-switcher .lang-btn span.material-symbols-outlined {
+    font-size: 20px !important;
+    color: inherit !important;
+}
+.sidebar-lang-switcher .lang-dropdown {
+    position: absolute !important;
+    bottom: calc(100% + 6px) !important;
+    top: auto !important;
+    left: 16px !important;
+    right: auto !important;
+    width: calc(100% - 32px) !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-solid) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-md) !important;
+    z-index: 500 !important;
+    padding: 4px 0 !important;
+}
+
+@media (max-width: 768px) {
+    /* Hide desktop header language picker, show mobile sidebar language picker */
+    .header-lang-switcher {
+        display: none !important;
+    }
+    .sidebar-lang-switcher {
+        display: inline-block !important;
+    }
+
+    .sidebar-overlay {
+        z-index: 12500 !important;
     }
 }
 
