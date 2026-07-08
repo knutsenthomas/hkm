@@ -4384,8 +4384,19 @@ class MinSideManager {
             </div>
         ` : '';
 
+        const previewBannerHtml = userPlan.isPreview ? `
+            <div class="preview-banner" style="background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.2); padding: 12px 24px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="color: #d17d39;">visibility</span>
+                    <span style="font-weight: 700; color: #bd4f2a; font-size: 14px;">Du forhåndsviser denne leseplanen</span>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${globalPlan.id}')" style="background: #1B4965; border-color: #1B4965; font-size: 13px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; padding: 0 16px; margin: 0 !important;">Velg plan</button>
+            </div>
+        ` : '';
+
         container.innerHTML = `
             <div class="ms-reading-plan-dashboard">
+                ${previewBannerHtml}
                 <!-- Plan Header & Progress Card -->
                 <div class="ms-rp-card-header" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
@@ -4396,7 +4407,7 @@ class MinSideManager {
                             </div>
                             <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; max-width: 600px;">${globalPlan.description || ''}</p>
                         </div>
-                        <button class="btn btn-secondary btn-sm" id="btn-change-plan">Bytt leseplan</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-change-plan">${userPlan.isPreview ? 'Gå tilbake' : 'Bytt leseplan'}</button>
                     </div>
 
                     <!-- Progress Bar -->
@@ -4501,7 +4512,11 @@ class MinSideManager {
         };
 
         container.querySelector('#btn-start-devotional').onclick = () => {
-            this.openDevotionalWizard(globalPlan, currentDayNum);
+            if (userPlan.isPreview) {
+                this.switchToPlanAndStart(globalPlan, currentDayNum);
+            } else {
+                this.openDevotionalWizard(globalPlan, currentDayNum);
+            }
         };
 
         if (container.querySelector('#btn-download-cert')) {
@@ -4625,33 +4640,65 @@ class MinSideManager {
     }
 
     async previewPlanDetails(planId) {
-        const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
-        if (!snap.exists) return;
-        const plan = snap.data();
-        
-        let modal = document.createElement('div');
-        modal.className = 'modal active';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
-                <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${plan.title}</h3>
-                    <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
-                </div>
-                <div style="max-height: 350px; overflow-y: auto; padding-right: 6px;">
-                    ${plan.days.map(d => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
-                        <span style="font-weight: 600; color: #475569;">Dag ${d.dayNumber}</span>
-                        <a href="/bibel?ref=${encodeURIComponent(d.verses)}" target="_blank" style="color: #1B4965; text-decoration: underline; font-weight: 500;">${d.verses}</a>
-                    </div>
-                    `).join('')}
-                </div>
-                <div style="display:flex; gap:12px; margin-top:20px; justify-content:flex-end;">
-                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Lukk</button>
-                    <button class="btn btn-primary" onclick="window.minSideManager.switchToPlan('${planId}'); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Velg plan</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+        const container = document.getElementById('view-container') || document.getElementById('content-area');
+        if (!container) return;
+
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+
+        try {
+            const snap = await firebase.firestore().collection('reading_plans').doc(planId).get();
+            if (!snap.exists) {
+                this.renderAllAvailablePlans(container);
+                return;
+            }
+            const plan = snap.data();
+
+            let userPlanData = {
+                planId: planId,
+                currentDay: 1,
+                completedDays: [],
+                completed: false,
+                isPreview: true
+            };
+
+            const uid = this.currentUser?.uid;
+            if (uid) {
+                const userPlanSnap = await firebase.firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .collection('reading_plans')
+                    .doc(planId)
+                    .get();
+                if (userPlanSnap.exists) {
+                    userPlanData = { ...userPlanSnap.data(), isPreview: true };
+                }
+            }
+
+            this.renderActivePlanProgress(container, userPlanData, { id: planId, ...plan });
+        } catch (err) {
+            console.error("Error loading preview:", err);
+            this.renderAllAvailablePlans(container);
+        }
+    }
+
+    async switchToPlanAndStart(globalPlan, dayNum) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        try {
+            const ref = firebase.firestore()
+                .collection('users')
+                .doc(uid)
+                .collection('reading_plans')
+                .doc(globalPlan.id);
+                
+            await ref.set({
+                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            this.openDevotionalWizard(globalPlan, dayNum);
+        } catch (e) {
+            console.error("Failed to switch plan and start:", e);
+        }
     }
 
     async selectDayPreview(planId, dayNumber) {
