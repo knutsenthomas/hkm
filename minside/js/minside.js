@@ -1823,90 +1823,182 @@ class MinSideManager {
         const greeting = hour < 12 ? t('overview.goodMorning') : hour < 17 ? t('overview.hello') : t('overview.goodEvening');
 
         container.innerHTML = `
-        <div class="ms-overview-wrap">
-
-            <!-- Welcome banner -->
-            <div class="ms-overview-banner">
-                <div>
-                    <h2 class="ms-overview-banner-title">
-                        ${greeting}, ${name}! 👋
-                    </h2>
-                    <p class="ms-overview-banner-quote">
-                        ${this._getDailyVerse(document.documentElement.lang || 'no')}
-                    </p>
-                </div>
-                <div class="ms-overview-banner-chip">
-                    <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
-                    <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
+        <!-- Welcome Banner -->
+        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-orange-400 p-card-padding text-white shadow-xl mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="banner-pattern absolute inset-0 opacity-20"></div>
+            <div class="relative z-10">
+                <h2 class="font-h1 text-h1 mb-2">${greeting}, ${name}! 👋</h2>
+                <p class="font-body-lg opacity-90 italic">${this._getDailyVerse(document.documentElement.lang || 'no')}</p>
+            </div>
+            <div class="relative z-10 flex flex-col items-end shrink-0">
+                <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/30">
+                    <p class="font-label-caps tracking-widest opacity-80 mb-1" data-i18n="overview.memberSince">${t('overview.memberSince')}</p>
+                    <p class="font-h2 text-h2 font-bold" id="ov-member-since">—</p>
                 </div>
             </div>
+        </section>
 
-            <!-- Stats row -->
-            <div class="ms-overview-stats">
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('notifications')">
-                    <div class="stat-chip-label">${t('overview.unreadNotifications')}</div>
-                    <div class="stat-chip-value" id="ov-notif-count">—</div>
-                    <div class="stat-chip-sub">${t('overview.clickToViewAll')}</div>
-                </div>
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('giving')">
-                    <div class="stat-chip-label">${t('overview.totalGiven')} ${year}</div>
-                    <div class="stat-chip-value" id="ov-year-total">—</div>
-                    <div class="stat-chip-sub" id="ov-year-sub">${t('overview.seeGivingHistory')}</div>
-                </div>
-                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('courses')">
-                    <div class="stat-chip-label">${t('overview.availableCourses')}</div>
-                    <div class="stat-chip-value" id="ov-courses-count">—</div>
-                    <div class="stat-chip-sub">${t('overview.teachingFromHkm')}</div>
-                </div>
-            </div>
-
-            <!-- Bønneveggen preview -->
-            <div class="info-card ms-overview-card-gap" id="ov-prayer-preview-card" style="display: none;">
-                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h3>Siste fra Bønneveggen</h3>
-                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
+        <!-- Quick Stats Bento -->
+        <div class="grid grid-cols-1 gap-gutter mb-stack-lg md:grid-cols-4">
+            <!-- Uleste Varslinger -->
+            <div class="glass-card p-card-padding rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:translate-y-[-4px]" onclick="window.minSideManager.loadView('notifications')">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">notifications_active</span>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">Gå til Bønneveggen</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 3px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
+                    <span class="text-on-surface-variant opacity-40 material-symbols-outlined">trending_flat</span>
                 </div>
-                <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
-                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
-                </div>
+                <p class="font-label-caps text-on-surface-variant opacity-60 mb-1" data-i18n="overview.unreadNotifications">${t('overview.unreadNotifications')}</p>
+                <p class="font-h1 text-h1 mb-2 text-on-surface" id="ov-notif-count">—</p>
+                <p class="font-body-sm text-primary font-bold" data-i18n="overview.clickToViewAll">${t('overview.clickToViewAll')}</p>
             </div>
 
-            <!-- Quick actions -->
-            <div class="info-card ms-overview-card-gap">
-                <div class="info-card-header"><h3>${t('overview.quickLinks')}</h3></div>
-                <div class="ms-overview-actions-grid">
-                    ${[
-                { view: 'profile', icon: 'person', label: t('overview.btnProfileLabel'), sub: t('overview.btnProfileSub') },
-                { view: 'giving', icon: 'volunteer_activism', label: t('overview.btnGivingLabel'), sub: t('overview.btnGivingSub') },
-                { view: 'courses', icon: 'school', label: t('overview.btnCoursesLabel'), sub: t('overview.btnCoursesSub') },
-                { view: 'notifications', icon: 'notifications', label: t('overview.btnNotificationsLabel'), sub: t('overview.btnNotificationsSub') },
-            ].map(a => `
-                    <button class="ov-action-btn" data-view="${a.view}">
-                        <div class="ms-overview-action-icon-wrap">
-                            <span class="material-symbols-outlined ms-overview-action-icon">${a.icon}</span>
+            <!-- Gitt totalt -->
+            <div class="glass-card p-card-padding rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:translate-y-[-4px]" onclick="window.minSideManager.loadView('giving')">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">savings</span>
+                    </div>
+                    <span class="text-on-surface-variant opacity-40 material-symbols-outlined">trending_up</span>
+                </div>
+                <p class="font-label-caps text-on-surface-variant opacity-60 mb-1">${t('overview.totalGiven')} ${year}</p>
+                <div class="flex items-baseline gap-1 mb-2">
+                    <p class="font-h1 text-h1 text-on-surface" id="ov-year-total">—</p>
+                </div>
+                <p class="font-body-sm text-blue-600 font-bold" id="ov-year-sub" data-i18n="overview.seeGivingHistory">${t('overview.seeGivingHistory')}</p>
+            </div>
+
+            <!-- Available courses -->
+            <div class="glass-card p-card-padding rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:translate-y-[-4px]" onclick="window.minSideManager.loadView('courses')">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">school</span>
+                    </div>
+                    <span class="text-on-surface-variant opacity-40 material-symbols-outlined">auto_awesome</span>
+                </div>
+                <p class="font-label-caps text-on-surface-variant opacity-60 mb-1" data-i18n="overview.availableCourses">${t('overview.availableCourses')}</p>
+                <p class="font-h1 text-h1 mb-2 text-on-surface" id="ov-courses-count">—</p>
+                <p class="font-body-sm text-purple-600 font-bold" data-i18n="overview.teachingFromHkm">${t('overview.teachingFromHkm')}</p>
+            </div>
+
+            <!-- Min Fremdrift -->
+            <div class="glass-card p-card-padding rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:translate-y-[-4px]" onclick="window.minSideManager.loadView('reading-plans')">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-500 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">analytics</span>
+                    </div>
+                    <span class="text-on-surface-variant opacity-40 material-symbols-outlined">trending_up</span>
+                </div>
+                <p class="font-label-caps text-on-surface-variant opacity-60 mb-1" data-i18n="sidebar.fremdrift">MIN FREMDRIFT</p>
+                <div class="flex items-center gap-3 mb-2">
+                    <p class="font-h1 text-h1 text-on-surface" id="ov-progress-text">0%</p>
+                    <div class="flex-grow h-2 bg-surface-container rounded-full overflow-hidden">
+                        <div class="h-full bg-teal-500 rounded-full transition-all duration-500" id="ov-progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <p class="font-body-sm text-teal-500 font-bold" id="ov-progress-sub">...</p>
+            </div>
+        </div>
+
+        <!-- Bønneveggen preview -->
+        <div class="glass-card rounded-2xl overflow-hidden shadow-sm mb-stack-lg" id="ov-prayer-preview-card" style="display: none;">
+            <div class="px-card-padding py-4 border-b border-outline-variant flex justify-between items-center bg-white">
+                <div>
+                    <h3 class="font-h3 text-on-surface font-bold">Siste fra Bønneveggen</h3>
+                    <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
+                </div>
+                <button class="text-primary font-bold text-body-sm hover:underline flex items-center gap-1" onclick="window.minSideManager.loadView('prayer-wall')">
+                    <span>Gå til Bønneveggen</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 24px; box-sizing: border-box; width: 100%;">
+                <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <section class="mb-stack-lg">
+            <h3 class="font-h3 text-h2 mb-6 text-on-surface flex items-center gap-2 font-bold">
+                <span class="w-2 h-8 bg-primary rounded-full"></span>
+                <span data-i18n="overview.quickLinks">${t('overview.quickLinks')}</span>
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+                <button class="glass-card p-card-padding rounded-2xl group hover:border-primary transition-all duration-300 text-left ov-action-btn" data-view="profile">
+                    <div class="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-primary mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">person</span>
+                    </div>
+                    <p class="font-h3 text-on-surface group-hover:text-primary font-bold" data-i18n="overview.btnProfileLabel">${t('overview.btnProfileLabel')}</p>
+                    <p class="font-body-sm text-on-surface-variant opacity-60" data-i18n="overview.btnProfileSub">${t('overview.btnProfileSub')}</p>
+                </button>
+                <button class="glass-card p-card-padding rounded-2xl group hover:border-blue-500 transition-all duration-300 text-left ov-action-btn" data-view="giving">
+                    <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-4 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">volunteer_activism</span>
+                    </div>
+                    <p class="font-h3 text-on-surface group-hover:text-blue-500 font-bold" data-i18n="overview.btnGivingLabel">${t('overview.btnGivingLabel')}</p>
+                    <p class="font-body-sm text-on-surface-variant opacity-60" data-i18n="overview.btnGivingSub">${t('overview.btnGivingSub')}</p>
+                </button>
+                <button class="glass-card p-card-padding rounded-2xl group hover:border-purple-500 transition-all duration-300 text-left ov-action-btn" data-view="courses">
+                    <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 mb-4 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">school</span>
+                    </div>
+                    <p class="font-h3 text-on-surface group-hover:text-purple-500 font-bold" data-i18n="overview.btnCoursesLabel">${t('overview.btnCoursesLabel')}</p>
+                    <p class="font-body-sm text-on-surface-variant opacity-60" data-i18n="overview.btnCoursesSub">${t('overview.btnCoursesSub')}</p>
+                </button>
+                <button class="glass-card p-card-padding rounded-2xl group hover:border-teal-500 transition-all duration-300 text-left ov-action-btn" data-view="notifications">
+                    <div class="w-14 h-14 rounded-full bg-teal-50 flex items-center justify-center text-teal-500 mb-4 group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">chat_bubble</span>
+                    </div>
+                    <p class="font-h3 text-on-surface group-hover:text-teal-500 font-bold" data-i18n="overview.btnNotificationsLabel">${t('overview.btnNotificationsLabel')}</p>
+                    <p class="font-body-sm text-on-surface-variant opacity-60" data-i18n="overview.btnNotificationsSub">${t('overview.btnNotificationsSub')}</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- Activity Feed / Siste Varslinger & Kommende Aktiviteter -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+            <!-- Siste Varslinger -->
+            <section class="glass-card rounded-2xl overflow-hidden shadow-sm">
+                <div class="px-card-padding py-4 border-b border-outline-variant flex justify-between items-center bg-white">
+                    <h3 class="font-h3 text-on-surface font-bold" data-i18n="overview.recentNotifications">${t('overview.recentNotifications')}</h3>
+                    <button class="text-primary font-bold text-body-sm hover:underline" data-i18n="overview.seeAll" onclick="window.minSideManager.loadView('notifications')">${t('overview.seeAll')}</button>
+                </div>
+                <div id="ov-recent-notifs" class="p-card-padding bg-white/50 min-h-[200px] flex flex-col gap-3">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </section>
+
+            <!-- Kommende Aktiviteter -->
+            <section class="glass-card rounded-2xl overflow-hidden shadow-sm bg-white">
+                <div class="px-card-padding py-4 border-b border-outline-variant flex justify-between items-center bg-white">
+                    <h3 class="font-h3 text-on-surface font-bold">Kommende aktiviteter</h3>
+                    <button class="text-primary font-bold text-body-sm hover:underline" onclick="window.minSideManager.loadView('courses')">Kalender</button>
+                </div>
+                <div class="p-card-padding bg-white/50 min-h-[200px] space-y-4">
+                    <div class="flex items-center gap-4 p-3 rounded-lg bg-white border border-outline-variant hover:border-primary transition-colors cursor-pointer" onclick="window.minSideManager.loadView('courses')">
+                        <div class="flex flex-col items-center justify-center w-12 h-12 bg-orange-50 text-primary rounded-lg shrink-0">
+                            <span class="text-[10px] font-bold">MAR</span>
+                            <span class="text-lg font-bold">15</span>
                         </div>
-                        <div class="ms-overview-action-label">${a.label}</div>
-                        <div class="ms-overview-action-sub">${a.sub}</div>
-                    </button>`).join('')}
+                        <div class="flex-grow">
+                            <p class="font-body-md font-bold text-on-surface">Live Webinar: Tro i hverdagen</p>
+                            <p class="font-body-sm text-on-surface-variant">Kl. 19:00 • Zoom</p>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant opacity-40">chevron_right</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-lg bg-white border border-outline-variant hover:border-primary transition-colors cursor-pointer" onclick="window.minSideManager.loadView('courses')">
+                        <div class="flex flex-col items-center justify-center w-12 h-12 bg-blue-50 text-blue-500 rounded-lg shrink-0">
+                            <span class="text-[10px] font-bold">MAR</span>
+                            <span class="text-lg font-bold">22</span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-body-md font-bold text-on-surface">Bibelstudie: Romerbrevet</p>
+                            <p class="font-body-sm text-on-surface-variant">Kl. 18:30 • HKM Studio</p>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant opacity-40">chevron_right</span>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Recent notifications -->
-            <div class="info-card">
-                <div class="info-card-header">
-                    <h3>${t('overview.recentNotifications')}</h3>
-                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('notifications')">
-                        ${t('overview.seeAll')}
-                    </button>
-                </div>
-                <div id="ov-recent-notifs">
-                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
-                </div>
-            </div>
-
+            </section>
         </div>`;
 
         // Quick action clicks
@@ -1938,8 +2030,44 @@ class MinSideManager {
             } else {
                 promises.push(Promise.resolve({ docs: [] }));
             }
+            // Fetch reading plan progress
+            promises.push(
+                firebase.firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .collection('reading_plans')
+                    .where('completed', '==', false)
+                    .orderBy('lastActiveAt', 'desc')
+                    .limit(1)
+                    .get()
+            );
 
-            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap] = await Promise.all(promises);
+            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap, plansSnap] = await Promise.all(promises);
+
+            // Progress Bar render
+            let progressPct = 0;
+            let progressTitle = 'Ingen aktiv plan';
+            if (plansSnap && !plansSnap.empty) {
+                const activeUserPlan = plansSnap.docs[0].data();
+                const globalSnap = await firebase.firestore()
+                    .collection('reading_plans')
+                    .doc(activeUserPlan.planId)
+                    .get();
+                if (globalSnap.exists) {
+                    const activeGlobalPlan = globalSnap.data();
+                    const completedDays = activeUserPlan.completedDays || [];
+                    const totalDays = activeGlobalPlan.daysCount || (activeGlobalPlan.days ? Object.keys(activeGlobalPlan.days).length : 0) || 1;
+                    progressPct = Math.round((completedDays.length / totalDays) * 100);
+                    const planTitle = activeGlobalPlan.title || '';
+                    progressTitle = `Fortsett: ${planTitle}`;
+                }
+            }
+            const progressTextEl = document.getElementById('ov-progress-text');
+            const progressBarEl = document.getElementById('ov-progress-bar');
+            const progressSubEl = document.getElementById('ov-progress-sub');
+            if (progressTextEl) progressTextEl.textContent = `${progressPct}%`;
+            if (progressBarEl) progressBarEl.style.width = `${progressPct}%`;
+            if (progressSubEl) progressSubEl.textContent = progressTitle;
 
             // Prayers preview rendering
             const ovPrayerCard = document.getElementById('ov-prayer-preview-card');
@@ -1963,21 +2091,24 @@ class MinSideManager {
                         const textSnippet = p.text.length > 80 ? p.text.substring(0, 80) + '...' : p.text;
                         
                         return `
-                            <div class="ov-prayer-item" style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+                            <div class="ov-prayer-item border border-outline-variant rounded-2xl p-4 bg-surface-container-low flex flex-col justify-between min-h-[120px] transition-all hover:border-primary duration-200">
                                 <div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <span style="font-size: 12px; font-weight: 700; color: #1B4965;">${name}</span>
-                                        <span style="font-size: 11px; color: #94a3b8;">${p.createdAt ? this.formatTimeAgo(p.createdAt) : ''}</span>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold text-on-surface">${name}</span>
+                                        <span class="text-[11px] text-on-surface-variant opacity-60">${p.createdAt ? this.formatTimeAgo(p.createdAt) : ''}</span>
                                     </div>
-                                    <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
+                                    <p class="text-[13.5px] text-on-surface-variant line-clamp-2 leading-relaxed mb-3">${textSnippet}</p>
                                 </div>
-                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 3.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber</span></div>
+                                <div class="flex items-center gap-1.5 text-[11px] font-bold text-primary border-t border-outline-variant pt-2 mt-auto">
+                                    <span class="material-symbols-outlined text-[14px]">volunteer_activism</span>
+                                    <span>${count} ber</span>
+                                </div>
                             </div>
                         `;
                     }).join('');
                 } else {
                     ovPrayerFeed.innerHTML = `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
+                        <div class="col-span-full text-center py-5 text-on-surface-variant opacity-60 text-xs">
                             Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.
                         </div>
                     `;
@@ -2011,24 +2142,26 @@ class MinSideManager {
             const recentEl = document.getElementById('ov-recent-notifs');
             if (recentEl) {
                 if (recentSnap.empty) {
-                    recentEl.innerHTML = `<div class="ms-overview-notifs-empty">${t('overview.noNotificationsYet')}</div>`;
+                    recentEl.innerHTML = `<div class="p-card-padding bg-white/50 min-h-[200px] flex flex-col items-center justify-center text-center">
+                        <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-on-surface-variant opacity-40 text-4xl">inbox</span>
+                        </div>
+                        <p class="font-body-lg text-on-surface-variant opacity-60">${t('overview.noNotificationsYet')}</p>
+                        <p class="font-body-sm text-on-surface-variant opacity-40">Vi sender deg beskjed her når det skjer noe spennende!</p>
+                    </div>`;
                 } else {
                     recentEl.innerHTML = recentSnap.docs.map(doc => {
                         const d = this._normalizeNotificationDoc(doc);
                         const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
-                        return `<div class="ms-overview-notif-row">
-                            <div class="ms-overview-notif-dot ${d.read ? 'is-read' : ''}"></div>
-                            <div class="ms-overview-notif-main">
-                                <div class="ms-overview-notif-title">${d.title}</div>
-                                <div class="ms-overview-notif-body">${d.body || ''}</div>
+                        return `<div class="flex items-center gap-4 p-3 rounded-lg bg-white border border-outline-variant hover:border-primary transition-all duration-200 cursor-pointer shadow-sm" onclick="window.minSideManager.loadView('notifications')">
+                            <div class="flex-shrink-0 w-2.5 h-2.5 rounded-full ${d.read ? 'bg-slate-300' : 'bg-primary'}"></div>
+                            <div class="flex-grow">
+                                <p class="font-body-md font-bold text-on-surface">${d.title}</p>
+                                <p class="font-body-sm text-on-surface-variant line-clamp-1">${d.body || ''}</p>
                             </div>
-                            <div class="ms-overview-notif-time">${this._timeAgo(date)}</div>
+                            <span class="text-xs text-on-surface-variant opacity-60 whitespace-nowrap shrink-0">${this._timeAgo(date)}</span>
                         </div>`;
-                    }).join('') + `<div class="ms-overview-notifs-footer">
-                        <button class="btn btn-ghost btn-sm ms-btn-full"
-                            onclick="window.minSideManager.loadView('notifications')">
-                            ${t('overview.showAllNotifications')}
-                        </button></div>`;
+                    }).join('');
                 }
             }
         } catch (e) {
