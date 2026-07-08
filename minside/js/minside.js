@@ -1921,25 +1921,7 @@ class MinSideManager {
                 </div>
             </div>
 
-            <!-- Quick actions -->
-            <div class="info-card ms-overview-card-gap">
-                <div class="info-card-header"><h3>${t('overview.quickLinks')}</h3></div>
-                <div class="ms-overview-actions-grid">
-                    ${[
-                { view: 'profile', icon: 'person', label: t('overview.btnProfileLabel'), sub: t('overview.btnProfileSub') },
-                { view: 'giving', icon: 'volunteer_activism', label: t('overview.btnGivingLabel'), sub: t('overview.btnGivingSub') },
-                { view: 'courses', icon: 'school', label: t('overview.btnCoursesLabel'), sub: t('overview.btnCoursesSub') },
-                { view: 'notifications', icon: 'notifications', label: t('overview.btnNotificationsLabel'), sub: t('overview.btnNotificationsSub') },
-            ].map(a => `
-                    <button class="ov-action-btn" data-view="${a.view}">
-                        <div class="ms-overview-action-icon-wrap">
-                            <span class="material-symbols-outlined ms-overview-action-icon">${a.icon}</span>
-                        </div>
-                        <div class="ms-overview-action-label">${a.label}</div>
-                        <div class="ms-overview-action-sub">${a.sub}</div>
-                    </button>`).join('')}
-                </div>
-            </div>
+
 
             <!-- Recent notifications -->
             <div class="info-card">
