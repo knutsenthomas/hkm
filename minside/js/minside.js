@@ -4469,9 +4469,17 @@ class MinSideManager {
 
                     <!-- Progress Bar -->
                     <div style="margin-top: 24px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span>Din Fremdrift</span>
-                            <span>${progressPct}% fullført (${completedDays.length}/${totalDays} dager)</span>
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                ${!userPlan.isPreview ? `
+                                <button onclick="window.minSideManager.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; text-decoration: underline;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">restore</span>
+                                    Tilpass datoer
+                                </button>
+                                ` : ''}
+                                <span>${progressPct}% fullført (${completedDays.length}/${totalDays} dager)</span>
+                            </div>
                         </div>
                         <div style="height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
                             <div style="height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; width: ${progressPct}%; transition: width 0.4s ease;"></div>
@@ -4827,6 +4835,31 @@ class MinSideManager {
         } catch (e) {
             console.error("Failed to jump to expected day:", e);
         }
+    }
+
+    openAdjustPlanDatesModal(planId, currentDay) {
+        const modal = document.createElement('div');
+        modal.className = 'modal modal-open';
+        modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.3); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px;';
+        
+        modal.innerHTML = `
+            <div style="background:#ffffff; border-radius:20px; max-width:450px; width:100%; padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid #e2e8f0; text-align:left;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="color:#d97706; font-size:24px;">restore</span>
+                    </div>
+                    <h3 style="font-size:18px; font-weight:700; color:#1b4965; margin:0;">Tilpass leseplanen</h3>
+                </div>
+                <p style="font-size:14px; color:#475569; line-height:1.5; margin:0 0 20px 0;">
+                    Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.
+                </p>
+                <div style="display:flex; justify-content:flex-end; gap:12px;">
+                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()" style="font-size:13px; height:36px; padding:0 16px;">Avbryt</button>
+                    <button class="btn btn-primary" onclick="window.minSideManager.shiftPlanDates('${planId}', ${currentDay}); this.closest('.modal').remove()" style="background:#d97706; border-color:#d97706; color:#ffffff; font-size:13px; height:36px; padding:0 16px;">Juster datoer</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
 
     async selectDayPreview(planId, dayNumber) {

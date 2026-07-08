@@ -3650,6 +3650,47 @@ class BibleReader {
         await this.syncToExpectedDay(planId, expectedDay);
     }
 
+    openAdjustPlanDatesModal(planId, currentDay) {
+        const lang = document.documentElement.lang || 'no';
+        const t_title = {
+            no: 'Tilpass leseplanen',
+            en: 'Adjust Reading Plan',
+            es: 'Ajustar Plan de Lectura'
+        }[lang] || 'Tilpass leseplanen';
+        
+        const t_desc = {
+            no: `Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.`,
+            en: `Do you want to shift the reading plan's calendar? This sets <strong>Day ${currentDay}</strong> to today. The plan schedule will be adjusted forward so you are on track, without losing your progress.`,
+            es: `¿Quieres ajustar el calendario del plan? Esto establece el <strong>Día ${currentDay}</strong> como hoy. El calendario del plan se ajustará hacia adelante para que estés al día, sin perder tu progreso.`
+        }[lang] || `Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.`;
+
+        const t_cancel = { no: 'Avbryt', en: 'Cancel', es: 'Cancelar' }[lang] || 'Avbryt';
+        const t_adjust = { no: 'Juster datoer', en: 'Adjust dates', es: 'Ajustar fechas' }[lang] || 'Juster datoer';
+
+        const modal = document.createElement('div');
+        modal.className = 'modal modal-open';
+        modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.3); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px;';
+        
+        modal.innerHTML = `
+            <div style="background:#ffffff; border-radius:20px; max-width:450px; width:100%; padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid #e2e8f0; text-align:left;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="color:#d97706; font-size:24px;">restore</span>
+                    </div>
+                    <h3 style="font-size:18px; font-weight:700; color:#1b4965; margin:0;">${t_title}</h3>
+                </div>
+                <p style="font-size:14px; color:#475569; line-height:1.5; margin:0 0 20px 0;">
+                    ${t_desc}
+                </p>
+                <div style="display:flex; justify-content:flex-end; gap:12px;">
+                    <button class="hkm-btn-secondary" onclick="this.closest('.modal').remove()" style="height:36px !important; padding:0 16px !important; font-size:13px !important; border-radius:8px !important; margin: 0 !important;">${t_cancel}</button>
+                    <button class="hkm-btn-primary" onclick="window.bibleReader.shiftPlanDates('${planId}', ${currentDay}); this.closest('.modal').remove()" style="background:#d97706 !important; border-color:#d97706 !important; color:#ffffff !important; height:36px !important; padding:0 16px !important; font-size:13px !important; border-radius:8px !important; margin: 0 !important;">${t_adjust}</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
     async getStartedPlanIds() {
         const startedPlanIds = new Set();
         const db = this.getFirestore();
@@ -4829,9 +4870,17 @@ class BibleReader {
             <div class="hkm-rp-sidebar-wrapper">
                 <!-- Progress overview card -->
                 <div class="hkm-rp-sidebar-card">
-                    <div class="card-header">
-                        <span class="material-symbols-outlined icon">trending_up</span>
-                        <h3>${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined icon">trending_up</span>
+                            <h3 style="margin: 0;">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
+                        </div>
+                        ${!userPlan.isPreview ? `
+                        <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; text-decoration: underline; margin-left: auto;">
+                            <span class="material-symbols-outlined" style="font-size: 13px;">restore</span>
+                            ${lang === 'en' ? 'Adjust' : (lang === 'es' ? 'Ajustar' : 'Tilpass')}
+                        </button>
+                        ` : ''}
                     </div>
                     
                     <!-- Circular Progress Inline -->
@@ -5431,6 +5480,12 @@ class BibleReader {
                             <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status" style="${isBehind ? 'color: #d97706 !important;' : ''}">
                                 ${progressStatusText}
                             </p>
+                            ${!userPlan.isPreview ? `
+                            <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer; text-decoration: underline; margin-top: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 12px;">restore</span>
+                                ${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}
+                            </button>
+                            ` : ''}
                         </div>
                     </div>
                     
