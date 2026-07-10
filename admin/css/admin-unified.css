@@ -2949,19 +2949,25 @@ body.builder-active .user-profile-link {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   justify-content: flex-end !important;
 }
 
 /* 1. Profile/Avatar LAST (Far Right) */
 .user-profile-link {
+  order: 5 !important;
+  margin: 0 !important;
+}
+
+/* 1.5. Language Switcher second to last */
+.lang-switcher.header-lang-switcher {
   order: 4 !important;
   margin: 0 !important;
 }
 
 /* 2. Notifications and other shortcut buttons */
 #messages-bell,
-.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) {
+.notification-btn:not(#global-search-opener):not(#global-search-btn):not(.mobile-nav-toggle) {
   order: 3 !important;
   margin: 0 !important;
 }
@@ -2973,7 +2979,8 @@ body.builder-active .user-profile-link {
 }
 
 /* 3. Search Box FIRST */
-#global-search-opener {
+#global-search-opener,
+#global-search-btn {
   order: 1 !important;
   margin: 0 !important;
 }
