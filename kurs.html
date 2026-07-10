@@ -534,6 +534,56 @@
             letter-spacing: 0;
         }
 
+        /* Responsive Hero & Bento Stats Overrides for Mobile */
+        @media (max-width: 768px) {
+            .kurs-hero {
+                padding: 120px 16px 64px;
+            }
+
+            .kurs-hero::after {
+                opacity: 0.45;
+                width: 180px;
+            }
+
+            .kurs-hero p {
+                margin-bottom: 32px;
+                font-size: 0.98rem;
+                padding: 0 8px;
+            }
+
+            .hero-stats-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-top: 40px;
+                padding: 0;
+            }
+
+            .hero-stat-card {
+                padding: 20px 10px;
+                min-width: 0;
+                max-width: none;
+                border-radius: 12px;
+            }
+
+            .hero-stat-icon-wrapper {
+                width: 36px;
+                height: 36px;
+                margin-bottom: 10px;
+                font-size: 0.95rem;
+            }
+
+            .hero-stat-number {
+                font-size: 1.45rem;
+                margin-bottom: 2px;
+            }
+
+            .hero-stat-label {
+                font-size: 0.72rem;
+                line-height: 1.25;
+            }
+        }
+
         .kurs-controls {
             background: white;
             border-bottom: 1px solid var(--border);
