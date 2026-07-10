@@ -2391,34 +2391,9 @@ class ContentManager {
      * Dynamically render Testimonials or fallback to empty
      */
     renderTestimonials(testimonials) {
-        const container = document.querySelector('.testimonial-track');
         const section = document.querySelector('.testimonials');
-        if (!container) return;
-
-        if (!testimonials || testimonials.length === 0) {
-            container.innerHTML = '';
-            if (section) section.style.display = 'none';
-            return;
-        }
-
-        if (section) section.style.display = 'block';
-
-        const testimonialsMarkup = testimonials.map((t, idx) => `
-            <div class="testimonial-card ${idx === 0 ? 'active' : ''}">
-                <div class="testimonial-image">
-                    <img src="${t.imageUrl || 'https://via.placeholder.com/150'}" alt="${t.name}" loading="lazy">
-                </div>
-                <p class="testimonial-text">"${t.text || ''}"</p>
-                <h4 class="testimonial-name">${t.name || ''}</h4>
-                <span class="testimonial-role">${t.role || 'Deltaker'}</span>
-            </div>
-        `).join('');
-
-        this.setHTMLIfChanged(container, testimonialsMarkup, '__testimonials-html');
-
-        // Re-initialize Testimonial Slider
-        if (window.testimonialSlider) {
-            window.testimonialSlider.init();
+        if (section) {
+            section.style.display = 'none';
         }
     }
 
@@ -2543,10 +2518,27 @@ class ContentManager {
         // Juicer.io Integration (parsed on client side into custom cards)
         if (config.feedSource === 'juicer' && config.juicerFeedId) {
             try {
-                const response = await fetch(`https://www.juicer.io/api/feeds/${config.juicerFeedId}`);
-                if (!response.ok) throw new Error(`Juicer feed fetch failed with status ${response.status}`);
-                
-                const payload = await response.json();
+                // Use JSONP to bypass CORS restrictions in the browser
+                const callbackName = 'juicer_jsonp_' + Date.now() + Math.round(Math.random() * 1000);
+                const payload = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = `https://www.juicer.io/api/feeds/${config.juicerFeedId}?callback=${callbackName}`;
+                    
+                    window[callbackName] = (data) => {
+                        resolve(data);
+                        script.remove();
+                        delete window[callbackName];
+                    };
+                    
+                    script.onerror = () => {
+                        reject(new Error('Juicer JSONP request failed'));
+                        script.remove();
+                        delete window[callbackName];
+                    };
+                    
+                    document.body.appendChild(script);
+                });
+
                 const items = Array.isArray(payload?.posts?.items) ? payload.posts.items : [];
                 
                 const parsedPosts = items.slice(0, config.livePostCount).map((item, idx) => {
@@ -2585,7 +2577,9 @@ class ContentManager {
                         excerpt: excerpt,
                         cta: "Les på Facebook",
                         image: item.image || "",
-                        link: link
+                        link: link,
+                        likes: typeof item.like_count === 'number' ? item.like_count : 0,
+                        comments: typeof item.comment_count === 'number' ? item.comment_count : 0
                     };
                 });
                 
@@ -2594,7 +2588,7 @@ class ContentManager {
                     return;
                 }
             } catch (err) {
-                console.warn('[ContentManager] Failed to load Juicer feed, falling back to API:', err);
+                console.warn('[ContentManager] Failed to load Juicer feed via JSONP, falling back to API:', err);
             }
         }
 

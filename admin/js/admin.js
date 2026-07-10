@@ -23442,9 +23442,7 @@ class AdminManager {
                     ${items.map((item, index) => {
                         const imageHtml = item.image
                             ? `<img src="${this.escapeHtml(item.image)}" alt="" style="width:72px; height:72px; border-radius:14px; object-fit:cover; flex-shrink:0; border:1px solid #dbe4ef;">`
-                            : `<div style="width:72px; height:72px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:#f8fafc; border:1px solid #dbe4ef; color:#94a3b8;">
-                                <span class="material-symbols-outlined">image</span>
-                            </div>`;
+                            : ``;
                         const href = (typeof item.link === 'string' && item.link.trim())
                             ? item.link.trim()
                             : (typeof state.pageUrl === 'string' && state.pageUrl.trim() ? state.pageUrl.trim() : '#');
@@ -23461,6 +23459,8 @@ class AdminManager {
                                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                         <span style="font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#2563eb;">Live</span>
                                         <span style="font-size:12px; color:#64748b;">${this.escapeHtml(item.date || '')}</span>
+                                        <span style="font-size:12px; color:#ef4444; display:inline-flex; align-items:center; gap:3px;"><i class="fas fa-heart" style="font-size:10px;"></i> ${item.likes || 0}</span>
+                                        <span style="font-size:12px; color:#d17d39; display:inline-flex; align-items:center; gap:3px;"><i class="fas fa-comment" style="font-size:10px;"></i> ${item.comments || 0}</span>
                                     </div>
                                     <div style="font-size:15px; font-weight:700; line-height:1.4; color:#0f172a;">${this.escapeHtml(title)}</div>
                                     <div style="font-size:13px; line-height:1.55; color:#64748b;">${this.escapeHtml(excerpt)}</div>
@@ -23499,10 +23499,27 @@ class AdminManager {
 
         if (config.feedSource === 'juicer' && config.juicerFeedId) {
             try {
-                const response = await fetch(`https://www.juicer.io/api/feeds/${config.juicerFeedId}`);
-                if (!response.ok) throw new Error(`Juicer feed fetch failed with status ${response.status}`);
-                
-                const payload = await response.json();
+                // Use JSONP to bypass CORS restrictions in the browser
+                const callbackName = 'juicer_jsonp_' + Date.now() + Math.round(Math.random() * 1000);
+                const payload = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = `https://www.juicer.io/api/feeds/${config.juicerFeedId}?callback=${callbackName}`;
+                    
+                    window[callbackName] = (data) => {
+                        resolve(data);
+                        script.remove();
+                        delete window[callbackName];
+                    };
+                    
+                    script.onerror = () => {
+                        reject(new Error('Juicer JSONP request failed'));
+                        script.remove();
+                        delete window[callbackName];
+                    };
+                    
+                    document.body.appendChild(script);
+                });
+
                 const items = Array.isArray(payload?.posts?.items) ? payload.posts.items : [];
                 
                 if (requestId === this._facebookFeedPreviewRequestId) {
@@ -23542,7 +23559,9 @@ class AdminManager {
                             excerpt: excerpt,
                             cta: "Les på Facebook",
                             image: item.image || "",
-                            link: link
+                            link: link,
+                            likes: typeof item.like_count === 'number' ? item.like_count : 0,
+                            comments: typeof item.comment_count === 'number' ? item.comment_count : 0
                         };
                     });
                     
@@ -23557,7 +23576,7 @@ class AdminManager {
                     }
                 }
             } catch (err) {
-                console.warn('[Admin] Failed to load live Facebook feed preview via Juicer:', err);
+                console.warn('[Admin] Failed to load live Facebook feed preview via Juicer JSONP:', err);
             }
         }
 
