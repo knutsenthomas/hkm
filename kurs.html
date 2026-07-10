@@ -1339,13 +1339,18 @@
                             try {
                                 const [eSnap, uDoc] = await Promise.all([
                                     firebase.firestore().collection('courseEnrollments')
-                                        .where('email', '==', user.email)
+                                        .where('email', 'in', [user.email, user.email.toLowerCase()])
                                         .get(),
                                     firebase.firestore().collection('users').doc(user.uid).get()
                                 ]);
                                 userEnrollments = [];
                                 eSnap.forEach(doc => userEnrollments.push(doc.data()));
-                                currentUserRole = (uDoc.exists ? uDoc.data()?.role : 'medlem') || 'medlem';
+                                const fallbackSuperadmins = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
+                                if (fallbackSuperadmins.includes((user.email || '').toLowerCase())) {
+                                    currentUserRole = 'superadmin';
+                                } else {
+                                    currentUserRole = (uDoc.exists ? uDoc.data()?.role : 'medlem') || 'medlem';
+                                }
                             } catch (e) {
                                 console.error("Error fetching enrollments/role on auth change:", e);
                             }
