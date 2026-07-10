@@ -8821,9 +8821,22 @@ html[data-theme="dark"] #header-profile-link:hover {
 /* Facebook Feed Grid & Cards Styles */
 .facebook-feed-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    grid-template-columns: 1fr;
+    gap: 20px;
     margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+    .facebook-feed-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+}
+
+@media (min-width: 992px) {
+    .facebook-feed-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .facebook-post-card {
@@ -8887,6 +8900,8 @@ html[data-theme="dark"] #header-profile-link:hover {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .facebook-post-title {
