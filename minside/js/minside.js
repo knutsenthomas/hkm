@@ -4548,6 +4548,17 @@ class MinSideManager {
                     val: formattedDate,
                     class: 'secondary'
                 });
+
+                // Legg til nedtelling hvis tidspunktet er i fremtiden
+                const lessonTime = new Date(lesson.date).getTime();
+                if (lessonTime > Date.now()) {
+                    metaItems.push({
+                        icon: 'alarm',
+                        label: 'Starter om',
+                        val: `<span id="zoom-countdown" data-target="${lessonTime}" style="color: #d17d39; font-weight: 700;">Laster nedtelling...</span>`,
+                        class: 'secondary'
+                    });
+                }
             }
         } else {
             metaItems.push({
@@ -5587,6 +5598,59 @@ class MinSideManager {
         });
 
         await loadBibleData();
+
+        // Setup Live Zoom Countdown Timer
+        if (window._playerCountdownInterval) {
+            clearInterval(window._playerCountdownInterval);
+            window._playerCountdownInterval = null;
+        }
+
+        const countdownEl = container.querySelector('#zoom-countdown');
+        if (countdownEl) {
+            const targetTime = parseInt(countdownEl.getAttribute('data-target'), 10);
+            
+            const updateTimer = () => {
+                const el = document.getElementById('zoom-countdown');
+                if (!el) {
+                    if (window._playerCountdownInterval) {
+                        clearInterval(window._playerCountdownInterval);
+                        window._playerCountdownInterval = null;
+                    }
+                    return;
+                }
+
+                const now = Date.now();
+                const diff = targetTime - now;
+                
+                if (diff <= 0) {
+                    el.innerHTML = '<span style="color: #10b981; font-weight: 700;">Startet! 🎉</span>';
+                    if (window._playerCountdownInterval) {
+                        clearInterval(window._playerCountdownInterval);
+                        window._playerCountdownInterval = null;
+                    }
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                let timeStr = '';
+                if (days > 0) {
+                    timeStr += `${days}d ${hours}t ${minutes}m`;
+                } else if (hours > 0) {
+                    timeStr += `${hours}t ${minutes}m ${seconds}s`;
+                } else {
+                    timeStr += `${minutes}m ${seconds}s`;
+                }
+                
+                el.textContent = timeStr;
+            };
+            
+            updateTimer();
+            window._playerCountdownInterval = setInterval(updateTimer, 1000);
+        }
     }
 
     // ──────────────────────────────────────────────────────────
