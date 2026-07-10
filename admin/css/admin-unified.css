@@ -212,6 +212,7 @@ body.builder-active {
   font-weight: 700 !important;
   margin: 0 !important;
   line-height: 1.15 !important;
+  white-space: nowrap !important;
 }
 
 .main-header .section-header {
@@ -7589,6 +7590,21 @@ body.builder-active .main-header .section-subtitle {
 @media (min-width: 1024px) {
   .bento-search-bar {
     width: 240px !important; /* Wider on larger screens */
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-search-bar {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+  .bento-search-bar .bento-search-text {
+    display: none !important;
   }
 }
 
