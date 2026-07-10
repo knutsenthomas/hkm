@@ -5098,6 +5098,7 @@ class ContentManager {
 
             const cleanHtml = (html) => String(html || '').replace(/\s+/g, ' ').trim();
             
+            // Trigger Vercel rebuild: timestamp-based merging
             let isDescDifferent = false;
             if (gEvent.updated && override.dashboardEditedAt) {
                 const gcalUpdatedTime = new Date(gEvent.updated).getTime();
