@@ -9132,7 +9132,11 @@ class AdminManager {
                             <div class="sidebar-group">
                                 <label>Påmeldings- eller arrangementlenke (valgfri)</label>
                                 <input type="text" id="col-item-event-link" class="sidebar-control" value="${item.eventLink || ''}" placeholder="F.eks. Facebook-event eller påmeldingsskjema">
-                                <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hvis oppgitt, vil "Meld deg på nå"-knappen på nettsiden lenke hit istedenfor til kontaktsiden.</p>
+                            </div>
+                            <div class="sidebar-group">
+                                <label>Knappetekst (valgfri)</label>
+                                <input type="text" id="col-item-event-link-text" class="sidebar-control" value="${item.eventLinkText || ''}" placeholder="Eks: Kjøp billett, Bli med...">
+                                <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Egendefinert tekst på påmeldingsknappen. Standard er "Meld deg på nå".</p>
                             </div>
                             ` : ''}
 
@@ -11542,6 +11546,7 @@ class AdminManager {
 
                 if (collectionId === 'events') {
                     item.eventLink = document.getElementById('col-item-event-link')?.value || '';
+                    item.eventLinkText = document.getElementById('col-item-event-link-text')?.value || '';
                 }
 
                 item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
