@@ -4304,19 +4304,35 @@ class MinSideManager {
                                 <div style="display:flex; flex-direction:column; gap:10px; padding-top:10px;">
                                     ${courseLessons.map((l, lIdx) => {
                                         const paid = hasPaidForLesson(c, l);
-                                        const formattedDate = l.date ? new Date(l.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-                                        const dateStr = formattedDate ? `Klasse: ${formattedDate}` : '';
+                                        let dateStr = '';
+                                        if (l.date) {
+                                            try {
+                                                const d = new Date(l.date);
+                                                const datePart = d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
+                                                const timePart = d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+                                                dateStr = `Klasse: ${datePart} • kl. ${timePart}`;
+                                            } catch (e) {
+                                                dateStr = `Klasse: ${l.date}`;
+                                            }
+                                        }
                                         
                                         const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
                                         return `
-                                        <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                                            <div>
-                                                <div style="font-weight:650; font-size:0.92rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
-                                                    <span style="font-size:0.8rem; color:#d17d39; font-weight:700;">#${lIdx + 1}</span>
-                                                    ${cleanTitle}
+                                        <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; transition: border-color 0.2s ease;">
+                                            <div style="display:flex; align-items:center; gap:14px;">
+                                                <div style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(27, 73, 101, 0.08); color:#1B4965; font-size:0.8rem; font-weight:800; flex-shrink:0; line-height: 1;">
+                                                    ${lIdx + 1}
                                                 </div>
-                                                <div style="font-size:0.8rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:12px;">
-                                                    ${dateStr ? `<span><i class="far fa-calendar-alt"></i> ${dateStr}</span>` : ''}
+                                                <div>
+                                                    <div style="font-weight:700; font-size:0.95rem; color:#1e293b; line-height:1.3;">
+                                                        ${cleanTitle}
+                                                    </div>
+                                                    ${dateStr ? `
+                                                        <div style="font-size:0.8rem; color:#64748b; margin-top:4px; display:flex; align-items:center; gap:5px; line-height: 1;">
+                                                            <span class="material-symbols-outlined" style="font-size:14px; color:#64748b; transform: translateY(1.5px) !important; display: inline-block !important;">calendar_today</span>
+                                                            <span style="display: inline-block; transform: translateY(0.5px) !important;">${dateStr}</span>
+                                                        </div>
+                                                    ` : ''}
                                                 </div>
                                             </div>
                                             <div>
