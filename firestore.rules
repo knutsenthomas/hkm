@@ -225,6 +225,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Course Enrollments
+    match /courseEnrollments/{enrollmentId} {
+      allow create: if true;
+      allow read: if isAdmin() || (signedIn() && (
+        (hasKey(resource.data, 'email') && resource.data.email is string && resource.data.email.lower() == request.auth.token.email.lower()) ||
+        (hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid) ||
+        (hasKey(resource.data, 'uid') && resource.data.uid == request.auth.uid)
+      ));
+      allow update, delete: if isAdmin();
+    }
 
     // Contact form messages (public submit, admin process)
     match /contactMessages/{messageId} {
