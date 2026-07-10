@@ -21390,8 +21390,8 @@ class AdminManager {
                 </button>
             `, '')}
 
-            <div id="courses-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-bottom:32px;">
-                <div class="loader" style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+            <div id="courses-list" style="margin-bottom:32px;">
+                <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
             </div>
 
             <!-- Course Modal -->
@@ -21534,12 +21534,14 @@ class AdminManager {
                     <tr>
                         <td>
                             <div class="user-info-cell">
-                                ${course.imageUrl
-                        ? `<img src="${this.escapeHtml(course.imageUrl)}" alt="" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid #e2e8f0;">`
-                        : `<div style="width:44px;height:44px;border-radius:10px;background:#fff7ed;color:#f97316;display:flex;align-items:center;justify-content:center;border:1px solid #fed7aa;"><span class="material-symbols-outlined" style="font-size:18px;">menu_book</span></div>`}
-                                <div>
-                                    <div class="user-name">${title}</div>
-                                    <div class="text-muted">${shortDesc || 'Ingen beskrivelse'}</div>
+                                <div style="width:44px;height:44px;min-width:44px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;background:#fff7ed;color:#f97316;">
+                                    ${course.imageUrl
+                        ? `<img src="${this.escapeHtml(course.imageUrl)}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+                        : `<span class="material-symbols-outlined" style="font-size:20px;">menu_book</span>`}
+                                </div>
+                                <div style="min-width: 0; flex: 1;">
+                                    <div class="user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
+                                    <div class="text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem;">${shortDesc || 'Ingen beskrivelse'}</div>
                                 </div>
                             </div>
                         </td>
@@ -21556,7 +21558,7 @@ class AdminManager {
             }).join('');
 
             list.innerHTML = `
-                <div class="table-container" style="grid-column:1/-1;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div class="table-container" style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
                     <table class="crm-table">
                         <thead>
                             <tr>
