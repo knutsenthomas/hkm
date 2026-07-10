@@ -438,7 +438,7 @@
             gap: 8px;
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #f39c12, #e07b39);
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
             color: white;
             border: none;
             border-radius: 10px;
@@ -455,7 +455,7 @@
         }
 
         .enroll-btn.free {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
         }
 
         /* Skeleton */
@@ -1453,7 +1453,7 @@
                         </div>
                         <p>${excerpt}</p>
                         ${hasAccess 
-                            ? `<button class="enroll-btn free" style="background:#16a34a; border-color:#16a34a; color:white;">
+                            ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white;">
                                  <i class="fas fa-play-circle"></i> Gå til kurset
                                </button>`
                             : `<button class="enroll-btn ${isFree ? 'free' : ''}">
