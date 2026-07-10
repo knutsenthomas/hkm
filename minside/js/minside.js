@@ -4482,10 +4482,13 @@ class MinSideManager {
                                 <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
                             </div>
                             
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                                <button id="player-fullscreen-btn" class="player-btn-fullscreen">
+                                    <span class="material-symbols-outlined">fullscreen</span> Fullskjerm
+                                </button>
                                 ${lesson.zoomUrl ? `
-                                    <a href="${lesson.zoomUrl}" target="_blank" class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; font-size:0.88rem;">
-                                        <span class="material-symbols-outlined" style="font-size:20px;">launch</span> Åpne i Zoom-appen
+                                    <a href="${lesson.zoomUrl}" target="_blank" class="player-btn-zoom-app">
+                                        <span class="material-symbols-outlined">launch</span> Åpne i Zoom-appen
                                     </a>
                                 ` : ''}
                             </div>
@@ -4568,6 +4571,67 @@ class MinSideManager {
 
         // 3. Mount Player Media Embed
         const playerContainer = document.getElementById('player-container');
+
+        const loadZoomSDK = () => {
+            return new Promise((resolve, reject) => {
+                if (window.ZoomMtgEmbedded) {
+                    resolve(window.ZoomMtgEmbedded);
+                    return;
+                }
+
+                // Load Zoom CSS
+                const cssUrl = 'https://source.zoom.us/zoom-meeting-embedded-3.8.0.css';
+                if (!document.querySelector(`link[href="${cssUrl}"]`)) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = cssUrl;
+                    document.head.appendChild(link);
+                }
+
+                const scripts = [
+                    'https://source.zoom.us/3.8.0/lib/vendor/react.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/react-dom.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/redux.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/redux-thunk.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/lodash.min.js',
+                    'https://source.zoom.us/zoom-meeting-embedded-3.8.0.min.js'
+                ];
+
+                let loadedCount = 0;
+
+                const loadNext = () => {
+                    if (loadedCount >= scripts.length) {
+                        if (window.ZoomMtgEmbedded) {
+                            resolve(window.ZoomMtgEmbedded);
+                        } else {
+                            reject(new Error('ZoomMtgEmbedded was not loaded successfully.'));
+                        }
+                        return;
+                    }
+
+                    const scriptUrl = scripts[loadedCount];
+                    if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+                        loadedCount++;
+                        loadNext();
+                        return;
+                    }
+
+                    const script = document.createElement('script');
+                    script.src = scriptUrl;
+                    script.async = false;
+                    script.onload = () => {
+                        loadedCount++;
+                        loadNext();
+                    };
+                    script.onerror = (err) => {
+                        reject(err);
+                    };
+                    document.body.appendChild(script);
+                };
+
+                loadNext();
+            });
+        };
         
         const loadPlayer = () => {
             // Reset to default 16:9 aspect ratio styling first
@@ -4596,8 +4660,71 @@ class MinSideManager {
                     playerContainer.style.height = '600px';
 
                     const studentName = this.profileData?.name || this.currentUser?.displayName || 'Student';
-                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
-                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>`;
+
+                    // Try to load Zoom Meeting SDK (Component View)
+                    playerContainer.innerHTML = `
+                        <div id="zoom-sdk-loading" style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
+                            <span class="material-symbols-outlined spinner" style="font-size: 48px; color: #cc6f2c; animation: spin 1.5s linear infinite;">sync</span>
+                            <div>
+                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Starter Zoom-spiller...</h3>
+                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Laster inn integrert Zoom-klient med chat og video. Vennligst vent.</p>
+                            </div>
+                        </div>
+                        <div id="zoom-sdk-element" style="width: 100%; height: 100%; display: none;"></div>
+                    `;
+
+                    const loadEmbeddedZoom = async () => {
+                        try {
+                            // 1. Fetch signature from API
+                            const sigRes = await fetch('/api/zoom-signature', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    meetingNumber: zoomData.meetingId,
+                                    role: 0 // participant
+                                })
+                            });
+                            const sigData = await sigRes.json();
+                            if (!sigRes.ok || sigData.error) {
+                                throw new Error(sigData.error || 'Failed to fetch signature');
+                            }
+
+                            // 2. Load scripts dynamically
+                            const embeddedSDK = await loadZoomSDK();
+
+                            // Hide loading, show element
+                            const sdkEl = document.getElementById('zoom-sdk-element');
+                            const loaderEl = document.getElementById('zoom-sdk-loading');
+                            if (sdkEl && loaderEl) {
+                                loaderEl.style.display = 'none';
+                                sdkEl.style.display = 'block';
+                            }
+
+                            // 3. Initialize and join
+                            const client = embeddedSDK.createClient();
+                            client.init({
+                                zoomAppRoot: sdkEl,
+                                language: 'no-NO'
+                            });
+
+                            await client.join({
+                                sdkKey: sigData.sdkKey,
+                                signature: sigData.signature,
+                                meetingNumber: String(zoomData.meetingId),
+                                password: zoomData.pwd || '',
+                                userName: studentName
+                            });
+                            
+                            console.log('Zoom SDK joined successfully!');
+                        } catch (err) {
+                            console.warn('Failing back to iframe Zoom client due to:', err);
+                            // Fallback to standard web client iframe
+                            const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                            playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                        }
+                    };
+
+                    loadEmbeddedZoom();
                 } else {
                     playerContainer.innerHTML = `
                         <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
@@ -4606,8 +4733,8 @@ class MinSideManager {
                                 <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Zoom Live Class</h3>
                                 <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Live Zoom-kobling er klar. Vennligst bruk knappen nedenfor for å åpne timen i Zoom-appen.</p>
                             </div>
-                            <a href="${lesson.zoomUrl}" target="_blank" class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:10px 20px; text-decoration:none;">
-                                Åpne Zoom-kobling
+                            <a href="${lesson.zoomUrl}" target="_blank" class="player-btn-zoom-app" style="box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);">
+                                <span class="material-symbols-outlined">launch</span> Åpne Zoom-kobling
                             </a>
                         </div>`;
                 }
@@ -4621,6 +4748,54 @@ class MinSideManager {
         };
         
         loadPlayer();
+
+        // Fullscreen Toggle Logic
+        const fsBtn = container.querySelector('#player-fullscreen-btn');
+        if (fsBtn) {
+            fsBtn.addEventListener('click', () => {
+                const doc = document;
+                const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+                
+                if (!isFs) {
+                    if (playerContainer.requestFullscreen) {
+                        playerContainer.requestFullscreen();
+                    } else if (playerContainer.webkitRequestFullscreen) {
+                        playerContainer.webkitRequestFullscreen();
+                    } else if (playerContainer.mozRequestFullScreen) {
+                        playerContainer.mozRequestFullScreen();
+                    } else if (playerContainer.msRequestFullscreen) {
+                        playerContainer.msRequestFullscreen();
+                    }
+                } else {
+                    if (doc.exitFullscreen) {
+                        doc.exitFullscreen();
+                    } else if (doc.webkitExitFullscreen) {
+                        doc.webkitExitFullscreen();
+                    } else if (doc.mozCancelFullScreen) {
+                        doc.mozCancelFullScreen();
+                    } else if (doc.msExitFullscreen) {
+                        doc.msExitFullscreen();
+                    }
+                }
+            });
+
+            const updateFullscreenUI = () => {
+                const doc = document;
+                const isFs = doc.fullscreenElement === playerContainer || 
+                             doc.webkitFullscreenElement === playerContainer || 
+                             doc.mozFullScreenElement === playerContainer || 
+                             doc.msFullscreenElement === playerContainer;
+                
+                fsBtn.innerHTML = isFs 
+                    ? `<span class="material-symbols-outlined">fullscreen_exit</span> Avslutt`
+                    : `<span class="material-symbols-outlined">fullscreen</span> Fullskjerm`;
+            };
+
+            playerContainer.addEventListener('fullscreenchange', updateFullscreenUI);
+            playerContainer.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+            playerContainer.addEventListener('mozfullscreenchange', updateFullscreenUI);
+            playerContainer.addEventListener('MSFullscreenChange', updateFullscreenUI);
+        }
 
         // 4. Setup Tab Navigation
         const tabs = container.querySelectorAll('.sidebar-tab-btn');
