@@ -990,6 +990,7 @@ class MinSideManager {
             notes: this.renderNotes,
             'reading-plans': this.renderReadingPlans,
             'prayer-wall': this.renderPrayerWall,
+            'course-player': this.renderCoursePlayer,
         };
 
 
@@ -1078,6 +1079,12 @@ class MinSideManager {
 
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
+
+                    window.addEventListener('hashchange', () => {
+                        const hash = window.location.hash.replace('#', '') || 'overview';
+                        if (this.lastLoadedHash === window.location.hash) return;
+                        this.loadView(hash);
+                    });
                 } else {
                     window.location.href = '/minside/login.html';
                 }
@@ -1149,12 +1156,41 @@ class MinSideManager {
         this.loadView(currentView);
     }
 
-    loadView(viewId) {
-        if (viewId === 'prayer-wall' && !this.prayerWallEnabled) {
-            viewId = 'overview';
+    loadView(viewId, viewArgs = null) {
+        let cleanViewId = viewId;
+        let queryParams = {};
+        
+        // Support hash path parsing (e.g. viewId = "course-player?courseId=xyz&lessonId=123")
+        if (viewId && viewId.includes('?')) {
+            const parts = viewId.split('?');
+            cleanViewId = parts[0];
+            const urlParams = new URLSearchParams(parts[1]);
+            for (const [k, v] of urlParams.entries()) {
+                queryParams[k] = v;
+            }
         }
-        if (!this.views[viewId]) viewId = 'overview';
-        window.location.hash = viewId;
+        
+        // If args are passed programmatically, merge them
+        if (viewArgs) {
+            queryParams = { ...queryParams, ...viewArgs };
+        }
+        
+        this.currentViewArgs = queryParams;
+        
+        if (cleanViewId === 'prayer-wall' && !this.prayerWallEnabled) {
+            cleanViewId = 'overview';
+        }
+        if (!this.views[cleanViewId]) cleanViewId = 'overview';
+        
+        // Re-construct the hash with query params if any exist
+        let hashString = cleanViewId;
+        if (Object.keys(queryParams).length > 0) {
+            const queryStr = new URLSearchParams(queryParams).toString();
+            hashString += `?${queryStr}`;
+        }
+        
+        this.lastLoadedHash = '#' + hashString;
+        window.location.hash = hashString;
 
         // View info mapping for header (Dynamic)
         const viewInfo = {
@@ -1167,10 +1203,11 @@ class MinSideManager {
             notes: { title: t('view.notes'), icon: 'notes' },
             'reading-plans': { title: t('view.readingPlans'), icon: 'auto_stories' },
             'prayer-wall': { title: t('view.prayerWall'), icon: 'favorite' },
+            'course-player': { title: 'Kurs-spiller', icon: 'school' }
         };
 
         // Update Header Title and Icon (Admin Style)
-        const info = viewInfo[viewId] || { title: t('sidebar.title'), icon: 'person' };
+        const info = viewInfo[cleanViewId] || { title: t('sidebar.title'), icon: 'person' };
         const titleEl = document.getElementById('dashboard-main-header-title');
         const iconEl = document.getElementById('dashboard-main-header-icon');
         
@@ -1178,17 +1215,17 @@ class MinSideManager {
         if (iconEl) iconEl.textContent = info.icon;
 
         document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => l.classList.remove('active'));
-        document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
-        document.querySelector(`.mobile-nav-item[data-view="${viewId}"]`)?.classList.add('active');
+        document.querySelector(`.nav-link[data-view="${cleanViewId}"]`)?.classList.add('active');
+        document.querySelector(`.mobile-nav-item[data-view="${cleanViewId}"]`)?.classList.add('active');
 
         const container = document.getElementById('view-container') || document.getElementById('content-area');
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>${t('common.loading')}...</p></div>`;
 
         setTimeout(async () => {
             try {
-                await this.views[viewId].call(this, container);
+                await this.views[cleanViewId].call(this, container, queryParams);
             } catch (err) {
-                console.error(`View "${viewId}" error:`, err);
+                console.error(`View "${cleanViewId}" error:`, err);
                 container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${t('common.errorOccurred')}</h3><p>${err.message}</p></div>`;
             }
         }, 80);
@@ -4250,21 +4287,19 @@ class MinSideManager {
                                         <div>
                                             ${paid ? `
                                                 <div style="display:flex; gap:8px; align-items:center;">
-                                                    ${l.zoomUrl ? `
-                                                        <a href="${l.zoomUrl}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                    ${l.videoUrl ? `
+                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#1b4965; border-color:#1b4965; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Start leksjon
+                                                        </a>
+                                                    ` : (l.zoomUrl ? `
+                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
                                                             <span class="material-symbols-outlined" style="font-size:18px;">video_camera_front</span> Bli med på Zoom
                                                         </a>
-                                                    ` : ''}
-                                                    ${l.videoUrl ? `
-                                                        <a href="${l.videoUrl}" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                            <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Se opptak
+                                                    ` : `
+                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">school</span> Åpne leksjon
                                                         </a>
-                                                    ` : ''}
-                                                    ${!l.zoomUrl && !l.videoUrl ? `
-                                                        <span style="font-size:0.85rem; color:#16a34a; font-weight:600; display:flex; align-items:center; gap:4px;">
-                                                            <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> Tilgang aktivert
-                                                        </span>
-                                                    ` : ''}
+                                                    `)}
                                                 </div>
                                             ` : `
                                                 <div style="display:flex; gap:8px; align-items:center;">
@@ -4286,6 +4321,494 @@ class MinSideManager {
                 </div>`;
             }).join('')}
         </div>`;
+    }
+
+    async renderCoursePlayer(container, args) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Logg inn</h3>
+                    <p>Du må være logget inn for å få tilgang til kurset.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const { courseId, lessonId } = args || {};
+        if (!courseId) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Manglende kurs-ID</h3>
+                    <p>Kan ikke åpne spilleren uten en gyldig kurs-ID.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+
+        // 1. Fetch Course details
+        let course = null;
+        try {
+            const doc = await firebase.firestore().collection('teaching').doc(courseId).get();
+            if (doc.exists) {
+                course = { id: doc.id, ...doc.data() };
+            }
+        } catch (e) {
+            console.error("Error fetching course:", e);
+        }
+
+        if (!course) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Kurset ble ikke funnet</h3>
+                    <p>Det oppstod en feil under henting av kurset fra databasen.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Find active lesson (or fallback to first lesson)
+        const lessons = course.lessons || [];
+        if (lessons.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Ingen leksjoner funnet</h3>
+                    <p>Dette kurset har ingen leksjoner ennå.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let activeLessonIndex = lessons.findIndex(l => l.id === lessonId);
+        if (activeLessonIndex === -1) activeLessonIndex = 0;
+        const lesson = lessons[activeLessonIndex];
+
+        // 2. Fetch Enrollments to verify access
+        let enrollments = [];
+        try {
+            const eSnap = await firebase.firestore().collection('courseEnrollments')
+                .where('email', '==', this.currentUser.email)
+                .get();
+            eSnap.forEach(d => enrollments.push(d.data()));
+        } catch (e) {
+            console.error("Error fetching course enrollments:", e);
+        }
+
+        const isCourseFree = !course.price || course.price === 0;
+        const hasEnrollment = enrollments.some(e => 
+            e.courseId === course.id && 
+            (e.status === 'paid' || e.status === 'success') &&
+            (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(lesson.id))
+        );
+
+        const isUnlocked = isCourseFree || hasEnrollment;
+
+        if (!isUnlocked) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Leksjonen er låst</h3>
+                    <p>Du må melde deg på og fullføre betalingen for dette kurset for å få tilgang.</p>
+                    <a href="/kurs.html" class="btn btn-primary" style="margin-top: 16px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:8px 20px; text-decoration:none; display:inline-block;">
+                        Meld deg på kurset
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
+        // Helper parsers
+        const parseZoom = (url) => {
+            if (!url) return null;
+            try {
+                const u = new URL(url);
+                const pathParts = u.pathname.split('/');
+                const meetingId = pathParts[pathParts.length - 1];
+                const pwd = u.searchParams.get('pwd') || '';
+                return { meetingId, pwd };
+            } catch (e) {
+                const match = url.match(/j\/(\d+)/);
+                if (match) {
+                    const meetingId = match[1];
+                    const pwdMatch = url.match(/pwd=([^&]+)/);
+                    const pwd = pwdMatch ? pwdMatch[1] : '';
+                    return { meetingId, pwd };
+                }
+                return null;
+            }
+        };
+
+        const parseYoutube = (url) => {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const parseVimeo = (url) => {
+            if (!url) return null;
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            return match ? match[1] : null;
+        };
+
+        // Render Layout
+        container.innerHTML = `
+            <div class="course-player-layout">
+                <!-- Left Side: Player & Info -->
+                <div class="player-main-area">
+                    <div class="video-player-container" id="player-container">
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 20px; text-align:center;">
+                            Laster spiller...
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02); display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+                            <div style="flex:1; min-width: 250px;">
+                                <span style="font-size: 0.8rem; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
+                                <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 4px 0 8px;">${lesson.title || 'Uten tittel'}</h2>
+                                <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                            </div>
+                            
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                ${lesson.zoomUrl ? `
+                                    <a href="${lesson.zoomUrl}" target="_blank" class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; font-size:0.88rem;">
+                                        <span class="material-symbols-outlined" style="font-size:20px;">launch</span> Åpne i Zoom-appen
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Sidebar Tabs Container -->
+                <div class="player-sidebar-card">
+                    <div class="sidebar-tabs">
+                        <button class="sidebar-tab-btn active" data-tab="lessons">
+                            <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
+                        </button>
+                        <button class="sidebar-tab-btn" data-tab="notes">
+                            <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
+                        </button>
+                        <button class="sidebar-tab-btn" data-tab="bible">
+                            <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span> Bibel
+                        </button>
+                    </div>
+                    
+                    <div class="sidebar-panels-container">
+                        <!-- Panel 1: Lessons list -->
+                        <div class="sidebar-panel active" id="panel-lessons">
+                            <div class="player-lessons-list">
+                                ${lessons.map((l, idx) => {
+                                    const isActive = idx === activeLessonIndex;
+                                    const cleanLTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+                                    return `
+                                        <div class="player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
+                                            <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                                                <span style="font-size:0.75rem; font-weight:700; color:${isActive ? '#d17d39' : '#94a3b8'};">LEKSJON #${idx + 1}</span>
+                                                <span style="font-weight:650; font-size:0.88rem; color:#1e293b; line-height:1.2;">${cleanLTitle}</span>
+                                            </div>
+                                            <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#d17d39' : '#94a3b8'};">
+                                                ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
+                                            </span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Notes Editor -->
+                        <div class="sidebar-panel" id="panel-notes">
+                            <div class="notes-editor-wrapper">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <h4 style="font-size:0.88rem; font-weight:700; color:#334155; margin:0;">Dine leksjonsnotater</h4>
+                                    <span id="notes-save-status" class="notes-autosave-status">
+                                        <span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret
+                                    </span>
+                                </div>
+                                <textarea class="notes-editor-textarea" id="lesson-notes-textarea" placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Bible Lookup -->
+                        <div class="sidebar-panel" id="panel-bible">
+                            <div class="bible-reader-widget">
+                                <div class="bible-widget-selectors">
+                                    <select id="bible-select-translation" class="bible-widget-select">
+                                        <option value="">Laster...</option>
+                                    </select>
+                                    <select id="bible-select-book" class="bible-widget-select" disabled>
+                                        <option value="">Bok</option>
+                                    </select>
+                                    <select id="bible-select-chapter" class="bible-widget-select" disabled>
+                                        <option value="">Kapittel</option>
+                                    </select>
+                                </div>
+                                <div id="bible-verses-display" class="bible-widget-text-area">
+                                    <p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Velg bok og kapittel for å begynne å lese.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 3. Mount Player Media Embed
+        const playerContainer = document.getElementById('player-container');
+        
+        const loadPlayer = () => {
+            if (lesson.videoUrl) {
+                // Recorded Video Player
+                const ytId = parseYoutube(lesson.videoUrl);
+                const vimId = parseVimeo(lesson.videoUrl);
+                
+                if (ytId) {
+                    playerContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?rel=0&autoplay=1" title="YouTube Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+                } else if (vimId) {
+                    playerContainer.innerHTML = `<iframe src="https://player.vimeo.com/video/${vimId}?autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+                } else {
+                    // Direct media player
+                    playerContainer.innerHTML = `<video src="${lesson.videoUrl}" controls autoplay></video>`;
+                }
+            } else if (lesson.zoomUrl) {
+                // Zoom embed
+                const zoomData = parseZoom(lesson.zoomUrl);
+                if (zoomData) {
+                    const studentName = this.profileData?.name || this.currentUser?.displayName || 'Student';
+                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>`;
+                } else {
+                    playerContainer.innerHTML = `
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #ff5b24;">video_camera_front</span>
+                            <div>
+                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Zoom Live Class</h3>
+                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Live Zoom-kobling er klar. Vennligst bruk knappen nedenfor for å åpne timen i Zoom-appen.</p>
+                            </div>
+                            <a href="${lesson.zoomUrl}" target="_blank" class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:10px 20px; text-decoration:none;">
+                                Åpne Zoom-kobling
+                            </a>
+                        </div>`;
+                }
+            } else {
+                playerContainer.innerHTML = `
+                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 12px;">
+                        <span class="material-symbols-outlined" style="font-size:40px; color:#94a3b8;">school</span>
+                        <div>Leksjonen har ingen live Zoom-time eller opptaks-video registrert ennå.</div>
+                    </div>`;
+            }
+        };
+        
+        loadPlayer();
+
+        // 4. Setup Tab Navigation
+        const tabs = container.querySelectorAll('.sidebar-tab-btn');
+        const panels = container.querySelectorAll('.sidebar-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const panelId = `panel-${tab.dataset.tab}`;
+                container.querySelector(`#${panelId}`).classList.add('active');
+            });
+        });
+
+        // 5. Sidebar Lesson Switcher
+        container.querySelectorAll('.player-lesson-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const idx = parseInt(item.dataset.idx);
+                const nextLesson = lessons[idx];
+                this.loadView('course-player', { courseId, lessonId: nextLesson.id });
+            });
+        });
+
+        // 6. Notes Auto-save Logic
+        const textarea = container.querySelector('#lesson-notes-textarea');
+        const saveStatus = container.querySelector('#notes-save-status');
+        let noteDocId = null;
+        let saveTimeout = null;
+
+        const loadNotes = async () => {
+            saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
+            try {
+                const snap = await firebase.firestore().collection('personal_notes')
+                    .where('userId', '==', uid)
+                    .where('lessonId', '==', lesson.id)
+                    .limit(1)
+                    .get();
+                
+                if (!snap.empty) {
+                    const noteDoc = snap.docs[0];
+                    noteDocId = noteDoc.id;
+                    textarea.value = noteDoc.data().text || '';
+                    saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                } else {
+                    textarea.value = '';
+                    saveStatus.innerHTML = `Ingen lagrede notater`;
+                }
+            } catch (e) {
+                console.error("Notes fetch error:", e);
+                saveStatus.innerHTML = `Feil ved innlasting`;
+            }
+        };
+
+        await loadNotes();
+
+        textarea.addEventListener('input', () => {
+            saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
+            clearTimeout(saveTimeout);
+            
+            saveTimeout = setTimeout(async () => {
+                const noteText = textarea.value.trim();
+                if (!noteText) {
+                    saveStatus.innerHTML = `Tomt notat`;
+                    return;
+                }
+                
+                try {
+                    if (noteDocId) {
+                        await firebase.firestore().collection('personal_notes').doc(noteDocId).update({
+                            text: noteText,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+                        const docRef = await firebase.firestore().collection('personal_notes').add({
+                            userId: uid,
+                            courseId: course.id,
+                            lessonId: lesson.id,
+                            title: `Notater: Leksjon ${activeLessonIndex + 1} - ${cleanLTitle}`,
+                            text: noteText,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        noteDocId = docRef.id;
+                    }
+                    saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret i skyen ✓`;
+                    setTimeout(() => {
+                        if (saveStatus.textContent.includes('skyen')) {
+                            saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                        }
+                    }, 2000);
+                } catch (e) {
+                    console.error("Notes autosave error:", e);
+                    saveStatus.innerHTML = `Kunne ikke lagre`;
+                }
+            }, 1000); // 1 sec debounce
+        });
+
+        // 7. Bible Reader Widget Logic
+        const bibTransSelect = container.querySelector('#bible-select-translation');
+        const bibBookSelect = container.querySelector('#bible-select-book');
+        const bibChapSelect = container.querySelector('#bible-select-chapter');
+        const bibDisplay = container.querySelector('#bible-verses-display');
+        let bibleList = [];
+
+        const loadBibleData = async () => {
+            try {
+                // Fetch Bibles
+                const res = await fetch('/api/bible/bibles');
+                bibleList = await res.json();
+                
+                bibTransSelect.innerHTML = bibleList.map(b => `
+                    <option value="${b.id}">${b.abbreviation}</option>
+                `).join('');
+                
+                // Trigger Book loading
+                if (bibleList.length > 0) {
+                    await loadBooks(bibleList[0].id);
+                }
+            } catch (e) {
+                console.error("Bible widget init error:", e);
+            }
+        };
+
+        const loadBooks = async (bibleId) => {
+            try {
+                bibBookSelect.disabled = true;
+                bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
+                const books = await res.json();
+                
+                bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
+                    <option value="${b.id}">${b.name}</option>
+                `).join('');
+                bibBookSelect.disabled = false;
+            } catch (e) {
+                console.error("Bible widget loadBooks error:", e);
+            }
+        };
+
+        const loadChapters = async (bibleId, bookId) => {
+            try {
+                bibChapSelect.disabled = true;
+                bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/books/${bookId}/chapters`);
+                const chapters = await res.json();
+                
+                bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
+                    <option value="${c.id}">${c.number}</option>
+                `).join('');
+                bibChapSelect.disabled = false;
+            } catch (e) {
+                console.error("Bible widget loadChapters error:", e);
+            }
+        };
+
+        const loadVerses = async (bibleId, chapterId) => {
+            try {
+                bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
+                const data = await res.json();
+                
+                const verses = data.verses || [];
+                if (verses.length === 0) {
+                    bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
+                    return;
+                }
+                
+                bibDisplay.innerHTML = verses.map(v => `
+                    <p style="margin-bottom:12px; font-size:0.9rem; line-height:1.55; color:#334155;">
+                        <span class="bible-verse-num">${v.number}</span>${v.text}
+                    </p>
+                `).join('');
+                bibDisplay.scrollTop = 0;
+            } catch (e) {
+                console.error("Bible widget loadVerses error:", e);
+                bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
+            }
+        };
+
+        bibTransSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            if (bibId) loadBooks(bibId);
+        });
+
+        bibBookSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const bookId = bibBookSelect.value;
+            if (bibId && bookId) loadChapters(bibId, bookId);
+        });
+
+        bibChapSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const chapId = bibChapSelect.value;
+            if (bibId && chapId) loadVerses(bibId, chapId);
+        });
+
+        await loadBibleData();
     }
 
     // ──────────────────────────────────────────────────────────

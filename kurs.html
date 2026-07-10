@@ -1323,6 +1323,34 @@
                 let allCourses = [];
                 let activeFilter = 'all';
                 let searchQuery = '';
+                let currentUser = null;
+                let userEnrollments = [];
+
+                async function listenToAuth() {
+                    await new Promise(resolve => {
+                        const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
+                        check();
+                    });
+
+                    firebase.auth().onAuthStateChanged(async (user) => {
+                        currentUser = user;
+                        if (user) {
+                            try {
+                                const eSnap = await firebase.firestore().collection('courseEnrollments')
+                                    .where('email', '==', user.email)
+                                    .get();
+                                userEnrollments = [];
+                                eSnap.forEach(doc => userEnrollments.push(doc.data()));
+                            } catch (e) {
+                                console.error("Error fetching enrollments on auth change:", e);
+                            }
+                        } else {
+                            userEnrollments = [];
+                        }
+                        renderGrid(getFiltered());
+                    });
+                }
+                listenToAuth();
 
                 // ── Load courses from Firebase ──────────────────────────────────
                 async function loadCourses() {
@@ -1386,29 +1414,45 @@
 
                     grid.innerHTML = courses.map(course => {
                         const isFree = !course.price || course.price === 0;
+                        const hasAccess = currentUser && (isFree || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                         const lessonCount = (course.lessons || []).length;
                         const excerpt = (course.description || '').substring(0, 110) + ((course.description || '').length > 110 ? '...' : '');
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
 
+                        const cardAction = hasAccess 
+                            ? `window.location.href='/minside/index.html#course-player?courseId=${course.id}'` 
+                            : `openEnrollModal(${JSON.stringify(course).replace(/"/g, '&quot;')})`;
+
                         return `
-                <div class="course-card" onclick="openEnrollModal(${JSON.stringify(course).replace(/"/g, '&quot;')})">
+                <div class="course-card" onclick="${cardAction}">
                     <div class="course-thumb">
                         ${course.imageUrl
                                 ? `<img src="${course.imageUrl}" alt="${course.title}" loading="lazy">`
                                 : `<div class="course-thumb-placeholder"><i class="fas fa-graduation-cap"></i></div>`}
                         ${course.category ? `<span class="category-badge">${course.category}</span>` : ''}
-                        <span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Gratis' : 'kr ' + course.price + ',-' + (course.priceSuffix ? ' ' + course.priceSuffix : '')}</span>
+                        ${hasAccess 
+                            ? `<span class="price-badge free" style="background:#16a34a; border-color:#16a34a;"><i class="fas fa-check-circle" style="font-size:11px; margin-right:3px;"></i> Låst opp</span>`
+                            : `<span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Gratis' : 'kr ' + course.price + ',-' + (course.priceSuffix ? ' ' + course.priceSuffix : '')}</span>`
+                        }
                     </div>
                     <div class="course-body">
                         <h3>${course.title || 'Uten tittel'}</h3>
                         <div class="course-meta">
                             <span><i class="fas fa-play-circle"></i> ${lessonCount} leksjon${lessonCount !== 1 ? 'er' : ''}</span>
-                            ${isFree ? '<span><i class="fas fa-unlock"></i> Gratis tilgang</span>' : '<span><i class="fas fa-lock"></i> Betalt kurs</span>'}
+                            ${hasAccess 
+                                ? '<span><i class="fas fa-unlock" style="color:#16a34a;"></i> Har tilgang</span>'
+                                : (isFree ? '<span><i class="fas fa-unlock"></i> Gratis tilgang</span>' : '<span><i class="fas fa-lock"></i> Betalt kurs</span>')
+                            }
                         </div>
                         <p>${excerpt}</p>
-                        <button class="enroll-btn ${isFree ? 'free' : ''}">
-                            ${isFree ? '<i class="fas fa-graduation-cap"></i> Start gratis' : '<i class="fas fa-shopping-cart"></i> Meld deg på'}
-                        </button>
+                        ${hasAccess 
+                            ? `<button class="enroll-btn free" style="background:#16a34a; border-color:#16a34a; color:white;">
+                                 <i class="fas fa-play-circle"></i> Gå til kurset
+                               </button>`
+                            : `<button class="enroll-btn ${isFree ? 'free' : ''}">
+                                 ${isFree ? '<i class="fas fa-graduation-cap"></i> Start gratis' : '<i class="fas fa-shopping-cart"></i> Meld deg på'}
+                               </button>`
+                        }
                     </div>
                 </div>`;
                     }).join('');
