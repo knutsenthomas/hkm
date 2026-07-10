@@ -2233,6 +2233,14 @@ class ContentManager {
                     const imageSrc = this._getEventImage(event);
                     const imageAlt = event.title || 'Arrangement';
 
+                    const rawDesc = event.seoDescription || event.excerpt || event.description || event.content || '';
+                    const cleanExcerpt = typeof rawDesc === 'string' 
+                        ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
+                        : '';
+                    const limitExcerpt = cleanExcerpt.length > 120 
+                        ? cleanExcerpt.slice(0, 117) + '...' 
+                        : cleanExcerpt;
+
                     const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
 
                     return `
@@ -2248,6 +2256,11 @@ class ContentManager {
                             </div>
                             <div class="event-content">
                                 <h3 class="event-title">${event.title || 'Uten tittel'}</h3>
+                                ${limitExcerpt ? `
+                                    <p class="event-desc-excerpt" style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px; line-clamp: 2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.45;">
+                                        ${limitExcerpt}
+                                    </p>
+                                ` : ''}
                                 <div class="event-meta">
                                     ${dateLabel ? `<span>${dateLabel}</span>` : ''}
                                 </div>
