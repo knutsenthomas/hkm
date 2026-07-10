@@ -1106,7 +1106,7 @@ class MinSideManager {
             link.addEventListener('click', e => {
                 e.preventDefault();
                 this.loadView(link.dataset.view);
-                if (window.innerWidth <= 768) this.toggleSidebar(false);
+                if (window.innerWidth <= 1024) this.toggleSidebar(false);
             });
         });
 

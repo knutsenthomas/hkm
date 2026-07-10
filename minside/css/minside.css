@@ -2174,31 +2174,33 @@ body.admin-body .btn-full,
 }
 
 /* Mobile: sidebar hidden off-screen, full-width content */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     :root {
-        --sidebar-w: 0px;
+        --sidebar-w: 0px !important;
+        --sidebar-width: 0px !important;
     }
 
     body.minside-body .sidebar {
-        left: -280px;
-        width: 280px;
-        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
+        left: -280px !important;
+        width: 280px !important;
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15) !important;
         z-index: 13000 !important;
         padding-bottom: 110px !important;
     }
 
     body.minside-body .sidebar.active {
-        left: 0;
+        left: 0 !important;
+        transform: translateX(0) !important;
     }
 
     .profile-header,
     .main-content {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 
     .mobile-toggle-btn {
-        display: flex;
+        display: flex !important;
     }
 
     .ph-right .ph-badges {
@@ -3710,7 +3712,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     padding: 4px 0 !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     /* Hide desktop header language picker, show mobile sidebar language picker */
     .header-lang-switcher {
         display: none !important;
