@@ -4097,6 +4097,28 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     background-color: rgba(27, 73, 101, 0.08) !important;
 }
 
+.course-lessons-accordion .expand-chevron {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform-origin: center center !important;
+    pointer-events: none !important;
+    text-align: center !important;
+}
+
+.course-lessons-accordion:not(.collapsed) .expand-chevron {
+    transform: rotate(180deg) translateZ(0) !important;
+}
+
+.course-lessons-accordion.collapsed .expand-chevron {
+    transform: rotate(0deg) translateZ(0) !important;
+}
+
 
 
 
