@@ -21792,31 +21792,31 @@ class AdminManager {
         const financeView = document.getElementById('finance-tab-view');
 
         listTabBtn?.addEventListener('click', () => {
-            listTabBtn.classList.add('active');
-            enrollmentsTabBtn.classList.remove('active');
+            listTabBtn?.classList.add('active');
+            enrollmentsTabBtn?.classList.remove('active');
             financeTabBtn?.classList.remove('active');
-            coursesView.style.display = 'block';
-            enrollmentsView.style.display = 'none';
-            financeView.style.display = 'none';
+            if (coursesView) coursesView.style.display = 'block';
+            if (enrollmentsView) enrollmentsView.style.display = 'none';
+            if (financeView) financeView.style.display = 'none';
         });
 
         enrollmentsTabBtn?.addEventListener('click', async () => {
-            enrollmentsTabBtn.classList.add('active');
-            listTabBtn.classList.remove('active');
+            enrollmentsTabBtn?.classList.add('active');
+            listTabBtn?.classList.remove('active');
             financeTabBtn?.classList.remove('active');
-            coursesView.style.display = 'none';
-            enrollmentsView.style.display = 'block';
-            financeView.style.display = 'none';
+            if (coursesView) coursesView.style.display = 'none';
+            if (enrollmentsView) enrollmentsView.style.display = 'block';
+            if (financeView) financeView.style.display = 'none';
             await this._loadEnrollmentsList();
         });
 
         financeTabBtn?.addEventListener('click', async () => {
-            financeTabBtn.classList.add('active');
-            listTabBtn.classList.remove('active');
-            enrollmentsTabBtn.classList.remove('active');
-            coursesView.style.display = 'none';
-            enrollmentsView.style.display = 'none';
-            financeView.style.display = 'block';
+            financeTabBtn?.classList.add('active');
+            listTabBtn?.classList.remove('active');
+            enrollmentsTabBtn?.classList.remove('active');
+            if (coursesView) coursesView.style.display = 'none';
+            if (enrollmentsView) enrollmentsView.style.display = 'none';
+            if (financeView) financeView.style.display = 'block';
             await this._loadFinanceData();
         });
 
@@ -22223,14 +22223,14 @@ class AdminManager {
         // Update active states on selection change
         editor.addEventListener('keyup', () => this._updateRteActiveStates(toolbar));
         editor.addEventListener('mouseup', () => this._updateRteActiveStates(toolbar));
-        editor.addEventListener('focus', () => toolbar.classList.add('rte-focused'));
-        editor.addEventListener('blur', () => toolbar.classList.remove('rte-focused'));
+        editor.addEventListener('focus', () => toolbar?.classList.add('rte-focused'));
+        editor.addEventListener('blur', () => toolbar?.classList.remove('rte-focused'));
     }
 
     _updateRteActiveStates(toolbar) {
         const cmds = ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList'];
         cmds.forEach(cmd => {
-            const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
+            const btn = toolbar?.querySelector(`[data-cmd="${cmd}"]`);
             if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
         });
     }
