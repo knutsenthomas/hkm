@@ -7504,6 +7504,266 @@ html[data-theme="dark"] .btn-icon {
 }
 
 
+/* ==========================================================================
+   HKM GOLD STANDARD TOPBAR HEADER STYLES
+   Force modern, premium, cohesive look on all Admin and Min Side headers
+   ========================================================================== */
+
+/* Main Header Container */
+#dashboard-main-header.main-header {
+  padding: 16px 24px !important; /* 8px multiples */
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(27, 73, 101, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Dark mode support */
+html[data-theme="dark"] #dashboard-main-header.main-header {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Header Content Alignment */
+.main-header .section-header.design-ui-header.in-topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 16px !important;
+}
+
+/* Left side Title & Icon */
+.section-header-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(27, 73, 101, 0.05) !important;
+  color: #1B4965 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: inset 0 1px 2px rgba(27, 73, 101, 0.05) !important;
+  transition: all 0.3s ease !important;
+}
+html[data-theme="dark"] .section-header-icon {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Right side actions flex container */
+.main-header .section-header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important; /* 8px grid */
+  justify-content: flex-end !important;
+}
+
+/* 1. Bento Search Bar */
+.bento-search-bar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important; /* 8px spacing */
+  height: 40px !important; /* 8px multiple */
+  width: 180px !important;
+  padding: 0 16px !important; /* 8px multiple */
+  border-radius: 12px !important;
+  background-color: rgba(209, 125, 57, 0.05) !important; /* Brand orange tint */
+  border: 1px solid rgba(209, 125, 57, 0.15) !important;
+  color: #bd4f2a !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.bento-search-bar:hover {
+  background-color: rgba(209, 125, 57, 0.1) !important;
+  border-color: rgba(209, 125, 57, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(209, 125, 57, 0.08) !important;
+}
+
+.bento-search-bar:active {
+  transform: scale(0.97) !important;
+}
+
+.bento-search-bar .material-symbols-outlined {
+  font-size: 18px !important;
+  color: #d17d39 !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html[data-theme="dark"] .bento-search-bar {
+  background-color: rgba(209, 125, 57, 0.08) !important;
+  border-color: rgba(209, 125, 57, 0.25) !important;
+  color: #ffd0c4 !important;
+}
+
+/* 2. Language Switcher Button */
+.lang-switcher .lang-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important; /* 8px spacing */
+  padding: 0 16px !important; /* 8px multiple */
+  height: 40px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(27, 73, 101, 0.08) !important;
+  background: #ffffff !important;
+  color: #1B4965 !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.lang-switcher .lang-btn:hover {
+  background-color: rgba(27, 73, 101, 0.04) !important;
+  border-color: rgba(27, 73, 101, 0.2) !important;
+  color: #1B4965 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(27, 73, 101, 0.05) !important;
+}
+
+.lang-switcher .lang-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.lang-switcher .lang-btn span.material-symbols-outlined {
+  font-size: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+html[data-theme="dark"] .lang-switcher .lang-btn {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+/* 3. Shortcut / Notification Buttons */
+.notification-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(27, 73, 101, 0.08) !important;
+  background: #ffffff !important;
+  color: #1B4965 !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.notification-btn:hover {
+  background-color: rgba(27, 73, 101, 0.04) !important;
+  border-color: rgba(27, 73, 101, 0.2) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(27, 73, 101, 0.05) !important;
+}
+
+.notification-btn:active {
+  transform: scale(0.97) !important;
+}
+
+html[data-theme="dark"] .notification-btn {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+/* 4. User Profile Link */
+.user-profile-link {
+  height: 40px !important;
+  border-radius: 12px !important;
+  padding: 0 4px 0 16px !important; /* 16px left padding, 4px right padding for avatar alignment */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(27, 73, 101, 0.08) !important;
+  background: #ffffff !important;
+  color: #1B4965 !important;
+  cursor: pointer !important;
+  gap: 8px !important; /* 8px spacing */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.user-profile-link:hover {
+  background-color: rgba(27, 73, 101, 0.04) !important;
+  border-color: rgba(27, 73, 101, 0.2) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(27, 73, 101, 0.05) !important;
+}
+
+.user-profile-link:active {
+  transform: scale(0.97) !important;
+}
+
+/* User avatar box inside link */
+.user-profile-link .user-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important; /* rounded matching avatar card */
+  background: rgba(209, 125, 57, 0.1) !important;
+  color: #d17d39 !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(209, 125, 57, 0.15) !important;
+}
+
+.user-profile-link .user-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+}
+
+.user-profile-link .user-name {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #1B4965 !important;
+}
+
+.user-profile-link .user-role {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #d17d39 !important;
+  opacity: 0.9 !important;
+}
+
+html[data-theme="dark"] .user-profile-link {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .user-profile-link .user-name {
+  color: #f1f5f9 !important;
+}
+
+
+
 
 
 
