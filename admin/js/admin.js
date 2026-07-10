@@ -4473,7 +4473,7 @@ class AdminManager {
 
     _getSavedAnalyticsRangeDays() {
         const saved = parseInt(localStorage.getItem('hkm_analytics_range_days'), 10);
-        const allowed = [7, 14, 30, 60, 90, 180, 365];
+        const allowed = [1, 7, 14, 30, 60, 90, 180, 365];
         return allowed.includes(saved) ? saved : 30;
     }
 
@@ -4518,84 +4518,46 @@ class AdminManager {
                 firebaseService.getPageContent('collection_teaching'),
                 firebaseService.getPageContent('collection_events'),
                 firebaseService.getPageContent('collection_causes'),
-                firebaseService.getPageContent('index'),
-                this.fetchYouTubeStats(),
-                this.fetchPodcastStats(),
-                typeof firebaseService.getSiteContent === 'function'
-                    ? firebaseService.getSiteContent('collection_courses')
-                    : null,
-                this.fetchAnalyticsData(this.analyticsRangeDays)
+                firebaseService.getPageContent('settings_index'),
+                firebaseService.getPageContent('settings_youtube'),
+                firebaseService.getPageContent('settings_podcast'),
+                firebaseService.getPageContent('collection_courses'),
+                this.fetchAnalyticsData(this.analyticsRangeDays).catch(() => null)
             ]);
 
-            this.gaData = gaData; // Store for rendering below
+            blogCount = Array.isArray(blogData) ? blogData.length : (blogData?.items ? Object.keys(blogData.items).length : 0);
+            teachingCount = Array.isArray(teachingData) ? teachingData.length : (teachingData?.items ? Object.keys(teachingData.items).length : 0);
+            eventCount = Array.isArray(eventData) ? eventData.length : (eventData?.items ? Object.keys(eventData.items).length : 0);
+            campaignCount = Array.isArray(causesData) ? causesData.length : (causesData?.items ? Object.keys(causesData.items).length : 0);
+            indexStats = indexData || {};
+            youtubeStats = yt || { subscribers: 'N/A', videos: 'N/A', views: '0' };
+            podcastCount = Array.isArray(pod) ? pod.length : (pod?.items ? Object.keys(pod.items).length : '0');
+            fullEvents = Array.isArray(eventData) ? eventData : (eventData?.items ? Object.values(eventData.items) : []);
 
-            blogCount = (Array.isArray(blogData) ? blogData : (blogData?.items || [])).length;
-            teachingCount = (Array.isArray(teachingData) ? teachingData : (teachingData?.items || [])).length;
+            // Count users securely
+            const usersSnap = await firebaseService.getSiteContent('users');
+            userCount = Array.isArray(usersSnap) ? usersSnap.length : (usersSnap?.items ? Object.keys(usersSnap.items).length : 0);
 
-            const eventsList = Array.isArray(eventData) ? eventData : (eventData?.items || []);
-            eventCount = eventsList.length;
-            fullEvents = eventsList;
+            // Fetch donations summary
+            const donationsSnap = await firebaseService.getSiteContent('donations');
+            const donations = Array.isArray(donationsSnap) ? donationsSnap : (donationsSnap?.items ? Object.values(donationsSnap.items) : []);
+            donationCount = donations.length;
+            donationTotal = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
 
-            campaignCount = (Array.isArray(causesData) ? causesData : (causesData?.items || [])).length;
-            indexStats = indexData?.stats || {};
-            if (yt) youtubeStats = yt;
-            if (pod) podcastCount = pod;
-            const coursesCount = (Array.isArray(coursesDoc) ? coursesDoc : (coursesDoc?.items || [])).length;
-            if (Number.isFinite(coursesCount)) {
-                // Keep a lightweight cached value in case a dedicated widget is enabled later.
-                this._coursesCountOverview = coursesCount;
-            }
-
-            if (firebaseService.db) {
-                const usersSnapshot = await firebaseService.db.collection('users').get();
-                userCount = usersSnapshot.size || 0;
-
-                // Fetch donations
-                const donationsSnapshot = await firebaseService.db.collection('donations').get();
-                const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                donationsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const donationDate = this.getDonationDate(data);
-                    if (!donationDate || donationDate < thirtyDaysAgo) {
-                        return;
-                    }
-                    donationCount++;
-                    if (data.amountNok != null || data.amountNOK != null || data.totalNok != null) {
-                        const raw = data.amountNok ?? data.amountNOK ?? data.totalNok;
-                        donationTotal += typeof adminUtils.normalizeAmountNok === 'function'
-                            ? adminUtils.normalizeAmountNok(raw)
-                            : Number(raw || 0);
-                    } else if (data.amount != null) {
-                        // Stripe amounts are stored in øre.
-                        donationTotal += (Number(data.amount) || 0) / 100;
-                    }
-                });
-
-
-            }
-        } catch (e) {
-            console.warn('Feil ved henting av statistikk:', e);
+            this.gaData = gaData;
+        } catch (err) {
+            console.warn("[AdminManager] Failed to fetch overview data, using mock statistics:", err);
         }
 
-        // Get Enabled Widgets & Order
-        const savedOrder = JSON.parse(localStorage.getItem('hkm_dashboard_widgets'));
-        let enabledWidgets = savedOrder || Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
-        if (savedOrder && savedOrder.includes('donations') && !savedOrder.includes('donation-amount')) {
-            const idx = savedOrder.indexOf('donations');
-            savedOrder.splice(idx + 1, 0, 'donation-amount');
-            enabledWidgets = savedOrder;
-            localStorage.setItem('hkm_dashboard_widgets', JSON.stringify(savedOrder));
-        }
-        const savedSpans = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans')) || {};
-
-        // Define Categories & Groups
+        // Render dashboard grid with stats
+        const enabledWidgets = ['visitors', 'analytics-engagement', 'users', 'status', 'blog', 'teaching', 'donations', 'donation-amount', 'youtube', 'podcast'];
+        
         const categories = [
             { id: 'traffic', label: 'Trafikk & Innsikt', icon: 'monitoring', widgets: ['visitors', 'analytics-engagement', 'users'] },
-            { id: 'content', label: 'Innhold', icon: 'description', widgets: ['blog', 'podcast', 'teaching', 'status'] },
-            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'donation-amount'] }
+            { id: 'content', label: 'Innholdsmåling', icon: 'description', widgets: ['status', 'blog', 'teaching', 'podcast', 'youtube'] },
+            { id: 'donations', label: 'Gaver & Bidrag', icon: 'volunteer_activism', widgets: ['donations', 'donation-amount'] }
         ];
 
-        // Build HTML for columns
         let widgetsHtml = '';
         
         categories.forEach(cat => {
@@ -4634,9 +4596,8 @@ class AdminManager {
 
                 switch (id) {
                     case 'visitors':
-                        const cachedVisits = localStorage.getItem('hkm_stat_visits');
                         const liveVisits = this.gaData ? (this.gaData.activeRangeUsers || this.gaData.active30dUsers) : indexStats.website_visits;
-                        value = liveVisits ? parseInt(liveVisits).toLocaleString('no-NO') : (cachedVisits ? parseInt(cachedVisits).toLocaleString('no-NO') : '—');
+                        value = liveVisits ? parseInt(liveVisits).toLocaleString('no-NO') : '—';
                         break;
                     case 'analytics-engagement':
                         const duration = this.gaData?.avgDuration || 0;
@@ -4700,42 +4661,35 @@ class AdminManager {
                     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
                 }
             </style>
-            <div class="analytics-bottom-row">
+            <div class="analytics-bottom-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-top: 32px;">
                 <div class="big-card">
-                    <div class="big-card-title">
-                        <span>Trafikkovervåking (Google Analytics)</span>
-                        <div style="display:flex; gap: 8px; align-items:center;">
-                            <label for="analytics-range-days" class="sr-only">Velg periode</label>
-                            <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode for Google Analytics">
-                                ${[1, 7, 14, 30, 60, 90, 180, 365].map(days => `
-                                    <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days).toUpperCase()}</option>
-                                `).join('')}
-                            </select>
-                            <span class="material-symbols-outlined" style="cursor:pointer; color: #64748b;">more_vert</span>
-                        </div>
+                    <div class="big-card-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                        <span style="font-weight:700; color:#1e293b;">Trafikkovervåking (Google Analytics)</span>
+                        <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode">
+                            ${[1, 7, 14, 30, 60, 90, 180, 365].map(days => `
+                                <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days).toUpperCase()}</option>
+                            `).join('')}
+                        </select>
                     </div>
                     <div style="height: 300px; background: white; border: 1px solid #f1f5f9; border-radius: 12px; display: flex; flex-direction: column; align-items: stretch; color: #94a3b8; padding: 24px;">
                         ${sparklineHtml}
                     </div>
                 </div>
-
-                <div class="big-card">
-                    <div class="big-card-title">Topp Sider</div>
-                    <div class="top-pages-list">
-                        ${topPagesArr.map(page => `
-                            <div class="top-page-item">
-                                <div class="top-page-info">
-                                    <span class="top-page-path">${page.path}</span>
-                                    <span class="top-page-pct">${page.pct}%</span>
+                <div class="side-card">
+                    <div class="side-card-title" style="font-weight:700; color:#1e293b; margin-bottom: 16px;">Mest leste sider</div>
+                    <div style="display:flex; flex-direction:column; gap: 16px; margin-top: 16px;">
+                        ${topPagesArr.map(p => `
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+                                    <span style="color:#475569; font-weight: 500;">${this.escapeHtml(p.path)}</span>
+                                    <span style="color:#64748b;">${p.pct}%</span>
                                 </div>
-                                <div class="top-page-bar-wrap">
-                                    <div class="top-page-bar" style="width: ${page.pct}%;"></div>
+                                <div style="width:100%; height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${p.pct}%; height:100%; background:#1B4965; border-radius:3px;"></div>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    <a href="https://analytics.google.com/analytics/web/" class="analytics-open-link" target="_blank" rel="noopener noreferrer">
-                        Åpne Google Analytics
                         <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                     </a>
                 </div>
@@ -5009,13 +4963,29 @@ class AdminManager {
                 labels = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
             } else if (days <= 7) {
                 trafficData = [142, 210, 185, 320, 410, 280, 195];
-                labels = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+                const dayNames = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
+                labels = Array.from({length: 7}, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (6 - i));
+                    return dayNames[d.getDay()];
+                });
             } else if (days <= 30) {
                 trafficData = [340, 410, 390, 520, 680, 590, 480, 610, 750, 820, 710, 640, 580, 690, 880, 940, 810, 720, 680, 790, 920, 1050, 980, 890, 840, 910, 1120, 1250, 1100, 950];
-                labels = Array.from({length: 30}, (_, i) => `${i + 1}. mai`);
+                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                labels = Array.from({length: 30}, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (29 - i));
+                    return `${d.getDate()}. ${months[d.getMonth()]}`;
+                });
             } else {
                 trafficData = [2400, 3100, 2900, 4200, 4800, 3900, 3400, 4100, 5500, 6200, 5100, 4400];
-                labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
+                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                labels = Array.from({length: 12}, (_, i) => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - (11 - i));
+                    const monthLabel = months[d.getMonth()];
+                    return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+                });
             }
         }
 
