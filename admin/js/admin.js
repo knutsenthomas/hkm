@@ -22168,6 +22168,7 @@ class AdminManager {
                     useLiveFeed: true,
                     livePostCount: 3,
                     pageId: '',
+                    feedUrl: '',
                     label: 'Følg oss på Facebook',
                     title: 'Siste fra Facebook-siden vår',
                     description: 'Se oppdateringer, kunngjøringer og glimt fra arbeidet vårt direkte fra Facebook.',
@@ -23494,6 +23495,71 @@ class AdminManager {
 
         this.renderFacebookFeedLivePreviewState(container, { status: 'loading' });
 
+        if (config.feedUrl) {
+            try {
+                const response = await fetch(config.feedUrl.trim());
+                if (!response.ok) throw new Error(`RSS feed fetch failed with status ${response.status}`);
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(xmlText, "text/xml");
+                const items = xml.querySelectorAll("item");
+                
+                if (requestId === this._facebookFeedPreviewRequestId) {
+                    const parsedPosts = Array.from(items).slice(0, livePostCount).map((item, idx) => {
+                        const title = item.querySelector("title")?.textContent || "";
+                        const link = item.querySelector("link")?.textContent || pageUrl || "https://www.facebook.com/hiskingdomministry777";
+                        const pubDate = item.querySelector("pubDate")?.textContent || "";
+                        const description = item.querySelector("description")?.textContent || "";
+                        
+                        let image = "";
+                        const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
+                        if (imgMatch) {
+                            image = imgMatch[1];
+                        }
+                        
+                        const cleanText = description.replace(/<[^>]*>/g, '').trim();
+                        let excerpt = cleanText || title;
+                        if (excerpt.length > 180) {
+                            excerpt = excerpt.substring(0, 177) + "...";
+                        }
+
+                        let friendlyDate = "Nylig";
+                        if (pubDate) {
+                            const date = new Date(pubDate);
+                            const diffTime = Math.abs(new Date() - date);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            if (diffDays <= 1) friendlyDate = "I går";
+                            else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
+                            else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                        }
+
+                        return {
+                            id: idx + 1,
+                            date: friendlyDate,
+                            title: (cleanText && cleanText.length > 50) ? (cleanText.substring(0, 47) + "...") : (title || "Innlegg"),
+                            excerpt: excerpt,
+                            cta: "Les på Facebook",
+                            image: image,
+                            link: link
+                        };
+                    });
+
+                    if (parsedPosts.length > 0) {
+                        this.renderFacebookFeedLivePreviewState(container, {
+                            status: 'ready',
+                            items: parsedPosts,
+                            pageUrl: pageUrl,
+                            message: 'Dette er innleggene som hentes live via RSS akkurat nå.'
+                        });
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('[Admin] Failed to load live Facebook feed preview via RSS URL:', err);
+            }
+        }
+
         let lastMessage = '';
 
         for (const url of this.getFacebookFeedPreviewUrls(livePostCount, { pageId, pageUrl })) {
@@ -23621,6 +23687,12 @@ class AdminManager {
                                     label: 'Facebook-side URL',
                                     value: feed.pageUrl || '',
                                     placeholder: 'https://www.facebook.com/...'
+                                })}
+                                ${this.renderFacebookFeedField({
+                                    key: 'facebookFeed.feedUrl',
+                                    label: 'Facebook RSS/XML Feed URL (fra f.eks. rss.app)',
+                                    value: feed.feedUrl || '',
+                                    placeholder: 'https://rss.app/feeds/...'
                                 })}
                                 ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.pageCta',

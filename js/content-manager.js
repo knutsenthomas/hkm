@@ -2502,7 +2502,8 @@ class ContentManager {
                 || this.extractFacebookPageIdentifier(typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl : '')
                 || this.extractFacebookPageIdentifier(sectionLink?.getAttribute('href') || ''),
             pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
-                || (sectionLink?.getAttribute('href') || '').trim()
+                || (sectionLink?.getAttribute('href') || '').trim(),
+            feedUrl: (typeof feedContent.feedUrl === 'string' ? feedContent.feedUrl.trim() : '')
         };
     }
 
@@ -2535,6 +2536,70 @@ class ContentManager {
         if (!config.useLiveFeed) {
             section.style.display = '';
             return;
+        }
+
+        // Client-side RSS parsing (matches Betania Vigeland behavior)
+        if (config.feedUrl) {
+            try {
+                const response = await fetch(config.feedUrl);
+                if (!response.ok) throw new Error(`RSS feed fetch failed with status ${response.status}`);
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(xmlText, "text/xml");
+                const items = xml.querySelectorAll("item");
+                
+                const parsedPosts = Array.from(items).slice(0, config.livePostCount).map((item, idx) => {
+                    const title = item.querySelector("title")?.textContent || "";
+                    const link = item.querySelector("link")?.textContent || config.pageUrl || "https://www.facebook.com/hiskingdomministry777";
+                    const pubDate = item.querySelector("pubDate")?.textContent || "";
+                    const description = item.querySelector("description")?.textContent || "";
+                    
+                    // Try to extract an image from the description HTML content
+                    let image = "";
+                    const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
+                    if (imgMatch) {
+                        image = imgMatch[1];
+                    }
+                    
+                    // Shave HTML tags from description to get raw post text
+                    const cleanText = description.replace(/<[^>]*>/g, '').trim();
+                    
+                    // Excerpt logic: keep it to a clean preview length
+                    let excerpt = cleanText || title;
+                    if (excerpt.length > 180) {
+                        excerpt = excerpt.substring(0, 177) + "...";
+                    }
+
+                    // Calculate a friendly relative date (e.g. '3 dager siden')
+                    let friendlyDate = "Nylig";
+                    if (pubDate) {
+                        const date = new Date(pubDate);
+                        const diffTime = Math.abs(new Date() - date);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays <= 1) friendlyDate = "I går";
+                        else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
+                        else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                    }
+
+                    return {
+                        id: idx + 1,
+                        date: friendlyDate,
+                        title: (cleanText && cleanText.length > 50) ? (cleanText.substring(0, 47) + "...") : (title || "Innlegg"),
+                        excerpt: excerpt,
+                        cta: "Les på Facebook",
+                        image: image,
+                        link: link
+                    };
+                });
+
+                if (parsedPosts.length > 0) {
+                    this.renderFacebookFeed(parsedPosts, config.pageUrl);
+                    return;
+                }
+            } catch (err) {
+                console.warn('[ContentManager] Failed to load live Facebook feed via RSS URL, falling back to API:', err);
+            }
         }
 
         let lastError = null;
