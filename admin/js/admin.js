@@ -22169,6 +22169,8 @@ class AdminManager {
                     livePostCount: 3,
                     pageId: '',
                     feedUrl: '',
+                    feedSource: 'rss',
+                    juicerFeedId: 'hiskingdomministry777',
                     label: 'Følg oss på Facebook',
                     title: 'Siste fra Facebook-siden vår',
                     description: 'Se oppdateringer, kunngjøringer og glimt fra arbeidet vårt direkte fra Facebook.',
@@ -23495,7 +23497,46 @@ class AdminManager {
 
         this.renderFacebookFeedLivePreviewState(container, { status: 'loading' });
 
-        if (config.feedUrl) {
+        if (config.feedSource === 'juicer') {
+            const previewNode = container.querySelector('[data-facebook-live-preview]');
+            const badgeNode = container.querySelector('[data-facebook-live-badge]');
+            const noteNode = container.querySelector('[data-facebook-live-note]');
+            
+            if (previewNode && badgeNode && noteNode) {
+                badgeNode.textContent = 'Juicer';
+                badgeNode.style.color = '#166534';
+                badgeNode.style.background = '#f0fdf4';
+                noteNode.textContent = `Viser live feed for Juicer ID: ${config.juicerFeedId || 'hiskingdomministry777'}`;
+                
+                const juicerId = config.juicerFeedId || 'hiskingdomministry777';
+                previewNode.innerHTML = `<ul class="juicer-feed" data-feed-id="${juicerId}" data-per="${livePostCount}"></ul>`;
+                
+                if (!document.querySelector('link[href*="juicer.io"]')) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'https://assets.juicer.io/embed.css';
+                    link.media = 'all';
+                    link.type = 'text/css';
+                    document.head.appendChild(link);
+                }
+                
+                const scriptSrc = `https://www.juicer.io/embed/${juicerId}/embed-code.js`;
+                const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
+                if (!existingScript) {
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = scriptSrc;
+                    script.async = true;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                } else if (window.Juicer && typeof window.Juicer.initialize === 'function') {
+                    window.Juicer.initialize();
+                }
+            }
+            return;
+        }
+
+        if (config.feedSource === 'rss' && config.feedUrl) {
             try {
                 const response = await fetch(config.feedUrl.trim());
                 if (!response.ok) throw new Error(`RSS feed fetch failed with status ${response.status}`);
@@ -23657,7 +23698,7 @@ class AdminManager {
                                 })}
                                 ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.useLiveFeed',
-                                    label: 'Bruk live Meta-feed',
+                                    label: 'Bruk live-feed',
                                     value: feed.useLiveFeed === false ? 'false' : 'true',
                                     valueType: 'boolean',
                                     options: [
@@ -23666,13 +23707,30 @@ class AdminManager {
                                     ]
                                 })}
                                 ${this.renderFacebookFeedField({
+                                    key: 'facebookFeed.feedSource',
+                                    label: 'Kilde til live-feed',
+                                    value: feed.feedSource || 'rss',
+                                    options: [
+                                        { value: 'rss', label: 'RSS Feed URL (rss.app)' },
+                                        { value: 'juicer', label: 'Juicer.io integrasjon' },
+                                        { value: 'meta', label: 'Meta API (Klassisk)' }
+                                    ]
+                                })}
+                                ${this.renderFacebookFeedField({
+                                    key: 'facebookFeed.juicerFeedId',
+                                    label: 'Juicer Feed ID (Brukernavn/slug)',
+                                    value: feed.juicerFeedId || 'hiskingdomministry777',
+                                    placeholder: 'hiskingdomministry777',
+                                    help: 'F.eks. hiskingdomministry777 hvis embed URL er https://www.juicer.io/embed/hiskingdomministry777'
+                                })}
+                                ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.livePostCount',
                                     label: 'Antall live innlegg',
                                     value: feed.livePostCount == null ? 3 : feed.livePostCount,
                                     type: 'number',
                                     valueType: 'number',
                                     min: '1',
-                                    max: '3',
+                                    max: '10',
                                     step: '1'
                                 })}
                                 ${this.renderFacebookFeedField({
@@ -23680,7 +23738,7 @@ class AdminManager {
                                     label: 'Facebook Page ID / slug',
                                     value: feed.pageId || '',
                                     placeholder: 'Valgfritt hvis URL brukes',
-                                    help: 'Kan sta tomt. Hvis du fyller inn side-URL under, brukes den ogsa til a finne riktig side.'
+                                    help: 'Kan stå tomt. Hvis du fyller inn side-URL under, brukes den også til å finne riktig side.'
                                 })}
                                 ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.pageUrl',

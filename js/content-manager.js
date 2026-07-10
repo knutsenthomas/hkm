@@ -2503,7 +2503,9 @@ class ContentManager {
                 || this.extractFacebookPageIdentifier(sectionLink?.getAttribute('href') || ''),
             pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
                 || (sectionLink?.getAttribute('href') || '').trim(),
-            feedUrl: (typeof feedContent.feedUrl === 'string' ? feedContent.feedUrl.trim() : '')
+            feedUrl: (typeof feedContent.feedUrl === 'string' ? feedContent.feedUrl.trim() : ''),
+            feedSource: typeof feedContent.feedSource === 'string' ? feedContent.feedSource.trim() : 'rss',
+            juicerFeedId: typeof feedContent.juicerFeedId === 'string' ? feedContent.juicerFeedId.trim() : 'hiskingdomministry777'
         };
     }
 
@@ -2538,8 +2540,40 @@ class ContentManager {
             return;
         }
 
+        // Juicer.io Integration
+        if (config.feedSource === 'juicer') {
+            section.style.display = '';
+            const gridContainer = section.querySelector('.facebook-feed-grid');
+            if (gridContainer) {
+                gridContainer.innerHTML = `<ul class="juicer-feed" data-feed-id="${config.juicerFeedId}" data-per="${config.livePostCount}"></ul>`;
+                
+                if (!document.querySelector('link[href*="juicer.io"]')) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'https://assets.juicer.io/embed.css';
+                    link.media = 'all';
+                    link.type = 'text/css';
+                    document.head.appendChild(link);
+                }
+                
+                const scriptSrc = `https://www.juicer.io/embed/${config.juicerFeedId}/embed-code.js`;
+                const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
+                if (!existingScript) {
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = scriptSrc;
+                    script.async = true;
+                    script.defer = true;
+                    document.body.appendChild(script);
+                } else if (window.Juicer && typeof window.Juicer.initialize === 'function') {
+                    window.Juicer.initialize();
+                }
+            }
+            return;
+        }
+
         // Client-side RSS parsing (matches Betania Vigeland behavior)
-        if (config.feedUrl) {
+        if (config.feedSource === 'rss' && config.feedUrl) {
             try {
                 const response = await fetch(config.feedUrl);
                 if (!response.ok) throw new Error(`RSS feed fetch failed with status ${response.status}`);
