@@ -101,7 +101,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { id, lang = 'no', type = 'plan' } = req.query;
+  const id = req.query.id || req.query.courseId || req.query.course;
+  const { lang = 'no', type = 'plan' } = req.query;
 
   // Resolve the HTML template file name based on type and lang
   let templatePath = 'dist/leseplan-detaljer-template.html';
@@ -130,6 +131,8 @@ export default async function handler(req, res) {
     } else {
       templatePath = 'dist/arrangement-detaljer-template.html';
     }
+  } else if (type === 'course') {
+    templatePath = 'dist/kurs-template.html';
   }
 
   // Load the HTML file
@@ -277,6 +280,19 @@ export default async function handler(req, res) {
           imageUrl = override.imageUrl || override.image || imageUrl;
         }
       }
+    } else if (type === 'course') {
+      const response = await fetch(`${BASE_URL}/siteContent/collection_courses?key=${API_KEY}`);
+      if (response.ok) {
+        const payload = await response.json();
+        const doc = decodeFirestoreFields(payload.fields);
+        const courses = Array.isArray(doc.items) ? doc.items : (doc.items ? Object.values(doc.items) : []);
+        const course = courses.find(c => String(c.id) === String(id));
+        if (course) {
+          title = course.title || 'Kurs';
+          description = course.description || 'Nettkurs fra His Kingdom Ministry';
+          imageUrl = course.imageUrl || 'https://www.hiskingdomministry.no/img/logo-hkm.png';
+        }
+      }
     }
 
     // Get the request host to format absolute page & image URLs
@@ -297,6 +313,8 @@ export default async function handler(req, res) {
       cleanPath = lang === 'en'
         ? `/en/event-details?id=${id}`
         : (lang === 'es' ? `/es/detalles-evento?id=${id}` : `/arrangement-detaljer?id=${id}`);
+    } else if (type === 'course') {
+      cleanPath = `/kurs.html?courseId=${id}`;
     }
     const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
 

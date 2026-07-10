@@ -12,6 +12,8 @@
   ],
   "rewrites": [
     { "source": "/api/bible/:path*", "destination": "/api/bible" },
+    { "source": "/kurs", "destination": "/api/share-preview?type=course&lang=no" },
+    { "source": "/kurs.html", "destination": "/api/share-preview?type=course&lang=no" },
     { "source": "/leseplan-detaljer", "destination": "/api/share-preview?lang=no" },
     { "source": "/leseplan-detaljer.html", "destination": "/api/share-preview?lang=no" },
     { "source": "/en/reading-plan-details", "destination": "/api/share-preview?lang=en" },
