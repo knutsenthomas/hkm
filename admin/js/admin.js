@@ -21446,7 +21446,55 @@ class AdminManager {
                     color: #111827 !important;
                 }
                 #courses-tab-view .design-ui-header .section-subtitle,
-                #enrollments-tab-view .design-ui-header .section-subtitle {
+                #enrollments-tab-view .design-ui-header .section-subtitle,
+                #finance-tab-view .design-ui-header .section-subtitle {
+                    text-align: left !important;
+                    font-size: 13px !important;
+                    color: var(--admin-page-muted) !important;
+                }
+                #finance-tab-view .design-ui-header {
+                    position: relative;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 20px !important;
+                    padding: 24px 32px !important;
+                    margin: 24px 0 32px !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    background: #fff !important;
+                    border: 1px solid var(--admin-page-panel-border) !important;
+                    border-radius: 16px !important;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+                    text-align: left !important;
+                }
+                #finance-tab-view .design-ui-header > * {
+                    position: relative;
+                    z-index: 1;
+                }
+                #finance-tab-view .design-ui-header .section-header-content {
+                    min-width: 0;
+                    flex: 1;
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 16px !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    text-align: left !important;
+                }
+                #finance-tab-view .design-ui-header .section-header-titles {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 4px !important;
+                    text-align: left !important;
+                    align-items: flex-start !important;
+                }
+                #finance-tab-view .design-ui-header .section-title {
+                    text-align: left !important;
+                    font-size: 18px !important;
+                    font-weight: 800 !important;
+                    color: #111827 !important;
+                }
+                #finance-tab-view .design-ui-header .section-subtitle {
                     text-align: left !important;
                     font-size: 13px !important;
                     color: var(--admin-page-muted) !important;
@@ -21457,6 +21505,7 @@ class AdminManager {
             <div style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 0;">
                 <button class="sub-tab-btn active" id="courses-list-tab-btn">Kursliste</button>
                 <button class="sub-tab-btn" id="courses-enrollments-tab-btn">Påmeldinger & Tilganger</button>
+                <button class="sub-tab-btn" id="courses-finance-tab-btn">Økonomi</button>
             </div>
 
             <!-- VIEW 1: COURSES VIEW -->
@@ -21599,6 +21648,47 @@ class AdminManager {
                 </div>
             </div>
 
+            <!-- VIEW 3: FINANCE VIEW -->
+            <div id="finance-tab-view" style="display: none;">
+                ${this.renderSectionHeader('payments', 'Kursøkonomi', 'Oversikt over omsetning, betalinger og økonomiske nøkkeltall for kurs.', '', '')}
+                
+                <div class="design-ui-shell">
+                    <!-- Key stats cards grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Total Omsetning</div>
+                            <div id="finance-total-revenue" style="font-size: 24px; font-weight: 800; color: #1B4965;">kr 0</div>
+                            <div style="font-size: 12px; color: #16a34a; font-weight: 500;">Fra godkjente betalinger</div>
+                        </div>
+                        <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Utestående beløp</div>
+                            <div id="finance-pending-revenue" style="font-size: 24px; font-weight: 800; color: #d17d39;">kr 0</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Registreringer til godkjenning</div>
+                        </div>
+                        <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Refundert beløp</div>
+                            <div id="finance-refunded-revenue" style="font-size: 24px; font-weight: 800; color: #ef4444;">kr 0</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Avbrutte påmeldinger</div>
+                        </div>
+                        <div class="design-ui-panel" style="padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Betalte kursdeltakere</div>
+                            <div id="finance-paid-count" style="font-size: 24px; font-weight: 800; color: #1e293b;">0</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Aktive betalte lisenser</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue breakdown per course -->
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px;">
+                        <div class="design-ui-panel" style="padding: 24px; border-radius: 16px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 0; margin-bottom: 16px;">Omsetning per kurs</h3>
+                            <div id="finance-courses-breakdown">
+                                <div class="loader" style="text-align:center;padding:20px;color:#94a3b8;">Beregner...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Lesson Access Modal -->
             <div id="lesson-access-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;overflow-y:auto;padding:20px;">
                 <div style="background:white;border-radius:16px;max-width:500px;margin:80px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
@@ -21651,22 +21741,38 @@ class AdminManager {
         // Tab selection & routing
         const listTabBtn = document.getElementById('courses-list-tab-btn');
         const enrollmentsTabBtn = document.getElementById('courses-enrollments-tab-btn');
+        const financeTabBtn = document.getElementById('courses-finance-tab-btn');
         const coursesView = document.getElementById('courses-tab-view');
         const enrollmentsView = document.getElementById('enrollments-tab-view');
+        const financeView = document.getElementById('finance-tab-view');
 
         listTabBtn?.addEventListener('click', () => {
             listTabBtn.classList.add('active');
             enrollmentsTabBtn.classList.remove('active');
+            financeTabBtn?.classList.remove('active');
             coursesView.style.display = 'block';
             enrollmentsView.style.display = 'none';
+            financeView.style.display = 'none';
         });
 
         enrollmentsTabBtn?.addEventListener('click', async () => {
             enrollmentsTabBtn.classList.add('active');
             listTabBtn.classList.remove('active');
+            financeTabBtn?.classList.remove('active');
             coursesView.style.display = 'none';
             enrollmentsView.style.display = 'block';
+            financeView.style.display = 'none';
             await this._loadEnrollmentsList();
+        });
+
+        financeTabBtn?.addEventListener('click', async () => {
+            financeTabBtn.classList.add('active');
+            listTabBtn.classList.remove('active');
+            enrollmentsTabBtn.classList.remove('active');
+            coursesView.style.display = 'none';
+            enrollmentsView.style.display = 'none';
+            financeView.style.display = 'block';
+            await this._loadFinanceData();
         });
 
         // Search & Filter event bindings
@@ -27007,6 +27113,154 @@ class AdminManager {
                 this.showToast('❌ Kunne ikke oppdatere leksjonstilgang: ' + err.message, 'error');
             }
         };
+    }
+
+    async _loadFinanceData() {
+        const breakdownContainer = document.getElementById('finance-courses-breakdown');
+        if (!breakdownContainer) return;
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            
+            // Fetch courses
+            const coursesSnapshot = await db.collection('courses').get();
+            const courses = [];
+            coursesSnapshot.forEach(doc => {
+                courses.push({ id: doc.id, ...doc.data() });
+            });
+            this.coursesItems = courses;
+
+            // Fetch enrollments
+            const enrollmentsSnapshot = await db.collection('courseEnrollments').get();
+            const enrollments = [];
+            enrollmentsSnapshot.forEach(doc => {
+                enrollments.push({ id: doc.id, ...doc.data() });
+            });
+            this.enrollmentItems = enrollments;
+
+            // Compute statistics
+            let totalRevenue = 0;
+            let pendingRevenue = 0;
+            let refundedRevenue = 0;
+            let paidCount = 0;
+
+            enrollments.forEach(item => {
+                const amount = Number(item.amount || 0);
+                const status = item.status || 'pending';
+
+                if (status === 'paid' || status === 'success') {
+                    totalRevenue += amount;
+                    paidCount++;
+                } else if (status.startsWith('pending')) {
+                    pendingRevenue += amount;
+                } else if (status === 'refunded') {
+                    refundedRevenue += amount;
+                }
+            });
+
+            // Update stats cards in UI
+            const totalRevenueEl = document.getElementById('finance-total-revenue');
+            const pendingRevenueEl = document.getElementById('finance-pending-revenue');
+            const refundedRevenueEl = document.getElementById('finance-refunded-revenue');
+            const paidCountEl = document.getElementById('finance-paid-count');
+
+            if (totalRevenueEl) totalRevenueEl.innerText = `kr ${totalRevenue.toLocaleString('no-NO')}`;
+            if (pendingRevenueEl) pendingRevenueEl.innerText = `kr ${pendingRevenue.toLocaleString('no-NO')}`;
+            if (refundedRevenueEl) refundedRevenueEl.innerText = `kr ${refundedRevenue.toLocaleString('no-NO')}`;
+            if (paidCountEl) paidCountEl.innerText = paidCount.toString();
+
+            // Compute breakdown per course
+            const courseStats = {};
+            
+            // Initialize with all courses
+            courses.forEach(c => {
+                courseStats[c.id] = {
+                    title: c.title || 'Uten tittel',
+                    totalStudents: 0,
+                    paidStudents: 0,
+                    revenue: 0,
+                    refunded: 0
+                };
+            });
+
+            // Group enrollments
+            enrollments.forEach(item => {
+                const courseId = item.courseId;
+                const courseTitle = item.courseTitle || 'Ukjent kurs';
+                const amount = Number(item.amount || 0);
+                const status = item.status || 'pending';
+
+                // Find key by courseId, fallback to finding by title or creating a new entry
+                let key = courseId;
+                if (!key || !courseStats[key]) {
+                    const found = courses.find(c => c.title === courseTitle);
+                    key = found ? found.id : (courseId || courseTitle);
+                }
+
+                if (!courseStats[key]) {
+                    courseStats[key] = {
+                        title: courseTitle,
+                        totalStudents: 0,
+                        paidStudents: 0,
+                        revenue: 0,
+                        refunded: 0
+                    };
+                }
+
+                courseStats[key].totalStudents++;
+                if (status === 'paid' || status === 'success') {
+                    courseStats[key].paidStudents++;
+                    courseStats[key].revenue += amount;
+                } else if (status === 'refunded') {
+                    courseStats[key].refunded += amount;
+                }
+            });
+
+            // Render breakdown table
+            const statsList = Object.values(courseStats);
+            if (statsList.length === 0) {
+                breakdownContainer.innerHTML = `<p style="color:#64748b;text-align:center;padding:20px;">Ingen kurs er opprettet ennå.</p>`;
+                return;
+            }
+
+            const rows = statsList.map(stat => {
+                const title = this.escapeHtml(stat.title);
+                const total = stat.totalStudents;
+                const paid = stat.paidStudents;
+                const rev = stat.revenue;
+                const ref = stat.refunded;
+
+                return `
+                    <tr>
+                        <td style="font-weight: 600; color: #1e293b;">${title}</td>
+                        <td style="text-align: center; color: #475569;">${total}</td>
+                        <td style="text-align: center; color: #16a34a; font-weight: 600;">${paid}</td>
+                        <td style="font-weight: 600; color: #1B4965;">kr ${rev.toLocaleString('no-NO')}</td>
+                        <td style="color: #ef4444; font-weight: 500;">kr ${ref.toLocaleString('no-NO')}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            breakdownContainer.innerHTML = `
+                <div class="table-container full-bleed">
+                    <table class="crm-table">
+                        <thead>
+                            <tr>
+                                <th>Kursnavn</th>
+                                <th style="text-align: center;">Meldt på totalt</th>
+                                <th style="text-align: center;">Betalte deltakere</th>
+                                <th>Omsetning</th>
+                                <th>Refundert</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        } catch (err) {
+            console.error('Finance load error:', err);
+            breakdownContainer.innerHTML = `<p style="color:#ef4444;text-align:center;padding:20px;">Kunne ikke laste økonomidata: ${err.message}</p>`;
+        }
     }
 }
 

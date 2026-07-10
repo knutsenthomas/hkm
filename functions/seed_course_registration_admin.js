@@ -16,7 +16,7 @@ async function run() {
   await docRef.set({
     subject: "Bekreftelse på kursregistrering: {{courseTitle}}",
     body: `<!-- Header Branding -->
-<div style="text-align: center; margin-bottom: 32px; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+<div style="text-align: left; margin-bottom: 32px; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
   <img src="https://hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" style="height: 64px; max-width: 100%; display: inline-block; margin-bottom: 12px;" />
   <br/>
   <span style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-size: 11px; font-weight: 800; padding: 6px 16px; border-radius: 9999px; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 6px rgba(209, 125, 57, 0.15);">
@@ -25,12 +25,12 @@ async function run() {
 </div>
 
 <!-- Heading -->
-<h2 style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 24px; font-weight: 800; color: #1B4965; text-align: center; margin: 0 0 16px 0; line-height: 1.3; letter-spacing: -0.02em;">
+<h2 style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 24px; font-weight: 800; color: #1B4965; text-align: left; margin: 0 0 16px 0; line-height: 1.3; letter-spacing: -0.02em;">
   Hei {{name}}, påmeldingen er bekreftet!
 </h2>
 
 <!-- Subtitle / Intro -->
-<p style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; color: #475569; text-align: center; margin: 0 0 32px 0;">
+<p style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; color: #475569; text-align: left; margin: 0 0 32px 0;">
   Du er nå påmeldt kurset <strong style="font-weight: 800; color: #1B4965;">{{courseTitle}}</strong>. Vi gleder oss til å ha deg med på denne reisen!
 </p>
 
@@ -43,7 +43,7 @@ async function run() {
   <div style="margin-bottom: 16px;">
     <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155; font-size: 14px;">1. Logg inn på Min Side</p>
     <p style="margin: 0; color: #64748b; font-size: 13.5px; line-height: 1.5;">
-      Hvis kurset er gratis, eller du allerede har betalt, kan du starte umiddelbart. Logg inn på din konto.
+      Hvis kurset er gratis, eller du already har betalt, kan du starte umiddelbart. Logg inn på din konto.
     </p>
   </div>
   
@@ -63,13 +63,13 @@ async function run() {
 </div>
 
 <!-- CTA Button -->
-<div style="text-align: center; margin-bottom: 32px; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+<div style="text-align: left; margin-bottom: 32px; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
   <a href="https://hiskingdomministry.no/minside/index.html" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 10px rgba(209, 125, 57, 0.25);">
     Gå til Min Side
   </a>
 </div>
 
-<p style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 13px; color: #94a3b8; text-align: center; margin: 0; line-height: 1.5;">
+<p style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 13px; color: #94a3b8; text-align: left; margin: 0; line-height: 1.5;">
   Vennlig hilsen,<br>
   <strong style="color: #1B4965;">His Kingdom Ministry</strong>
 </p>`,
