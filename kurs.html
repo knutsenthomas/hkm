@@ -662,6 +662,76 @@
                 flex-shrink: 0;
             }
         }
+
+        /* Course Share Button & Modal Styles */
+        .course-card-actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .btn-share-course {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-share-course:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: scale(1.05);
+        }
+
+        .btn-share-course:active {
+            transform: scale(0.95);
+        }
+
+        #share-modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        #share-modal-overlay.open {
+            display: flex;
+        }
+
+        #share-modal-overlay .enroll-modal {
+            min-height: auto;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 32px 24px;
+            max-width: 480px;
+            width: 100%;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .social-link {
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .social-link:hover {
+            transform: scale(1.1);
+            opacity: 0.95;
+        }
+
+        .social-link:active {
+            transform: scale(0.95);
+        }
     </style>
     <!-- Loader Safety Net -->
     <script>
@@ -1158,6 +1228,37 @@
         </div>
     </div>
 
+    <!-- Share Modal -->
+    <div class="enroll-modal-overlay" id="share-modal-overlay">
+        <div class="enroll-modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <h3 style="margin:0;font-size:1.4rem;font-weight:800;color:#1B4965;">Del kurset</h3>
+                <button id="close-share-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.6rem;padding:0;line-height:1;transition:color 0.2s;">✕</button>
+            </div>
+            
+            <p id="share-modal-course-title" style="font-weight:700;font-size:1.1rem;color:#1e293b;margin-bottom:20px; line-height:1.4;"></p>
+            
+            <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 28px;">
+                <a href="javascript:void(0)" id="share-fb" class="social-link" style="background: #3b5998; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;"><i class="fab fa-facebook-f" style="font-size:1.2rem;"></i></a>
+                <a href="javascript:void(0)" id="share-tw" class="social-link" style="background: #000000; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512" fill="white">
+                        <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
+                    </svg>
+                </a>
+                <a href="javascript:void(0)" id="share-li" class="social-link" style="background: #0077b5; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;"><i class="fab fa-linkedin-in" style="font-size:1.2rem;"></i></a>
+                <a href="javascript:void(0)" id="share-copy" class="social-link" style="background: #f39c12; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;" title="Kopier lenke"><i class="fas fa-link" style="font-size:1.2rem;"></i></a>
+            </div>
+
+            <div class="form-field" style="margin-bottom:0;">
+                <label style="font-weight:700;font-size:0.9rem;color:#475569;">Kopier lenke</label>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <input type="text" id="share-link-input" readonly style="flex:1;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#f8fafc;" onclick="this.select();">
+                    <button id="copy-link-btn" class="enroll-btn" style="width:auto;padding:0 20px;font-size:0.95rem;white-space:nowrap;margin-top:0;">Kopier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer" id="kontakt">
         <div class="container">
@@ -1402,6 +1503,16 @@
                         }
 
                         renderGrid(allCourses);
+
+                        // Check if a specific course should be opened on load
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const courseIdParam = urlParams.get('courseId') || urlParams.get('course');
+                        if (courseIdParam && allCourses && allCourses.length > 0) {
+                            const matchedCourse = allCourses.find(c => c.id === courseIdParam);
+                            if (matchedCourse) {
+                                openEnrollModal(matchedCourse);
+                            }
+                        }
                     } catch (err) {
                         console.error('Course load error:', err);
                         document.getElementById('kurs-grid').innerHTML = `
@@ -1478,14 +1589,19 @@
                             }
                         </div>
                         <p>${excerpt}</p>
-                        ${hasAccess 
-                            ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white;">
-                                 <i class="fas fa-play-circle"></i> Gå til kurset
-                               </button>`
-                            : `<button class="enroll-btn ${isFree ? 'free' : ''}">
-                                 ${isFree ? '<i class="fas fa-graduation-cap"></i> Start gratis' : '<i class="fas fa-shopping-cart"></i> Meld deg på'}
-                               </button>`
-                        }
+                        <div class="course-card-actions">
+                            ${hasAccess 
+                                ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white; flex:1;">
+                                     <i class="fas fa-play-circle"></i> Gå til kurset
+                                   </button>`
+                                : `<button class="enroll-btn ${isFree ? 'free' : ''}" style="flex:1;">
+                                     ${isFree ? '<i class="fas fa-graduation-cap"></i> Start gratis' : '<i class="fas fa-shopping-cart"></i> Meld deg på'}
+                                   </button>`
+                            }
+                            <button class="btn-share-course" title="Del dette kurset" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')">
+                                <i class="fas fa-share-nodes"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>`;
                     }).join('');
@@ -1525,7 +1641,7 @@
                 window.openEnrollModal = function (course) {
                     if (!currentUser) {
                         alert("Du må opprette en bruker eller logge inn for å melde deg på og betale for kursene.");
-                        window.location.href = `/minside/login.html?redirect=${encodeURIComponent(window.location.pathname)}`;
+                        window.location.href = `/minside/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
                         return;
                     }
                     currentCourse = course;
@@ -1644,6 +1760,87 @@
                 document.getElementById('enroll-modal-overlay').addEventListener('click', e => {
                     if (e.target === document.getElementById('enroll-modal-overlay')) {
                         document.getElementById('enroll-modal-overlay').classList.remove('open');
+                    }
+                });
+
+                // ── Share Modal & Actions ─────────────────────────────────────────
+                window.openShareMenu = function (e, courseId, courseTitle) {
+                    if (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                    const shareUrl = window.location.origin + '/kurs.html?courseId=' + courseId;
+                    
+                    if (navigator.share) {
+                        navigator.share({
+                            title: courseTitle,
+                            text: 'Sjekk ut dette kurset fra His Kingdom Ministry: ' + courseTitle,
+                            url: shareUrl
+                        }).catch(err => {
+                            console.error('Error sharing:', err);
+                            if (err.name !== 'AbortError') {
+                                openCustomShareModal(shareUrl, courseTitle);
+                            }
+                        });
+                    } else {
+                        openCustomShareModal(shareUrl, courseTitle);
+                    }
+                };
+
+                function openCustomShareModal(shareUrl, courseTitle) {
+                    const modal = document.getElementById('share-modal-overlay');
+                    const titleEl = document.getElementById('share-modal-course-title');
+                    const inputEl = document.getElementById('share-link-input');
+                    const copyBtn = document.getElementById('copy-link-btn');
+
+                    if (!modal) return;
+
+                    titleEl.textContent = courseTitle;
+                    inputEl.value = shareUrl;
+                    
+                    document.getElementById('share-fb').onclick = () => {
+                        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), 'facebook-share-dialog', 'width=800,height=600');
+                    };
+                    document.getElementById('share-tw').onclick = () => {
+                        window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(courseTitle), 'twitter-share-dialog', 'width=800,height=600');
+                    };
+                    document.getElementById('share-li').onclick = () => {
+                        window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shareUrl), 'linkedin-share-dialog', 'width=800,height=600');
+                    };
+                    
+                    const copyAction = () => {
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            copyBtn.textContent = 'Kopiert!';
+                            copyBtn.style.background = '#16a34a';
+                            copyBtn.style.borderColor = '#16a34a';
+                            copyBtn.style.color = 'white';
+                            if (window.showToast) {
+                                window.showToast('Lenke kopiert til utklippstavlen!', 'success');
+                            }
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Kopier';
+                                copyBtn.style.background = '';
+                                copyBtn.style.borderColor = '';
+                                copyBtn.style.color = '';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Copy failed:', err);
+                            alert('Kunne ikke kopiere automatisk. Vennligst merk teksten og kopier manuelt.');
+                        });
+                    };
+                    
+                    document.getElementById('share-copy').onclick = copyAction;
+                    copyBtn.onclick = copyAction;
+
+                    modal.classList.add('open');
+                }
+
+                document.getElementById('close-share-modal').addEventListener('click', () => {
+                    document.getElementById('share-modal-overlay').classList.remove('open');
+                });
+                document.getElementById('share-modal-overlay').addEventListener('click', e => {
+                    if (e.target === document.getElementById('share-modal-overlay')) {
+                        document.getElementById('share-modal-overlay').classList.remove('open');
                     }
                 });
 
