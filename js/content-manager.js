@@ -4248,6 +4248,26 @@ class ContentManager {
             locEl.textContent = event.location || this.getTranslation('location_not_set');
         }
 
+        // Update registration CTA button dynamically
+        const registerBtn = document.querySelector('.btn-register');
+        if (registerBtn) {
+            if (event.eventLink) {
+                registerBtn.href = event.eventLink;
+                if (event.eventLink.startsWith('http://') || event.eventLink.startsWith('https://')) {
+                    registerBtn.target = '_blank';
+                    registerBtn.rel = 'noopener noreferrer';
+                } else {
+                    registerBtn.removeAttribute('target');
+                    registerBtn.removeAttribute('rel');
+                }
+            } else {
+                const contactPath = lang === 'en' ? '/en/contact' : (lang === 'es' ? '/es/contacto' : '/kontakt');
+                registerBtn.href = contactPath;
+                registerBtn.removeAttribute('target');
+                registerBtn.removeAttribute('rel');
+            }
+        }
+
         // Sidebar: Recent Events
         this.populateSidebarRecentEvents();
 
