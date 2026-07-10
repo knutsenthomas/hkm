@@ -31,7 +31,7 @@ async function run() {
 
 <!-- Subtitle / Intro -->
 <p style="font-family: 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; color: #475569; text-align: center; margin: 0 0 32px 0;">
-  Du er nå påmeldt kurset <strong>{{courseTitle}}</strong>. Vi gleder oss til å ha deg med på denne reisen!
+  Du er nå påmeldt kurset <strong style="font-weight: 800; color: #1B4965;">{{courseTitle}}</strong>. Vi gleder oss til å ha deg med på denne reisen!
 </p>
 
 <!-- Info Card -->
