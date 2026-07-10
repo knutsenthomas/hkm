@@ -31,6 +31,8 @@
 
     <!-- Icons -->
     <!-- Font Awesome (Deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
     <!-- Material Symbols Outlined -->
     <!-- Material Symbols Outlined (Deferred) -->
@@ -65,12 +67,10 @@
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
             margin: 0;
-        }
-
-        /* Hero */
+        }        /* Hero */
         .kurs-hero {
-            background: linear-gradient(135deg, #1e293b 0%, #2d3748 50%, #1a202c 100%);
-            padding: 150px 24px 96px;
+            background: #0f172a;
+            padding: 160px 24px 112px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -80,8 +80,11 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse at 70% 50%, rgba(243, 156, 18, 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 30% 80%, rgba(192, 57, 43, 0.1) 0%, transparent 50%);
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(27, 73, 101, 0.45) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(209, 125, 57, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.5) 0%, #0f172a 100%);
+            z-index: 0;
         }
 
         .kurs-hero>* {
@@ -90,27 +93,135 @@
         }
 
         .kurs-hero h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 800;
+            font-size: clamp(2.25rem, 6vw, 3.75rem);
+            font-weight: 850;
             color: white;
-            margin: 0 auto 20px;
+            margin: 0 auto 24px;
             max-width: 980px;
-            line-height: 1.15;
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
 
         .kurs-hero h1 span {
-            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: none;
         }
 
         .kurs-hero p {
-            font-size: 1.15rem;
+            font-size: 1.125rem;
+            color: #cbd5e1;
+            max-width: 720px;
+            margin: 0 auto 48px;
+            line-height: 1.62;
+            font-weight: 400;
+        }
+
+        /* Hero Action Buttons */
+        .hero-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            color: white;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(209, 125, 57, 0.5);
+            opacity: 0.95;
+        }
+
+        .hero-btn-primary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .hero-btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-btn-secondary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Bento Stats Section */
+        .hero-stats-container {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 64px;
+            flex-wrap: wrap;
+            padding: 0 16px;
+        }
+
+        .hero-stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 24px 40px;
+            min-width: 240px;
+            flex: 1;
+            max-width: 280px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .hero-stat-card:hover {
+            border-color: rgba(209, 125, 57, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 0 20px rgba(209, 125, 57, 0.1);
+        }
+
+        .hero-stat-number {
+            font-size: 2.75rem;
+            font-weight: 850;
+            color: white;
+            line-height: 1;
+            text-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+            font-feature-settings: "tnum";
+        }
+
+        .hero-stat-label {
+            font-size: 0.75rem;
             color: #94a3b8;
-            max-width: 760px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
+            margin-top: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .kurs-controls {
@@ -856,30 +967,27 @@
         <h1>Veks i <span>tro og kunnskap</span></h1>
         <p>Utforsk kurs fra His Kingdom Ministry og fordyp deg i Guds ord. Lær i ditt eget tempo.</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-            <a href="#kurs-grid-section"
-                style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:linear-gradient(135deg,#f39c12,#e74c3c);color:white;border-radius:30px;font-weight:700;text-decoration:none;font-size:1rem;transition:transform .2s;"
-                onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
+            <a href="#kurs-grid-section" class="hero-btn-primary">
                 <i class="fas fa-graduation-cap"></i> Utforsk kurs
             </a>
-            <a href="/media"
-                style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:rgba(255,255,255,0.1);color:white;border:1.5px solid rgba(255,255,255,0.3);border-radius:30px;font-weight:600;text-decoration:none;font-size:1rem;backdrop-filter:blur(4px);">
+            <a href="/media" class="hero-btn-secondary">
                 <i class="fas fa-play-circle"></i> Gratis undervisning
             </a>
         </div>
 
-        <!-- Stats -->
-        <div style="display:flex;gap:56px;justify-content:center;margin-top:56px;flex-wrap:wrap;">
-            <div style="text-align:center;">
-                <div id="stat-course-count" style="font-size:2rem;font-weight:800;color:white;">—</div>
-                <div style="font-size:0.85rem;color:#94a3b8;margin-top:4px;">Kurs tilgjengelig</div>
+        <!-- Bento Stats Section -->
+        <div class="hero-stats-container">
+            <div class="hero-stat-card">
+                <div id="stat-course-count" class="hero-stat-number">—</div>
+                <div class="hero-stat-label">Kurs tilgjengelig</div>
             </div>
-            <div style="text-align:center;">
-                <div id="stat-lesson-count" style="font-size:2rem;font-weight:800;color:white;">—</div>
-                <div style="font-size:0.85rem;color:#94a3b8;margin-top:4px;">Totale leksjoner</div>
+            <div class="hero-stat-card">
+                <div id="stat-lesson-count" class="hero-stat-number">—</div>
+                <div class="hero-stat-label">Totale leksjoner</div>
             </div>
-            <div style="text-align:center;">
-                <div style="font-size:2rem;font-weight:800;color:white;">∞</div>
-                <div style="font-size:0.85rem;color:#94a3b8;margin-top:4px;">Tilgang når som helst</div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-number">∞</div>
+                <div class="hero-stat-label">Tilgang når som helst</div>
             </div>
         </div>
     </section>
@@ -977,13 +1085,25 @@
                     <textarea id="enroll-message" rows="2" placeholder="Noe du vil fortelle oss?"></textarea>
                 </div>
                 
+                <div id="enroll-lessons-selection" style="display: none; margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label style="font-weight: 700; color: #1e293b; font-size: 0.9rem; display: block; margin-bottom: 12px;">Velg leksjoner du vil delta på:</label>
+                    <div id="modal-lessons-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; color: #1e293b; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="select-all-lessons" checked style="width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #cbd5e1; accent-color: #d17d39;">
+                            Velg alle leksjoner
+                        </label>
+                        <span id="dynamic-total-price" style="font-weight: 750; color: #d17d39; font-size: 0.95rem;"></span>
+                    </div>
+                </div>
+                
                 <div id="payment-options-container" style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
                     <button type="submit" class="enroll-btn" id="enroll-submit-btn">
                         <i class="fas fa-paper-plane" style="margin-right:8px;"></i> Send forespørsel
                     </button>
                     
                     <button type="button" class="enroll-btn" id="vipps-payment-btn" style="background: #ff5b24; display: none;">
-                        <img src="img/vipps-logo-white.png" alt="Vipps" style="height: 20px; vertical-align: middle; margin-right: 8px; filter: brightness(0) invert(1);" loading="lazy"> 
+                        <img src="img/vipps-logo-white.svg" alt="Vipps" style="height: 20px; vertical-align: middle; margin-right: 8px; filter: brightness(0) invert(1);" loading="lazy"> 
                         Betal med Vipps
                     </button>
 
@@ -1299,21 +1419,21 @@
 
                 // ── Enroll Modal ─────────────────────────────────────────────────
                 let currentCourse = null;
+                let selectedLessons = [];
+                let currentPrice = 0;
 
                 window.openEnrollModal = function (course) {
                     currentCourse = course;
                     const isFree = !course.price || course.price === 0;
-                    document.getElementById('modal-course-title').textContent = isFree ? 'Start gratis' : 'Meld deg på – kr ' + course.price + ',-';
+                    document.getElementById('modal-course-title').textContent = isFree ? 'Start gratis' : 'Meld deg på';
                     document.getElementById('modal-course-price').textContent = isFree ? 'Dette kurset er helt gratis.' : 'Etter betaling mottar du tilgangslenke på e-post.';
                     document.getElementById('modal-course-name').textContent = course.title || 'Kurs';
                     document.getElementById('modal-lesson-count').textContent = (course.lessons || []).length + ' leksjoner inkludert';
                     document.getElementById('enroll-status').textContent = '';
                     document.getElementById('enroll-form').reset();
+                    
                     const submitBtn = document.getElementById('enroll-submit-btn');
                     const vippsBtn = document.getElementById('vipps-payment-btn');
-                    
-                    submitBtn.textContent = isFree ? '🎓 Start kurset nå' : '📩 Send forespørsel';
-                    
                     const stripeBtn = document.getElementById('stripe-payment-btn');
                     const stripeContainer = document.getElementById('stripe-checkout-container');
                     const stripeError = document.getElementById('stripe-error-message');
@@ -1321,12 +1441,91 @@
                     if (stripeError) stripeError.style.display = 'none';
                     if (stripeContainer) stripeContainer.style.display = 'none';
                     
-                    if (!isFree) {
-                        vippsBtn.style.display = 'block';
-                        if (stripeBtn) stripeBtn.style.display = 'block';
+                    // Reset selections
+                    selectedLessons = [];
+                    currentPrice = isFree ? 0 : (course.price || 0);
+
+                    // Setup lessons checklist container
+                    const selectionContainer = document.getElementById('enroll-lessons-selection');
+                    const lessonsList = document.getElementById('modal-lessons-list');
+                    const selectAllCheckbox = document.getElementById('select-all-lessons');
+                    const totalPriceLabel = document.getElementById('dynamic-total-price');
+
+                    if (!isFree && course.lessons && course.lessons.length > 0) {
+                        selectionContainer.style.display = 'block';
+                        lessonsList.innerHTML = course.lessons.map((lesson, idx) => {
+                            const lessonPrice = lesson.price || 300;
+                            const formattedDate = lesson.date ? new Date(lesson.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                            const dateStr = formattedDate ? ` (${formattedDate})` : '';
+                            return `
+                                <label style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #e2e8f0; font-size: 0.88rem; color: #334155; cursor: pointer; user-select: none;">
+                                    <span style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" class="lesson-select-cb" data-id="${lesson.id || 'lesson_' + idx}" data-price="${lessonPrice}" checked style="width: 16px; height: 16px; accent-color: #d17d39;">
+                                        <span>Leksjon ${idx + 1}: ${lesson.title || 'Uten tittel'} ${dateStr}</span>
+                                    </span>
+                                    <strong style="color: #475569;">kr ${lessonPrice},-</strong>
+                                </label>
+                            `;
+                        }).join('');
+
+                        const updateSelection = () => {
+                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                            let total = 0;
+                            selectedLessons = [];
+                            checkboxes.forEach(cb => {
+                                if (cb.checked) {
+                                    total += parseFloat(cb.dataset.price) || 0;
+                                    selectedLessons.push(cb.dataset.id);
+                                }
+                            });
+                            
+                            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                            selectAllCheckbox.checked = checkedCount === checkboxes.length;
+                            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+
+                            currentPrice = total;
+                            totalPriceLabel.textContent = `Total: kr ${currentPrice},-`;
+                            
+                            if (currentPrice === 0) {
+                                vippsBtn.style.display = 'none';
+                                stripeBtn.style.display = 'none';
+                                submitBtn.style.display = 'block';
+                                submitBtn.textContent = '🎓 Meld på gratis';
+                            } else {
+                                vippsBtn.style.display = 'block';
+                                stripeBtn.style.display = 'block';
+                                submitBtn.style.display = 'none';
+                            }
+                            
+                            const stripeAmountEl = document.getElementById("stripe-amount-text");
+                            if (stripeAmountEl) stripeAmountEl.textContent = currentPrice;
+                        };
+
+                        document.querySelectorAll('.lesson-select-cb').forEach(cb => {
+                            cb.addEventListener('change', updateSelection);
+                        });
+
+                        selectAllCheckbox.onclick = () => {
+                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                            checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                            updateSelection();
+                        };
+
+                        updateSelection();
                     } else {
-                        vippsBtn.style.display = 'none';
-                        if (stripeBtn) stripeBtn.style.display = 'none';
+                        selectionContainer.style.display = 'none';
+                        lessonsList.innerHTML = '';
+                        selectedLessons = [];
+                        if (!isFree) {
+                            vippsBtn.style.display = 'block';
+                            stripeBtn.style.display = 'block';
+                            submitBtn.style.display = 'none';
+                        } else {
+                            vippsBtn.style.display = 'none';
+                            stripeBtn.style.display = 'none';
+                            submitBtn.style.display = 'block';
+                            submitBtn.textContent = '🎓 Start kurset nå';
+                        }
                     }
                     
                     document.getElementById('enroll-modal-overlay').classList.add('open');
@@ -1353,7 +1552,6 @@
                     btn.textContent = 'Sender...';
 
                     try {
-                        // Wait for firebase
                         await new Promise(resolve => {
                             const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
                             check();
@@ -1363,7 +1561,8 @@
                             name, email, phone, message,
                             courseId: currentCourse?.id || '',
                             courseTitle: currentCourse?.title || '',
-                            coursePrice: currentCourse?.price || 0,
+                            amount: currentPrice,
+                            paidLessons: selectedLessons,
                             enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
                             status: 'pending'
                         });
@@ -1409,18 +1608,17 @@
                                 type: 'Course'
                             };
                             
-                            // Record intention to Firestore before redirecting
                             await firebase.firestore().collection('courseEnrollments').add({
                                 ...customerDetails,
-                                amount: currentCourse?.price || 0,
+                                amount: currentPrice,
+                                paidLessons: selectedLessons,
                                 enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
                                 status: 'pending_vipps',
                                 paymentMethod: 'Vipps'
                             });
                             
-                            // Start Vipps redirect
                             if (typeof window.startVippsPayment === 'function') {
-                                await window.startVippsPayment(currentCourse.price, customerDetails);
+                                await window.startVippsPayment(currentPrice, { ...customerDetails, amount: currentPrice, paidLessons: selectedLessons });
                             } else {
                                 alert('Vipps-modulen er ikke klar ennå. Vennligst prøv igjen om et sekund.');
                                 vBtn.disabled = false;
@@ -1457,12 +1655,13 @@
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
-                                    amount: currentCourse.price,
+                                    amount: currentPrice,
                                     currency: "nok",
                                     customerDetails: {
                                         name, email, phone,
                                         courseId: currentCourse.id,
                                         courseTitle: currentCourse.title,
+                                        paidLessons: selectedLessons,
                                         type: 'Course'
                                     }
                                 })
@@ -1473,7 +1672,6 @@
                                 throw new Error(data.error || "Mangler clientSecret");
                             }
                             
-                            // Initialize stripe elements inline in the modal
                             const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
                             const appearance = {
                                 theme: 'stripe',
@@ -1491,7 +1689,7 @@
                             const paymentElement = elements.create("payment", { layout: "tabs" });
                             paymentElement.mount("#payment-element");
                             
-                            document.getElementById("stripe-amount-text").textContent = currentCourse.price;
+                            document.getElementById("stripe-amount-text").textContent = currentPrice;
                             document.getElementById("stripe-checkout-container").style.display = "block";
                             sBtn.style.display = "none";
                             
@@ -1501,12 +1699,12 @@
                                 const origSubmitText = submitBtn.innerHTML;
                                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Behandler...';
                                 
-                                // Save intention to Firestore before redirecting
                                 await firebase.firestore().collection('courseEnrollments').add({
                                     name, email, phone,
                                     courseId: currentCourse.id,
                                     courseTitle: currentCourse.title,
-                                    amount: currentCourse.price,
+                                    amount: currentPrice,
+                                    paidLessons: selectedLessons,
                                     enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
                                     status: 'pending_stripe',
                                     paymentMethod: 'Card'

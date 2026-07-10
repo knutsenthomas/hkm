@@ -4967,16 +4967,32 @@ class ContentManager {
         );
 
         if (override) {
+            // Determine if the description has been updated on GCal since the Firestore override
+            const overrideHtml = override.content
+                ? (typeof override.content === 'object' && override.content.blocks ? this.parseBlocks(override.content) : override.content)
+                : (override.description || '');
+
+            const cleanHtml = (html) => String(html || '').replace(/\s+/g, ' ').trim();
+            const isDescDifferent = gEvent.description && cleanHtml(overrideHtml) !== cleanHtml(gEvent.description);
+
             // Apply overrides while preserving GCal source identity where needed
-            return {
+            const merged = {
                 ...gEvent,
                 ...override,
-                // Specifically ensure these fields from Firestore are used if they exist
                 title: override.title || gEvent.title,
-                description: override.content || override.description || gEvent.description,
                 imageUrl: override.dashboardImage || override.imageUrl || gEvent.imageUrl,
                 sourceId: gEvent.sourceId || override.sourceId
             };
+
+            if (isDescDifferent) {
+                // GCal description has updated, prioritize it and remove the Firestore override content
+                merged.description = gEvent.description;
+                delete merged.content;
+            } else {
+                merged.description = override.content || override.description || gEvent.description;
+            }
+
+            return merged;
         }
         return gEvent;
     }

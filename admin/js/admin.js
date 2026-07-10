@@ -8456,8 +8456,11 @@ class AdminManager {
             const gItems = gData.items.map((gi) => ({
                 title: gi.summary,
                 date: gi.start?.dateTime || gi.start?.date,
+                description: gi.description || '',
+                location: gi.location || '',
                 isSynced: true,
-                id: gi.id
+                id: gi.id,
+                gcalId: gi.id
             })).filter((item) => item.title || item.date);
 
             gItems.forEach((gi) => {
@@ -8473,6 +8476,26 @@ class AdminManager {
 
                 existing.isSynced = true;
                 if (!existing.gcalId) existing.gcalId = gi.id;
+
+                // Merge GCal details: for synced events, GCal is the source of truth for description and location.
+                if (gi.description) {
+                    const existingDescHtml = typeof existing.content === 'object' && existing.content.blocks
+                        ? this.blocksToHtml(existing.content)
+                        : (existing.description || existing.content || '');
+
+                    const cleanHtml = (html) => String(html || '').replace(/\s+/g, ' ').trim();
+                    if (cleanHtml(existingDescHtml) !== cleanHtml(gi.description)) {
+                        console.log(`[AdminManager] GCal description updated for event ${gi.title}. Syncing to editor blocks.`);
+                        existing.description = gi.description;
+                        existing.content = this.htmlToEditorJsBlocks(gi.description);
+                    } else if (!existing.description) {
+                        existing.description = gi.description;
+                    }
+                }
+
+                if (gi.location && !existing.location) {
+                    existing.location = gi.location;
+                }
             });
 
             if (!isCurrentRequest()) return;
@@ -9209,10 +9232,12 @@ class AdminManager {
                 // For now, let's assume item.content might have been the HTML version of richContent.
             }
 
-            // 3. Fallback to HTML string in content or text
+            // 3. Fallback to HTML string in content, description, or text
             if (!this._hasMeaningfulEditorContent(editorData)) {
                 if (typeof item.content === 'string' && item.content.trim().length > 0) {
                     editorData = this.htmlToEditorJsBlocks(item.content);
+                } else if (typeof item.description === 'string' && item.description.trim().length > 0) {
+                    editorData = this.htmlToEditorJsBlocks(item.description);
                 } else if (typeof item.text === 'string' && item.text.trim().length > 0) {
                     editorData = this.htmlToEditorJsBlocks(item.text);
                 }
@@ -11481,6 +11506,11 @@ class AdminManager {
                 }
 
                 item.content = nextContent;
+                if (collectionId === 'events') {
+                    item.description = nextContent && nextContent.blocks
+                        ? this.blocksToHtml(nextContent)
+                        : (typeof nextContent === 'string' ? nextContent : (item.description || ''));
+                }
                 item.date = document.getElementById('col-item-date')?.value || '';
 
                 item.imageUrl = document.getElementById('col-item-img')?.value || '';
@@ -21511,7 +21541,7 @@ class AdminManager {
                 document.getElementById('course-price').value = course.price || 0;
                 document.getElementById('course-image').value = course.imageUrl || '';
 
-                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl));
+                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id));
             } catch (err) { console.error(err); }
         } else {
             title.textContent = 'Nytt kurs';
@@ -21542,19 +21572,38 @@ class AdminManager {
         if (modal) modal.style.display = 'none';
     }
 
-    _addLessonRow(lessonTitle = '', videoUrl = '') {
+    _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '') {
         const container = document.getElementById('lessons-container');
         if (!container) return;
         const index = container.children.length + 1;
         const row = document.createElement('div');
-        row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;background:#f8fafc;padding:12px;border-radius:10px;border:1px solid #e2e8f0;';
+        row.className = 'lesson-row-item';
+        
+        // Preserve or generate unique ID for this lesson
+        const id = lessonId || `lesson_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        row.dataset.id = id;
+
+        row.style.cssText = 'display:flex;flex-direction:column;gap:10px;background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;';
         row.innerHTML = `
-            <input type="text" placeholder="Leksjon ${index}: Tittel" value="${lessonTitle}"
-                style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;" class="lesson-title">
-            <input type="url" placeholder="YouTube/Vimeo URL" value="${videoUrl}"
-                style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;" class="lesson-video">
-            <button type="button" style="background:#fee2e2;color:#ef4444;border:none;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.1rem;flex-shrink:0;"
-                onclick="this.closest('div').remove()">✕</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:0.95rem;color:#1e293b;">
+                <span>Leksjon ${index}</span>
+                <button type="button" style="background:#fee2e2;color:#ef4444;border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;"
+                    onclick="this.closest('div.lesson-row-item').remove()">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
+                <input type="text" placeholder="Tittel" value="${lessonTitle}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-title">
+                <input type="number" placeholder="Pris (NOK)" value="${price}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-price">
+                <input type="datetime-local" placeholder="Dato/Tid" value="${date}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-date">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <input type="url" placeholder="Zoom Møtelenke" value="${zoomUrl}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-zoom">
+                <input type="url" placeholder="Videoopptak URL (f.eks. Vimeo)" value="${videoUrl}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-video">
+            </div>
         `;
         container.appendChild(row);
     }
@@ -21565,10 +21614,23 @@ class AdminManager {
         const editCourseKey = document.getElementById('course-id').value;
 
         const lessons = [];
-        document.querySelectorAll('#lessons-container > div').forEach(row => {
+        document.querySelectorAll('#lessons-container > .lesson-row-item').forEach(row => {
+            const id = row.dataset.id;
             const t = row.querySelector('.lesson-title')?.value?.trim();
             const v = row.querySelector('.lesson-video')?.value?.trim();
-            if (t || v) lessons.push({ title: t || '', videoUrl: v || '' });
+            const p = parseInt(row.querySelector('.lesson-price')?.value) || 0;
+            const d = row.querySelector('.lesson-date')?.value || '';
+            const z = row.querySelector('.lesson-zoom')?.value?.trim() || '';
+            if (t) {
+                lessons.push({
+                    id,
+                    title: t,
+                    videoUrl: v || '',
+                    price: p,
+                    date: d,
+                    zoomUrl: z
+                });
+            }
         });
 
         const rawCourse = {

@@ -4173,21 +4173,117 @@ class MinSideManager {
             return;
         }
 
-        container.innerHTML = `<div class="courses-grid">
-            ${courses.map(c => `
-            <div class="course-card">
-                <div class="course-thumb">
-                    ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" loading="lazy">` : `<div class="ms-course-thumb-empty"><span class="material-symbols-outlined ms-course-thumb-empty-icon">school</span></div>`}
-                    ${c.category ? `<span class="course-badge">${c.category}</span>` : ''}
-                </div>
-                <div class="course-body">
-                    <div class="course-title">${c.title || t('courses.untitled')}</div>
-                    <div class="course-desc">${c.excerpt || c.intro || ''}</div>
-                    ${c.videoUrl ? `<a href="${c.videoUrl}" target="_blank" class="btn btn-primary btn-sm">
-                        <span class="material-symbols-outlined">play_circle</span> ${t('courses.watchVideo')}
-                    </a>` : ''}
-                </div>
-            </div>`).join('')}
+        // Fetch enrollments for current user to authorize lessons access
+        let enrollments = [];
+        if (this.currentUser?.email) {
+            try {
+                const eSnap = await firebase.firestore().collection('courseEnrollments')
+                    .where('email', '==', this.currentUser.email)
+                    .get();
+                eSnap.forEach(d => enrollments.push(d.data()));
+            } catch (e) {
+                console.error("Error fetching course enrollments:", e);
+            }
+        }
+
+        const hasPaidForLesson = (course, lesson) => {
+            const isCourseFree = !course.price || course.price === 0;
+            if (isCourseFree) return true;
+
+            const coursePaid = enrollments.find(e => 
+                e.courseId === course.id && 
+                (e.status === 'paid' || e.status === 'success')
+            );
+
+            if (!coursePaid) return false;
+
+            if (!coursePaid.paidLessons || coursePaid.paidLessons.length === 0) {
+                return true;
+            }
+
+            return coursePaid.paidLessons.includes(lesson.id);
+        };
+
+        container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
+            ${courses.map((c, cIdx) => {
+                const courseLessons = c.lessons || [];
+                
+                return `
+                <div class="course-card-premium" style="background:white; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 4px 20px rgba(0,0,0,0.03); overflow:hidden; display:flex; flex-direction:column;">
+                    <div style="display:flex; gap:20px; padding:20px; border-bottom:1px solid #f1f5f9; align-items:center; flex-wrap:wrap;">
+                        <div style="width:100px; height:60px; border-radius:10px; overflow:hidden; background:#f1f5f9; flex-shrink:0;">
+                            ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <span style="font-size:0.75rem; font-weight:700; color:#d17d39; text-transform:uppercase; letter-spacing:0.05em;">${c.category || 'Generelt'}</span>
+                            <h3 style="font-size:1.2rem; font-weight:750; color:#1e293b; margin:2px 0 4px;">${c.title || t('courses.untitled')}</h3>
+                            <p style="font-size:0.88rem; color:#64748b; margin:0;">${c.excerpt || c.intro || ''}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="padding:20px; background:#f8fafc;">
+                        <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0 0 12px; display:flex; align-items:center; gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Leksjoner og Live-økter
+                        </h4>
+                        
+                        ${courseLessons.length === 0 ? `
+                            <p style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin:0;">Ingen leksjoner lagt til ennå.</p>
+                        ` : `
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                ${courseLessons.map((l, lIdx) => {
+                                    const paid = hasPaidForLesson(c, l);
+                                    const formattedDate = l.date ? new Date(l.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                                    const dateStr = formattedDate ? `Klasse: ${formattedDate}` : '';
+                                    
+                                    return `
+                                    <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                                        <div>
+                                            <div style="font-weight:650; font-size:0.92rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                                <span style="font-size:0.8rem; color:#d17d39; font-weight:700;">#${lIdx + 1}</span>
+                                                ${l.title || 'Leksjonsøving'}
+                                            </div>
+                                            <div style="font-size:0.8rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:12px;">
+                                                ${dateStr ? `<span><i class="far fa-calendar-alt"></i> ${dateStr}</span>` : ''}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            ${paid ? `
+                                                <div style="display:flex; gap:8px; align-items:center;">
+                                                    ${l.zoomUrl ? `
+                                                        <a href="${l.zoomUrl}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">video_camera_front</span> Bli med på Zoom
+                                                        </a>
+                                                    ` : ''}
+                                                    ${l.videoUrl ? `
+                                                        <a href="${l.videoUrl}" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Se opptak
+                                                        </a>
+                                                    ` : ''}
+                                                    ${!l.zoomUrl && !l.videoUrl ? `
+                                                        <span style="font-size:0.85rem; color:#16a34a; font-weight:600; display:flex; align-items:center; gap:4px;">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> Tilgang aktivert
+                                                        </span>
+                                                    ` : ''}
+                                                </div>
+                                            ` : `
+                                                <div style="display:flex; gap:8px; align-items:center;">
+                                                    <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
+                                                        <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Låst (kr ${l.price || 300},-)
+                                                    </span>
+                                                    <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                        Lås opp
+                                                    </a>
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>`;
+            }).join('')}
         </div>`;
     }
 
