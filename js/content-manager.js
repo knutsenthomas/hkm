@@ -4237,7 +4237,10 @@ class ContentManager {
         }
 
         // Description
-        const rawDescription = event.description || event.content || '';
+        let rawDescription = event.description || event.content || '';
+        if (rawDescription && typeof rawDescription === 'object' && rawDescription.blocks) {
+            rawDescription = this.parseBlocks(rawDescription) || '';
+        }
         if (descEl) {
             const html = this.sanitizeEventHtml(rawDescription) || `<p>${this.getTranslation('no_description')}</p>`;
             descEl.innerHTML = html;
@@ -5129,7 +5132,11 @@ class ContentManager {
                 merged.description = gEvent.description;
                 delete merged.content;
             } else {
-                merged.description = override.content || override.description || gEvent.description;
+                // Ensure description is a string (convert content blocks to HTML if needed)
+                const adminDesc = override.content
+                    ? (typeof override.content === 'object' && override.content.blocks ? this.parseBlocks(override.content) : override.content)
+                    : (override.description || '');
+                merged.description = adminDesc || gEvent.description || '';
             }
 
             return merged;
