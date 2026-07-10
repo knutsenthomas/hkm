@@ -278,14 +278,17 @@
 
         .event-large-image-wrap {
             width: 100%;
-            border-radius: 15px;
+            height: 420px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
         }
 
         .event-large-image-wrap img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
         }
 
@@ -419,6 +422,75 @@
                 text-align: center;
                 gap: 25px;
             }
+
+            .event-info-panel-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+        }
+
+        .event-info-panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0 32px;
+        }
+
+        .info-panel-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-meta-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-meta-header .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        .icon-blue {
+            color: #1b4965;
+        }
+
+        .icon-orange {
+            color: #d17d39;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .card-meta-content {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        html[data-theme="dark"] .event-info-panel-grid {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        html[data-theme="dark"] .meta-label {
+            color: #94a3b8;
+        }
+
+        html[data-theme="dark"] .card-meta-content {
+            color: #f1f5f9;
         }
     </style>
     <!-- Loader Safety Net -->
@@ -808,11 +880,31 @@
 
                 <!-- Event Details Header -->
                 <div class="event-detail-header">
-                    <div class="event-meta-info">
-                        <span><i class="fas fa-calendar-alt"></i> <span id="event-time">Loading...</span></span>
-                        <span><i class="fas fa-map-marker-alt"></i> <span id="event-location">Loading...</span></span>
-                    </div>
                     <h2 class="event-main-title" id="event-title">Event Title</h2>
+
+                    <div class="event-info-panel-grid">
+                        <!-- Date Section -->
+                        <div class="info-panel-card">
+                            <div class="card-meta-header">
+                                <span class="material-symbols-outlined icon-blue">calendar_today</span>
+                                <span class="meta-label">DATE & TIME</span>
+                            </div>
+                            <div class="card-meta-content" id="event-time">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Location Section -->
+                        <div class="info-panel-card">
+                            <div class="card-meta-header">
+                                <span class="material-symbols-outlined icon-orange">location_on</span>
+                                <span class="meta-label">LOCATION</span>
+                            </div>
+                            <div class="card-meta-content" id="event-location">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="event-description" id="event-description">
                         <p>Loading description...</p>
