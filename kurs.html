@@ -514,6 +514,31 @@
         }
 
         /* Enroll Modal */
+        .lesson-select-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.88rem;
+            color: #334155;
+            cursor: pointer;
+            user-select: none;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .lesson-select-label:hover {
+            border-color: #d17d39;
+            background-color: #fffaf7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.05);
+        }
+        .lesson-select-label:active {
+            transform: scale(0.99);
+        }
+
         .enroll-modal-overlay {
             display: none;
             position: fixed;
@@ -1460,7 +1485,7 @@
                             const rawTitle = lesson.title || 'Uten tittel';
                             const displayTitle = rawTitle.replace(/^leksjon\s+\d+:\s*/i, '');
                             return `
-                                <label style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #e2e8f0; font-size: 0.88rem; color: #334155; cursor: pointer; user-select: none; gap: 12px;">
+                                <label class="lesson-select-label">
                                     <span style="display: flex; align-items: flex-start; gap: 10px;">
                                         <input type="checkbox" class="lesson-select-cb" data-id="${lesson.id || 'lesson_' + idx}" data-price="${lessonPrice}" checked style="width: 16px; height: 16px; accent-color: #d17d39; margin-top: 2px; flex-shrink: 0;">
                                         <span style="line-height: 1.4;">Leksjon ${idx + 1}: ${displayTitle}${dateStr}</span>
