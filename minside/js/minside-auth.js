@@ -463,8 +463,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        const queryParams = new URLSearchParams(window.location.search);
+        const redirectUrl = queryParams.get('redirect');
+
         if (!user || !service) {
-            window.location.href = '/minside/index.html';
+            if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+                window.location.href = redirectUrl;
+            } else {
+                window.location.href = '/minside/index.html';
+            }
             return;
         }
 
@@ -480,14 +487,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (roleLookupFailed) {
             // Avoid misrouting admins to member area when Firestore is temporarily slow.
             showMessage(t('auth.roleVerificationSlow'), 'success');
-            window.location.href = '/minside/index.html';
+            if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+                window.location.href = redirectUrl;
+            } else {
+                window.location.href = '/minside/index.html';
+            }
             return;
         }
 
         const normalizedRole = String(role || '').trim().toLowerCase();
         const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
 
-        window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+        if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+            window.location.href = redirectUrl;
+        } else {
+            window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+        }
     }
 
     function getErrorMessage(error) {

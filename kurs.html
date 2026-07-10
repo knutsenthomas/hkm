@@ -1506,6 +1506,11 @@
                 let currentPrice = 0;
 
                 window.openEnrollModal = function (course) {
+                    if (!currentUser) {
+                        alert("Du må opprette en bruker eller logge inn for å melde deg på og betale for kursene.");
+                        window.location.href = `/minside/login.html?redirect=${encodeURIComponent(window.location.pathname)}`;
+                        return;
+                    }
                     currentCourse = course;
                     const isFree = !course.price || course.price === 0;
                     document.getElementById('modal-course-title').textContent = isFree ? 'Start gratis' : 'Meld deg på';
