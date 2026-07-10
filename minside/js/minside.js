@@ -4294,7 +4294,7 @@ class MinSideManager {
                             <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Leksjoner og Live-økter
                             </h4>
-                            <span class="material-symbols-outlined expand-chevron" style="font-size:20px; color:#64748b; transition: transform 0.3s ease;">expand_more</span>
+                            <span class="material-symbols-outlined expand-chevron" style="display: inline-block; font-size:20px; color:#64748b; transition: transform 0.3s ease; transform-origin: center;">expand_more</span>
                         </div>
                         
                         <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:none; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
