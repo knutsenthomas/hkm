@@ -21550,7 +21550,7 @@ class AdminManager {
                 if (coursePriceSuffixInput) coursePriceSuffixInput.value = course.priceSuffix || '';
                 document.getElementById('course-image').value = course.imageUrl || '';
 
-                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id));
+                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id, l.resource, l.resourceUrl, l.description));
             } catch (err) { console.error(err); }
         } else {
             title.textContent = 'Nytt kurs';
@@ -21581,7 +21581,7 @@ class AdminManager {
         if (modal) modal.style.display = 'none';
     }
 
-    _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '') {
+    _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '', resource = '', resourceUrl = '', description = '') {
         const container = document.getElementById('lessons-container');
         if (!container) return;
         const index = container.children.length + 1;
@@ -21613,6 +21613,16 @@ class AdminManager {
                 <input type="url" placeholder="Videoopptak URL (f.eks. Vimeo)" value="${videoUrl}"
                     style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-video">
             </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <input type="text" placeholder="Ressurs-navn (f.eks. Arbeidsark PDF)" value="${resource}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource">
+                <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+                <textarea placeholder="Leksjonsbeskrivelse / Tekstinnhold" rows="2"
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;font-family:inherit;resize:vertical;" class="lesson-description">${description}</textarea>
+            </div>
         `;
         container.appendChild(row);
     }
@@ -21630,6 +21640,9 @@ class AdminManager {
             const p = parseInt(row.querySelector('.lesson-price')?.value) || 0;
             const d = row.querySelector('.lesson-date')?.value || '';
             const z = row.querySelector('.lesson-zoom')?.value?.trim() || '';
+            const r = row.querySelector('.lesson-resource')?.value?.trim() || '';
+            const ru = row.querySelector('.lesson-resource-url')?.value?.trim() || '';
+            const desc = row.querySelector('.lesson-description')?.value?.trim() || '';
             if (t) {
                 lessons.push({
                     id,
@@ -21637,7 +21650,10 @@ class AdminManager {
                     videoUrl: v || '',
                     price: p,
                     date: d,
-                    zoomUrl: z
+                    zoomUrl: z,
+                    resource: r,
+                    resourceUrl: ru,
+                    description: desc
                 });
             }
         });
