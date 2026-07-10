@@ -21442,8 +21442,8 @@ class AdminManager {
                                 <div style="display: flex; gap: 10px;">
                                     <input id="course-image" type="url" placeholder="https://..."
                                         style="flex: 1; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:1rem;">
-                                    <button type="button" id="course-unsplash-btn" class="btn btn-secondary" style="padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer;">
-                                        <span class="material-symbols-outlined">image_search</span> Unsplash
+                                    <button type="button" id="course-unsplash-btn" class="btn btn-secondary" style="padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; line-height: 1;">
+                                        <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">image_search</span> Unsplash
                                     </button>
                                 </div>
                             </div>
@@ -21453,16 +21453,16 @@ class AdminManager {
                         <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:4px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                                 <h4 style="font-size:1rem;font-weight:700;">Leksjoner</h4>
-                                <button type="button" id="add-lesson-btn" style="background:#fff8f0;color:#e07b39;border:1.5px solid #ffd5b0;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">add</span> Legg til leksjon
+                                <button type="button" id="add-lesson-btn" style="background:#fff8f0;color:#e07b39;border:1.5px solid #ffd5b0;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1;">
+                                    <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">add</span> Legg til leksjon
                                 </button>
                             </div>
                             <div id="lessons-container" style="display:flex;flex-direction:column;gap:12px;"></div>
                         </div>
 
                         <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;">
-                            <button type="submit" id="save-course-btn" class="btn-primary" style="padding:12px 28px;border-radius:10px;font-weight:600;display:flex;align-items:center;gap:8px;">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">save</span> Lagre kurs
+                            <button type="submit" id="save-course-btn" class="btn-primary" style="padding:12px 28px;border-radius:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1;">
+                                <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">save</span> Lagre kurs
                             </button>
                             <button type="button" id="delete-course-btn" style="display:none;padding:12px 20px;border-radius:10px;background:white;color:#ef4444;border:1.5px solid #fee2e2;font-weight:600;cursor:pointer;">
                                 Slett kurs
@@ -21691,8 +21691,8 @@ class AdminManager {
                 <div style="display:flex;gap:8px;">
                     <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
                         style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url">
-                    <button type="button" class="lesson-upload-btn" style="padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;" title="Last opp fil fra mobil/PC">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;">cloud_upload</span>
+                    <button type="button" class="lesson-upload-btn" style="padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;line-height:1;" title="Last opp fil fra mobil/PC">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;transform:none !important;line-height:1;">cloud_upload</span>
                     </button>
                     <input type="file" class="lesson-file-input" style="display:none;">
                 </div>
