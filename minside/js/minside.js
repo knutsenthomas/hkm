@@ -4324,22 +4324,22 @@ class MinSideManager {
                                                     <div style="display:flex; gap:8px; align-items:center;">
                                                         ${l.videoUrl ? `
                                                             <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Start leksjon
+                                                                <span class="material-symbols-outlined" style="font-size:18px; transform: translateY(2px) !important; display: inline-block !important; line-height: 1 !important;">play_circle</span> Start leksjon
                                                             </a>
                                                         ` : (l.zoomUrl ? `
                                                             <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px;">video_camera_front</span> Bli med på Zoom
+                                                                <span class="material-symbols-outlined" style="font-size:18px; transform: translateY(2px) !important; display: inline-block !important; line-height: 1 !important;">video_camera_front</span> Bli med på Zoom
                                                             </a>
                                                         ` : `
                                                             <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px;">school</span> Åpne leksjon
+                                                                <span class="material-symbols-outlined" style="font-size:18px; transform: translateY(2px) !important; display: inline-block !important; line-height: 1 !important;">school</span> Åpne leksjon
                                                             </a>
                                                         `)}
                                                     </div>
                                                 ` : `
                                                     <div style="display:flex; gap:8px; align-items:center;">
                                                         <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
-                                                            <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Låst (kr ${l.price || 300},-)
+                                                            <span class="material-symbols-outlined" style="font-size:16px; transform: translateY(1.5px) !important; display: inline-block !important; line-height: 1 !important;">lock</span> Låst (kr ${l.price || 300},-)
                                                         </span>
                                                         <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
                                                             Lås opp
