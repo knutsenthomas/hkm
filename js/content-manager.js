@@ -4253,7 +4253,33 @@ class ContentManager {
                 const atPrefix = lang === 'en' ? 'at' : (lang === 'es' ? 'a las' : 'kl.');
                 formattedTime += `, ${atPrefix} ${startTime}`;
             }
-            timeEl.textContent = formattedTime;
+
+            let timeHtml = `<span>${formattedTime}</span>`;
+
+            if (event.eventRecurring) {
+                timeHtml += `<div class="event-recurring-badge" style="margin-top: 6px; font-size: 0.85rem; color: #d17d39; display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                    <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">autorenew</span>
+                    <span>${this.sanitizeEventHtml(event.eventRecurring)}</span>
+                </div>`;
+            }
+
+            if (event.eventAdditionalDates) {
+                const cleanDates = this.sanitizeEventHtml(event.eventAdditionalDates).replace(/\n/g, '<br>');
+                timeHtml += `<div class="event-additional-dates" style="margin-top: 8px; font-size: 0.85rem; color: #475569; display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; color: #1b4965;">Flere datoer:</span>
+                    <span style="padding-left: 6px; border-left: 2px solid #cbd5e1; color: #64748b; font-weight: 500;">${cleanDates}</span>
+                </div>`;
+            }
+
+            if (event.eventSchedule) {
+                const cleanSchedule = this.sanitizeEventHtml(event.eventSchedule).replace(/\n/g, '<br>');
+                timeHtml += `<div class="event-schedule-times" style="margin-top: 8px; font-size: 0.85rem; color: #475569; display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; color: #1b4965;">Program/Tidspunkter:</span>
+                    <span style="padding-left: 6px; border-left: 2px solid #cbd5e1; color: #64748b; font-weight: 500;">${cleanSchedule}</span>
+                </div>`;
+            }
+
+            timeEl.innerHTML = timeHtml;
         }
 
         // Location Info

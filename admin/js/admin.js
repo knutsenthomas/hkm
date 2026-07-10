@@ -9138,6 +9138,20 @@ class AdminManager {
                                 <input type="text" id="col-item-event-link-text" class="sidebar-control" value="${item.eventLinkText || ''}" placeholder="Eks: Kjøp billett, Bli med...">
                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Egendefinert tekst på påmeldingsknappen. Standard er "Meld deg på nå".</p>
                             </div>
+
+                            <h4 class="sidebar-section-title">DATO & GJENTAKELSE</h4>
+                            <div class="sidebar-group">
+                                <label>Gjentakelse / Recurring (valgfri)</label>
+                                <input type="text" id="col-item-event-recurring" class="sidebar-control" value="${item.eventRecurring || ''}" placeholder="Eks: Hver tirsdag kl. 19:00">
+                            </div>
+                            <div class="sidebar-group">
+                                <label>Flere datoer (valgfri)</label>
+                                <textarea id="col-item-event-additional-dates" class="sidebar-control" style="height: 60px;" placeholder="Eks:&#10;12. august kl. 18:00&#10;19. august kl. 18:00">${item.eventAdditionalDates || ''}</textarea>
+                            </div>
+                            <div class="sidebar-group">
+                                <label>Flere tidspunkter / Program (valgfri)</label>
+                                <textarea id="col-item-event-schedule" class="sidebar-control" style="height: 60px;" placeholder="Eks:&#10;Fredag: kl. 19:00&#10;Lørdag: kl. 11:00 & 18:00">${item.eventSchedule || ''}</textarea>
+                            </div>
                             ` : ''}
 
                              <h4 class="sidebar-section-title">SEO & SYNLIGHET</h4>
@@ -11547,6 +11561,9 @@ class AdminManager {
                 if (collectionId === 'events') {
                     item.eventLink = document.getElementById('col-item-event-link')?.value || '';
                     item.eventLinkText = document.getElementById('col-item-event-link-text')?.value || '';
+                    item.eventRecurring = document.getElementById('col-item-event-recurring')?.value || '';
+                    item.eventAdditionalDates = document.getElementById('col-item-event-additional-dates')?.value || '';
+                    item.eventSchedule = document.getElementById('col-item-event-schedule')?.value || '';
                 }
 
                 item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
