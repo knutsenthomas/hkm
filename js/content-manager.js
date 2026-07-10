@@ -4310,6 +4310,9 @@ class ContentManager {
         // Sidebar: Recent Events
         this.populateSidebarRecentEvents();
 
+        // Sidebar: Categories
+        this.populateSidebarCategories();
+
         // Injisere Schema.org JSON-LD (GEO optimalisering for arrangementer)
         this.injectEventSchemaOrgData(event);
     }
@@ -4357,6 +4360,68 @@ class ContentManager {
         } catch (err) {
             console.warn('[ContentManager] Failed to inject dynamic event schema:', err);
         }
+    }
+
+    async populateSidebarCategories() {
+        const categoryContainer = document.querySelector('.category-list');
+        if (!categoryContainer) return;
+
+        const lang = this.getCurrentLanguage(); // 'no', 'en', 'es'
+
+        // Get all events
+        const allEvents = await this.loadEvents();
+
+        // Filter out holidays and past events
+        const activeEvents = (allEvents || []).filter(e => {
+            if (e.isHoliday) return false;
+            return !this.isEventPast(e);
+        });
+
+        // Count events per category
+        const categoryCounts = {};
+        activeEvents.forEach(e => {
+            const sourceLabel = e.sourceLabel || (e.isHoliday ? 'Helligdager' : 'Kalender');
+            let categoryName = e.category || sourceLabel;
+
+            if (categoryName === 'Interne arrangementer' || categoryName === 'manual') {
+                categoryName = lang === 'en' ? 'Meetings & Conferences' : (lang === 'es' ? 'Reuniones y Conferencias' : 'Møter & Konferanser');
+            }
+
+            if (categoryName) {
+                // Translate standard categories
+                let displayName = categoryName;
+                if (lang === 'en') {
+                    if (categoryName === 'Møter & Konferanser') displayName = 'Meetings & Conferences';
+                    else if (categoryName === 'Bønnesamlinger') displayName = 'Prayer Gatherings';
+                    else if (categoryName === 'Undervisning') displayName = 'Teaching';
+                    else if (categoryName === 'Business Network') displayName = 'Business Network';
+                } else if (lang === 'es') {
+                    if (categoryName === 'Møter & Konferanser') displayName = 'Reuniones y Conferencias';
+                    else if (categoryName === 'Bønnesamlinger') displayName = 'Reuniones de Oración';
+                    else if (categoryName === 'Undervisning') displayName = 'Enseñanza';
+                    else if (categoryName === 'Business Network') displayName = 'Business Network';
+                }
+                
+                categoryCounts[displayName] = (categoryCounts[displayName] || 0) + 1;
+            }
+        });
+
+        const categories = Object.keys(categoryCounts);
+        if (categories.length === 0) {
+            categoryContainer.innerHTML = `<li style="font-size: 0.95rem; color: #64748b; font-weight: 500; padding: 8px 0;">${lang === 'en' ? 'No categories' : (lang === 'es' ? 'Sin categorías' : 'Ingen kategorier')}</li>`;
+            return;
+        }
+
+        // Sort alphabetically
+        categories.sort();
+
+        // Render categories that have counts > 0
+        categoryContainer.innerHTML = categories.map(cat => {
+            const count = categoryCounts[cat];
+            const formattedCount = String(count).padStart(2, '0');
+            const eventsPage = this.getLocalizedLink('arrangementer.html');
+            return `<li><a href="${eventsPage}">${this.escapeHtml(cat)}</a> <span class="category-count">(${formattedCount})</span></li>`;
+        }).join('');
     }
 
     async populateSidebarRecentEvents() {
