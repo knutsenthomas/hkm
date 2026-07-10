@@ -4643,18 +4643,32 @@ class MinSideManager {
                     background: #f8fafc;
                     border-color: #cbd5e1;
                 }
-                .hkm-lesson-card.active {
-                    border-color: rgba(209, 125, 57, 0.3);
-                    background: rgba(209, 125, 57, 0.05);
+                .player-lesson-item {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    gap: 0px !important;
+                    background: #ffffff !important;
+                    border: 1px solid #e2e8f0 !important;
+                }
+                .player-lesson-item:hover {
+                    background: #f8fafc !important;
+                    border-color: #cbd5e1 !important;
+                    transform: translateX(4px) !important;
+                }
+                .player-lesson-item.active {
+                    background: rgba(209, 125, 57, 0.04) !important;
+                    border-color: rgba(209, 125, 57, 0.4) !important;
                 }
                 .hkm-lesson-card.locked {
                     opacity: 0.5;
                     cursor: not-allowed;
-                    background: rgba(241, 245, 249, 0.4);
+                    background: rgba(241, 245, 249, 0.4) !important;
+                    border-color: #e2e8f0 !important;
                 }
                 .hkm-lesson-card.locked:hover {
-                    transform: none;
-                    background: rgba(241, 245, 249, 0.4);
+                    transform: none !important;
+                    background: rgba(241, 245, 249, 0.4) !important;
                 }
 
                 /* Notes Editor custom */
