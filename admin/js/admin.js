@@ -25506,6 +25506,7 @@ class AdminManager {
             // Standardmaler som alltid bør finnes
             const defaultTemplates = [
                 { id: 'welcome_email', name: 'Velkomst-e-post', description: 'Sendes når en ny bruker registrerer seg.' },
+                { id: 'course_registration', name: 'Kurs-registrering', description: 'Sendes når en person melder seg på et kurs.' },
                 { id: 'newsletter_confirmation', name: 'Nyhetsbrev-bekreftelse', description: 'Sendes ved påmelding til nyhetsbrev.' },
                 { id: 'daily_bible_reading', name: 'Dagens bibellesing', description: 'Sendes som daglig e-postvarsel for leseplaner.' }
             ];
@@ -25688,6 +25689,18 @@ class AdminManager {
                     if (templateId === 'welcome_email') {
                         const emailSubject = subject.replace("{{name}}", "Test-bruker");
                         const htmlBody = body.replace("{{name}}", "Test-bruker");
+                        testSubject = emailSubject;
+                        testHtml = `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                ${htmlBody}
+                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                    Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                                </div>
+                            </div>
+                        `;
+                    } else if (templateId === 'course_registration') {
+                        const emailSubject = subject.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
+                        const htmlBody = body.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
                         testSubject = emailSubject;
                         testHtml = `
                             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
@@ -25917,6 +25930,11 @@ class AdminManager {
             let vars = [];
             if (templateId === 'welcome_email') {
                 vars = [{ tag: '{{name}}', label: 'Navn' }];
+            } else if (templateId === 'course_registration') {
+                vars = [
+                    { tag: '{{name}}', label: 'Navn' },
+                    { tag: '{{courseTitle}}', label: 'Kurstittel' }
+                ];
             } else if (templateId === 'newsletter_confirmation') {
                 vars = [{ tag: '{{email}}', label: 'E-post' }];
             } else if (templateId === 'daily_bible_reading') {

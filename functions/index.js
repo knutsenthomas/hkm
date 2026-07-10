@@ -8234,3 +8234,63 @@ exports.indexContentForVectorSearch = onDocumentWritten({
   await batch.commit();
   console.log(`[Indexer] Vellykket indeksering av "${title}" (${chunks.length} embeddings lagret).`);
 });
+
+/**
+ * Trigger som sender e-post ved registrering til et kurs.
+ */
+exports.onCourseEnrollmentCreated = onDocumentCreated({
+  document: "courseEnrollments/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const enrollData = snapshot.data();
+  const email = enrollData.email;
+  const name = enrollData.name || '';
+  const courseTitle = enrollData.courseTitle || 'Kurset';
+
+  if (!email) return;
+
+  const fallback = {
+    subject: "Bekreftelse på kursregistrering: {{courseTitle}}",
+    body: `<h2>Hei {{name}}, takk for din påmelding!</h2>
+      <p>Vi har mottatt din registrering for kurset <strong>{{courseTitle}}</strong>.</p>
+      <p><strong>Hva skjer videre?</strong></p>
+      <ul>
+        <li>Hvis kurset er gratis, eller du allerede har betalt, kan du logge inn på <a href="https://hiskingdomministry.no/minside/index.html">Min Side</a> og starte kurset umiddelbart.</li>
+        <li>Hvis kurset krever betaling og du ikke har betalt ennå, vil vi behandle påmeldingen din så snart betalingen er registrert. Du vil da motta en bekreftelse på e-post med tilgang.</li>
+      </ul>
+      <p>Du finner alle dine kurs og leksjoner under "Kurs"-fanen på <a href="https://hiskingdomministry.no/minside/index.html">Min Side</a>.</p>
+      <p>Vennlig hilsen,<br>His Kingdom Ministry</p>`
+  };
+
+  const template = await getEmailTemplate("course_registration", fallback);
+  const subject = template.subject.replace(/{{name}}/g, name).replace(/{{courseTitle}}/g, courseTitle);
+  const htmlBody = template.body.replace(/{{name}}/g, name).replace(/{{courseTitle}}/g, courseTitle);
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+      ${htmlBody}
+      <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+        Dette er en automatisk bekreftelse fra His Kingdom Ministry. Du kan kontakte oss på post@hiskingdomministry.no hvis du har spørsmål.
+      </div>
+    </div>
+  `;
+
+  try {
+    const ok = await sendEmail({
+      to: email,
+      subject,
+      html,
+      text: `Takk for din påmelding til kurset ${courseTitle}!`
+    });
+    if (ok) {
+      console.log(`Kurs-bekreftelse sendt til ${email} for kurset ${courseTitle}`);
+    } else {
+      console.warn(`[onCourseEnrollmentCreated] Kunne ikke sende kurs-bekreftelse til ${email}.`);
+    }
+  } catch (error) {
+    console.error("Feil ved sending av kurs-bekreftelse:", error);
+  }
+});
+
