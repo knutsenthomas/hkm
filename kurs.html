@@ -67,13 +67,232 @@
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
             margin: 0;
-        }        /* Hero */
+        }
+
+        /* Featured Teaching Section Styles */
+        .featured-teaching-section {
+            padding: 80px 24px;
+            background: #ffffff;
+        }
+        
+        .featured-teaching-section .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .featured-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Spotlight Card */
+        .spotlight-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        }
+
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(15, 23, 42, 0.1) 100%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .spotlight-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        }
+
+        .spotlight-card-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .spotlight-card:hover .spotlight-card-bg {
+            transform: scale(1.05);
+        }
+
+        .spotlight-content {
+            position: relative;
+            z-index: 2;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .spotlight-badge {
+            background: #d17d39;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .spotlight-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
+        }
+
+        .spotlight-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin: 0 0 24px 0;
+            line-height: 1.6;
+            max-width: 540px;
+        }
+
+        .spotlight-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .spotlight-card:hover .spotlight-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #ffffff;
+        }
+
+        /* Right List Column */
+        .featured-list-col {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .horizontal-course-card {
+            background: #ffffff;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            text-align: left;
+        }
+
+        .horizontal-course-card:hover {
+            transform: translateY(-4px);
+            border-color: #e2e8f0;
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+        }
+
+        .horizontal-course-thumb {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .horizontal-course-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .horizontal-course-title {
+            font-size: 1.2rem;
+            font-weight: 750;
+            color: #1e293b;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+        }
+
+        .horizontal-course-desc {
+            font-size: 0.92rem;
+            color: #475569;
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .horizontal-course-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .horizontal-course-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .horizontal-course-meta i {
+            color: #d17d39;
+        }
+
+        /* Hero */
         .kurs-hero {
             background: #0f172a;
             padding: 160px 24px 112px;
             text-align: center;
             position: relative;
             overflow: hidden;
+        }
+
+        .kurs-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .kurs-hero::before {
@@ -1080,16 +1299,43 @@
         <!-- Bento Stats Section -->
         <div class="hero-stats-container">
             <div class="hero-stat-card">
+                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-graduation-cap"></i></div>
                 <div id="stat-course-count" class="hero-stat-number">—</div>
-                <div class="hero-stat-label">Kurs tilgjengelig</div>
+                <div class="hero-stat-label" style="margin-top: 8px;">Kurs tilgjengelig</div>
             </div>
             <div class="hero-stat-card">
+                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-layer-group"></i></div>
                 <div id="stat-lesson-count" class="hero-stat-number">—</div>
-                <div class="hero-stat-label">Totale leksjoner</div>
+                <div class="hero-stat-label" style="margin-top: 8px;">Totale leksjoner</div>
             </div>
             <div class="hero-stat-card">
+                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-infinity"></i></div>
                 <div class="hero-stat-number">∞</div>
-                <div class="hero-stat-label">Tilgang når som helst</div>
+                <div class="hero-stat-label" style="margin-top: 8px;">Uendelig Tilgang</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Teaching Section -->
+    <section class="featured-teaching-section" id="featured-teaching">
+        <div class="container">
+            <div class="featured-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+                <div style="text-align: left;">
+                    <h2 class="featured-title" style="font-size:2rem; font-weight:800; color:#1B4965; margin:0;">Utvalgt Undervisning</h2>
+                    <p class="featured-subtitle" style="color:#64748b; font-size:1rem; margin-top:8px; max-width:600px;">Dykk ned i våre mest populære emner, nøye utvalgt for din personlige og åndelige vekst.</p>
+                </div>
+                <a href="#kurs-grid-section" class="see-all-courses-link" style="color:#d17d39; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:8px; font-size:1rem; transition:color 0.2s;">
+                    Se alle kurs <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="featured-grid" id="featured-courses-container">
+                <!-- Skeleton Loader for Featured Section -->
+                <div class="spotlight-card skeleton" style="cursor:default; min-height:480px; background:#f8fafc;"></div>
+                <div class="featured-list-col">
+                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
+                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
+                </div>
             </div>
         </div>
     </section>
@@ -1459,9 +1705,10 @@
                             userEnrollments = [];
                             currentUserRole = 'medlem';
                         }
-                        renderGrid(getFiltered());
-                    });
-                }
+                         renderGrid(getFiltered());
+                         renderFeaturedSection();
+                     });
+                 }
                 listenToAuth();
 
                 // ── Load courses from Firebase ──────────────────────────────────
@@ -1503,6 +1750,7 @@
                         }
 
                         renderGrid(allCourses);
+                        renderFeaturedSection();
 
                         // Check if a specific course should be opened on load
                         const urlParams = new URLSearchParams(window.location.search);
@@ -1537,8 +1785,148 @@
                     requestAnimationFrame(step);
                 }
 
+                // ── Featured Section Dynamic Handling ─────────────────────────────
+                window.handleCourseCardClick = function (courseId, isMock) {
+                    if (isMock) {
+                        if (window.showToast) {
+                            window.showToast('Dette kurset åpner snart! Følg med for lansering.', 'info');
+                        } else {
+                            alert('Dette kurset åpner snart! Følg med for lansering.');
+                        }
+                        return;
+                    }
+                    const course = allCourses.find(c => c.id === courseId);
+                    if (!course) return;
+                    
+                    const isFree = !course.price || course.price === 0;
+                    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
+                    const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
+                    
+                    if (hasAccess) {
+                        window.location.href = '/minside/index.html#course-player?courseId=' + course.id;
+                    } else {
+                        openEnrollModal(course);
+                    }
+                };
+
+                function renderFeaturedSection() {
+                    const container = document.getElementById('featured-courses-container');
+                    if (!container) return;
+
+                    // 1. Determine Spotlight Course
+                    let spotlightCourse = allCourses[0];
+                    let isSpotlightMock = false;
+                    if (!spotlightCourse) {
+                        spotlightCourse = {
+                            id: 'mock_spotlight',
+                            title: 'Fundamentet for Tro',
+                            description: 'En grundig gjennomgang av de viktigste pilarene i den kristne tro, bygget for å gi deg et solid fundament.',
+                            imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'
+                        };
+                        isSpotlightMock = true;
+                    }
+
+                    // 2. Determine Right Course 1
+                    let rightCourse1 = allCourses[1];
+                    let isRight1Mock = false;
+                    if (!rightCourse1) {
+                        rightCourse1 = {
+                            id: 'mock_right_1',
+                            title: 'Bønnens Kraft',
+                            description: 'Lær hvordan du kan utvikle et rikere og mer meningsfylt bønneliv i hverdagen.',
+                            imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+                            durationText: '12 Timer',
+                            studentsText: '1.2k Studenter'
+                        };
+                        isRight1Mock = true;
+                    } else {
+                        rightCourse1.durationText = (rightCourse1.lessons || []).length + ' leksjoner';
+                        const isFree = !rightCourse1.price || rightCourse1.price === 0;
+                        rightCourse1.studentsText = isFree ? 'Gratis tilgang' : 'Betalt kurs';
+                    }
+
+                    // 3. Determine Right Course 2
+                    let rightCourse2 = allCourses[2];
+                    let isRight2Mock = false;
+                    if (!rightCourse2) {
+                        rightCourse2 = {
+                            id: 'mock_right_2',
+                            title: 'Lederskap i Tjeneste',
+                            description: 'Prinsipper for å lede andre med ydmykhet, visjon og integritet i en moderne verden.',
+                            imageUrl: 'https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=600&q=80',
+                            durationText: '8 Timer',
+                            studentsText: '850 Studenter'
+                        };
+                        isRight2Mock = true;
+                    } else {
+                        rightCourse2.durationText = (rightCourse2.lessons || []).length + ' leksjoner';
+                        const isFree = !rightCourse2.price || rightCourse2.price === 0;
+                        rightCourse2.studentsText = isFree ? 'Gratis tilgang' : 'Betalt kurs';
+                    }
+
+                    const badgeText = isSpotlightMock ? 'Kommer Snart' : 'Populært';
+
+                    container.innerHTML = `
+                        <!-- Left: Large Spotlight Card -->
+                        <div class="spotlight-card" onclick="handleCourseCardClick('${spotlightCourse.id}', ${isSpotlightMock})">
+                            <img class="spotlight-card-bg" src="${spotlightCourse.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${spotlightCourse.title}" loading="lazy">
+                            <div class="spotlight-content">
+                                <span class="spotlight-badge" style="${isSpotlightMock ? 'background:#64748b;' : ''}">${badgeText}</span>
+                                <h3 class="spotlight-title">${spotlightCourse.title}</h3>
+                                <p class="spotlight-desc">${spotlightCourse.description || ''}</p>
+                                <button class="spotlight-btn">
+                                    Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right: Two smaller horizontal cards -->
+                        <div class="featured-list-col">
+                            <div class="horizontal-course-card" onclick="handleCourseCardClick('${rightCourse1.id}', ${isRight1Mock})">
+                                <img class="horizontal-course-thumb" src="${rightCourse1.imageUrl}" alt="${rightCourse1.title}" loading="lazy">
+                                <div class="horizontal-course-content">
+                                    <h4 class="horizontal-course-title">${rightCourse1.title}</h4>
+                                    <p class="horizontal-course-desc">${rightCourse1.description}</p>
+                                    <div class="horizontal-course-meta">
+                                        <span><i class="far fa-clock"></i> ${rightCourse1.durationText}</span>
+                                        <span><i class="far fa-user"></i> ${rightCourse1.studentsText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="horizontal-course-card" onclick="handleCourseCardClick('${rightCourse2.id}', ${isRight2Mock})">
+                                <img class="horizontal-course-thumb" src="${rightCourse2.imageUrl}" alt="${rightCourse2.title}" loading="lazy">
+                                <div class="horizontal-course-content">
+                                    <h4 class="horizontal-course-title">${rightCourse2.title}</h4>
+                                    <p class="horizontal-course-desc">${rightCourse2.description}</p>
+                                    <div class="horizontal-course-meta">
+                                        <span><i class="far fa-clock"></i> ${rightCourse2.durationText}</span>
+                                        <span><i class="far fa-user"></i> ${rightCourse2.studentsText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                function updateFeaturedVisibility() {
+                    const featuredSection = document.getElementById('featured-teaching');
+                    if (!featuredSection) return;
+                    
+                    const searchInput = document.getElementById('course-search');
+                    const hasSearch = searchInput && searchInput.value.trim().length > 0;
+                    const hasFilter = activeFilter && activeFilter !== 'all';
+                    
+                    if (hasSearch || hasFilter) {
+                        featuredSection.style.display = 'none';
+                    } else {
+                        featuredSection.style.display = 'block';
+                    }
+                }
+
                 // ── Render grid ──────────────────────────────────────────────────
                 function renderGrid(courses) {
+                    updateFeaturedVisibility();
                     const grid = document.getElementById('kurs-grid');
                     const meta = document.getElementById('results-meta');
 
