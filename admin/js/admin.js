@@ -27123,11 +27123,11 @@ class AdminManager {
             const db = window.firebaseService?.db || firebase.firestore();
             
             // Fetch courses
-            const coursesSnapshot = await db.collection('courses').get();
-            const courses = [];
-            coursesSnapshot.forEach(doc => {
-                courses.push({ id: doc.id, ...doc.data() });
-            });
+            const fService = window.firebaseService;
+            const coursesData = typeof fService?.getSiteContent === 'function'
+                ? await fService.getSiteContent('collection_courses')
+                : null;
+            const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.items || []);
             this.coursesItems = courses;
 
             // Fetch enrollments
