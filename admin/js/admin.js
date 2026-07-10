@@ -21856,9 +21856,14 @@ class AdminManager {
                         <td>${price > 0 ? `<span class="badge status-pending">${priceText}</span>` : `<span class="badge status-read">${priceText}</span>`}</td>
                         <td>${lessonsCount}</td>
                         <td class="col-actions">
-                            <button type="button" class="btn-secondary" onclick="window.adminManager._openCourseModal(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;">
-                                Rediger
-                            </button>
+                            <div style="display:flex; gap:6px; justify-content: flex-end;">
+                                <button type="button" class="btn-secondary" onclick="window.adminManager._openCourseModal(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;">
+                                    Rediger
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="window.adminManager.createEventFromCourse(${i})" style="padding:8px 12px;border-radius:8px;font-size:12px;background:#f0fdf4;border-color:#bbf7d0;color:#15803d;display:inline-flex;align-items:center;gap:4px;" title="Opprett kalenderarrangement">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">calendar_add_on</span> Kalender
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -21873,7 +21878,7 @@ class AdminManager {
                                 <th>Kategori</th>
                                 <th>Pris</th>
                                 <th>Leksjoner</th>
-                                <th class="col-actions">Handlinger</th>
+                                <th class="col-actions" style="text-align: right; padding-right: 24px;">Handlinger</th>
                             </tr>
                         </thead>
                         <tbody>${rows}</tbody>
@@ -21883,6 +21888,73 @@ class AdminManager {
         } catch (err) {
             console.error('Kurs-feil:', err);
             if (list) list.innerHTML = `<p style="color:#ef4444;">Kunne ikke laste kurs.</p>`;
+        }
+    }
+
+    async createEventFromCourse(courseIndex) {
+        const course = this.coursesItems ? this.coursesItems[courseIndex] : null;
+        if (!course) {
+            this.showToast('Kunne ikke finne kurset.', 'error');
+            return;
+        }
+
+        const confirmed = await this.showConfirm(
+            'Opprett arrangement',
+            `Vil du opprette et kalenderarrangement for kurset "${course.title || 'Uten tittel'}"?`,
+            'Opprett'
+        );
+
+        if (!confirmed) return;
+
+        try {
+            // Force invalidation of events cache
+            firebaseService.invalidatePageContentCache('collection_events');
+            
+            const currentData = await firebaseService.getPageContent('collection_events');
+            const list = this._getCollectionItems(currentData);
+
+            // Construct new event from course details
+            const eventTitle = `Kurs: ${course.title || 'Nytt kurs'}`;
+            const courseLink = `/kurs.html?courseId=${course.id}`;
+
+            const newEvent = {
+                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                title: eventTitle,
+                date: new Date().toISOString().split('T')[0],
+                imageUrl: course.imageUrl || '',
+                description: course.description || '',
+                eventLink: courseLink,
+                eventLinkText: 'Start kurs',
+                category: 'Kurs',
+                tags: ['Kurs', 'Undervisning'],
+                published: true
+            };
+
+            list.unshift(newEvent);
+
+            await firebaseService.savePageContent('collection_events', { items: list });
+
+            this.showToast('✅ Kalenderarrangement opprettet! Åpner Arrangementer...', 'success', 3000);
+            
+            this.clearPublicEventCache();
+
+            // Automatically switch view to the Events editor list
+            setTimeout(() => {
+                const eventsMenuItem = document.querySelector('.sidebar-menu-item[data-tab="events"]') || 
+                                     document.querySelector('[data-page="events"]') ||
+                                     document.querySelector('a[href="#events"]') ||
+                                     document.querySelector('[onclick*="events"]');
+                if (eventsMenuItem) {
+                    eventsMenuItem.click();
+                } else {
+                    // Fallback to loading collection editor directly
+                    this.renderCollectionEditor('events', 'Arrangementer');
+                }
+            }, 1000);
+
+        } catch (error) {
+            console.error('Failed to create event from course:', error);
+            this.showToast('Kunne ikke opprette kalenderarrangement.', 'error');
         }
     }
 
