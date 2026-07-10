@@ -4644,8 +4644,8 @@ class MinSideManager {
                     border-color: #cbd5e1;
                 }
                 .hkm-lesson-card.active {
-                    border-color: rgba(27, 73, 101, 0.3);
-                    background: rgba(27, 73, 101, 0.05);
+                    border-color: rgba(209, 125, 57, 0.3);
+                    background: rgba(209, 125, 57, 0.05);
                 }
                 .hkm-lesson-card.locked {
                     opacity: 0.5;
@@ -4875,18 +4875,18 @@ class MinSideManager {
                                             <div class="hkm-lesson-card player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
                                                 <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
                                                     <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#1B4965' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
+                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
                                                         <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
                                                     </div>
-                                                    <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#1B4965' : 'rgba(100, 116, 139, 0.4)'};">
+                                                    <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.4)'};">
                                                         ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
                                                     </span>
                                                 </div>
                                                 ${isActive ? `
                                                     <div style="margin-top: 16px; height: 4px; width: 100%; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
-                                                        <div style="height: 100%; background: #1B4965; width: 65%;"></div>
+                                                        <div style="height: 100%; background: #d17d39; width: 65%;"></div>
                                                     </div>
-                                                    <p style="margin: 8px 0 0 0; font-size: 10px; font-weight: 700; color: #1B4965;">PÅGÅENDE - 65% ferdig</p>
+                                                    <p style="margin: 8px 0 0 0; font-size: 10px; font-weight: 700; color: #d17d39;">PÅGÅENDE - 65% ferdig</p>
                                                 ` : ''}
                                             </div>
                                         `;
