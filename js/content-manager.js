@@ -4739,6 +4739,17 @@ class ContentManager {
             }
         }
         
+        // 2. Firebase Storage or other external URLs via wsrv.nl proxy (excluding unsplash/local urls)
+        if ((cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) && !cleanUrl.includes('wsrv.nl')) {
+            const lowerUrl = cleanUrl.toLowerCase();
+            // Don't proxy SVGs
+            if (!lowerUrl.includes('.svg')) {
+                let targetWidth = options.width || (window.innerWidth < 768 ? 600 : 1200);
+                let targetQuality = options.quality || 80;
+                return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${targetWidth}&output=webp&q=${targetQuality}`;
+            }
+        }
+        
         return cleanUrl;
     }
 
@@ -5090,7 +5101,8 @@ class ContentManager {
 
     _getEventImage(event) {
         if (!event) return this.generateEventImage('default');
-        return event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+        const img = event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+        return this.optimizeDynamicImageUrl(img, { width: 800, quality: 80 });
     }
 
     _mergeEventWithFirestore(gEvent, firebaseItems) {
