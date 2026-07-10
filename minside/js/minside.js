@@ -4465,104 +4465,479 @@ class MinSideManager {
 
         // Render Layout
         container.innerHTML = `
-            <div class="course-player-layout">
-                <!-- Left Side: Player & Info -->
-                <div class="player-main-area">
+            <style>
+                /* Style Overrides for modern design */
+                .hkm-player-grid {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 24px;
+                    width: 100%;
+                    margin-top: 8px;
+                }
+                @media (max-width: 1024px) {
+                    .hkm-player-grid {
+                        flex-direction: column;
+                    }
+                }
+                .hkm-player-main {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+                .hkm-player-sidebar {
+                    width: 380px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+                @media (max-width: 1024px) {
+                    .hkm-player-sidebar {
+                        width: 100%;
+                    }
+                }
+                .hkm-card {
+                    background: #fff8f6;
+                    border: 1px solid #e1bfb3;
+                    border-radius: 16px;
+                    padding: 24px;
+                    box-shadow: 0 4px 20px rgba(38, 24, 19, 0.03);
+                    transition: all 0.3s ease;
+                }
+                .hkm-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    text-decoration: none;
+                    height: 44px;
+                    box-sizing: border-box;
+                }
+                .hkm-btn:active {
+                    transform: scale(0.95);
+                }
+                .hkm-btn-fs {
+                    background: #3c2d27;
+                    color: #ffede7;
+                    border: none;
+                }
+                .hkm-btn-fs:hover {
+                    background: #513e37;
+                }
+                .hkm-btn-zoom {
+                    background: #1DB954;
+                    color: white;
+                    border: none;
+                }
+                .hkm-btn-zoom:hover {
+                    background: #1ed760;
+                }
+                
+                /* Metadata Grid */
+                .hkm-meta-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 24px;
+                    padding-top: 24px;
+                    border-top: 1px solid rgba(225, 191, 179, 0.3);
+                }
+                @media (max-width: 640px) {
+                    .hkm-meta-grid {
+                        grid-template-columns: 1fr;
+                        gap: 16px;
+                    }
+                }
+                .hkm-meta-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                .hkm-meta-icon {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: #ffdbce;
+                    color: #a73a00;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .hkm-meta-icon.secondary {
+                    background: #dde2f3;
+                    color: #585e6c;
+                }
+                .hkm-meta-icon.tertiary {
+                    background: #e0f2fe;
+                    color: #0369a1;
+                }
+                .hkm-meta-text {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .hkm-meta-label {
+                    font-size: 10px;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: rgba(89, 65, 56, 0.6);
+                    margin: 0;
+                    line-height: 1;
+                }
+                .hkm-meta-val {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #261813;
+                    margin: 4px 0 0;
+                    line-height: 1.2;
+                }
+                
+                /* Sidebar navigation and Tabs */
+                .hkm-tabs-header {
+                    display: flex;
+                    border-bottom: 1px solid #e1bfb3;
+                }
+                .hkm-tab-btn {
+                    flex: 1;
+                    padding: 16px 8px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: rgba(89, 65, 56, 0.6);
+                    background: transparent;
+                    border: none;
+                    border-bottom: 2px solid transparent;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                }
+                .hkm-tab-btn:hover {
+                    color: #261813;
+                }
+                .hkm-tab-btn.active {
+                    color: #a73a00;
+                    border-bottom-color: #a73a00;
+                    background: rgba(245, 101, 35, 0.04);
+                }
+                
+                /* Lesson Item Card */
+                .hkm-lesson-card {
+                    border-radius: 12px;
+                    border: 1px solid rgba(225, 191, 179, 0.3);
+                    padding: 16px;
+                    cursor: pointer;
+                    background: transparent;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin-bottom: 16px;
+                }
+                .hkm-lesson-card:hover {
+                    transform: translateX(4px);
+                    background: #ffe9e2;
+                }
+                .hkm-lesson-card.active {
+                    border-color: rgba(167, 58, 0, 0.2);
+                    background: rgba(255, 219, 206, 0.2);
+                }
+                .hkm-lesson-card.locked {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    background: rgba(238, 213, 204, 0.1);
+                }
+                .hkm-lesson-card.locked:hover {
+                    transform: none;
+                    background: rgba(238, 213, 204, 0.1);
+                }
+
+                /* Notes Editor custom */
+                .hkm-notes-textarea {
+                    width: 100%;
+                    height: 160px;
+                    border: 1px solid #e1bfb3;
+                    background: #ffe9e2;
+                    border-radius: 12px;
+                    padding: 16px;
+                    font-size: 14px;
+                    color: #261813;
+                    outline: none;
+                    resize: none;
+                    transition: all 0.3s ease;
+                }
+                .hkm-notes-textarea:focus {
+                    border-color: #a73a00;
+                    box-shadow: 0 0 0 2px rgba(167, 58, 0, 0.15);
+                }
+
+                /* Bible Widget selectors */
+                .hkm-bible-selects {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                    margin-bottom: 16px;
+                }
+                .hkm-bible-select {
+                    width: 100%;
+                    border: 1px solid #e1bfb3;
+                    background: #ffe9e2;
+                    border-radius: 8px;
+                    padding: 8px;
+                    font-size: 12px;
+                    color: #261813;
+                    outline: none;
+                }
+                .hkm-bible-display {
+                    background: #fff8f6;
+                    border: 1px solid #e1bfb3;
+                    border-radius: 12px;
+                    padding: 16px;
+                    height: 240px;
+                    overflow-y: auto;
+                }
+
+                /* Scrollbar styling */
+                .hkm-bible-display::-webkit-scrollbar,
+                .hkm-sidebar-scroll::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .hkm-bible-display::-webkit-scrollbar-track,
+                .hkm-sidebar-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .hkm-bible-display::-webkit-scrollbar-thumb,
+                .hkm-sidebar-scroll::-webkit-scrollbar-thumb {
+                    background: #e1bfb3;
+                    border-radius: 4px;
+                }
+                .hkm-bible-display::-webkit-scrollbar-thumb:hover,
+                .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #8d7166;
+                }
+
+                /* Bible Verse Card */
+                .hkm-verse-card {
+                    background: #3c2d27;
+                    color: #ffede7;
+                    padding: 24px;
+                    border-radius: 16px;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 4px 20px rgba(60, 45, 39, 0.15);
+                }
+                .hkm-verse-card::before {
+                    content: '';
+                    position: absolute;
+                    top: -64px;
+                    right: -64px;
+                    width: 144px;
+                    height: 144px;
+                    background: rgba(245, 101, 35, 0.08);
+                    border-radius: 50%;
+                    filter: blur(16px);
+                }
+
+                /* Landscape Media Guard */
+                @media (orientation: landscape) and (max-height: 500px) {
+                    .hkm-player-grid {
+                        gap: 16px;
+                    }
+                    .hkm-card {
+                        padding: 16px;
+                    }
+                    .hkm-meta-grid {
+                        gap: 16px;
+                        padding-top: 16px;
+                    }
+                }
+            </style>
+
+            <div class="hkm-player-grid">
+                <!-- Left Side: Player & Lesson Details -->
+                <div class="hkm-player-main">
+                    <!-- Videospiller container -->
                     <div class="video-player-container" id="player-container">
-                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 20px; text-align:center;">
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 24px; text-align:center;">
                             Laster spiller...
                         </div>
                     </div>
-                    
-                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02); display: flex; flex-direction: column; gap: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+
+                    <!-- Leksjon info kort -->
+                    <div class="hkm-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
                             <div style="flex:1; min-width: 250px;">
-                                <span style="font-size: 0.8rem; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
-                                <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 4px 0 8px;">${lesson.title || 'Uten tittel'}</h2>
-                                <p style="font-size: 0.9rem; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                                <span style="font-size: 11px; font-weight: 700; color: #a73a00; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
+                                <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #261813; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
+                                <p style="font-size: 14px; color: #594138; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
                             </div>
-                            
-                            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                                <button id="player-fullscreen-btn" class="player-btn-fullscreen">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button id="player-fullscreen-btn" class="hkm-btn hkm-btn-fs">
                                     <span class="material-symbols-outlined">fullscreen</span> Fullskjerm
                                 </button>
                                 ${lesson.zoomUrl ? `
-                                    <a href="${lesson.zoomUrl}" target="_blank" class="player-btn-zoom-app">
-                                        <span class="material-symbols-outlined">launch</span> Åpne i Zoom-appen
+                                    <a href="${lesson.zoomUrl}" target="_blank" class="hkm-btn hkm-btn-zoom">
+                                        <span class="material-symbols-outlined">open_in_new</span> Åpne i Zoom-appen
                                     </a>
                                 ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Beskrivelse -->
+                        <p style="font-size: 14px; color: #594138; line-height: 1.6; margin: 0 0 24px 0;">
+                            ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.'}
+                        </p>
+
+                        <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
+                        <div class="hkm-meta-grid">
+                            <div class="hkm-meta-item">
+                                <div class="hkm-meta-icon">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                </div>
+                                <div class="hkm-meta-text">
+                                    <p class="hkm-meta-label">Varighet</p>
+                                    <p class="hkm-meta-val">${lesson.duration || '45 minutter'}</p>
+                                </div>
+                            </div>
+                            <div class="hkm-meta-item">
+                                <div class="hkm-meta-icon secondary">
+                                    <span class="material-symbols-outlined">description</span>
+                                </div>
+                                <div class="hkm-meta-text">
+                                    <p class="hkm-meta-label">Ressurser</p>
+                                    <p class="hkm-meta-val">${lesson.resource || 'PDF Arbeidsbok'}</p>
+                                </div>
+                            </div>
+                            <div class="hkm-meta-item">
+                                <div class="hkm-meta-icon tertiary">
+                                    <span class="material-symbols-outlined">forum</span>
+                                </div>
+                                <div class="hkm-meta-text">
+                                    <p class="hkm-meta-label">Fellesskap</p>
+                                    <p class="hkm-meta-val">124 Svar</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side: Sidebar Tabs Container -->
-                <div class="player-sidebar-card">
-                    <div class="sidebar-tabs">
-                        <button class="sidebar-tab-btn active" data-tab="lessons">
-                            <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
-                        </button>
-                        <button class="sidebar-tab-btn" data-tab="notes">
-                            <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
-                        </button>
-                        <button class="sidebar-tab-btn" data-tab="bible">
-                            <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span> Bibel
-                        </button>
-                    </div>
-                    
-                    <div class="sidebar-panels-container">
-                        <!-- Panel 1: Lessons list -->
-                        <div class="sidebar-panel active" id="panel-lessons">
-                            <div class="player-lessons-list">
-                                ${lessons.map((l, idx) => {
-                                    const isActive = idx === activeLessonIndex;
-                                    const cleanLTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
-                                    return `
-                                        <div class="player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
-                                            <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                <span style="font-size:0.75rem; font-weight:700; color:${isActive ? '#d17d39' : '#94a3b8'};">LEKSJON #${idx + 1}</span>
-                                                <span style="font-weight:650; font-size:0.88rem; color:#1e293b; line-height:1.2;">${cleanLTitle}</span>
+                <!-- Right Side: Sidebar Navigation and Tabs -->
+                <div class="hkm-player-sidebar">
+                    <div class="hkm-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                        <!-- Tabs Header -->
+                        <div class="hkm-tabs-header" style="display: flex; border-bottom: 1px solid rgba(225, 191, 179, 0.3);">
+                            <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons" style="border-right: 1px solid rgba(225, 191, 179, 0.1);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
+                            </button>
+                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="notes" style="border-right: 1px solid rgba(225, 191, 179, 0.1);">
+                                <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
+                            </button>
+                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="bible">
+                                <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span> Bibel
+                            </button>
+                        </div>
+
+                        <!-- Tab Panels scroll wrapper -->
+                        <div class="hkm-sidebar-scroll" style="padding: 24px; max-height: 480px; overflow-y: auto;">
+                            <!-- Panel 1: Lessons List -->
+                            <div class="sidebar-panel active" id="panel-lessons">
+                                <div class="player-lessons-list">
+                                    ${lessons.map((l, idx) => {
+                                        const isActive = idx === activeLessonIndex;
+                                        const cleanItemTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+                                        
+                                        const isLessonUnlocked = isCourseFree || isAdmin || enrollments.some(e => 
+                                            e.courseId === course.id && 
+                                            (e.status === 'paid' || e.status === 'success') &&
+                                            (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(l.id))
+                                        );
+                                        
+                                        if (!isLessonUnlocked) {
+                                            return `
+                                                <div class="hkm-lesson-card locked player-lesson-item" data-idx="${idx}">
+                                                    <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                                                        <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                                                            <span style="font-size:10px; font-weight:700; color:rgba(89, 65, 56, 0.4); text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
+                                                            <span style="font-weight:600; font-size:14px; color:#261813; line-height:1.2;">${cleanItemTitle}</span>
+                                                        </div>
+                                                        <span class="material-symbols-outlined" style="font-size:18px; color:rgba(89, 65, 56, 0.4);">lock</span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }
+                                        
+                                        return `
+                                            <div class="hkm-lesson-card player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
+                                                <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                                                    <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#a73a00' : 'rgba(89, 65, 56, 0.5)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
+                                                        <span style="font-weight:600; font-size:14px; color:#261813; line-height:1.2;">${cleanItemTitle}</span>
+                                                    </div>
+                                                    <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#a73a00' : 'rgba(89, 65, 56, 0.3)'};">
+                                                        ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
+                                                    </span>
+                                                </div>
+                                                ${isActive ? `
+                                                    <div style="margin-top: 16px; height: 4px; width: 100%; background: #ffe9e2; border-radius: 2px; overflow: hidden;">
+                                                        <div style="height: 100%; background: #f56523; width: 65%;"></div>
+                                                    </div>
+                                                    <p style="margin: 8px 0 0 0; font-size: 10px; font-weight: 700; color: #f56523;">PÅGÅENDE - 65% ferdig</p>
+                                                ` : ''}
                                             </div>
-                                            <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#d17d39' : '#94a3b8'};">
-                                                ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
-                                            </span>
-                                        </div>
-                                    `;
-                                }).join('')}
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Notes Editor (Dynamic autosave) -->
+                            <div class="sidebar-panel" id="panel-notes">
+                                <div style="display:flex; flex-direction:column; gap:16px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <h4 style="font-size:14px; font-weight:700; color:#261813; margin:0;">Dine leksjonsnotater</h4>
+                                        <span id="notes-save-status" class="notes-autosave-status" style="font-size:11px; font-weight:600; color:#8d7166;">
+                                            <span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret
+                                        </span>
+                                    </div>
+                                    <textarea class="hkm-notes-textarea" id="lesson-notes-textarea" placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Panel 3: Bible Lookup (Dynamic API loader) -->
+                            <div class="sidebar-panel" id="panel-bible">
+                                <div style="display:flex; flex-direction:column; gap:16px;">
+                                    <div>
+                                        <h4 style="font-size:14px; font-weight:700; color:#261813; margin:0;">Slå opp i Bibelen</h4>
+                                        <p style="font-size:11px; color:rgba(89, 65, 56, 0.6); margin:8px 0 0 0;">Slå opp vers eller kapitler direkte i spillervinduet.</p>
+                                    </div>
+                                    <div class="hkm-bible-selects">
+                                        <select id="bible-select-translation" class="hkm-bible-select">
+                                            <option value="">Laster...</option>
+                                        </select>
+                                        <select id="bible-select-book" class="hkm-bible-select" disabled>
+                                            <option value="">Bok</option>
+                                        </select>
+                                        <select id="bible-select-chapter" class="hkm-bible-select" disabled>
+                                            <option value="">Kapittel</option>
+                                        </select>
+                                    </div>
+                                    <div id="bible-verses-display" class="hkm-bible-display">
+                                        <p style="color:rgba(89, 65, 56, 0.5); text-align:center; font-style:italic; font-size:12px; padding-top:40px; margin: 0;">Velg bok og kapittel for å begynne å lese.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Panel 2: Notes Editor -->
-                        <div class="sidebar-panel" id="panel-notes">
-                            <div class="notes-editor-wrapper">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <h4 style="font-size:0.88rem; font-weight:700; color:#334155; margin:0;">Dine leksjonsnotater</h4>
-                                    <span id="notes-save-status" class="notes-autosave-status">
-                                        <span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret
-                                    </span>
-                                </div>
-                                <textarea class="notes-editor-textarea" id="lesson-notes-textarea" placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Panel 3: Bible Lookup -->
-                        <div class="sidebar-panel" id="panel-bible">
-                            <div class="bible-reader-widget">
-                                <div class="bible-widget-selectors">
-                                    <select id="bible-select-translation" class="bible-widget-select">
-                                        <option value="">Laster...</option>
-                                    </select>
-                                    <select id="bible-select-book" class="bible-widget-select" disabled>
-                                        <option value="">Bok</option>
-                                    </select>
-                                    <select id="bible-select-chapter" class="bible-widget-select" disabled>
-                                        <option value="">Kapittel</option>
-                                    </select>
-                                </div>
-                                <div id="bible-verses-display" class="bible-widget-text-area">
-                                    <p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Velg bok og kapittel for å begynne å lese.</p>
-                                </div>
-                            </div>
+                    <!-- Bible Verse of the Day Card -->
+                    <div class="hkm-verse-card">
+                        <div style="position: relative; z-index: 10;">
+                            <span class="material-symbols-outlined" style="font-size:24px; color:#ffdbce; margin-bottom:12px;">format_quote</span>
+                            <p style="font-size: 13px; font-style: italic; line-height: 1.5; color: #ffede7; margin: 0 0 16px 0;">
+                                "Men den som drikker av det vannet jeg vil gi ham, skal aldri i evighet tørste. Det vannet jeg vil gi ham, skal bli en kilde i ham med vann som veller fram til evig liv."
+                            </p>
+                            <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:#ffdbce; margin:0;">Johannes 4:14</p>
                         </div>
                     </div>
                 </div>
