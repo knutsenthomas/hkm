@@ -5097,7 +5097,22 @@ class ContentManager {
                 : (override.description || '');
 
             const cleanHtml = (html) => String(html || '').replace(/\s+/g, ' ').trim();
-            const isDescDifferent = gEvent.description && cleanHtml(overrideHtml) !== cleanHtml(gEvent.description);
+            
+            let isDescDifferent = false;
+            if (gEvent.updated && override.dashboardEditedAt) {
+                const gcalUpdatedTime = new Date(gEvent.updated).getTime();
+                const dashboardEditedTime = new Date(override.dashboardEditedAt).getTime();
+                
+                // Only override admin if GCal has been updated *after* the admin edit, and the text actually changed
+                if (gcalUpdatedTime > dashboardEditedTime) {
+                    isDescDifferent = gEvent.description && cleanHtml(overrideHtml) !== cleanHtml(gEvent.description);
+                }
+            } else {
+                // Fallback: If not edited via dashboard, let GCal override if different
+                if (!override.dashboardEdited) {
+                    isDescDifferent = gEvent.description && cleanHtml(overrideHtml) !== cleanHtml(gEvent.description);
+                }
+            }
 
             // Apply overrides while preserving GCal source identity where needed
             const merged = {
