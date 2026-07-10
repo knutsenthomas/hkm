@@ -2791,6 +2791,11 @@ body.hero-animate .slide-buttons {
     .event-large-image-wrap {
         display: none !important;
     }
+
+    .event-details-layout {
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+    }
 }
 
 /* Fix horizontal overflow from decorative images */
