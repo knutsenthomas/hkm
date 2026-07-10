@@ -6506,6 +6506,10 @@ a[href*="#deduccion-fiscal"],
     }
 
     /* Om oss - circular video/image crop */
+    .about-image {
+        display: none !important;
+    }
+
     .circular-image {
         width: 250px !important;
         height: 250px !important;

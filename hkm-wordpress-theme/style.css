@@ -2783,6 +2783,10 @@ body.hero-animate .slide-buttons {
     .footer-grid {
         grid-template-columns: 1fr;
     }
+
+    .about-image {
+        display: none !important;
+    }
 }
 
 /* Fix horizontal overflow from decorative images */
