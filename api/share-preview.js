@@ -146,8 +146,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  // If no ID is provided, just return the template as-is
-  if (!id) {
+  // If no ID is provided (and type is not 'course'), just return the template as-is
+  if (!id && type !== 'course') {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.status(200).send(html);
     return;
@@ -286,7 +286,8 @@ export default async function handler(req, res) {
         const payload = await response.json();
         const doc = decodeFirestoreFields(payload.fields);
         const courses = Array.isArray(doc.items) ? doc.items : (doc.items ? Object.values(doc.items) : []);
-        const course = courses.find(c => String(c.id) === String(id));
+        const targetId = id || (courses[0] ? courses[0].id : null);
+        const course = courses.find(c => String(c.id) === String(targetId));
         if (course) {
           title = course.title || 'Kurs';
           description = course.description || 'Nettkurs fra His Kingdom Ministry';
@@ -314,7 +315,7 @@ export default async function handler(req, res) {
         ? `/en/event-details?id=${id}`
         : (lang === 'es' ? `/es/detalles-evento?id=${id}` : `/arrangement-detaljer?id=${id}`);
     } else if (type === 'course') {
-      cleanPath = `/kurs.html?courseId=${id}`;
+      cleanPath = id ? `/kurs.html?courseId=${id}` : `/kurs`;
     }
     const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
 
