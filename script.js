@@ -85,6 +85,14 @@ function applySubpageHeroCentering() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Dynamically request FILL axis for Material Symbols to allow filled icons
+    document.querySelectorAll('link[href*="Material+Symbols+Outlined"]').forEach(link => {
+        let href = link.getAttribute('href');
+        if (href && href.includes('FILL,GRAD@24,400,0,0')) {
+            link.setAttribute('href', href.replace('FILL,GRAD@24,400,0,0', 'FILL,GRAD@24,400,0..1,0'));
+        }
+    });
+
     applySubpageHeroCentering();
 
     window.requestAnimationFrame(applySubpageHeroCentering);
