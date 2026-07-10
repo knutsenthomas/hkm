@@ -4549,15 +4549,35 @@ class MinSideManager {
                     class: 'secondary'
                 });
 
-                // Legg til nedtelling hvis tidspunktet er i fremtiden
+                // Legg til status eller nedtelling basert på tidspunkt
                 const lessonTime = new Date(lesson.date).getTime();
-                if (lessonTime > Date.now()) {
+                const now = Date.now();
+                if (lessonTime > now) {
                     metaItems.push({
                         icon: 'alarm',
                         label: 'Starter om',
                         val: `<span id="zoom-countdown" data-target="${lessonTime}" style="color: #d17d39; font-weight: 700;">Laster nedtelling...</span>`,
                         class: 'secondary'
                     });
+                } else {
+                    const hoursPassed = (now - lessonTime) / (1000 * 60 * 60);
+                    if (hoursPassed < 2) {
+                        // Mindre enn 2 timer siden start (anta at sendingen pågår)
+                        metaItems.push({
+                            icon: 'live_tv',
+                            label: 'Status',
+                            val: '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>',
+                            class: 'secondary'
+                        });
+                    } else {
+                        // Mer enn 2 timer siden start, og admin har ennå ikke lagt til opptak (siden videoUrl mangler)
+                        metaItems.push({
+                            icon: 'lock_clock',
+                            label: 'Status',
+                            val: '<span style="color: #64748b; font-weight: 600; font-size: 13.5px;">Avsluttet (Opptak kommer)</span>',
+                            class: 'secondary'
+                        });
+                    }
                 }
             }
         } else {
@@ -4940,6 +4960,15 @@ class MinSideManager {
                         gap: 16px;
                         padding-top: 16px;
                     }
+                }
+
+                @keyframes hkm-pulse {
+                    0% { opacity: 0.4; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.4; }
+                }
+                .hkm-live-pulse {
+                    animation: hkm-pulse 1.5s infinite ease-in-out;
                 }
             </style>
 
@@ -5623,7 +5652,7 @@ class MinSideManager {
                 const diff = targetTime - now;
                 
                 if (diff <= 0) {
-                    el.innerHTML = '<span style="color: #10b981; font-weight: 700;">Startet! 🎉</span>';
+                    el.innerHTML = '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>';
                     if (window._playerCountdownInterval) {
                         clearInterval(window._playerCountdownInterval);
                         window._playerCountdownInterval = null;
