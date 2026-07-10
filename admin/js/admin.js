@@ -21298,8 +21298,6 @@ class AdminManager {
         this.renderCollectionEditor('teaching', 'Undervisning');
     }
 
-
-
     async renderReadingPlansManager() {
         const section = document.getElementById('reading-plans-section');
         if (section) {
@@ -21383,102 +21381,190 @@ class AdminManager {
                     color: #94a3b8;
                     pointer-events: none;
                 }
+                .sub-tab-btn {
+                    background: none;
+                    border: none;
+                    font-weight: 600;
+                    padding: 12px 20px;
+                    cursor: pointer;
+                    color: #64748b;
+                    border-bottom: 2px solid transparent;
+                    transition: all 0.3s ease;
+                    outline: none;
+                    font-family: inherit;
+                    font-size: 0.95rem;
+                }
+                .sub-tab-btn.active {
+                    color: #1B4965;
+                    border-bottom: 2px solid #1B4965;
+                }
             </style>
-            ${this.renderSectionHeader('menu_book', 'Kursadministrasjon', 'Opprett og administrer kurs med leksjoner – Udemy-stil.', `
-                <button class="btn btn-primary" id="create-course-btn">
-                    <span class="material-symbols-outlined">add</span> Nytt kurs
-                </button>
-            `, '')}
 
-            <div class="design-ui-shell">
-                <div class="design-ui-workspace" style="padding: 0;">
-                    <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div id="courses-list">
-                            <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+            <!-- Sub-tab Bar -->
+            <div style="display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 0;">
+                <button class="sub-tab-btn active" id="courses-list-tab-btn">Kursliste</button>
+                <button class="sub-tab-btn" id="courses-enrollments-tab-btn">Påmeldinger & Tilganger</button>
+            </div>
+
+            <!-- VIEW 1: COURSES VIEW -->
+            <div id="courses-tab-view">
+                ${this.renderSectionHeader('menu_book', 'Kursliste', 'Opprett og administrer kurs med leksjoner – Udemy-stil.', `
+                    <button class="btn btn-primary" id="create-course-btn">
+                        <span class="material-symbols-outlined">add</span> Nytt kurs
+                    </button>
+                `, '')}
+
+                <div class="design-ui-shell">
+                    <div class="design-ui-workspace" style="padding: 0;">
+                        <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div id="courses-list">
+                                <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Modal -->
+                <div id="course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;padding:20px;">
+                    <div style="background:white;border-radius:16px;max-width:780px;margin:20px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                            <h3 id="course-modal-title" style="font-size:1.4rem;font-weight:700;">Nytt kurs</h3>
+                            <button id="close-course-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;">✕</button>
+                        </div>
+
+                        <form id="course-form">
+                            <input type="hidden" id="course-id">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                                <div style="grid-column:span 2;">
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Kurstitel *</label>
+                                    <input id="course-title" type="text" placeholder="Eks: Identitet i Kristus" required
+                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                </div>
+                                <div style="grid-column:span 2;">
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Beskrivelse</label>
+                                    <textarea id="course-description" rows="3" placeholder="Hva lærer studentene?"
+                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:1rem;resize:vertical;"></textarea>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
+                                    <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
+                                        <option value="Bibelstudium">Bibelstudium</option>
+                                        <option value="Bønn">Bønn</option>
+                                        <option value="Lederskap">Lederskap</option>
+                                        <option value="Helbredelse">Helbredelse</option>
+                                        <option value="Evangelisering">Evangelisering</option>
+                                        <option value="Identitet">Identitet</option>
+                                        <option value="Annet">Annet</option>
+                                    </select>
+                                    <div id="new-category-container" style="display:none;">
+                                        <input id="course-new-category" type="text" placeholder="Skriv ny kategori..."
+                                            style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Pris (NOK) – 0 = gratis</label>
+                                    <input id="course-price" type="number" min="0" placeholder="0" value="0"
+                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                </div>
+                                <div style="grid-column:span 2;">
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Pris-tekst / Suffix (f.eks. "pr. leksjon", "pr. kveld", "totalt")</label>
+                                    <input id="course-price-suffix" type="text" placeholder="Eks: pr. leksjon"
+                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                </div>
+                                <div style="grid-column:span 2;">
+                                    <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input id="course-image" type="url" placeholder="https://..."
+                                            style="flex: 1; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:1rem;">
+                                        <button type="button" id="course-unsplash-btn" class="btn btn-secondary" style="padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; line-height: 1;">
+                                            <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">image_search</span> Unsplash
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lessons -->
+                            <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:4px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                    <h4 style="font-size:1rem;font-weight:700;">Leksjoner</h4>
+                                    <button type="button" id="add-lesson-btn" style="background:#fff8f0;color:#e07b39;border:1.5px solid #ffd5b0;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1;">
+                                        <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">add</span> Legg til leksjon
+                                    </button>
+                                </div>
+                                <div id="lessons-container" style="display:flex;flex-direction:column;gap:12px;"></div>
+                            </div>
+
+                            <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;">
+                                <button type="submit" id="save-course-btn" class="btn-primary" style="padding:12px 28px;border-radius:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1;">
+                                    <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">save</span> Lagre kurs
+                                </button>
+                                <button type="button" id="delete-course-btn" style="display:none;padding:12px 20px;border-radius:10px;background:white;color:#ef4444;border:1.5px solid #fee2e2;font-weight:600;cursor:pointer;">
+                                    Slett kurs
+                                </button>
+                            </div>
+                            <p id="course-save-status" style="margin-top:12px;font-size:0.85rem;"></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: ENROLLMENTS VIEW -->
+            <div id="enrollments-tab-view" style="display: none;">
+                ${this.renderSectionHeader('group', 'Kurs-påmeldinger & Tilganger', 'Administrer registreringer, godkjenn betalinger og tilpass leksjonstilgang.', '', '')}
+
+                <div class="design-ui-shell">
+                    <!-- Search & Filter Controls -->
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); align-items: center;">
+                        <div style="flex: 1; min-width: 200px; position: relative;">
+                            <input type="text" id="enrollment-search" placeholder="Søk på navn eller e-post..." style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                        </div>
+                        <div style="min-width: 180px;">
+                            <select id="enrollment-course-filter" style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                                <option value="">Alle kurs</option>
+                            </select>
+                        </div>
+                        <div style="min-width: 180px;">
+                            <select id="enrollment-status-filter" style="width: 100%; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white; font-family: inherit;">
+                                <option value="">Alle statuser</option>
+                                <option value="pending">Venter (Standard)</option>
+                                <option value="pending_stripe">Venter (Stripe)</option>
+                                <option value="pending_vipps">Venter (Vipps)</option>
+                                <option value="paid">Godkjent (Paid)</option>
+                                <option value="success">Godkjent (Success)</option>
+                                <option value="refunded">Refundert</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="design-ui-workspace" style="padding: 0;">
+                        <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div id="enrollments-list">
+                                <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster påmeldinger...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Course Modal -->
-            <div id="course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;padding:20px;">
-                <div style="background:white;border-radius:16px;max-width:780px;margin:20px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                        <h3 id="course-modal-title" style="font-size:1.4rem;font-weight:700;">Nytt kurs</h3>
-                        <button id="close-course-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;">✕</button>
+            <!-- Lesson Access Modal -->
+            <div id="lesson-access-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;overflow-y:auto;padding:20px;">
+                <div style="background:white;border-radius:16px;max-width:500px;margin:80px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h3 style="font-size:1.25rem;font-weight:700;color:#1B4965;margin:0;">Leksjonstilgang</h3>
+                        <button id="close-lesson-access-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;padding:0;line-height:1;">✕</button>
                     </div>
-
-                    <form id="course-form">
-                        <input type="hidden" id="course-id">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                            <div style="grid-column:span 2;">
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Kurstitel *</label>
-                                <input id="course-title" type="text" placeholder="Eks: Identitet i Kristus" required
-                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
-                            </div>
-                            <div style="grid-column:span 2;">
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Beskrivelse</label>
-                                <textarea id="course-description" rows="3" placeholder="Hva lærer studentene?"
-                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:1rem;resize:vertical;"></textarea>
-                            </div>
-                            <div>
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
-                                <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
-                                    <option value="Bibelstudium">Bibelstudium</option>
-                                    <option value="Bønn">Bønn</option>
-                                    <option value="Lederskap">Lederskap</option>
-                                    <option value="Helbredelse">Helbredelse</option>
-                                    <option value="Evangelisering">Evangelisering</option>
-                                    <option value="Identitet">Identitet</option>
-                                    <option value="Annet">Annet</option>
-                                </select>
-                                <div id="new-category-container" style="display:none;">
-                                    <input id="course-new-category" type="text" placeholder="Skriv ny kategori..."
-                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
-                                </div>
-                            </div>
-                            <div>
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Pris (NOK) – 0 = gratis</label>
-                                <input id="course-price" type="number" min="0" placeholder="0" value="0"
-                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
-                            </div>
-                            <div style="grid-column:span 2;">
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Pris-tekst / Suffix (f.eks. "pr. leksjon", "pr. kveld", "totalt")</label>
-                                <input id="course-price-suffix" type="text" placeholder="Eks: pr. leksjon"
-                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
-                            </div>
-                            <div style="grid-column:span 2;">
-                                <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input id="course-image" type="url" placeholder="https://..."
-                                        style="flex: 1; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:1rem;">
-                                    <button type="button" id="course-unsplash-btn" class="btn btn-secondary" style="padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; line-height: 1;">
-                                        <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">image_search</span> Unsplash
-                                    </button>
-                                </div>
-                            </div>
+                    <p style="font-size:14px;color:#64748b;margin-bottom:20px;line-height:1.5;">
+                        Velg hvilke leksjoner denne brukeren skal ha tilgang til. Huker du av alle (eller ingen), vil brukeren ha tilgang til hele kurset.
+                    </p>
+                    <form id="lesson-access-form">
+                        <input type="hidden" id="access-enrollment-id">
+                        <div id="lesson-checkboxes-container" style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;max-height:280px;overflow-y:auto;padding-right:8px;">
+                            <!-- Dynamic checkboxes -->
                         </div>
-
-                        <!-- Lessons -->
-                        <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:4px;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                                <h4 style="font-size:1rem;font-weight:700;">Leksjoner</h4>
-                                <button type="button" id="add-lesson-btn" style="background:#fff8f0;color:#e07b39;border:1.5px solid #ffd5b0;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;line-height:1;">
-                                    <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">add</span> Legg til leksjon
-                                </button>
-                            </div>
-                            <div id="lessons-container" style="display:flex;flex-direction:column;gap:12px;"></div>
+                        <div style="display:flex;gap:12px;justify-content:flex-end;border-top:1px solid #e2e8f0;padding-top:20px;">
+                            <button type="button" id="cancel-lesson-access" style="padding:10px 16px;border-radius:8px;border:1.5px solid #cbd5e1;background:white;font-weight:600;cursor:pointer;font-family:inherit;">Avbryt</button>
+                            <button type="submit" style="padding:10px 20px;border-radius:8px;background:#1B4965;color:white;border:none;font-weight:600;cursor:pointer;font-family:inherit;">Lagre tilgang</button>
                         </div>
-
-                        <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;">
-                            <button type="submit" id="save-course-btn" class="btn-primary" style="padding:12px 28px;border-radius:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1;">
-                                <span class="material-symbols-outlined" style="font-size:1.15rem;transform:none !important;line-height:1;">save</span> Lagre kurs
-                            </button>
-                            <button type="button" id="delete-course-btn" style="display:none;padding:12px 20px;border-radius:10px;background:white;color:#ef4444;border:1.5px solid #fee2e2;font-weight:600;cursor:pointer;">
-                                Slett kurs
-                            </button>
-                        </div>
-                        <p id="course-save-status" style="margin-top:12px;font-size:0.85rem;"></p>
                     </form>
                 </div>
             </div>
@@ -21489,7 +21575,7 @@ class AdminManager {
         this._ensureCoursesRealtimeSubscription();
         await this._loadCoursesList();
 
-        // Course actions (support legacy/new IDs and avoid hard crashes if markup changes)
+        // Course actions
         const createCourseBtn = document.getElementById('create-course-btn') || document.getElementById('new-course-btn');
         const closeCourseModalBtn = document.getElementById('close-course-modal');
         const courseModal = document.getElementById('course-modal');
@@ -21508,6 +21594,37 @@ class AdminManager {
             this._saveCourse();
         });
         deleteCourseBtn?.addEventListener('click', () => this._deleteCourse());
+
+        // Tab selection & routing
+        const listTabBtn = document.getElementById('courses-list-tab-btn');
+        const enrollmentsTabBtn = document.getElementById('courses-enrollments-tab-btn');
+        const coursesView = document.getElementById('courses-tab-view');
+        const enrollmentsView = document.getElementById('enrollments-tab-view');
+
+        listTabBtn?.addEventListener('click', () => {
+            listTabBtn.classList.add('active');
+            enrollmentsTabBtn.classList.remove('active');
+            coursesView.style.display = 'block';
+            enrollmentsView.style.display = 'none';
+        });
+
+        enrollmentsTabBtn?.addEventListener('click', async () => {
+            enrollmentsTabBtn.classList.add('active');
+            listTabBtn.classList.remove('active');
+            coursesView.style.display = 'none';
+            enrollmentsView.style.display = 'block';
+            await this._loadEnrollmentsList();
+        });
+
+        // Search & Filter event bindings
+        const searchInput = document.getElementById('enrollment-search');
+        searchInput?.addEventListener('input', () => this._renderEnrollmentsList());
+
+        const courseFilter = document.getElementById('enrollment-course-filter');
+        courseFilter?.addEventListener('change', () => this._renderEnrollmentsList());
+
+        const statusFilter = document.getElementById('enrollment-status-filter');
+        statusFilter?.addEventListener('change', () => this._renderEnrollmentsList());
     }
 
     async _loadCoursesList() {
@@ -26536,6 +26653,307 @@ class AdminManager {
             resultsEl.style.display = 'none';
         }
         if (statusEl) statusEl.textContent = item.country ? `Valgt: ${item.country}` : 'Adresse valgt.';
+    }
+
+    async _loadEnrollmentsList() {
+        const list = document.getElementById('enrollments-list');
+        if (!list) return;
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            const snapshot = await db.collection('courseEnrollments').orderBy('enrolledAt', 'desc').get();
+            const items = [];
+            snapshot.forEach(doc => {
+                items.push({ id: doc.id, ...doc.data() });
+            });
+            this.enrollmentItems = items;
+
+            this._populateEnrollmentCourseFilter();
+            this._renderEnrollmentsList();
+        } catch (err) {
+            console.error('Enrollments load error:', err);
+            list.innerHTML = `<p style="color:#ef4444;text-align:center;padding:20px;">Kunne ikke laste påmeldinger: ${err.message}</p>`;
+        }
+    }
+
+    _populateEnrollmentCourseFilter() {
+        const select = document.getElementById('enrollment-course-filter');
+        if (!select) return;
+
+        const courses = new Set();
+        if (Array.isArray(this.coursesItems)) {
+            this.coursesItems.forEach(c => {
+                if (c.title) courses.add(c.title);
+            });
+        }
+        if (Array.isArray(this.enrollmentItems)) {
+            this.enrollmentItems.forEach(e => {
+                if (e.courseTitle) courses.add(e.courseTitle);
+            });
+        }
+
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Alle kurs</option>' +
+            Array.from(courses).sort().map(title => `
+                <option value="${this.escapeHtml(title)}">${this.escapeHtml(title)}</option>
+            `).join('');
+        select.value = currentVal;
+    }
+
+    _renderEnrollmentsList() {
+        const list = document.getElementById('enrollments-list');
+        if (!list) return;
+
+        const searchQuery = (document.getElementById('enrollment-search')?.value || '').trim().toLowerCase();
+        const courseFilter = document.getElementById('enrollment-course-filter')?.value || '';
+        const statusFilter = document.getElementById('enrollment-status-filter')?.value || '';
+
+        const filtered = (this.enrollmentItems || []).filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const email = (item.email || '').toLowerCase();
+            const phone = (item.phone || '').toLowerCase();
+            const textMatch = !searchQuery || name.includes(searchQuery) || email.includes(searchQuery) || phone.includes(searchQuery);
+            const courseMatch = !courseFilter || item.courseTitle === courseFilter || item.courseId === courseFilter;
+            const statusMatch = !statusFilter || item.status === statusFilter;
+            return textMatch && courseMatch && statusMatch;
+        });
+
+        if (filtered.length === 0) {
+            list.innerHTML = `
+                <div style="text-align:center;padding:40px;color:#64748b;">
+                    <span class="material-symbols-outlined" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:8px;">search_off</span>
+                    Ingen påmeldinger matcher søkekriteriene.
+                </div>
+            `;
+            return;
+        }
+
+        const rows = filtered.map((item, index) => {
+            const name = this.escapeHtml(item.name || 'Ukjent');
+            const email = this.escapeHtml(item.email || 'Ingen e-post');
+            const phone = this.escapeHtml(item.phone || 'Ingen telefon');
+            const courseTitle = this.escapeHtml(item.courseTitle || 'Ukjent kurs');
+            const amount = Number(item.amount || 0);
+            const method = this.escapeHtml(item.paymentMethod || item.method || 'Forespørsel');
+            const status = item.status || 'pending';
+
+            let dateStr = '—';
+            if (item.enrolledAt) {
+                const dateObj = item.enrolledAt.toDate ? item.enrolledAt.toDate() : new Date(item.enrolledAt);
+                dateStr = dateObj.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            let badgeClass = 'status-pending';
+            let badgeText = 'Venter';
+            if (status === 'paid' || status === 'success') {
+                badgeClass = 'status-active';
+                badgeText = 'Godkjent';
+            } else if (status === 'refunded') {
+                badgeClass = 'status-stopped';
+                badgeText = 'Refundert';
+            } else if (status === 'pending_stripe') {
+                badgeClass = 'status-pending';
+                badgeText = 'Venter (Stripe)';
+            } else if (status === 'pending_vipps') {
+                badgeClass = 'status-pending';
+                badgeText = 'Venter (Vipps)';
+            }
+
+            const isApproved = status === 'paid' || status === 'success';
+            const approveBtn = !isApproved ? `
+                <button class="btn-primary" onclick="window.adminManager._approveEnrollment('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;background:#16a34a;border:none;color:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> Godkjenn
+                </button>
+            ` : '';
+
+            const refundBtn = status !== 'refunded' ? `
+                <button class="btn-secondary" onclick="window.adminManager._markEnrollmentRefunded('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;color:#ef4444;border-color:#fee2e2;background:white;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">keyboard_return</span> Refundert
+                </button>
+            ` : '';
+
+            const paidLessonsCount = Array.isArray(item.paidLessons) ? item.paidLessons.length : 0;
+            const courseObj = (this.coursesItems || []).find(c => c.id === item.courseId || c.title === item.courseTitle);
+            const totalLessons = courseObj && Array.isArray(courseObj.lessons) ? courseObj.lessons.length : 0;
+            const accessText = paidLessonsCount > 0 && paidLessonsCount < totalLessons
+                ? `${paidLessonsCount}/${totalLessons} deler`
+                : 'Full tilgang';
+
+            return `
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; color: #1e293b;">${name}</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">${email}</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">${phone}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600; color: #1e293b;">${courseTitle}</div>
+                        <div style="font-size: 0.85rem; color: #d17d39; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">lock_open</span> ${accessText}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600; color: #1e293b;">kr ${amount.toLocaleString('no-NO')}</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">${method}</div>
+                    </td>
+                    <td style="font-size: 0.9rem; color: #475569;">${dateStr}</td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td class="col-actions" style="text-align:right;white-space:nowrap;">
+                        <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
+                            ${approveBtn}
+                            <button class="btn-secondary" onclick="window.adminManager._openLessonAccessModal('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:14px;">rule</span> Leksjoner
+                            </button>
+                            ${refundBtn}
+                            <button class="btn-secondary" onclick="window.adminManager._deleteEnrollment('${item.id}')" style="padding:6px 10px;border-radius:6px;font-size:12px;color:#ef4444;background:#fef2f2;border:none;cursor:pointer;" title="Slett påmelding">
+                                <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        list.innerHTML = `
+            <div class="table-container full-bleed">
+                <table class="crm-table">
+                    <thead>
+                        <tr>
+                            <th>Deltaker</th>
+                            <th>Kurs & Tilgang</th>
+                            <th>Beløp / Metode</th>
+                            <th>Dato registrert</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Handlinger</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    async _approveEnrollment(id) {
+        const confirmed = await this.showConfirm('Godkjenn tilgang', 'Vil du godkjenne denne påmeldingen? Brukeren vil få tilgang umiddelbart og en e-postbekreftelse vil bli sendt ut.', 'Godkjenn');
+        if (!confirmed) return;
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            await db.collection('courseEnrollments').doc(id).update({
+                status: 'paid',
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            this.showToast('✅ Tilgang godkjent og bekreftelses-e-post sendt!', 'success');
+            await this._loadEnrollmentsList();
+        } catch (err) {
+            console.error('Approve enrollment error:', err);
+            this.showToast('❌ Kunne ikke godkjenne tilgang: ' + err.message, 'error');
+        }
+    }
+
+    async _markEnrollmentRefunded(id) {
+        const confirmed = await this.showConfirm('Marker som refundert', 'Vil du markere denne påmeldingen som refundert? Dette vil stoppe brukerens tilgang til kurset. Penger må refunderes manuelt i Stripe eller Vipps.', 'Marker refundert');
+        if (!confirmed) return;
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            await db.collection('courseEnrollments').doc(id).update({
+                status: 'refunded',
+                refundedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            this.showToast('✅ Status oppdatert til refundert. Tilgang stoppet.', 'success');
+            await this._loadEnrollmentsList();
+        } catch (err) {
+            console.error('Refund enrollment error:', err);
+            this.showToast('❌ Kunne ikke oppdatere status: ' + err.message, 'error');
+        }
+    }
+
+    async _deleteEnrollment(id) {
+        const confirmed = await this.showConfirm('Slett påmelding', 'Er du sikker på at du vil slette denne påmeldingsposten permanent? Denne handlingen kan ikke angres.', 'Slett permanent');
+        if (!confirmed) return;
+
+        try {
+            const db = window.firebaseService?.db || firebase.firestore();
+            await db.collection('courseEnrollments').doc(id).delete();
+            this.showToast('✅ Påmelding slettet.', 'success');
+            await this._loadEnrollmentsList();
+        } catch (err) {
+            console.error('Delete enrollment error:', err);
+            this.showToast('❌ Kunne ikke slette påmelding: ' + err.message, 'error');
+        }
+    }
+
+    async _openLessonAccessModal(enrollmentId) {
+        const modal = document.getElementById('lesson-access-modal');
+        const container = document.getElementById('lesson-checkboxes-container');
+        const enrollmentIdInput = document.getElementById('access-enrollment-id');
+        const cancelBtn = document.getElementById('cancel-lesson-access');
+        const closeBtn = document.getElementById('close-lesson-access-modal');
+        const form = document.getElementById('lesson-access-form');
+
+        if (!modal || !container || !enrollmentIdInput || !form) return;
+
+        const enrollment = (this.enrollmentItems || []).find(e => e.id === enrollmentId);
+        if (!enrollment) return;
+
+        const course = (this.coursesItems || []).find(c => c.id === enrollment.courseId || c.title === enrollment.courseTitle);
+        if (!course || !Array.isArray(course.lessons) || course.lessons.length === 0) {
+            this.showToast('❌ Fant ingen leksjoner registrert for dette kurset.', 'error');
+            return;
+        }
+
+        enrollmentIdInput.value = enrollmentId;
+        container.innerHTML = '';
+
+        const restrictedLessons = Array.isArray(enrollment.paidLessons) ? enrollment.paidLessons : [];
+        const isFullAccess = restrictedLessons.length === 0;
+
+        course.lessons.forEach(lesson => {
+            const isChecked = isFullAccess || restrictedLessons.includes(lesson.id);
+            container.innerHTML += `
+                <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;background:#f8fafc;transition:background 0.2s;">
+                    <input type="checkbox" name="lesson-checkbox" value="${this.escapeHtml(lesson.id)}" ${isChecked ? 'checked' : ''} style="width:18px;height:18px;accent-color:#1B4965;">
+                    <div style="flex:1;">
+                        <div style="font-weight:600;font-size:14px;color:#1e293b;">${this.escapeHtml(lesson.title || 'Uten tittel')}</div>
+                    </div>
+                </label>
+            `;
+        });
+
+        modal.style.display = 'block';
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        cancelBtn.onclick = closeModal;
+        closeBtn.onclick = closeModal;
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const checkedBoxes = container.querySelectorAll('input[name="lesson-checkbox"]:checked');
+            const totalCheckboxes = container.querySelectorAll('input[name="lesson-checkbox"]');
+
+            let paidLessons = [];
+            if (checkedBoxes.length < totalCheckboxes.length) {
+                checkedBoxes.forEach(cb => {
+                    paidLessons.push(cb.value);
+                });
+            }
+
+            try {
+                const db = window.firebaseService?.db || firebase.firestore();
+                await db.collection('courseEnrollments').doc(enrollmentId).update({
+                    paidLessons: paidLessons
+                });
+                this.showToast('✅ Leksjonstilgang oppdatert!', 'success');
+                closeModal();
+                await this._loadEnrollmentsList();
+            } catch (err) {
+                console.error('Save lesson access error:', err);
+                this.showToast('❌ Kunne ikke oppdatere leksjonstilgang: ' + err.message, 'error');
+            }
+        };
     }
 }
 
