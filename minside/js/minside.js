@@ -4465,6 +4465,107 @@ class MinSideManager {
 
         const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
 
+        // Build metadata dynamically based on actual database values
+        const metaItems = [];
+        if (lesson.zoomUrl) {
+            metaItems.push({
+                icon: 'videocam',
+                label: 'Type',
+                val: 'Live Zoom-møte',
+                class: ''
+            });
+            if (lesson.date) {
+                const formattedDate = new Date(lesson.date).toLocaleDateString(
+                    document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'nb-NO',
+                    { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+                );
+                metaItems.push({
+                    icon: 'calendar_month',
+                    label: 'Tidspunkt',
+                    val: formattedDate,
+                    class: 'secondary'
+                });
+            }
+        } else if (lesson.videoUrl) {
+            metaItems.push({
+                icon: 'play_circle',
+                label: 'Type',
+                val: 'Video-undervisning',
+                class: ''
+            });
+            if (lesson.duration) {
+                metaItems.push({
+                    icon: 'schedule',
+                    label: 'Varighet',
+                    val: lesson.duration,
+                    class: 'secondary'
+                });
+            }
+        } else {
+            metaItems.push({
+                icon: 'auto_stories',
+                label: 'Type',
+                val: 'Tekstleksjon',
+                class: ''
+            });
+        }
+
+        // Resources (only show if exists in database)
+        if (lesson.resource || lesson.resourceUrl) {
+            metaItems.push({
+                icon: 'description',
+                label: 'Ressurser',
+                val: lesson.resource || 'Leksjonsmateriell',
+                class: 'tertiary',
+                link: lesson.resourceUrl
+            });
+        }
+
+        // Community/Replies (only show if exists in database)
+        if (lesson.commentsCount) {
+            metaItems.push({
+                icon: 'forum',
+                label: 'Fellesskap',
+                val: `${lesson.commentsCount} svar`,
+                class: 'tertiary'
+            });
+        }
+
+        let metaGridHtml = '';
+        if (metaItems.length > 0) {
+            metaGridHtml = `
+                <div class="hkm-meta-grid">
+                    \${metaItems.map(item => {
+                        const iconHtml = \`<span class="material-symbols-outlined">\${item.icon}</span>\`;
+                        const textHtml = \`
+                            <div class="hkm-meta-text">
+                                <p class="hkm-meta-label">\${item.label}</p>
+                                <p class="hkm-meta-val">\${item.val}</p>
+                            </div>
+                        \`;
+                        if (item.link) {
+                            return \`
+                                <a href="\${item.link}" target="_blank" class="hkm-meta-item" style="text-decoration:none; color:inherit; cursor:pointer;">
+                                    <div class="hkm-meta-icon \${item.class}">
+                                        \${iconHtml}
+                                    </div>
+                                    \${textHtml}
+                                </a>
+                            \`;
+                        }
+                        return \`
+                            <div class="hkm-meta-item">
+                                <div class="hkm-meta-icon \${item.class}">
+                                    \${iconHtml}
+                                </div>
+                                \${textHtml}
+                            </div>
+                        \`;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         // Render Layout
         container.innerHTML = `
             <style>
@@ -4544,7 +4645,7 @@ class MinSideManager {
                 /* Metadata Grid */
                 .hkm-meta-grid {
                     display: grid;
-                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                     gap: 24px;
                     padding-top: 24px;
                     border-top: 1px solid rgba(226, 232, 240, 0.8);
@@ -4808,35 +4909,7 @@ class MinSideManager {
                         </p>
 
                         <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
-                        <div class="hkm-meta-grid">
-                            <div class="hkm-meta-item">
-                                <div class="hkm-meta-icon">
-                                    <span class="material-symbols-outlined">schedule</span>
-                                </div>
-                                <div class="hkm-meta-text">
-                                    <p class="hkm-meta-label">Varighet</p>
-                                    <p class="hkm-meta-val">${lesson.duration || '45 minutter'}</p>
-                                </div>
-                            </div>
-                            <div class="hkm-meta-item">
-                                <div class="hkm-meta-icon secondary">
-                                    <span class="material-symbols-outlined">description</span>
-                                </div>
-                                <div class="hkm-meta-text">
-                                    <p class="hkm-meta-label">Ressurser</p>
-                                    <p class="hkm-meta-val">${lesson.resource || 'PDF Arbeidsbok'}</p>
-                                </div>
-                            </div>
-                            <div class="hkm-meta-item">
-                                <div class="hkm-meta-icon tertiary">
-                                    <span class="material-symbols-outlined">forum</span>
-                                </div>
-                                <div class="hkm-meta-text">
-                                    <p class="hkm-meta-label">Fellesskap</p>
-                                    <p class="hkm-meta-val">124 Svar</p>
-                                </div>
-                            </div>
-                        </div>
+                        ${metaGridHtml}
                     </div>
                 </div>
 
