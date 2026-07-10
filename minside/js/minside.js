@@ -4717,10 +4717,28 @@ class MinSideManager {
                             
                             console.log('Zoom SDK joined successfully!');
                         } catch (err) {
-                            console.warn('Failing back to iframe Zoom client due to:', err);
-                            // Fallback to standard web client iframe
-                            const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
-                            playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                            console.error('Zoom SDK error:', err);
+                            const errMsg = err.message || JSON.stringify(err) || 'Ukjent feil';
+                            playerContainer.innerHTML = `
+                                <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
+                                    <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
+                                    <div>
+                                        <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #f87171;">Zoom SDK Feil</h3>
+                                        <p style="margin: 0 0 16px; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
+                                            Kunne ikke starte den integrerte spilleren: <code>${errMsg}</code>
+                                        </p>
+                                        <p style="margin: 0; font-size: 0.8rem; font-weight: 400; color: #94a3b8;">
+                                            Starter reserveløsning (iframe) om 6 sekunder...
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            setTimeout(() => {
+                                // Fallback to standard web client iframe
+                                const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                                playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                            }, 6000);
                         }
                     };
 
