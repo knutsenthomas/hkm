@@ -21616,8 +21616,14 @@ class AdminManager {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <input type="text" placeholder="Ressurs-navn (f.eks. Arbeidsark PDF)" value="${resource}"
                     style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource">
-                <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url">
+                <div style="display:flex;gap:8px;">
+                    <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
+                        style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url">
+                    <button type="button" class="lesson-upload-btn" style="padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;" title="Last opp fil fra mobil/PC">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;">cloud_upload</span>
+                    </button>
+                    <input type="file" class="lesson-file-input" style="display:none;">
+                </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;">
                 <textarea placeholder="Leksjonsbeskrivelse / Tekstinnhold" rows="2"
@@ -21625,6 +21631,42 @@ class AdminManager {
             </div>
         `;
         container.appendChild(row);
+
+        // Wire up file upload listeners
+        const uploadBtn = row.querySelector('.lesson-upload-btn');
+        const fileInput = row.querySelector('.lesson-file-input');
+        const urlInput = row.querySelector('.lesson-resource-url');
+
+        if (uploadBtn && fileInput && urlInput) {
+            uploadBtn.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem; animation: spin 1.5s linear infinite; display: inline-block;">sync</span>';
+
+                try {
+                    const url = await firebaseService.uploadFile(
+                        file,
+                        `course_resources/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
+                        ['image/', 'application/', 'text/', 'audio/', 'video/'],
+                        50, // 50MB max
+                        null,
+                        { timeoutMs: 180000 } // 3 min timeout
+                    );
+                    urlInput.value = url;
+                } catch (err) {
+                    console.error('Resource file upload error:', err);
+                    alert('Feil ved filopplasting: ' + err.message);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;">cloud_upload</span>';
+                    fileInput.value = '';
+                }
+            });
+        }
     }
 
     async _saveCourse() {
