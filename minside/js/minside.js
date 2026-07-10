@@ -4535,32 +4535,32 @@ class MinSideManager {
         if (metaItems.length > 0) {
             metaGridHtml = `
                 <div class="hkm-meta-grid">
-                    \${metaItems.map(item => {
-                        const iconHtml = \`<span class="material-symbols-outlined">\${item.icon}</span>\`;
-                        const textHtml = \`
+                    ${metaItems.map(item => {
+                        const iconHtml = `<span class="material-symbols-outlined">${item.icon}</span>`;
+                        const textHtml = `
                             <div class="hkm-meta-text">
-                                <p class="hkm-meta-label">\${item.label}</p>
-                                <p class="hkm-meta-val">\${item.val}</p>
+                                <p class="hkm-meta-label">${item.label}</p>
+                                <p class="hkm-meta-val">${item.val}</p>
                             </div>
-                        \`;
+                        `;
                         if (item.link) {
-                            return \`
-                                <a href="\${item.link}" target="_blank" class="hkm-meta-item" style="text-decoration:none; color:inherit; cursor:pointer;">
-                                    <div class="hkm-meta-icon \${item.class}">
-                                        \${iconHtml}
+                            return `
+                                <a href="${item.link}" target="_blank" class="hkm-meta-item" style="text-decoration:none; color:inherit; cursor:pointer;">
+                                    <div class="hkm-meta-icon ${item.class}">
+                                        ${iconHtml}
                                     </div>
-                                    \${textHtml}
+                                    ${textHtml}
                                 </a>
-                            \`;
+                            `;
                         }
-                        return \`
+                        return `
                             <div class="hkm-meta-item">
-                                <div class="hkm-meta-icon \${item.class}">
-                                    \${iconHtml}
+                                <div class="hkm-meta-icon ${item.class}">
+                                    ${iconHtml}
                                 </div>
-                                \${textHtml}
+                                ${textHtml}
                             </div>
-                        \`;
+                        `;
                     }).join('')}
                 </div>
             `;
