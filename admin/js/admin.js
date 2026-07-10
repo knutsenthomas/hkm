@@ -5138,11 +5138,14 @@ class AdminManager {
                     border-color: rgba(15, 23, 42, 0.95) transparent transparent;
                 }
             </style>
-            
             ${isSimulated ? `
                 <div style="position: absolute; top: -15px; right: 0; background: rgba(249, 115, 22, 0.1); color: #f97316; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 20px; border: 1px solid rgba(249, 115, 22, 0.2); letter-spacing: 0.05em; text-transform: uppercase; z-index: 10; display: flex; align-items: center; gap: 4px;">
                     <span class="material-symbols-outlined" style="font-size: 12px;">info</span>
-                    Demovisning (Google Analytics ikke tilkoblet)
+                    ${this._analyticsUnconfigured 
+                        ? 'Demovisning (Google Analytics ikke tilkoblet)' 
+                        : (this._analyticsFetchFailed 
+                            ? 'Demovisning (Feil under henting av data)' 
+                            : 'Demovisning (Venter på mer trafikkdata)')}
                 </div>
             ` : ''}
 
