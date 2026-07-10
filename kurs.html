@@ -339,15 +339,30 @@
             font-weight: 400;
         }
 
+        /* Hero Badge */
+        .hero-badge {
+            display: inline-block;
+            background: rgba(209, 125, 57, 0.08);
+            border: 1.5px solid rgba(209, 125, 57, 0.25);
+            color: #d17d39;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            margin-bottom: 28px;
+        }
+
         /* Hero Action Buttons */
         .hero-btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 12px;
             padding: 16px 36px;
-            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            background: #d17d39;
             color: white;
-            border-radius: 50px;
+            border-radius: 10px;
             font-weight: 700;
             text-decoration: none;
             font-size: 1rem;
@@ -357,8 +372,8 @@
 
         .hero-btn-primary:hover {
             transform: translateY(-2px);
+            background: #e0883f;
             box-shadow: 0 8px 24px rgba(209, 125, 57, 0.5);
-            opacity: 0.95;
         }
 
         .hero-btn-primary:active {
@@ -370,10 +385,10 @@
             align-items: center;
             gap: 12px;
             padding: 16px 36px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
             font-weight: 600;
             text-decoration: none;
             font-size: 1rem;
@@ -405,42 +420,66 @@
 
         .hero-stat-card {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 24px 40px;
-            min-width: 240px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 32px 24px;
+            min-width: 210px;
             flex: 1;
-            max-width: 280px;
+            max-width: 250px;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .hero-stat-card:hover {
-            border-color: rgba(209, 125, 57, 0.3);
-            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(209, 125, 57, 0.35);
+            background: rgba(255, 255, 255, 0.04);
             transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 0 20px rgba(209, 125, 57, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 20px rgba(209, 125, 57, 0.1);
+        }
+
+        .hero-stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            background: rgba(209, 125, 57, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d17d39;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            border: 1px solid rgba(209, 125, 57, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .hero-stat-card:hover .hero-stat-icon-wrapper {
+            background: rgba(209, 125, 57, 0.2);
+            color: #f69445;
+            transform: scale(1.05);
         }
 
         .hero-stat-number {
-            font-size: 2.75rem;
-            font-weight: 850;
+            font-size: 1.75rem;
+            font-weight: 750;
             color: white;
-            line-height: 1;
-            text-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+            line-height: 1.2;
+            margin-bottom: 6px;
             font-feature-settings: "tnum";
         }
 
         .hero-stat-label {
-            font-size: 0.75rem;
+            font-size: 0.82rem;
             color: #94a3b8;
-            margin-top: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            font-weight: 500;
+            margin-top: 2px;
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         .kurs-controls {
@@ -1285,9 +1324,10 @@
 
     <!-- Hero -->
     <section class="kurs-hero">
+        <div class="hero-badge">EXPERTLY GUIDED</div>
         <h1>Vekst i <span>tro og kunnskap</span></h1>
-        <p>Utforsk kurs fra His Kingdom Ministry og fordyp deg i Guds ord. Lær i ditt eget tempo.</p>
-        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <p>Utforsk kurs fra His Kingdom Ministry og fordyp deg i Guds ord. Lær i ditt eget tempo med ressurser designet for å styrke din vandring.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
             <a href="#kurs-grid-section" class="hero-btn-primary">
                 <i class="fas fa-graduation-cap"></i> Utforsk kurs
             </a>
@@ -1299,19 +1339,25 @@
         <!-- Bento Stats Section -->
         <div class="hero-stats-container">
             <div class="hero-stat-card">
-                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-graduation-cap"></i></div>
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-book"></i>
+                </div>
                 <div id="stat-course-count" class="hero-stat-number">—</div>
-                <div class="hero-stat-label" style="margin-top: 8px;">Kurs tilgjengelig</div>
+                <div class="hero-stat-label">Kurs tilgjengelig</div>
             </div>
             <div class="hero-stat-card">
-                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-layer-group"></i></div>
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-layer-group"></i>
+                </div>
                 <div id="stat-lesson-count" class="hero-stat-number">—</div>
-                <div class="hero-stat-label" style="margin-top: 8px;">Totale leksjoner</div>
+                <div class="hero-stat-label">Totale leksjoner</div>
             </div>
             <div class="hero-stat-card">
-                <div class="hero-stat-icon" style="color:#d17d39; font-size: 1.25rem; margin-bottom: 12px;"><i class="fas fa-infinity"></i></div>
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-infinity"></i>
+                </div>
                 <div class="hero-stat-number">∞</div>
-                <div class="hero-stat-label" style="margin-top: 8px;">Uendelig Tilgang</div>
+                <div class="hero-stat-label">Uendelig Tilgang</div>
             </div>
         </div>
     </section>
