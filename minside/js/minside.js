@@ -4731,7 +4731,8 @@ class MinSideManager {
             try {
                 // Fetch Bibles
                 const res = await fetch('/api/bible/bibles');
-                bibleList = await res.json();
+                const payload = await res.json();
+                bibleList = payload.data || payload || [];
                 
                 bibTransSelect.innerHTML = bibleList.map(b => `
                     <option value="${b.id}">${b.abbreviation}</option>
@@ -4752,7 +4753,8 @@ class MinSideManager {
                 bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
                 
                 const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
-                const books = await res.json();
+                const payload = await res.json();
+                const books = payload.data || payload || [];
                 
                 bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
                     <option value="${b.id}">${b.name}</option>
@@ -4769,7 +4771,8 @@ class MinSideManager {
                 bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
                 
                 const res = await fetch(`/api/bible/bibles/${bibleId}/books/${bookId}/chapters`);
-                const chapters = await res.json();
+                const payload = await res.json();
+                const chapters = payload.data || payload || [];
                 
                 bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
                     <option value="${c.id}">${c.number}</option>
@@ -4785,7 +4788,8 @@ class MinSideManager {
                 bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
                 
                 const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
-                const data = await res.json();
+                const payload = await res.json();
+                const data = payload.data || payload || {};
                 
                 const verses = data.verses || [];
                 if (verses.length === 0) {
@@ -4795,7 +4799,7 @@ class MinSideManager {
                 
                 bibDisplay.innerHTML = verses.map(v => `
                     <p style="margin-bottom:12px; font-size:0.9rem; line-height:1.55; color:#334155;">
-                        <span class="bible-verse-num">${v.number}</span>${v.text}
+                        <span class="bible-verse-num">${v.verse || v.number || ''}</span>${v.text}
                     </p>
                 `).join('');
                 bibDisplay.scrollTop = 0;
