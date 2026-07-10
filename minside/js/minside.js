@@ -4227,6 +4227,9 @@ class MinSideManager {
             const isCourseFree = !course.price || course.price === 0;
             if (isCourseFree) return true;
 
+            const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
+            if (isAdmin) return true;
+
             const coursePaid = enrollments.find(e => 
                 e.courseId === course.id && 
                 (e.status === 'paid' || e.status === 'success')
@@ -4401,13 +4404,14 @@ class MinSideManager {
         }
 
         const isCourseFree = !course.price || course.price === 0;
+        const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
         const hasEnrollment = enrollments.some(e => 
             e.courseId === course.id && 
             (e.status === 'paid' || e.status === 'success') &&
             (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(lesson.id))
         );
 
-        const isUnlocked = isCourseFree || hasEnrollment;
+        const isUnlocked = isCourseFree || isAdmin || hasEnrollment;
 
         if (!isUnlocked) {
             container.innerHTML = `

@@ -1325,6 +1325,7 @@
                 let searchQuery = '';
                 let currentUser = null;
                 let userEnrollments = [];
+                let currentUserRole = 'medlem';
 
                 async function listenToAuth() {
                     await new Promise(resolve => {
@@ -1336,16 +1337,21 @@
                         currentUser = user;
                         if (user) {
                             try {
-                                const eSnap = await firebase.firestore().collection('courseEnrollments')
-                                    .where('email', '==', user.email)
-                                    .get();
+                                const [eSnap, uDoc] = await Promise.all([
+                                    firebase.firestore().collection('courseEnrollments')
+                                        .where('email', '==', user.email)
+                                        .get(),
+                                    firebase.firestore().collection('users').doc(user.uid).get()
+                                ]);
                                 userEnrollments = [];
                                 eSnap.forEach(doc => userEnrollments.push(doc.data()));
+                                currentUserRole = (uDoc.exists ? uDoc.data()?.role : 'medlem') || 'medlem';
                             } catch (e) {
-                                console.error("Error fetching enrollments on auth change:", e);
+                                console.error("Error fetching enrollments/role on auth change:", e);
                             }
                         } else {
                             userEnrollments = [];
+                            currentUserRole = 'medlem';
                         }
                         renderGrid(getFiltered());
                     });
@@ -1414,7 +1420,8 @@
 
                     grid.innerHTML = courses.map(course => {
                         const isFree = !course.price || course.price === 0;
-                        const hasAccess = currentUser && (isFree || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
+                        const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
+                        const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                         const lessonCount = (course.lessons || []).length;
                         const excerpt = (course.description || '').substring(0, 110) + ((course.description || '').length > 110 ? '...' : '');
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
