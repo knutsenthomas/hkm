@@ -121,6 +121,39 @@ class AdminManager {
         }
     }
 
+    get googleAccessToken() {
+        try {
+            const stored = localStorage.getItem('hkm_google_access_token');
+            const expiresAt = localStorage.getItem('hkm_google_access_token_expires_at');
+            if (stored && expiresAt) {
+                if (Date.now() < parseInt(expiresAt, 10)) {
+                    return stored;
+                } else {
+                    localStorage.removeItem('hkm_google_access_token');
+                    localStorage.removeItem('hkm_google_access_token_expires_at');
+                }
+            }
+        } catch (e) {
+            console.error('Failed to get googleAccessToken from localStorage:', e);
+        }
+        return this._inMemoryGoogleAccessToken || null;
+    }
+
+    set googleAccessToken(val) {
+        this._inMemoryGoogleAccessToken = val;
+        try {
+            if (val) {
+                localStorage.setItem('hkm_google_access_token', val);
+                localStorage.setItem('hkm_google_access_token_expires_at', (Date.now() + 3500 * 1000).toString());
+            } else {
+                localStorage.removeItem('hkm_google_access_token');
+                localStorage.removeItem('hkm_google_access_token_expires_at');
+            }
+        } catch (e) {
+            console.error('Failed to set googleAccessToken in localStorage:', e);
+        }
+    }
+
     init() {
         console.log("Initializing AdminManager...");
 
@@ -1852,6 +1885,12 @@ class AdminManager {
 
                 console.log("[AdminManager] Admin access verified, removing cloak.");
                 this.removeSplashScreen();
+                
+                // Reload current section to ensure Firestore fetches succeed with authenticated user
+                if (this.currentSection) {
+                    console.log(`[AdminManager] Reloading current section after auth verification: ${this.currentSection}`);
+                    this.onSectionSwitch(this.currentSection);
+                }
             } catch (error) {
                 console.error("Error verifying admin role:", error);
                 this.removeSplashScreen(); // Still remove cloak to show error UI
@@ -6335,8 +6374,6 @@ class AdminManager {
             if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
             if (event.target.id === 'save-ai-settings' || event.target.id === 'save-ga-settings') this.saveIntegrationsSettings();
             if (event.target.id === 'add-gcal') this.addGCalInput();
-            if (event.target.id === 'connect-google-btn') this.handleGoogleAuth();
-            if (event.target.id === 'disconnect-google') this.handleGoogleDisconnect();
         });
     }
 
@@ -7655,8 +7692,8 @@ class AdminManager {
 
         authContainer.innerHTML = this.googleAccessToken ? `
             <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
-                <span class="material-symbols-outlined" style="color: #16a34a;">check_circle</span>
-                <div style="flex: 1;">
+                <span class="material-symbols-outlined" style="color: #16a34a; pointer-events: none;">check_circle</span>
+                <div style="flex: 1; pointer-events: none;">
                     <p style="font-size: 13px; font-weight: 600; color: #166534; margin: 0;">Tilkoblet Google</p>
                     <p style="font-size: 11px; color: #15803d; margin: 0;">Skrivetilgang er aktivert</p>
                 </div>
@@ -7664,10 +7701,29 @@ class AdminManager {
             </div>
         ` : `
             <button class="btn btn-outline" id="connect-google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google">
-                Koble til Google for skrivetilgang
+                <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google" style="pointer-events: none;">
+                <span style="pointer-events: none;">Koble til Google for skrivetilgang</span>
             </button>
         `;
+
+        // Direct listener registration to bypass browser popup blocker rules
+        const connectBtn = document.getElementById('connect-google-btn');
+        if (connectBtn) {
+            connectBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleGoogleAuth();
+            });
+        }
+
+        const disconnectBtn = document.getElementById('disconnect-google');
+        if (disconnectBtn) {
+            disconnectBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleGoogleDisconnect();
+            });
+        }
     }
 
     async saveIntegrationsSettings() {
@@ -7741,7 +7797,7 @@ class AdminManager {
         row.innerHTML = `
             <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. HKM)" value="${label}" style="flex: 1;">
             <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${id}" style="flex: 2;">
-            <button type="button" class="btn btn-icon remove-gcal" style="color: #ef4444; background: transparent; border: none; cursor: pointer;">
+            <button type="button" class="remove-gcal" style="color: #ef4444; background: transparent !important; border: none !important; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none !important; outline: none !important; align-self: center;">
                 <span class="material-symbols-outlined">delete</span>
             </button>
         `;
@@ -7750,30 +7806,29 @@ class AdminManager {
         container.appendChild(row);
     }
 
-    async handleGoogleAuth() {
+    handleGoogleAuth() {
         if (this._googleAuthConnecting) return;
         
         const btn = document.getElementById('connect-google-btn');
-        const originalHtml = btn ? btn.innerHTML : '';
         if (btn) {
-            btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kobler til...';
         }
         
         this._googleAuthConnecting = true;
-        try {
-            const result = await firebaseService.connectToGoogle();
-            this.googleAccessToken = result.accessToken;
-            this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
-            this._updateGoogleAuthUI();
-        } catch (error) {
-            console.error('Google connection failed:', error);
-            this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
-            // Re-render auth UI to restore button state
-            this._updateGoogleAuthUI();
-        } finally {
-            this._googleAuthConnecting = false;
-        }
+        firebaseService.connectToGoogle()
+            .then((result) => {
+                this.googleAccessToken = result.accessToken;
+                this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
+                this._updateGoogleAuthUI();
+            })
+            .catch((error) => {
+                console.error('Google connection failed:', error);
+                this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
+                this._updateGoogleAuthUI();
+            })
+            .finally(() => {
+                this._googleAuthConnecting = false;
+            });
     }
 
     handleGoogleDisconnect() {

@@ -959,23 +959,24 @@ class FirebaseService {
         });
     }
 
-    async connectToGoogle() {
+    connectToGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
 
         const provider = new firebase.auth.GoogleAuthProvider();
         // Request write access to calendar events
         provider.addScope('https://www.googleapis.com/auth/calendar.events');
 
-        try {
-            const result = await this.auth.signInWithPopup(provider);
-            return {
-                user: result.user,
-                accessToken: result.credential.accessToken
-            };
-        } catch (error) {
-            console.error("❌ Google Connection Failed:", error);
-            throw error;
-        }
+        return this.auth.signInWithPopup(provider)
+            .then((result) => {
+                return {
+                    user: result.user,
+                    accessToken: result.credential.accessToken
+                };
+            })
+            .catch((error) => {
+                console.error("❌ Google Connection Failed:", error);
+                throw error;
+            });
     }
 
     async getUserRole(uid, options = {}) {
