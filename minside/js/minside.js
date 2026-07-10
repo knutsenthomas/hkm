@@ -4292,7 +4292,7 @@ class MinSideManager {
                     <div class="course-lessons-accordion" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
                         <div class="accordion-header" data-course-id="${c.id || cIdx}" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition: background-color 0.2s ease;">
                             <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Leksjoner og Live-økter
+                                <span class="material-symbols-outlined" style="display: inline-flex; align-items: center; justify-content: center; font-size:18px; line-height: 1 !important;">format_list_bulleted</span> Leksjoner og Live-økter
                             </h4>
                             <span class="material-symbols-outlined expand-chevron" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; font-size: 20px; color:#64748b; transition: transform 0.3s ease; transform-origin: center;">expand_more</span>
                         </div>
