@@ -8819,6 +8819,11 @@ html[data-theme="dark"] #header-profile-link:hover {
 }
 
 /* Facebook Feed Grid & Cards Styles */
+.facebook-feed-section .section-description {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 .facebook-feed-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
