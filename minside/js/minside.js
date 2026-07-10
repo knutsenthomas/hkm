@@ -1995,7 +1995,7 @@ class MinSideManager {
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).where('read', '==', false).get(),
                 this._fetchCurrentUserDonations(),
-                firebase.firestore().collection('teaching').get(),
+                firebase.firestore().collection('siteContent').doc('collection_courses').get(),
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get()
             ];
@@ -2080,7 +2080,8 @@ class MinSideManager {
 
             // Courses count
             const coursesEl = document.getElementById('ov-courses-count');
-            if (coursesEl) coursesEl.textContent = coursesSnap.size || '0';
+            const coursesData = (coursesSnap.exists ? coursesSnap.data()?.items : null) || [];
+            if (coursesEl) coursesEl.textContent = coursesData.length || '0';
 
             // Progress render
             let progressPct = 0;
@@ -4197,9 +4198,11 @@ class MinSideManager {
         container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
         let courses = [];
         try {
-            const snap = await firebase.firestore().collection('teaching').orderBy('createdAt', 'desc').get();
-            snap.forEach(d => courses.push({ id: d.id, ...d.data() }));
-        } catch (e) { }
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            courses = (snap.exists ? snap.data()?.items : null) || [];
+        } catch (e) {
+            console.error("Error fetching courses:", e);
+        }
 
         if (courses.length === 0) {
             container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
@@ -4356,10 +4359,9 @@ class MinSideManager {
         // 1. Fetch Course details
         let course = null;
         try {
-            const doc = await firebase.firestore().collection('teaching').doc(courseId).get();
-            if (doc.exists) {
-                course = { id: doc.id, ...doc.data() };
-            }
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            const courses = (snap.exists ? snap.data()?.items : null) || [];
+            course = courses.find(c => c.id === courseId);
         } catch (e) {
             console.error("Error fetching course:", e);
         }
@@ -7133,7 +7135,7 @@ class MinSideManager {
                 const uid = this.currentUser?.uid;
                 const db = firebase.firestore();
                 const promises = [
-                    db.collection('teaching').get(),
+                    db.collection('siteContent').doc('collection_courses').get(),
                     db.collection('reading_plans').get(),
                     uid ? db.collection('personal_notes').where('userId', '==', uid).get() : Promise.resolve({ empty: true })
                 ];
@@ -7145,7 +7147,8 @@ class MinSideManager {
 
                 const [coursesSnap, plansSnap, notesSnap, prayersSnap] = await Promise.all(promises);
 
-                searchCache.courses = coursesSnap.empty ? [] : coursesSnap.docs.map(d => ({ id: d.id, type: 'course', title: d.data().title || '', desc: d.data().description || '' }));
+                const coursesItems = (coursesSnap.exists ? coursesSnap.data()?.items : null) || [];
+                searchCache.courses = coursesItems.map(d => ({ id: d.id, type: 'course', title: d.title || '', desc: d.description || '' }));
                 searchCache.readingPlans = plansSnap.empty ? [] : plansSnap.docs.map(d => ({ id: d.id, type: 'reading-plan', title: d.data().title || '', desc: d.data().description || '' }));
                 searchCache.notes = (!notesSnap || notesSnap.empty) ? [] : notesSnap.docs.map(d => ({ id: d.id, type: 'note', title: d.data().title || '', desc: d.data().text || d.data().content || '' }));
                 searchCache.prayers = prayersSnap.empty ? [] : prayersSnap.docs.map(d => {
