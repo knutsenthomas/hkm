@@ -2230,6 +2230,13 @@ class ContentManager {
                         ? startDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
                         : '';
 
+                    let timeLabel = '';
+                    if (hasTime && startDate) {
+                        const startTime = startDate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+                        const atPrefix = lang === 'en' ? 'at' : (lang === 'es' ? 'a las' : 'kl.');
+                        timeLabel = `, ${atPrefix} ${startTime}`;
+                    }
+
                     const imageSrc = this._getEventImage(event);
                     const imageAlt = event.title || 'Arrangement';
 
@@ -2261,8 +2268,9 @@ class ContentManager {
                                         ${limitExcerpt}
                                     </p>
                                 ` : ''}
-                                <div class="event-meta">
-                                    ${dateLabel ? `<span>${dateLabel}</span>` : ''}
+                                <div class="event-meta" style="font-weight: 600; color: #1B4965; display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">calendar_today</span>
+                                    <span>${dateLabel}${timeLabel}</span>
                                 </div>
                             </div>
                         </a>
