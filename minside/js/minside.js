@@ -1138,6 +1138,26 @@ class MinSideManager {
 
         // Profile photo upload
         document.getElementById('ph-upload')?.addEventListener('change', e => this.handlePhotoUpload(e));
+
+        // Collapsible course accordion event delegation
+        document.addEventListener('click', e => {
+            const header = e.target.closest('.course-lessons-accordion .accordion-header');
+            if (header) {
+                const courseId = header.getAttribute('data-course-id');
+                const body = document.getElementById(`lessons-body-${courseId}`);
+                const chevron = header.querySelector('.expand-chevron');
+                if (body && chevron) {
+                    const isCollapsed = window.getComputedStyle(body).display === 'none';
+                    if (isCollapsed) {
+                        body.style.setProperty('display', 'flex', 'important');
+                        chevron.style.transform = 'rotate(180deg)';
+                    } else {
+                        body.style.setProperty('display', 'none', 'important');
+                        chevron.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
     }
 
     toggleSidebar(show) {
@@ -4269,65 +4289,70 @@ class MinSideManager {
                         </div>
                     </div>
                     
-                    <div style="padding:20px; background:#f8fafc;">
-                        <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0 0 12px; display:flex; align-items:center; gap:6px;">
-                            <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Leksjoner og Live-økter
-                        </h4>
+                    <div class="course-lessons-accordion" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
+                        <div class="accordion-header" data-course-id="${c.id || cIdx}" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition: background-color 0.2s ease;">
+                            <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Leksjoner og Live-økter
+                            </h4>
+                            <span class="material-symbols-outlined expand-chevron" style="font-size:20px; color:#64748b; transition: transform 0.3s ease;">expand_more</span>
+                        </div>
                         
-                        ${courseLessons.length === 0 ? `
-                            <p style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin:0;">Ingen leksjoner lagt til ennå.</p>
-                        ` : `
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                ${courseLessons.map((l, lIdx) => {
-                                    const paid = hasPaidForLesson(c, l);
-                                    const formattedDate = l.date ? new Date(l.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-                                    const dateStr = formattedDate ? `Klasse: ${formattedDate}` : '';
-                                    
-                                    const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
-                                    return `
-                                    <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                                        <div>
-                                            <div style="font-weight:650; font-size:0.92rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
-                                                <span style="font-size:0.8rem; color:#d17d39; font-weight:700;">#${lIdx + 1}</span>
-                                                ${cleanTitle}
+                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:none; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
+                            ${courseLessons.length === 0 ? `
+                                <p style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
+                            ` : `
+                                <div style="display:flex; flex-direction:column; gap:10px; padding-top:10px;">
+                                    ${courseLessons.map((l, lIdx) => {
+                                        const paid = hasPaidForLesson(c, l);
+                                        const formattedDate = l.date ? new Date(l.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                                        const dateStr = formattedDate ? `Klasse: ${formattedDate}` : '';
+                                        
+                                        const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
+                                        return `
+                                        <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                                            <div>
+                                                <div style="font-weight:650; font-size:0.92rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                                    <span style="font-size:0.8rem; color:#d17d39; font-weight:700;">#${lIdx + 1}</span>
+                                                    ${cleanTitle}
+                                                </div>
+                                                <div style="font-size:0.8rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:12px;">
+                                                    ${dateStr ? `<span><i class="far fa-calendar-alt"></i> ${dateStr}</span>` : ''}
+                                                </div>
                                             </div>
-                                            <div style="font-size:0.8rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:12px;">
-                                                ${dateStr ? `<span><i class="far fa-calendar-alt"></i> ${dateStr}</span>` : ''}
+                                            <div>
+                                                ${paid ? `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        ${l.videoUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Start leksjon
+                                                            </a>
+                                                        ` : (l.zoomUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px;">video_camera_front</span> Bli med på Zoom
+                                                            </a>
+                                                        ` : `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px;">school</span> Åpne leksjon
+                                                            </a>
+                                                        `)}
+                                                    </div>
+                                                ` : `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
+                                                            <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Låst (kr ${l.price || 300},-)
+                                                        </span>
+                                                        <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            Lås opp
+                                                        </a>
+                                                    </div>
+                                                `}
                                             </div>
                                         </div>
-                                        <div>
-                                            ${paid ? `
-                                                <div style="display:flex; gap:8px; align-items:center;">
-                                                    ${l.videoUrl ? `
-                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                            <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Start leksjon
-                                                        </a>
-                                                    ` : (l.zoomUrl ? `
-                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                            <span class="material-symbols-outlined" style="font-size:18px;">video_camera_front</span> Bli med på Zoom
-                                                        </a>
-                                                    ` : `
-                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                            <span class="material-symbols-outlined" style="font-size:18px;">school</span> Åpne leksjon
-                                                        </a>
-                                                    `)}
-                                                </div>
-                                            ` : `
-                                                <div style="display:flex; gap:8px; align-items:center;">
-                                                    <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
-                                                        <span class="material-symbols-outlined" style="font-size:16px;">lock</span> Låst (kr ${l.price || 300},-)
-                                                    </span>
-                                                    <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                        Lås opp
-                                                    </a>
-                                                </div>
-                                            `}
-                                        </div>
-                                    </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        `}
+                                        `;
+                                    }).join('')}
+                                </div>
+                            `}
+                        </div>
                     </div>
                 </div>`;
             }).join('')}
