@@ -511,6 +511,12 @@ a.button i.fa-heart {
     align-items: center !important;
 }
 
+.header-donate-btn .material-symbols-outlined,
+.footer-donate-btn .material-symbols-outlined,
+.mega-menu-footer .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1 !important;
+}
+
 .header-donate-btn i,
 .footer-donate-btn i,
 .header-donate-btn .heart,
