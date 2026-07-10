@@ -23497,43 +23497,68 @@ class AdminManager {
 
         this.renderFacebookFeedLivePreviewState(container, { status: 'loading' });
 
-        if (config.feedSource === 'juicer') {
-            const previewNode = container.querySelector('[data-facebook-live-preview]');
-            const badgeNode = container.querySelector('[data-facebook-live-badge]');
-            const noteNode = container.querySelector('[data-facebook-live-note]');
-            
-            if (previewNode && badgeNode && noteNode) {
-                badgeNode.textContent = 'Juicer';
-                badgeNode.style.color = '#166534';
-                badgeNode.style.background = '#f0fdf4';
-                noteNode.textContent = `Viser live feed for Juicer ID: ${config.juicerFeedId || 'hiskingdomministry777'}`;
+        if (config.feedSource === 'juicer' && config.juicerFeedId) {
+            try {
+                const response = await fetch(`https://www.juicer.io/api/feeds/${config.juicerFeedId}`);
+                if (!response.ok) throw new Error(`Juicer feed fetch failed with status ${response.status}`);
                 
-                const juicerId = config.juicerFeedId || 'hiskingdomministry777';
-                previewNode.innerHTML = `<ul class="juicer-feed" data-feed-id="${juicerId}" data-per="${livePostCount}"></ul>`;
+                const payload = await response.json();
+                const items = Array.isArray(payload?.posts?.items) ? payload.posts.items : [];
                 
-                if (!document.querySelector('link[href*="juicer.io"]')) {
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = 'https://assets.juicer.io/embed.css';
-                    link.media = 'all';
-                    link.type = 'text/css';
-                    document.head.appendChild(link);
+                if (requestId === this._facebookFeedPreviewRequestId) {
+                    const parsedPosts = items.slice(0, livePostCount).map((item, idx) => {
+                        const message = item.message || "";
+                        const cleanText = message.replace(/<[^>]*>/g, '').trim();
+                        let excerpt = cleanText;
+                        if (excerpt.length > 180) {
+                            excerpt = excerpt.substring(0, 177) + "...";
+                        }
+                        
+                        let title = cleanText;
+                        if (title.length > 50) {
+                            title = title.substring(0, 47) + "...";
+                        }
+                        if (!title) {
+                            title = "Innlegg";
+                        }
+                        
+                        const link = item.full_url || pageUrl || "https://www.facebook.com/hiskingdomministry777";
+                        const pubDate = item.external_created_at || "";
+                        
+                        let friendlyDate = "Nylig";
+                        if (pubDate) {
+                            const date = new Date(pubDate);
+                            const diffTime = Math.abs(new Date() - date);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            if (diffDays <= 1) friendlyDate = "I går";
+                            else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
+                            else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                        }
+                        
+                        return {
+                            id: item.id || idx + 1,
+                            date: friendlyDate,
+                            title: title,
+                            excerpt: excerpt,
+                            cta: "Les på Facebook",
+                            image: item.image || "",
+                            link: link
+                        };
+                    });
+                    
+                    if (parsedPosts.length > 0) {
+                        this.renderFacebookFeedLivePreviewState(container, {
+                            status: 'ready',
+                            items: parsedPosts,
+                            pageUrl: pageUrl,
+                            message: 'Dette er innleggene som hentes live via Juicer API akkurat nå.'
+                        });
+                        return;
+                    }
                 }
-                
-                const scriptSrc = `https://www.juicer.io/embed/${juicerId}/embed-code.js`;
-                const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
-                if (!existingScript) {
-                    const script = document.createElement('script');
-                    script.type = 'text/javascript';
-                    script.src = scriptSrc;
-                    script.async = true;
-                    script.defer = true;
-                    document.body.appendChild(script);
-                } else if (window.Juicer && typeof window.Juicer.initialize === 'function') {
-                    window.Juicer.initialize();
-                }
+            } catch (err) {
+                console.warn('[Admin] Failed to load live Facebook feed preview via Juicer:', err);
             }
-            return;
         }
 
         if (config.feedSource === 'rss' && config.feedUrl) {

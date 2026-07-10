@@ -2540,36 +2540,62 @@ class ContentManager {
             return;
         }
 
-        // Juicer.io Integration
-        if (config.feedSource === 'juicer') {
-            section.style.display = '';
-            const gridContainer = section.querySelector('.facebook-feed-grid');
-            if (gridContainer) {
-                gridContainer.innerHTML = `<ul class="juicer-feed" data-feed-id="${config.juicerFeedId}" data-per="${config.livePostCount}"></ul>`;
+        // Juicer.io Integration (parsed on client side into custom cards)
+        if (config.feedSource === 'juicer' && config.juicerFeedId) {
+            try {
+                const response = await fetch(`https://www.juicer.io/api/feeds/${config.juicerFeedId}`);
+                if (!response.ok) throw new Error(`Juicer feed fetch failed with status ${response.status}`);
                 
-                if (!document.querySelector('link[href*="juicer.io"]')) {
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = 'https://assets.juicer.io/embed.css';
-                    link.media = 'all';
-                    link.type = 'text/css';
-                    document.head.appendChild(link);
-                }
+                const payload = await response.json();
+                const items = Array.isArray(payload?.posts?.items) ? payload.posts.items : [];
                 
-                const scriptSrc = `https://www.juicer.io/embed/${config.juicerFeedId}/embed-code.js`;
-                const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
-                if (!existingScript) {
-                    const script = document.createElement('script');
-                    script.type = 'text/javascript';
-                    script.src = scriptSrc;
-                    script.async = true;
-                    script.defer = true;
-                    document.body.appendChild(script);
-                } else if (window.Juicer && typeof window.Juicer.initialize === 'function') {
-                    window.Juicer.initialize();
+                const parsedPosts = items.slice(0, config.livePostCount).map((item, idx) => {
+                    const message = item.message || "";
+                    const cleanText = message.replace(/<[^>]*>/g, '').trim();
+                    let excerpt = cleanText;
+                    if (excerpt.length > 180) {
+                        excerpt = excerpt.substring(0, 177) + "...";
+                    }
+                    
+                    let title = cleanText;
+                    if (title.length > 50) {
+                        title = title.substring(0, 47) + "...";
+                    }
+                    if (!title) {
+                        title = "Innlegg";
+                    }
+                    
+                    const link = item.full_url || config.pageUrl || "https://www.facebook.com/hiskingdomministry777";
+                    const pubDate = item.external_created_at || "";
+                    
+                    let friendlyDate = "Nylig";
+                    if (pubDate) {
+                        const date = new Date(pubDate);
+                        const diffTime = Math.abs(new Date() - date);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays <= 1) friendlyDate = "I går";
+                        else if (diffDays <= 7) friendlyDate = `${diffDays} dager siden`;
+                        else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+                    }
+                    
+                    return {
+                        id: item.id || idx + 1,
+                        date: friendlyDate,
+                        title: title,
+                        excerpt: excerpt,
+                        cta: "Les på Facebook",
+                        image: item.image || "",
+                        link: link
+                    };
+                });
+                
+                if (parsedPosts.length > 0) {
+                    this.renderFacebookFeed(parsedPosts, config.pageUrl);
+                    return;
                 }
+            } catch (err) {
+                console.warn('[ContentManager] Failed to load Juicer feed, falling back to API:', err);
             }
-            return;
         }
 
         // Client-side RSS parsing (matches Betania Vigeland behavior)
