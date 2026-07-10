@@ -4935,13 +4935,6 @@ class MinSideManager {
             <div class="hkm-player-grid">
                 <!-- Left Side: Player & Lesson Details -->
                 <div class="hkm-player-main">
-                    <!-- Videospiller container -->
-                    <div class="video-player-container" id="player-container">
-                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 24px; text-align:center;">
-                            Laster spiller...
-                        </div>
-                    </div>
-
                     <!-- Leksjon info kort -->
                     <div class="hkm-card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
@@ -4969,6 +4962,13 @@ class MinSideManager {
 
                         <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
                         ${metaGridHtml}
+                    </div>
+
+                    <!-- Videospiller container -->
+                    <div class="video-player-container" id="player-container">
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 24px; text-align:center;">
+                            Laster spiller...
+                        </div>
                     </div>
                 </div>
 
