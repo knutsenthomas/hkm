@@ -4292,7 +4292,7 @@ class MinSideManager {
                     <div class="course-lessons-accordion collapsed" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
                         <div class="accordion-header" data-course-id="${c.id || cIdx}" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition: background-color 0.2s ease;">
                             <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px !important; transform: translateY(2.5px) !important; display: inline-block !important; line-height: 1 !important; margin: 0 !important;">format_list_bulleted</span> Leksjoner og Live-økter
+                                <span class="material-symbols-outlined" style="font-size: 18px !important;">format_list_bulleted</span> Leksjoner og Live-økter
                             </h4>
                             <span class="material-symbols-outlined expand-chevron">expand_more</span>
                         </div>
@@ -4329,7 +4329,7 @@ class MinSideManager {
                                                     </div>
                                                     ${dateStr ? `
                                                         <div style="font-size:0.78rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:4px; line-height: 1;">
-                                                            <span class="material-symbols-outlined" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 14px !important; height: 14px !important; font-size: 14px !important; line-height: 1 !important; color:#64748b !important; margin: 0 !important; padding: 0 !important; transform: translateY(2px) !important;">calendar_today</span>
+                                                            <span class="material-symbols-outlined" style="font-size: 14px !important; color:#64748b !important;">calendar_today</span>
                                                             <span style="display: inline-block; line-height: 1;">${dateStr}</span>
                                                         </div>
                                                     ` : ''}
