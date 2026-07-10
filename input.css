@@ -2914,8 +2914,8 @@ body.hero-animate .slide-buttons {
 
 @media (max-width: 480px) {
     .footer-nav-grid {
-        grid-template-columns: 1fr !important;
-        gap: 16px !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
     }
 
     .footer-nav-grid .nav-col {
@@ -3059,7 +3059,7 @@ body.hero-animate .slide-buttons {
 
 @media (max-width: 576px) {
     .footer-nav-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr) !important;
     }
 
     .footer-brand .logo {
