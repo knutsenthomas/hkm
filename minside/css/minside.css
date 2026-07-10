@@ -1734,7 +1734,7 @@ body.admin-body .btn-full,
 .personal-note-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06), 0 4px 8px rgba(15, 23, 42, 0.02);
-    border-color: rgba(27, 73, 101, 0.25);
+    border-color: rgba(209, 125, 57, 0.25);
 }
 
 .personal-note-card-top {
@@ -2952,7 +2952,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 .prayer-wall-header h3 {
   font-size: 24px !important;
   font-weight: 800 !important;
-  color: #1B4965;
+  color: #d17d39;
   letter-spacing: -0.02em;
   margin: 0 0 4px 0 !important;
 }
@@ -3007,7 +3007,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 
 /* Praying Buttons */
 .btn-pray {
-  background-color: #1B4965 !important;
+  background-color: #d17d39 !important;
   color: #ffffff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -3025,7 +3025,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 .btn-pray:hover {
   background-color: #14354a !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(27, 73, 101, 0.15) !important;
+  box-shadow: 0 4px 10px rgba(209, 125, 57, 0.15) !important;
 }
 .btn-pray:active {
   transform: translateY(0);
@@ -3265,13 +3265,13 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     padding: 10px 16px;
     font-size: 13.5px;
     font-weight: 600;
-    color: #1B4965;
+    color: #d17d39;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
     width: 130px;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d17d39' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
     background-repeat: no-repeat !important;
     background-position: right 14px center !important;
     background-size: 12px !important;
@@ -3450,7 +3450,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 .hkm-devotional-step-title {
     font-size: 20px;
     font-weight: 700;
-    color: #1B4965;
+    color: #d17d39;
     margin-bottom: 16px;
 }
 
@@ -3526,7 +3526,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 .hkm-celebration-title {
     font-size: 24px;
     font-weight: 700;
-    color: #1B4965;
+    color: #d17d39;
     text-align: center;
     margin-top: 16px;
     margin-bottom: 8px;
@@ -3683,8 +3683,8 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     box-sizing: border-box !important;
 }
 .sidebar-lang-switcher .lang-btn:hover {
-    background-color: rgba(27, 73, 101, 0.05) !important;
-    color: #1B4965 !important;
+    background-color: rgba(209, 125, 57, 0.05) !important;
+    color: #d17d39 !important;
 }
 .sidebar-lang-switcher .lang-btn span.material-symbols-outlined {
     font-size: 20px !important;
@@ -3810,9 +3810,9 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
 }
 
 .player-btn-fullscreen {
-    background: #1B4965 !important;
+    background: #d17d39 !important;
     color: white !important;
-    border: 1px solid #1B4965 !important;
+    border: 1px solid #d17d39 !important;
     border-radius: 30px !important;
     font-weight: 600 !important;
     display: inline-flex !important;
@@ -3824,15 +3824,15 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     cursor: pointer !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     outline: none !important;
-    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15) !important;
     height: 42px !important;
 }
 
 .player-btn-fullscreen:hover {
-    background: #256187 !important;
-    border-color: #256187 !important;
+    background: #bd4f2a !important;
+    border-color: #bd4f2a !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25) !important;
+    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25) !important;
 }
 
 .player-btn-fullscreen:active {

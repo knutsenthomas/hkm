@@ -2041,7 +2041,7 @@ class MinSideManager {
                             <div class="ov-prayer-item" style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
                                 <div>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <span style="font-size: 12px; font-weight: 700; color: #1B4965;">${name}</span>
+                                        <span style="font-size: 12px; font-weight: 700; color: #d17d39;">${name}</span>
                                         <span style="font-size: 11px; color: #94a3b8;">${p.createdAt ? this.formatTimeAgo(p.createdAt) : ''}</span>
                                     </div>
                                     <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
@@ -2443,8 +2443,8 @@ class MinSideManager {
                 <!-- Mobile Navigation Menu Preferences -->
                 <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
                     <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
-                        <span class="material-symbols-outlined" style="color: #1B4965; font-size: 22px;">phone_android</span>
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1b4965; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
+                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">phone_android</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #d17d39; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
                     </div>
                     <div class="ms-card-body-pad" style="padding: 20px 24px !important; display: block !important;">
                         <p class="ms-danger-copy" style="margin-bottom: 16px !important; color: var(--text-muted, #64748b) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
@@ -2468,7 +2468,7 @@ class MinSideManager {
                 
                 <!-- Main Header (Mockup Title and Description) -->
                 <div style="margin-bottom: 28px;">
-                    <h2 style="font-size: 30px; font-weight: 800; color: #1B4965; margin: 0 0 8px 0; letter-spacing: -0.02em;">Varslingsinnstillinger</h2>
+                    <h2 style="font-size: 30px; font-weight: 800; color: #d17d39; margin: 0 0 8px 0; letter-spacing: -0.02em;">Varslingsinnstillinger</h2>
                     <p style="font-size: 13.5px; color: #64748b; margin: 0; line-height: 1.5; font-weight: 500;">
                         Administrer hvordan du ønsker å motta oppdateringer og undervisning fra oss. Hold deg tilkoblet fellesskapet på dine egne premisser.
                     </p>
@@ -3656,8 +3656,8 @@ class MinSideManager {
                         datasets: [{
                             label: t('giving.chartNok'),
                             data: trendsData,
-                            borderColor: '#1B4965',
-                            backgroundColor: 'rgba(27, 73, 101, 0.05)',
+                            borderColor: '#d17d39',
+                            backgroundColor: 'rgba(209, 125, 57, 0.05)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.35,
@@ -3730,7 +3730,7 @@ class MinSideManager {
                         datasets: [{
                             data: methodsData,
                             backgroundColor: [
-                                '#1B4965',
+                                '#d17d39',
                                 '#bd4f2a',
                                 '#d17d39',
                                 '#475569',
@@ -4054,18 +4054,18 @@ class MinSideManager {
             <body>
                 <div class="no-print" style="margin-bottom:20px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:13px; color:#475569; font-weight:500;">${previewLabel}</span>
-                    <button onclick="window.print()" style="background:#1B4965; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">
+                    <button onclick="window.print()" style="background:#d17d39; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">
                         ${printBtnLabel}
                     </button>
                 </div>
 
                 <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
                     <!-- Logo & Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1B4965; padding-bottom:16px; margin-bottom:24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #d17d39; padding-bottom:16px; margin-bottom:24px;">
                         <div style="display:flex; align-items:center; gap:16px;">
                             <img src="/img/logo-hkm.png" alt="Logo" style="height:55px; width:auto; object-fit:contain; border-radius:4px;">
                             <div>
-                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#1B4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#d17d39; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
                                 <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">${subtitle}</p>
                             </div>
                         </div>
@@ -4093,11 +4093,11 @@ class MinSideManager {
                     <!-- Main Table -->
                     <table style="width:100%; border-collapse:collapse; margin-bottom:32px;">
                         <thead>
-                            <tr style="border-bottom:2px solid #1B4965; text-align:left;">
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${dateLabel}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${typeLabelStr}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${methodLabelStr}</th>
-                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
+                            <tr style="border-bottom:2px solid #d17d39; text-align:left;">
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${dateLabel}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${typeLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${methodLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -4107,7 +4107,7 @@ class MinSideManager {
 
                     <!-- Total Block -->
                     <div style="display:flex; justify-content:flex-end; margin-bottom:40px;">
-                        <div style="background:#1B4965; color:white; padding:12px 24px; border-radius:8px; text-align:right; min-width:200px;">
+                        <div style="background:#d17d39; color:white; padding:12px 24px; border-radius:8px; text-align:right; min-width:200px;">
                             <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;">${totalLabelStr}</span>
                             <div style="font-size:22px; font-weight:800; margin-top:2px;">kr ${totalSum.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
                         </div>
@@ -4294,7 +4294,7 @@ class MinSideManager {
                                             ${paid ? `
                                                 <div style="display:flex; gap:8px; align-items:center;">
                                                     ${l.videoUrl ? `
-                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#1b4965; border-color:#1b4965; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                        <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
                                                             <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span> Start leksjon
                                                         </a>
                                                     ` : (l.zoomUrl ? `
@@ -4626,12 +4626,12 @@ class MinSideManager {
                     transform: scale(0.95);
                 }
                 .hkm-btn-fs {
-                    background: #1B4965;
+                    background: #d17d39;
                     color: #ffffff;
                     border: none;
                 }
                 .hkm-btn-fs:hover {
-                    background: #2a6f97;
+                    background: #bd4f2a;
                 }
                 .hkm-btn-zoom {
                     background: #1DB954;
@@ -4665,19 +4665,19 @@ class MinSideManager {
                     width: 40px;
                     height: 40px;
                     border-radius: 50%;
-                    background: rgba(27, 73, 101, 0.08);
-                    color: #1B4965;
+                    background: rgba(209, 125, 57, 0.08);
+                    color: #d17d39;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                 }
                 .hkm-meta-icon.secondary {
-                    background: rgba(27, 73, 101, 0.06);
-                    color: #1B4965;
+                    background: rgba(209, 125, 57, 0.06);
+                    color: #d17d39;
                 }
                 .hkm-meta-icon.tertiary {
-                    background: rgba(27, 73, 101, 0.06);
-                    color: #1B4965;
+                    background: rgba(209, 125, 57, 0.06);
+                    color: #d17d39;
                 }
                 .hkm-meta-text {
                     display: flex;
@@ -4724,9 +4724,9 @@ class MinSideManager {
                     color: #1e293b;
                 }
                 .hkm-tab-btn.active {
-                    color: #1B4965;
-                    border-bottom-color: #1B4965;
-                    background: rgba(27, 73, 101, 0.04);
+                    color: #d17d39;
+                    border-bottom-color: #d17d39;
+                    background: rgba(209, 125, 57, 0.04);
                 }
                 
                 /* Lesson Item Card */
@@ -4787,8 +4787,8 @@ class MinSideManager {
                     transition: all 0.3s ease;
                 }
                 .hkm-notes-textarea:focus {
-                    border-color: #1B4965;
-                    box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.15);
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
                 }
 
                 /* Bible Widget selectors */
@@ -4817,6 +4817,12 @@ class MinSideManager {
                     overflow-y: auto;
                 }
 
+                
+                .hkm-bible-select:focus {
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+                }
+
                 /* Scrollbar styling */
                 .hkm-bible-display::-webkit-scrollbar,
                 .hkm-sidebar-scroll::-webkit-scrollbar {
@@ -4838,13 +4844,13 @@ class MinSideManager {
 
                 /* Bible Verse Card */
                 .hkm-verse-card {
-                    background: #1B4965;
+                    background: #d17d39;
                     color: #ffffff;
                     padding: 24px;
                     border-radius: 16px;
                     position: relative;
                     overflow: hidden;
-                    box-shadow: 0 4px 20px rgba(27, 73, 101, 0.15);
+                    box-shadow: 0 4px 20px rgba(209, 125, 57, 0.15);
                 }
                 .hkm-verse-card::before {
                     content: '';
@@ -4947,7 +4953,7 @@ class MinSideManager {
                                         if (!isLessonUnlocked) {
                                             return `
                                                 <div class="hkm-lesson-card locked player-lesson-item" data-idx="${idx}">
-                                                    <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                                                         <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
                                                             <span style="font-size:10px; font-weight:700; color:rgba(100, 116, 139, 0.4); text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
                                                             <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
@@ -4960,7 +4966,7 @@ class MinSideManager {
                                         
                                         return `
                                             <div class="hkm-lesson-card player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
-                                                <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                                                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                                                     <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
                                                         <span style="font-size:10px; font-weight:700; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
                                                         <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
@@ -5119,7 +5125,7 @@ class MinSideManager {
                     // Try to load Zoom Meeting SDK (Component View)
                     playerContainer.innerHTML = `
                         <div id="zoom-sdk-loading" style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
-                            <span class="material-symbols-outlined spinner" style="font-size: 48px; color: #cc6f2c; animation: spin 1.5s linear infinite;">sync</span>
+                            <span class="material-symbols-outlined spinner" style="font-size: 48px; color: #d17d39; animation: spin 1.5s linear infinite;">sync</span>
                             <div>
                                 <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Starter Zoom-spiller...</h3>
                                 <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Laster inn integrert Zoom-klient med chat og video. Vennligst vent.</p>
@@ -5234,7 +5240,7 @@ class MinSideManager {
                 } else {
                     playerContainer.innerHTML = `
                         <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
-                            <span class="material-symbols-outlined" style="font-size: 48px; color: #ff5b24;">video_camera_front</span>
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39;">video_camera_front</span>
                             <div>
                                 <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Zoom Live Class</h3>
                                 <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Live Zoom-kobling er klar. Vennligst bruk knappen nedenfor for å åpne timen i Zoom-appen.</p>
@@ -5765,7 +5771,7 @@ class MinSideManager {
                     <span class="material-symbols-outlined" style="color: #d17d39;">visibility</span>
                     <span style="font-weight: 700; color: #bd4f2a; font-size: 14px;">Du forhåndsviser denne leseplanen</span>
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${globalPlan.id}')" style="background: #1B4965; border-color: #1B4965; font-size: 13px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; padding: 0 16px; margin: 0 !important;">Velg plan</button>
+                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${globalPlan.id}')" style="background: #d17d39; border-color: #d17d39; font-size: 13px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; padding: 0 16px; margin: 0 !important;">Velg plan</button>
             </div>
         ` : '';
 
@@ -5778,7 +5784,7 @@ class MinSideManager {
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
                         <div>
                             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
-                                <h2 style="font-size: 22px; font-weight: 700; color: #1B4965; margin: 0;">${globalPlan.title}</h2>
+                                <h2 style="font-size: 22px; font-weight: 700; color: #d17d39; margin: 0;">${globalPlan.title}</h2>
                                 ${streakHtml}
                             </div>
                             <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; max-width: 600px;">${globalPlan.description || ''}</p>
@@ -5824,7 +5830,7 @@ class MinSideManager {
                                     <span class="material-symbols-outlined">menu_book</span>
                                     Les i Bibelen
                                 </a>
-                                <button class="btn btn-primary" id="btn-start-devotional" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; background: #1B4965; border-color: #1B4965; color: #ffffff;">
+                                <button class="btn btn-primary" id="btn-start-devotional" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; background: #d17d39; border-color: #d17d39; color: #ffffff;">
                                     <span class="material-symbols-outlined">auto_stories</span>
                                     Start Dagens Andakt
                                 </button>
@@ -5833,7 +5839,7 @@ class MinSideManager {
 
                         <!-- Prayer & Resources Preview -->
                         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
-                            <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Bønnefokus & Fordypning</h3>
+                            <h3 style="font-size: 15px; font-weight: 700; color: #d17d39; margin: 0 0 16px 0;">Bønnefokus & Fordypning</h3>
                             
                             <div style="background: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: #475569;">
                                 "${currentDayConfig?.prayerFocus || 'Be over ordene du har lest i dag.'}"
@@ -5862,17 +5868,17 @@ class MinSideManager {
 
                     <!-- Right Column: Checklist of days -->
                     <div class="ms-rp-checklist-card">
-                        <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin: 0 0 16px 0;">Alle dager</h3>
+                        <h3 style="font-size: 15px; font-weight: 700; color: #d17d39; margin: 0 0 16px 0;">Alle dager</h3>
                         
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             ${globalPlan.days.map(d => {
                                 const isCompleted = completedDays.includes(d.dayNumber);
                                 const isActive = d.dayNumber === currentDayNum;
                                 return `
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#1B4965' : '#f1f5f9'}; background: ${isActive ? 'rgba(27, 73, 101, 0.02)' : '#ffffff'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#d17d39' : '#f1f5f9'}; background: ${isActive ? 'rgba(209, 125, 57, 0.02)' : '#ffffff'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#1B4965' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex !important; align-items: center !important; justify-content: center !important; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0; box-sizing: border-box !important;">
-                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">check</span>' : `<span style="font-size: 11px; font-weight: 700; color: ${isActive ? '#1B4965' : '#475569'}; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">${d.dayNumber}</span>`}
+                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#d17d39' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex !important; align-items: center !important; justify-content: center !important; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0; box-sizing: border-box !important;">
+                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">check</span>' : `<span style="font-size: 11px; font-weight: 700; color: ${isActive ? '#d17d39' : '#475569'}; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">${d.dayNumber}</span>`}
                                         </div>
                                         <div>
                                             <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${d.verses}</div>
@@ -5977,9 +5983,9 @@ class MinSideManager {
             container.innerHTML = `
                 <div class="empty-state" style="padding: 40px 20px; text-align: center;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">auto_stories</span>
-                    <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">Ingen påbegynte leseplaner</h3>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #d17d39; margin: 0 0 8px 0;">Ingen påbegynte leseplaner</h3>
                     <p style="font-size: 14px; color: #64748b; margin: 0 0 20px 0;">Du har ikke startet noen leseplaner ennå.</p>
-                    <a href="/leseplaner.html" class="btn btn-primary" style="background: #1B4965; border-color: #1B4965; display: inline-flex; align-items: center; gap: 8px;">
+                    <a href="/leseplaner.html" class="btn btn-primary" style="background: #d17d39; border-color: #d17d39; display: inline-flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined">explore</span> Finn en leseplan
                     </a>
                 </div>
@@ -5989,7 +5995,7 @@ class MinSideManager {
 
         container.innerHTML = `
             <div style="padding: 8px;">
-                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin-bottom: 20px;">Dine påbegynte leseplaner</h3>
+                <h3 style="font-size: 18px; font-weight: 700; color: #d17d39; margin-bottom: 20px;">Dine påbegynte leseplaner</h3>
                 <div class="courses-grid">
                     ${startedPlans.map(p => {
                         const totalDays = p.durationDays || p.days.length;
@@ -6000,7 +6006,7 @@ class MinSideManager {
                         <div class="course-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
                             <div class="course-body">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(27, 73, 101, 0.1); color: #1B4965; font-weight: 700;">${totalDays} dager</span>
+                                    <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(209, 125, 57, 0.1); color: #d17d39; font-weight: 700;">${totalDays} dager</span>
                                     <span style="font-size: 12px; font-weight: 600; color: #d17d39;">${progressPct}% fullført</span>
                                 </div>
                                 <div class="course-title" style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${p.title}</div>
@@ -6012,7 +6018,7 @@ class MinSideManager {
                             </div>
                             <div style="display: flex; gap: 8px; padding: 0 16px 16px 16px;">
                                 <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
-                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #1B4965; border-color: #1B4965;">Velg plan</button>
+                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #d17d39; border-color: #d17d39;">Velg plan</button>
                             </div>
                         </div>
                         `;
@@ -6165,7 +6171,7 @@ class MinSideManager {
                     <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
                         <span class="material-symbols-outlined" style="color:#d97706; font-size:24px;">restore</span>
                     </div>
-                    <h3 style="font-size:18px; font-weight:700; color:#1b4965; margin:0;">Tilpass leseplanen</h3>
+                    <h3 style="font-size:18px; font-weight:700; color:#d17d39; margin:0;">Tilpass leseplanen</h3>
                 </div>
                 <p style="font-size:14px; color:#475569; line-height:1.5; margin:0 0 20px 0;">
                     Vil du forskyve leseplanens kalender? Dette setter <strong>Dag ${currentDay}</strong> til å være i dag. Planens tidsplan justeres fremover slik at du blir "i rute", uten at du mister fremdriften din.
@@ -6191,7 +6197,7 @@ class MinSideManager {
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 16px; font-weight: 700; color: #1B4965; margin:0;">Dag ${dayNumber}: Detaljer</h3>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #d17d39; margin:0;">Dag ${dayNumber}: Detaljer</h3>
                     <span class="material-symbols-outlined close" style="cursor:pointer;" onclick="this.closest('.modal').remove()">close</span>
                 </div>
                 
@@ -6212,7 +6218,7 @@ class MinSideManager {
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         ${dayConfig.resources && dayConfig.resources.length > 0 ? 
                             dayConfig.resources.map(res => `
-                            <a href="${res.url || '#'}" target="_blank" style="display:flex; align-items:center; gap:8px; font-size: 12px; color: #1B4965; text-decoration: underline;">
+                            <a href="${res.url || '#'}" target="_blank" style="display:flex; align-items:center; gap:8px; font-size: 12px; color: #d17d39; text-decoration: underline;">
                                 <span class="material-symbols-outlined" style="font-size:16px;">launch</span>
                                 ${res.title} (${res.type})
                             </a>
@@ -6223,7 +6229,7 @@ class MinSideManager {
 
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
                     <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Lukk</button>
-                    <button class="btn btn-primary" onclick="window.minSideManager.openDevotionalWizardDirect('${planId}', ${dayNumber}); this.closest('.modal').remove()" style="background: #1B4965; border-color: #1B4965;">Åpne andakt</button>
+                    <button class="btn btn-primary" onclick="window.minSideManager.openDevotionalWizardDirect('${planId}', ${dayNumber}); this.closest('.modal').remove()" style="background: #d17d39; border-color: #d17d39;">Åpne andakt</button>
                 </div>
             </div>
         `;
@@ -6730,7 +6736,7 @@ class MinSideManager {
                         width: 800px;
                         height: 560px;
                         padding: 40px;
-                        border: 15px solid #1B4965;
+                        border: 15px solid #d17d39;
                         box-sizing: border-box;
                         position: relative;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -6752,7 +6758,7 @@ class MinSideManager {
                     .logo {
                         font-weight: 900;
                         font-size: 20px;
-                        color: #1B4965;
+                        color: #d17d39;
                         letter-spacing: 0.1em;
                         text-transform: uppercase;
                     }
@@ -6760,7 +6766,7 @@ class MinSideManager {
                         font-family: 'Playfair Display', serif;
                         font-size: 42px;
                         font-weight: 700;
-                        color: #1B4965;
+                        color: #d17d39;
                         margin: 10px 0 0 0;
                     }
                     .subtitle {
@@ -6837,7 +6843,7 @@ class MinSideManager {
                         position: absolute;
                         top: -50px;
                         right: 0;
-                        background: #1B4965;
+                        background: #d17d39;
                         color: #ffffff;
                         border: none;
                         padding: 10px 20px;
@@ -7428,7 +7434,7 @@ class MinSideManager {
                     ? `<div class="member-avatar" style="background: #cbd5e1; color: #ffffff;"><span class="material-symbols-outlined" style="font-size: 18px;">visibility_off</span></div>`
                     : (p.userPhotoURL 
                         ? `<div class="member-avatar"><img src="${p.userPhotoURL}" alt=""></div>`
-                        : `<div class="member-avatar" style="background: #1B4965; color: #ffffff;">${(p.userName || '?').charAt(0).toUpperCase()}</div>`);
+                        : `<div class="member-avatar" style="background: #d17d39; color: #ffffff;">${(p.userName || '?').charAt(0).toUpperCase()}</div>`);
 
                 const nameHtml = p.isAnonymous ? t('prayer.anonymous') : (p.userName || t('prayer.member'));
                 
@@ -7446,7 +7452,7 @@ class MinSideManager {
                                     </div>
                                     ${isOwner ? `
                                         <div style="display: flex; gap: 8px;">
-                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #1B4965; padding: 4px; cursor:pointer;" onclick="window.minSideManager.editPrayer('${p.id}')" title="${t('common.edit')}">
+                                            <button class="btn btn-icon-only" style="background:none; border:none; color: #d17d39; padding: 4px; cursor:pointer;" onclick="window.minSideManager.editPrayer('${p.id}')" title="${t('common.edit')}">
                                                 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                             </button>
                                             <button class="btn btn-icon-only" style="background:none; border:none; color: #ef4444; padding: 4px; cursor:pointer;" onclick="window.minSideManager.deletePrayer('${p.id}')" title="Slett">
@@ -7461,7 +7467,7 @@ class MinSideManager {
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: auto;">
                                 <div style="display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px; font-weight: 700; color: #64748b; line-height: 1 !important;"><span class="material-symbols-outlined" style="font-size: 18px; color: #bd4f2a; position: relative; top: 1.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${t('prayer.praysForThis', { n: count })}</span></div>
                                 
-                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: not-allowed !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"' : 'style="background: #1B4965 !important; border-color: #1B4965 !important; color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px !important; position: relative !important; top: 1px !important; line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">favorite</span><span style="line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">${hasPrayed ? t('prayer.hasPrayed') : t('prayer.pray')}</span></button>
+                                <button class="${hasPrayed ? 'btn-pray-disabled' : 'btn-pray'}" ${hasPrayed ? 'disabled style="background: #f1f5f9 !important; border-color: #f1f5f9 !important; color: #94a3b8 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: not-allowed !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"' : 'style="background: #d17d39 !important; border-color: #d17d39 !important; color: #ffffff !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 8px 16px !important; font-size: 13.5px !important; font-weight: 600 !important; border: none !important; border-radius: 8px !important; cursor: pointer !important; line-height: 1 !important; width: auto !important; height: auto !important; box-sizing: border-box !important;"'} onclick="window.minSideManager.supportPrayer('${p.id}', '${p.userId}')"><span class="material-symbols-outlined" style="font-size: 18px !important; position: relative !important; top: 1px !important; line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">favorite</span><span style="line-height: 1 !important; display: inline-block !important; margin: 0 !important; padding: 0 !important; width: auto !important; height: auto !important;">${hasPrayed ? t('prayer.hasPrayed') : t('prayer.pray')}</span></button>
                             </div>
                         </div>
                     </div>
@@ -7484,7 +7490,7 @@ class MinSideManager {
                         ${prayers.length > 0 ? feedHtml : `
                             <div class="empty-state" style="padding: 60px 20px; text-align: center; grid-column: 1 / -1; width: 100%;">
                                 <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">favorite</span>
-                                <h3 style="font-size: 16px; font-weight: 700; color: #1b4965; margin: 0 0 8px 0;">${t('prayer.emptyTitle')}</h3>
+                                <h3 style="font-size: 16px; font-weight: 700; color: #d17d39; margin: 0 0 8px 0;">${t('prayer.emptyTitle')}</h3>
                                 <p style="font-size: 14px; color: #64748b; margin: 0;">${t('prayer.emptyDesc')}</p>
                             </div>
                         `}
@@ -7599,7 +7605,7 @@ class MinSideManager {
         modal.innerHTML = `
             <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${t('prayer.editModalTitle')}</h3>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #d17d39; margin:0;">${t('prayer.editModalTitle')}</h3>
                     <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
                 </div>
                 
@@ -7686,7 +7692,7 @@ class MinSideManager {
         modal.innerHTML = `
             <div class="hkm-modal-container" style="max-width: 500px; border-radius: 24px; padding: 24px;">
                 <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin:0;">${t('prayer.modalTitle')}</h3>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #d17d39; margin:0;">${t('prayer.modalTitle')}</h3>
                     <span class="material-symbols-outlined close" style="cursor:pointer;">close</span>
                 </div>
                 
@@ -7902,7 +7908,7 @@ class MinSideManager {
                 if (idx === selectedIndex) {
                     item.classList.add('selected');
                     item.style.background = 'var(--admin-bg, #f8f9fa)';
-                    item.style.borderColor = '#1B4965';
+                    item.style.borderColor = '#d17d39';
                     item.scrollIntoView({ block: 'nearest' });
                 } else {
                     item.classList.remove('selected');
@@ -8058,7 +8064,7 @@ class MinSideManager {
                     versesHtml = bibleData.crossReferences.map(refObj => {
                         const cleanRef = refObj.ref.trim();
                         const href = `${bibleUrlBase}?ref=${encodeURIComponent(cleanRef)}`;
-                        return `<a href="${href}" onclick="event.stopPropagation();" style="display: inline-block; font-size: 11px; margin: 4px 4px 0 0; padding: 4px 8px; border-radius: 6px; background: #1B496515; color: #1B4965; font-weight: 600; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='#1B496530'" onmouseout="this.style.background='#1B496515'">${cleanRef}</a>`;
+                        return `<a href="${href}" onclick="event.stopPropagation();" style="display: inline-block; font-size: 11px; margin: 4px 4px 0 0; padding: 4px 8px; border-radius: 6px; background: #d17d3915; color: #d17d39; font-weight: 600; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='#d17d3930'" onmouseout="this.style.background='#d17d3915'">${cleanRef}</a>`;
                     }).join('');
                 }
 
@@ -8075,7 +8081,7 @@ class MinSideManager {
                 if (isLoadingBible) {
                     resultsContainer.innerHTML = `
                         <div style="padding: 40px 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
-                            <div class="spinner" style="width: 20px; height: 20px; border-width: 2.5px; border-color: #cbd5e1; border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                            <div class="spinner" style="width: 20px; height: 20px; border-width: 2.5px; border-color: #cbd5e1; border-top-color: #d17d39; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                             <span style="font-size: 14px; color: #64748b; font-weight: 500;">Søker...</span>
                         </div>
                     `;
@@ -8092,13 +8098,13 @@ class MinSideManager {
 
             selectedIndex = -1;
             const typeLabels = {
-                'course': { name: 'Kurs & Undervisning', icon: 'school', color: '#1B4965' },
+                'course': { name: 'Kurs & Undervisning', icon: 'school', color: '#d17d39' },
                 'reading-plan': { name: 'Leseplaner & Andakt', icon: 'auto_stories', color: '#bd4f2a' },
                 'note': { name: 'Dine Notater', icon: 'notes', color: '#d17d39' },
                 'prayer-wall': { name: 'Bønneveggen', icon: 'favorite', color: '#bd4f2a' },
-                'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#1b4965' },
-                'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#1b4965' },
-                'biblical-character': { name: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'), icon: 'person', color: '#1B4965' },
+                'bible-search': { name: 'Bibel & Ordbok', icon: 'menu_book', color: '#d17d39' },
+                'bible-ref': { name: 'Nettbibel', icon: 'menu_book', color: '#d17d39' },
+                'biblical-character': { name: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'), icon: 'person', color: '#d17d39' },
                 'timeline-ref': { name: lang === 'en' ? 'Timeline' : (lang === 'es' ? 'Línea de Tiempo' : 'Tidslinje'), icon: 'timeline', color: '#bd4f2a' }
             };
 
@@ -8126,7 +8132,7 @@ class MinSideManager {
             if (isLoadingBible) {
                 html += `
                     <div class="bible-search-loading-placeholder" style="padding: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; margin-top: 8px;">
-                        <div class="spinner" style="width: 16px; height: 16px; border-width: 2px; border-color: #cbd5e1; border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                        <div class="spinner" style="width: 16px; height: 16px; border-width: 2px; border-color: #cbd5e1; border-top-color: #d17d39; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                         <span style="font-size: 12.5px; color: #64748b; font-weight: 500;">Søker i Bibel & Ordbok...</span>
                     </div>
                 `;
