@@ -4119,6 +4119,16 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     transform: rotate(0deg) translateZ(0) !important;
 }
 
+/* Global Centering Safety Override for Material Symbols Outlined */
+.material-symbols-outlined {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 1em !important;
+    min-height: 1em !important;
+    vertical-align: middle !important;
+}
+
 
 
 

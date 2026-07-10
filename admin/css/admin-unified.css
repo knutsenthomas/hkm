@@ -6141,7 +6141,12 @@ button.btn, a.btn, .btn {
   line-height: 1 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 1em !important;
+  min-height: 1em !important;
+  vertical-align: middle !important;
   white-space: nowrap !important;
   word-wrap: normal !important;
   direction: ltr !important;
