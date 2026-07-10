@@ -21312,6 +21312,78 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
+            <style>
+                .rte-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    transition: all 0.3s ease;
+                    margin-top: 4px;
+                    box-sizing: border-box;
+                }
+                .rte-wrapper:focus-within {
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+                }
+                .rte-toolbar {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 8px;
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e2e8f0;
+                    flex-wrap: wrap;
+                }
+                .rte-btn {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 6px;
+                    border: none;
+                    background: transparent;
+                    color: #475569;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    padding: 0;
+                }
+                .rte-btn .material-symbols-outlined {
+                    font-size: 18px;
+                }
+                .rte-btn:hover {
+                    background: #e2e8f0;
+                    color: #1e293b;
+                }
+                .rte-btn.active {
+                    background: rgba(209, 125, 57, 0.1);
+                    color: #d17d39;
+                }
+                .rte-divider {
+                    width: 1px;
+                    height: 18px;
+                    background: #cbd5e1;
+                    margin: 0 4px;
+                }
+                .rte-editor {
+                    min-height: 100px;
+                    max-height: 250px;
+                    overflow-y: auto;
+                    padding: 12px;
+                    font-size: 14px;
+                    color: #1e293b;
+                    outline: none;
+                    background: #ffffff;
+                }
+                .rte-editor:empty::before {
+                    content: attr(data-placeholder);
+                    color: #94a3b8;
+                    pointer-events: none;
+                }
+            </style>
             ${this.renderSectionHeader('menu_book', 'Kursadministrasjon', 'Opprett og administrer kurs med leksjoner – Udemy-stil.', `
                 <button class="btn btn-primary" id="create-course-btn">
                     <span class="material-symbols-outlined">add</span> Nytt kurs
@@ -21626,8 +21698,24 @@ class AdminManager {
                 </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;">
-                <textarea placeholder="Leksjonsbeskrivelse / Tekstinnhold" rows="2"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;font-family:inherit;resize:vertical;" class="lesson-description">${description}</textarea>
+                <label style="font-weight:600;font-size:0.85rem;color:#1e293b;margin-bottom:2px;">Beskrivelse / Tekstinnhold</label>
+                <div class="rte-wrapper">
+                    <div class="rte-toolbar" id="rte-toolbar-${id}">
+                        <button type="button" class="rte-btn" data-cmd="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
+                        <button type="button" class="rte-btn" data-cmd="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
+                        <button type="button" class="rte-btn" data-cmd="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="Overskrift"><span class="material-symbols-outlined">title</span></button>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="Avsnitt"><span class="material-symbols-outlined">format_paragraph</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
+                    </div>
+                    <div class="rte-editor lesson-description" id="lesson-description-editor-${id}" contenteditable="true"
+                        data-placeholder="Leksjonsbeskrivelse / Tekstinnhold">${description}</div>
+                </div>
             </div>
         `;
         container.appendChild(row);
@@ -21667,6 +21755,41 @@ class AdminManager {
                 }
             });
         }
+
+        // Wire up rich text editor toolbar
+        this._wireRteToolbar(`rte-toolbar-${id}`, `lesson-description-editor-${id}`);
+    }
+
+    _wireRteToolbar(toolbarId, editorId) {
+        const toolbar = document.getElementById(toolbarId);
+        const editor = document.getElementById(editorId);
+        if (!toolbar || !editor) return;
+
+        // Execute formatting commands
+        toolbar.querySelectorAll('.rte-btn').forEach(btn => {
+            btn.addEventListener('mousedown', e => {
+                e.preventDefault(); // keep focus in editor
+                const cmd = btn.dataset.cmd;
+                const val = btn.dataset.val || null;
+                document.execCommand(cmd, false, val);
+                editor.focus();
+                this._updateRteActiveStates(toolbar);
+            });
+        });
+
+        // Update active states on selection change
+        editor.addEventListener('keyup', () => this._updateRteActiveStates(toolbar));
+        editor.addEventListener('mouseup', () => this._updateRteActiveStates(toolbar));
+        editor.addEventListener('focus', () => toolbar.classList.add('rte-focused'));
+        editor.addEventListener('blur', () => toolbar.classList.remove('rte-focused'));
+    }
+
+    _updateRteActiveStates(toolbar) {
+        const cmds = ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList'];
+        cmds.forEach(cmd => {
+            const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
+            if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
+        });
     }
 
     async _saveCourse() {
@@ -21684,7 +21807,7 @@ class AdminManager {
             const z = row.querySelector('.lesson-zoom')?.value?.trim() || '';
             const r = row.querySelector('.lesson-resource')?.value?.trim() || '';
             const ru = row.querySelector('.lesson-resource-url')?.value?.trim() || '';
-            const desc = row.querySelector('.lesson-description')?.value?.trim() || '';
+            const desc = row.querySelector('.lesson-description')?.innerHTML?.trim() || '';
             if (t) {
                 lessons.push({
                     id,
