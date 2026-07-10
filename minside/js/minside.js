@@ -4318,19 +4318,19 @@ class MinSideManager {
                                         
                                         const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
                                         return `
-                                        <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; transition: border-color 0.2s ease;">
-                                            <div style="display:flex; align-items:center; gap:14px;">
-                                                <div style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(27, 73, 101, 0.08); color:#1B4965; font-size:0.8rem; font-weight:800; flex-shrink:0; line-height: 1;">
+                                        <div style="background:white; border-radius:12px; padding:12px 16px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; transition: border-color 0.2s ease;">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:rgba(27, 73, 101, 0.08); color:#1B4965; font-size:0.75rem; font-weight:800; flex-shrink:0; line-height: 1;">
                                                     ${lIdx + 1}
                                                 </div>
                                                 <div>
-                                                    <div style="font-weight:700; font-size:0.95rem; color:#1e293b; line-height:1.3;">
+                                                    <div style="font-weight:700; font-size:0.92rem; color:#1e293b; line-height:1.2;">
                                                         ${cleanTitle}
                                                     </div>
                                                     ${dateStr ? `
-                                                        <div style="font-size:0.8rem; color:#64748b; margin-top:4px; display:flex; align-items:center; gap:5px; line-height: 1;">
-                                                            <span class="material-symbols-outlined" style="font-size:14px; color:#64748b; transform: translateY(1.5px) !important; display: inline-block !important;">calendar_today</span>
-                                                            <span style="display: inline-block; transform: translateY(0.5px) !important;">${dateStr}</span>
+                                                        <div style="font-size:0.78rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:4px; line-height: 1;">
+                                                            <span class="material-symbols-outlined" style="display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; font-size: 14px; line-height: 1 !important; color:#64748b; margin: 0 !important; padding: 0 !important; transform: translateY(0.5px) !important;">calendar_today</span>
+                                                            <span style="display: inline-block; line-height: 1;">${dateStr}</span>
                                                         </div>
                                                     ` : ''}
                                                 </div>
