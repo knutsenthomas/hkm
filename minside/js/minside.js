@@ -4537,28 +4537,25 @@ class MinSideManager {
                 <div class="hkm-meta-grid">
                     ${metaItems.map(item => {
                         const iconHtml = `<span class="material-symbols-outlined">${item.icon}</span>`;
-                        const textHtml = `
-                            <div class="hkm-meta-text">
-                                <p class="hkm-meta-label">${item.label}</p>
+                        const contentHtml = `
+                            <p class="hkm-meta-label">${item.label}</p>
+                            <div class="hkm-meta-value-container">
+                                <div class="hkm-meta-icon ${item.class}">
+                                    ${iconHtml}
+                                </div>
                                 <p class="hkm-meta-val">${item.val}</p>
                             </div>
                         `;
                         if (item.link) {
                             return `
                                 <a href="${item.link}" target="_blank" class="hkm-meta-item" style="text-decoration:none; color:inherit; cursor:pointer;">
-                                    <div class="hkm-meta-icon ${item.class}">
-                                        ${iconHtml}
-                                    </div>
-                                    ${textHtml}
+                                    ${contentHtml}
                                 </a>
                             `;
                         }
                         return `
                             <div class="hkm-meta-item">
-                                <div class="hkm-meta-icon ${item.class}">
-                                    ${iconHtml}
-                                </div>
-                                ${textHtml}
+                                ${contentHtml}
                             </div>
                         `;
                     }).join('')}
@@ -4658,8 +4655,14 @@ class MinSideManager {
                 }
                 .hkm-meta-item {
                     display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 8px;
+                }
+                .hkm-meta-value-container {
+                    display: flex;
                     align-items: center;
-                    gap: 16px;
+                    gap: 8px;
                 }
                 .hkm-meta-icon {
                     width: 40px;
@@ -4680,17 +4683,13 @@ class MinSideManager {
                     background: rgba(209, 125, 57, 0.06);
                     color: #d17d39;
                 }
-                .hkm-meta-text {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                }
                 .hkm-meta-label {
                     font-size: 10px;
                     text-transform: uppercase;
                     font-weight: 700;
                     color: rgba(100, 116, 139, 0.6);
                     margin: 0;
+                    padding-left: 48px;
                     line-height: 1;
                 }
                 .hkm-meta-val {
