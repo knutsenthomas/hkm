@@ -4218,7 +4218,7 @@ class MinSideManager {
         if (this.currentUser?.email) {
             try {
                 const eSnap = await firebase.firestore().collection('courseEnrollments')
-                    .where('email', '==', this.currentUser.email)
+                    .where('email', 'in', [this.currentUser.email, this.currentUser.email.toLowerCase()])
                     .get();
                 eSnap.forEach(d => enrollments.push(d.data()));
             } catch (e) {
@@ -4398,7 +4398,7 @@ class MinSideManager {
         let enrollments = [];
         try {
             const eSnap = await firebase.firestore().collection('courseEnrollments')
-                .where('email', '==', this.currentUser.email)
+                .where('email', 'in', [this.currentUser.email, this.currentUser.email.toLowerCase()])
                 .get();
             eSnap.forEach(d => enrollments.push(d.data()));
         } catch (e) {
