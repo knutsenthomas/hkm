@@ -5028,7 +5028,7 @@ class MinSideManager {
                                                         ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
                                                     </span>
                                                 </div>
-                                                ${isActive ? `
+                                                ${isActive && l.videoUrl ? `
                                                     <div style="margin-top: 16px; height: 4px; width: 100%; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
                                                         <div style="height: 100%; background: #d17d39; width: 65%;"></div>
                                                     </div>
