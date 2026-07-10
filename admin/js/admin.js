@@ -23457,7 +23457,7 @@ class AdminManager {
                                 ${imageHtml}
                                 <div style="min-width:0; display:grid; gap:6px;">
                                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                        <span style="font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#2563eb;">Live</span>
+                                        <span style="font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:${String(item.source || '').toLowerCase() === 'youtube' ? '#ff0000' : '#1877f2'};">${this.escapeHtml(item.source || 'Facebook')}</span>
                                         <span style="font-size:12px; color:#64748b;">${this.escapeHtml(item.date || '')}</span>
                                         <span style="font-size:12px; color:#ef4444; display:inline-flex; align-items:center; gap:3px;"><i class="fas fa-heart" style="font-size:10px;"></i> ${item.likes || 0}</span>
                                         <span style="font-size:12px; color:#d17d39; display:inline-flex; align-items:center; gap:3px;"><i class="fas fa-comment" style="font-size:10px;"></i> ${item.comments || 0}</span>
@@ -23552,16 +23552,20 @@ class AdminManager {
                             else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
                         }
                         
+                        const sourceName = item.source?.source || 'Facebook';
+                        const isYoutube = String(sourceName).toLowerCase() === 'youtube';
+
                         return {
                             id: item.id || idx + 1,
                             date: friendlyDate,
                             title: title,
                             excerpt: excerpt,
-                            cta: "Les på Facebook",
+                            cta: isYoutube ? "Se på YouTube" : "Les på Facebook",
                             image: item.image || "",
                             link: link,
                             likes: typeof item.like_count === 'number' ? item.like_count : 0,
-                            comments: typeof item.comment_count === 'number' ? item.comment_count : 0
+                            comments: typeof item.comment_count === 'number' ? item.comment_count : 0,
+                            source: sourceName
                         };
                     });
                     
@@ -23570,7 +23574,7 @@ class AdminManager {
                             status: 'ready',
                             items: parsedPosts,
                             pageUrl: pageUrl,
-                            message: 'Dette er innleggene som hentes live via Juicer API akkurat nå.'
+                            message: 'Dette er innleggene som hentes live via API-et akkurat nå.'
                         });
                         return;
                     }

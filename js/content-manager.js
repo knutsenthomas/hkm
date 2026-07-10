@@ -2570,16 +2570,20 @@ class ContentManager {
                         else friendlyDate = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
                     }
                     
+                    const sourceName = item.source?.source || 'Facebook';
+                    const isYoutube = String(sourceName).toLowerCase() === 'youtube';
+
                     return {
                         id: item.id || idx + 1,
                         date: friendlyDate,
                         title: title,
                         excerpt: excerpt,
-                        cta: "Les på Facebook",
+                        cta: isYoutube ? "Se på YouTube" : "Les på Facebook",
                         image: item.image || "",
                         link: link,
                         likes: typeof item.like_count === 'number' ? item.like_count : 0,
-                        comments: typeof item.comment_count === 'number' ? item.comment_count : 0
+                        comments: typeof item.comment_count === 'number' ? item.comment_count : 0,
+                        source: sourceName
                     };
                 });
                 
@@ -2740,6 +2744,18 @@ class ContentManager {
             if (titleEl && post.title) titleEl.textContent = post.title;
             if (excerptEl && post.excerpt) excerptEl.textContent = post.excerpt;
             if (ctaEl && post.cta) ctaEl.textContent = post.cta;
+
+            const badgeEl = card.querySelector('.facebook-post-badge');
+            if (badgeEl) {
+                const isYoutube = String(post.source || '').toLowerCase() === 'youtube';
+                if (isYoutube) {
+                    badgeEl.innerHTML = '<i class="fab fa-youtube"></i> YouTube';
+                    badgeEl.style.color = '#ff0000';
+                } else {
+                    badgeEl.innerHTML = '<i class="fab fa-facebook-f"></i> Facebook';
+                    badgeEl.style.color = '#1877f2';
+                }
+            }
 
             if (likesEl && typeof post.likes !== 'undefined') likesEl.textContent = post.likes;
             if (commentsEl && typeof post.comments !== 'undefined') commentsEl.textContent = post.comments;
