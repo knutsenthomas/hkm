@@ -272,6 +272,58 @@
             color: #d17d39;
         }
 
+        /* Floating Share Buttons for Featured Layout */
+        .spotlight-share-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+        }
+
+        .spotlight-share-btn:hover {
+            background: #d17d39;
+            border-color: #d17d39;
+            transform: scale(1.05);
+        }
+
+        .horizontal-share-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .horizontal-share-btn:hover {
+            background: #d17d39;
+            border-color: #d17d39;
+            color: white;
+            transform: scale(1.05);
+        }
+
         /* Hero */
         .kurs-hero {
             background: #0f172a;
@@ -1880,11 +1932,15 @@
                     if (allCourses.length === 1) {
                         // Single course: render a full-width Spotlight Card
                         const course = allCourses[0];
+                        const safeTitle = (course.title || '').replace(/'/g, "\\'");
                         
                         container.style.gridTemplateColumns = '1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course.id}', false)" style="min-height: 400px;">
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course.id}', false)" style="min-height: 400px; position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
                                 <img class="spotlight-card-bg" src="${course.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course.title}" loading="lazy">
                                 <div class="spotlight-content" style="max-width: 800px;">
                                     <span class="spotlight-badge">Utvalgt Kurs</span>
@@ -1901,6 +1957,9 @@
                         const course1 = allCourses[0];
                         const course2 = allCourses[1];
                         
+                        const safeTitle1 = (course1.title || '').replace(/'/g, "\\'");
+                        const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
+                        
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
                         course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
@@ -1908,7 +1967,10 @@
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)">
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
                                 <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
                                 <div class="spotlight-content">
                                     <span class="spotlight-badge">Populært</span>
@@ -1921,7 +1983,10 @@
                             </div>
 
                             <div class="featured-list-col">
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="height: 100%; display: flex; align-items: center;">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="height: 100%; display: flex; align-items: center; position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
                                     <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
                                     <div class="horizontal-course-content">
                                         <h4 class="horizontal-course-title">${course2.title}</h4>
@@ -1940,6 +2005,10 @@
                         const course2 = allCourses[1];
                         const course3 = allCourses[2];
                         
+                        const safeTitle1 = (course1.title || '').replace(/'/g, "\\'");
+                        const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
+                        const safeTitle3 = (course3.title || '').replace(/'/g, "\\'");
+                        
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
                         course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
@@ -1951,7 +2020,10 @@
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)">
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
                                 <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
                                 <div class="spotlight-content">
                                     <span class="spotlight-badge">Populært</span>
@@ -1964,7 +2036,10 @@
                             </div>
 
                             <div class="featured-list-col">
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
                                     <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
                                     <div class="horizontal-course-content">
                                         <h4 class="horizontal-course-title">${course2.title}</h4>
@@ -1976,7 +2051,10 @@
                                     </div>
                                 </div>
                                 
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course3.id}', false)">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course3.id}', false)" style="position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course3.id}', '${safeTitle3}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
                                     <img class="horizontal-course-thumb" src="${course3.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course3.title}" loading="lazy">
                                     <div class="horizontal-course-content">
                                         <h4 class="horizontal-course-title">${course3.title}</h4>
