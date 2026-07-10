@@ -1395,7 +1395,7 @@
                                 ? `<img src="${course.imageUrl}" alt="${course.title}" loading="lazy">`
                                 : `<div class="course-thumb-placeholder"><i class="fas fa-graduation-cap"></i></div>`}
                         ${course.category ? `<span class="category-badge">${course.category}</span>` : ''}
-                        <span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Gratis' : 'kr ' + course.price + ',-'}</span>
+                        <span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Gratis' : 'kr ' + course.price + ',-' + (course.priceSuffix ? ' ' + course.priceSuffix : '')}</span>
                     </div>
                     <div class="course-body">
                         <h3>${course.title || 'Uten tittel'}</h3>

@@ -21361,6 +21361,11 @@ class AdminManager {
                                     style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
                             </div>
                             <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Pris-tekst / Suffix (f.eks. "pr. leksjon", "pr. kveld", "totalt")</label>
+                                <input id="course-price-suffix" type="text" placeholder="Eks: pr. leksjon"
+                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                            </div>
+                            <div style="grid-column:span 2;">
                                 <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
                                 <div style="display: flex; gap: 10px;">
                                     <input id="course-image" type="url" placeholder="https://..."
@@ -21448,8 +21453,9 @@ class AdminManager {
                 const category = course.category ? this.escapeHtml(course.category) : '—';
                 const lessonsCount = Array.isArray(course.lessons) ? course.lessons.length : 0;
                 const price = Number(course.price || 0);
+                const suffix = course.priceSuffix ? ' ' + course.priceSuffix : '';
                 const priceText = price > 0
-                    ? `kr ${Math.round(price).toLocaleString('no-NO')}`
+                    ? `kr ${Math.round(price).toLocaleString('no-NO')}${suffix}`
                     : 'Gratis';
 
                 return `
@@ -21508,6 +21514,7 @@ class AdminManager {
         const courseForm = document.getElementById('course-form');
         const courseIdInput = document.getElementById('course-id');
         const coursePriceInput = document.getElementById('course-price');
+        const coursePriceSuffixInput = document.getElementById('course-price-suffix');
 
         if (!modal || !title || !deleteBtn || !lessonsContainer || !courseForm || !courseIdInput || !coursePriceInput) {
             console.warn('Kursmodal mangler forventede felter og kunne ikke åpnes trygt.');
@@ -21518,6 +21525,7 @@ class AdminManager {
         courseForm.reset();
         courseIdInput.value = '';
         coursePriceInput.value = '0';
+        if (coursePriceSuffixInput) coursePriceSuffixInput.value = '';
         lessonsContainer.innerHTML = '';
         if (status) status.textContent = '';
 
@@ -21539,6 +21547,7 @@ class AdminManager {
                 document.getElementById('course-description').value = course.description || '';
                 document.getElementById('course-category').value = course.category || 'Bibelstudium';
                 document.getElementById('course-price').value = course.price || 0;
+                if (coursePriceSuffixInput) coursePriceSuffixInput.value = course.priceSuffix || '';
                 document.getElementById('course-image').value = course.imageUrl || '';
 
                 (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id));
@@ -21639,6 +21648,7 @@ class AdminManager {
             description: document.getElementById('course-description').value.trim(),
             category: document.getElementById('course-category').value,
             price: parseInt(document.getElementById('course-price').value) || 0,
+            priceSuffix: document.getElementById('course-price-suffix')?.value?.trim() || '',
             imageUrl: document.getElementById('course-image').value.trim(),
             lessons,
             updatedAt: new Date().toISOString()

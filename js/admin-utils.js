@@ -296,6 +296,7 @@
         const imageUrl = String(rawCourse?.imageUrl || '').trim();
         const priceNum = Number(rawCourse?.price || 0);
         const price = Number.isFinite(priceNum) && priceNum >= 0 ? Math.round(priceNum) : 0;
+        const priceSuffix = String(rawCourse?.priceSuffix || '').trim();
 
         if (!title) errors.push('Kurstitel er påkrevd.');
 
@@ -312,6 +313,11 @@
         rawLessons.forEach((lesson, index) => {
             const lessonTitle = String(lesson?.title || '').trim();
             const videoUrl = String(lesson?.videoUrl || '').trim();
+            const lessonId = String(lesson?.id || `les_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`).trim();
+            const lessonPriceNum = Number(lesson?.price || 0);
+            const lessonPrice = Number.isFinite(lessonPriceNum) && lessonPriceNum >= 0 ? Math.round(lessonPriceNum) : 0;
+            const lessonDate = String(lesson?.date || '').trim();
+            const zoomUrl = String(lesson?.zoomUrl || '').trim();
 
             if (!lessonTitle && !videoUrl) return;
             if (!lessonTitle || !videoUrl) {
@@ -324,7 +330,24 @@
                 errors.push(`Leksjon ${index + 1} har ugyldig video-URL.`);
                 return;
             }
-            lessons.push({ title: lessonTitle, videoUrl });
+
+            if (zoomUrl) {
+                try {
+                    new URL(zoomUrl);
+                } catch (e) {
+                    errors.push(`Leksjon ${index + 1} har ugyldig Zoom-URL.`);
+                    return;
+                }
+            }
+
+            lessons.push({
+                id: lessonId,
+                title: lessonTitle,
+                videoUrl,
+                price: lessonPrice,
+                date: lessonDate,
+                zoomUrl
+            });
         });
 
         const payload = {
@@ -332,6 +355,7 @@
             title,
             category,
             price,
+            priceSuffix,
             lessons,
             updatedAt: new Date().toISOString()
         };
