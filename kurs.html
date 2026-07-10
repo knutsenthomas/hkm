@@ -1776,18 +1776,27 @@
                             title: courseTitle,
                             text: 'Sjekk ut dette kurset fra His Kingdom Ministry: ' + courseTitle,
                             url: shareUrl
+                        }).then(() => {
+                            if (window.gtag) {
+                                window.gtag('event', 'share', {
+                                    method: 'Native Share',
+                                    content_type: 'course',
+                                    item_id: courseId,
+                                    item_name: courseTitle
+                                });
+                            }
                         }).catch(err => {
                             console.error('Error sharing:', err);
                             if (err.name !== 'AbortError') {
-                                openCustomShareModal(shareUrl, courseTitle);
+                                openCustomShareModal(shareUrl, courseTitle, courseId);
                             }
                         });
                     } else {
-                        openCustomShareModal(shareUrl, courseTitle);
+                        openCustomShareModal(shareUrl, courseTitle, courseId);
                     }
                 };
 
-                function openCustomShareModal(shareUrl, courseTitle) {
+                function openCustomShareModal(shareUrl, courseTitle, courseId) {
                     const modal = document.getElementById('share-modal-overlay');
                     const titleEl = document.getElementById('share-modal-course-title');
                     const inputEl = document.getElementById('share-link-input');
@@ -1799,16 +1808,48 @@
                     inputEl.value = shareUrl;
                     
                     document.getElementById('share-fb').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Facebook',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
                         window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), 'facebook-share-dialog', 'width=800,height=600');
                     };
                     document.getElementById('share-tw').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Twitter',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
                         window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(courseTitle), 'twitter-share-dialog', 'width=800,height=600');
                     };
                     document.getElementById('share-li').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'LinkedIn',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
                         window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shareUrl), 'linkedin-share-dialog', 'width=800,height=600');
                     };
                     
                     const copyAction = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Copy Link',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
                         navigator.clipboard.writeText(shareUrl).then(() => {
                             copyBtn.textContent = 'Kopiert!';
                             copyBtn.style.background = '#16a34a';
