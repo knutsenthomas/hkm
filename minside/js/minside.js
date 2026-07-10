@@ -4538,12 +4538,12 @@ class MinSideManager {
                     ${metaItems.map(item => {
                         const iconHtml = `<span class="material-symbols-outlined">${item.icon}</span>`;
                         const contentHtml = `
-                            <p class="hkm-meta-label">${item.label}</p>
+                            <span class="hkm-meta-label">${item.label}</span>
                             <div class="hkm-meta-value-container">
                                 <div class="hkm-meta-icon ${item.class}">
                                     ${iconHtml}
                                 </div>
-                                <p class="hkm-meta-val">${item.val}</p>
+                                <span class="hkm-meta-val">${item.val}</span>
                             </div>
                         `;
                         if (item.link) {
@@ -4663,6 +4663,7 @@ class MinSideManager {
                     display: flex;
                     align-items: center;
                     gap: 8px;
+                    height: 40px;
                 }
                 .hkm-meta-icon {
                     width: 40px;
@@ -4684,19 +4685,22 @@ class MinSideManager {
                     color: #d17d39;
                 }
                 .hkm-meta-label {
+                    display: inline-block;
                     font-size: 10px;
                     text-transform: uppercase;
                     font-weight: 700;
                     color: rgba(100, 116, 139, 0.6);
-                    margin: 0;
-                    padding-left: 48px;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    padding-left: 48px !important;
                     line-height: 1;
                 }
                 .hkm-meta-val {
                     font-size: 14px;
                     font-weight: 600;
                     color: #1e293b;
-                    margin: 0;
+                    margin: 0 !important;
+                    padding: 0 !important;
                     line-height: 1.2;
                 }
                 
