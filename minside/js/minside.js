@@ -4467,7 +4467,22 @@ class MinSideManager {
 
         // Build metadata dynamically based on actual database values
         const metaItems = [];
-        if (lesson.zoomUrl) {
+        if (lesson.videoUrl) {
+            metaItems.push({
+                icon: 'play_circle',
+                label: 'Type',
+                val: 'Video-undervisning',
+                class: ''
+            });
+            if (lesson.duration) {
+                metaItems.push({
+                    icon: 'schedule',
+                    label: 'Varighet',
+                    val: lesson.duration,
+                    class: 'secondary'
+                });
+            }
+        } else if (lesson.zoomUrl) {
             metaItems.push({
                 icon: 'videocam',
                 label: 'Type',
@@ -4485,21 +4500,6 @@ class MinSideManager {
                     icon: 'calendar_month',
                     label: 'Tidspunkt',
                     val: formattedDate,
-                    class: 'secondary'
-                });
-            }
-        } else if (lesson.videoUrl) {
-            metaItems.push({
-                icon: 'play_circle',
-                label: 'Type',
-                val: 'Video-undervisning',
-                class: ''
-            });
-            if (lesson.duration) {
-                metaItems.push({
-                    icon: 'schedule',
-                    label: 'Varighet',
-                    val: lesson.duration,
                     class: 'secondary'
                 });
             }
