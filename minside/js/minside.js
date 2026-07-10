@@ -4718,7 +4718,38 @@ class MinSideManager {
                             console.log('Zoom SDK joined successfully!');
                         } catch (err) {
                             console.error('Zoom SDK error:', err);
-                            const errMsg = err.message || JSON.stringify(err) || 'Ukjent feil';
+                            const errStr = JSON.stringify(err) || '';
+                            const errMsg = err.message || errStr || 'Ukjent feil';
+                            const errorCode = err.errorCode || (err.detail && err.detail.errorCode);
+                            const reason = err.reason || '';
+                            
+                            // Check if the meeting has not started yet (errorCode 3008)
+                            if (errorCode === 3008 || reason.includes('Meeting has not started') || errStr.includes('3008') || errMsg.includes('3008')) {
+                                playerContainer.innerHTML = `
+                                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
+                                        <style>
+                                            @keyframes zoom-pulse {
+                                                0%, 100% { opacity: 1; transform: scale(1); }
+                                                50% { opacity: 0.6; transform: scale(0.95); }
+                                            }
+                                        </style>
+                                        <span class="material-symbols-outlined" style="font-size: 48px; color: #3b82f6; animation: zoom-pulse 2s infinite;">schedule</span>
+                                        <div>
+                                            <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #93c5fd;">Møtet har ikke startet ennå</h3>
+                                            <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
+                                                Webinaret er planlagt til et senere tidspunkt. Vi overfører deg til Zooms venterom om 3 sekunder...
+                                            </p>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                setTimeout(() => {
+                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                                }, 3000);
+                                return;
+                            }
+                            
                             playerContainer.innerHTML = `
                                 <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
                                     <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
