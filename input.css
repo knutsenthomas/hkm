@@ -8972,16 +8972,20 @@ html[data-theme="dark"] #header-profile-link:hover {
 }
 
 .facebook-post-link::after {
-    content: " ↗";
-    font-family: inherit;
-    font-weight: bold;
-    font-size: 14px;
-    margin-left: 4px;
+    content: "";
     display: inline-block;
-    transition: transform 0.2s ease;
+    width: 11px;
+    height: 11px;
+    margin-left: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d17d39' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='7' y1='17' x2='17' y2='7'%3E%3C/line%3E%3Cpolyline points='7 7 17 7 17 17'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    transition: transform 0.2s ease, background-image 0.2s ease;
 }
 
 .facebook-post-card:hover .facebook-post-link::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bd4f2a' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='7' y1='17' x2='17' y2='7'%3E%3C/line%3E%3Cpolyline points='7 7 17 7 17 17'%3E%3C/polyline%3E%3C/svg%3E");
     transform: translate(2px, -2px);
 }
 
