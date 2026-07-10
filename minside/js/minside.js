@@ -4571,12 +4571,12 @@ class MinSideManager {
                     justify-content: center;
                 }
                 .hkm-meta-icon.secondary {
-                    background: #dde2f3;
-                    color: #585e6c;
+                    background: rgba(27, 73, 101, 0.06);
+                    color: #1B4965;
                 }
                 .hkm-meta-icon.tertiary {
-                    background: #e0f2fe;
-                    color: #0369a1;
+                    background: rgba(27, 73, 101, 0.06);
+                    color: #1B4965;
                 }
                 .hkm-meta-text {
                     display: flex;
@@ -4772,7 +4772,7 @@ class MinSideManager {
                     <div class="hkm-card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
                             <div style="flex:1; min-width: 250px;">
-                                <span style="font-size: 11px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
+                                <span style="font-size: 11px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
                                 <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
                                 <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
                             </div>
@@ -4933,16 +4933,6 @@ class MinSideManager {
                         </div>
                     </div>
 
-                    <!-- Bible Verse of the Day Card -->
-                    <div class="hkm-verse-card">
-                        <div style="position: relative; z-index: 10;">
-                            <span class="material-symbols-outlined" style="font-size:24px; color:rgba(255, 255, 255, 0.6); margin-bottom:12px;">format_quote</span>
-                            <p style="font-size: 13px; font-style: italic; line-height: 1.5; color: #ffffff; margin: 0 0 16px 0;">
-                                "Men den som drikker av det vannet jeg vil gi ham, skal aldri i evighet tørste. Det vannet jeg vil gi ham, skal bli en kilde i ham med vann som veller fram til evig liv."
-                            </p>
-                            <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:rgba(255, 255, 255, 0.7); margin:0;">Johannes 4:14</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         `;
