@@ -21390,8 +21390,14 @@ class AdminManager {
                 </button>
             `, '')}
 
-            <div id="courses-list" style="margin-bottom:32px;">
-                <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+            <div class="design-ui-shell">
+                <div class="design-ui-workspace" style="padding: 0;">
+                    <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div id="courses-list">
+                            <div class="loader" style="text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Course Modal -->
@@ -21558,7 +21564,7 @@ class AdminManager {
             }).join('');
 
             list.innerHTML = `
-                <div class="table-container" style="background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div class="table-container full-bleed">
                     <table class="crm-table">
                         <thead>
                             <tr>
