@@ -18,6 +18,8 @@ async function run() {
     body: `<div style="background-color: #f8fafc; padding: 32px 16px; border-radius: 16px; font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
   <!-- Header Branding -->
   <div style="text-align: center; margin-bottom: 24px;">
+    <img src="https://hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" style="height: 64px; max-width: 100%; display: inline-block; margin-bottom: 12px;" />
+    <br/>
     <span style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-size: 11px; font-weight: 800; padding: 6px 16px; border-radius: 9999px; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 6px rgba(209, 125, 57, 0.15);">
       His Kingdom Ministry
     </span>
