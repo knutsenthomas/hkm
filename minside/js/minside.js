@@ -1775,6 +1775,7 @@ class MinSideManager {
         const el = document.getElementById('notif-badge');
         const headerDot = document.getElementById('notif-badge-header');
         const bottomDot = document.getElementById('notif-badge-bottom');
+        const bellDot = document.getElementById('notif-badge-header-bell');
         
         if (el) {
             el.textContent = count > 9 ? '9+' : count;
@@ -1787,6 +1788,10 @@ class MinSideManager {
 
         if (bottomDot) {
             bottomDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
+        }
+
+        if (bellDot) {
+            bellDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
         }
     }
 
