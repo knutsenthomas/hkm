@@ -4727,18 +4727,20 @@ class MinSideManager {
                                         <p style="margin: 0 0 16px; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
                                             Kunne ikke starte den integrerte spilleren: <code>${errMsg}</code>
                                         </p>
-                                        <p style="margin: 0; font-size: 0.8rem; font-weight: 400; color: #94a3b8;">
-                                            Starter reserveløsning (iframe) om 6 sekunder...
-                                        </p>
+                                        <button id="zoom-fallback-trigger-btn" class="player-btn-zoom-app" style="background:#ef4444 !important; border-color:#ef4444 !important; font-size:0.8rem !important; height:38px !important; padding:6px 16px !important; border-radius:30px !important;">
+                                            Start reserveløsning (iframe)
+                                        </button>
                                     </div>
                                 </div>
                             `;
                             
-                            setTimeout(() => {
-                                // Fallback to standard web client iframe
-                                const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
-                                playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
-                            }, 6000);
+                            const fallbackBtn = document.getElementById('zoom-fallback-trigger-btn');
+                            if (fallbackBtn) {
+                                fallbackBtn.addEventListener('click', () => {
+                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                                });
+                            }
                         }
                     };
 
