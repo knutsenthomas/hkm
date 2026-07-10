@@ -5003,7 +5003,23 @@ class MinSideManager {
                                             <span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret
                                         </span>
                                     </div>
-                                    <textarea class="hkm-notes-textarea" id="lesson-notes-textarea" placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></textarea>
+                                    <div class="rte-wrapper">
+                                        <div class="rte-toolbar" id="rte-toolbar-lesson">
+                                            <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
+                                        </div>
+                                        <div class="rte-editor" id="lesson-notes-editor" contenteditable="true"
+                                            data-placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -5340,10 +5356,13 @@ class MinSideManager {
         });
 
         // 6. Notes Auto-save Logic
-        const textarea = container.querySelector('#lesson-notes-textarea');
+        const editor = container.querySelector('#lesson-notes-editor');
         const saveStatus = container.querySelector('#notes-save-status');
         let noteDocId = null;
         let saveTimeout = null;
+
+        // Wire the Rich Text Editor toolbar
+        this._wireRteToolbar('rte-toolbar-lesson', 'lesson-notes-editor');
 
         const loadNotes = async () => {
             saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
@@ -5357,10 +5376,10 @@ class MinSideManager {
                 if (!snap.empty) {
                     const noteDoc = snap.docs[0];
                     noteDocId = noteDoc.id;
-                    textarea.value = noteDoc.data().text || '';
+                    editor.innerHTML = noteDoc.data().text || '';
                     saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
                 } else {
-                    textarea.value = '';
+                    editor.innerHTML = '';
                     saveStatus.innerHTML = `Ingen lagrede notater`;
                 }
             } catch (e) {
@@ -5371,13 +5390,14 @@ class MinSideManager {
 
         await loadNotes();
 
-        textarea.addEventListener('input', () => {
+        editor.addEventListener('input', () => {
             saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
             clearTimeout(saveTimeout);
             
             saveTimeout = setTimeout(async () => {
-                const noteText = textarea.value.trim();
-                if (!noteText) {
+                const noteText = editor.innerHTML.trim();
+                const plainText = editor.innerText.trim();
+                if (!plainText) {
                     saveStatus.innerHTML = `Tomt notat`;
                     return;
                 }
