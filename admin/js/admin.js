@@ -21398,6 +21398,59 @@ class AdminManager {
                     color: #1B4965;
                     border-bottom: 2px solid #1B4965;
                 }
+                #courses-tab-view .design-ui-header,
+                #enrollments-tab-view .design-ui-header {
+                    position: relative;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 20px !important;
+                    padding: 24px 32px !important;
+                    margin: 24px 0 32px !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    background: #fff !important;
+                    border: 1px solid var(--admin-page-panel-border) !important;
+                    border-radius: 16px !important;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+                    text-align: left !important;
+                }
+                #courses-tab-view .design-ui-header > *,
+                #enrollments-tab-view .design-ui-header > * {
+                    position: relative;
+                    z-index: 1;
+                }
+                #courses-tab-view .design-ui-header .section-header-content,
+                #enrollments-tab-view .design-ui-header .section-header-content {
+                    min-width: 0;
+                    flex: 1;
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 16px !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    text-align: left !important;
+                }
+                #courses-tab-view .design-ui-header .section-header-titles,
+                #enrollments-tab-view .design-ui-header .section-header-titles {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 4px !important;
+                    text-align: left !important;
+                    align-items: flex-start !important;
+                }
+                #courses-tab-view .design-ui-header .section-title,
+                #enrollments-tab-view .design-ui-header .section-title {
+                    text-align: left !important;
+                    font-size: 18px !important;
+                    font-weight: 800 !important;
+                    color: #111827 !important;
+                }
+                #courses-tab-view .design-ui-header .section-subtitle,
+                #enrollments-tab-view .design-ui-header .section-subtitle {
+                    text-align: left !important;
+                    font-size: 13px !important;
+                    color: var(--admin-page-muted) !important;
+                }
             </style>
 
             <!-- Sub-tab Bar -->

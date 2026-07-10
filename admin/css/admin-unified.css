@@ -7577,7 +7577,7 @@ body.builder-active .main-header .section-subtitle {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  gap: 8px !important; /* 8px spacing */
+  gap: 12px !important; /* 12px spacing */
   height: 40px !important; /* 8px multiple */
   width: 160px !important; /* default width on narrower screens */
   padding: 0 16px !important; /* 8px multiple */
@@ -7628,7 +7628,7 @@ body.builder-active .main-header .section-subtitle {
 .bento-search-bar .material-symbols-outlined {
   font-size: 18px !important;
   color: #d17d39 !important;
-  font-weight: bold !important;
+  font-weight: normal !important;
   line-height: 1 !important;
   margin: 0 !important;
   display: flex !important;
