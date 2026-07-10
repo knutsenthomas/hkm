@@ -8463,7 +8463,8 @@ class AdminManager {
                 location: gi.location || '',
                 isSynced: true,
                 id: gi.id,
-                gcalId: gi.id
+                gcalId: gi.id,
+                updated: gi.updated
             })).filter((item) => item.title || item.date);
 
             gItems.forEach((gi) => {
@@ -8480,14 +8481,20 @@ class AdminManager {
                 existing.isSynced = true;
                 if (!existing.gcalId) existing.gcalId = gi.id;
 
-                // Merge GCal details: for synced events, GCal is the source of truth for description and location.
+                // Merge GCal details: for synced events, GCal is the source of truth for description and location,
+                // UNLESS the item has been edited in the admin dashboard (dashboardEdited = true).
                 if (gi.description) {
                     const existingDescHtml = typeof existing.content === 'object' && existing.content.blocks
                         ? this.blocksToHtml(existing.content)
                         : (existing.description || existing.content || '');
 
                     const cleanHtml = (html) => String(html || '').replace(/\s+/g, ' ').trim();
-                    if (cleanHtml(existingDescHtml) !== cleanHtml(gi.description)) {
+                    
+                    // Only let GCal overwrite if it has NOT been edited in the dashboard, or if GCal is actually newer
+                    const shouldSyncFromGcal = !existing.dashboardEdited || 
+                        (gi.updated && existing.dashboardEditedAt && new Date(gi.updated).getTime() > new Date(existing.dashboardEditedAt).getTime());
+
+                    if (shouldSyncFromGcal && cleanHtml(existingDescHtml) !== cleanHtml(gi.description)) {
                         console.log(`[AdminManager] GCal description updated for event ${gi.title}. Syncing to editor blocks.`);
                         existing.description = gi.description;
                         existing.content = this.htmlToEditorJsBlocks(gi.description);
