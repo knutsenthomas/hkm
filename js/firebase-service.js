@@ -961,7 +961,6 @@ class FirebaseService {
 
     async connectToGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        await this.ensureAuthPersistence();
 
         const provider = new firebase.auth.GoogleAuthProvider();
         // Request write access to calendar events

@@ -7751,6 +7751,16 @@ class AdminManager {
     }
 
     async handleGoogleAuth() {
+        if (this._googleAuthConnecting) return;
+        
+        const btn = document.getElementById('connect-google-btn');
+        const originalHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kobler til...';
+        }
+        
+        this._googleAuthConnecting = true;
         try {
             const result = await firebaseService.connectToGoogle();
             this.googleAccessToken = result.accessToken;
@@ -7759,6 +7769,10 @@ class AdminManager {
         } catch (error) {
             console.error('Google connection failed:', error);
             this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
+            // Re-render auth UI to restore button state
+            this._updateGoogleAuthUI();
+        } finally {
+            this._googleAuthConnecting = false;
         }
     }
 
