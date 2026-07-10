@@ -2701,7 +2701,8 @@ class ContentManager {
     }
 
     renderFacebookFeed(posts, pageUrl = '') {
-        const section = document.getElementById('facebook-feed');
+        const config = this.getFacebookFeedConfig();
+        const section = config.section || document.getElementById('facebook-feed');
         if (!section) return;
 
         // Ensure section is visible once we have data to render
@@ -2736,16 +2737,31 @@ class ContentManager {
             const ctaEl = card.querySelector('[data-content-key$=".cta"]');
             const imageEl = card.querySelector('.facebook-post-image');
             const imageWrap = card.querySelector('.facebook-post-image-wrap');
+            
+            const likesEl = card.querySelector('.likes-count');
+            const commentsEl = card.querySelector('.comments-count');
+            const statsEl = card.querySelector('.facebook-post-stats');
 
             if (dateEl && post.date) dateEl.textContent = post.date;
             if (titleEl && post.title) titleEl.textContent = post.title;
             if (excerptEl && post.excerpt) excerptEl.textContent = post.excerpt;
             if (ctaEl && post.cta) ctaEl.textContent = post.cta;
 
+            if (likesEl && typeof post.likes !== 'undefined') likesEl.textContent = post.likes;
+            if (commentsEl && typeof post.comments !== 'undefined') commentsEl.textContent = post.comments;
+
+            if (statsEl) {
+                if (typeof post.likes !== 'undefined' || typeof post.comments !== 'undefined') {
+                    statsEl.style.display = 'flex';
+                } else {
+                    statsEl.style.display = 'none';
+                }
+            }
+
             if (imageEl) {
                 const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
                 const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
-                const effectiveImage = liveImage || fallbackSrc;
+                const effectiveImage = liveImage || (config.useLiveFeed ? '' : fallbackSrc);
 
                 if (effectiveImage) {
                     if (imageEl.getAttribute('src') !== effectiveImage) {
