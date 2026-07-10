@@ -21423,7 +21423,7 @@ class AdminManager {
                             </div>
                             <div>
                                 <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
-                                <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;">
+                                <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;margin-bottom:8px;">
                                     <option value="Bibelstudium">Bibelstudium</option>
                                     <option value="Bønn">Bønn</option>
                                     <option value="Lederskap">Lederskap</option>
@@ -21432,6 +21432,10 @@ class AdminManager {
                                     <option value="Identitet">Identitet</option>
                                     <option value="Annet">Annet</option>
                                 </select>
+                                <div id="new-category-container" style="display:none;">
+                                    <input id="course-new-category" type="text" placeholder="Skriv ny kategori..."
+                                        style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                </div>
                             </div>
                             <div>
                                 <label style="display:block;font-weight:600;margin-bottom:6px;">Pris (NOK) – 0 = gratis</label>
@@ -21608,6 +21612,44 @@ class AdminManager {
         if (coursePriceSuffixInput) coursePriceSuffixInput.value = '';
         lessonsContainer.innerHTML = '';
         if (status) status.textContent = '';
+
+        // Dynamic categories populating
+        const select = document.getElementById('course-category');
+        if (select) {
+            const categories = new Set([
+                'Bibelstudium',
+                'Bønn',
+                'Lederskap',
+                'Helbredelse',
+                'Evangelisering',
+                'Identitet'
+            ]);
+            if (Array.isArray(this.coursesItems)) {
+                this.coursesItems.forEach(c => {
+                    if (c.category) categories.add(c.category);
+                });
+            }
+            select.innerHTML = Array.from(categories).map(cat => `
+                <option value="${this.escapeHtml(cat)}">${this.escapeHtml(cat)}</option>
+            `).join('') + `
+                <option value="__NEW__">+ Opprett ny kategori...</option>
+            `;
+            
+            const newCatContainer = document.getElementById('new-category-container');
+            const newCatInput = document.getElementById('course-new-category');
+            
+            select.onchange = () => {
+                if (select.value === '__NEW__') {
+                    newCatContainer.style.display = 'block';
+                    if (newCatInput) newCatInput.focus();
+                } else {
+                    newCatContainer.style.display = 'none';
+                    if (newCatInput) newCatInput.value = '';
+                }
+            };
+            newCatContainer.style.display = 'none';
+            if (newCatInput) newCatInput.value = '';
+        }
 
         if (index !== null) {
             // Edit existing
@@ -21831,11 +21873,23 @@ class AdminManager {
             }
         });
 
+        let category = document.getElementById('course-category').value;
+        if (category === '__NEW__') {
+            category = document.getElementById('course-new-category')?.value?.trim() || '';
+            if (!category) {
+                if (status) {
+                    status.style.color = '#ef4444';
+                    status.textContent = 'Vennligst oppgi navn på den nye kategorien.';
+                }
+                return;
+            }
+        }
+
         const rawCourse = {
             id: editCourseKey && !editCourseKey.startsWith('idx:') ? editCourseKey : `course_${Date.now()}`,
             title: document.getElementById('course-title').value.trim(),
             description: document.getElementById('course-description').value.trim(),
-            category: document.getElementById('course-category').value,
+            category: category,
             price: parseInt(document.getElementById('course-price').value) || 0,
             priceSuffix: document.getElementById('course-price-suffix')?.value?.trim() || '',
             imageUrl: document.getElementById('course-image').value.trim(),

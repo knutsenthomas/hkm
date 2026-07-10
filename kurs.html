@@ -1380,6 +1380,27 @@
                         animateCount(document.getElementById('stat-course-count'), allCourses.length);
                         animateCount(document.getElementById('stat-lesson-count'), totalLessons);
 
+                        // Populate categories dynamically
+                        const filterScroll = document.getElementById('filter-scroll');
+                        if (filterScroll) {
+                            const uniqueCategories = [...new Set(allCourses.map(c => c.category).filter(Boolean))];
+                            filterScroll.innerHTML = `
+                                <button class="filter-btn active" data-cat="all">Alle kurs</button>
+                                ${uniqueCategories.map(cat => `
+                                    <button class="filter-btn" data-cat="${cat}">${cat}</button>
+                                `).join('')}
+                            `;
+                            
+                            filterScroll.querySelectorAll('.filter-btn').forEach(btn => {
+                                btn.addEventListener('click', () => {
+                                    filterScroll.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                                    btn.classList.add('active');
+                                    activeFilter = btn.dataset.cat;
+                                    renderGrid(getFiltered());
+                                });
+                            });
+                        }
+
                         renderGrid(allCourses);
                     } catch (err) {
                         console.error('Course load error:', err);
@@ -1486,15 +1507,6 @@
                     }
                     return filtered;
                 }
-
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        activeFilter = btn.dataset.cat;
-                        renderGrid(getFiltered());
-                    });
-                });
 
                 let searchTimeout;
                 document.getElementById('course-search').addEventListener('input', e => {
