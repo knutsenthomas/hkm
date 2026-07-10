@@ -1816,8 +1816,11 @@ textarea.form-control {
 .btn-primary span.material-symbols-outlined {
     font-size: 20px;
     line-height: 1;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    transform: translateY(1.5px);
 }
 
 .btn-secondary {

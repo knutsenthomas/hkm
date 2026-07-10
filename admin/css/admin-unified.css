@@ -5995,7 +5995,20 @@ body.minside-body .sidebar-nav {
 .btn-login i,
 .btn-ghost i,
 .btn-link i {
-  margin-right: 4px !important; /* Elegant margin nudge inside all buttons/links to prevent text clash */
+}
+
+/* Center icons inside buttons vertically and ensure optical balance */
+.btn .material-symbols-outlined,
+.btn-primary .material-symbols-outlined,
+.btn-secondary .material-symbols-outlined,
+.btn-outline .material-symbols-outlined,
+.btn-danger .material-symbols-outlined,
+button .material-symbols-outlined {
+  vertical-align: middle !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: translateY(1.5px) !important;
 }
 
 /* Badges & Status Pills Icon Spacing */
