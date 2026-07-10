@@ -1859,100 +1859,137 @@
                     const container = document.getElementById('featured-courses-container');
                     if (!container) return;
 
-                    // 1. Determine Spotlight Course
-                    let spotlightCourse = allCourses[0];
-                    let isSpotlightMock = false;
-                    if (!spotlightCourse) {
-                        spotlightCourse = {
-                            id: 'mock_spotlight',
-                            title: 'Fundamentet for Tro',
-                            description: 'En grundig gjennomgang av de viktigste pilarene i den kristne tro, bygget for å gi deg et solid fundament.',
-                            imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'
-                        };
-                        isSpotlightMock = true;
+                    // If no courses are loaded, hide the featured section entirely
+                    if (!allCourses || allCourses.length === 0) {
+                        const featuredSection = document.getElementById('featured-teaching');
+                        if (featuredSection) featuredSection.style.display = 'none';
+                        return;
                     }
 
-                    // 2. Determine Right Course 1
-                    let rightCourse1 = allCourses[1];
-                    let isRight1Mock = false;
-                    if (!rightCourse1) {
-                        rightCourse1 = {
-                            id: 'mock_right_1',
-                            title: 'Bønnens Kraft',
-                            description: 'Lær hvordan du kan utvikle et rikere og mer meningsfylt bønneliv i hverdagen.',
-                            imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
-                            durationText: '12 Timer',
-                            studentsText: '1.2k Studenter'
-                        };
-                        isRight1Mock = true;
-                    } else {
-                        rightCourse1.durationText = (rightCourse1.lessons || []).length + ' leksjoner';
-                        const isFree = !rightCourse1.price || rightCourse1.price === 0;
-                        rightCourse1.studentsText = isFree ? 'Gratis tilgang' : 'Betalt kurs';
+                    // Explicitly make sure the section is visible if we have courses
+                    const featuredSection = document.getElementById('featured-teaching');
+                    if (featuredSection) {
+                        const searchInput = document.getElementById('course-search');
+                        const hasSearch = searchInput && searchInput.value.trim().length > 0;
+                        const hasFilter = activeFilter && activeFilter !== 'all';
+                        if (!hasSearch && !hasFilter) {
+                            featuredSection.style.display = 'block';
+                        }
                     }
 
-                    // 3. Determine Right Course 2
-                    let rightCourse2 = allCourses[2];
-                    let isRight2Mock = false;
-                    if (!rightCourse2) {
-                        rightCourse2 = {
-                            id: 'mock_right_2',
-                            title: 'Lederskap i Tjeneste',
-                            description: 'Prinsipper for å lede andre med ydmykhet, visjon og integritet i en moderne verden.',
-                            imageUrl: 'https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=600&q=80',
-                            durationText: '8 Timer',
-                            studentsText: '850 Studenter'
-                        };
-                        isRight2Mock = true;
-                    } else {
-                        rightCourse2.durationText = (rightCourse2.lessons || []).length + ' leksjoner';
-                        const isFree = !rightCourse2.price || rightCourse2.price === 0;
-                        rightCourse2.studentsText = isFree ? 'Gratis tilgang' : 'Betalt kurs';
-                    }
-
-                    const badgeText = isSpotlightMock ? 'Kommer Snart' : 'Populært';
-
-                    container.innerHTML = `
-                        <!-- Left: Large Spotlight Card -->
-                        <div class="spotlight-card" onclick="handleCourseCardClick('${spotlightCourse.id}', ${isSpotlightMock})">
-                            <img class="spotlight-card-bg" src="${spotlightCourse.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${spotlightCourse.title}" loading="lazy">
-                            <div class="spotlight-content">
-                                <span class="spotlight-badge" style="${isSpotlightMock ? 'background:#64748b;' : ''}">${badgeText}</span>
-                                <h3 class="spotlight-title">${spotlightCourse.title}</h3>
-                                <p class="spotlight-desc">${spotlightCourse.description || ''}</p>
-                                <button class="spotlight-btn">
-                                    Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
-                                </button>
+                    if (allCourses.length === 1) {
+                        // Single course: render a full-width Spotlight Card
+                        const course = allCourses[0];
+                        
+                        container.style.gridTemplateColumns = '1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course.id}', false)" style="min-height: 400px;">
+                                <img class="spotlight-card-bg" src="${course.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course.title}" loading="lazy">
+                                <div class="spotlight-content" style="max-width: 800px;">
+                                    <span class="spotlight-badge">Utvalgt Kurs</span>
+                                    <h3 class="spotlight-title">${course.title}</h3>
+                                    <p class="spotlight-desc" style="max-width: 700px;">${course.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        `;
+                    } else if (allCourses.length === 2) {
+                        // Two courses: render spotlight card on the left, and one horizontal card on the right
+                        const course1 = allCourses[0];
+                        const course2 = allCourses[1];
+                        
+                        course2.durationText = (course2.lessons || []).length + ' leksjoner';
+                        const isFree2 = !course2.price || course2.price === 0;
+                        course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
 
-                        <!-- Right: Two smaller horizontal cards -->
-                        <div class="featured-list-col">
-                            <div class="horizontal-course-card" onclick="handleCourseCardClick('${rightCourse1.id}', ${isRight1Mock})">
-                                <img class="horizontal-course-thumb" src="${rightCourse1.imageUrl}" alt="${rightCourse1.title}" loading="lazy">
-                                <div class="horizontal-course-content">
-                                    <h4 class="horizontal-course-title">${rightCourse1.title}</h4>
-                                    <p class="horizontal-course-desc">${rightCourse1.description}</p>
-                                    <div class="horizontal-course-meta">
-                                        <span><i class="far fa-clock"></i> ${rightCourse1.durationText}</span>
-                                        <span><i class="far fa-user"></i> ${rightCourse1.studentsText}</span>
+                        container.style.gridTemplateColumns = '1.2fr 1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)">
+                                <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
+                                <div class="spotlight-content">
+                                    <span class="spotlight-badge">Populært</span>
+                                    <h3 class="spotlight-title">${course1.title}</h3>
+                                    <p class="spotlight-desc">${course1.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="featured-list-col">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="height: 100%; display: flex; align-items: center;">
+                                    <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course2.title}</h4>
+                                        <p class="horizontal-course-desc">${course2.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course2.durationText}</span>
+                                            <span><i class="far fa-user"></i> ${course2.studentsText}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="horizontal-course-card" onclick="handleCourseCardClick('${rightCourse2.id}', ${isRight2Mock})">
-                                <img class="horizontal-course-thumb" src="${rightCourse2.imageUrl}" alt="${rightCourse2.title}" loading="lazy">
-                                <div class="horizontal-course-content">
-                                    <h4 class="horizontal-course-title">${rightCourse2.title}</h4>
-                                    <p class="horizontal-course-desc">${rightCourse2.description}</p>
-                                    <div class="horizontal-course-meta">
-                                        <span><i class="far fa-clock"></i> ${rightCourse2.durationText}</span>
-                                        <span><i class="far fa-user"></i> ${rightCourse2.studentsText}</span>
+                        `;
+                    } else {
+                        // 3 or more courses: render standard layout with spotlight + 2 horizontal cards
+                        const course1 = allCourses[0];
+                        const course2 = allCourses[1];
+                        const course3 = allCourses[2];
+                        
+                        course2.durationText = (course2.lessons || []).length + ' leksjoner';
+                        const isFree2 = !course2.price || course2.price === 0;
+                        course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
+
+                        course3.durationText = (course3.lessons || []).length + ' leksjoner';
+                        const isFree3 = !course3.price || course3.price === 0;
+                        course3.studentsText = isFree3 ? 'Gratis tilgang' : 'Betalt kurs';
+
+                        container.style.gridTemplateColumns = '1.2fr 1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)">
+                                <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
+                                <div class="spotlight-content">
+                                    <span class="spotlight-badge">Populært</span>
+                                    <h3 class="spotlight-title">${course1.title}</h3>
+                                    <p class="spotlight-desc">${course1.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="featured-list-col">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)">
+                                    <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course2.title}</h4>
+                                        <p class="horizontal-course-desc">${course2.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course2.durationText}</span>
+                                            <span><i class="far fa-user"></i> ${course2.studentsText}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course3.id}', false)">
+                                    <img class="horizontal-course-thumb" src="${course3.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course3.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course3.title}</h4>
+                                        <p class="horizontal-course-desc">${course3.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course3.durationText}</span>
+                                            <span><i class="far fa-user"></i> ${course3.studentsText}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
                 }
 
                 function updateFeaturedVisibility() {
