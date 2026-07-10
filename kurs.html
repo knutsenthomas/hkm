@@ -1933,6 +1933,8 @@
                         // Single course: render a full-width Spotlight Card
                         const course = allCourses[0];
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
+                        const isFree = !course.price || course.price === 0;
+                        const priceText = isFree ? 'Gratis' : 'kr ' + course.price + ',-';
                         
                         container.style.gridTemplateColumns = '1fr';
                         
@@ -1943,7 +1945,10 @@
                                 </button>
                                 <img class="spotlight-card-bg" src="${course.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course.title}" loading="lazy">
                                 <div class="spotlight-content" style="max-width: 800px;">
-                                    <span class="spotlight-badge">Utvalgt Kurs</span>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Utvalgt Kurs</span>
+                                        <span class="spotlight-badge" style="background: ${isFree ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText}</span>
+                                    </div>
                                     <h3 class="spotlight-title">${course.title}</h3>
                                     <p class="spotlight-desc" style="max-width: 700px;">${course.description || ''}</p>
                                     <button class="spotlight-btn">
@@ -1960,9 +1965,12 @@
                         const safeTitle1 = (course1.title || '').replace(/'/g, "\\'");
                         const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
                         
+                        const isFree1 = !course1.price || course1.price === 0;
+                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
-                        course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
+                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
 
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
@@ -1973,7 +1981,10 @@
                                 </button>
                                 <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
                                 <div class="spotlight-content">
-                                    <span class="spotlight-badge">Populært</span>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
+                                        <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                    </div>
                                     <h3 class="spotlight-title">${course1.title}</h3>
                                     <p class="spotlight-desc">${course1.description || ''}</p>
                                     <button class="spotlight-btn">
@@ -1993,7 +2004,7 @@
                                         <p class="horizontal-course-desc">${course2.description || ''}</p>
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course2.durationText}</span>
-                                            <span><i class="far fa-user"></i> ${course2.studentsText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -2009,13 +2020,16 @@
                         const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
                         const safeTitle3 = (course3.title || '').replace(/'/g, "\\'");
                         
+                        const isFree1 = !course1.price || course1.price === 0;
+                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        
                         course2.durationText = (course2.lessons || []).length + ' leksjoner';
                         const isFree2 = !course2.price || course2.price === 0;
-                        course2.studentsText = isFree2 ? 'Gratis tilgang' : 'Betalt kurs';
+                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
 
                         course3.durationText = (course3.lessons || []).length + ' leksjoner';
                         const isFree3 = !course3.price || course3.price === 0;
-                        course3.studentsText = isFree3 ? 'Gratis tilgang' : 'Betalt kurs';
+                        course3.priceText = isFree3 ? 'Gratis' : 'kr ' + course3.price + ',-';
 
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
@@ -2026,7 +2040,10 @@
                                 </button>
                                 <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
                                 <div class="spotlight-content">
-                                    <span class="spotlight-badge">Populært</span>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
+                                        <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                    </div>
                                     <h3 class="spotlight-title">${course1.title}</h3>
                                     <p class="spotlight-desc">${course1.description || ''}</p>
                                     <button class="spotlight-btn">
@@ -2046,7 +2063,7 @@
                                         <p class="horizontal-course-desc">${course2.description || ''}</p>
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course2.durationText}</span>
-                                            <span><i class="far fa-user"></i> ${course2.studentsText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -2061,7 +2078,7 @@
                                         <p class="horizontal-course-desc">${course3.description || ''}</p>
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course3.durationText}</span>
-                                            <span><i class="far fa-user"></i> ${course3.studentsText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course3.priceText}</span>
                                         </div>
                                     </div>
                                 </div>
