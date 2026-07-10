@@ -350,7 +350,15 @@ export default async function handler(req, res) {
     html = html.replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/gi, '');
     html = html.replace(/<meta\s+content="[\s\S]*?"\s+name="description"\s*\/?>/gi, '');
 
-    // 3. Inject new tags right before </head>
+    // 3. Remove existing og:* tags
+    html = html.replace(/<meta\s+(?:property|name)="og:[^"]*"\s+content="[^"]*"\s*\/?>/gi, '');
+    html = html.replace(/<meta\s+content="[^"]*"\s+(?:property|name)="og:[^"]*"\s*\/?>/gi, '');
+
+    // 4. Remove existing twitter:* tags
+    html = html.replace(/<meta\s+(?:property|name)="twitter:[^"]*"\s+content="[^"]*"\s*\/?>/gi, '');
+    html = html.replace(/<meta\s+content="[^"]*"\s+(?:property|name)="twitter:[^"]*"\s*\/?>/gi, '');
+
+    // 5. Inject new tags right before </head>
     html = html.replace('</head>', `${ogTags}\n</head>`);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
