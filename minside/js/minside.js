@@ -4570,6 +4570,10 @@ class MinSideManager {
         const playerContainer = document.getElementById('player-container');
         
         const loadPlayer = () => {
+            // Reset to default 16:9 aspect ratio styling first
+            playerContainer.style.paddingTop = '56.25%';
+            playerContainer.style.height = 'auto';
+
             if (lesson.videoUrl) {
                 // Recorded Video Player
                 const ytId = parseYoutube(lesson.videoUrl);
@@ -4587,6 +4591,10 @@ class MinSideManager {
                 // Zoom embed
                 const zoomData = parseZoom(lesson.zoomUrl);
                 if (zoomData) {
+                    // Increase container height for Zoom meeting interface to prevent clipping
+                    playerContainer.style.paddingTop = '0px';
+                    playerContainer.style.height = '600px';
+
                     const studentName = this.profileData?.name || this.currentUser?.displayName || 'Student';
                     const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
                     playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>`;
