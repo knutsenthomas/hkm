@@ -4463,6 +4463,8 @@ class MinSideManager {
             return match ? match[1] : null;
         };
 
+        const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+
         // Render Layout
         container.innerHTML = `
             <style>
