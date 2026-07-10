@@ -6786,12 +6786,12 @@ body.builder-active .btn-primary:active,
 
 
 
-  /* Hide the administrator subtext to save horizontal space and keep it extremely clean */
+  /* Show the administrator/member subtext as it fits perfectly with our responsive search bar */
   body.admin-body .main-header .user-profile-link .user-role,
   body.minside-body .main-header .user-profile-link .user-role,
   body.crm-body .main-header .user-profile-link .user-role,
   body.builder-active .main-header .user-profile-link .user-role {
-    display: none !important;
+    display: block !important;
   }
 
   /* Reduce profile card gap and padding for narrow screens */
