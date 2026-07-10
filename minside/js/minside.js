@@ -4235,12 +4235,13 @@ class MinSideManager {
                                     const formattedDate = l.date ? new Date(l.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
                                     const dateStr = formattedDate ? `Klasse: ${formattedDate}` : '';
                                     
+                                    const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
                                     return `
                                     <div style="background:white; border-radius:12px; padding:14px 18px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                                         <div>
                                             <div style="font-weight:650; font-size:0.92rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
                                                 <span style="font-size:0.8rem; color:#d17d39; font-weight:700;">#${lIdx + 1}</span>
-                                                ${l.title || 'Leksjonsøving'}
+                                                ${cleanTitle}
                                             </div>
                                             <div style="font-size:0.8rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:12px;">
                                                 ${dateStr ? `<span><i class="far fa-calendar-alt"></i> ${dateStr}</span>` : ''}
