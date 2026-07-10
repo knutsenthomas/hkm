@@ -2787,6 +2787,10 @@ body.hero-animate .slide-buttons {
     .about-image {
         display: none !important;
     }
+
+    .event-large-image-wrap {
+        display: none !important;
+    }
 }
 
 /* Fix horizontal overflow from decorative images */
