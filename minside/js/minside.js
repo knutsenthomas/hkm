@@ -1936,7 +1936,7 @@ class MinSideManager {
                 </div>
 
                 <!-- Available courses -->
-                <div class="bento-stat-card bento-purple" onclick="window.minSideManager.loadView('courses')">
+                <div class="bento-stat-card bento-brand-blue" onclick="window.minSideManager.loadView('courses')">
                     <div class="bento-card-header">
                         <div class="bento-icon-wrap">
                             <span class="material-symbols-outlined">school</span>
