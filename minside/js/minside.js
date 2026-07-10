@@ -4620,7 +4620,7 @@ class MinSideManager {
                     flex-direction: row;
                     gap: 24px;
                     width: 100%;
-                    margin-top: 8px;
+                    margin-top: 24px;
                 }
                 @media (max-width: 1024px) {
                     .hkm-player-grid {
