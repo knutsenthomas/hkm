@@ -4475,10 +4475,12 @@ class MinSideManager {
                 class: ''
             });
             if (lesson.date) {
-                const formattedDate = new Date(lesson.date).toLocaleDateString(
+                let formattedDate = new Date(lesson.date).toLocaleDateString(
                     document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'nb-NO',
                     { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
                 );
+                // Remove the comma after abbreviation dots in Norwegian (e.g. "7. aug., 19:00" -> "7. aug. 19:00")
+                formattedDate = formattedDate.replace('.,', '.');
                 metaItems.push({
                     icon: 'calendar_month',
                     label: 'Tidspunkt',
