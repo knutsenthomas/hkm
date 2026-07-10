@@ -319,16 +319,20 @@
             const lessonDate = String(lesson?.date || '').trim();
             const zoomUrl = String(lesson?.zoomUrl || '').trim();
 
-            if (!lessonTitle && !videoUrl) return;
-            if (!lessonTitle || !videoUrl) {
-                errors.push(`Leksjon ${index + 1} må ha både tittel og video-URL.`);
+            if (!lessonTitle) {
+                if (videoUrl || zoomUrl || lessonDate || lessonPrice > 0) {
+                    errors.push(`Leksjon ${index + 1} må ha en tittel.`);
+                }
                 return;
             }
-            try {
-                new URL(videoUrl);
-            } catch (e) {
-                errors.push(`Leksjon ${index + 1} har ugyldig video-URL.`);
-                return;
+
+            if (videoUrl) {
+                try {
+                    new URL(videoUrl);
+                } catch (e) {
+                    errors.push(`Leksjon ${index + 1} har ugyldig video-URL.`);
+                    return;
+                }
             }
 
             if (zoomUrl) {
