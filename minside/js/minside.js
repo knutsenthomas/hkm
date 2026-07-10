@@ -1150,10 +1150,10 @@ class MinSideManager {
                     const isCollapsed = window.getComputedStyle(body).display === 'none';
                     if (isCollapsed) {
                         body.style.setProperty('display', 'flex', 'important');
-                        chevron.style.transform = 'rotate(180deg)';
+                        chevron.style.setProperty('transform', 'rotate(180deg) translateZ(0)', 'important');
                     } else {
                         body.style.setProperty('display', 'none', 'important');
-                        chevron.style.transform = 'rotate(0deg)';
+                        chevron.style.setProperty('transform', 'rotate(0deg) translateZ(0)', 'important');
                     }
                 }
             }
@@ -4294,7 +4294,7 @@ class MinSideManager {
                             <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined" style="display: inline-flex; align-items: center; justify-content: center; font-size:18px; line-height: 1 !important;">format_list_bulleted</span> Leksjoner og Live-økter
                             </h4>
-                            <span class="material-symbols-outlined expand-chevron" style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 20px; line-height: 1 !important; color:#64748b; transition: transform 0.3s ease; transform-origin: center; margin: 0 !important; padding: 0 !important;">expand_more</span>
+                            <span class="material-symbols-outlined expand-chevron" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; font-size: 20px; line-height: 1 !important; color:#64748b; transition: transform 0.3s ease; transform-origin: center center !important; margin: 0 !important; padding: 0 !important; will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: rotate(0deg) translateZ(0);">expand_more</span>
                         </div>
                         
                         <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:none; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
