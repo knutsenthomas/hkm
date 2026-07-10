@@ -4079,8 +4079,8 @@ class ContentManager {
             }
         } catch (e) { }
 
-        // 2. Initial fetch (Cached if 15m TTL)
-        const allEvents = await this.loadEvents();
+        // 2. Initial fetch (Force refresh to bypass 15m cache, so updates show up immediately)
+        const allEvents = await this.loadEvents(true);
         const foundInCurrent = allEvents.find(e => this.getEventKey(e) === eventKey || encodeURIComponent(this.getEventKey(e)) === eventKey);
 
         if (foundInCurrent) {
