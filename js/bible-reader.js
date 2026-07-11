@@ -5002,6 +5002,18 @@ class BibleReader {
             globalPlan.title.toLowerCase().includes('oración')
         );
 
+        let displayTitle = globalPlan.title || '';
+        const titleLower = displayTitle.toLowerCase();
+        if (titleLower === 'johannesevangeliet' || titleLower === 'gospel of john' || titleLower === 'evangelio de juan') {
+            displayTitle = lang === 'no' ? 'Johannes' : (lang === 'es' ? 'Juan' : 'John');
+        } else if (titleLower === 'matteusevangeliet' || titleLower === 'gospel of matthew' || titleLower === 'evangelio de mateo') {
+            displayTitle = lang === 'no' ? 'Matteus' : (lang === 'es' ? 'Mateo' : 'Matthew');
+        } else if (titleLower === 'markusevangeliet' || titleLower === 'gospel of mark' || titleLower === 'evangelio de marcos') {
+            displayTitle = lang === 'no' ? 'Markus' : (lang === 'es' ? 'Marcos' : 'Mark');
+        } else if (titleLower === 'lukasevangeliet' || titleLower === 'gospel of luke' || titleLower === 'evangelio de lucas') {
+            displayTitle = lang === 'no' ? 'Lukas' : (lang === 'es' ? 'Lucas' : 'Luke');
+        }
+
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
@@ -5018,9 +5030,10 @@ class BibleReader {
             const activeClass = isActive ? 'active' : '';
 
             // Calculate date label: JUL 10, JUL 11 etc.
-            const dayDate = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate() + (d - 1));
-            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DES"];
-            const dateLabel = `${monthNames[dayDate.getMonth()]} ${dayDate.getDate()}`;
+            const dateObj = new Date(startedAtDate);
+            dateObj.setDate(startedAtDate.getDate() + (d - 1));
+            const monthName = dateObj.toLocaleDateString(lang, { month: 'short' }).replace('.', '').toUpperCase();
+            const dateLabel = `${monthName} ${dateObj.getDate()}`;
 
             dayItemsHtml += `
                 <button class="hkm-rp-day-strip-bubble-v3 ${completedClass} ${activeClass}" 
@@ -5028,7 +5041,7 @@ class BibleReader {
                         style="box-sizing: border-box;">
                     <span class="day-num">${d}</span>
                     <span class="day-date">${dateLabel}</span>
-                    ${isCompleted ? '<span class="check-badge">✓</span>' : ''}
+                    ${isCompleted ? '<span class="material-symbols-outlined check-badge">check</span>' : ''}
                 </button>
             `;
         }
@@ -5048,7 +5061,7 @@ class BibleReader {
                     <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
                         <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
                     </button>
-                    <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${globalPlan.title}</h2>
+                    <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${displayTitle}</h2>
                     <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
