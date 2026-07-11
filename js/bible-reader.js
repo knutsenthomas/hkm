@@ -6109,12 +6109,27 @@ class BibleReader {
                     <div class="hkm-devotional-prayer-box">${text}</div>
                 `;
             } else {
-                stepContentHtml = `
-                    <h3 class="hkm-devotional-step-title">${heading}</h3>
-                    <div class="hkm-devotional-text-serif" style="text-align: left; font-style: normal !important;">
-                        ${this.formatDevotionalText(text)}
-                    </div>
-                `;
+                const formattedText = this.formatDevotionalText(text);
+                const startsWithHeading = formattedText.trim().startsWith('<h1') || 
+                                          formattedText.trim().startsWith('<h2') || 
+                                          formattedText.trim().startsWith('<h3') || 
+                                          formattedText.trim().startsWith('<h4');
+                
+                if (startsWithHeading) {
+                    stepContentHtml = `
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39; margin-bottom: 8px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.2;">${heading}</div>
+                        <div class="hkm-devotional-text-serif" style="text-align: left; font-style: normal !important;">
+                            ${formattedText}
+                        </div>
+                    `;
+                } else {
+                    stepContentHtml = `
+                        <h3 class="hkm-devotional-step-title">${heading}</h3>
+                        <div class="hkm-devotional-text-serif" style="text-align: left; font-style: normal !important;">
+                            ${formattedText}
+                        </div>
+                    `;
+                }
             }
         } else if (step === 3) {
             const heading = lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Dypere Dykk');
