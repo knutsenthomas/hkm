@@ -3022,11 +3022,14 @@ exports.createPaymentIntent = onRequest({
     }
     const stripe = require('stripe')(stripeKey, { apiVersion: '2023-10-16' });
 
+    const isCourse = (customerDetails.type === 'Course' || customerDetails.courseId);
+    const transactionType = isCourse ? "Kurs" : "Gave";
+
     const paymentIntentPayload = {
       amount: amountOre, // Stripe bruker ore (cents)
       currency: normalizedCurrency,
       receipt_email: customerDetails.email || undefined,
-      description: `Donasjon fra ${customerDetails.name || "Ukjent"}`,
+      description: isCourse ? `Kurs: ${customerDetails.courseTitle || "Kurskjøp"} - ${customerDetails.name || "Ukjent"}` : `Donasjon fra ${customerDetails.name || "Ukjent"}`,
       metadata: {
         customer_name: customerDetails.name,
         customer_email: customerDetails.email,
@@ -3037,6 +3040,9 @@ exports.createPaymentIntent = onRequest({
         message: customerDetails.message,
         user_id: resolvedUserId || "",
         fund: customerDetails.fund || "general",
+        type: transactionType,
+        course_id: customerDetails.courseId || "",
+        course_title: customerDetails.courseTitle || "",
       },
       shipping: customerDetails.name && customerDetails.address ? {
         name: customerDetails.name,
@@ -3075,7 +3081,9 @@ exports.createPaymentIntent = onRequest({
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
-      type: "Gave",
+      type: transactionType,
+      courseId: customerDetails.courseId || null,
+      courseTitle: customerDetails.courseTitle || null,
       fund: customerDetails.fund || "general"
     });
 
@@ -3694,6 +3702,9 @@ exports.createVippsPayment = onRequest({
     const paymentReturnUrl = buildVippsReturnUrl(returnUrl, reference);
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
 
+    const isCourse = (customerDetails.type === 'Course' || customerDetails.courseId);
+    const transactionType = isCourse ? "Kurs" : "Gave";
+
     const paymentRequest = {
       merchantInfo: {
         merchantSerialNumber: config.merchantSerialNumber,
@@ -3705,7 +3716,7 @@ exports.createVippsPayment = onRequest({
       transaction: {
         amount: amountOre,
         orderId: reference,
-        transactionText: "Donasjon til His Kingdom Ministry"
+        transactionText: isCourse ? `Kurs: ${customerDetails.courseTitle || "Kurskjøp"}` : "Donasjon til His Kingdom Ministry"
       }
     };
 
@@ -3728,7 +3739,9 @@ exports.createVippsPayment = onRequest({
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
-      type: "Gave",
+      type: transactionType,
+      courseId: customerDetails.courseId || null,
+      courseTitle: customerDetails.courseTitle || null,
       fund: customerDetails.fund || "general"
     });
 
@@ -4155,7 +4168,9 @@ exports.stripeWebhook = onRequest({
         donorName: metadata.customer_name || "Ukjent",
         donorEmail: metadata.customer_email || paymentIntent.receipt_email || "Ukjent",
         message: metadata.message || "",
-        type: "Gave",
+        type: metadata.type || "Gave",
+        courseId: metadata.course_id || null,
+        courseTitle: metadata.course_title || null,
         fund: metadata.fund || "general"
       }, { merge: true });
       

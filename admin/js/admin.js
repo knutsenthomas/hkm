@@ -13837,9 +13837,13 @@ class AdminManager {
 
         return records.filter((record) => {
             if (record.isInKind) return false;
-            // Exclude shop transactions from the donations list unless type is 'all' or 'butikk'
-            if (String(record.type || '').toLowerCase() === 'butikk') {
+            // Exclude shop and course transactions from the donations list unless type is 'all' or specifically requested
+            const recTypeLower = String(record.type || '').toLowerCase();
+            if (recTypeLower === 'butikk') {
                 if (type !== 'all' && type !== 'butikk') return false;
+            }
+            if (recTypeLower === 'kurs' || recTypeLower === 'course') {
+                if (type !== 'all' && type !== 'kurs' && type !== 'course') return false;
             }
 
             const date = this.getDonationDate(record);
@@ -14002,7 +14006,8 @@ class AdminManager {
             if (['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase())) {
                 existing.completedCount += 1;
                 existing.total += amount;
-                if (String(record.type || '').toLowerCase() === 'butikk') {
+                const recType = String(record.type || '').toLowerCase();
+                if (recType === 'butikk' || recType === 'kurs' || recType === 'course' || recType === 'product') {
                     existing.totalShop += amount;
                 } else {
                     existing.totalGifts += amount;
@@ -14082,12 +14087,17 @@ class AdminManager {
         // 1. Calculations for donations tab
         const todayRecords = (this.allDonationRecords || []).filter((record) => {
             if (record.isInKind) return false;
-            if (String(record.type || '').toLowerCase() === 'butikk') return false;
+            const recType = String(record.type || '').toLowerCase();
+            if (recType === 'butikk' || recType === 'kurs' || recType === 'course' || recType === 'product') return false;
             const date = this.getDonationDate(record);
             return date && date >= todayRange.start && date <= todayRange.end;
         });
         const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
-        const allRecords = (this.allDonationRecords || []).filter(r => !r.isInKind && String(r.type || '').toLowerCase() !== 'butikk');
+        const allRecords = (this.allDonationRecords || []).filter(r => {
+            if (r.isInKind) return false;
+            const recType = String(r.type || '').toLowerCase();
+            return recType !== 'butikk' && recType !== 'kurs' && recType !== 'course' && recType !== 'product';
+        });
         const allCompletedRecords = allRecords.filter(isCompleted);
         const allCompletedTotal = allCompletedRecords.reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const allAverage = allCompletedRecords.length ? allCompletedTotal / allCompletedRecords.length : 0;
@@ -14140,6 +14150,10 @@ class AdminManager {
                 let typeBadge = '';
                 if (recType === 'fast') {
                     typeBadge = `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">FAST</span>`;
+                } else if (recType === 'butikk' || recType === 'product') {
+                    typeBadge = `<span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">BUTIKK</span>`;
+                } else if (recType === 'kurs' || recType === 'course') {
+                    typeBadge = `<span style="background: #f0fdf4; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">KURS</span>`;
                 } else {
                     typeBadge = `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">ENKELT</span>`;
                 }
@@ -14755,9 +14769,16 @@ class AdminManager {
 
         // Calculate summary stats
         const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
-        const completedGifts = donations.filter(isCompleted);
-        const donorTotal = completedGifts.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
-        const giftCount = donations.length;
+        const completedOnly = donations.filter(isCompleted);
+        
+        const isProdType = (r) => ['butikk', 'kurs', 'course', 'product'].includes(String(r.type || '').toLowerCase());
+        const completedGifts = completedOnly.filter(r => !isProdType(r));
+        const completedProducts = completedOnly.filter(isProdType);
+        
+        const donorTotalGifts = completedGifts.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        const donorTotalProducts = completedProducts.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        
+        const giftCount = donations.filter(r => !isProdType(r)).length;
         const completedCount = completedGifts.length;
         
         const latestDate = this.getDonationDate(firstRec);
@@ -14780,9 +14801,19 @@ class AdminManager {
             const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
             const method = this.escapeHtml(this.getDonationMethodLabel(d.method) || (d.isInKind ? 'Fysisk' : 'Ukjent'));
             
-            const isRecurring = String(d.type || '').toLowerCase() === 'fast';
-            const typeText = d.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
-            const typeBadge = `<span style="background: ${d.isInKind ? '#fef3c7' : (isRecurring ? '#e0f2fe' : '#f1f5f9')}; color: ${d.isInKind ? '#b45309' : (isRecurring ? '#0369a1' : '#475569')}; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">${typeText}</span>`;
+            const recType = String(d.type || '').toLowerCase();
+            let typeBadge = '';
+            if (d.isInKind) {
+                typeBadge = `<span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">Fysisk</span>`;
+            } else if (recType === 'fast') {
+                typeBadge = `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">Fast</span>`;
+            } else if (recType === 'butikk' || recType === 'product') {
+                typeBadge = `<span style="background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">Butikk</span>`;
+            } else if (recType === 'kurs' || recType === 'course') {
+                typeBadge = `<span style="background: #f0fdf4; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">Kurs</span>`;
+            } else {
+                typeBadge = `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">Enkelt</span>`;
+            }
             
             const statusLabel = this.escapeHtml(this.getDonationStatusLabel(d.status));
             const statusBadge = `<span class="method-tag">${statusLabel}</span>`;
@@ -14833,15 +14864,17 @@ class AdminManager {
                 <div style="padding:24px; overflow-y:auto; flex:1;">
                     <!-- Stats Summary Box -->
                     <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px;">
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
-                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Totalt bidrag</span>
-                            <div id="donor-modal-total-sum" style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${this.formatDonationCurrency(donorTotal)}</div>
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Gaver totalt</span>
+                            <div id="donor-modal-total-sum" style="font-size:18px; font-weight:800; color:#047857; margin-top:4px;">${this.formatDonationCurrency(donorTotalGifts)}</div>
+                            <span style="font-size:11px; color:#64748b; margin-top:2px;">${completedCount} av ${giftCount} fullført</span>
                         </div>
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
-                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Fullførte gaver</span>
-                            <div id="donor-modal-gifts-count" style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${completedCount} av ${giftCount}</div>
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Produktkjøp (butikk/kurs)</span>
+                            <div id="donor-modal-gifts-count" style="font-size:18px; font-weight:800; color:#1B4965; margin-top:4px;">${this.formatDonationCurrency(donorTotalProducts)}</div>
+                            <span style="font-size:11px; color:#64748b; margin-top:2px;">${completedProducts.length} fullførte kjøp</span>
                         </div>
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
                             <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Siste aktivitet</span>
                             <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:6px;">${latestDateStr}</div>
                         </div>
@@ -15211,7 +15244,10 @@ class AdminManager {
                 `;
             }).join('');
         } else if (type === 'donor-statement') {
-            const donations = this.getDonationsForDonor(donorKey);
+            const donations = this.getDonationsForDonor(donorKey).filter(d => {
+                const recType = String(d.type || 'Gave').toLowerCase();
+                return recType !== 'butikk' && recType !== 'kurs' && recType !== 'course' && recType !== 'product';
+            });
             if (donations.length === 0) return;
 
             const firstRec = donations[0];
@@ -18218,8 +18254,11 @@ class AdminManager {
                 if (!donationsSnapshot.empty) {
                     monetaryRecords.forEach(data => {
                         if (['completed', 'succeeded', 'captured'].includes(String(data.status || '').toLowerCase())) {
-                            completedDonationCount++;
-                            totalDonations += this.normalizeDonationAmountNok(data);
+                            const recType = String(data.type || '').toLowerCase();
+                            if (recType !== 'butikk' && recType !== 'kurs' && recType !== 'course' && recType !== 'product') {
+                                completedDonationCount++;
+                                totalDonations += this.normalizeDonationAmountNok(data);
+                            }
                         }
                     });
                 }
@@ -18478,6 +18517,7 @@ class AdminManager {
                                     <option value="gave">Enkeltgave</option>
                                     <option value="fast">Fast avtale</option>
                                     <option value="butikk">Butikk</option>
+                                    <option value="kurs">Kurs</option>
                                 </select>
                             </div>
 
@@ -18594,6 +18634,7 @@ class AdminManager {
                                     <option value="gave">Enkeltgave</option>
                                     <option value="fast">Fast avtale</option>
                                     <option value="butikk">Butikk</option>
+                                    <option value="kurs">Kurs</option>
                                 </select>
                             </div>
 
