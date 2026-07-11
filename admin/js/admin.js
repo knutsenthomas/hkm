@@ -8765,8 +8765,30 @@ class AdminManager {
             this.currentMediaPath = `editor/${collectionId}/`;
 
             let safeDate = new Date().toISOString().split('T')[0];
-            if (item.date && typeof item.date === 'string') {
-                safeDate = item.date.split('T')[0];
+            let safeTime = '';
+            if (item.date) {
+                if (typeof item.date === 'string') {
+                    safeDate = item.date.split('T')[0];
+                    const parts = item.date.split('T')[1] || item.date.split(' ')[1];
+                    if (parts) {
+                        safeTime = parts.substring(0, 5); // HH:mm
+                    }
+                } else if (typeof item.date === 'object') {
+                    let dateObj = null;
+                    if (typeof item.date.toDate === 'function') {
+                        dateObj = item.date.toDate();
+                    } else if (typeof item.date.seconds === 'number') {
+                        dateObj = new Date(item.date.seconds * 1000);
+                    } else if (item.date instanceof Date) {
+                        dateObj = item.date;
+                    }
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        safeDate = dateObj.toISOString().split('T')[0];
+                        const hours = String(dateObj.getHours()).padStart(2, '0');
+                        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                        safeTime = `${hours}:${minutes}`;
+                    }
+                }
             }
 
             // Handle existing tags (ensure array)
@@ -9028,10 +9050,23 @@ class AdminManager {
 
                         <aside class="editor-sidebar-v2">
                              <h4 class="sidebar-section-title">DETALJER</h4>
+                             ${collectionId === 'events' ? `
+                             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                 <div style="flex: 1;">
+                                     <label style="font-size: 13px; font-weight: 500; color: #475569; margin-bottom: 6px; display: block;">Dato</label>
+                                     <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}" style="box-sizing: border-box;">
+                                 </div>
+                                 <div style="flex: 1;">
+                                     <label style="font-size: 13px; font-weight: 500; color: #475569; margin-bottom: 6px; display: block;">Klokkeslett</label>
+                                     <input type="time" id="col-item-time" class="sidebar-control" value="${safeTime}" style="box-sizing: border-box;">
+                                 </div>
+                             </div>
+                             ` : `
                              <div class="sidebar-group">
                                  <label>Publiseringsdato</label>
                                  <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}">
                              </div>
+                             `}
                              <div class="sidebar-group">
                                  <label>Forfatter</label>
                                  <input type="text" id="col-item-author" class="sidebar-control" value="${item.author || ''}" placeholder="Navn">
@@ -11534,7 +11569,13 @@ class AdminManager {
                         ? this.blocksToHtml(nextContent)
                         : (typeof nextContent === 'string' ? nextContent : (item.description || ''));
                 }
-                item.date = document.getElementById('col-item-date')?.value || '';
+                const dateVal = document.getElementById('col-item-date')?.value || '';
+                if (collectionId === 'events') {
+                    const timeVal = document.getElementById('col-item-time')?.value || '';
+                    item.date = timeVal ? `${dateVal}T${timeVal}` : dateVal;
+                } else {
+                    item.date = dateVal;
+                }
 
                 item.imageUrl = document.getElementById('col-item-img')?.value || '';
                 item.author = document.getElementById('col-item-author')?.value || '';
