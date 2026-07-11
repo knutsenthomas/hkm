@@ -3930,6 +3930,7 @@ class BibleReader {
     async initReadingPlanMode(planId, dayNumFromUrl) {
         this.activePlanMode = true;
         this.activePlanId = planId;
+        this.activePlanDay = parseInt(dayNumFromUrl, 10) || this.activePlanDay || null;
         
         // Force running text layout (paragraph) for reading plans / prayer apps
         this.settings.layout = 'paragraph';
@@ -3954,7 +3955,7 @@ class BibleReader {
             this.activePlanData = { id: planDoc.id, ...planDoc.data() };
 
             // Determine active day
-            let activeDayNum = parseInt(dayNumFromUrl, 10) || null;
+            let activeDayNum = this.activePlanDay;
             
             // Check user progress if logged in
             if (this.currentUser) {
