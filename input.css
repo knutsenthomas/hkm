@@ -5314,14 +5314,14 @@ ol.block-list {
     background-position: center;
     /* Subtle zoom effect on active */
     /* No zoom animation */
-    transform: scale(1.05);
+    transform: none;
     transition: none;
     filter: brightness(0.90) contrast(1.01); /* Dim bright images for text contrast */
 }
 
 .hero-slide.active .hero-bg,
 .hero-slide.active .hero-video {
-    transform: scale(1.05);
+    transform: none;
 }
 
 /* Gradient Overlay */
