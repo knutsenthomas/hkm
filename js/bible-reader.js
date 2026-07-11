@@ -6436,7 +6436,11 @@ class BibleReader {
         if (backBtn && step > 1) {
             backBtn.onclick = () => {
                 if (window.speechSynthesis) window.speechSynthesis.cancel();
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, step - 1, scriptureHtml);
+                let targetStep = step - 1;
+                if (targetStep === 3 && (!dayConfig.resources || dayConfig.resources.length === 0)) {
+                    targetStep = 2;
+                }
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, targetStep, scriptureHtml);
             };
         }
 
@@ -6446,7 +6450,11 @@ class BibleReader {
                 if (window.speechSynthesis) window.speechSynthesis.cancel();
                 
                 if (step < 4) {
-                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, step + 1, scriptureHtml);
+                    let targetStep = step + 1;
+                    if (targetStep === 3 && (!dayConfig.resources || dayConfig.resources.length === 0)) {
+                        targetStep = 4;
+                    }
+                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, targetStep, scriptureHtml);
                 } else if (step === 4) {
                     const textarea = stepContainer.querySelector('#hkm-yv-reflection-input');
                     const text = textarea ? textarea.value.trim() : '';

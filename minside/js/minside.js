@@ -7120,6 +7120,13 @@ class MinSideManager {
         stepContainer.className = 'hkm-devotional-content';
         modal.appendChild(stepContainer);
 
+        const hasResources = dayConfig.resources && dayConfig.resources.length > 0;
+        const totalSteps = hasResources ? 5 : 4;
+        let stepDisplay = step;
+        if (!hasResources && step > 3) {
+            stepDisplay = step - 1;
+        }
+
         const header = document.createElement('div');
         header.style.display = 'flex';
         header.style.justify = 'space-between';
@@ -7127,7 +7134,7 @@ class MinSideManager {
         header.style.marginBottom = '20px';
         header.innerHTML = `
             <div style="font-size: 11px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">
-                ${plan.title} &bull; Steg ${step} av 5
+                ${plan.title} &bull; Steg ${stepDisplay} av ${totalSteps}
             </div>
             <button style="background: none; border: none; cursor: pointer; color: #64748b; display: flex; align-items: center;" onclick="document.getElementById('hkm-devotional-modal').remove()">
                 <span class="material-symbols-outlined">close</span>
@@ -7180,7 +7187,7 @@ class MinSideManager {
                     Tilbake
                 </button>
                 <button class="hkm-btn-primary" id="btn-devotional-next">
-                    Neste: Ressurser
+                    Neste: ${hasResources ? 'Ressurser' : 'Refleksjon'}
                     <span class="material-symbols-outlined">arrow_forward</span>
                 </button>
             `;
@@ -7190,7 +7197,8 @@ class MinSideManager {
                 this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
             };
             actions.querySelector('#btn-devotional-next').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+                const targetStep = hasResources ? 3 : 4;
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, targetStep, scriptureHtml);
             };
 
         } else if (step === 3) {
@@ -7299,7 +7307,8 @@ class MinSideManager {
             stepContainer.appendChild(actions);
 
             actions.querySelector('#btn-devotional-back').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
+                const targetStep = hasResources ? 3 : 2;
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, targetStep, scriptureHtml);
             };
             
             actions.querySelector('#btn-devotional-save').onclick = async () => {
