@@ -4206,6 +4206,23 @@ class BibleReader {
             .hkm-rp-start-btn-black:active {
                 transform: scale(0.98) !important;
             }
+            .hkm-rp-close-btn-mobile {
+                display: none !important;
+                background: none !important;
+                border: none !important;
+                padding: 8px !important;
+                cursor: pointer !important;
+                color: var(--text-base) !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                transition: background-color 0.2s !important;
+            }
+            @media (max-width: 768px) {
+                .hkm-rp-close-btn-mobile {
+                    display: flex !important;
+                }
+            }
 
             .hkm-rp-header-wrapper {
                 width: 100%;
@@ -4810,6 +4827,9 @@ class BibleReader {
         const booksListWrapper = document.querySelector('.books-list-wrapper');
         if (booksListWrapper) booksListWrapper.style.display = 'none';
 
+        const sidebarHeader = this.dom.sidebar ? this.dom.sidebar.querySelector('.sidebar-header') : null;
+        if (sidebarHeader) sidebarHeader.style.display = 'none';
+
         const searchContainer = document.querySelector('.sidebar-header .search-container');
         if (searchContainer) searchContainer.style.display = 'none';
 
@@ -4916,6 +4936,9 @@ class BibleReader {
         const booksListWrapper = document.querySelector('.books-list-wrapper');
         if (booksListWrapper) booksListWrapper.style.display = 'block';
 
+        const sidebarHeader = this.dom.sidebar ? this.dom.sidebar.querySelector('.sidebar-header') : null;
+        if (sidebarHeader) sidebarHeader.style.display = '';
+
         const searchContainer = document.querySelector('.sidebar-header .search-container');
         if (searchContainer) searchContainer.style.display = 'flex';
 
@@ -4952,6 +4975,7 @@ class BibleReader {
         const rpToggleBtn = document.getElementById('rp-sidebar-toggle-mode');
         const titleRow = document.querySelector('.sidebar-mobile-title-row');
         const titleSpan = titleRow ? titleRow.querySelector('span') : null;
+        const sidebarHeader = this.dom.sidebar ? this.dom.sidebar.querySelector('.sidebar-header') : null;
 
         if (booksListWrapper && booksListWrapper.style.display === 'none') {
             booksListWrapper.style.display = 'block';
@@ -4959,12 +4983,14 @@ class BibleReader {
             if (planSidebar) planSidebar.style.display = 'none';
             if (rpToggleBtn) rpToggleBtn.innerText = 'Vis andakt';
             if (titleSpan) titleSpan.innerText = 'Bibelbøker';
+            if (sidebarHeader) sidebarHeader.style.display = '';
         } else {
             if (booksListWrapper) booksListWrapper.style.display = 'none';
             if (searchContainer) searchContainer.style.display = 'none';
             if (planSidebar) planSidebar.style.display = 'block';
             if (rpToggleBtn) rpToggleBtn.innerText = 'Vis bøker';
             if (titleSpan) titleSpan.innerText = 'Dagens andakt';
+            if (sidebarHeader) sidebarHeader.style.display = 'none';
         }
     }
 
@@ -5023,6 +5049,9 @@ class BibleReader {
                         <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
                     </button>
                     <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${globalPlan.title}</h2>
+                    <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
                 </div>
 
                 <!-- Horizontal day selector strip -->
