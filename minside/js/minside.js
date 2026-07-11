@@ -4289,7 +4289,7 @@ class MinSideManager {
                         </div>
                     </div>
                     
-                    <div class="course-lessons-accordion collapsed" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
+                    <div class="course-lessons-accordion" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
                         <div class="accordion-header" data-course-id="${c.id || cIdx}" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition: background-color 0.2s ease;">
                             <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined" style="font-size: 18px !important;">format_list_bulleted</span> Leksjoner og Live-økter
@@ -4297,7 +4297,7 @@ class MinSideManager {
                             <span class="material-symbols-outlined expand-chevron">expand_more</span>
                         </div>
                         
-                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:none; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
+                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
                             ${courseLessons.length === 0 ? `
                                 <p style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
                             ` : `
