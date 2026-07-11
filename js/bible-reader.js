@@ -5004,13 +5004,13 @@ class BibleReader {
 
         let displayTitle = globalPlan.title || '';
         const titleLower = displayTitle.toLowerCase();
-        if (titleLower === 'johannesevangeliet' || titleLower === 'gospel of john' || titleLower === 'evangelio de juan') {
+        if (titleLower.includes('johannesevangeliet') || titleLower.includes('gospel of john') || titleLower.includes('evangelio de juan')) {
             displayTitle = lang === 'no' ? 'Johannes' : (lang === 'es' ? 'Juan' : 'John');
-        } else if (titleLower === 'matteusevangeliet' || titleLower === 'gospel of matthew' || titleLower === 'evangelio de mateo') {
+        } else if (titleLower.includes('matteusevangeliet') || titleLower.includes('gospel of matthew') || titleLower.includes('evangelio de mateo')) {
             displayTitle = lang === 'no' ? 'Matteus' : (lang === 'es' ? 'Mateo' : 'Matthew');
-        } else if (titleLower === 'markusevangeliet' || titleLower === 'gospel of mark' || titleLower === 'evangelio de marcos') {
+        } else if (titleLower.includes('markusevangeliet') || titleLower.includes('gospel of mark') || titleLower.includes('evangelio de marcos')) {
             displayTitle = lang === 'no' ? 'Markus' : (lang === 'es' ? 'Marcos' : 'Mark');
-        } else if (titleLower === 'lukasevangeliet' || titleLower === 'gospel of luke' || titleLower === 'evangelio de lucas') {
+        } else if (titleLower.includes('lukasevangeliet') || titleLower.includes('gospel of luke') || titleLower.includes('evangelio de lucas')) {
             displayTitle = lang === 'no' ? 'Lukas' : (lang === 'es' ? 'Lucas' : 'Luke');
         }
 
