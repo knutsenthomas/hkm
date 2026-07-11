@@ -218,11 +218,12 @@ const i18nManager = {
             currentLang = localStorage.getItem(this.storageKey) || 'no';
         } else {
             // We are on a Norwegian page (path does not start with /en or /es)
+            // Statically built root pages are always in Norwegian.
+            // We should not override the language to English/Spanish here just because of localStorage preference,
+            // because that would lead to a mixed language state on static pages.
+            // However, we still do the browser/homepage check on first visit to redirect them correctly.
             const savedPref = localStorage.getItem(this.storageKey);
-            if (savedPref) {
-                currentLang = savedPref;
-            } else {
-                // First-time visit and no preference stored. Check if we're on the homepage.
+            if (!savedPref) {
                 const isHomepage = path === '/' || path === '/index.html' || path === '/index';
                 if (isHomepage) {
                     const autoLang = this.getBrowserOrGeoLanguage();
@@ -234,8 +235,8 @@ const i18nManager = {
                         return currentLang;
                     }
                 }
-                currentLang = 'no';
             }
+            currentLang = 'no';
         }
 
         document.documentElement.lang = currentLang;
