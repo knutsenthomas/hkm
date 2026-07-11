@@ -5847,19 +5847,22 @@ class BibleReader {
         const cleanText = text.replace(/\r\n/g, '\n');
         const paragraphs = cleanText.split(/\n\s*\n/);
         
-        return paragraphs.map(p => {
+        return paragraphs.map((p, idx) => {
             const trimmed = p.trim();
             if (!trimmed) return '';
             
             // Check for Markdown headings
             if (trimmed.startsWith('###')) {
-                return `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: 24px; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^###\s*/, '')}</h4>`;
+                const marginTop = idx === 0 ? '0' : '16px';
+                return `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${marginTop}; margin-bottom: 8px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.3;">${trimmed.replace(/^###\s*/, '')}</h4>`;
             }
             if (trimmed.startsWith('##')) {
-                return `<h3 style="font-size: 1.3em; font-weight: 700; color: #1B4965; margin-top: 28px; margin-bottom: 14px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^##\s*/, '')}</h3>`;
+                const marginTop = idx === 0 ? '0' : '20px';
+                return `<h3 style="font-size: 1.3em; font-weight: 700; color: #1B4965; margin-top: ${marginTop}; margin-bottom: 10px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.3;">${trimmed.replace(/^##\s*/, '')}</h3>`;
             }
             if (trimmed.startsWith('#')) {
-                return `<h2 style="font-size: 1.5em; font-weight: 700; color: #1B4965; margin-top: 32px; margin-bottom: 16px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^#\s*/, '')}</h2>`;
+                const marginTop = idx === 0 ? '0' : '24px';
+                return `<h2 style="font-size: 1.5em; font-weight: 700; color: #1B4965; margin-top: ${marginTop}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.3;">${trimmed.replace(/^#\s*/, '')}</h2>`;
             }
             
             // Normalize asterisks to check for prayer/reflection patterns
@@ -5909,7 +5912,7 @@ class BibleReader {
                 formatted = formatted.replace(/\n/g, '<br>');
                 
                 return `
-                    <div class="hkm-devotional-prayer-box" style="margin-top: 24px; margin-bottom: 24px; background: rgba(209, 125, 57, 0.05); border-left: 4px solid #d17d39; padding: 20px 24px; border-radius: 8px; box-shadow: none; border-top: none; border-right: none; border-bottom: none; display: block !important;">
+                    <div class="hkm-devotional-prayer-box" style="margin-top: 16px; margin-bottom: 16px; background: rgba(209, 125, 57, 0.05); border-left: 4px solid #d17d39; padding: 20px 24px; border-radius: 8px; box-shadow: none; border-top: none; border-right: none; border-bottom: none; display: block !important;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #d17d39; font-weight: 700; font-family: system-ui, -apple-system, sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">auto_awesome</span>
                             <span>${matchPrefix}</span>
@@ -5929,7 +5932,7 @@ class BibleReader {
                 formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 formatted = formatted.replace(/\n/g, '<br>');
                 return `
-                    <blockquote style="margin: 24px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
+                    <blockquote style="margin: 16px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
                         ${formatted}
                     </blockquote>
                 `;
