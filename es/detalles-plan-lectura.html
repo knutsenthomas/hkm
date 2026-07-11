@@ -1847,10 +1847,20 @@
                                 }).join('');
                             };
                             
-                            focusTextHtml = `
+                            const stripHtml = (html) => {
+                                const tmp = document.createElement("DIV");
+                                tmp.innerHTML = html;
+                                return tmp.textContent || tmp.innerText || "";
+                            };
+                            
+                            const plainText = stripHtml(focusText).trim();
+                            const isLong = plainText.length > 180;
+                            const previewText = isLong ? plainText.substring(0, 120).trim() + '...' : plainText;
+
+                             focusTextHtml = `
                                 <div class="prayer-focus-quote" style="padding-left: 24px; border-radius: 12px;">
                                     <div class="prayer-focus-text" style="font-size: 1rem; font-weight: normal; color: #334155; line-height: 1.7;">
-                                        ${formatDetailFocusText(focusText)}
+                                        ${isLong ? escapeHtml(previewText) : formatDetailFocusText(focusText)}
                                     </div>
                                 </div>
                             `;
