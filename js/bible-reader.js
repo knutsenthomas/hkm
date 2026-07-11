@@ -1168,8 +1168,11 @@ class BibleReader {
             });
         }
 
-        // Hide toolbar and clear highlight on scroll in content pane
+        // Hide toolbar, clear highlight, and show/hide floating nav on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
+        const floatingNav = document.getElementById('floating-bible-nav');
+        let lastScrollTop = 0;
+        
         if (mainContentPane) {
             mainContentPane.addEventListener('scroll', () => {
                 if (this.dom.verseToolbar) {
@@ -1179,6 +1182,18 @@ class BibleReader {
                 if (this.highlightedVerseElement && !this.isProgrammaticScrolling) {
                     this.highlightedVerseElement.classList.remove('verse-temp-highlight');
                     this.highlightedVerseElement = null;
+                }
+                
+                // Hide/show floating book selector on scroll
+                if (floatingNav) {
+                    const scrollTop = mainContentPane.scrollTop;
+                    // Only hide if we scrolled down past 50px
+                    if (scrollTop > lastScrollTop && scrollTop > 50) {
+                        floatingNav.classList.add('hidden-nav');
+                    } else {
+                        floatingNav.classList.remove('hidden-nav');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
                 }
             });
         }

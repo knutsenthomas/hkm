@@ -679,16 +679,16 @@
         /* Floating Minimalist Bottom Navigation */
         .floating-bible-nav {
             position: absolute;
-            bottom: 24px;
+            bottom: 32px;
             left: 50%;
             transform: translateX(-50%) translateZ(0);
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             background: var(--bg-card) !important;
             border: 1px solid var(--border-color);
-            padding: 6px 16px;
-            border-radius: 30px;
+            padding: 10px 24px;
+            border-radius: 40px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             z-index: 140;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -701,9 +701,15 @@
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
         }
 
+        .floating-bible-nav.hidden-nav {
+            transform: translateX(-50%) translateY(100px) translateZ(0) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
         .floating-nav-btn {
-            width: 36px;
-            height: 36px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: 1px solid var(--border-color);
             background: var(--bg-base);
@@ -737,12 +743,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 90px;
+            min-width: 105px;
             user-select: none;
         }
 
         #floating-nav-book {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -751,7 +757,7 @@
         }
 
         #floating-nav-chapter {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 800;
             color: var(--bible-primary);
             line-height: 1.2;
@@ -1584,24 +1590,29 @@
             /* Floating bible navigation on mobile */
             .floating-bible-nav {
                 opacity: 0.95 !important;
-                bottom: 16px !important;
-                padding: 6px 12px !important;
-                gap: 12px !important;
+                bottom: 24px !important;
+                padding: 8px 18px !important;
+                gap: 16px !important;
                 transform: translateX(-50%) translateZ(0) !important;
             }
             .floating-bible-nav:hover {
                 transform: translateX(-50%) translateZ(0) !important;
                 opacity: 0.95 !important;
             }
+            .floating-bible-nav.hidden-nav {
+                transform: translateX(-50%) translateY(100px) translateZ(0) !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
             .floating-nav-btn {
-                width: 32px !important;
-                height: 32px !important;
+                width: 38px !important;
+                height: 38px !important;
             }
             .floating-nav-info {
-                min-width: 80px !important;
+                min-width: 95px !important;
             }
             #floating-nav-chapter {
-                font-size: 14px !important;
+                font-size: 16px !important;
             }
         }
 
@@ -2795,7 +2806,7 @@
     <!-- JavaScript -->
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.11.10"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.07.11.11"></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
