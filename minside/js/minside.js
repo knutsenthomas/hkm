@@ -5750,6 +5750,54 @@ class MinSideManager {
             if (btnHighlight) btnHighlight.disabled = !hasSelected;
         };
 
+        const loadBibleData = async () => {
+            try {
+                const res = await fetch('/api/bible/bibles');
+                const payload = await res.json();
+                bibleList = payload.data || payload || [];
+                
+                bibTransSelect.innerHTML = bibleList.map(b => `
+                    <option value="${b.id}">${b.abbreviation}</option>
+                `).join('');
+                
+                if (bibleList.length > 0) {
+                    await loadBooks(bibleList[0].id, isBibleInit);
+                    isBibleInit = false;
+                }
+            } catch (e) {
+                console.error("Bible widget init error:", e);
+            }
+        };
+
+        const loadBooks = async (bibleId, autoSelect = false) => {
+            try {
+                bibBookSelect.disabled = true;
+                bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
+                const payload = await res.json();
+                const books = payload.data || payload || [];
+                
+                bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
+                    <option value="${b.id}">${b.name}</option>
+                `).join('');
+                bibBookSelect.disabled = false;
+
+                if (autoSelect && books.length > 0) {
+                    const defaultBook = books.find(b => 
+                        b.id.toLowerCase() === 'jhn' || 
+                        b.id.toLowerCase().includes('jhn') || 
+                        b.name.toLowerCase().includes('johannes')
+                    ) || books[0];
+
+                    bibBookSelect.value = defaultBook.id;
+                    await loadChapters(bibleId, defaultBook.id, true);
+                }
+            } catch (e) {
+                console.error("Bible widget loadBooks error:", e);
+            }
+        };
+
         const loadVerses = async (bibleId, chapterId) => {
             try {
                 bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
@@ -6008,6 +6056,26 @@ class MinSideManager {
                 console.error("Bible widget loadChapters error:", e);
             }
         };
+
+        bibTransSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            if (bibId) loadBooks(bibId, true);
+        });
+
+        bibBookSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const bookId = bibBookSelect.value;
+            if (bibId && bookId) loadChapters(bibId, bookId, true);
+        });
+
+        bibChapSelect.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const chapId = bibChapSelect.value;
+            if (bibId && chapId) loadVerses(bibId, chapId);
+        });
+
+        // Trigger initial data load
+        loadBibleData();
 
 
 

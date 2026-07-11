@@ -4146,12 +4146,12 @@ class BibleReader {
             }
             
             .hkm-rp-day-strip-item-v2.active {
-                border: 2.5px solid #1B4965 !important;
+                border: 2.5px solid #d17d39 !important;
                 background: #ffffff !important;
                 transform: scale(1.02);
             }
             .hkm-rp-day-strip-item-v2.active .day-num {
-                color: #1B4965 !important;
+                color: #d17d39 !important;
                 font-weight: 800 !important;
             }
             
@@ -4252,7 +4252,7 @@ class BibleReader {
                 flex: 1;
                 height: 38px;
                 border-radius: 99px;
-                background: #1B4965;
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: #ffffff;
                 font-weight: 700;
                 font-size: 13px;
@@ -4262,12 +4262,12 @@ class BibleReader {
                 justify-content: center;
                 gap: 6px;
                 cursor: pointer;
-                box-shadow: 0 4px 12px rgba(27, 73, 101, 0.1);
+                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
                 transition: all 0.2s ease;
             }
             .hkm-btn-complete-minimal:hover {
-                background: #153a50;
-                box-shadow: 0 6px 16px rgba(27, 73, 101, 0.2);
+                filter: brightness(1.1);
+                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
             }
             .hkm-btn-complete-minimal.completed {
                 background: #10b981 !important;
