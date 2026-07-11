@@ -4258,7 +4258,7 @@ class BibleReader {
                 flex: 1.2;
                 height: 38px;
                 border-radius: 99px;
-                background: linear-gradient(135deg, #1b4965 0%, #2a6f97 100%);
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: #ffffff;
                 font-weight: 700;
                 font-size: 13px;
@@ -4268,12 +4268,12 @@ class BibleReader {
                 justify-content: center;
                 gap: 6px;
                 cursor: pointer;
-                box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
+                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
                 transition: all 0.2s ease;
             }
             .hkm-btn-devotional-trigger-minimal:hover {
                 filter: brightness(1.1);
-                box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
+                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
             }
             body.prayer-app-mode .hkm-btn-devotional-trigger-minimal {
                 background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
