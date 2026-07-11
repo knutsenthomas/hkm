@@ -1355,6 +1355,7 @@ class MinSideManager {
                         background: rgba(0, 0, 0, 0.03) !important;
                         color: #1B4965 !important;
                     }
+
                     .header.scrolled #header-today-devotional-btn:hover,
                     .header.menu-open #header-today-devotional-btn:hover,
                     body:not(.header-dark-start) .header #header-today-devotional-btn:hover,
@@ -1369,6 +1370,12 @@ class MinSideManager {
                     html[data-theme="dark"] #header-today-devotional-btn:hover {
                         background: rgba(255, 255, 255, 0.12) !important;
                     }
+                    @media (min-width: 992px) {
+                        #header-today-devotional-btn {
+                            display: none !important;
+                        }
+                    }
+
                 `;
                 document.head.appendChild(devStyle);
             }
