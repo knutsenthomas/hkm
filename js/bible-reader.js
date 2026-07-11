@@ -4089,332 +4089,237 @@ class BibleReader {
                 max-width: 680px;
                 display: flex;
                 flex-direction: column;
-                margin-bottom: 24px;
+                margin-bottom: 20px;
                 flex-shrink: 0;
-            }
-            .hkm-rp-header-card-v2 {
-                background: #ffffff;
-                border: 1px solid var(--border-color, #e2e8f0);
-                border-radius: 24px;
-                padding: 24px;
-                margin: 0 0 24px 0;
-                box-shadow: 0 10px 30px rgba(30, 58, 76, 0.05);
-                position: relative;
-                width: 100%;
                 box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-                overflow: visible;
-                flex-shrink: 0;
-            }
-            .bible-theme-dark .hkm-rp-header-card-v2 {
-                background: #242424;
-                border-color: #333333;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            }
-            .hkm-rp-badge-pill {
-                position: absolute;
-                top: 0;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: #ffffff;
-                border: 1px solid var(--border-color, #e2e8f0);
-                border-radius: 99px;
-                padding: 4px 16px;
-                font-size: 11px;
-                font-weight: 700;
-                color: #475569;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-                white-space: nowrap;
-                z-index: 10;
-            }
-            .bible-theme-dark .hkm-rp-badge-pill {
-                background: #242424;
-                border-color: #333333;
-                color: #94a3b8;
-            }
-            .hkm-rp-progress-row-v2 {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: 24px;
-                width: 100%;
-                flex-wrap: wrap;
-            }
-            @media (max-width: 768px) {
-                .hkm-rp-progress-row-v2 {
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                    gap: 16px;
-                }
-            }
-            .hkm-rp-progress-info-v2 {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                flex-shrink: 0;
-            }
-            @media (max-width: 768px) {
-                .hkm-rp-progress-info-v2 {
-                    flex-direction: column;
-                }
-            }
-            .glow-effect {
-                filter: drop-shadow(0 0 8px rgba(198, 99, 56, 0.2));
-            }
-            .progress-ring__circle {
-                transition: stroke-dashoffset 1.0s cubic-bezier(0.4, 0, 0.2, 1);
-                transform: rotate(-90deg);
-                transform-origin: 50% 50%;
-            }
-            .progress-info-text-v2 {
-                display: flex;
-                flex-direction: column;
-                white-space: nowrap;
-            }
-            .progress-info-text-v2 p.title {
-                font-size: 14px;
-                font-weight: 700;
-                color: #1B4965;
-                margin: 0;
-            }
-            .bible-theme-dark .progress-info-text-v2 p.title {
-                color: #cbd5e1;
-            }
-            .progress-info-text-v2 p.status {
-                font-size: 13px;
-                color: #64748b;
-                margin: 4px 0 0 0;
-            }
-            .bible-theme-dark .progress-info-text-v2 p.status {
-                color: #94a3b8;
-            }
-            .progress-info-text-v2 p.status.completed-status {
-                color: #10b981;
-                font-weight: 700;
             }
             
-            /* Buttons row */
-            .hkm-rp-buttons-row-v2 {
+            /* YouVersion style Day Strip */
+            .hkm-rp-day-strip-v2 {
                 display: flex;
-                align-items: center;
                 gap: 8px;
-                justify-content: center;
-                flex-shrink: 0;
-                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 8px 4px;
+                scrollbar-width: none; /* Hide scrollbar for Firefox */
+                -ms-overflow-style: none;  /* Hide scrollbar for IE/Edge */
+                -webkit-overflow-scrolling: touch;
+                border-bottom: 1.5px solid var(--border-color, #e2e8f0);
+                padding-bottom: 12px;
+                margin-bottom: 8px;
             }
-            .hkm-rp-btn-nav-v2 {
-                background: none;
-                border: 1px solid var(--border-color, #e2e8f0);
-                border-radius: 12px;
-                padding: 12px;
-                color: #1B4965;
-                cursor: pointer;
-                display: inline-flex;
+            .hkm-rp-day-strip-v2::-webkit-scrollbar {
+                display: none; /* Hide scrollbar for Chrome/Safari */
+            }
+            
+            .hkm-rp-day-strip-item-v2 {
+                position: relative;
+                display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 width: 44px;
-                height: 44px;
-                transition: all 0.2s ease;
-                box-sizing: border-box;
+                height: 50px;
+                border-radius: 10px;
+                border: 1.5px solid var(--border-color, #e2e8f0);
+                background: #ffffff;
+                cursor: pointer;
+                flex-shrink: 0;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             }
-            .bible-theme-dark .hkm-rp-btn-nav-v2 {
+            .hkm-rp-day-strip-item-v2 .day-num {
+                font-size: 13.5px;
+                font-weight: 600;
+                color: #475569;
+            }
+            .hkm-rp-day-strip-item-v2 .check-tick {
+                font-size: 11px;
+                font-weight: 800;
+                color: #10b981;
+                margin-top: 1px;
+                line-height: 1;
+            }
+            .hkm-rp-day-strip-item-v2 .day-dot {
+                font-size: 8px;
+                color: #cbd5e1;
+                margin-top: 1px;
+                line-height: 1;
+            }
+            
+            .hkm-rp-day-strip-item-v2.active {
+                border: 2.5px solid #1B4965 !important;
+                background: #ffffff !important;
+                transform: scale(1.02);
+            }
+            .hkm-rp-day-strip-item-v2.active .day-num {
+                color: #1B4965 !important;
+                font-weight: 800 !important;
+            }
+            
+            .bible-theme-dark .hkm-rp-day-strip-item-v2 {
+                background: #1e1e1e;
                 border-color: #333333;
-                color: #38bdf8;
             }
-            .hkm-rp-btn-nav-v2:hover:not(:disabled) {
-                background: rgba(27, 73, 101, 0.05);
-                border-color: #1B4965;
+            .bible-theme-dark .hkm-rp-day-strip-item-v2 .day-num {
+                color: #cbd5e1;
             }
-            .bible-theme-dark .hkm-rp-btn-nav-v2:hover:not(:disabled) {
-                background: rgba(255, 255, 255, 0.05);
-                border-color: #38bdf8;
+            .bible-theme-dark .hkm-rp-day-strip-item-v2.active {
+                border-color: #cbd5e1 !important;
             }
-            .hkm-rp-btn-nav-v2:disabled {
+            .bible-theme-dark .hkm-rp-day-strip-item-v2.active .day-num {
+                color: #ffffff !important;
+            }
+            
+            /* Info Bar */
+            .hkm-rp-info-bar-v2 {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 12px;
+                margin-bottom: 12px;
+                padding: 0 4px;
+                font-family: 'Inter', sans-serif;
+            }
+            .hkm-rp-info-bar-v2 .day-count {
+                font-size: 14.5px;
+                font-weight: 700;
+                color: #1B4965;
+            }
+            .bible-theme-dark .hkm-rp-info-bar-v2 .day-count {
+                color: #e2e8f0;
+            }
+            .hkm-rp-info-bar-v2 .behind-badge {
+                background: #fffbeb;
+                color: #d97706;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 99px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border: 1px solid #fef3c7;
+            }
+            .hkm-rp-info-bar-v2 .on-track-badge {
+                background: #ecfdf5;
+                color: #047857;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 99px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border: 1px solid #d1fae5;
+            }
+            
+            /* Minimal Buttons Control Row */
+            .hkm-rp-buttons-row-minimal {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 16px;
+                width: 100%;
+            }
+            
+            .hkm-rp-btn-nav-minimal {
+                background: #ffffff;
+                border: 1.5px solid var(--border-color, #e2e8f0);
+                color: #475569;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                flex-shrink: 0;
+            }
+            .bible-theme-dark .hkm-rp-btn-nav-minimal {
+                background: #1e1e1e;
+                border-color: #333333;
+                color: #cbd5e1;
+            }
+            .hkm-rp-btn-nav-minimal:hover:not(:disabled) {
+                border-color: #d17d39;
+                color: #d17d39;
+            }
+            .hkm-rp-btn-nav-minimal:disabled {
                 opacity: 0.3;
                 cursor: not-allowed;
             }
             
-            .hkm-btn-complete-v2 {
-                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                padding: 12px 16px;
-                font-weight: 700;
-                cursor: pointer;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
-                transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-                box-sizing: border-box;
-                height: 44px;
+            .hkm-btn-complete-minimal {
                 flex: 1;
-                max-width: 180px;
-                min-width: 100px;
-            }
-            .hkm-btn-complete-v2:hover {
-                filter: brightness(1.1);
-                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
-            }
-            .hkm-btn-complete-v2.completed {
-                background-color: #10b981 !important;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-            }
-            .hkm-btn-complete-v2.completed:hover {
-                background-color: #059669 !important;
-                box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-            }
-            
-            /* Divider */
-            .hkm-rp-divider-v2 {
-                height: 1px;
-                background: var(--border-color, #e2e8f0);
-                width: 100%;
-                margin: 4px 0;
-            }
-            .bible-theme-dark .hkm-rp-divider-v2 {
-                background: #333333;
-            }
-            
-            /* Toolbelt */
-            .hkm-rp-toolbelt-v2 {
-                display: flex;
-                justify-content: center;
-                gap: 16px;
-                width: 100%;
-            }
-            .hkm-rp-toolbelt-btn-v2 {
-                background: none;
+                height: 38px;
+                border-radius: 99px;
+                background: #1B4965;
+                color: #ffffff;
+                font-weight: 700;
+                font-size: 13px;
                 border: none;
-                color: #466275;
-                cursor: pointer;
                 display: flex;
-                flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                text-align: center;
-                gap: 4px;
-                font-size: 11px;
-                font-weight: 600;
+                gap: 6px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(27, 73, 101, 0.1);
                 transition: all 0.2s ease;
-                padding: 6px 8px;
-                border-radius: 8px;
-                position: relative;
-                width: 110px;
-                box-sizing: border-box;
             }
-            .bible-theme-dark .hkm-rp-toolbelt-btn-v2 {
-                color: #94a3b8;
+            .hkm-btn-complete-minimal:hover {
+                background: #153a50;
+                box-shadow: 0 6px 16px rgba(27, 73, 101, 0.2);
             }
-            .hkm-rp-toolbelt-btn-v2:hover {
-                transform: translateY(-2px);
-                color: #bd4f2a;
+            .hkm-btn-complete-minimal.completed {
+                background: #10b981 !important;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
             }
-            .bible-theme-dark .hkm-rp-toolbelt-btn-v2:hover {
-                color: #f97316;
-            }
-            @media (max-width: 480px) {
-                .hkm-rp-toolbelt-v2 {
-                    gap: 8px;
-                }
-                .hkm-rp-toolbelt-btn-v2 {
-                    width: auto;
-                    flex: 1;
-                    font-size: 10px;
-                    padding: 6px 4px;
-                }
-            }
-            .particle {
-                position: absolute;
-                border-radius: 50%;
-                pointer-events: none;
-                opacity: 0;
-            }
-            .hkm-rp-nav-label-v2 {
-                font-size: 14px;
-                font-weight: 700;
-                color: #475569;
-            }
-            .bible-theme-dark .hkm-rp-nav-label-v2 {
-                color: #94a3b8;
-            }
-            @media (max-width: 480px) {
-                .progress-ticks-v2 {
-                    display: none !important;
-                }
-            }
+            
+            /* Sidebar widgets */
             .hkm-rp-sidebar-wrapper {
                 display: flex;
                 flex-direction: column;
-                gap: 24px;
-                padding-bottom: 40px;
+                gap: 16px;
             }
             .hkm-rp-sidebar-card {
                 background: #ffffff;
                 border: 1px solid var(--border-color, #e2e8f0);
                 border-radius: 16px;
-                padding: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-                display: block;
-                transform: translateZ(0) !important;
-                backface-visibility: hidden !important;
+                padding: 16px;
             }
             .bible-theme-dark .hkm-rp-sidebar-card {
                 background: #242424;
                 border-color: #333333;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
             .hkm-rp-sidebar-card .card-header {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
                 margin-bottom: 12px;
-                border-bottom: 1px solid rgba(27, 73, 101, 0.05);
+                border-bottom: 1px solid var(--border-color, #e2e8f0);
                 padding-bottom: 8px;
             }
             .bible-theme-dark .hkm-rp-sidebar-card .card-header {
-                border-bottom-color: rgba(255,255,255,0.05);
+                border-color: #333333;
             }
             .hkm-rp-sidebar-card .card-header .icon {
                 color: #d17d39;
-                font-size: 22px;
+                font-size: 20px;
             }
             .hkm-rp-sidebar-card .card-header h3 {
-                font-size: 15px;
+                font-size: 14px;
                 font-weight: 700;
                 color: #1B4965;
                 margin: 0;
             }
             .bible-theme-dark .hkm-rp-sidebar-card .card-header h3 {
-                color: #cbd5e1;
+                color: #e2e8f0;
             }
-            .hkm-rp-sidebar-card p {
-                font-size: 14px;
-                line-height: 1.6;
-                color: #334155;
-                margin: 0;
-            }
-            .bible-theme-dark .hkm-rp-sidebar-card p {
-                color: #94a3b8;
-            }
-            .hkm-rp-sidebar-card .resources-list {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
+            
             .hkm-rp-resource-item {
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                padding: 8px 12px;
+                padding: 10px;
                 background: #f8fafc;
                 border: 1px solid #e2e8f0;
                 border-radius: 8px;
@@ -4434,17 +4339,18 @@ class BibleReader {
                 border-color: #1B4965;
                 transform: translateX(2px);
             }
+            
             .hkm-rp-sidebar-card textarea {
                 display: block !important;
                 width: 100% !important;
-                min-height: 100px !important;
-                padding: 12px !important;
+                min-height: 80px !important;
+                padding: 10px !important;
                 border-radius: 8px !important;
                 border: 1px solid #cbd5e1 !important;
                 outline: none !important;
-                font-size: 13px !important;
-                line-height: 1.5 !important;
-                margin-bottom: 12px !important;
+                font-size: 12.5px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 10px !important;
                 resize: vertical !important;
                 background: #ffffff !important;
                 color: #1e293b !important;
@@ -4459,11 +4365,6 @@ class BibleReader {
             .hkm-rp-sidebar-card textarea:focus {
                 border-color: #d17d39 !important;
             }
-            .save-status {
-                font-size: 11px;
-                color: #64748b;
-                margin-top: 6px;
-                text-align: right;
             }
             
             /* Premium layout 3-column elements */
@@ -5335,26 +5236,13 @@ class BibleReader {
             ticks.push(currentDayNum);
             ticks.sort((a, b) => a - b);
         }
-
-        let html = '';
-        ticks.forEach(tick => {
-            const isCurrent = tick === currentDayNum;
-            const isEnd = tick === totalDays;
-            
-            let classes = 'tick-number';
-            if (isCurrent) classes += ' current-tick';
-            else if (isEnd) classes += ' end-tick';
-            
-            html += `<span class="${classes}">${tick}</span>`;
-        });
-        return html;
+        return '';
     }
 
     renderTopHeaderPanel(container, globalPlan, userPlan, currentDayNum, dayConfig) {
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
         const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
         const progressPct = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
-        const dashOffset = 175.92 * (1 - progressPct / 100);
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
         const isPrayerApp = globalPlan.title && (
@@ -5367,9 +5255,6 @@ class BibleReader {
         const completeLabel = isCurrentDayCompleted 
             ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!')))
             : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
-
-        const planCoverImage = globalPlan.image || globalPlan.imageUrl || globalPlan.coverImage || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';
-        const dayTitle = dayConfig.title || (lang === 'en' ? 'Day ' + currentDayNum : (lang === 'es' ? 'Día ' + currentDayNum : 'Dag ' + currentDayNum));
 
         const db = this.getFirestore();
         if (db && !userPlan.isPreview) {
@@ -5401,11 +5286,6 @@ class BibleReader {
         }
 
         const isBehind = currentDayNum < expectedDay;
-        const progressStatusText = isBehind
-            ? (lang === 'en' ? `Behind schedule (Should be on Day ${expectedDay})` : (lang === 'es' ? `Atrasado (Deberías estar en el Día ${expectedDay})` : `Bak tidsplanen! (Skulle vært på Dag ${expectedDay})`))
-            : (isCurrentDayCompleted 
-                ? (lang === 'en' ? 'Goal reached!' : (lang === 'es' ? '¡Objetivo alcanzado!' : 'Dagens mål nådd!')) 
-                : (lang === 'en' ? 'On track!' : (lang === 'es' ? '¡En marcha!' : 'Du er i rute!')));
 
         const t_daysBehind = {
             no: `Du ligger ${expectedDay - currentDayNum} dager bak planen (Skulle vært på Dag ${expectedDay}).`,
@@ -5426,7 +5306,7 @@ class BibleReader {
         }[lang] || 'Hopp til i dag';
 
         const syncBannerHtml = isBehind ? `
-            <div class="hkm-rp-sync-banner-bible" style="background: #fffbeb; border: 1.5px solid #fef3c7; border-radius: 16px; padding: 16px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.05); text-align: left;">
+            <div class="hkm-rp-sync-banner-bible" style="background: #fffbeb; border: 1.5px solid #fef3c7; border-radius: 16px; padding: 16px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.05); text-align: left; width: 100%; box-sizing: border-box;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px;">info</span>
                     <span style="font-size: 13px; color: #b45309; font-weight: 600;">
@@ -5446,186 +5326,62 @@ class BibleReader {
             </div>
         ` : '';
 
+        // Generate YouVersion calendar strip HTML
+        let dayItemsHtml = '';
+        for (let d = 1; d <= totalDays; d++) {
+            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d);
+            const isActive = d === currentDayNum;
+            dayItemsHtml += `
+                <div class="hkm-rp-day-strip-item-v2 ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" 
+                     onclick="window.bibleReader.selectReadingPlanDay(${d})" 
+                     title="Dag ${d}">
+                    <span class="day-num">${d}</span>
+                    ${isCompleted ? '<span class="check-tick">✓</span>' : '<span class="day-dot">•</span>'}
+                </div>
+            `;
+        }
+
         container.className = 'hkm-rp-header-wrapper';
 
         container.innerHTML = `
-            <!-- 1. Premium Hero Image Card -->
-            <div class="hkm-rp-hero-card-v2">
-                <div class="hkm-rp-hero-bg-v2" style="background-image: url('${planCoverImage}');"></div>
-                <div class="hkm-rp-hero-overlay-v2"></div>
-                <div class="hkm-rp-hero-content-v2">
-                    <span class="hkm-rp-hero-badge-v2">${globalPlan.title}</span>
-                    <h1 class="hkm-rp-hero-title-v2">${dayTitle}</h1>
-                    <p class="hkm-rp-hero-subtitle-v2">Dag ${currentDayNum} av ${totalDays} • Reise gjennom ${globalPlan.title}</p>
+            <!-- 1. Day Selector Strip (YouVersion style) -->
+            <div class="hkm-rp-day-strip-v2">
+                ${dayItemsHtml}
+            </div>
+
+            <!-- 2. Info status row -->
+            <div class="hkm-rp-info-bar-v2">
+                <span class="day-count">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer; text-decoration: underline;">
+                        <span class="material-symbols-outlined" style="font-size: 12.5px;">restore</span>
+                        ${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}
+                    </button>
+                    ${isBehind 
+                        ? `<span class="behind-badge">${expectedDay - currentDayNum} ${lang === 'en' ? 'days behind' : (lang === 'es' ? 'días atr.' : 'dg bak')}</span>` 
+                        : `<span class="on-track-badge">${lang === 'en' ? 'On track' : (lang === 'es' ? 'En marcha' : 'I rute')}</span>`
+                    }
                 </div>
             </div>
-            
-            
-            <!-- 3. Mobile Combined Card (Visible on mobile/tablet, hidden on desktop) -->
-            <div class="hkm-rp-header-card-v2 lg:hidden" id="progress-card">
-                <!-- Circular progress & Status on the left -->
-                <div class="hkm-rp-progress-row-v2">
-                    <div class="hkm-rp-progress-info-v2">
-                        <div class="relative flex items-center justify-center cursor-help group transition-transform duration-300 hover:scale-105" style="position: relative; display: flex; align-items: center; justify-content: center;">
-                            <svg class="w-16 h-16 glow-effect" style="width: 64px; height: 64px;">
-                                <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--border-color, #e2e8f0)" stroke-width="4"></circle>
-                                <circle class="progress-ring__circle" id="progress-circle" cx="32" cy="32" r="28" fill="transparent" stroke="#d17d39" stroke-width="4" stroke-dasharray="175.92" stroke-dashoffset="${dashOffset}" stroke-linecap="round"></circle>
-                            </svg>
-                            <span class="absolute font-bold" id="progress-text" style="position: absolute; font-size: 11px; font-weight: 700; color: var(--text-base);">${progressPct}%</span>
-                        </div>
-                        <div class="progress-info-text-v2 text-left">
-                            <p class="title">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Fremdrift')}</p>
-                            <p class="status ${isCurrentDayCompleted ? 'completed-status' : ''}" id="progress-status" style="${isBehind ? 'color: #d97706 !important;' : ''}">
-                                ${progressStatusText}
-                            </p>
-                            <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer; text-decoration: underline; margin-top: 4px;">
-                                <span class="material-symbols-outlined" style="font-size: 12px;">restore</span>
-                                ${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Prev, Complete, Next on the right -->
-                    <div class="hkm-rp-buttons-row-v2">
-                        <button class="hkm-rp-btn-nav-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum - 1})" ${currentDayNum <= 1 ? 'disabled' : ''}>
-                            <span class="material-symbols-outlined">chevron_left</span>
-                        </button>
-                        
-                        <button class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
-                            <span class="material-symbols-outlined transition-transform duration-300" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 20px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
-                            <span id="btn-text">${completeLabel}</span>
-                        </button>
-                        
-                        <button class="hkm-rp-btn-nav-v2" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum + 1})" ${currentDayNum >= totalDays ? 'disabled' : ''}>
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </button>
-                    </div>
-                </div>
+
+            <!-- 3. Minimal navigation and completion controls -->
+            <div class="hkm-rp-buttons-row-minimal">
+                <button class="hkm-rp-btn-nav-minimal" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum - 1})" ${currentDayNum <= 1 ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+                </button>
+                
+                <button class="hkm-btn-complete-minimal ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
+                    <span class="material-symbols-outlined" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 18px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
+                    <span id="btn-text">${completeLabel}</span>
+                </button>
+                
+                <button class="hkm-rp-btn-nav-minimal" onclick="window.bibleReader.selectReadingPlanDay(${currentDayNum + 1})" ${currentDayNum >= totalDays ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+                </button>
             </div>
+
             ${syncBannerHtml}
         `;
-
-        // Wire up desktop tool size change
-        const desktopSizeBtn = container.querySelector('#desktop-rp-tool-size');
-        if (desktopSizeBtn) {
-            desktopSizeBtn.onclick = () => {
-                const currentSize = this.settings.fontSize || 18;
-                const newSize = currentSize >= 24 ? 16 : currentSize + 2;
-                this.settings.fontSize = newSize;
-                this.dom.readingPane.style.setProperty('--bible-font-size', `${newSize}px`);
-                const fontSizeDisp = document.getElementById('font-size-display');
-                if (fontSizeDisp) fontSizeDisp.innerText = `${newSize}px`;
-                const fontSizeDispMobile = document.getElementById('font-size-display-mobile');
-                if (fontSizeDispMobile) fontSizeDispMobile.innerText = `${newSize}px`;
-                this.saveSettings();
-            };
-        }
-
-        // Wire up desktop tool audio play
-        const desktopAudioBtn = container.querySelector('#desktop-rp-tool-audio');
-        if (desktopAudioBtn) {
-            desktopAudioBtn.onclick = () => {
-                this.toggleAudioPlayback();
-            };
-        }
-
-        // Wire up desktop tool bookmark
-        const desktopBookmarkBtn = container.querySelector('#desktop-rp-tool-bookmark');
-        if (desktopBookmarkBtn) {
-            const isBookmarked = this.bookmarks && this.bookmarks.some(b => b.chapterId === this.selectedChapterId);
-            const bookmarkIcon = desktopBookmarkBtn.querySelector('.material-symbols-outlined');
-            if (bookmarkIcon) {
-                bookmarkIcon.innerText = isBookmarked ? 'bookmark' : 'bookmark_border';
-                if (isBookmarked) {
-                    bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
-                    desktopBookmarkBtn.style.color = '#bd4f2a';
-                }
-            }
-            
-            desktopBookmarkBtn.onclick = () => {
-                const activeBook = this.books.find(b => b.id === this.selectedBookId);
-                const bookName = activeBook ? activeBook.name : '';
-                const fullRef = `${bookName} ${this.selectedChapterNum}`;
-                
-                const existingIdx = this.bookmarks.findIndex(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
-                if (existingIdx > -1) {
-                    this.bookmarks.splice(existingIdx, 1);
-                } else {
-                    this.bookmarks.push({
-                        id: 'bm_' + Date.now(),
-                        ref: fullRef,
-                        bibleId: this.selectedBibleId,
-                        chapterId: this.selectedChapterId,
-                        bookId: this.selectedBookId,
-                        chapter: this.selectedChapterNum,
-                        createdAt: new Date().toISOString()
-                    });
-                }
-                this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
-                this.renderBookmarksList();
-                
-                const nowBookmarked = this.bookmarks.some(b => b.chapterId === this.selectedChapterId);
-                if (bookmarkIcon) {
-                    bookmarkIcon.innerText = nowBookmarked ? 'bookmark' : 'bookmark_border';
-                    if (nowBookmarked) {
-                        bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
-                        desktopBookmarkBtn.style.color = '#bd4f2a';
-                    } else {
-                        bookmarkIcon.style.fontVariationSettings = "'FILL' 0";
-                        desktopBookmarkBtn.style.color = '';
-                    }
-                }
-            };
-        }
-
-        // Wire up mobile tool size change
-        const mobileSizeBtn = container.querySelector('#rp-toolbelt-size');
-        if (mobileSizeBtn) {
-            mobileSizeBtn.onclick = () => {
-                const currentSize = this.settings.fontSize || 18;
-                const newSize = currentSize >= 24 ? 16 : currentSize + 2;
-                this.settings.fontSize = newSize;
-                this.dom.readingPane.style.setProperty('--bible-font-size', `${newSize}px`);
-                const fontSizeDisp = document.getElementById('font-size-display');
-                if (fontSizeDisp) fontSizeDisp.innerText = `${newSize}px`;
-                const fontSizeDispMobile = document.getElementById('font-size-display-mobile');
-                if (fontSizeDispMobile) fontSizeDispMobile.innerText = `${newSize}px`;
-                this.saveSettings();
-            };
-        }
-
-        // Wire up mobile tool audio play
-        const mobileAudioBtn = container.querySelector('#rp-toolbelt-audio');
-        if (mobileAudioBtn) {
-            mobileAudioBtn.onclick = () => {
-                this.toggleAudioPlayback();
-            };
-        }
-
-        // Wire up translation selects (both desktop and mobile if present)
-        const transSelect = container.querySelector('#rp-toolbelt-trans-select');
-        if (transSelect && this.bibles) {
-            let optionsHtml = '';
-            this.bibles.forEach(b => {
-                optionsHtml += `<option value="${b.id}" ${b.id === this.selectedBibleId ? 'selected' : ''}>${b.abbreviation} - ${b.name}</option>`;
-            });
-            transSelect.innerHTML = optionsHtml;
-            transSelect.onchange = async (e) => {
-                const newTrans = e.target.value;
-                this.selectedBibleId = newTrans;
-                this.safeSetLocalStorage(`hkm_bible_translation_${lang}`, newTrans);
-                if (this.dom.translationSelect) {
-                    this.dom.translationSelect.value = newTrans;
-                }
-                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-                if (mobileTransSelect) {
-                    mobileTransSelect.value = newTrans;
-                }
-                await this.loadChapterText();
-                this.updateUrlParams();
-                this.setupReadingPlanUI();
-            };
-        }
 
         // Wire up mobile complete day button
         const mobileCompleteBtn = container.querySelector('#rp-complete-day-btn');
