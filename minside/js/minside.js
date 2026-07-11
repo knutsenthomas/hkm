@@ -4556,7 +4556,7 @@ class MinSideManager {
                     metaItems.push({
                         icon: 'alarm',
                         label: 'Starter om',
-                        val: `<span id="zoom-countdown" data-target="${lessonTime}" style="color: #d17d39; font-weight: 700;">Laster nedtelling...</span>`,
+                        val: `<span id="zoom-countdown" data-target="${lessonTime}">Laster nedtelling...</span>`,
                         class: 'secondary'
                     });
                 } else {
@@ -4617,11 +4617,11 @@ class MinSideManager {
                     ${metaItems.map(item => {
                         const iconHtml = `<span class="material-symbols-outlined">${item.icon}</span>`;
                         const contentHtml = `
-                            <span class="hkm-meta-label">${item.label}</span>
-                            <div class="hkm-meta-value-container">
-                                <div class="hkm-meta-icon ${item.class}">
-                                    ${iconHtml}
-                                </div>
+                            <div class="hkm-meta-icon ${item.class}">
+                                ${iconHtml}
+                            </div>
+                            <div class="hkm-meta-text">
+                                <span class="hkm-meta-label">${item.label}</span>
                                 <span class="hkm-meta-val">${item.val}</span>
                             </div>
                         `;
@@ -4699,29 +4699,35 @@ class MinSideManager {
                     box-sizing: border-box;
                 }
                 .hkm-btn:active {
-                    transform: scale(0.95);
+                    transform: scale(0.97);
                 }
                 .hkm-btn-fs {
-                    background: #d17d39;
+                    background: #1B4965;
                     color: #ffffff;
                     border: none;
+                    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
                 }
                 .hkm-btn-fs:hover {
-                    background: #bd4f2a;
+                    background: #255d80;
+                    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
+                    transform: translateY(-1px);
                 }
                 .hkm-btn-zoom {
-                    background: #1DB954;
+                    background: #22c55e;
                     color: white;
                     border: none;
+                    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
                 }
                 .hkm-btn-zoom:hover {
-                    background: #1ed760;
+                    background: #16a34a;
+                    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
+                    transform: translateY(-1px);
                 }
                 
                 /* Metadata Grid */
                 .hkm-meta-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                     gap: 24px;
                     padding-top: 24px;
                     border-top: 1px solid rgba(226, 232, 240, 0.8);
@@ -4734,54 +4740,64 @@ class MinSideManager {
                 }
                 .hkm-meta-item {
                     display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 8px;
-                }
-                .hkm-meta-value-container {
-                    display: flex;
                     align-items: center;
-                    gap: 8px;
-                    height: 40px;
+                    gap: 16px;
+                    transition: all 0.2s ease;
+                }
+                .hkm-meta-text {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
                 }
                 .hkm-meta-icon {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: rgba(209, 125, 57, 0.08);
-                    color: #d17d39;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 12px;
+                    background: rgba(27, 73, 101, 0.08); /* Primary dark blue tint */
+                    color: #1B4965;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     flex-shrink: 0;
+                    transition: all 0.2s ease;
                 }
                 .hkm-meta-icon.secondary {
-                    background: rgba(209, 125, 57, 0.06);
+                    background: rgba(209, 125, 57, 0.08); /* Secondary orange tint */
                     color: #d17d39;
                 }
                 .hkm-meta-icon.tertiary {
-                    background: rgba(209, 125, 57, 0.06);
-                    color: #d17d39;
+                    background: rgba(14, 165, 233, 0.08); /* Sky blue tint */
+                    color: #0ea5e9;
                 }
                 .hkm-meta-label {
-                    display: inline-block;
-                    font-size: 10px;
+                    font-size: 11px;
                     text-transform: uppercase;
                     font-weight: 700;
-                    color: rgba(100, 116, 139, 0.6);
+                    color: #64748b;
                     margin: 0 !important;
                     padding: 0 !important;
-                    padding-left: 48px !important;
+                    letter-spacing: 0.05em;
                     line-height: 1;
                 }
                 .hkm-meta-val {
-                    font-size: 14px;
+                    font-size: 15px;
                     font-weight: 600;
                     color: #1e293b;
                     margin: 0 !important;
                     padding: 0 !important;
                     line-height: 1.2;
                 }
+                #zoom-countdown {
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                    font-size: 14.5px;
+                    letter-spacing: -0.02em;
+                    color: #d17d39;
+                    font-weight: 700;
+                    background: rgba(209, 125, 57, 0.06);
+                    padding: 2px 6px;
+                    border-radius: 6px;
+                }
+                
                 
                 /* Sidebar navigation and Tabs */
                 .hkm-tabs-header {
