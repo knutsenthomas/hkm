@@ -4072,6 +4072,11 @@ class BibleReader {
             // Render reading plan UI
             await this.setupReadingPlanUI();
             this.updateUrlParams();
+
+            // Auto-open devotional wizard on mobile
+            if (window.innerWidth <= 1024) {
+                this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
+            }
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         }
@@ -4249,11 +4254,11 @@ class BibleReader {
                 cursor: not-allowed;
             }
             
-            .hkm-btn-complete-minimal {
-                flex: 1;
+            .hkm-btn-devotional-trigger-minimal {
+                flex: 1.2;
                 height: 38px;
                 border-radius: 99px;
-                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+                background: linear-gradient(135deg, #1b4965 0%, #2a6f97 100%);
                 color: #ffffff;
                 font-weight: 700;
                 font-size: 13px;
@@ -4263,16 +4268,52 @@ class BibleReader {
                 justify-content: center;
                 gap: 6px;
                 cursor: pointer;
-                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
+                box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
+                transition: all 0.2s ease;
+            }
+            .hkm-btn-devotional-trigger-minimal:hover {
+                filter: brightness(1.1);
+                box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
+            }
+            body.prayer-app-mode .hkm-btn-devotional-trigger-minimal {
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+                box-shadow: 0 4px 12px rgba(189, 79, 42, 0.15) !important;
+            }
+            
+            .hkm-btn-complete-minimal {
+                flex: 1;
+                height: 38px;
+                border-radius: 99px;
+                background: #f1f5f9;
+                color: #475569;
+                font-weight: 700;
+                font-size: 13px;
+                border: 1px solid #cbd5e1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                cursor: pointer;
                 transition: all 0.2s ease;
             }
             .hkm-btn-complete-minimal:hover {
-                filter: brightness(1.1);
-                box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
+                background: #e2e8f0;
             }
             .hkm-btn-complete-minimal.completed {
                 background: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete-minimal {
+                background: rgba(189, 79, 42, 0.08) !important;
+                border-color: rgba(189, 79, 42, 0.2) !important;
+                color: #bd4f2a !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete-minimal.completed {
+                background: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
             }
             
             /* Sidebar widgets */
@@ -5073,6 +5114,11 @@ class BibleReader {
         window.history.pushState({}, '', url.toString());
 
         await this.setupReadingPlanUI();
+
+        // Auto-open devotional wizard on mobile
+        if (window.innerWidth <= 1024) {
+            this.openDevotionalWizard(this.activePlanId, dayNum);
+        }
     }
 
     async toggleActivePlanDayCompletion(btnElement) {
@@ -5371,6 +5417,11 @@ class BibleReader {
                     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
                 </button>
                 
+                <button class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
+                    <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
+                </button>
+
                 <button class="hkm-btn-complete-minimal ${isCurrentDayCompleted ? 'completed' : ''}" id="rp-complete-day-btn">
                     <span class="material-symbols-outlined" id="btn-icon" style="font-variation-settings: 'FILL' 1; font-size: 18px;">${isCurrentDayCompleted ? 'check_circle' : 'favorite'}</span>
                     <span id="btn-text">${completeLabel}</span>
@@ -5424,25 +5475,27 @@ class BibleReader {
     }
 
     async openDevotionalWizard(planId, dayNumber) {
-        if (!this.currentUser) return;
+        let globalPlan = this.activePlanData;
+        let dayConfig = null;
 
-        const db = this.getFirestore();
-        if (!db) {
-            alert("Database utilgjengelig. Prøv igjen senere.");
-            return;
+        if (globalPlan && globalPlan.id === planId) {
+            dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
         }
 
-        const globalPlanSnap = await db.collection('reading_plans')
-            .doc(planId)
-            .get();
+        if (!dayConfig) {
+            const db = this.getFirestore();
+            if (db) {
+                const globalPlanSnap = await db.collection('reading_plans')
+                    .doc(planId)
+                    .get();
 
-        if (!globalPlanSnap.exists) {
-            alert("Leseplanen finnes ikke.");
-            return;
+                if (globalPlanSnap.exists) {
+                    globalPlan = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
+                    dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
+                }
+            }
         }
 
-        const globalPlan = globalPlanSnap.data();
-        const dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
         if (!dayConfig) {
             alert("Dagens andakt er ikke konfigurert.");
             return;
@@ -5793,33 +5846,22 @@ class BibleReader {
             actions.querySelector('#btn-devotional-close').onclick = () => {
                 modal.remove();
                 this.loadReadingPlan();
+                this.setupReadingPlanUI();
             };
         }
     }
 
     async completeDevotionalDay(plan, dayNumber, reflectionText) {
-        if (!this.currentUser) return;
-        
-        const db = this.getFirestore();
-        if (!db) {
-            throw new Error("Database utilgjengelig.");
-        }
-
-        const uid = this.currentUser.uid;
         const planId = plan.id;
-        
-        const ref = db.collection('users')
-            .doc(uid)
-            .collection('reading_plans')
-            .doc(planId);
-            
-        const snap = await ref.get();
-        let userPlan = snap.exists ? snap.data() : {
-            planId: planId,
-            currentDay: 1,
-            completedDays: [],
-            reflections: {}
-        };
+        let userPlan = this.userPlanProgress;
+        if (!userPlan) {
+            userPlan = {
+                planId: planId,
+                currentDay: 1,
+                completedDays: [],
+                reflections: {}
+            };
+        }
         
         userPlan.reflections = userPlan.reflections || {};
         if (reflectionText) {
@@ -5847,20 +5889,38 @@ class BibleReader {
         }
         
         userPlan.lastActiveAt = this.getServerTimestamp();
-        await ref.set(userPlan, { merge: true });
-        
-        if (reflectionText) {
-            await db.collection('personal_notes')
-                .add({
-                    userId: uid,
-                    title: `Leseplan: ${plan.title} - Dag ${dayNumber}`,
-                    text: reflectionText,
-                    createdAt: this.getServerTimestamp(),
-                    isReadingPlanNote: true,
-                    readingPlanId: planId,
-                    dayNumber: dayNumber
-                });
+        this.userPlanProgress = userPlan;
+
+        if (this.currentUser) {
+            const db = this.getFirestore();
+            if (db) {
+                const uid = this.currentUser.uid;
+                const ref = db.collection('users')
+                    .doc(uid)
+                    .collection('reading_plans')
+                    .doc(planId);
+                
+                await ref.set(userPlan, { merge: true });
+
+                if (reflectionText) {
+                    await db.collection('personal_notes')
+                        .add({
+                            userId: uid,
+                            title: `Leseplan: ${plan.title} - Dag ${dayNumber}`,
+                            text: reflectionText,
+                            createdAt: this.getServerTimestamp(),
+                            isReadingPlanNote: true,
+                            readingPlanId: planId,
+                            dayNumber: dayNumber
+                        });
+                }
+            }
+        } else {
+            this.safeSetLocalStorage('hkm_reading_plan_progress_' + planId, JSON.stringify(userPlan));
         }
+
+        // Refresh UI
+        await this.setupReadingPlanUI();
     }
 
     // ==========================================================================
