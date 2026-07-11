@@ -20,6 +20,18 @@ class ContentManager {
 
         this.ensureResponsiveHeroTitleStyles();
 
+        this.cachedHeroSlides = null;
+        this.lastDeviceType = window.innerWidth < 768 ? 'mobile' : 'desktop';
+        window.addEventListener('resize', () => {
+            const currentDeviceType = window.innerWidth < 768 ? 'mobile' : 'desktop';
+            if (currentDeviceType !== this.lastDeviceType) {
+                this.lastDeviceType = currentDeviceType;
+                if (this.cachedHeroSlides) {
+                    this.renderHeroSlides(this.cachedHeroSlides, true);
+                }
+            }
+        });
+
         this.init();
         this.agendaMonthsToShow = 1;
     }
@@ -3576,12 +3588,13 @@ class ContentManager {
     /**
      * Dynamically render Hero Slides
      */
-    renderHeroSlides(slides) {
+    renderHeroSlides(slides, force = false) {
         const lang = this.getCurrentLanguage(); // 'no', 'en', 'es'
         const sliderContainer = document.querySelector('.slider-container');
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
+            this.cachedHeroSlides = slides;
             // Localize slides on the fly
             const localizedSlides = slides.map(slide => {
                 if (lang === 'no') return slide;
@@ -3604,7 +3617,7 @@ class ContentManager {
                 btnLink: (slide.btnLink || '').trim()
             }));
             const incomingSignature = JSON.stringify(normalizedIncomingSlides);
-            if (this._renderHtmlSignatures.get('__hero-slides-data') === incomingSignature) {
+            if (!force && this._renderHtmlSignatures.get('__hero-slides-data') === incomingSignature) {
                 return;
             }
 
@@ -3620,7 +3633,7 @@ class ContentManager {
             }));
 
             // Compare incoming slides data with what is currently in the DOM
-            const isDifferent = localizedSlides.length !== currentSlides.length || localizedSlides.some((slide, i) => {
+            const isDifferent = force || localizedSlides.length !== currentSlides.length || localizedSlides.some((slide, i) => {
                 const current = currentSlides[i];
                 if (!current) return true;
 
@@ -3649,7 +3662,7 @@ class ContentManager {
             });
 
             if (isDifferent) {
-                console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
+                console.log("[ContentManager] Hero content changed, updated or resized, re-rendering...");
                 document.body.classList.remove('hero-animate');
 
                 const heroMarkup = localizedSlides.map((slide, index) => {
@@ -3676,11 +3689,11 @@ class ContentManager {
                                 <div class="hero-video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);"></div>
                             </div>
                         ` : (hasVideo ? `
-                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 600 : 1200 })}">
+                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 800 : 1920 })}">
                                 <source src="${videoUrl}" type="video/mp4">
                             </video>
                         ` : `
-                            <div class="hero-bg" style="background-image: url('${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 600 : 1200 })}')"></div>
+                            <div class="hero-bg" style="background-image: url('${this.optimizeDynamicImageUrl(slide.imageUrl, { width: window.innerWidth < 768 ? 800 : 1920 })}')"></div>
                         `)}
                         <div class="container hero-container">
                             <div class="hero-content">
@@ -4719,7 +4732,7 @@ class ContentManager {
                 const u = new URL(cleanUrl);
                 
                 // Determine target width
-                let targetWidth = options.width || (window.innerWidth < 768 ? 600 : 1200);
+                let targetWidth = options.width || (window.innerWidth < 768 ? 800 : 1920);
                 u.searchParams.set('w', String(targetWidth));
                 
                 // Set default format & quality
@@ -4744,7 +4757,7 @@ class ContentManager {
             const lowerUrl = cleanUrl.toLowerCase();
             // Don't proxy SVGs
             if (!lowerUrl.includes('.svg')) {
-                let targetWidth = options.width || (window.innerWidth < 768 ? 600 : 1200);
+                let targetWidth = options.width || (window.innerWidth < 768 ? 800 : 1920);
                 let targetQuality = options.quality || 80;
                 return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${targetWidth}&output=webp&q=${targetQuality}`;
             }
