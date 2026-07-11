@@ -4333,6 +4333,7 @@ class BibleReader {
             @media (max-width: 768px) {
                 .hkm-rp-close-btn-mobile {
                     display: flex !important;
+                    margin-right: 12px !important;
                 }
             }
 
