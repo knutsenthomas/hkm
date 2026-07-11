@@ -4995,7 +4995,7 @@ class MinSideManager {
                     <div class="hkm-card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
                             <div style="flex:1; min-width: 250px;">
-                                <span style="font-size: 11px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon #${activeLessonIndex + 1}</span>
+                                <span style="font-size: 13px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon ${activeLessonIndex + 1}</span>
                                 <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
                                 <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
                             </div>
@@ -5064,7 +5064,7 @@ class MinSideManager {
                                                 <div class="hkm-lesson-card locked player-lesson-item" data-idx="${idx}">
                                                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                                                         <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                            <span style="font-size:10px; font-weight:700; color:rgba(100, 116, 139, 0.4); text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
+                                                            <span style="font-size:10px; font-weight:700; color:rgba(100, 116, 139, 0.4); text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
                                                             <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
                                                         </div>
                                                         <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">lock</span>
@@ -5077,7 +5077,7 @@ class MinSideManager {
                                             <div class="hkm-lesson-card player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
                                                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                                                     <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon #${idx + 1}</span>
+                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
                                                         <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
                                                     </div>
                                                     <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.4)'};">
