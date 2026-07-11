@@ -16,7 +16,7 @@ const i18nManager = {
             'event-details', 'events', 'for-businesses', 'for-churches',
             'index', 'media', 'podcast', 'privacy',
             'regular-donors', 'teaching', 'youtube', 'reading-plan-details',
-            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje'
+            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje', 'courses'
         ]),
         es: new Set([
             'accesibilidad', 'bibel', 'blog-post-1', 'blog-post-2',
@@ -26,7 +26,7 @@ const i18nManager = {
             'ensenanza', 'eventos', 'index', 'media',
             'para-empresas', 'para-iglesias', 'podcast',
             'privacidad', 'sobre-nosotros', 'youtube', 'detalles-plan-lectura',
-            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje'
+            'tidslinje-imperier', 'leseplaner', 'bibelsk-tidslinje', 'cursos'
         ])
     },
 
@@ -324,6 +324,9 @@ const i18nManager = {
         }
 
         let currentFile = pathParts[pathParts.length - 1] || 'index';
+        if (currentFile === 'butikk' || currentFile === 'betingelser') {
+            return true;
+        }
         const mappedFile = this.mapFileName(currentFile, lang);
 
         if (this.knownFiles[lang] && this.knownFiles[lang].has(mappedFile)) {
@@ -403,6 +406,11 @@ const i18nManager = {
 
         let currentFile = pathParts[pathParts.length - 1] || 'index';
         
+        if (currentFile === 'butikk' || currentFile === 'betingelser') {
+            window.location.reload();
+            return;
+        }
+        
         const mappedFile = this.mapFileName(currentFile, lang);
         let newPath = '';
 
@@ -442,7 +450,7 @@ const i18nManager = {
                 'undervisning': 'teaching',
                 'bibelstudier': 'teaching',
                 'seminarer': 'teaching',
-                'kurs': 'teaching',
+                'kurs': 'courses',
                 'reisevirksomhet': 'events',
                 'bli-fast-giver': 'regular-donors',
                 'personvern': 'privacy',
@@ -476,7 +484,7 @@ const i18nManager = {
                 'undervisning': 'ensenanza',
                 'bibelstudier': 'ensenanza',
                 'seminarer': 'ensenanza',
-                'kurs': 'ensenanza',
+                'kurs': 'cursos',
                 'reisevirksomhet': 'eventos',
                 'bli-fast-giver': 'donantes-regulares',
                 'personvern': 'privacidad',

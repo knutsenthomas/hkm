@@ -132,7 +132,13 @@ export default async function handler(req, res) {
       templatePath = 'dist/arrangement-detaljer-template.html';
     }
   } else if (type === 'course') {
-    templatePath = 'dist/kurs-template.html';
+    if (lang === 'en') {
+      templatePath = 'dist/en/courses-template.html';
+    } else if (lang === 'es') {
+      templatePath = 'dist/es/cursos-template.html';
+    } else {
+      templatePath = 'dist/kurs-template.html';
+    }
   }
 
   // Load the HTML file
@@ -315,7 +321,13 @@ export default async function handler(req, res) {
         ? `/en/event-details?id=${id}`
         : (lang === 'es' ? `/es/detalles-evento?id=${id}` : `/arrangement-detaljer?id=${id}`);
     } else if (type === 'course') {
-      cleanPath = id ? `/kurs.html?courseId=${id}` : `/kurs`;
+      if (lang === 'en') {
+        cleanPath = id ? `/en/courses.html?courseId=${id}` : `/en/courses`;
+      } else if (lang === 'es') {
+        cleanPath = id ? `/es/cursos.html?courseId=${id}` : `/es/cursos`;
+      } else {
+        cleanPath = id ? `/kurs.html?courseId=${id}` : `/kurs`;
+      }
     }
     const absolutePageUrl = `${protocol}://${host}${cleanPath}`;
 
