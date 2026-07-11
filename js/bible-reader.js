@@ -4897,24 +4897,12 @@ class BibleReader {
                 this.dom.navRight.classList.add('active');
             }
         }
-
-        // 4. Render top header panel in central column (Mobile Only to prevent duplicate controls on PC)
-        let planHeader = document.getElementById('reading-plan-header-panel');
-        if (!planHeader) {
-            planHeader = document.createElement('div');
-            planHeader.id = 'reading-plan-header-panel';
-            
-            const contentPane = document.querySelector('.bible-content-pane');
-            if (contentPane) {
-                contentPane.insertBefore(planHeader, contentPane.firstChild);
-            }
-        }
-        if (window.innerWidth <= 1024) {
-            planHeader.style.display = 'block';
-            this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
-        } else {
+        // Hide old top header panel in central column (Deprecated/Removed)
+        const planHeader = document.getElementById('reading-plan-header-panel');
+        if (planHeader) {
             planHeader.style.display = 'none';
         }
+
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
             await this.showDayVerses(dayConfig.verses, openSidebarOnMobile);
