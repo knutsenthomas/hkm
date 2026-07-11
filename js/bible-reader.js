@@ -3287,7 +3287,7 @@ class BibleReader {
         return dict[lang]?.[key] || dict['no']?.[key] || fallback;
     }
 
-    async loadReadingPlan() {
+    async loadReadingPlan(openSidebarOnMobile = false) {
         const container = this.dom.readingPlanContent;
         if (!container) return;
 
@@ -3942,13 +3942,18 @@ class BibleReader {
             }
         }
     }
-
-    async showDayVerses(verses) {
+    async showDayVerses(verses, keepSidebarOpen = false) {
         if (!verses) return;
         await this.parseAndNavigateToReference(verses);
         if (window.innerWidth <= 1024) {
             const sidebar = document.getElementById('bible-sidebar');
-            if (sidebar) sidebar.classList.remove('active');
+            if (sidebar) {
+                if (keepSidebarOpen) {
+                    sidebar.classList.add('active');
+                } else {
+                    sidebar.classList.remove('active');
+                }
+            }
             const navRight = document.getElementById('bible-nav-right');
             if (navRight) navRight.classList.remove('active');
         }
@@ -4910,10 +4915,9 @@ class BibleReader {
         } else {
             planHeader.style.display = 'none';
         }
-
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
-            await this.showDayVerses(dayConfig.verses);
+            await this.showDayVerses(dayConfig.verses, openSidebarOnMobile);
             this.applyReadingPlanHighlights();
         }
     }
@@ -5435,7 +5439,7 @@ class BibleReader {
             // Reload UI after a short delay for the celebration animation to shine!
             setTimeout(() => {
                 this.setupReadingPlanUI();
-                this.loadReadingPlan();
+                this.loadReadingPlan(true);
             }, 1200);
         }
     }
@@ -6080,7 +6084,7 @@ class BibleReader {
                     }
                 } else if (step === 5) {
                     modal.remove();
-                    this.loadReadingPlan();
+                    this.loadReadingPlan(true);
                 }
             };
         }

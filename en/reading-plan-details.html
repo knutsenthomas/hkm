@@ -550,23 +550,24 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         @media (max-width: 1024px) {
             .details-container {
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 24px !important;
             }
 
-            .details-main {
-                order: 2;
+            .left-content {
+                order: 2 !important;
             }
 
-            .details-sidebar {
-                order: 1;
+            .right-sidebar {
+                order: 1 !important;
             }
 
             .sidebar-card {
-                position: static;
+                position: static !important;
             }
         }
 
@@ -2084,10 +2085,9 @@
                 document.getElementById('start-plan-btn').addEventListener('click', () => {
                     window.location.href = `/en/bibel.html?plan=${plan.id}&day=1`;
                 });
-
                 // Toggle views
                 document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('details-view').style.display = 'grid';
+                document.getElementById('details-view').style.display = '';
             }
 
             function renderResources(resources) {
