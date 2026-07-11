@@ -4400,15 +4400,24 @@ class BibleReader {
             }
             .hkm-rp-close-btn-mobile {
                 display: none !important;
-                background: none !important;
-                border: none !important;
-                padding: 8px !important;
+                background: rgba(27, 73, 101, 0.06) !important;
+                border: 1px solid rgba(27, 73, 101, 0.15) !important;
+                padding: 0 !important;
                 cursor: pointer !important;
-                color: var(--text-base) !important;
+                color: var(--bible-primary) !important;
                 align-items: center !important;
                 justify-content: center !important;
                 border-radius: 50% !important;
-                transition: background-color 0.2s !important;
+                width: 36px !important;
+                height: 36px !important;
+                box-sizing: border-box !important;
+                transition: all 0.2s ease !important;
+            }
+            .hkm-rp-close-btn-mobile:hover {
+                background: rgba(27, 73, 101, 0.12) !important;
+            }
+            .hkm-rp-close-btn-mobile:active {
+                transform: scale(0.95) !important;
             }
             @media (max-width: 768px) {
                 .hkm-rp-close-btn-mobile {
@@ -5255,7 +5264,7 @@ class BibleReader {
                         <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
                     </button>
                     <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${displayTitle}</h2>
-                    <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
