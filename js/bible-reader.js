@@ -5810,6 +5810,44 @@ class BibleReader {
         return filteredHtml;
     }
 
+    formatDevotionalText(text) {
+        if (!text) return '';
+        
+        const cleanText = text.replace(/\r\n/g, '\n');
+        const paragraphs = cleanText.split(/\n\s*\n/);
+        
+        return paragraphs.map(p => {
+            const trimmed = p.trim();
+            if (!trimmed) return '';
+            
+            // Check for Markdown headings
+            if (trimmed.startsWith('###')) {
+                return `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: 24px; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^###\s*/, '')}</h4>`;
+            }
+            if (trimmed.startsWith('##')) {
+                return `<h3 style="font-size: 1.3em; font-weight: 700; color: #1B4965; margin-top: 28px; margin-bottom: 14px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^##\s*/, '')}</h3>`;
+            }
+            if (trimmed.startsWith('#')) {
+                return `<h2 style="font-size: 1.5em; font-weight: 700; color: #1B4965; margin-top: 32px; margin-bottom: 16px; font-family: system-ui, -apple-system, sans-serif;">${trimmed.replace(/^#\s*/, '')}</h2>`;
+            }
+            
+            // Check for blockquote or special focus paragraph
+            if (trimmed.startsWith('>')) {
+                return `<div class="hkm-devotional-prayer-box" style="margin-top: 16px; margin-bottom: 16px;">${trimmed.replace(/^>\s*/, '')}</div>`;
+            }
+            
+            // Format inline bold/italic
+            let formatted = trimmed;
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Replace single newlines within the paragraph with `<br>` to preserve line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Georgia', serif; font-size: 17px; color: #334155;">${formatted}</p>`;
+        }).join('');
+    }
+
     renderDevotionalStep(modal, plan, dayNumber, dayConfig, step, scriptureHtml) {
         modal.innerHTML = '';
         
@@ -5851,10 +5889,20 @@ class BibleReader {
                 ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus'))
                 : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional' : 'Dagens Andakt'));
             const text = dayConfig.prayerFocus || (isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.');
-            stepContentHtml = `
-                <h3 class="hkm-devotional-step-title">${heading}</h3>
-                <div class="hkm-devotional-prayer-box">${text}</div>
-            `;
+            
+            if (isPrayerApp) {
+                stepContentHtml = `
+                    <h3 class="hkm-devotional-step-title">${heading}</h3>
+                    <div class="hkm-devotional-prayer-box">${text}</div>
+                `;
+            } else {
+                stepContentHtml = `
+                    <h3 class="hkm-devotional-step-title">${heading}</h3>
+                    <div class="hkm-devotional-text-serif" style="text-align: left; font-style: normal !important;">
+                        ${this.formatDevotionalText(text)}
+                    </div>
+                `;
+            }
         } else if (step === 3) {
             const heading = lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Dypere Dykk');
             let resourcesListHtml = '';

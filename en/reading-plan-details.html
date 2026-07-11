@@ -1804,6 +1804,51 @@
                         const defaultFocus = isPrayerApp ? 'Silent prayer and reflection.' : 'Silent reflection.';
                         const focusText = day.prayerFocus || defaultFocus;
 
+                        let focusTextHtml = '';
+                        if (isPrayerApp) {
+                            focusTextHtml = `
+                                <div class="prayer-focus-quote">
+                                    <span class="quote-mark">“</span>
+                                    <p class="prayer-focus-text">${escapeHtml(focusText)}</p>
+                                </div>
+                            `;
+                        } else {
+                            const formatDetailFocusText = (text) => {
+                                if (!text) return '';
+                                let escaped = escapeHtml(text);
+                                const paragraphs = escaped.split(/\n\s*\n/);
+                                return paragraphs.map(p => {
+                                    const trimmed = p.trim();
+                                    if (!trimmed) return '';
+                                    if (trimmed.startsWith('###')) {
+                                        return `<h4 style="font-size: 1.1em; font-weight: 700; color: #1B4965; margin: 12px 0 6px 0;">${trimmed.replace(/^###\s*/, '')}</h4>`;
+                                    }
+                                    if (trimmed.startsWith('##')) {
+                                        return `<h3 style="font-size: 1.2em; font-weight: 700; color: #1B4965; margin: 16px 0 8px 0;">${trimmed.replace(/^##\s*/, '')}</h3>`;
+                                    }
+                                    if (trimmed.startsWith('#')) {
+                                        return `<h2 style="font-size: 1.3em; font-weight: 700; color: #1B4965; margin: 20px 0 10px 0;">${trimmed.replace(/^#\s*/, '')}</h2>`;
+                                    }
+                                    if (trimmed.startsWith('&gt;')) {
+                                        return `<div style="margin: 12px 0; padding-left: 12px; border-left: 3px solid #d17d39; font-style: italic; color: #475569;">${trimmed.replace(/^&gt;\s*/, '')}</div>`;
+                                    }
+                                    let formatted = trimmed;
+                                    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                                    formatted = formatted.replace(/\n/g, '<br>');
+                                    return `<p style="margin: 0 0 12px 0; line-height: 1.7; font-family: 'Georgia', serif; font-size: 16px; color: #334155;">${formatted}</p>`;
+                                }).join('');
+                            };
+                            
+                            focusTextHtml = `
+                                <div class="prayer-focus-quote" style="padding-left: 24px; border-radius: 12px;">
+                                    <div class="prayer-focus-text" style="font-size: 1rem; font-weight: normal; color: #334155; line-height: 1.7;">
+                                        ${formatDetailFocusText(focusText)}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
                         return `
                             <div class="day-item prayer-day-card ${isHiddenClass}">
                                 <div class="prayer-day-header">
@@ -1813,10 +1858,7 @@
                                     </div>
                                     <span class="material-symbols-outlined prayer-icon-right">${headerIcon}</span>
                                 </div>
-                                <div class="prayer-focus-quote">
-                                    <span class="quote-mark">“</span>
-                                    <p class="prayer-focus-text">${escapeHtml(focusText)}</p>
-                                </div>
+                                ${focusTextHtml}
                                 ${versesText ? `
                                 <div class="prayer-bible-tip">
                                     <span class="material-symbols-outlined">menu_book</span>
