@@ -4117,6 +4117,92 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
+            /* YouVersion Dashboard Layout styles */
+            .hkm-rp-day-strip-v3 {
+                display: flex !important;
+                gap: 10px !important;
+                overflow-x: auto !important;
+                padding: 4px 4px 16px 4px !important;
+                margin-bottom: 24px !important;
+                scroll-behavior: smooth !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+            }
+            .hkm-rp-day-strip-v3::-webkit-scrollbar {
+                display: none !important;
+            }
+            .hkm-rp-day-strip-bubble-v3 {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 64px !important;
+                height: 64px !important;
+                min-width: 64px !important;
+                border-radius: 14px !important;
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                position: relative !important;
+                cursor: pointer !important;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                padding: 0 !important;
+                outline: none !important;
+            }
+            .hkm-rp-day-strip-bubble-v3 .day-num {
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #1e293b !important;
+                line-height: 1.1 !important;
+            }
+            .hkm-rp-day-strip-bubble-v3 .day-date {
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                color: #94a3b8 !important;
+                margin-top: 4px !important;
+                text-transform: uppercase !important;
+            }
+            .hkm-rp-day-strip-bubble-v3.active {
+                background: #ffffff !important;
+                border: 2.5px solid #0f172a !important;
+                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+            }
+            .hkm-rp-day-strip-bubble-v3.active .day-num {
+                color: #0f172a !important;
+            }
+            .hkm-rp-day-strip-bubble-v3.completed {
+                background: #f1f5f9 !important;
+            }
+            .hkm-rp-day-strip-bubble-v3 .check-badge {
+                position: absolute !important;
+                top: -4px !important;
+                right: -4px !important;
+                width: 16px !important;
+                height: 16px !important;
+                border-radius: 50% !important;
+                background: #10b981 !important;
+                color: #ffffff !important;
+                font-size: 10px !important;
+                font-weight: bold !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2) !important;
+            }
+            
+            .hkm-rp-checklist-item {
+                transition: background-color 0.2s !important;
+            }
+            .hkm-rp-start-btn-black {
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+            .hkm-rp-start-btn-black:hover {
+                background: #1e293b !important;
+                transform: translateY(-1px) !important;
+            }
+            .hkm-rp-start-btn-black:active {
+                transform: scale(0.98) !important;
+            }
+
             .hkm-rp-header-wrapper {
                 width: 100%;
                 max-width: 680px;
@@ -4831,6 +4917,45 @@ class BibleReader {
         }
     }
 
+    exitReadingPlanMode() {
+        this.activePlanMode = false;
+        this.activePlanId = null;
+        this.activePlanData = null;
+        this.activePlanDay = null;
+
+        // Restore normal left sidebar elements
+        const booksListWrapper = document.querySelector('.books-list-wrapper');
+        if (booksListWrapper) booksListWrapper.style.display = 'block';
+
+        const searchContainer = document.querySelector('.sidebar-header .search-container');
+        if (searchContainer) searchContainer.style.display = 'flex';
+
+        const mobileControls = document.getElementById('sidebar-mobile-controls');
+        if (mobileControls) mobileControls.style.display = 'flex';
+
+        const planSidebar = document.getElementById('reading-plan-sidebar-content');
+        if (planSidebar) planSidebar.style.display = 'none';
+
+        const planHeader = document.getElementById('reading-plan-header-panel');
+        if (planHeader) planHeader.style.display = 'none';
+
+        const titleRow = document.querySelector('.sidebar-mobile-title-row');
+        const titleSpan = titleRow ? titleRow.querySelector('span') : null;
+        if (titleSpan) {
+            titleSpan.innerText = 'Bibelbøker';
+        }
+
+        const rpToggleBtn = document.getElementById('rp-sidebar-toggle-mode');
+        if (rpToggleBtn) rpToggleBtn.style.display = 'none';
+
+        // Hide the standard Leseplan tab on the right sidebar if not active
+        const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+        if (rpTabBtn) rpTabBtn.style.display = 'none';
+
+        // Reload the bible view normally
+        this.loadBibleBook(this.currentBookId || 1, this.currentChapterNum || 1);
+    }
+
     toggleLeftSidebarMode() {
         const booksListWrapper = document.querySelector('.books-list-wrapper');
         const searchContainer = document.querySelector('.sidebar-header .search-container');
@@ -4863,118 +4988,117 @@ class BibleReader {
         );
 
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
-        const completedDaysCount = userPlan.completedDays ? userPlan.completedDays.length : 0;
-        const progressPct = totalDays > 0 ? Math.round((completedDaysCount / totalDays) * 100) : 0;
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
 
-        const completeLabel = isCurrentDayCompleted 
-            ? (isPrayerApp ? (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Orado!' : 'Bedt!')) : (lang === 'en' ? 'Completed!' : (lang === 'es' ? '¡Completado!' : 'Fullført!')))
-            : (isPrayerApp ? (lang === 'en' ? 'Mark as prayed' : (lang === 'es' ? 'Marcar como orado' : 'Marker som bedt')) : (lang === 'en' ? 'Complete' : (lang === 'es' ? 'Completar' : 'Fullfør')));
+        // Parse started date to calculate calendar date tags
+        const startedAt = userPlan.startedAt;
+        const startedAtDate = startedAt ? (startedAt.toDate ? startedAt.toDate() : new Date(startedAt)) : new Date();
 
-        const t = {
-            no: {
-                defaultPrayer: isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.'
-            },
-            en: {
-                defaultPrayer: isPrayerApp ? 'Pray over the scriptures you read today.' : 'Reflect on the words you read today.'
-            },
-            es: {
-                defaultPrayer: isPrayerApp ? 'Ora sobre las escrituras que leas hoy.' : 'Reflexiona sobre las palabras que leíste hoy.'
-            }
-        }[lang] || { defaultPrayer: 'Reflekter over ordene du har lest.' };
-
-        // Generate Days Grid
-        let daysGridHtml = '';
-        globalPlan.days.forEach(d => {
-            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d.dayNumber);
-            const isActive = d.dayNumber === currentDayNum;
+        // 1. Generate Days Horizontal Selector Strip
+        let dayItemsHtml = '';
+        for (let d = 1; d <= totalDays; d++) {
+            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d);
+            const isActive = d === currentDayNum;
             const completedClass = isCompleted ? 'completed' : '';
             const activeClass = isActive ? 'active' : '';
-            daysGridHtml += `
-                <button class="hkm-rp-day-bubble ${completedClass} ${activeClass}" onclick="window.bibleReader.selectReadingPlanDay(${d.dayNumber})">
-                    ${d.dayNumber}
+
+            // Calculate date label: JUL 10, JUL 11 etc.
+            const dayDate = new Date(startedAtDate.getFullYear(), startedAtDate.getMonth(), startedAtDate.getDate() + (d - 1));
+            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DES"];
+            const dateLabel = `${monthNames[dayDate.getMonth()]} ${dayDate.getDate()}`;
+
+            dayItemsHtml += `
+                <button class="hkm-rp-day-strip-bubble-v3 ${completedClass} ${activeClass}" 
+                        onclick="window.bibleReader.selectReadingPlanDay(${d})"
+                        style="box-sizing: border-box;">
+                    <span class="day-num">${d}</span>
+                    <span class="day-date">${dateLabel}</span>
+                    ${isCompleted ? '<span class="check-badge">✓</span>' : ''}
                 </button>
             `;
-        });
+        }
 
-        const completeBg = isCurrentDayCompleted 
-            ? '#10b981 !important' 
-            : (isPrayerApp ? 'rgba(189, 79, 42, 0.08) !important' : '#f1f5f9 !important');
-        const completeColor = isCurrentDayCompleted 
-            ? '#ffffff !important' 
-            : (isPrayerApp ? '#bd4f2a !important' : '#475569 !important');
-        const completeBorder = isCurrentDayCompleted 
-            ? '1px solid #10b981 !important' 
-            : (isPrayerApp ? '1px solid rgba(189, 79, 42, 0.2) !important' : '1px solid #cbd5e1 !important');
+        // 2. Checklist items for this day
+        // Task 1: Andakt
+        // Task 2: Verses/Scripture
+        const checkIconHtml = isCurrentDayCompleted 
+            ? `<div class="hkm-task-circle completed" style="width: 24px; height: 24px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; flex-shrink: 0; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">✓</div>`
+            : `<div class="hkm-task-circle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0;"></div>`;
 
         container.innerHTML = `
-            <div class="hkm-rp-sidebar-wrapper">
-                <!-- Progress overview card -->
-                <div class="hkm-rp-sidebar-card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="material-symbols-outlined icon">trending_up</span>
-                            <h3 style="margin: 0;">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
-                        </div>
-                        <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; margin-left: auto;">
-                            ${lang === 'en' ? 'Adjust' : (lang === 'es' ? 'Ajustar' : 'Tilpass')}
-                        </button>
-                    </div>
-                    
-                    <!-- Circular Progress Inline -->
-                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-                        <div class="relative flex items-center justify-center transition-transform duration-300 hover:scale-105" style="width: 56px; height: 56px;">
-                            <svg style="width: 56px; height: 56px;" class="glow-effect">
-                                <circle class="text-outline-variant" cx="28" cy="28" r="24" fill="transparent" stroke="currentColor" stroke-width="3" style="color: var(--border-color, #e2e8f0);"></circle>
-                                <circle cx="28" cy="28" r="24" fill="transparent" stroke="#d17d39" stroke-width="3"
-                                        stroke-dasharray="150.8" stroke-dashoffset="${150.8 * (1 - progressPct / 100)}"
-                                        stroke-linecap="round" style="transition: stroke-dashoffset 1s ease; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-                            </svg>
-                            <span style="position: absolute; font-size: 11px; font-weight: 800; color: var(--text-base);">${progressPct}%</span>
-                        </div>
-                        <div>
-                            <p style="margin: 0; font-size: 13px; font-weight: 700; color: var(--bible-primary);">${completedDaysCount} av ${totalDays} ${lang === 'en' ? 'days' : (lang === 'es' ? 'días' : 'dager')}</p>
-                            <p style="margin: 2px 0 0; font-size: 10px; color: var(--text-muted); font-weight: 600; line-height: 1.2;">${globalPlan.title}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Days Grid -->
-                    <div class="hkm-rp-days-grid-v2">
-                        ${daysGridHtml}
-                    </div>
-                    
-                    <!-- Visual Action Buttons stacked -->
-                    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 16px;">
-                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100% !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13.5px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; border: none !important; color: #ffffff !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
-                            <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
-                        </button>
-                        
-                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100% !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13.5px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; background: ${completeBg}; color: ${completeColor}; border: ${completeBorder};">
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
-                            <span>${completeLabel}</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="hkm-rp-sidebar-wrapper" style="padding: 16px; background: #fafafa; min-height: 100%; box-sizing: border-box;">
                 
-                <!-- Devotional text card -->
-                <div class="hkm-rp-sidebar-card">
-                    <div class="card-header">
-                        <span class="material-symbols-outlined icon">lightbulb</span>
-                        <h3>${isPrayerApp ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus')) : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional diario' : 'Dagens andakt'))}</h3>
-                    </div>
-                    <p style="font-size: 13px; line-height: 1.6; color: var(--text-base); margin: 0;">${dayConfig.prayerFocus || t.defaultPrayer}</p>
+                <!-- Title Row with back arrow -->
+                <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: #1B4965; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
+                    </button>
+                    <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: #1B4965; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${globalPlan.title}</h2>
                 </div>
+
+                <!-- Cover Image Card -->
+                <div class="hkm-rp-sidebar-cover-wrapper" style="position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);">
+                    <img src="${globalPlan.imageUrl || 'img/bible-timeline-hero.webp'}" style="width: 100%; height: 100%; object-fit: cover;">
+                    ${globalPlan.category || globalPlan.subtitle ? `
+                    <span class="hkm-rp-category-badge" style="position: absolute; top: 16px; left: 16px; background: rgba(255, 255, 255, 0.95); color: #bd4f2a; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 14px; border-radius: 99px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none;">
+                        ${globalPlan.category || globalPlan.subtitle}
+                    </span>
+                    ` : ''}
+                </div>
+
+                <!-- Horizontal day selector strip -->
+                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 16px 4px; margin-bottom: 24px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                    ${dayItemsHtml}
+                </div>
+
+                <!-- Active Day subtitle -->
+                <h3 class="hkm-rp-days-count-title" style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">
+                    ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
+                </h3>
+
+                <!-- Checklist Card Container -->
+                <div class="hkm-rp-checklist-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 24px;">
+                    
+                    <!-- 1. Andakt Task -->
+                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            ${checkIconHtml}
+                            <span style="font-size: 15px; font-weight: 700; color: #0f172a;">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="color: #94a3b8; font-size: 20px;">chevron_right</span>
+                    </div>
+
+                    <!-- 2. Scripture Task -->
+                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            ${checkIconHtml}
+                            <span style="font-size: 15px; font-weight: 700; color: #0f172a;">${dayConfig ? dayConfig.verses : 'Bibeltekst'}</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="color: #94a3b8; font-size: 20px;">chevron_right</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Solid Black Button -->
+                <button class="hkm-rp-start-btn-black" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="width: 100% !important; background: #0f172a !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 52px !important; font-size: 14px !important; font-weight: 800; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.12) !important; transition: all 0.2s !important;">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
+                    <span>${isCurrentDayCompleted 
+                        ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
+                        : (lang === 'en' ? 'Start Reading' : (lang === 'es' ? 'Comenzar lectura' : 'Start lesing'))
+                    }</span>
+                </button>
+
             </div>
         `;
 
-        // Wire up complete day button
-        const completeBtn = container.querySelector('#rp-sidebar-complete-btn');
-        if (completeBtn) {
-            completeBtn.onclick = () => {
-                this.toggleActivePlanDayCompletion(completeBtn);
-            };
-        }
+        // 3. Auto-scroll active day strip bubble into center view
+        setTimeout(() => {
+            const activeBubble = container.querySelector('.hkm-rp-day-strip-bubble-v3.active');
+            const dayStrip = container.querySelector('.hkm-rp-day-strip-v3');
+            if (activeBubble && dayStrip) {
+                const scrollLeft = activeBubble.offsetLeft - (dayStrip.offsetWidth / 2) + (activeBubble.offsetWidth / 2);
+                dayStrip.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            }
+        }, 100);
     }
 
     renderRightSidebarReadingPlan(container, dayConfig) {
@@ -5577,7 +5701,7 @@ class BibleReader {
         }
     }
 
-    async openDevotionalWizard(planId, dayNumber) {
+    async openDevotionalWizard(planId, dayNumber, startStep = 1) {
         let globalPlan = this.activePlanData;
         let dayConfig = null;
 
@@ -5621,7 +5745,7 @@ class BibleReader {
             scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
         }
 
-        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, 1, scriptureHtml);
+        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, startStep, scriptureHtml);
     }
 
     async fetchAndFilterVersesText(versesText) {
