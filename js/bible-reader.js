@@ -580,6 +580,101 @@ class BibleReader {
             chapterCrossRefsSection: document.getElementById('chapter-cross-references-section'),
             chapterCrossRefsList: document.getElementById('chapter-cross-references')
         };
+
+        // Restructure Bible reader tools into bottom floating settings popover dynamically
+        const popover = document.getElementById('floating-settings-popover');
+        if (popover) {
+            // 1. Move quick search form and translation select into a single row
+            const searchForm = document.getElementById('bible-quick-search-form');
+            const translationSelect = document.getElementById('bible-translation-select');
+            
+            if (searchForm || translationSelect) {
+                const row = document.createElement('div');
+                row.className = 'settings-row';
+                row.style.gap = '8px';
+                
+                if (translationSelect) {
+                    const wrapper = translationSelect.closest('.select-wrapper') || translationSelect;
+                    row.appendChild(wrapper);
+                }
+                if (searchForm) {
+                    row.appendChild(searchForm);
+                }
+                popover.appendChild(row);
+            }
+            
+            // 2. Move dictionary trigger, reading mode, bookmarks into an icon button strip
+            const dictBtn = document.getElementById('dict-manual-trigger');
+            const readBtn = document.getElementById('btn-toggle-reading-mode');
+            const bookmarkBtn = document.getElementById('mobile-nav-right-toggle');
+            
+            if (dictBtn || readBtn || bookmarkBtn) {
+                const strip = document.createElement('div');
+                strip.className = 'popover-icon-strip';
+                
+                if (dictBtn) {
+                    dictBtn.className = 'popover-icon-btn';
+                    strip.appendChild(dictBtn);
+                }
+                if (readBtn) {
+                    readBtn.className = 'popover-icon-btn';
+                    strip.appendChild(readBtn);
+                }
+                if (bookmarkBtn) {
+                    bookmarkBtn.className = 'popover-icon-btn';
+                    strip.appendChild(bookmarkBtn);
+                }
+                popover.appendChild(strip);
+            }
+            
+            // 3. Move settings dropdown rows
+            const settingsDropdown = document.getElementById('settings-dropdown');
+            if (settingsDropdown) {
+                const rows = Array.from(settingsDropdown.querySelectorAll('.settings-row'));
+                rows.forEach(r => popover.appendChild(r));
+                settingsDropdown.remove();
+            }
+            
+            // 4. Set up click listener for the floating settings button to toggle popover
+            const settingsBtn = document.getElementById('floating-settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    popover.classList.toggle('active');
+                });
+                
+                // Prevent closing when clicking inside popover
+                popover.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+                
+                // Close popover when clicking anywhere else
+                document.addEventListener('click', () => {
+                    popover.classList.remove('active');
+                });
+            }
+            
+            // 5. Set up click listener for the book/chapter pill
+            const pill = document.getElementById('floating-nav-info-pill');
+            if (pill) {
+                pill.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.innerWidth <= 991) {
+                        // On mobile, toggle the book navigation sidebar
+                        const sidebar = document.getElementById('bible-sidebar');
+                        if (sidebar) {
+                            sidebar.classList.toggle('active');
+                        }
+                    } else {
+                        // On desktop, toggle the quick chapter select overlay
+                        const overlay = document.getElementById('chapter-selector-overlay');
+                        if (overlay) {
+                            overlay.classList.toggle('active');
+                        }
+                    }
+                });
+            }
+        }
     }
 
     bindEvents() {

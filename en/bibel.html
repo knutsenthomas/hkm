@@ -677,6 +677,12 @@
         }
 
         /* Floating Minimalist Bottom Navigation */
+        /* Hide Top Bible Control Bar */
+        .bible-controls {
+            display: none !important;
+        }
+
+        /* Floating Minimalist Bottom Navigation */
         .floating-bible-nav {
             position: absolute;
             bottom: 32px;
@@ -705,6 +711,146 @@
             transform: translateX(-50%) translateY(100px) translateZ(0) !important;
             opacity: 0 !important;
             pointer-events: none !important;
+        }
+
+        /* Floating Settings Popover */
+        .floating-settings-popover {
+            position: absolute;
+            bottom: calc(100% + 16px);
+            right: 0;
+            width: 320px;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95);
+            transform-origin: bottom right;
+            opacity: 0;
+            box-sizing: border-box;
+        }
+
+        .floating-settings-popover.active {
+            display: flex;
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Responsive Popover centering on Mobile */
+        @media (max-width: 768px) {
+            .floating-settings-popover {
+                width: 290px !important;
+                right: 50% !important;
+                transform: translateX(50%) scale(0.95) !important;
+                transform-origin: bottom center !important;
+            }
+            .floating-settings-popover.active {
+                transform: translateX(50%) scale(1) !important;
+            }
+        }
+
+        .floating-settings-popover .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .floating-settings-popover .settings-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Select Wrapper styles inside popover */
+        .floating-settings-popover .select-wrapper {
+            max-width: 100% !important;
+            flex: 1;
+        }
+
+        /* Quick Search Form inside popover */
+        .floating-settings-popover #bible-quick-search-form {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .floating-settings-popover input.bible-control-input {
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-base);
+            color: var(--text-base);
+            font-size: 13px;
+            flex: 1;
+            min-width: 0;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .floating-settings-popover input.bible-control-input:focus {
+            border-color: var(--bible-primary);
+        }
+
+        .floating-settings-popover .btn-bible-go {
+            height: 40px;
+            padding: 0 16px;
+            background: var(--bible-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            box-shadow: none !important;
+            margin: 0 !important;
+        }
+
+        /* Icon strip for tools */
+        .popover-icon-strip {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .popover-icon-btn {
+            flex: 1;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: none !important;
+            padding: 0;
+        }
+
+        .popover-icon-btn:hover {
+            background: var(--active-bg);
+            color: var(--bible-primary);
+            border-color: var(--bible-primary);
+        }
+
+        .popover-icon-btn.active {
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary) !important;
         }
 
         .floating-nav-btn {
@@ -745,6 +891,19 @@
             align-items: center;
             min-width: 105px;
             user-select: none;
+            cursor: pointer;
+            background: var(--bg-base);
+            padding: 8px 20px !important;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .floating-nav-info:hover {
+            background: var(--active-bg);
+            border-color: var(--bible-primary);
+            transform: translateY(-1px);
         }
 
         #floating-nav-book {
@@ -2598,13 +2757,21 @@
                 <button class="floating-nav-btn" id="floating-prev-btn" title="Previous chapter">
                     <span class="material-symbols-outlined">chevron_left</span>
                 </button>
-                <div class="floating-nav-info">
+                <div class="floating-nav-info" id="floating-nav-info-pill" title="Choose book and chapter">
                     <span id="floating-nav-book">JOHN</span>
                     <span id="floating-nav-chapter">1</span>
                 </div>
                 <button class="floating-nav-btn" id="floating-next-btn" title="Next chapter">
                     <span class="material-symbols-outlined">chevron_right</span>
                 </button>
+                <button class="floating-nav-btn" id="floating-settings-btn" title="Settings & Tools">
+                    <span class="material-symbols-outlined">tune</span>
+                </button>
+                
+                <!-- Floating Settings Popover -->
+                <div class="floating-settings-popover" id="floating-settings-popover">
+                    <!-- Content moved here via JS -->
+                </div>
             </div>
         </main>
 
@@ -2806,7 +2973,7 @@
     <!-- JavaScript -->
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.11.11"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.07.11.12"></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
