@@ -4702,14 +4702,14 @@ class MinSideManager {
                     transform: scale(0.97);
                 }
                 .hkm-btn-fs {
-                    background: #1B4965;
+                    background: #d17d39;
                     color: #ffffff;
                     border: none;
-                    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
+                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
                 }
                 .hkm-btn-fs:hover {
-                    background: #255d80;
-                    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
+                    background: #bd4f2a;
+                    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
                     transform: translateY(-1px);
                 }
                 .hkm-btn-zoom {
@@ -4753,8 +4753,8 @@ class MinSideManager {
                     width: 44px;
                     height: 44px;
                     border-radius: 12px;
-                    background: rgba(27, 73, 101, 0.08); /* Primary dark blue tint */
-                    color: #1B4965;
+                    background: rgba(209, 125, 57, 0.08); /* Secondary orange tint by default */
+                    color: #d17d39;
                     display: flex;
                     align-items: center;
                     justify-content: center;
