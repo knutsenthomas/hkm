@@ -5865,11 +5865,8 @@ class BibleReader {
                 return `<h2 style="font-size: 1.5em; font-weight: 700; color: #1B4965; margin-top: ${marginTop}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.3;">${trimmed.replace(/^#\s*/, '')}</h2>`;
             }
             
-            // Normalize asterisks to check for prayer/reflection patterns
-            let tempText = trimmed;
-            if (tempText.startsWith('*') && tempText.endsWith('*') && !tempText.includes('**')) {
-                tempText = tempText.slice(1, -1).trim();
-            }
+            // Strip any asterisks/formatting from text to do a clean prefix search
+            const cleanForSearch = trimmed.replace(/\*/g, '').trim().toLowerCase();
             
             const prefixes = [
                 // Norwegian
@@ -5897,10 +5894,15 @@ class BibleReader {
             let remainingText = trimmed;
             
             for (const pref of prefixes) {
-                if (tempText.toLowerCase().startsWith(pref.key)) {
+                if (cleanForSearch.startsWith(pref.key)) {
                     isPrayerOrReflection = true;
                     matchPrefix = pref.label;
-                    remainingText = tempText.substring(pref.key.length).trim();
+                    const colonIndex = trimmed.indexOf(':');
+                    if (colonIndex !== -1) {
+                        remainingText = trimmed.substring(colonIndex + 1).trim();
+                        // Strip leading/trailing asterisks or spaces from prayer text
+                        remainingText = remainingText.replace(/^[\s\*]+|[\s\*]+$/g, '').trim();
+                    }
                     break;
                 }
             }
