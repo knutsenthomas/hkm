@@ -5583,6 +5583,7 @@ class MinSideManager {
         const bibChapSelect = container.querySelector('#bible-select-chapter');
         const bibDisplay = container.querySelector('#bible-verses-display');
         let bibleList = [];
+        let isBibleInit = true;
 
         const loadBibleData = async () => {
             try {
@@ -5597,14 +5598,15 @@ class MinSideManager {
                 
                 // Trigger Book loading
                 if (bibleList.length > 0) {
-                    await loadBooks(bibleList[0].id);
+                    await loadBooks(bibleList[0].id, isBibleInit);
+                    isBibleInit = false;
                 }
             } catch (e) {
                 console.error("Bible widget init error:", e);
             }
         };
 
-        const loadBooks = async (bibleId) => {
+        const loadBooks = async (bibleId, autoSelect = false) => {
             try {
                 bibBookSelect.disabled = true;
                 bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
@@ -5617,12 +5619,24 @@ class MinSideManager {
                     <option value="${b.id}">${b.name}</option>
                 `).join('');
                 bibBookSelect.disabled = false;
+
+                if (autoSelect && books.length > 0) {
+                    // Try to pre-select John / Johannes, fallback to first book (Genesis)
+                    const defaultBook = books.find(b => 
+                        b.id.toLowerCase() === 'jhn' || 
+                        b.id.toLowerCase().includes('jhn') || 
+                        b.name.toLowerCase().includes('johannes')
+                    ) || books[0];
+
+                    bibBookSelect.value = defaultBook.id;
+                    await loadChapters(bibleId, defaultBook.id, true);
+                }
             } catch (e) {
                 console.error("Bible widget loadBooks error:", e);
             }
         };
 
-        const loadChapters = async (bibleId, bookId) => {
+        const loadChapters = async (bibleId, bookId, autoSelect = false) => {
             try {
                 bibChapSelect.disabled = true;
                 bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
@@ -5635,6 +5649,13 @@ class MinSideManager {
                     <option value="${c.id}">${c.number}</option>
                 `).join('');
                 bibChapSelect.disabled = false;
+
+                if (autoSelect && chapters.length > 0) {
+                    // Pre-select Chapter 1, fallback to first chapter
+                    const defaultChapter = chapters.find(c => c.number === '1' || c.number === 1) || chapters[0];
+                    bibChapSelect.value = defaultChapter.id;
+                    await loadVerses(bibleId, defaultChapter.id);
+                }
             } catch (e) {
                 console.error("Bible widget loadChapters error:", e);
             }
@@ -5668,13 +5689,13 @@ class MinSideManager {
 
         bibTransSelect.addEventListener('change', () => {
             const bibId = bibTransSelect.value;
-            if (bibId) loadBooks(bibId);
+            if (bibId) loadBooks(bibId, true);
         });
 
         bibBookSelect.addEventListener('change', () => {
             const bibId = bibTransSelect.value;
             const bookId = bibBookSelect.value;
-            if (bibId && bookId) loadChapters(bibId, bookId);
+            if (bibId && bookId) loadChapters(bibId, bookId, true);
         });
 
         bibChapSelect.addEventListener('change', () => {
