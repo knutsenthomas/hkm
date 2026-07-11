@@ -3357,8 +3357,9 @@ class BibleReader {
                 .hkm-yv-footer { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 16px 24px !important; border-top: 1px solid #f1f5f9 !important; background: #ffffff !important; flex-shrink: 0 !important; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.02) !important; }
                 .hkm-yv-nav-circle-btn { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #f1f5f9 !important; border: none !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
                 .hkm-yv-nav-circle-btn:hover { background: #e2e8f0 !important; color: #0f172a !important; }
-                .hkm-yv-nav-circle-btn.active { background: #1B4965 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(27, 73, 101, 0.2) !important; }
-                .hkm-yv-nav-circle-btn.active:hover { background: #153c54 !important; }
+                .hkm-yv-nav-circle-btn.active { background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(209, 125, 57, 0.25) !important; }
+                .hkm-yv-nav-circle-btn.active:hover { filter: brightness(1.08) !important; }
+                .hkm-yv-nav-circle-btn.active:active { transform: scale(0.95) !important; }
                 .hkm-yv-footer-pill { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; padding: 8px 16px !important; border-radius: 99px !important; font-size: 12px !important; font-weight: 800 !important; color: #64748b !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; }
                 
                 @keyframes hkmFadeIn {
