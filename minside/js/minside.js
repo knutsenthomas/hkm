@@ -4713,14 +4713,14 @@ class MinSideManager {
                     transform: translateY(-1px);
                 }
                 .hkm-btn-zoom {
-                    background: #22c55e;
+                    background: #1B4965;
                     color: white;
                     border: none;
-                    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+                    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
                 }
                 .hkm-btn-zoom:hover {
-                    background: #16a34a;
-                    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
+                    background: #255d80;
+                    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
                     transform: translateY(-1px);
                 }
                 
