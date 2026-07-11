@@ -5142,6 +5142,8 @@ class ContentManager {
             const merged = {
                 ...gEvent,
                 ...override,
+                start: override.date || gEvent.start,
+                end: override.date || gEvent.end,
                 title: override.title || gEvent.title,
                 imageUrl: override.dashboardImage || override.imageUrl || gEvent.imageUrl,
                 sourceId: gEvent.sourceId || override.sourceId
