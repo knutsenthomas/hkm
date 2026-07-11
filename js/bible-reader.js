@@ -5025,18 +5025,8 @@ class BibleReader {
                     <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: #1B4965; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${globalPlan.title}</h2>
                 </div>
 
-                <!-- Cover Image Card -->
-                <div class="hkm-rp-sidebar-cover-wrapper" style="position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);">
-                    <img src="${globalPlan.imageUrl || 'img/bible-timeline-hero.webp'}" style="width: 100%; height: 100%; object-fit: cover;">
-                    ${globalPlan.category || globalPlan.subtitle ? `
-                    <span class="hkm-rp-category-badge" style="position: absolute; top: 16px; left: 16px; background: rgba(255, 255, 255, 0.95); color: #bd4f2a; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 14px; border-radius: 99px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); pointer-events: none;">
-                        ${globalPlan.category || globalPlan.subtitle}
-                    </span>
-                    ` : ''}
-                </div>
-
                 <!-- Horizontal day selector strip -->
-                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 16px 4px; margin-bottom: 24px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 16px 4px; margin-bottom: 20px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                     ${dayItemsHtml}
                 </div>
 
@@ -5045,11 +5035,10 @@ class BibleReader {
                     ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
                 </h3>
 
-                <!-- Checklist Card Container -->
-                <div class="hkm-rp-checklist-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 24px;">
-                    
+                <!-- Checklist Items (Direct layout, no wrapper card) -->
+                <div style="margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
                     <!-- 1. Andakt Task -->
-                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.04)'; this.style.borderColor='#cbd5e1';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)'; this.style.borderColor='#e2e8f0';">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             ${checkIconHtml}
                             <span style="font-size: 15px; font-weight: 700; color: #0f172a;">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
@@ -5058,7 +5047,7 @@ class BibleReader {
                     </div>
 
                     <!-- 2. Scripture Task -->
-                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.04)'; this.style.borderColor='#cbd5e1';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)'; this.style.borderColor='#e2e8f0';">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             ${checkIconHtml}
                             <span style="font-size: 15px; font-weight: 700; color: #0f172a;">${dayConfig ? dayConfig.verses : 'Bibeltekst'}</span>
