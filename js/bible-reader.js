@@ -5068,12 +5068,13 @@ class BibleReader {
                 </div>
 
                 <!-- Bottom Solid Brand Button -->
-                <button class="hkm-rp-start-btn-blue" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
-                        style="width: 100% !important; background: #1B4965 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 52px !important; font-size: 14px !important; font-weight: 800; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; box-shadow: 0 4px 15px rgba(27, 73, 101, 0.2) !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;"
-                        onmouseover="this.style.backgroundColor='#14374b'; this.style.transform='translateY(-1px)';" 
-                        onmouseout="this.style.backgroundColor='#1B4965'; this.style.transform='none';"
+                <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
+                        style="width: 100% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 52px !important; font-size: 14px !important; font-weight: 800; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; box-shadow: 0 4px 15px rgba(209, 125, 57, 0.25) !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;"
+                        onmouseover="this.style.filter='brightness(1.08)'; this.style.transform='translateY(-1px)';" 
+                        onmouseout="this.style.filter='none'; this.style.transform='none';"
                         onmousedown="this.style.transform='scale(0.98)';"
-                        onmouseup="this.style.transform='translateY(-1px)';">
+                        onmouseup="this.style.transform='translateY(-1px)';"
+                        onmouseleave="this.style.filter='none'; this.style.transform='none';">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
                     <span>${isCurrentDayCompleted 
                         ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
