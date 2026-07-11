@@ -4855,9 +4855,9 @@ class BibleReader {
                             <span class="material-symbols-outlined icon">trending_up</span>
                             <h3 style="margin: 0;">${lang === 'en' ? 'Progress' : (lang === 'es' ? 'Progreso' : 'Planfremgang')}</h3>
                         </div>
-                        <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; text-decoration: underline; margin-left: auto;">
-                            <span class="material-symbols-outlined" style="font-size: 13px;">restore</span>
-                            ${lang === 'en' ? 'Adjust' : (lang === 'es' ? 'Ajustar' : 'Tilpass')}
+                        <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 0; cursor: pointer; margin-left: auto;">
+                            <span class="material-symbols-outlined" style="font-size: 13px; text-decoration: none;">restore</span>
+                            <span style="text-decoration: underline;">${lang === 'en' ? 'Adjust' : (lang === 'es' ? 'Ajustar' : 'Tilpass')}</span>
                         </button>
                     </div>
                     
@@ -5444,9 +5444,9 @@ class BibleReader {
             <div class="hkm-rp-info-bar-v2">
                 <span class="day-count">${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer; text-decoration: underline;">
-                        <span class="material-symbols-outlined" style="font-size: 12.5px;">restore</span>
-                        ${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}
+                    <button onclick="window.bibleReader.openAdjustPlanDatesModal('${globalPlan.id}', ${currentDayNum})" style="background: none; border: none; color: #d17d39; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; padding: 0; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 12.5px; text-decoration: none;">restore</span>
+                        <span style="text-decoration: underline;">${lang === 'en' ? 'Adjust dates' : (lang === 'es' ? 'Ajustar fechas' : 'Tilpass datoer')}</span>
                     </button>
                     ${isBehind 
                         ? `<span class="behind-badge">${expectedDay - currentDayNum} ${lang === 'en' ? 'days behind' : (lang === 'es' ? 'días atr.' : 'dg bak')}</span>` 
