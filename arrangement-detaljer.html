@@ -472,8 +472,8 @@
 
             .event-info-panel-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
-                padding: 16px;
+                gap: 24px;
+                padding: 24px;
             }
 
             .registration-footer {
@@ -487,12 +487,13 @@
         .event-info-panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 32px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
-            padding: 24px;
+            padding: 24px 32px;
             margin: 24px 0 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
 
         .info-panel-card {
@@ -501,10 +502,30 @@
             gap: 8px;
         }
 
+        @media (min-width: 769px) {
+            .info-panel-card:not(:last-child) {
+                border-right: 1px solid #e2e8f0;
+                padding-right: 32px;
+            }
+            html[data-theme="dark"] .info-panel-card:not(:last-child) {
+                border-color: #334155;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .info-panel-card:not(:last-child) {
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 24px;
+            }
+            html[data-theme="dark"] .info-panel-card:not(:last-child) {
+                border-color: #334155;
+            }
+        }
+
         .card-meta-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .card-meta-header .material-symbols-outlined {
@@ -528,15 +549,17 @@
         }
 
         .card-meta-content {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #1e293b;
             line-height: 1.5;
+            padding-left: 32px;
         }
 
         html[data-theme="dark"] .event-info-panel-grid {
             background: #1e293b;
             border-color: #334155;
+            box-shadow: none;
         }
 
         html[data-theme="dark"] .meta-label {
