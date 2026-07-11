@@ -5822,7 +5822,6 @@ class BibleReader {
         const stepContainer = document.createElement('div');
         stepContainer.className = 'hkm-devotional-content';
         modal.appendChild(stepContainer);
-
         const lang = document.documentElement.lang || 'no';
         const isPrayerApp = plan.title && (
             plan.title.toLowerCase().includes('bønn') ||
@@ -5830,6 +5829,13 @@ class BibleReader {
             plan.title.toLowerCase().includes('oración')
         );
 
+        let headerTitleText = plan.title || '';
+        if (headerTitleText.includes(':')) {
+            headerTitleText = headerTitleText.split(':')[0].trim();
+        }
+        if (headerTitleText.length > 25) {
+            headerTitleText = headerTitleText.substring(0, 22) + '...';
+        }
         // Step Label mapping
         let stepLabel = 'BIBEL';
         if (step === 1) stepLabel = lang === 'en' ? 'BIBLE' : (lang === 'es' ? 'BIBLIA' : 'BIBEL');
@@ -5929,8 +5935,8 @@ class BibleReader {
                     </button>
                     
                     <div class="hkm-yv-header-title">
-                        <span class="hkm-yv-header-avatar">${plan.title.charAt(0)}</span>
-                        <span class="hkm-yv-header-text">${plan.title}</span>
+                        <span class="hkm-yv-header-avatar">${headerTitleText.charAt(0)}</span>
+                        <span class="hkm-yv-header-text">${headerTitleText}</span>
                     </div>
                     
                     <div class="hkm-yv-header-actions">
