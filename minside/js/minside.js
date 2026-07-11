@@ -4954,10 +4954,28 @@ class MinSideManager {
                     border: 1px solid #e2e8f0;
                     border-radius: 12px;
                     padding: 16px;
-                    height: 240px;
+                    height: 290px; /* Match Notes editor height for visual symmetry */
                     overflow-y: auto;
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
                 }
-
+                .hkm-bible-display p {
+                    font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+                    font-size: 16.5px !important;
+                    line-height: 1.75 !important;
+                    color: #1e293b !important;
+                    margin-bottom: 16px !important;
+                    text-align: left !important;
+                }
+                .hkm-bible-display .bible-verse-num {
+                    font-family: 'Work Sans', 'Inter', sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    color: #d17d39 !important;
+                    margin-right: 8px !important;
+                    vertical-align: baseline !important;
+                    position: relative !important;
+                    top: -1px !important;
+                }
                 
                 .hkm-bible-select:focus {
                     border-color: #d17d39;
