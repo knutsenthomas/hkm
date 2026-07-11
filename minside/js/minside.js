@@ -4872,23 +4872,64 @@ class MinSideManager {
                     background: rgba(241, 245, 249, 0.4) !important;
                 }
 
-                /* Notes Editor custom */
-                .hkm-notes-textarea {
-                    width: 100%;
-                    height: 160px;
-                    border: 1px solid #cbd5e1;
-                    background: #f8fafc;
+                /* Notes Editor custom overrides */
+                #panel-notes .rte-wrapper {
+                    border: 1.5px solid #cbd5e1;
                     border-radius: 12px;
-                    padding: 16px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                }
+                #panel-notes .rte-wrapper:focus-within {
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15);
+                }
+                #panel-notes .rte-toolbar {
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e2e8f0;
+                    padding: 8px 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    flex-wrap: wrap;
+                }
+                #panel-notes .rte-editor {
+                    min-height: 290px; /* Taller editor to fill the sidebar panel nicely */
                     font-size: 14px;
+                    line-height: 1.6;
                     color: #1e293b;
                     outline: none;
-                    resize: none;
-                    transition: all 0.3s ease;
+                    white-space: pre-wrap;
+                    overflow-y: auto;
+                    padding: 16px;
+                    background: #ffffff;
                 }
-                .hkm-notes-textarea:focus {
-                    border-color: #d17d39;
-                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+                #panel-notes .rte-btn {
+                    width: 32px;
+                    height: 32px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    transition: background 0.15s, color 0.15s;
+                }
+                #panel-notes .rte-btn:hover {
+                    background: #e2e8f0;
+                    color: #1e293b;
+                }
+                #panel-notes .rte-btn.active {
+                    background: rgba(209, 125, 57, 0.08);
+                    color: #d17d39;
+                }
+                #panel-notes .rte-divider {
+                    width: 1px;
+                    height: 20px;
+                    background: #e2e8f0;
+                    margin: 0 4px;
                 }
 
                 /* Bible Widget selectors */
