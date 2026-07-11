@@ -784,6 +784,7 @@
         /* Select Wrapper styles inside popover */
         .floating-settings-popover .select-wrapper {
             max-width: 100% !important;
+            width: 100% !important;
             flex: 1;
         }
 
@@ -804,8 +805,9 @@
             background: var(--bg-base);
             color: var(--text-base);
             font-size: 13px;
-            flex: 1;
-            min-width: 0;
+            flex: 1 !important;
+            width: 100% !important;
+            min-width: 0 !important;
             box-sizing: border-box;
             outline: none;
             transition: border-color 0.2s;
@@ -1666,16 +1668,16 @@
         }        /* Premium Floating Verse Toolbar */
         #verse-context-toolbar {
             position: absolute !important;
-            background: rgba(27, 73, 101, 0.95) !important;
+            background: var(--bg-card) !important;
             backdrop-filter: blur(12px) !important;
             -webkit-backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid var(--border-color) !important;
             border-radius: 9999px !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 8px 16px -8px rgba(0, 0, 0, 0.3) !important;
-            padding: 4px 8px !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.1) !important;
+            padding: 6px 10px !important;
             display: none;
             align-items: center;
-            gap: 4px !important;
+            gap: 6px !important;
             z-index: 1000;
             transform: translate(-50%, -125%) !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -1685,7 +1687,7 @@
             background: none !important;
             border: none !important;
             cursor: pointer !important;
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: var(--text-base) !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -1697,8 +1699,8 @@
         }
 
         .toolbar-action-btn:hover {
-            background: rgba(255, 255, 255, 0.15) !important;
-            color: #ffffff !important;
+            background: var(--active-bg) !important;
+            color: var(--bible-primary) !important;
             transform: translateY(-2px) !important;
         }
 
@@ -1707,23 +1709,23 @@
         }
 
         #toolbar-btn-lookup {
-            color: #fef08a !important; /* Highlight gold color for Lexicon */
+            color: var(--bible-primary) !important; /* Use theme primary color (orange/blue) for Lexicon */
         }
         #toolbar-btn-lookup:hover {
-            background: rgba(254, 240, 138, 0.15) !important;
+            background: var(--active-bg) !important;
         }
 
         #toolbar-btn-clear {
-            color: #f87171 !important; /* Soft red for close button */
+            color: #bd4f2a !important; /* Soft red for close button */
         }
         #toolbar-btn-clear:hover {
-            background: rgba(248, 113, 113, 0.15) !important;
+            background: var(--active-bg) !important;
         }
 
         .toolbar-divider {
             width: 1px !important;
             height: 20px !important;
-            background: rgba(255, 255, 255, 0.2) !important;
+            background: var(--border-color) !important;
             margin: 0 4px !important;
         }
 
@@ -3073,7 +3075,7 @@
     <!-- JavaScript -->
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.07.11.12"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.07.11.14"></script>
     <script type="module" src="js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">

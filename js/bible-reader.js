@@ -584,22 +584,22 @@ class BibleReader {
         // Restructure Bible reader tools into bottom floating settings popover dynamically
         const popover = document.getElementById('floating-settings-popover');
         if (popover) {
-            // 1. Move quick search form and translation select into a single row
-            const searchForm = document.getElementById('bible-quick-search-form');
+            // 1. Move translation select to its own row
             const translationSelect = document.getElementById('bible-translation-select');
-            
-            if (searchForm || translationSelect) {
+            if (translationSelect) {
                 const row = document.createElement('div');
                 row.className = 'settings-row';
-                row.style.gap = '8px';
-                
-                if (translationSelect) {
-                    const wrapper = translationSelect.closest('.select-wrapper') || translationSelect;
-                    row.appendChild(wrapper);
-                }
-                if (searchForm) {
-                    row.appendChild(searchForm);
-                }
+                const wrapper = translationSelect.closest('.select-wrapper') || translationSelect;
+                row.appendChild(wrapper);
+                popover.appendChild(row);
+            }
+            
+            // 2. Move quick search form to its own row
+            const searchForm = document.getElementById('bible-quick-search-form');
+            if (searchForm) {
+                const row = document.createElement('div');
+                row.className = 'settings-row';
+                row.appendChild(searchForm);
                 popover.appendChild(row);
             }
             
@@ -1443,8 +1443,10 @@ class BibleReader {
                         if (this.dom.verseToolbar) {
                             this.dom.verseToolbar.style.display = 'flex';
                             
-                            // Align at horizontal center of the screen/container
-                            const y = paragraph.offsetTop;
+                            // Calculate position relative to scrollable pane to handle inline layout correctly
+                            const pane = this.dom.readingPane.closest('.bible-content-pane');
+                            const paneRect = pane.getBoundingClientRect();
+                            const y = e.clientY - paneRect.top + pane.scrollTop - 10;
                             
                             this.dom.verseToolbar.style.left = '50%';
                             this.dom.verseToolbar.style.top = `${y}px`;
