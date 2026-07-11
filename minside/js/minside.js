@@ -1318,6 +1318,143 @@ class MinSideManager {
 
         document.getElementById('ph-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
         document.getElementById('sidebar-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
+
+        // Dynamically inject Dagens andakt shortcut button before the profile link if missing
+        const profileLink = document.querySelector('.user-profile-link');
+        let devBtn = document.getElementById('header-today-devotional-btn');
+        if (!devBtn && profileLink) {
+            // Inject style tag if not present
+            let devStyle = document.getElementById('header-today-devotional-btn-style');
+            if (!devStyle) {
+                devStyle = document.createElement('style');
+                devStyle.id = 'header-today-devotional-btn-style';
+                devStyle.innerHTML = `
+                    #header-today-devotional-btn {
+                        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                        background: rgba(255, 255, 255, 0.08) !important;
+                        color: #ffffff !important;
+                        transition: all 0.3s ease !important;
+                        flex-shrink: 0 !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        margin-right: 12px !important;
+                    }
+                    #header-today-devotional-btn:hover {
+                        background: rgba(255, 255, 255, 0.2) !important;
+                        transform: scale(1.05) !important;
+                    }
+                    #header-today-devotional-btn:active {
+                        transform: scale(0.95) !important;
+                    }
+                    .header.scrolled #header-today-devotional-btn,
+                    .header.menu-open #header-today-devotional-btn,
+                    body:not(.header-dark-start) .header #header-today-devotional-btn,
+                    .main-header #header-today-devotional-btn {
+                        border-color: rgba(0, 0, 0, 0.08) !important;
+                        background: rgba(0, 0, 0, 0.03) !important;
+                        color: #1B4965 !important;
+                    }
+                    .header.scrolled #header-today-devotional-btn:hover,
+                    .header.menu-open #header-today-devotional-btn:hover,
+                    body:not(.header-dark-start) .header #header-today-devotional-btn:hover,
+                    .main-header #header-today-devotional-btn:hover {
+                        background: rgba(0, 0, 0, 0.08) !important;
+                    }
+                    html[data-theme="dark"] #header-today-devotional-btn {
+                        border-color: rgba(255, 255, 255, 0.1) !important;
+                        background: rgba(255, 255, 255, 0.05) !important;
+                        color: #f1f5f9 !important;
+                    }
+                    html[data-theme="dark"] #header-today-devotional-btn:hover {
+                        background: rgba(255, 255, 255, 0.12) !important;
+                    }
+                `;
+                document.head.appendChild(devStyle);
+            }
+
+            devBtn = document.createElement('a');
+            devBtn.id = 'header-today-devotional-btn';
+            devBtn.className = 'w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden';
+            
+            const lang = document.documentElement.lang || 'no';
+            const label = lang.startsWith('en') ? "Today's Devotional" : (lang.startsWith('es') ? 'Devocional de hoy' : 'Dagens andakt');
+            devBtn.setAttribute('aria-label', label);
+            devBtn.setAttribute('title', label);
+            devBtn.innerHTML = '<span class="material-symbols-outlined text-xl" style="font-variation-settings: \'FILL\' 1;">auto_stories</span>';
+            profileLink.parentNode.insertBefore(devBtn, profileLink);
+        }
+
+        // Check cache first for instant render
+        try {
+            const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+            if (cachedUserRaw && devBtn) {
+                const cachedUser = JSON.parse(cachedUserRaw);
+                if (cachedUser && cachedUser.uid === this.currentUser?.uid && cachedUser.activePlanId) {
+                    const lang = document.documentElement.lang || 'no';
+                    const prefix = lang.startsWith('no') ? '' : `/${lang.split('-')[0]}`;
+                    devBtn.href = `${prefix}/bibel.html?plan=${cachedUser.activePlanId}&day=${cachedUser.activePlanDay || 1}`;
+                    devBtn.classList.remove('hidden');
+                    devBtn.classList.add('flex');
+                }
+            }
+        } catch (e) {}
+
+        // Fetch active reading plan and update shortcut button from Firestore
+        if (this.currentUser) {
+            firebase.firestore().collection('users')
+                .doc(this.currentUser.uid)
+                .collection('reading_plans')
+                .where('completed', '==', false)
+                .get()
+                .then(snap => {
+                    if (!snap.empty) {
+                        const userPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Sort in memory by lastActiveAt descending
+                        userPlans.sort((a, b) => {
+                            const aTime = a.lastActiveAt?.toMillis ? a.lastActiveAt.toMillis() : (a.lastActiveAt?.seconds ? a.lastActiveAt.seconds * 1000 : 0);
+                            const bTime = b.lastActiveAt?.toMillis ? b.lastActiveAt.toMillis() : (b.lastActiveAt?.seconds ? b.lastActiveAt.seconds * 1000 : 0);
+                            return bTime - aTime;
+                        });
+                        
+                        const activePlan = userPlans[0];
+                        const planId = activePlan.planId;
+                        const currentDay = activePlan.currentDay || 1;
+
+                        if (planId && devBtn) {
+                            const lang = document.documentElement.lang || 'no';
+                            const prefix = lang.startsWith('no') ? '' : `/${lang.split('-')[0]}`;
+                            devBtn.href = `${prefix}/bibel.html?plan=${planId}&day=${currentDay}`;
+                            devBtn.classList.remove('hidden');
+                            devBtn.classList.add('flex');
+
+                            // Update cache
+                            try {
+                                const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+                                let cachedData = cachedUserRaw ? JSON.parse(cachedUserRaw) : {};
+                                if (!cachedData || cachedData.uid !== this.currentUser.uid) {
+                                    cachedData = { uid: this.currentUser.uid };
+                                }
+                                cachedData.activePlanId = planId;
+                                cachedData.activePlanDay = currentDay;
+                                localStorage.setItem('hkm_public_user_cache', JSON.stringify(cachedData));
+                            } catch (cacheErr) {}
+                        }
+                    } else {
+                        if (devBtn) {
+                            devBtn.classList.add('hidden');
+                            devBtn.classList.remove('flex');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.warn('[DevotionalShortcut] Failed to fetch active plan:', err);
+                    if (devBtn) {
+                        devBtn.classList.add('hidden');
+                        devBtn.classList.remove('flex');
+                    }
+                });
+        }
     }
 
     _setAvatarEl(el, photoURL, name) {

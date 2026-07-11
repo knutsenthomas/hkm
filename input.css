@@ -8814,6 +8814,7 @@ body:not(.header-dark-start) .header #header-profile-link {
     background: rgba(0, 0, 0, 0.03);
     color: #1B4965 !important;
 }
+
 .header.scrolled #header-profile-link:hover,
 .header.menu-open #header-profile-link:hover,
 body:not(.header-dark-start) .header #header-profile-link:hover {
@@ -8827,6 +8828,43 @@ html[data-theme="dark"] #header-profile-link {
 html[data-theme="dark"] #header-profile-link:hover {
     background: rgba(255, 255, 255, 0.12) !important;
 }
+
+#header-today-devotional-btn {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+#header-today-devotional-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.05);
+}
+#header-today-devotional-btn:active {
+    transform: scale(0.95);
+}
+.header.scrolled #header-today-devotional-btn,
+.header.menu-open #header-today-devotional-btn,
+body:not(.header-dark-start) .header #header-today-devotional-btn {
+    border-color: rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.03);
+    color: #1B4965 !important;
+}
+.header.scrolled #header-today-devotional-btn:hover,
+.header.menu-open #header-today-devotional-btn:hover,
+body:not(.header-dark-start) .header #header-today-devotional-btn:hover {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="dark"] #header-today-devotional-btn {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #f1f5f9 !important;
+}
+html[data-theme="dark"] #header-today-devotional-btn:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
 
 /* Facebook Feed Grid & Cards Styles */
 .facebook-feed-grid {

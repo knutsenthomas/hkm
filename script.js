@@ -4629,6 +4629,71 @@ window.addEventListener('load', () => {
         const mobileProfileImg = document.getElementById('mobile-menu-profile-img');
         const mobileProfileIcon = mobileProfileLink ? mobileProfileLink.querySelector('.material-symbols-outlined') : null;
 
+        // Dynamically inject Dagens andakt shortcut button before the profile link if missing
+        let devBtn = document.getElementById('header-today-devotional-btn');
+        if (!devBtn && profileLink) {
+            // Inject dynamic style tag
+            let devStyle = document.getElementById('header-today-devotional-btn-style');
+            if (!devStyle) {
+                devStyle = document.createElement('style');
+                devStyle.id = 'header-today-devotional-btn-style';
+                devStyle.innerHTML = `
+                    #header-today-devotional-btn {
+                        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                        background: rgba(255, 255, 255, 0.08) !important;
+                        color: #ffffff !important;
+                        transition: all 0.3s ease !important;
+                        flex-shrink: 0 !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        margin-right: 8px !important;
+                    }
+                    #header-today-devotional-btn:hover {
+                        background: rgba(255, 255, 255, 0.2) !important;
+                        transform: scale(1.05) !important;
+                    }
+                    #header-today-devotional-btn:active {
+                        transform: scale(0.95) !important;
+                    }
+                    .header.scrolled #header-today-devotional-btn,
+                    .header.menu-open #header-today-devotional-btn,
+                    body:not(.header-dark-start) .header #header-today-devotional-btn,
+                    .main-header #header-today-devotional-btn {
+                        border-color: rgba(0, 0, 0, 0.08) !important;
+                        background: rgba(0, 0, 0, 0.03) !important;
+                        color: #1B4965 !important;
+                    }
+                    .header.scrolled #header-today-devotional-btn:hover,
+                    .header.menu-open #header-today-devotional-btn:hover,
+                    body:not(.header-dark-start) .header #header-today-devotional-btn:hover,
+                    .main-header #header-today-devotional-btn:hover {
+                        background: rgba(0, 0, 0, 0.08) !important;
+                    }
+                    html[data-theme="dark"] #header-today-devotional-btn {
+                        border-color: rgba(255, 255, 255, 0.1) !important;
+                        background: rgba(255, 255, 255, 0.05) !important;
+                        color: #f1f5f9 !important;
+                    }
+                    html[data-theme="dark"] #header-today-devotional-btn:hover {
+                        background: rgba(255, 255, 255, 0.12) !important;
+                    }
+                `;
+                document.head.appendChild(devStyle);
+            }
+
+            devBtn = document.createElement('a');
+            devBtn.id = 'header-today-devotional-btn';
+            devBtn.className = 'w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden';
+            
+            const lang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'no';
+            const label = lang === 'en' ? "Today's Devotional" : (lang === 'es' ? 'Devocional de hoy' : 'Dagens andakt');
+            devBtn.setAttribute('aria-label', label);
+            devBtn.setAttribute('title', label);
+            devBtn.innerHTML = '<span class="material-symbols-outlined text-xl" style="font-variation-settings: \'FILL\' 1;">auto_stories</span>';
+            profileLink.parentNode.insertBefore(devBtn, profileLink);
+        }
+
         // Helper to update DOM states for both desktop and mobile profile elements
         const updateProfileDOM = (photoURL) => {
             // Update Desktop header profile (hidden on mobile, flex on desktop)
@@ -4672,15 +4737,90 @@ window.addEventListener('load', () => {
                 if (mobileProfileImg) mobileProfileImg.classList.add('hidden');
                 if (mobileProfileIcon) mobileProfileIcon.classList.remove('hidden');
             }
+            if (devBtn) {
+                devBtn.classList.add('hidden');
+                devBtn.classList.remove('flex');
+            }
         };
 
-        // Immediately render avatar from cache if user was logged in previously to avoid UX flicker
+        const updateDevotionalShortcut = async (user) => {
+            if (!user) {
+                if (devBtn) {
+                    devBtn.classList.add('hidden');
+                    devBtn.classList.remove('flex');
+                }
+                return;
+            }
+
+            try {
+                // Fetch active, uncompleted reading plans
+                const snap = await window.firebaseService.db.collection('users')
+                    .doc(user.uid)
+                    .collection('reading_plans')
+                    .where('completed', '==', false)
+                    .get();
+
+                if (!snap.empty) {
+                    const userPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // Sort in memory by lastActiveAt descending
+                    userPlans.sort((a, b) => {
+                        const aTime = a.lastActiveAt?.toMillis ? a.lastActiveAt.toMillis() : (a.lastActiveAt?.seconds ? a.lastActiveAt.seconds * 1000 : 0);
+                        const bTime = b.lastActiveAt?.toMillis ? b.lastActiveAt.toMillis() : (b.lastActiveAt?.seconds ? b.lastActiveAt.seconds * 1000 : 0);
+                        return bTime - aTime;
+                    });
+                    
+                    const activePlan = userPlans[0];
+                    const planId = activePlan.planId;
+                    const currentDay = activePlan.currentDay || 1;
+
+                    if (planId && devBtn) {
+                        const lang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'no';
+                        const prefix = lang === 'no' ? '' : `/${lang}`;
+                        devBtn.href = `${prefix}/bibel.html?plan=${planId}&day=${currentDay}`;
+                        devBtn.classList.remove('hidden');
+                        devBtn.classList.add('flex');
+                        
+                        // Update cache
+                        try {
+                            const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+                            let cachedData = cachedUserRaw ? JSON.parse(cachedUserRaw) : {};
+                            if (!cachedData || cachedData.uid !== user.uid) {
+                                cachedData = { uid: user.uid };
+                            }
+                            cachedData.activePlanId = planId;
+                            cachedData.activePlanDay = currentDay;
+                            localStorage.setItem('hkm_public_user_cache', JSON.stringify(cachedData));
+                        } catch (cacheErr) {}
+                    }
+                } else {
+                    if (devBtn) {
+                        devBtn.classList.add('hidden');
+                        devBtn.classList.remove('flex');
+                    }
+                }
+            } catch (err) {
+                console.warn('[DevotionalShortcut] Failed to fetch active reading plan:', err);
+                if (devBtn) {
+                    devBtn.classList.add('hidden');
+                    devBtn.classList.remove('flex');
+                }
+            }
+        };
+
+        // Immediately render avatar and shortcut from cache if user was logged in previously to avoid UX flicker
         try {
             const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
             if (cachedUserRaw) {
                 const cachedUser = JSON.parse(cachedUserRaw);
                 if (cachedUser && cachedUser.uid) {
                     updateProfileDOM(cachedUser.photoURL);
+                    if (cachedUser.activePlanId && devBtn) {
+                        const lang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'no';
+                        const prefix = lang === 'no' ? '' : `/${lang}`;
+                        devBtn.href = `${prefix}/bibel.html?plan=${cachedUser.activePlanId}&day=${cachedUser.activePlanDay || 1}`;
+                        devBtn.classList.remove('hidden');
+                        devBtn.classList.add('flex');
+                    }
                 }
             }
         } catch (e) {
@@ -4720,15 +4860,19 @@ window.addEventListener('load', () => {
 
             // Update cache for instant render next time
             try {
-                localStorage.setItem('hkm_public_user_cache', JSON.stringify({
-                    uid: user.uid,
-                    photoURL: photoURL || ''
-                }));
+                const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+                let cachedData = cachedUserRaw ? JSON.parse(cachedUserRaw) : {};
+                if (!cachedData || cachedData.uid !== user.uid) {
+                    cachedData = { uid: user.uid };
+                }
+                cachedData.photoURL = photoURL || '';
+                localStorage.setItem('hkm_public_user_cache', JSON.stringify(cachedData));
             } catch (cacheErr) {
                 // noop
             }
 
             updateProfileDOM(photoURL);
+            updateDevotionalShortcut(user);
         });
     }
 
