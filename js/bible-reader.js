@@ -4256,8 +4256,8 @@ class BibleReader {
             
             .hkm-btn-devotional-trigger-minimal {
                 flex: 1.2;
-                height: 38px;
-                border-radius: 99px;
+                height: 40px !important;
+                border-radius: 99px !important;
                 background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: #ffffff;
                 font-weight: 700;
@@ -4282,8 +4282,8 @@ class BibleReader {
             
             .hkm-btn-complete-minimal {
                 flex: 1;
-                height: 38px;
-                border-radius: 99px;
+                height: 40px !important;
+                border-radius: 99px !important;
                 background: #f1f5f9;
                 color: #475569;
                 font-weight: 700;
@@ -4326,6 +4326,8 @@ class BibleReader {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                height: 40px !important;
+                border-radius: 99px !important;
             }
             .hkm-btn-complete-v2:hover {
                 background: #e2e8f0;
