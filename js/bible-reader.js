@@ -3588,7 +3588,7 @@ class BibleReader {
     selectReadingPlanDay(dayNumber) {
         this.activePlanDay = dayNumber;
         this.updateUrlParams();
-        this.setupReadingPlanUI();
+        this.setupReadingPlanUI(true);
     }
 
     async syncToExpectedDay(planId, expectedDay) {
@@ -3633,7 +3633,7 @@ class BibleReader {
                 // Switch and render
                 this.activePlanDay = expectedDay;
                 this.updateUrlParams();
-                this.setupReadingPlanUI();
+                this.setupReadingPlanUI(true);
             } catch (err) {
                 console.error("Failed to sync reading plan day:", err);
             }
@@ -3666,7 +3666,7 @@ class BibleReader {
                 }
 
                 // Refresh UI
-                this.setupReadingPlanUI();
+                this.setupReadingPlanUI(true);
             } catch (err) {
                 console.error("Failed to shift plan dates:", err);
             }
@@ -4098,13 +4098,11 @@ class BibleReader {
                     activeDayNum = this.userPlanProgress.currentDay || 1;
                 }
             }
-
             this.activePlanDay = activeDayNum;
-
+            
             // Render reading plan UI
-            await this.setupReadingPlanUI();
+            await this.setupReadingPlanUI(true);
             this.updateUrlParams();
-
             // Auto-open devotional wizard on mobile
             if (window.innerWidth <= 1024) {
                 this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
@@ -4790,10 +4788,8 @@ class BibleReader {
         `;
         document.head.appendChild(style);
     }
-
-    async setupReadingPlanUI() {
-        const globalPlan = this.activePlanData;
-        const userPlan = this.userPlanProgress;
+    async setupReadingPlanUI(openSidebarOnMobile = false) {
+        const globalPlan = this.activePlanData;        const userPlan = this.userPlanProgress;
         const currentDayNum = this.activePlanDay;
         const dayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
 
@@ -5339,7 +5335,7 @@ class BibleReader {
         url.searchParams.set('day', dayNum);
         window.history.pushState({}, '', url.toString());
 
-        await this.setupReadingPlanUI();
+        await this.setupReadingPlanUI(true);
 
         // Auto-open devotional wizard on mobile
         if (window.innerWidth <= 1024) {
@@ -5362,7 +5358,7 @@ class BibleReader {
             userPlan.lastActiveAt = this.getServerTimestamp();
             await this.saveProgress();
             
-            this.setupReadingPlanUI();
+            this.setupReadingPlanUI(true);
             this.loadReadingPlan();
         } else {
             if (!userPlan.completedDays.includes(currentDayNum)) {
@@ -5423,15 +5419,12 @@ class BibleReader {
             
             userPlan.lastActiveAt = this.getServerTimestamp();
             await this.saveProgress();
-            
-            // Reload UI after a short delay for the celebration animation to shine!
-            setTimeout(() => {
-                this.setupReadingPlanUI();
+                        setTimeout(() => {
+                this.setupReadingPlanUI(true);
                 this.loadReadingPlan(true);
             }, 1200);
         }
     }
-
     async showScriptureRef(ref) {
         await this.showDayVerses(ref);
         this.applyReadingPlanHighlights();
@@ -5975,14 +5968,16 @@ class BibleReader {
                 </div>
             </div>
         `;
-
-        // Wire up Top Header listeners
         const closeBtn = stepContainer.querySelector('#hkm-yv-btn-close');
         if (closeBtn) {
             closeBtn.onclick = () => {
                 if (window.speechSynthesis) window.speechSynthesis.cancel();
                 modal.remove();
-                this.loadReadingPlan();
+                if (this.activePlanMode) {
+                    this.setupReadingPlanUI(true);
+                } else {
+                    this.loadReadingPlan();
+                }
             };
         }
 
@@ -6078,7 +6073,7 @@ class BibleReader {
                     }
                 } else if (step === 5) {
                     modal.remove();
-                    this.loadReadingPlan(true);
+                    this.setupReadingPlanUI(true);
                 }
             };
         }
@@ -6153,7 +6148,7 @@ class BibleReader {
         }
 
         // Refresh UI
-        await this.setupReadingPlanUI();
+        await this.setupReadingPlanUI(true);
     }
 
     // ==========================================================================
