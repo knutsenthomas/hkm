@@ -4261,15 +4261,17 @@ class BibleReader {
                 background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
                 color: #ffffff;
                 font-weight: 700;
-                font-size: 13px;
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
+                font-size: 13px !important;
+                border: none !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
                 cursor: pointer;
                 box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
                 transition: all 0.2s ease;
+                padding: 0 16px !important;
+                box-sizing: border-box !important;
             }
             .hkm-btn-devotional-trigger-minimal:hover {
                 filter: brightness(1.1);
@@ -4287,14 +4289,16 @@ class BibleReader {
                 background: #f1f5f9;
                 color: #475569;
                 font-weight: 700;
-                font-size: 13px;
-                border: 1px solid #cbd5e1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
+                font-size: 13px !important;
+                border: 1px solid #cbd5e1 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
                 cursor: pointer;
                 transition: all 0.2s ease;
+                padding: 0 16px !important;
+                box-sizing: border-box !important;
             }
             .hkm-btn-complete-minimal:hover {
                 background: #e2e8f0;
@@ -4320,14 +4324,18 @@ class BibleReader {
                 background: #f1f5f9;
                 color: #475569;
                 font-weight: 700;
-                border: 1px solid #cbd5e1;
+                font-size: 13px !important;
+                border: 1px solid #cbd5e1 !important;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
                 height: 40px !important;
                 border-radius: 99px !important;
+                padding: 0 16px !important;
+                box-sizing: border-box !important;
             }
             .hkm-btn-complete-v2:hover {
                 background: #e2e8f0;
@@ -4884,12 +4892,12 @@ class BibleReader {
                     
                     <!-- Visual Action Buttons stacked -->
                     <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 16px;">
-                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px; box-sizing: border-box;">
+                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100%;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
                             <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
                         </button>
                         
-                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px; box-sizing: border-box;">
+                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100%;">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
                             <span>${completeLabel}</span>
                         </button>
