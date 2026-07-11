@@ -5005,24 +5005,72 @@ class MinSideManager {
                     height: auto !important;
                     overflow-y: auto;
                     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+                    position: relative;
                 }
                 .hkm-bible-display p {
-                    font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
-                    font-size: 16.5px !important;
-                    line-height: 1.75 !important;
-                    color: #1e293b !important;
-                    margin-bottom: 16px !important;
+                    font-family: 'Inter', system-ui, sans-serif !important;
+                    font-size: 15px !important;
+                    line-height: 1.65 !important;
+                    color: #334155 !important;
+                    margin-bottom: 12px !important;
                     text-align: left !important;
                 }
                 .hkm-bible-display .bible-verse-num {
-                    font-family: 'Work Sans', 'Inter', sans-serif !important;
+                    font-family: 'Inter', system-ui, sans-serif !important;
                     font-size: 11px !important;
                     font-weight: 700 !important;
                     color: #d17d39 !important;
                     margin-right: 8px !important;
-                    vertical-align: baseline !important;
-                    position: relative !important;
-                    top: -1px !important;
+                    vertical-align: super !important;
+                }
+                .hkm-bible-tool-btn {
+                    width: 28px;
+                    height: 28px;
+                    border: 1px solid #cbd5e1;
+                    background: #ffffff;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    font-size: 11px;
+                    font-weight: 700;
+                    transition: all 0.15s ease;
+                }
+                .hkm-bible-tool-btn:hover:not(:disabled) {
+                    border-color: #d17d39;
+                    color: #d17d39;
+                    background: rgba(209, 125, 57, 0.04);
+                }
+                .hkm-bible-tool-btn:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                }
+                .hkm-bible-tool-btn.active {
+                    background: rgba(209, 125, 57, 0.08);
+                    border-color: #d17d39;
+                    color: #d17d39;
+                }
+                .hkm-bible-display .bible-verse-item.highlighted-verse {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-left: 3px solid #d17d39 !important;
+                    padding-left: 5px !important;
+                }
+                .hkm-bible-display .bible-verse-item.selected-verse {
+                    background: rgba(14, 165, 233, 0.08) !important;
+                    border-left: 3px solid #0ea5e9 !important;
+                    padding-left: 5px !important;
+                }
+                .hkm-bible-display span.bible-verse-item.highlighted-verse {
+                    background: rgba(209, 125, 57, 0.15) !important;
+                    border-left: none !important;
+                    padding-left: 2px !important;
+                }
+                .hkm-bible-display span.bible-verse-item.selected-verse {
+                    background: rgba(14, 165, 233, 0.15) !important;
+                    border-left: none !important;
+                    padding-left: 2px !important;
                 }
                 
                 .hkm-bible-select:focus {
@@ -5233,11 +5281,11 @@ class MinSideManager {
                             </div>
 
                             <!-- Panel 3: Bible Lookup (Dynamic API loader) -->
-                            <div class="sidebar-panel" id="panel-bible">
-                                <div style="display:flex; flex-direction:column; gap:16px;">
+                            <div class="sidebar-panel" id="panel-bible" style="position: relative;">
+                                <div style="display:flex; flex-direction:column; gap:16px; height: 100%;">
                                     <div>
                                         <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin:0;">Slå opp i Bibelen</h4>
-                                        <p style="font-size:11px; color:rgba(100, 116, 139, 0.6); margin:8px 0 0 0;">Slå opp vers eller kapitler direkte i spillervinduet.</p>
+                                        <p style="font-size:11px; color:rgba(100, 116, 139, 0.6); margin:8px 0 0 0;">Dobbeltklikk på ord for ordbok. Velg vers for å kopiere eller markere.</p>
                                     </div>
                                     <div class="hkm-bible-selects">
                                         <select id="bible-select-translation" class="hkm-bible-select">
@@ -5250,8 +5298,42 @@ class MinSideManager {
                                             <option value="">Kapittel</option>
                                         </select>
                                     </div>
+                                    
+                                    <!-- Interactive Tools Toolbar -->
+                                    <div class="hkm-bible-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-top: -8px; margin-bottom: -4px;">
+                                        <div style="display: flex; gap: 6px;">
+                                            <button type="button" id="bible-btn-layout" class="hkm-bible-tool-btn" title="Bytt visning (Vers / Løpende tekst)">
+                                                <span class="material-symbols-outlined" style="font-size:16px;">segment</span>
+                                            </button>
+                                            <button type="button" id="bible-btn-copy" class="hkm-bible-tool-btn" title="Kopier markerte vers" disabled>
+                                                <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+                                            </button>
+                                            <button type="button" id="bible-btn-highlight" class="hkm-bible-tool-btn" title="Marker vers" disabled>
+                                                <span class="material-symbols-outlined" style="font-size:16px;">border_color</span>
+                                            </button>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                            <button type="button" id="bible-btn-font-dec" class="hkm-bible-tool-btn" title="Mindre skrift" style="font-size:9px;">A-</button>
+                                            <span id="bible-font-size-indicator" style="font-size: 11px; font-weight: 600; color: #64748b; width: 34px; text-align: center;">15px</span>
+                                            <button type="button" id="bible-btn-font-inc" class="hkm-bible-tool-btn" title="Større skrift" style="font-size:9px;">A+</button>
+                                        </div>
+                                    </div>
+
                                     <div id="bible-verses-display" class="hkm-bible-display">
                                         <p style="color:rgba(100, 116, 139, 0.5); text-align:center; font-style:italic; font-size:12px; padding-top:40px; margin: 0;">Velg bok og kapittel for å begynne å lese.</p>
+                                    </div>
+                                    
+                                    <!-- Bible Dictionary Overlay -->
+                                    <div id="bible-dict-overlay" style="display: none; position: absolute; inset: 0; background: #ffffff; z-index: 10; padding: 20px; flex-direction: column; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                                            <h4 id="bible-dict-title" style="font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 700; color: #1b4965; margin: 0;">Bibeleksikon</h4>
+                                            <button type="button" id="bible-dict-close" class="hkm-bible-tool-btn" style="border: none; background: transparent;">
+                                                <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">close</span>
+                                            </button>
+                                        </div>
+                                        <div id="bible-dict-content" style="flex: 1; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #334155; padding-right: 4px;">
+                                            Laster forklaring...
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -5569,8 +5651,7 @@ class MinSideManager {
         const saveStatus = container.querySelector('#notes-save-status');
         let noteDocId = null;
         let saveTimeout = null;
-
-        // Wire the Rich Text Editor toolbar
+// Wire the Rich Text Editor toolbar
         this._wireRteToolbar('rte-toolbar-lesson', 'lesson-notes-editor');
 
         const loadNotes = async () => {
@@ -5648,59 +5729,260 @@ class MinSideManager {
         const bibBookSelect = container.querySelector('#bible-select-book');
         const bibChapSelect = container.querySelector('#bible-select-chapter');
         const bibDisplay = container.querySelector('#bible-verses-display');
+        
+        // Dictionary Overlay Elements
+        const dictOverlay = container.querySelector('#bible-dict-overlay');
+        const dictTitle = container.querySelector('#bible-dict-title');
+        const dictContent = container.querySelector('#bible-dict-content');
+        const dictClose = container.querySelector('#bible-dict-close');
+
         let bibleList = [];
         let isBibleInit = true;
+        let selectedVerses = [];
+        let bibleLayout = 'verse'; // 'verse' | 'paragraph'
+        let bibleFontSize = 15; // default size matches new Inter CSS style
 
-        const loadBibleData = async () => {
+        const updateToolbarStates = () => {
+            const hasSelected = selectedVerses.length > 0;
+            const btnCopy = container.querySelector('#bible-btn-copy');
+            const btnHighlight = container.querySelector('#bible-btn-highlight');
+            if (btnCopy) btnCopy.disabled = !hasSelected;
+            if (btnHighlight) btnHighlight.disabled = !hasSelected;
+        };
+
+        const loadVerses = async (bibleId, chapterId) => {
             try {
-                // Fetch Bibles
-                const res = await fetch('/api/bible/bibles');
+                bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
+                
+                // Clear active selection on reload
+                selectedVerses = [];
+                updateToolbarStates();
+
+                const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
                 const payload = await res.json();
-                bibleList = payload.data || payload || [];
+                const data = payload.data || payload || {};
+                const verses = data.verses || [];
                 
-                bibTransSelect.innerHTML = bibleList.map(b => `
-                    <option value="${b.id}">${b.abbreviation}</option>
-                `).join('');
-                
-                // Trigger Book loading
-                if (bibleList.length > 0) {
-                    await loadBooks(bibleList[0].id, isBibleInit);
-                    isBibleInit = false;
+                if (verses.length === 0) {
+                    bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
+                    return;
                 }
+                
+                const highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
+                
+                if (bibleLayout === 'paragraph') {
+                    bibDisplay.innerHTML = `<div style="font-family: 'Inter', system-ui, sans-serif; font-size:${bibleFontSize}px; line-height:1.75; color:#334155; text-align:left;">` + 
+                        verses.map(v => {
+                            const verseNum = v.verse || v.number || '';
+                            const isHighlighted = highlights.some(h => 
+                                h.bibleId === bibleId && 
+                                h.chapterId === chapterId && 
+                                h.verseNum === verseNum.toString()
+                            );
+                            const highlightClass = isHighlighted ? 'highlighted-verse' : '';
+                            const isSelected = selectedVerses.includes(verseNum.toString());
+                            const selectedClass = isSelected ? 'selected-verse' : '';
+                            
+                            return `
+                                <span class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="cursor:pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s; display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone;">
+                                    <span class="bible-verse-num" style="font-size: 10px; font-weight: 700; color: #d17d39; margin-left: 6px; margin-right: 4px; vertical-align: super;">${verseNum}</span>${v.text}
+                                </span>
+                            `;
+                        }).join('') + `</div>`;
+                } else {
+                    bibDisplay.innerHTML = verses.map(v => {
+                        const verseNum = v.verse || v.number || '';
+                        const isHighlighted = highlights.some(h => 
+                            h.bibleId === bibleId && 
+                            h.chapterId === chapterId && 
+                            h.verseNum === verseNum.toString()
+                        );
+                        const highlightClass = isHighlighted ? 'highlighted-verse' : '';
+                        const isSelected = selectedVerses.includes(verseNum.toString());
+                        const selectedClass = isSelected ? 'selected-verse' : '';
+                        
+                        return `
+                            <p class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="margin-bottom:12px; font-size:${bibleFontSize}px; line-height:1.65; color:#334155; cursor:pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s; display: block; border-left: 3px solid transparent;">
+                                <span class="bible-verse-num" style="font-size: 11px; font-weight: 700; color: #d17d39; margin-right: 8px; vertical-align: super;">${verseNum}</span>${v.text}
+                            </p>
+                        `;
+                    }).join('');
+                }
+                
+                // Attach click handlers for verse items selection
+                bibDisplay.querySelectorAll('.bible-verse-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (e.detail > 1) return; // Prevent selection trigger on double-click
+                        
+                        const verseNum = item.dataset.verse;
+                        const idx = selectedVerses.indexOf(verseNum);
+                        if (idx > -1) {
+                            selectedVerses.splice(idx, 1);
+                            item.classList.remove('selected-verse');
+                        } else {
+                            selectedVerses.push(verseNum);
+                            item.classList.add('selected-verse');
+                        }
+                        updateToolbarStates();
+                    });
+                });
+
+                // Attach double-click handler for Bible Dictionary lookup
+                bibDisplay.addEventListener('dblclick', () => {
+                    const selection = window.getSelection().toString().trim();
+                    const cleanedWord = selection.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").trim();
+                    if (cleanedWord && cleanedWord.length > 1 && cleanedWord.length < 30) {
+                        lookupWord(cleanedWord);
+                    }
+                });
+
+                bibDisplay.scrollTop = 0;
             } catch (e) {
-                console.error("Bible widget init error:", e);
+                console.error("Bible widget loadVerses error:", e);
+                bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
             }
         };
 
-        const loadBooks = async (bibleId, autoSelect = false) => {
+        const lookupWord = async (word) => {
+            dictOverlay.style.display = 'flex';
+            dictTitle.textContent = `Eksikon: "${word}"`;
+            dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Søker i Bibeleksikon...</p>`;
+            
             try {
-                bibBookSelect.disabled = true;
-                bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
+                const lang = document.documentElement.lang || 'no';
+                const res = await fetch(`/api/bible/dictionary?word=${encodeURIComponent(word)}&lang=${lang}`);
+                if (!res.ok) throw new Error("Fetch failed");
+                const dictRes = await res.json();
                 
-                const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
-                const payload = await res.json();
-                const books = payload.data || payload || [];
-                
-                bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
-                    <option value="${b.id}">${b.name}</option>
-                `).join('');
-                bibBookSelect.disabled = false;
-
-                if (autoSelect && books.length > 0) {
-                    // Try to pre-select John / Johannes, fallback to first book (Genesis)
-                    const defaultBook = books.find(b => 
-                        b.id.toLowerCase() === 'jhn' || 
-                        b.id.toLowerCase().includes('jhn') || 
-                        b.name.toLowerCase().includes('johannes')
-                    ) || books[0];
-
-                    bibBookSelect.value = defaultBook.id;
-                    await loadChapters(bibleId, defaultBook.id, true);
+                if (dictRes && dictRes.definition) {
+                    const parsedDef = dictRes.definition
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    
+                    let html = `<p style="margin-bottom:8px;"><strong>Kategori:</strong> ${dictRes.category || 'Ordbok'}</p>`;
+                    html += `<p style="margin-top:12px; font-size: 13.5px; line-height: 1.6; color:#1e293b;">${parsedDef}</p>`;
+                    if (dictRes.contextualNote) {
+                        const parsedNote = dictRes.contextualNote
+                            .replace(/\n/g, '<br>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                        html += `<div style="margin-top:16px; padding:12px; background:#f8fafc; border-left:3px solid #d17d39; border-radius:4px; font-size:12px; line-height: 1.5; color: #475569;">${parsedNote}</div>`;
+                    }
+                    dictContent.innerHTML = html;
+                } else {
+                    dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Fant ingen definisjon på "${word}" i leksikonet.</p>`;
                 }
             } catch (e) {
-                console.error("Bible widget loadBooks error:", e);
+                console.error("Word lookup error:", e);
+                dictContent.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; padding-top:40px;">Feil ved søk i leksikon.</p>`;
             }
         };
+
+        dictClose.addEventListener('click', () => {
+            dictOverlay.style.display = 'none';
+        });
+
+        // Copy selected verses
+        container.querySelector('#bible-btn-copy').addEventListener('click', () => {
+            if (selectedVerses.length === 0) return;
+            selectedVerses.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+            
+            const bookName = bibBookSelect.options[bibBookSelect.selectedIndex].text;
+            const chapterNum = bibChapSelect.options[bibChapSelect.selectedIndex].text;
+            
+            const textToCopy = selectedVerses.map(vNum => {
+                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${vNum}"]`);
+                return el ? `[v. ${vNum}] ${el.innerText.replace(vNum, '').trim()}` : '';
+            }).filter(Boolean).join('\n');
+            
+            const fullRef = `${bookName} ${chapterNum}:${selectedVerses.join(', ')}`;
+            const finalString = `${fullRef}\n\n${textToCopy}\n\n(Delt fra His Kingdom Ministry)`;
+            
+            navigator.clipboard.writeText(finalString).then(() => {
+                window.showToast?.('Bibelversene er kopiert!', 'success') || alert('Kopiert til utklippstavle!');
+                selectedVerses = [];
+                bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
+                updateToolbarStates();
+            });
+        });
+
+        // Highlight/Bookmark selected verses
+        container.querySelector('#bible-btn-highlight').addEventListener('click', () => {
+            if (selectedVerses.length === 0) return;
+            const bibleId = bibTransSelect.value;
+            const bookId = bibBookSelect.value;
+            const chapterId = bibChapSelect.value;
+            
+            let highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
+            
+            selectedVerses.forEach(verseNum => {
+                const matchIdx = highlights.findIndex(h => 
+                    h.bibleId === bibleId && 
+                    h.chapterId === chapterId && 
+                    h.verseNum === verseNum.toString()
+                );
+                
+                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${verseNum}"]`);
+                
+                if (matchIdx > -1) {
+                    highlights.splice(matchIdx, 1);
+                    if (el) el.classList.remove('highlighted-verse');
+                } else {
+                    highlights.push({ bibleId, bookId, chapterId, verseNum: verseNum.toString() });
+                    if (el) el.classList.add('highlighted-verse');
+                }
+            });
+            
+            localStorage.setItem('hkm_bible_highlights', JSON.stringify(highlights));
+            window.showToast?.('Markeringsstatus oppdatert!', 'success');
+            
+            selectedVerses = [];
+            bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
+            updateToolbarStates();
+        });
+
+        // Toggle layout layout-paragraph vs layout-verse
+        container.querySelector('#bible-btn-layout').addEventListener('click', () => {
+            const btn = container.querySelector('#bible-btn-layout');
+            if (bibleLayout === 'verse') {
+                bibleLayout = 'paragraph';
+                btn.classList.add('active');
+            } else {
+                bibleLayout = 'verse';
+                btn.classList.remove('active');
+            }
+            // Trigger re-render of verses with new layout
+            const bibleId = bibTransSelect.value;
+            const chapterId = bibChapSelect.value;
+            if (bibleId && chapterId) {
+                loadVerses(bibleId, chapterId);
+            }
+        });
+
+        // Font size adjustments
+        const updateFontSizeDisplay = () => {
+            container.querySelector('#bible-font-size-indicator').textContent = `${bibleFontSize}px`;
+            const bibleId = bibTransSelect.value;
+            const chapterId = bibChapSelect.value;
+            if (bibleId && chapterId) {
+                loadVerses(bibleId, chapterId);
+            }
+        };
+
+        container.querySelector('#bible-btn-font-dec').addEventListener('click', () => {
+            if (bibleFontSize > 11) {
+                bibleFontSize -= 1;
+                updateFontSizeDisplay();
+            }
+        });
+
+        container.querySelector('#bible-btn-font-inc').addEventListener('click', () => {
+            if (bibleFontSize < 24) {
+                bibleFontSize += 1;
+                updateFontSizeDisplay();
+            }
+        });
 
         const loadChapters = async (bibleId, bookId, autoSelect = false) => {
             try {
@@ -5727,50 +6009,7 @@ class MinSideManager {
             }
         };
 
-        const loadVerses = async (bibleId, chapterId) => {
-            try {
-                bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
-                
-                const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
-                const payload = await res.json();
-                const data = payload.data || payload || {};
-                
-                const verses = data.verses || [];
-                if (verses.length === 0) {
-                    bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
-                    return;
-                }
-                
-                bibDisplay.innerHTML = verses.map(v => `
-                    <p style="margin-bottom:12px; font-size:0.9rem; line-height:1.55; color:#334155;">
-                        <span class="bible-verse-num">${v.verse || v.number || ''}</span>${v.text}
-                    </p>
-                `).join('');
-                bibDisplay.scrollTop = 0;
-            } catch (e) {
-                console.error("Bible widget loadVerses error:", e);
-                bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
-            }
-        };
 
-        bibTransSelect.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            if (bibId) loadBooks(bibId, true);
-        });
-
-        bibBookSelect.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            const bookId = bibBookSelect.value;
-            if (bibId && bookId) loadChapters(bibId, bookId, true);
-        });
-
-        bibChapSelect.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            const chapId = bibChapSelect.value;
-            if (bibId && chapId) loadVerses(bibId, chapId);
-        });
-
-        await loadBibleData();
 
         // Setup Live Zoom Countdown Timer
         if (window._playerCountdownInterval) {
