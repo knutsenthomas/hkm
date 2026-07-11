@@ -5674,255 +5674,257 @@ class BibleReader {
         stepContainer.className = 'hkm-devotional-content';
         modal.appendChild(stepContainer);
 
-        const header = document.createElement('div');
-        header.style.display = 'flex';
-        header.style.justify = 'space-between';
-        header.style.alignItems = 'center';
-        header.style.marginBottom = '20px';
-        header.innerHTML = `
-            <div style="font-size: 11px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">
-                ${plan.title} &bull; Steg ${step} av 5
-            </div>
-            <button style="background: none; border: none; cursor: pointer; color: #64748b; display: flex; align-items: center;" onclick="document.getElementById('hkm-devotional-modal').remove()">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        `;
-        stepContainer.appendChild(header);
+        const lang = document.documentElement.lang || 'no';
+        const isPrayerApp = plan.title && (
+            plan.title.toLowerCase().includes('bønn') ||
+            plan.title.toLowerCase().includes('prayer') ||
+            plan.title.toLowerCase().includes('oración')
+        );
 
+        // Step Label mapping
+        let stepLabel = 'BIBEL';
+        if (step === 1) stepLabel = lang === 'en' ? 'BIBLE' : (lang === 'es' ? 'BIBLIA' : 'BIBEL');
+        else if (step === 2) stepLabel = isPrayerApp ? (lang === 'en' ? 'PRAYER' : (lang === 'es' ? 'ORACIÓN' : 'BØNN')) : (lang === 'en' ? 'DEVOTION' : (lang === 'es' ? 'DEVOCIONAL' : 'ANDAKT'));
+        else if (step === 3) stepLabel = lang === 'en' ? 'RESOURCES' : (lang === 'es' ? 'RECURSOS' : 'RESSURSER');
+        else if (step === 4) stepLabel = lang === 'en' ? 'NOTES' : (lang === 'es' ? 'NOTAS' : 'NOTAT');
+        else if (step === 5) stepLabel = lang === 'en' ? 'COMPLETED' : (lang === 'es' ? 'COMPLETADO' : 'FULLFØRT');
+
+        // Generate dynamic content HTML
+        let stepContentHtml = '';
         if (step === 1) {
-            const title = document.createElement('h3');
-            title.className = 'hkm-devotional-step-title';
-            title.innerText = `1. Les skriftstedet (${dayConfig.verses})`;
-            stepContainer.appendChild(title);
-
-            const scriptureBox = document.createElement('div');
-            scriptureBox.className = 'hkm-devotional-text-serif';
-            scriptureBox.innerHTML = scriptureHtml;
-            stepContainer.appendChild(scriptureBox);
-
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.justify = 'flex-end';
-            actions.innerHTML = `
-                <button class="hkm-btn-primary" id="btn-devotional-next">
-                    Neste: Bønn
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
+            const heading = dayConfig.verses || 'BIBEL';
+            stepContentHtml = `
+                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <div class="hkm-devotional-text-serif">${scriptureHtml}</div>
             `;
-            stepContainer.appendChild(actions);
-
-            actions.querySelector('#btn-devotional-next').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
-            };
-
         } else if (step === 2) {
-            const title = document.createElement('h3');
-            title.className = 'hkm-devotional-step-title';
-            title.innerText = '2. Dagens Bønnefokus';
-            stepContainer.appendChild(title);
-
-            const prayerBox = document.createElement('div');
-            prayerBox.className = 'hkm-devotional-prayer-box';
-            prayerBox.innerText = dayConfig.prayerFocus || 'Be i dag over ordene du har lest, og be om visdom og veiledning for dagen.';
-            stepContainer.appendChild(prayerBox);
-
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.justify = 'space-between';
-            actions.innerHTML = `
-                <button class="hkm-btn-secondary" id="btn-devotional-back">
-                    Tilbake
-                </button>
-                <button class="hkm-btn-primary" id="btn-devotional-next">
-                    Neste: Ressurser
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
+            const heading = isPrayerApp 
+                ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus'))
+                : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional' : 'Dagens Andakt'));
+            const text = dayConfig.prayerFocus || (isPrayerApp ? 'Be over skriftstedene du leser i dag.' : 'Reflekter over ordene du har lest.');
+            stepContentHtml = `
+                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <div class="hkm-devotional-prayer-box">${text}</div>
             `;
-            stepContainer.appendChild(actions);
-
-            actions.querySelector('#btn-devotional-back').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 1, scriptureHtml);
-            };
-            actions.querySelector('#btn-devotional-next').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
-            };
-
         } else if (step === 3) {
-            const title = document.createElement('h3');
-            title.className = 'hkm-devotional-step-title';
-            title.innerText = '3. Dypere Dykk & Ressurser';
-            stepContainer.appendChild(title);
-
-            const desc = document.createElement('p');
-            desc.style.fontSize = '14px';
-            desc.style.color = '#64748b';
-            desc.style.marginBottom = '20px';
-            desc.style.lineHeight = '1.5';
-            desc.innerText = 'Bruk disse ressursene til å gå dypere i dagens tema:';
-            stepContainer.appendChild(desc);
-
-            const resourcesList = document.createElement('div');
-            resourcesList.style.display = 'flex';
-            resourcesList.style.flexDirection = 'column';
-            resourcesList.style.gap = '12px';
-            resourcesList.style.marginBottom = '24px';
-            
+            const heading = lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Dypere Dykk');
+            let resourcesListHtml = '';
             if (dayConfig.resources && dayConfig.resources.length > 0) {
                 dayConfig.resources.forEach(res => {
-                    const card = document.createElement('a');
-                    card.href = res.url || '#';
-                    card.target = '_blank';
-                    card.className = 'hkm-rp-card';
-                    card.style.textDecoration = 'none';
-                    card.style.display = 'block';
-                    card.style.margin = '0';
-                    card.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span class="material-symbols-outlined" style="color: #d17d39; font-size: 24px;">
-                                ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
-                            </span>
-                            <div>
-                                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">${res.title}</div>
-                                <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94a3b8;">${res.type}</div>
+                    resourcesListHtml += `
+                        <a href="${res.url || '#'}" target="_blank" class="hkm-rp-card" style="text-decoration: none; display: block; margin: 0 0 12px 0;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="color: #d17d39; font-size: 24px;">
+                                    ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
+                                </span>
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">${res.title}</div>
+                                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #94a3b8;">${res.type}</div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     `;
-                    resourcesList.appendChild(card);
                 });
             } else {
-                resourcesList.innerHTML = `
+                resourcesListHtml = `
                     <p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px 0;">
-                        Ingen ekstra ressurser tilknyttet denne dagen.
+                        ${lang === 'en' ? 'No extra resources for this day.' : (lang === 'es' ? 'No hay recursos adicionales.' : 'Ingen ekstra ressurser tilknyttet denne dagen.')}
                     </p>
                 `;
             }
-            stepContainer.appendChild(resourcesList);
-
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.justify = 'space-between';
-            actions.innerHTML = `
-                <button class="hkm-btn-secondary" id="btn-devotional-back">
-                    Tilbake
-                </button>
-                <button class="hkm-btn-primary" id="btn-devotional-next">
-                    Neste: Refleksjon
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
+            stepContentHtml = `
+                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                    ${resourcesListHtml}
+                </div>
             `;
-            stepContainer.appendChild(actions);
-
-            actions.querySelector('#btn-devotional-back').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 2, scriptureHtml);
-            };
-            actions.querySelector('#btn-devotional-next').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 4, scriptureHtml);
-            };
-
         } else if (step === 4) {
-            const title = document.createElement('h3');
-            title.className = 'hkm-devotional-step-title';
-            title.innerText = '4. Skriv dine refleksjoner';
-            stepContainer.appendChild(title);
-
-            const desc = document.createElement('p');
-            desc.style.fontSize = '14px';
-            desc.style.color = '#64748b';
-            desc.style.marginBottom = '16px';
-            desc.style.lineHeight = '1.5';
-            desc.innerText = 'Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.';
-            stepContainer.appendChild(desc);
-
-            const textarea = document.createElement('textarea');
-            textarea.className = 'hkm-devotional-reflection-textarea';
-            textarea.placeholder = 'Skriv dine tanker her... (Dette lagres også i dine notater på Min Side)';
-            stepContainer.appendChild(textarea);
-
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.justify = 'space-between';
-            actions.innerHTML = `
-                <button class="hkm-btn-secondary" id="btn-devotional-back">
-                    Tilbake
-                </button>
-                <button class="hkm-btn-primary" id="btn-devotional-save">
-                    Fullfør og Lagre
-                    <span class="material-symbols-outlined">check</span>
-                </button>
+            const heading = lang === 'en' ? 'Notes' : (lang === 'es' ? 'Reflexión' : 'Notat & Refleksjon');
+            const desc = lang === 'en' 
+                ? 'Write down what God spoke to you today, or write a prayer. Saved to your notes.'
+                : (lang === 'es' ? 'Escribe lo que Dios te habló hoy o escribe una oración.' : 'Noter ned hva Gud talte til deg gjennom ordene du leste, eller skriv en bønn.');
+            stepContentHtml = `
+                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <p style="font-size: 14px; color: #64748b; margin-bottom: 16px; line-height: 1.5;">${desc}</p>
+                <textarea id="hkm-yv-reflection-input" class="hkm-devotional-reflection-textarea" placeholder="${lang === 'en' ? 'Write here...' : (lang === 'es' ? 'Escribe aquí...' : 'Skriv dine tanker her...')}" style="width: 100%; box-sizing: border-box;"></textarea>
             `;
-            stepContainer.appendChild(actions);
-
-            actions.querySelector('#btn-devotional-back').onclick = () => {
-                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 3, scriptureHtml);
-            };
-            
-            actions.querySelector('#btn-devotional-save').onclick = async () => {
-                const text = textarea.value.trim();
-                const saveBtn = actions.querySelector('#btn-devotional-save');
-                saveBtn.disabled = true;
-                saveBtn.innerText = 'Lagrer...';
-
-                try {
-                    await this.completeDevotionalDay(plan, dayNumber, text);
-                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 5, scriptureHtml);
-                } catch (e) {
-                    console.error("Failed to complete devotional day:", e);
-                    alert("Kunne ikke lagre andakt: " + e.message);
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = `Fullfør og Lagre <span class="material-symbols-outlined">check</span>`;
-                }
-            };
-
         } else if (step === 5) {
-            const confetti = document.createElement('div');
-            confetti.style.fontSize = '64px';
-            confetti.style.textAlign = 'center';
-            confetti.style.marginBottom = '16px';
-            confetti.innerHTML = '🎉';
-            stepContainer.appendChild(confetti);
-
-            const isPrayerApp = plan.title && (
-                plan.title.toLowerCase().includes('bønn') ||
-                plan.title.toLowerCase().includes('prayer') ||
-                plan.title.toLowerCase().includes('oración')
-            );
-            const lang = document.documentElement.lang || 'no';
-
-            const title = document.createElement('h3');
-            title.className = 'hkm-celebration-title';
-            title.innerText = isPrayerApp 
-                ? (lang === 'en' ? 'Prayer completed!' : (lang === 'es' ? '¡Oración completada!' : 'Bønn fullført!'))
-                : (lang === 'en' ? 'Devotional completed!' : (lang === 'es' ? '¡Devocional completado!' : 'Andakt fullført!'));
-            stepContainer.appendChild(title);
-
-            const desc = document.createElement('p');
-            desc.className = 'hkm-celebration-desc';
-            
             const planTypeWord = isPrayerApp 
                 ? (lang === 'en' ? 'prayer app' : (lang === 'es' ? 'aplicación de oración' : 'bønneappen'))
                 : (lang === 'en' ? 'reading plan' : (lang === 'es' ? 'plan de lectura' : 'leseplanen'));
             
-            desc.innerText = lang === 'en' 
+            const celebrationTitle = isPrayerApp 
+                ? (lang === 'en' ? 'Prayer completed!' : (lang === 'es' ? '¡Oración completada!' : 'Bønn fullført!'))
+                : (lang === 'en' ? 'Devotional completed!' : (lang === 'es' ? '¡Devocional completado!' : 'Andakt fullført!'));
+                
+            const celebrationDesc = lang === 'en' 
                 ? `Great job! You have completed day ${dayNumber} of the ${planTypeWord} "${plan.title}".`
                 : (lang === 'es' 
                     ? `¡Buen trabajo! Has completado el día ${dayNumber} de la ${planTypeWord} "${plan.title}".`
                     : `Kjempebra jobbet! Du har fullført dag ${dayNumber} av ${planTypeWord} "${plan.title}".`);
-            stepContainer.appendChild(desc);
 
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.justify = 'center';
-            actions.innerHTML = `
-                <button class="hkm-btn-primary" id="btn-devotional-close" style="min-width: 150px;">
-                    Lukk
-                </button>
+            stepContentHtml = `
+                <div style="font-size: 64px; text-align: center; margin-bottom: 16px;">🎉</div>
+                <h3 class="hkm-celebration-title" style="text-align: center; color: #1B4965; font-size: 24px; font-weight: 700; margin-bottom: 8px;">${celebrationTitle}</h3>
+                <p class="hkm-celebration-desc" style="text-align: center; color: #64748b; font-size: 15px; margin-bottom: 24px;">${celebrationDesc}</p>
             `;
-            stepContainer.appendChild(actions);
+        }
 
-            actions.querySelector('#btn-devotional-close').onclick = () => {
+        // Render YouVersion Layout
+        stepContainer.innerHTML = `
+            <div class="hkm-yv-wrapper">
+                <!-- 1. Top Header Bar -->
+                <div class="hkm-yv-header">
+                    <button class="hkm-yv-header-btn-close" id="hkm-yv-btn-close" title="Lukk">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    
+                    <div class="hkm-yv-header-title">
+                        <span class="hkm-yv-header-avatar">${plan.title.charAt(0)}</span>
+                        <span class="hkm-yv-header-text">${plan.title}</span>
+                    </div>
+                    
+                    <div class="hkm-yv-header-actions">
+                        <button class="hkm-yv-action-btn" id="hkm-yv-btn-audio" title="Les opp">
+                            <span class="material-symbols-outlined">volume_up</span>
+                        </button>
+                        <button class="hkm-yv-action-btn" id="hkm-yv-btn-font" title="Tekststørrelse">
+                            <span style="font-weight: 800; font-size: 14px;">AA</span>
+                        </button>
+                        <button class="hkm-yv-action-btn" id="hkm-yv-btn-share" title="Del">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 2. Scrollable Body Content -->
+                <div class="hkm-yv-body">
+                    <div class="hkm-yv-body-inner">
+                        ${stepContentHtml}
+                    </div>
+                </div>
+                
+                <!-- 3. Bottom Navigation Bar -->
+                <div class="hkm-yv-footer">
+                    <button class="hkm-yv-nav-circle-btn" id="btn-yv-back" ${step === 1 ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    
+                    <div class="hkm-yv-footer-pill">
+                        ${stepLabel}
+                    </div>
+                    
+                    <button class="hkm-yv-nav-circle-btn active" id="btn-yv-next">
+                        <span class="material-symbols-outlined">${step === 4 ? 'check' : step === 5 ? 'close' : 'chevron_right'}</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Wire up Top Header listeners
+        const closeBtn = stepContainer.querySelector('#hkm-yv-btn-close');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
                 modal.remove();
                 this.loadReadingPlan();
-                this.setupReadingPlanUI();
+            };
+        }
+
+        const fontBtn = stepContainer.querySelector('#hkm-yv-btn-font');
+        if (fontBtn) {
+            fontBtn.onclick = () => {
+                const body = stepContainer.querySelector('.hkm-yv-body');
+                if (body.classList.contains('font-size-large')) {
+                    body.classList.remove('font-size-large');
+                    body.classList.add('font-size-xlarge');
+                } else if (body.classList.contains('font-size-xlarge')) {
+                    body.classList.remove('font-size-xlarge');
+                } else {
+                    body.classList.add('font-size-large');
+                }
+            };
+        }
+
+        const audioBtn = stepContainer.querySelector('#hkm-yv-btn-audio');
+        if (audioBtn) {
+            audioBtn.onclick = () => {
+                if (window.speechSynthesis) {
+                    if (window.speechSynthesis.speaking) {
+                        window.speechSynthesis.cancel();
+                        audioBtn.querySelector('span').innerText = 'volume_up';
+                        audioBtn.classList.remove('speaking');
+                    } else {
+                        // Extract speakable text from body inner
+                        const speakText = stepContainer.querySelector('.hkm-yv-body-inner').innerText;
+                        const utterance = new SpeechSynthesisUtterance(speakText);
+                        utterance.lang = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+                        utterance.onend = () => {
+                            audioBtn.querySelector('span').innerText = 'volume_up';
+                            audioBtn.classList.remove('speaking');
+                        };
+                        audioBtn.querySelector('span').innerText = 'volume_off';
+                        audioBtn.classList.add('speaking');
+                        window.speechSynthesis.speak(utterance);
+                    }
+                }
+            };
+        }
+
+        const shareBtn = stepContainer.querySelector('#hkm-yv-btn-share');
+        if (shareBtn) {
+            shareBtn.onclick = async () => {
+                const shareData = {
+                    title: plan.title,
+                    text: `Leseplan: ${plan.title} - Dag ${dayNumber} (${dayConfig.verses})`,
+                    url: window.location.href
+                };
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else {
+                        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                        alert(lang === 'en' ? 'Link copied to clipboard!' : (lang === 'es' ? '¡Enlace copiado al portapapeles!' : 'Leseplan-lenke kopiert til utklippstavlen!'));
+                    }
+                } catch (err) {
+                    console.log("Error sharing:", err);
+                }
+            };
+        }
+
+        // Wire up Footer Navigation listeners
+        const backBtn = stepContainer.querySelector('#btn-yv-back');
+        if (backBtn && step > 1) {
+            backBtn.onclick = () => {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, step - 1, scriptureHtml);
+            };
+        }
+
+        const nextBtn = stepContainer.querySelector('#btn-yv-next');
+        if (nextBtn) {
+            nextBtn.onclick = async () => {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                
+                if (step < 4) {
+                    this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, step + 1, scriptureHtml);
+                } else if (step === 4) {
+                    const textarea = stepContainer.querySelector('#hkm-yv-reflection-input');
+                    const text = textarea ? textarea.value.trim() : '';
+                    nextBtn.disabled = true;
+                    
+                    try {
+                        await this.completeDevotionalDay(plan, dayNumber, text);
+                        this.renderDevotionalStep(modal, plan, dayNumber, dayConfig, 5, scriptureHtml);
+                    } catch (e) {
+                        console.error("Failed to complete devotional day:", e);
+                        alert("Kunne ikke lagre andakt: " + e.message);
+                        nextBtn.disabled = false;
+                    }
+                } else if (step === 5) {
+                    modal.remove();
+                    this.loadReadingPlan();
+                }
             };
         }
     }
