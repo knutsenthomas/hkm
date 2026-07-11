@@ -9037,6 +9037,32 @@ html[data-theme="dark"] #header-today-devotional-btn:hover {
     transform: translate(2px, -2px);
 }
 
+/* Mobile Menu Language Selector Fix */
+#mega-menu .lang-switch-btn {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+    flex-shrink: 0 !important;
+}
+
+#mega-menu div:has(> .lang-switch-btn) {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+#mega-menu div:has(> div > .lang-switch-btn) {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+}
+
+
 
 
 
