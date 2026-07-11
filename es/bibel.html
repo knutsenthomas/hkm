@@ -696,13 +696,13 @@
             padding: 10px 24px;
             border-radius: 40px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            z-index: 140;
+            z-index: 2000 !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.95;
+            opacity: 1 !important;
         }
 
         .floating-bible-nav:hover {
-            opacity: 1;
+            opacity: 1 !important;
             transform: translateX(-50%) translateY(-2px) translateZ(0);
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
         }
@@ -1757,15 +1757,16 @@
             
             /* Floating bible navigation on mobile */
             .floating-bible-nav {
-                opacity: 0.95 !important;
+                opacity: 1 !important;
                 bottom: 24px !important;
                 padding: 8px 18px !important;
                 gap: 16px !important;
                 transform: translateX(-50%) translateZ(0) !important;
+                z-index: 2000 !important;
             }
             .floating-bible-nav:hover {
                 transform: translateX(-50%) translateZ(0) !important;
-                opacity: 0.95 !important;
+                opacity: 1 !important;
             }
             .floating-bible-nav.hidden-nav {
                 transform: translateX(-50%) translateY(100px) translateZ(0) !important;
@@ -2989,7 +2990,7 @@
     <!-- JavaScript -->
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.11.15"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.07.11.16"></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
