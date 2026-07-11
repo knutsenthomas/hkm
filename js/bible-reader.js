@@ -3323,25 +3323,51 @@ class BibleReader {
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
                 .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
-                .hkm-devotional-content { background: #ffffff !important; width: 90% !important; max-width: 600px !important; border-radius: 24px !important; padding: 32px !important; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important; display: block !important; position: relative !important; animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
-                .hkm-devotional-step-title { font-size: 20px; font-weight: 700; color: #1B4965; margin-bottom: 16px; }
-                .hkm-devotional-text-serif { font-family: 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; overflow-y: auto !important; max-height: 40vh !important; padding-right: 8px !important; text-align: left !important; }
-                .hkm-devotional-text-serif p { display: inline !important; position: relative !important; padding: 2px 4px !important; margin: 0 !important; border-radius: 4px !important; font-size: 18px !important; line-height: 1.8 !important; box-decoration-break: clone !important; -webkit-box-decoration-break: clone !important; font-family: 'Georgia', serif !important; }
-                .hkm-devotional-text-serif sup.v { font-size: 0.6em !important; font-weight: 700 !important; color: #64748b !important; margin-right: 4px !important; margin-left: 6px !important; vertical-align: baseline !important; position: relative !important; top: -0.35em !important; line-height: 0 !important; user-select: none !important; padding: 0 !important; cursor: default !important; display: inline !important; }
-                .hkm-devotional-prayer-box { background: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; font-style: italic; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 24px; }
-                .hkm-devotional-reflection-textarea { display: block !important; width: 100% !important; min-height: 120px !important; padding: 16px !important; border-radius: 12px !important; border: 1px solid #cbd5e1 !important; outline: none !important; font-size: 14px !important; line-height: 1.5 !important; margin-bottom: 24px !important; resize: vertical !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-content { background: #ffffff !important; width: 90% !important; max-width: 640px !important; height: 85% !important; max-height: 800px !important; border-radius: 24px !important; padding: 0 !important; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important; display: flex !important; flex-direction: column !important; position: relative !important; animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
+                .hkm-devotional-step-title { font-size: 22px; font-weight: 700; color: #1B4965; margin-bottom: 16px; line-height: 1.3; }
+                .hkm-devotional-text-serif { font-family: 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
+                .hkm-devotional-text-serif p { display: block !important; position: relative !important; margin-bottom: 16px !important; font-size: 18px !important; line-height: 1.8 !important; font-family: 'Georgia', serif !important; }
+                .hkm-devotional-text-serif sup.v { font-size: 0.65em !important; font-weight: 700 !important; color: #d17d39 !important; margin-right: 6px !important; vertical-align: baseline !important; position: relative !important; top: -0.3em !important; line-height: 0 !important; user-select: none !important; }
+                .hkm-devotional-prayer-box { background: #f8fafc; border-left: 4px solid #d17d39; padding: 20px; border-radius: 0 12px 12px 0; font-style: italic; font-size: 16px; line-height: 1.6; color: #334155; margin-bottom: 24px; }
+                .hkm-devotional-reflection-textarea { display: block !important; width: 100% !important; min-height: 150px !important; padding: 16px !important; border-radius: 12px !important; border: 1px solid #cbd5e1 !important; outline: none !important; font-size: 15px !important; line-height: 1.5 !important; margin-bottom: 24px !important; resize: vertical !important; }
                 .hkm-celebration-title { font-size: 24px; font-weight: 700; color: #1B4965; text-align: center; margin-top: 16px; margin-bottom: 8px; }
                 .hkm-celebration-desc { font-size: 15px; color: #64748b; text-align: center; margin-bottom: 24px; }
+                
+                /* YouVersion-specific classes */
+                .hkm-yv-wrapper { display: flex !important; flex-direction: column !important; height: 100% !important; width: 100% !important; background: #ffffff !important; box-sizing: border-box !important; position: relative !important; overflow: hidden !important; }
+                .hkm-yv-header { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 16px 20px !important; border-bottom: 1px solid #f1f5f9 !important; background: #ffffff !important; flex-shrink: 0 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important; }
+                .hkm-yv-header-btn-close { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important; transition: background-color 0.2s !important; }
+                .hkm-yv-header-btn-close:hover { background: #f1f5f9 !important; }
+                .hkm-yv-header-title { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 !important; margin: 0 16px !important; min-width: 0 !important; }
+                .hkm-yv-header-avatar { width: 28px !important; height: 28px !important; border-radius: 50% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 13px !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important; }
+                .hkm-yv-header-text { font-size: 15px !important; font-weight: 700 !important; color: #1B4965 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+                .hkm-yv-header-actions { display: flex !important; align-items: center !important; gap: 4px !important; }
+                .hkm-yv-action-btn { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important; transition: all 0.2s !important; }
+                .hkm-yv-action-btn:hover { background: #f1f5f9 !important; color: #1e293b !important; }
+                .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.08) !important; }
+                
+                .hkm-yv-body { flex: 1 !important; overflow-y: auto !important; padding: 24px 20px !important; background: #ffffff !important; display: flex !important; flex-direction: column !important; }
+                .hkm-yv-body-inner { max-width: 600px !important; margin: 0 auto !important; width: 100% !important; }
+                
+                .hkm-yv-body.font-size-large .hkm-devotional-text-serif { font-size: 21px !important; }
+                .hkm-yv-body.font-size-large .hkm-devotional-text-serif p { font-size: 21px !important; }
+                .hkm-yv-body.font-size-xlarge .hkm-devotional-text-serif { font-size: 24px !important; }
+                .hkm-yv-body.font-size-xlarge .hkm-devotional-text-serif p { font-size: 24px !important; }
+                
+                .hkm-yv-footer { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 16px 24px !important; border-top: 1px solid #f1f5f9 !important; background: #ffffff !important; flex-shrink: 0 !important; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.02) !important; }
+                .hkm-yv-nav-circle-btn { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #f1f5f9 !important; border: none !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+                .hkm-yv-nav-circle-btn:hover { background: #e2e8f0 !important; color: #0f172a !important; }
+                .hkm-yv-nav-circle-btn.active { background: #1B4965 !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(27, 73, 101, 0.2) !important; }
+                .hkm-yv-nav-circle-btn.active:hover { background: #153c54 !important; }
+                .hkm-yv-footer-pill { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; padding: 8px 16px !important; border-radius: 99px !important; font-size: 12px !important; font-weight: 800 !important; color: #64748b !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; }
+                
                 @keyframes hkmFadeIn {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
                 @media (max-width: 1024px) {
                     .hkm-devotional-overlay { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-                    .hkm-devotional-content { width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)) 16px !important; display: flex !important; flex-direction: column !important; box-shadow: none !important; animation: none !important; }
-                    .hkm-devotional-text-serif { flex: 1 !important; max-height: none !important; overflow-y: auto !important; margin-bottom: 16px !important; }
-                    .hkm-devotional-prayer-box { flex: 1 !important; margin-bottom: 16px !important; overflow-y: auto !important; }
-                    .hkm-devotional-reflection-textarea { flex: 1 !important; min-height: 150px !important; margin-bottom: 16px !important; }
+                    .hkm-devotional-content { width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; display: flex !important; flex-direction: column !important; box-shadow: none !important; animation: none !important; }
                 }
             `;
             document.head.appendChild(style);
