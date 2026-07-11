@@ -4316,6 +4316,37 @@ class BibleReader {
                 color: #ffffff !important;
             }
             
+            .hkm-btn-complete-v2 {
+                background: #f1f5f9;
+                color: #475569;
+                font-weight: 700;
+                border: 1px solid #cbd5e1;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .hkm-btn-complete-v2:hover {
+                background: #e2e8f0;
+            }
+            .hkm-btn-complete-v2.completed {
+                background: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete-v2 {
+                background: rgba(189, 79, 42, 0.08) !important;
+                border-color: rgba(189, 79, 42, 0.2) !important;
+                color: #bd4f2a !important;
+            }
+            body.prayer-app-mode .hkm-btn-complete-v2.completed {
+                background: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
+            }
+            
             /* Sidebar widgets */
             .hkm-rp-sidebar-wrapper {
                 display: flex;
@@ -4722,7 +4753,7 @@ class BibleReader {
             }
         }
 
-        // 4. Render top header panel in central column
+        // 4. Render top header panel in central column (Mobile Only to prevent duplicate controls on PC)
         let planHeader = document.getElementById('reading-plan-header-panel');
         if (!planHeader) {
             planHeader = document.createElement('div');
@@ -4733,8 +4764,12 @@ class BibleReader {
                 contentPane.insertBefore(planHeader, contentPane.firstChild);
             }
         }
-        planHeader.style.display = 'block';
-        this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
+        if (window.innerWidth <= 1024) {
+            planHeader.style.display = 'block';
+            this.renderTopHeaderPanel(planHeader, globalPlan, userPlan, currentDayNum, dayConfig);
+        } else {
+            planHeader.style.display = 'none';
+        }
 
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
@@ -4846,11 +4881,18 @@ class BibleReader {
                         ${daysGridHtml}
                     </div>
                     
-                    <!-- Complete Day Button -->
-                    <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
-                        <span>${completeLabel}</span>
-                    </button>
+                    <!-- Visual Action Buttons stacked -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 16px;">
+                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px; box-sizing: border-box;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
+                            <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
+                        </button>
+                        
+                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100%; display: flex; justify-content: center; height: 40px; border-radius: 10px; font-size: 13px; gap: 8px; box-sizing: border-box;">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
+                            <span>${completeLabel}</span>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Devotional text card -->
