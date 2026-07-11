@@ -4357,6 +4357,22 @@ class BibleReader {
                 color: #ffffff !important;
             }
             
+            #rp-sidebar-devotional-btn,
+            #rp-sidebar-complete-btn {
+                height: 44px !important;
+                min-height: 44px !important;
+                max-height: 44px !important;
+                border-radius: 99px !important;
+                box-sizing: border-box !important;
+                padding: 0 16px !important;
+                font-size: 13.5px !important;
+                font-weight: 700 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+            }
+            
             /* Sidebar widgets */
             .hkm-rp-sidebar-wrapper {
                 display: flex;
@@ -4902,12 +4918,12 @@ class BibleReader {
                     
                     <!-- Visual Action Buttons stacked -->
                     <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 16px;">
-                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100% !important; height: 40px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; border: none !important; color: #ffffff !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;">
+                        <button id="rp-sidebar-devotional-btn" class="hkm-btn-devotional-trigger-minimal" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum})" style="width: 100% !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13.5px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; border: none !important; color: #ffffff !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span>
                             <span>${isPrayerApp ? (lang === 'en' ? 'Start prayer' : (lang === 'es' ? 'Comenzar' : 'Start bønn')) : (lang === 'en' ? 'Read devotion' : (lang === 'es' ? 'Leer' : 'Vis andakt'))}</span>
                         </button>
                         
-                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100% !important; height: 40px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; background: ${completeBg}; color: ${completeColor}; border: ${completeBorder};">
+                        <button id="rp-sidebar-complete-btn" class="hkm-btn-complete-v2 ${isCurrentDayCompleted ? 'completed' : ''}" style="width: 100% !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; border-radius: 99px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 13.5px !important; font-weight: 700 !important; cursor: pointer !important; box-sizing: border-box !important; padding: 0 16px !important; margin: 0 !important; line-height: 1 !important; outline: none !important; background: ${completeBg}; color: ${completeColor}; border: ${completeBorder};">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">check_circle</span>
                             <span>${completeLabel}</span>
                         </button>
