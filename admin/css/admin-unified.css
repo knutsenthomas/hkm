@@ -6017,7 +6017,7 @@ button .material-symbols-outlined {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transform: translateY(1.5px) !important;
+  transform: none !important;
 }
 
 /* Badges & Status Pills Icon Spacing */
