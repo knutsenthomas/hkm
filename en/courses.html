@@ -783,6 +783,7 @@
         .course-meta {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 10px;
             font-size: 0.8rem;
             color: #94a3b8;
@@ -2083,6 +2084,7 @@
                     }
 
                     if (allCourses.length === 1) {
+                        const hasTranslation = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
                         // Single course: render a full-width Spotlight Card
                         const course = allCourses[0];
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
@@ -2101,6 +2103,10 @@
                                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
                                         <span class="spotlight-badge" style="margin-bottom: 0;">Utvalgt Kurs</span>
                                         <span class="spotlight-badge" style="background: ${isFree ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText}</span>
+                                        ${lang !== 'no' && !hasTranslation 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                            : ''
+                                        }
                                     </div>
                                     <h3 class="spotlight-title">${course.title}</h3>
                                     <p class="spotlight-desc" style="max-width: 700px;">${course.description || ''}</p>
@@ -2111,6 +2117,8 @@
                             </div>
                         `;
                     } else if (allCourses.length === 2) {
+                        const hasTranslation1 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
+                        const hasTranslation2 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[1], lang);
                         // Two courses: render spotlight card on the left, and one horizontal card on the right
                         const course1 = allCourses[0];
                         const course2 = allCourses[1];
@@ -2137,6 +2145,10 @@
                                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
                                         <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
                                         <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                        ${lang !== 'no' && !hasTranslation1 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                            : ''
+                                        }
                                     </div>
                                     <h3 class="spotlight-title">${course1.title}</h3>
                                     <p class="spotlight-desc">${course1.description || ''}</p>
@@ -2158,6 +2170,10 @@
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course2.durationText}</span>
                                             <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation2 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                                : ''
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -2165,6 +2181,9 @@
                         `;
                     } else {
                         // 3 or more courses: render standard layout with spotlight + 2 horizontal cards
+                        const hasTranslation1 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
+                        const hasTranslation2 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[1], lang);
+                        const hasTranslation3 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[2], lang);
                         const course1 = allCourses[0];
                         const course2 = allCourses[1];
                         const course3 = allCourses[2];
@@ -2196,6 +2215,10 @@
                                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
                                         <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
                                         <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                        ${lang !== 'no' && !hasTranslation1 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                            : ''
+                                        }
                                     </div>
                                     <h3 class="spotlight-title">${course1.title}</h3>
                                     <p class="spotlight-desc">${course1.description || ''}</p>
@@ -2217,6 +2240,10 @@
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course2.durationText}</span>
                                             <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation2 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                                : ''
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -2232,6 +2259,10 @@
                                         <div class="horizontal-course-meta">
                                             <span><i class="far fa-clock"></i> ${course3.durationText}</span>
                                             <span><i class="fas fa-tag"></i> ${course3.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation3 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                                : ''
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -2276,6 +2307,7 @@
 
                     grid.innerHTML = courses.map(course => {
                         const isFree = !course.price || course.price === 0;
+                        const hasTranslation = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(course, lang);
                         const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
                         const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                         const lessonCount = (course.lessons || []).length;
@@ -2305,6 +2337,10 @@
                             ${hasAccess 
                                 ? `<span><i class="fas fa-unlock" style="color:#16a34a;"></i> ${t('hasAccess')}</span>`
                                 : (isFree ? `<span><i class="fas fa-unlock"></i> ${t('freeAccess')}</span>` : `<span><i class="fas fa-lock"></i> ${t('paidCourse')}</span>`)
+                            }
+                            ${lang !== 'no' && !hasTranslation 
+                                ? `<span class="lang-indicator" style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'En noruego' : 'In Norwegian'}</span>` 
+                                : ''
                             }
                         </div>
                         <p>${excerpt}</p>
