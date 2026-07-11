@@ -1982,8 +1982,88 @@ class BibleReader {
         const floatBookSpan = document.getElementById('floating-nav-book');
         const floatChapSpan = document.getElementById('floating-nav-chapter');
         const currentBook = this.books.find(b => b.id === this.selectedBookId);
-        if (floatBookSpan && currentBook) floatBookSpan.innerText = currentBook.name;
+        if (floatBookSpan && currentBook) {
+            const isMobile = window.innerWidth <= 768;
+            floatBookSpan.innerText = isMobile ? this.getBookAbbreviation(currentBook.name) : currentBook.name;
+        }
         if (floatChapSpan) floatChapSpan.innerText = chapterNum;
+    }
+
+    getBookAbbreviation(bookName) {
+        if (!bookName) return '';
+        const name = bookName.toLowerCase().trim();
+        
+        // Gamle testamentet
+        if (name === '1. mosebok' || name === '1 mosebok') return '1. Mos';
+        if (name === '2. mosebok' || name === '2 mosebok') return '2. Mos';
+        if (name === '3. mosebok' || name === '3 mosebok') return '3. Mos';
+        if (name === '4. mosebok' || name === '4 mosebok') return '4. Mos';
+        if (name === '5. mosebok' || name === '5 mosebok') return '5. Mos';
+        if (name === 'josva') return 'Jos';
+        if (name === 'dommerne') return 'Dom';
+        if (name === 'rut') return 'Rut';
+        if (name === '1. samuelsbok' || name === '1 samuelsbok') return '1. Sam';
+        if (name === '2. samuelsbok' || name === '2 samuelsbok') return '2. Sam';
+        if (name === '1. kongebok' || name === '1 kongebok') return '1. Kong';
+        if (name === '2. kongebok' || name === '2 kongebok') return '2. Kong';
+        if (name === '1. krønikebok' || name === '1 krønikebok') return '1. Krøn';
+        if (name === '2. krønikebok' || name === '2 krønikebok') return '2. Krøn';
+        if (name === 'esra') return 'Esr';
+        if (name === 'nehemja') return 'Neh';
+        if (name === 'ester') return 'Est';
+        if (name === 'job') return 'Job';
+        if (name === 'salmene') return 'Sal';
+        if (name === 'salomos ordspråk' || name === 'ordspråkene') return 'Ord';
+        if (name === 'forkynneren') return 'Fork';
+        if (name === 'høysangen') return 'Høys';
+        if (name === 'jesaja') return 'Jes';
+        if (name === 'jeremia') return 'Jer';
+        if (name === 'klagesangene') return 'Klag';
+        if (name === 'esekiel') return 'Esek';
+        if (name === 'daniel') return 'Dan';
+        if (name === 'hosea') return 'Hos';
+        if (name === 'joel') return 'Joel';
+        if (name === 'amos') return 'Am';
+        if (name === 'obadja') return 'Ob';
+        if (name === 'jona') return 'Jon';
+        if (name === 'mika') return 'Mik';
+        if (name === 'nahum') return 'Nah';
+        if (name === 'habakkuk') return 'Hab';
+        if (name === 'sefanja') return 'Sef';
+        if (name === 'haggai') return 'Hag';
+        if (name === 'sakarja') return 'Sak';
+        if (name === 'malaki') return 'Mal';
+        
+        // Nye testamentet
+        if (name === 'matteus') return 'Matt';
+        if (name === 'markus') return 'Mark';
+        if (name === 'lukas') return 'Luk';
+        if (name === 'johannes') return 'Joh';
+        if (name === 'apostlenes gjerninger' || name.includes('gjerninger') || name.includes('acts')) return 'Apg';
+        if (name === 'romerne') return 'Rom';
+        if (name === '1. korinter' || name === '1. korinterbrev' || name === '1 korinter') return '1. Kor';
+        if (name === '2. korinter' || name === '2. korinterbrev' || name === '2 korinter') return '2. Kor';
+        if (name === 'galaterne') return 'Gal';
+        if (name === 'efeserne') return 'Efe';
+        if (name === 'filipperne') return 'Fil';
+        if (name === 'kolosserne') return 'Kol';
+        if (name === '1. tessaloniker' || name === '1. tessalonikerbrev' || name === '1 tessaloniker') return '1. Tess';
+        if (name === '2. tessaloniker' || name === '2. tessalonikerbrev' || name === '2 tessaloniker') return '2. Tess';
+        if (name === '1. timoteus' || name === '1. timoteusbrev' || name === '1 timoteus') return '1. Tim';
+        if (name === '2. timoteus' || name === '2. timoteusbrev' || name === '2 timoteus') return '2. Tim';
+        if (name === 'titus') return 'Tit';
+        if (name === 'filemon') return 'Filem';
+        if (name === 'hebreerne') return 'Hebr';
+        if (name === 'jakob') return 'Jak';
+        if (name === '1. peter' || name === '1 peter') return '1. Pet';
+        if (name === '2. peter' || name === '2 peter') return '2. Pet';
+        if (name === '1. johannes' || name === '1 johannes') return '1. Joh';
+        if (name === '2. johannes' || name === '2 johannes') return '2. Joh';
+        if (name === '3. johannes' || name === '3 johannes') return '3. Joh';
+        if (name === 'judas') return 'Jud';
+        if (name === 'åpenbaringen') return 'Åp';
+        
+        return bookName.length > 5 ? bookName.substring(0, 4) + '.' : bookName;
     }
 
     async navigateChapter(direction) {
