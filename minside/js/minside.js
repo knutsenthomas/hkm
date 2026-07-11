@@ -4872,13 +4872,52 @@ class MinSideManager {
                     background: rgba(241, 245, 249, 0.4) !important;
                 }
 
+                /* Layout stretching overrides */
+                .hkm-player-grid {
+                    align-items: stretch !important;
+                }
+                .hkm-player-sidebar {
+                    height: auto !important;
+                }
+                .hkm-player-sidebar > .hkm-card {
+                    height: 100% !important;
+                }
+                .hkm-sidebar-scroll {
+                    max-height: none !important;
+                    height: calc(100vh - 380px) !important;
+                    min-height: 420px !important;
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                /* Panel containers */
+                .hkm-sidebar-scroll > .sidebar-panel {
+                    flex: 1;
+                    display: none;
+                    flex-direction: column;
+                    height: 100%;
+                }
+                .hkm-sidebar-scroll > .sidebar-panel.active {
+                    display: flex;
+                }
+
                 /* Notes Editor custom overrides */
+                #panel-notes > div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                    flex: 1;
+                    height: 100%;
+                }
                 #panel-notes .rte-wrapper {
                     border: 1.5px solid #cbd5e1;
                     border-radius: 12px;
                     overflow: hidden;
                     background: #ffffff;
                     transition: border-color 0.2s, box-shadow 0.2s;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
                 }
                 #panel-notes .rte-wrapper:focus-within {
                     border-color: #d17d39;
@@ -4894,7 +4933,7 @@ class MinSideManager {
                     flex-wrap: wrap;
                 }
                 #panel-notes .rte-editor {
-                    min-height: 290px; /* Taller editor to fill the sidebar panel nicely */
+                    flex: 1;
                     font-size: 14px;
                     line-height: 1.6;
                     color: #1e293b;
@@ -4903,6 +4942,7 @@ class MinSideManager {
                     overflow-y: auto;
                     padding: 16px;
                     background: #ffffff;
+                    min-height: 200px;
                 }
                 #panel-notes .rte-btn {
                     width: 32px;
@@ -4949,12 +4989,20 @@ class MinSideManager {
                     color: #1e293b;
                     outline: none;
                 }
+                #panel-bible > div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                    flex: 1;
+                    height: 100%;
+                }
                 .hkm-bible-display {
                     background: #ffffff;
                     border: 1px solid #e2e8f0;
                     border-radius: 12px;
                     padding: 16px;
-                    height: 290px; /* Match Notes editor height for visual symmetry */
+                    flex: 1;
+                    height: auto !important;
                     overflow-y: auto;
                     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
                 }
@@ -5089,7 +5137,7 @@ class MinSideManager {
 
                 <!-- Right Side: Sidebar Navigation and Tabs -->
                 <div class="hkm-player-sidebar">
-                    <div class="hkm-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="hkm-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
                         <!-- Tabs Header -->
                         <div class="hkm-tabs-header" style="display: flex; border-bottom: 1px solid #e2e8f0;">
                             <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons" style="border-right: 1px solid #e2e8f0;">
@@ -5104,7 +5152,7 @@ class MinSideManager {
                         </div>
 
                         <!-- Tab Panels scroll wrapper -->
-                        <div class="hkm-sidebar-scroll" style="padding: 24px; max-height: 480px; overflow-y: auto;">
+                        <div class="hkm-sidebar-scroll" style="padding: 24px;">
                             <!-- Panel 1: Lessons List -->
                             <div class="sidebar-panel active" id="panel-lessons">
                                 <div class="player-lessons-list">
