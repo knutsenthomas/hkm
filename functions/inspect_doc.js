@@ -9,6 +9,39 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
+// Simple DOM Mocking for testing
+global.window = {
+  location: { href: "https://www.hiskingdomministry.no/leseplan-detaljer?id=P0goQTHeFCsRjwHrxI9m" }
+};
+global.document = {
+  documentElement: { lang: "no" },
+  body: { classList: { add: () => {}, remove: () => {} } },
+  getElementById: (id) => {
+    console.log(`[DOM Mock] getElementById: ${id}`);
+    return {
+      textContent: "",
+      style: { display: "" },
+      addEventListener: () => {},
+      appendChild: () => {},
+      closest: () => ({ querySelector: () => {} })
+    };
+  },
+  querySelector: (sel) => {
+    console.log(`[DOM Mock] querySelector: ${sel}`);
+    return {
+      style: { setProperty: () => {} },
+      textContent: ""
+    };
+  },
+  querySelectorAll: (sel) => {
+    console.log(`[DOM Mock] querySelectorAll: ${sel}`);
+    return [];
+  },
+  createElement: (tag) => {
+    return { textContent: "", innerHTML: "" };
+  }
+};
+
 async function inspectDoc() {
   try {
     const doc = await db.collection('reading_plans').doc('P0goQTHeFCsRjwHrxI9m').get();

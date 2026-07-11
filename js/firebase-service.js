@@ -25,8 +25,14 @@ class FirebaseService {
         this.isLazy = true; // Indicates Firebase is deferred to user interaction
         
         // Bypass lazy-loading if the user is already cached as logged in (public or admin) to avoid UX flicker
-        const hasPublicCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_public_user_cache');
-        const hasAdminCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_admin_identity_cache');
+        let hasPublicCache = false;
+        let hasAdminCache = false;
+        try {
+            hasPublicCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_public_user_cache');
+            hasAdminCache = typeof localStorage !== 'undefined' && localStorage.getItem('hkm_admin_identity_cache');
+        } catch (e) {
+            console.warn("[FirebaseService] localStorage access blocked in constructor:", e);
+        }
         const isAdminRoute = typeof window !== 'undefined' && (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/minside'));
         
         if (hasPublicCache || hasAdminCache || isAdminRoute) {
@@ -37,13 +43,12 @@ class FirebaseService {
     }
 
     getStoredConfig() {
-        const savedConfig = localStorage.getItem('hkm_firebase_config');
-        if (!savedConfig) return null;
-
         try {
+            const savedConfig = typeof localStorage !== 'undefined' ? localStorage.getItem('hkm_firebase_config') : null;
+            if (!savedConfig) return null;
             return JSON.parse(savedConfig);
         } catch (e) {
-            console.error("Local config error:", e);
+            console.error("Local config error or access blocked:", e);
             return null;
         }
     }

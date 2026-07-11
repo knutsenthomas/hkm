@@ -550,11 +550,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         @media (max-width: 1024px) {
             .details-container {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
                 gap: 24px;
+            }
+
+            .details-main {
+                order: 2;
+            }
+
+            .details-sidebar {
+                order: 1;
             }
 
             .sidebar-card {
@@ -1444,7 +1452,12 @@
                 }
             } catch (err) {
                 console.error("Error loading plan details:", err);
+                if (err && err.stack) {
+                    console.error(err.stack);
+                }
                 showErrorState();
+                // Asynchronously throw to bubble up to window.onerror for logging
+                setTimeout(() => { throw err; }, 0);
             }
 
             function renderPlanDetails(plan) {
