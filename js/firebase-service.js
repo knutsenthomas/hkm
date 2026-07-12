@@ -460,12 +460,21 @@ class FirebaseService {
         const sessionPersistence = firebase?.auth?.Auth?.Persistence?.SESSION;
         if (!localPersistence) return false;
 
-        this._authPersistencePromise = this.auth.setPersistence(localPersistence)
+        const persistencePromise = this.auth.setPersistence(localPersistence);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Persistence timeout")), 800)
+        );
+
+        this._authPersistencePromise = Promise.race([persistencePromise, timeoutPromise])
             .then(() => true)
             .catch((err) => {
-                console.warn("[FirebaseService] Could not enforce LOCAL auth persistence, trying SESSION:", err);
+                console.warn("[FirebaseService] LOCAL auth persistence failed or timed out, trying SESSION:", err);
                 if (sessionPersistence) {
-                    return this.auth.setPersistence(sessionPersistence)
+                    const sessionPromise = this.auth.setPersistence(sessionPersistence);
+                    const sessionTimeout = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error("Session persistence timeout")), 800)
+                    );
+                    return Promise.race([sessionPromise, sessionTimeout])
                         .then(() => true)
                         .catch(() => false);
                 }

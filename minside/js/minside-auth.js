@@ -421,25 +421,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.textContent = t('auth.openingGoogle');
         hideMessage();
 
+        // Safety timeout to reset button if it hangs (e.g., blocked popups on Safari)
+        const safetyTimeout = setTimeout(() => {
+            if (btn.disabled) {
+                btn.disabled = false;
+                btn.innerHTML = origContent;
+                showMessage(
+                    document.documentElement.lang === 'es' ? 'Si la ventana de inicio de sesión no se abre, permita las ventanas emergentes en Safari e inténtelo de nuevo.' :
+                    document.documentElement.lang === 'en' ? 'If the login window did not open, please allow popups in Safari and try again.' :
+                    'Hvis innloggingsvinduet ikke åpnet seg, vennligst tillat popups i Safari og prøv igjen.',
+                    'info'
+                );
+            }
+        }, 5000);
+
+        const clearSafety = () => clearTimeout(safetyTimeout);
+
         const service = window.firebaseService;
         if (service && service.isInitialized) {
             service.loginWithGoogle({ redirectFallback: true })
                 .then(async (result) => {
+                    clearSafety();
                     if (!result) return; // redirected
                     await ensureMemberProfile(result.user);
                     await routeByRole();
                 })
                 .catch((error) => {
+                    clearSafety();
                     handleGoogleError(error, btn, origContent);
                 });
         } else {
             waitForFirebaseReady().then(async (srv) => {
                 if (!srv || !srv.isInitialized) throw new Error("Firebase mismatch");
                 const result = await srv.loginWithGoogle({ redirectFallback: true });
+                clearSafety();
                 if (!result) return;
                 await ensureMemberProfile(result.user);
                 await routeByRole();
             }).catch((error) => {
+                clearSafety();
                 handleGoogleError(error, btn, origContent);
             });
         }
