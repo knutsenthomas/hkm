@@ -422,7 +422,12 @@ const initAdminHeader = () => {
 
         const footerItems = [];
 
-        const mainHtml = mainItems.map((item) => (
+        // Split mainItems into top-level items and categorized items
+        const topLevelItems = mainItems.filter(item => !item.header && !item.category);
+        const categorizedItems = mainItems.filter(item => item.header || item.category);
+
+        const topLevelHtml = topLevelItems.map(item => renderItem(item)).join('');
+        const categorizedHtml = categorizedItems.map((item) => (
             item.header ? renderHeader(item.header, item.label) : renderItem(item)
         )).join('');
 
@@ -438,8 +443,9 @@ const initAdminHeader = () => {
         sidebarNav.innerHTML = `
             <div class="nav-group">
                 <ul class="nav-list">
+                    ${topLevelHtml}
                     ${favHtml}
-                    ${mainHtml}
+                    ${categorizedHtml}
                 </ul>
             </div>
             <div class="nav-group bottom">
