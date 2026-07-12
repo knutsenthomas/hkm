@@ -6717,20 +6717,20 @@ class MinSideManager {
                         const progressPct = Math.round((completedDays.length / totalDays) * 100);
                         
                         return `
-                        <div class="course-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <div class="reading-plan-card-started">
                             <div class="course-body">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                     <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(209, 125, 57, 0.1); color: #d17d39; font-weight: 700;">${totalDays} dager</span>
                                     <span style="font-size: 12px; font-weight: 600; color: #d17d39;">${progressPct}% fullført</span>
                                 </div>
-                                <div class="course-title" style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${p.title}</div>
-                                <div class="course-desc" style="font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
+                                <div class="course-title">${p.title}</div>
+                                <div class="course-desc" style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
                                 
-                                <div style="height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
-                                    <div style="height: 100%; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border-radius: 99px; width: ${progressPct}%;"></div>
+                                <div class="progress-track">
+                                    <div class="progress-bar" style="width: ${progressPct}%;"></div>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 8px; padding: 0 16px 16px 16px;">
+                            <div class="card-actions">
                                 <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
                                 <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #d17d39; border-color: #d17d39;">Velg plan</button>
                             </div>
