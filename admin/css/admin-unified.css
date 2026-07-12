@@ -4959,8 +4959,8 @@ body.admin-body .nav-link:hover {
 
 body.admin-body .nav-link.active,
 body.minside-body .nav-link.active {
-  background-color: #fff7ed !important;
-  color: #f97316 !important;
+  background-color: #e8f1f5 !important;
+  color: #1b4965 !important;
   box-shadow: none !important;
   border-left: none !important;
   border-bottom: none !important;
