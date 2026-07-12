@@ -3883,7 +3883,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: 24px;
-    align-items: start;
+    align-items: stretch; /* Stretch columns to equal height */
     width: 100%;
     margin-bottom: 24px;
 }
@@ -3893,6 +3893,17 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     flex-direction: column;
     gap: 24px;
 }
+
+@media (min-width: 1025px) {
+    .notif-grid-left {
+        height: 100%;
+    }
+    .notif-grid-left .notif-settings-card {
+        height: 100%;
+        margin-bottom: 0 !important;
+    }
+}
+
 @media (max-width: 1024px) {
     .notif-grid-layout {
         grid-template-columns: 1fr;
