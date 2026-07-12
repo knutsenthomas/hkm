@@ -402,31 +402,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    const handleGoogleError = (error, btn, origContent) => {
+        console.error(error);
+        let msg = getErrorMessage(error);
+        if (error.code === 'auth/unauthorized-domain') {
+            msg = t('auth.googleUnauthorizedDomain') + ' (' + window.location.hostname + ')';
+        }
+        showMessage(msg, 'error');
+        btn.disabled = false;
+        btn.innerHTML = origContent;
+    };
+
     // --- 4. Google Login ---
-    document.getElementById('google-login').addEventListener('click', async () => {
+    document.getElementById('google-login').addEventListener('click', (e) => {
         const btn = document.getElementById('google-login');
-        btn.disabled = true;
         const origContent = btn.innerHTML;
+        btn.disabled = true;
         btn.textContent = t('auth.openingGoogle');
         hideMessage();
 
-        try {
-            const service = await waitForFirebaseReady();
-            if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
-            const result = await service.loginWithGoogle({ redirectFallback: true });
-            if (!result) return;
-
-            await ensureMemberProfile(result.user);
-            await routeByRole();
-        } catch (error) {
-            console.error(error);
-            let msg = getErrorMessage(error);
-            if (error.code === 'auth/unauthorized-domain') {
-                msg = t('auth.googleUnauthorizedDomain') + ' (' + window.location.hostname + ')';
-            }
-            showMessage(msg, 'error');
-            btn.disabled = false;
-            btn.innerHTML = origContent;
+        const service = window.firebaseService;
+        if (service && service.isInitialized) {
+            service.loginWithGoogle({ redirectFallback: true })
+                .then(async (result) => {
+                    if (!result) return; // redirected
+                    await ensureMemberProfile(result.user);
+                    await routeByRole();
+                })
+                .catch((error) => {
+                    handleGoogleError(error, btn, origContent);
+                });
+        } else {
+            waitForFirebaseReady().then(async (srv) => {
+                if (!srv || !srv.isInitialized) throw new Error("Firebase mismatch");
+                const result = await srv.loginWithGoogle({ redirectFallback: true });
+                if (!result) return;
+                await ensureMemberProfile(result.user);
+                await routeByRole();
+            }).catch((error) => {
+                handleGoogleError(error, btn, origContent);
+            });
         }
     });
 

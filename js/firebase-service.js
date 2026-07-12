@@ -457,12 +457,18 @@ class FirebaseService {
         if (this._authPersistencePromise) return this._authPersistencePromise;
 
         const localPersistence = firebase?.auth?.Auth?.Persistence?.LOCAL;
+        const sessionPersistence = firebase?.auth?.Auth?.Persistence?.SESSION;
         if (!localPersistence) return false;
 
         this._authPersistencePromise = this.auth.setPersistence(localPersistence)
             .then(() => true)
             .catch((err) => {
-                console.warn("[FirebaseService] Could not enforce LOCAL auth persistence:", err);
+                console.warn("[FirebaseService] Could not enforce LOCAL auth persistence, trying SESSION:", err);
+                if (sessionPersistence) {
+                    return this.auth.setPersistence(sessionPersistence)
+                        .then(() => true)
+                        .catch(() => false);
+                }
                 return false;
             });
 
