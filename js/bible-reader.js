@@ -553,6 +553,8 @@ class BibleReader {
             dictExtendedSection: document.getElementById('dict-extended-section'),
             dictExtendedText: document.getElementById('dict-extended-text'),
             dictExtendedTriggerWrap: document.getElementById('dict-extended-trigger-wrap'),
+            dictHistoricalSection: document.getElementById('dict-historical-section'),
+            dictHistoricalList: document.getElementById('dict-historical-list'),
             
             // Bookmarks / History sidebar
             bookmarksList: document.getElementById('bookmarks-list'),
@@ -2338,6 +2340,8 @@ class BibleReader {
         if (this.dom.dictExtendedText) this.dom.dictExtendedText.innerHTML = '';
         if (this.dom.dictExtendedBtn) this.dom.dictExtendedBtn.disabled = false;
         if (this.dom.dictExtendedBtnText) this.dom.dictExtendedBtnText.textContent = this.t('extended_btn');
+        if (this.dom.dictHistoricalSection) this.dom.dictHistoricalSection.style.display = 'none';
+        if (this.dom.dictHistoricalList) this.dom.dictHistoricalList.innerHTML = '';
 
         const dictRelatedBox = document.getElementById('dict-related-resources');
         if (dictRelatedBox) dictRelatedBox.innerHTML = '';
@@ -2438,6 +2442,47 @@ class BibleReader {
                 }
             }
 
+            // Render historical commentaries
+            if (this.dom.dictHistoricalSection && this.dom.dictHistoricalList) {
+                if (dictRes.historicalCommentaries && dictRes.historicalCommentaries.length > 0) {
+                    this.dom.dictHistoricalList.innerHTML = dictRes.historicalCommentaries.map(c => `
+                        <div class="dict-commentary-card" style="padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; line-height: 1.6; color: var(--text-base); transition: all 0.2s; box-sizing: border-box; width: 100%;">
+                            <div style="font-weight: 700; color: var(--bible-primary); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                                <span>${c.author}</span>
+                                <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 400;">${c.sourceTitle}</span>
+                            </div>
+                            <div style="font-style: italic; color: var(--text-base); font-size: 12.5px;">"${c.quote}"</div>
+                            ${c.sourceUrl ? `
+                            <div style="margin-top: 8px; text-align: right;">
+                                <a href="${c.sourceUrl}" target="_blank" style="font-size: 11px; color: var(--bible-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 2px;">
+                                    Les kilde <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
+                                </a>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+
+                    // Add premium micro-interactions
+                    const cards = this.dom.dictHistoricalList.querySelectorAll('.dict-commentary-card');
+                    cards.forEach(card => {
+                        card.addEventListener('mouseenter', () => {
+                            card.style.borderColor = 'var(--bible-primary)';
+                            card.style.transform = 'translateY(-1px)';
+                            card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.borderColor = 'var(--border-color)';
+                            card.style.transform = 'none';
+                            card.style.boxShadow = 'none';
+                        });
+                    });
+
+                    this.dom.dictHistoricalSection.style.display = 'block';
+                } else {
+                    this.dom.dictHistoricalSection.style.display = 'none';
+                }
+            }
+
             // Render related resources
             if (dictRelatedBox) {
                 if (resources.length === 0) {
@@ -2453,6 +2498,9 @@ class BibleReader {
             }
             if (this.dom.dictOriginalWordsSection) {
                 this.dom.dictOriginalWordsSection.style.display = 'none';
+            }
+            if (this.dom.dictHistoricalSection) {
+                this.dom.dictHistoricalSection.style.display = 'none';
             }
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';

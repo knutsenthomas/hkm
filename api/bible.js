@@ -2,6 +2,243 @@ import { GoogleGenAI, Type } from "@google/genai";
 import fs from 'fs';
 import path from 'path';
 
+// Translation map of Norwegian/Spanish book names and abbreviations to English canonical names
+const bookTranslationMap = {
+  // Norwegian to English
+  "1. mosebok": "Genesis", "1 mosebok": "Genesis", "genesis": "Genesis",
+  "2. mosebok": "Exodus", "2 mosebok": "Exodus", "exodus": "Exodus",
+  "3. mosebok": "Leviticus", "3 mosebok": "Leviticus", "leviticus": "Leviticus",
+  "4. mosebok": "Numbers", "4 mosebok": "Numbers", "numbers": "Numbers",
+  "5. mosebok": "Deuteronomy", "5 mosebok": "Deuteronomy", "deuteronomy": "Deuteronomy",
+  "josva": "Joshua", "joshua": "Joshua",
+  "dommerne": "Judges", "judges": "Judges",
+  "rut": "Ruth", "ruth": "Ruth",
+  "1. samuelsbok": "1 Samuel", "1 samuelsbok": "1 Samuel", "1 samuel": "1 Samuel",
+  "2. samuelsbok": "2 Samuel", "2 samuelsbok": "2 Samuel", "2 samuel": "2 Samuel",
+  "1. kongebok": "1 Kings", "1 kongebok": "1 Kings", "1 kings": "1 Kings",
+  "2. kongebok": "2 Kings", "2 kongebok": "2 Kings", "2 kings": "2 Kings",
+  "1. krønikebok": "1 Chronicles", "1 krønikebok": "1 Chronicles", "1 chronicles": "1 Chronicles",
+  "2. krønikebok": "2 Chronicles", "2 krønikebok": "2 Chronicles", "2 chronicles": "2 Chronicles",
+  "esra": "Ezra", "ezra": "Ezra",
+  "nehemja": "Nehemiah", "nehemia": "Nehemiah", "nehemiah": "Nehemiah",
+  "ester": "Esther", "esther": "Esther",
+  "job": "Job",
+  "salmene": "Psalms", "salme": "Psalms", "psalms": "Psalms",
+  "ordspråkene": "Proverbs", "ordspråk": "Proverbs", "proverbs": "Proverbs",
+  "forkynneren": "Ecclesiastes", "ecclesiastes": "Ecclesiastes",
+  "høysangen": "Song of Solomon", "song of solomon": "Song of Solomon",
+  "jesaja": "Isaiah", "isaiah": "Isaiah",
+  "jeremia": "Jeremiah", "jeremiah": "Jeremiah",
+  "klagesangene": "Lamentations", "lamentations": "Lamentations",
+  "esekiel": "Ezekiel", "ezekiel": "Ezekiel",
+  "daniel": "Daniel",
+  "hosea": "Hosea",
+  "joel": "Joel",
+  "amos": "Amos",
+  "obadja": "Obadiah", "obadja": "Obadiah",
+  "jona": "Jonah", "jonah": "Jonah",
+  "mika": "Micah", "micah": "Micah",
+  "nahum": "Nahum",
+  "habakkuk": "Habakkuk",
+  "sefanja": "Zephaniah", "zephaniah": "Zephaniah",
+  "haggai": "Haggai",
+  "sakarja": "Zechariah", "zechariah": "Zechariah",
+  "malaki": "Malachi", "malachi": "Malachi",
+  
+  "matteus": "Matthew", "matthew": "Matthew",
+  "markus": "Mark", "mark": "Mark",
+  "lukas": "Luke", "luke": "Luke",
+  "johannes": "John", "john": "John",
+  "apostlenes gjerninger": "Acts", "acts": "Acts",
+  "romerne": "Romans", "romans": "Romans",
+  "1. korinterne": "1 Corinthians", "1 korinterne": "1 Corinthians", "1 corinthians": "1 Corinthians",
+  "2. korinterne": "2 Corinthians", "2 korinterne": "2 Corinthians", "2 corinthians": "2 Corinthians",
+  "galaterne": "Galatians", "galatians": "Galatians",
+  "efeserne": "Ephesians", "ephesians": "Ephesians",
+  "filipperne": "Philippians", "philippians": "Philippians",
+  "kolosserne": "Colossians", "colossians": "Colossians",
+  "1. tessalonikerne": "1 Thessalonians", "1 tessalonikerne": "1 Thessalonians", "1 thessalonians": "1 Thessalonians",
+  "2. tessalonikerne": "2 Thessalonians", "2 tessalonikerne": "2 Thessalonians", "2 thessalonians": "2 Thessalonians",
+  "1. timoteus": "1 Timothy", "1 timoteus": "1 Timothy", "1 timothy": "1 Timothy",
+  "2. timoteus": "2 Timothy", "2 timoteus": "2 Timothy", "2 timothy": "2 Timothy",
+  "titus": "Titus",
+  "filemon": "Philemon", "philemon": "Philemon",
+  "hebreerne": "Hebrews", "hebrews": "Hebrews",
+  "jakob": "James", "james": "James",
+  "1. peter": "1 Peter", "1 peter": "1 Peter",
+  "2. peter": "2 Peter", "2 peter": "2 Peter",
+  "1. johannes": "1 John", "1 johannes": "1 John", "1 john": "1 John",
+  "2. johannes": "2 John", "2 johannes": "2 John", "2 john": "2 John",
+  "3. johannes": "3 John", "3 johannes": "3 John", "3 john": "3 John",
+  "judas": "Jude", "jude": "Jude",
+  "åpenbaringen": "Revelation", "revelation": "Revelation",
+
+  // Spanish to English
+  "génesis": "Genesis", "éxodo": "Exodus", "levítico": "Leviticus", "números": "Numbers", "deuteronomio": "Deuteronomy",
+  "josué": "Joshua", "jueces": "Judges", "rut": "Ruth", "1 samuel": "1 Samuel", "2 samuel": "2 Samuel",
+  "1 reyes": "1 Kings", "2 reyes": "2 Kings", "1 crónicas": "1 Chronicles", "2 crónicas": "2 Chronicles",
+  "esdras": "Esdras", "nehemías": "Nehemiah", "ester": "Esther", "job": "Job", "salmos": "Psalms",
+  "proverbios": "Proverbs", "eclesiastés": "Ecclesiastes", "cantar de los cantares": "Song of Solomon",
+  "isaías": "Isaiah", "jeremías": "Jeremiah", "lamentaciones": "Lamentations", "ezequiel": "Ezekiel",
+  "daniel": "Daniel", "oseas": "Hosea", "joel": "Joel", "amós": "Amos", "abdías": "Obadiah",
+  "jonás": "Jonah", "miqueas": "Micah", "nahúm": "Nahum", "habacuc": "Habakkuk", "sofonías": "Zephaniah",
+  "hageo": "Haggai", "zacarías": "Zechariah", "malaquías": "Malachi",
+  
+  "mateo": "Matthew", "marcos": "Mark", "lucas": "Luke", "juan": "John", "hechos": "Acts",
+  "romanos": "Romans", "1 corintios": "1 Corinthians", "2 corintios": "2 Corinthians",
+  "gálatas": "Galatians", "efesios": "Ephesians", "filipenses": "Philippians", "colosenses": "Colossians",
+  "1 tesalonicenses": "1 Thessalonians", "2 tesalonicenses": "2 Thessalonians",
+  "1 timoteo": "1 Timothy", "2 timoteo": "2 Timothy", "tito": "Titus", "filemón": "Philemon",
+  "hebreos": "Hebrews", "santiago": "James", "1 pedro": "1 Peter", "2 pedro": "2 Peter",
+  "1 juan": "1 John", "2 juan": "2 John", "3 juan": "3 John", "judas": "Jude", "apocalipsis": "Revelation",
+
+  // Abbreviations
+  "matt": "Matthew", "mat": "Matthew", "mr": "Mark", "mk": "Mark", "lu": "Luke", "lk": "Luke",
+  "joh": "John", "jn": "John", "act": "Acts", "ac": "Acts", "rom": "Romans", "ro": "Romans",
+  "1 kor": "1 Corinthians", "2 kor": "2 Corinthians", "gal": "Galatians", "ef": "Ephesians",
+  "fil": "Philippians", "kol": "Colossians", "1 tes": "1 Thessalonians", "2 tes": "2 Thessalonians",
+  "1 tim": "1 Timothy", "2 tim": "2 Timothy", "tit": "Titus", "ti": "Titus", "filem": "Philemon",
+  "heb": "Hebrews", "jak": "James", "jas": "James", "1 pet": "1 Peter", "2 pet": "2 Peter",
+  "1 joh": "1 John", "2 joh": "2 John", "3 joh": "3 John", "jud": "Jude", "åp": "Revelation", "rev": "Revelation",
+  "1. kor": "1 Corinthians", "2. kor": "2 Corinthians", "1. tes": "1 Thessalonians", "2. tes": "2 Thessalonians",
+  "1. tim": "1 Timothy", "2. tim": "2 Timothy", "1. pet": "1 Peter", "2. pet": "2 Peter",
+  "1. joh": "1 John", "2. joh": "2 John", "3. joh": "3 John",
+  
+  "1. mos": "Genesis", "2. mos": "Exodus", "3. mos": "Leviticus", "4. mos": "Numbers", "5. mos": "Deuteronomy",
+  "1 mos": "Genesis", "2 mos": "Exodus", "3 mos": "Leviticus", "4 mos": "Numbers", "5 mos": "Deuteronomy",
+  "gen": "Genesis", "ex": "Exodus", "lev": "Leviticus", "num": "Numbers", "deu": "Deuteronomy",
+  "jos": "Joshua", "josh": "Joshua", "dom": "Judges", "judg": "Judges",
+  "1. sam": "1 Samuel", "2. sam": "2 Samuel", "1 sam": "1 Samuel", "2 sam": "2 Samuel",
+  "1. kon": "1 Kings", "2. kon": "2 Kings", "1 kon": "1 Kings", "2 kon": "2 Kings",
+  "1. krø": "1 Chronicles", "2. krø": "2 Chronicles", "1 krø": "1 Chronicles", "2 krø": "2 Chronicles",
+  "esr": "Ezra", "neh": "Nehemiah", "est": "Esther", "ps": "Psalms", "sal": "Psalms", "salm": "Psalms",
+  "ord": "Proverbs", "prov": "Proverbs", "for": "Ecclesiastes", "ecc": "Ecclesiastes",
+  "høy": "Song of Solomon", "jes": "Isaiah", "isa": "Isaiah", "jer": "Jeremiah", "kla": "Lamentations",
+  "lam": "Lamentations", "ese": "Ezekiel", "ezk": "Ezekiel", "dan": "Daniel", "hos": "Hosea",
+  "joe": "Joel", "am": "Amos", "ob": "Obadiah", "jon": "Jonah", "mik": "Micah", "mic": "Micah",
+  "nah": "Nahum", "hab": "Habakkuk", "sef": "Zephaniah", "zep": "Zephaniah", "hag": "Haggai",
+  "sak": "Zechariah", "zec": "Zechariah", "mal": "Malachi"
+};
+
+function parseReference(refStr) {
+  if (!refStr) return null;
+  const regex = /^([\d\.\s]*[^\d\s\:]+)\s+(\d+)[\:_](\d+)(?:-(\d+))?$/;
+  const match = refStr.trim().match(regex);
+  if (!match) return null;
+  return {
+    book: match[1].trim(),
+    chapter: parseInt(match[2], 10),
+    startVerse: parseInt(match[3], 10),
+    endVerse: match[4] ? parseInt(match[4], 10) : parseInt(match[3], 10)
+  };
+}
+
+function parseCommentaryToml(tomlText) {
+  const commentaries = [];
+  const sections = tomlText.split(/\[\[commentary\]\]/i);
+  
+  for (let i = 1; i < sections.length; i++) {
+    const section = sections[i];
+    
+    let quote = '';
+    const quoteMatch = section.match(/quote\s*=\s*(['"]{3})([\s\S]*?)\1/);
+    if (quoteMatch) {
+      quote = quoteMatch[2].trim();
+    } else {
+      const singleQuoteMatch = section.match(/quote\s*=\s*['"]([\s\S]*?)['"]/);
+      if (singleQuoteMatch) {
+        quote = singleQuoteMatch[1].trim();
+      }
+    }
+    
+    let sourceTitle = '';
+    const sourceTitleMatch = section.match(/source_title\s*=\s*['"]([\s\S]*?)['"]/);
+    if (sourceTitleMatch) {
+      sourceTitle = sourceTitleMatch[1].trim();
+    }
+    
+    let sourceUrl = '';
+    const sourceUrlMatch = section.match(/source_url\s*=\s*['"]([\s\S]*?)['"]/);
+    if (sourceUrlMatch) {
+      sourceUrl = sourceUrlMatch[1].trim();
+    }
+
+    let appendAuthor = '';
+    const appendAuthorMatch = section.match(/append_to_author_name\s*=\s*['"]([\s\S]*?)['"]/);
+    if (appendAuthorMatch) {
+      appendAuthor = appendAuthorMatch[1].trim();
+    }
+    
+    if (quote) {
+      commentaries.push({
+        quote,
+        sourceTitle,
+        sourceUrl,
+        appendAuthor
+      });
+    }
+  }
+  
+  return commentaries;
+}
+
+async function getHistoricalCommentaries(refStr) {
+  const parsedRef = parseReference(refStr);
+  if (!parsedRef) return [];
+  
+  const canonicalBook = bookTranslationMap[parsedRef.book.toLowerCase()];
+  if (!canonicalBook) return [];
+  
+  const safeBookName = canonicalBook.replace(/ /g, "_");
+  const indexPath = path.join(process.cwd(), 'api', 'commentaries-index', `${safeBookName}.json`);
+  if (!fs.existsSync(indexPath)) return [];
+  
+  try {
+    const bookIndexData = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+    const chapterEntries = bookIndexData[String(parsedRef.chapter)] || [];
+    
+    const matchingEntries = chapterEntries.filter(entry => {
+      if (entry.sc === entry.ec) {
+        return entry.sc === parsedRef.chapter && parsedRef.startVerse >= entry.sv && parsedRef.startVerse <= entry.ev;
+      } else {
+        const qch = parsedRef.chapter;
+        const qv = parsedRef.startVerse;
+        return (qch === entry.sc && qv >= entry.sv) ||
+               (qch === entry.ec && qv <= entry.ev) ||
+               (qch > entry.sc && qch < entry.ec);
+      }
+    });
+    
+    if (matchingEntries.length === 0) return [];
+    
+    const fetchedCommentaries = await Promise.all(
+      matchingEntries.map(async (entry) => {
+        try {
+          const url = `https://raw.githubusercontent.com/HistoricalChristianFaith/Commentaries-Database/master/${encodeURIComponent(entry.p)}`;
+          const response = await fetch(url);
+          if (!response.ok) return [];
+          const tomlText = await response.text();
+          const parsed = parseCommentaryToml(tomlText);
+          return parsed.map(c => ({
+            author: entry.a + (c.appendAuthor || ''),
+            quote: c.quote,
+            sourceTitle: c.sourceTitle || 'Historical Commentary',
+            sourceUrl: c.sourceUrl || ''
+          }));
+        } catch (fetchErr) {
+          console.warn(`Failed to fetch/parse commentary for ${entry.p}:`, fetchErr.message);
+          return [];
+        }
+      })
+    );
+    
+    return fetchedCommentaries.flat();
+  } catch (err) {
+    console.error(`Error reading commentaries index for ${safeBookName}:`, err);
+    return [];
+  }
+}
+
 const OPENBIBLE_NB_FOLDERS = [
   "01.1 Mosebok",
   "02.2 Mosebok",
@@ -400,10 +637,12 @@ export default async function handler(req, res) {
         }
       };
 
+      let responseData = null;
+
       if (lang === 'no' && !extended) {
         const fallbackEntry = fallbackDict[cleanWord];
         if (fallbackEntry) {
-          return res.status(200).json({
+          responseData = {
             word: word,
             definition: fallbackEntry.definition,
             category: fallbackEntry.category,
@@ -411,42 +650,42 @@ export default async function handler(req, res) {
             originalWords: [],
             crossReferences: fallbackEntry.crossReferences || [],
             extendedAnalysis: ""
-          });
+          };
         }
       }
 
-      // Check Firestore Cache first with separated cache keys
-      const cacheKey = extended ? `${cleanWord}_extended` : cleanWord;
-      const cached = await getCachedDefinition(lang, cacheKey);
-      if (cached) {
-        return res.status(200).json(cached);
-      }
+      if (!responseData) {
+        // Check Firestore Cache first with separated cache keys
+        const cacheKey = extended ? `${cleanWord}_extended` : cleanWord;
+        const cached = await getCachedDefinition(lang, cacheKey);
+        if (cached) {
+          responseData = cached;
+        } else {
+          // Set up languages instructions
+          let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
+          let rejectCategory = "Ikke bibelrelatert";
+          let rejectDefinition = "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie.";
+          let rejectNote = "Søk avvist pga. manglende teologisk eller bibelsk relevans.";
 
-      // Set up languages instructions
-      let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
-      let rejectCategory = "Ikke bibelrelatert";
-      let rejectDefinition = "Søket fraviker fra bibelrelaterte emner. Denne AI-ordboken er reservert for bibelstudie og tillater kun søk etter konsepter eller ord relatert til Bibelen, kristen teologi, tro, kirkehistorie eller bibelsk geografi/historie.";
-      let rejectNote = "Søk avvist pga. manglende teologisk eller bibelsk relevans.";
+          if (lang === 'en') {
+            responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
+            rejectCategory = "Not Bible-related";
+            rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
+            rejectNote = "Search rejected due to lack of theological or biblical relevance.";
+          } else if (lang === 'es') {
+            responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
+            rejectCategory = "No relacionado con la Biblia";
+            rejectDefinition = "La búsqueda se desvía de los temas relacionados con la Biblia. Este diccionario de IA está reservado para el estudio de la Biblia y solo permite búsquedas de conceptos o palabras relacionadas con la Biblia, la teología cristiana, la fe, la historia de la iglesia o la geografía/historia bíblica.";
+            rejectNote = "Búsqueda rechazada debido a la falta de relevancia teológica o bíblica.";
+          }
 
-      if (lang === 'en') {
-        responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
-        rejectCategory = "Not Bible-related";
-        rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
-        rejectNote = "Search rejected due to lack of theological or biblical relevance.";
-      } else if (lang === 'es') {
-        responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
-        rejectCategory = "No relacionado con la Biblia";
-        rejectDefinition = "La búsqueda se desvía de los temas relacionados con la Biblia. Este diccionario de IA está reservado para el estudio de la Biblia y solo permite búsquedas de conceptos o palabras relacionadas con la Biblia, la teología cristiana, la fe, la historia de la iglesia o la geografía/historia bíblica.";
-        rejectNote = "Búsqueda rechazada debido a la falta de relevancia teológica o bíblica.";
-      }
+          const geminiApiKey = process.env.GEMINI_API_KEY;
 
-      const geminiApiKey = process.env.GEMINI_API_KEY;
+          if (geminiApiKey) {
+            try {
+              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-      if (geminiApiKey) {
-        try {
-          const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-
-          const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
+              const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
 ${responseLangInstruction}
 
 Vurder først ekstremt nøye om søkeordet eller emnet "${word}" har relevans til Bibelen, kristen teologi, kristendom, kirkehistorie, bibelhistorie, religiøse retninger, bønner eller jødisk-kristne bibelske kontekster/historier.
@@ -492,105 +731,119 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   ]
 }`;
 
-          const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-            config: {
-              responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  word: { type: Type.STRING },
-                  definition: { type: Type.STRING },
-                  category: { type: Type.STRING },
-                  contextualNote: { type: Type.STRING },
-                  extendedAnalysis: { type: Type.STRING },
-                  originalWords: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        word: { type: Type.STRING },
-                        transliteration: { type: Type.STRING },
-                        pronunciation: { type: Type.STRING },
-                        language: { type: Type.STRING },
-                        meaning: { type: Type.STRING }
+              const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt,
+                config: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                      word: { type: Type.STRING },
+                      definition: { type: Type.STRING },
+                      category: { type: Type.STRING },
+                      contextualNote: { type: Type.STRING },
+                      extendedAnalysis: { type: Type.STRING },
+                      originalWords: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            word: { type: Type.STRING },
+                            transliteration: { type: Type.STRING },
+                            pronunciation: { type: Type.STRING },
+                            language: { type: Type.STRING },
+                            meaning: { type: Type.STRING }
+                          },
+                          required: ["word", "transliteration", "pronunciation", "language", "meaning"]
+                        }
                       },
-                      required: ["word", "transliteration", "pronunciation", "language", "meaning"]
-                    }
-                  },
-                  crossReferences: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        ref: { type: Type.STRING },
-                        text: { type: Type.STRING }
-                      },
-                      required: ["ref", "text"]
-                    }
+                      crossReferences: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            ref: { type: Type.STRING },
+                            text: { type: Type.STRING }
+                          },
+                          required: ["ref", "text"]
+                        }
+                      }
+                    },
+                    required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
                   }
-                },
-                required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
+                }
+              });
+
+              if (response.text) {
+                responseData = JSON.parse(response.text);
+                await setCachedDefinition(lang, cacheKey, responseData);
               }
+            } catch (aiErr) {
+              console.error("Gemini/Firestore integration failed:", aiErr);
             }
-          });
-
-          let responseData = null;
-          if (response.text) {
-            responseData = JSON.parse(response.text);
           }
-
-          if (responseData) {
-            // Save to Firestore Cache with separated cache keys
-            await setCachedDefinition(lang, cacheKey, responseData);
-            return res.status(200).json(responseData);
-          }
-        } catch (aiErr) {
-          console.error("Gemini/Firestore integration failed:", aiErr);
         }
       }
 
-      // No API key or AI lookup failed. Let's do a fallback direct English matching.
-      let directEntry = null;
-      const letter = cleanWord.charAt(0).toLowerCase();
-      if (letter >= 'a' && letter <= 'z') {
+      if (!responseData) {
+        // No API key or AI lookup failed. Let's do a fallback direct English matching.
+        let directEntry = null;
+        const letter = cleanWord.charAt(0).toLowerCase();
+        if (letter >= 'a' && letter <= 'z') {
+          try {
+            const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
+            if (fs.existsSync(dataPath)) {
+              const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+              const upperWord = cleanWord.toUpperCase();
+              directEntry = fileData[upperWord];
+              if (!directEntry) {
+                const foundKey = Object.keys(fileData).find(k => k.toLowerCase() === cleanWord || fileData[k].slug === cleanWord);
+                if (foundKey) {
+                  directEntry = fileData[foundKey];
+                }
+              }
+            }
+          } catch (err) {
+            console.error("Error loading offline direct dictionary file:", err);
+          }
+        }
+
+        if (directEntry) {
+          responseData = {
+            word: directEntry.name,
+            definition: directEntry.definitions.map(d => `[${d.source}] ${d.text}`).join('\n\n'),
+            category: "Easton/Smith Dictionary",
+            contextualNote: `Source: ${directEntry.sources.join(', ')}`,
+            originalWords: [],
+            crossReferences: directEntry.scripture_refs ? directEntry.scripture_refs.map(r => ({ ref: r.reference, text: "Bibelreferanse fra ordboken." })) : [],
+            extendedAnalysis: ""
+          };
+        } else {
+          responseData = {
+            word,
+            definition: `Ingen forhåndsdefinert forklaring funnet for "${word}". Legg til en Gemini API-nøkkel på serveren for å aktivere full AI-ordbok.`,
+            category: "Ordbok",
+            contextualNote: "Søk uten treff.",
+            crossReferences: [],
+            originalWords: [],
+            extendedAnalysis: ""
+          };
+        }
+      }
+
+      // NOW: if it's a verse lookup, enrich it with historical commentaries!
+      const finalRef = scriptureRef || (parseReference(word) ? word : '');
+      if (finalRef) {
         try {
-          const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
-          if (fs.existsSync(dataPath)) {
-            const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-            const upperWord = cleanWord.toUpperCase();
-            directEntry = fileData[upperWord];
-            if (!directEntry) {
-              const foundKey = Object.keys(fileData).find(k => k.toLowerCase() === cleanWord || fileData[k].slug === cleanWord);
-              if (foundKey) {
-                directEntry = fileData[foundKey];
-              }
-            }
-          }
-        } catch (err) {
-          console.error("Error loading offline direct dictionary file:", err);
+          const historicalCommentaries = await getHistoricalCommentaries(finalRef);
+          responseData.historicalCommentaries = historicalCommentaries;
+        } catch (commErr) {
+          console.error("Error retrieving historical commentaries:", commErr);
         }
       }
 
-      if (directEntry) {
-        return res.status(200).json({
-          word: directEntry.name,
-          definition: directEntry.definitions.map(d => `[${d.source}] ${d.text}`).join('\n\n'),
-          category: "Easton/Smith Dictionary",
-          contextualNote: `Source: ${directEntry.sources.join(', ')}`,
-          originalWords: [],
-          crossReferences: directEntry.scripture_refs ? directEntry.scripture_refs.map(r => ({ ref: r.reference, text: "Bibelreferanse fra ordboken." })) : []
-        });
-      }
-
-      return res.status(200).json({
-        word,
-        definition: `Ingen forhåndsdefinert forklaring funnet for "${word}". Legg til en Gemini API-nøkkel på serveren for å aktivere full AI-ordbok.`,
-        category: "Ordbok",
-        contextualNote: "Søk uten treff.",
-        crossReferences: []
-      });
+      return res.status(200).json(responseData);
     }
 
     // 2b. GET /api/bible/cross-references
