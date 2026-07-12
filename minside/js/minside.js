@@ -1320,77 +1320,8 @@ class MinSideManager {
         document.getElementById('sidebar-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
 
         // Dynamically inject Dagens andakt shortcut button before the profile link if missing
-        const profileLink = document.querySelector('.user-profile-link');
-        let devBtn = document.getElementById('header-today-devotional-btn');
-        if (!devBtn && profileLink) {
-            // Inject style tag if not present
-            let devStyle = document.getElementById('header-today-devotional-btn-style');
-            if (!devStyle) {
-                devStyle = document.createElement('style');
-                devStyle.id = 'header-today-devotional-btn-style';
-                devStyle.innerHTML = `
-                    #header-today-devotional-btn {
-                        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-                        background: rgba(255, 255, 255, 0.08) !important;
-                        color: #ffffff !important;
-                        transition: all 0.3s ease !important;
-                        flex-shrink: 0 !important;
-                        display: inline-flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        margin-right: 12px !important;
-                    }
-                    #header-today-devotional-btn:hover {
-                        background: rgba(255, 255, 255, 0.2) !important;
-                        transform: scale(1.05) !important;
-                    }
-                    #header-today-devotional-btn:active {
-                        transform: scale(0.95) !important;
-                    }
-                    .header.scrolled #header-today-devotional-btn,
-                    .header.menu-open #header-today-devotional-btn,
-                    body:not(.header-dark-start) .header #header-today-devotional-btn,
-                    .main-header #header-today-devotional-btn {
-                        border-color: rgba(0, 0, 0, 0.08) !important;
-                        background: rgba(0, 0, 0, 0.03) !important;
-                        color: #1B4965 !important;
-                    }
-
-                    .header.scrolled #header-today-devotional-btn:hover,
-                    .header.menu-open #header-today-devotional-btn:hover,
-                    body:not(.header-dark-start) .header #header-today-devotional-btn:hover,
-                    .main-header #header-today-devotional-btn:hover {
-                        background: rgba(0, 0, 0, 0.08) !important;
-                    }
-                    html[data-theme="dark"] #header-today-devotional-btn {
-                        border-color: rgba(255, 255, 255, 0.1) !important;
-                        background: rgba(255, 255, 255, 0.05) !important;
-                        color: #f1f5f9 !important;
-                    }
-                    html[data-theme="dark"] #header-today-devotional-btn:hover {
-                        background: rgba(255, 255, 255, 0.12) !important;
-                    }
-                    @media (min-width: 992px) {
-                        #header-today-devotional-btn {
-                            display: none !important;
-                        }
-                    }
-
-                `;
-                document.head.appendChild(devStyle);
-            }
-
-            devBtn = document.createElement('a');
-            devBtn.id = 'header-today-devotional-btn';
-            devBtn.className = 'w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden';
-            
-            const lang = document.documentElement.lang || 'no';
-            const label = lang.startsWith('en') ? "Today's Devotional" : (lang.startsWith('es') ? 'Devocional de hoy' : 'Dagens andakt');
-            devBtn.setAttribute('aria-label', label);
-            devBtn.setAttribute('title', label);
-            devBtn.innerHTML = '<span class="material-symbols-outlined text-xl" style="font-variation-settings: \'FILL\' 1;">auto_stories</span>';
-            profileLink.parentNode.insertBefore(devBtn, profileLink);
-        }
+        // DISABLED: Shortcut button removed as per user request
+        let devBtn = null;
 
         // Check cache first for instant render
         try {
