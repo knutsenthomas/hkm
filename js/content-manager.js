@@ -1238,13 +1238,19 @@ class ContentManager {
 
         const lang = this.getCurrentLanguage();
         let defaultLabel = 'Generell gave (der det trengs mest)';
+        let basarLabel = 'Basar';
         if (lang === 'en') {
             defaultLabel = 'General donation (where it is needed most)';
+            basarLabel = 'Bazaar';
         } else if (lang === 'es') {
             defaultLabel = 'Donación general (donde más se necesite)';
+            basarLabel = 'Bazar';
         }
 
-        selectEl.innerHTML = `<option value="general">${defaultLabel}</option>`;
+        selectEl.innerHTML = `
+            <option value="general">${defaultLabel}</option>
+            <option value="basar">${basarLabel}</option>
+        `;
 
         if (causes && Array.isArray(causes)) {
             causes.forEach(cause => {
