@@ -683,8 +683,18 @@ const initAdminHeader = () => {
         categoryHeaders.forEach(header => {
             const cat = header.getAttribute('data-target-category');
             
-            // All categories are open as standard on page load
-            setCategory(cat, true);
+            // Check if this category contains the active section on load
+            const activeLink = document.querySelector('.nav-link.active[data-section]');
+            const activeSection = activeLink?.getAttribute('data-section') || window.location.hash.substring(1) || sessionStorage.getItem('hkm_admin_last_dashboard_section') || 'overview';
+            const matchingNavItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${activeSection}"]`);
+            const activeCat = matchingNavItem?.closest('.nav-item')?.getAttribute('data-nav-category');
+
+            let shouldBeOpen = (cat === 'kommunikasjon'); // default: only Kommunikasjon open
+            if (activeCat) {
+                shouldBeOpen = (cat === activeCat);
+            }
+            
+            setCategory(cat, shouldBeOpen);
 
             // Use direct onclick to ensure it's not blocked by other listeners
             header.onclick = (e) => {
@@ -692,6 +702,18 @@ const initAdminHeader = () => {
                 const currentlyCollapsed = header.classList.contains('collapsed');
                 setCategory(cat, currentlyCollapsed);
             };
+        });
+
+        // Auto-expand category on section switch (hashchange)
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const navItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${hash}"]`);
+                const cat = navItem?.closest('.nav-item')?.getAttribute('data-nav-category');
+                if (cat) {
+                    setCategory(cat, true);
+                }
+            }
         });
     };
 
