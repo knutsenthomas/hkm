@@ -4145,6 +4145,110 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     transform: rotate(0deg) translateZ(0) !important;
 }
 
+/* Premium Course Card Layout */
+.course-card-premium {
+    background: var(--card-bg) !important;
+    border-radius: 24px !important; /* Premium rounded corner radius */
+    border: 1px solid var(--border-solid) !important;
+    box-shadow: var(--shadow) !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease !important;
+}
+.course-card-premium:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Course Thumbnail image wrapper */
+.course-card-premium .course-thumbnail {
+    width: 120px !important;
+    height: 72px !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    background: var(--main-bg);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease !important;
+}
+.course-card-premium:hover .course-thumbnail {
+    transform: scale(1.03) !important;
+}
+
+/* Category pill tag */
+.course-category-tag {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: var(--accent-color) !important;
+    background: var(--accent-light) !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    display: inline-block;
+    margin-bottom: 6px;
+    line-height: 1.4 !important;
+}
+
+/* Lesson Accordion Header */
+.course-lessons-accordion {
+    background: var(--main-bg) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+/* Lesson cards list row */
+.course-lesson-row {
+    background: var(--card-bg) !important;
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+    border: 1px solid var(--border-solid) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02) !important;
+}
+.course-lesson-row:hover {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Lesson index circle badge */
+.lesson-index-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(27, 73, 101, 0.08);
+    color: #1B4965;
+    font-size: 0.78rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: background-color 0.25s ease, color 0.25s ease !important;
+}
+.course-lesson-row:hover .lesson-index-badge {
+    background: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+/* Lesson buttons hovers */
+.course-lesson-row .btn-primary {
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.course-lesson-row .btn-primary:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25) !important;
+}
+
 /* Global Centering Safety Override for Material Symbols Outlined */
 .material-symbols-outlined {
     display: inline-flex !important;

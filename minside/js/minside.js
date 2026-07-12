@@ -4352,31 +4352,31 @@ class MinSideManager {
                 const courseLessons = c.lessons || [];
                 
                 return `
-                <div class="course-card-premium" style="background:white; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 4px 20px rgba(0,0,0,0.03); overflow:hidden; display:flex; flex-direction:column;">
-                    <div style="display:flex; gap:20px; padding:20px; border-bottom:1px solid #f1f5f9; align-items:center; flex-wrap:wrap;">
-                        <div style="width:100px; height:60px; border-radius:10px; overflow:hidden; background:#f1f5f9; flex-shrink:0;">
+                <div class="course-card-premium">
+                    <div style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap;">
+                        <div class="course-thumbnail">
                             ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
                         </div>
                         <div style="flex:1; min-width:200px;">
-                            <span style="font-size:0.75rem; font-weight:700; color:#d17d39; text-transform:uppercase; letter-spacing:0.05em;">${c.category || 'Generelt'}</span>
-                            <h3 style="font-size:1.2rem; font-weight:750; color:#1e293b; margin:2px 0 4px;">${c.title || t('courses.untitled')}</h3>
-                            <p style="font-size:0.88rem; color:#64748b; margin:0;">${c.excerpt || c.intro || ''}</p>
+                            <span class="course-category-tag">${c.category || 'Generelt'}</span>
+                            <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
+                            <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
                         </div>
                     </div>
                     
-                    <div class="course-lessons-accordion" style="background:#f8fafc; border-top:1px solid #f1f5f9;">
-                        <div class="accordion-header" data-course-id="${c.id || cIdx}" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition: background-color 0.2s ease;">
-                            <h4 style="font-size:0.9rem; font-weight:700; color:#475569; margin:0; display:flex; align-items:center; gap:6px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px !important;">format_list_bulleted</span> Leksjoner og Live-økter
+                    <div class="course-lessons-accordion">
+                        <div class="accordion-header" data-course-id="${c.id || cIdx}">
+                            <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin:0; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size: 20px !important;">format_list_bulleted</span> Leksjoner og Live-økter
                             </h4>
                             <span class="material-symbols-outlined expand-chevron">expand_more</span>
                         </div>
                         
-                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 20px 20px 20px; flex-direction:column; gap:10px;">
+                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 24px 24px 24px; flex-direction:column; gap:12px;">
                             ${courseLessons.length === 0 ? `
-                                <p style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
+                                <p style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
                             ` : `
-                                <div style="display:flex; flex-direction:column; gap:10px; padding-top:10px;">
+                                <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
                                     ${courseLessons.map((l, lIdx) => {
                                         const paid = hasPaidForLesson(c, l);
                                         let dateStr = '';
@@ -4393,18 +4393,18 @@ class MinSideManager {
                                         
                                         const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
                                         return `
-                                        <div style="background:white; border-radius:12px; padding:12px 16px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; transition: border-color 0.2s ease;">
-                                            <div style="display:flex; align-items:center; gap:10px;">
-                                                <div style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:rgba(27, 73, 101, 0.08); color:#1B4965; font-size:0.75rem; font-weight:800; flex-shrink:0; line-height: 1;">
+                                        <div class="course-lesson-row">
+                                            <div style="display:flex; align-items:center; gap:12px;">
+                                                <div class="lesson-index-badge">
                                                     ${lIdx + 1}
                                                 </div>
                                                 <div>
-                                                    <div style="font-weight:700; font-size:0.92rem; color:#1e293b; line-height:1.2;">
+                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2;">
                                                         ${cleanTitle}
                                                     </div>
                                                     ${dateStr ? `
-                                                        <div style="font-size:0.78rem; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:4px; line-height: 1;">
-                                                            <span class="material-symbols-outlined" style="font-size: 14px !important; color:#64748b !important;">calendar_today</span>
+                                                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; display:flex; align-items:center; gap:4px; line-height: 1;">
+                                                            <span class="material-symbols-outlined" style="font-size: 14px !important;">calendar_today</span>
                                                             <span style="display: inline-block; line-height: 1;">${dateStr}</span>
                                                         </div>
                                                     ` : ''}
