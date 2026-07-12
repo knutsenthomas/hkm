@@ -2261,12 +2261,13 @@ class MinSideManager {
 
                 let events = [];
                 try {
-                    const settingsSnap = await firebase.firestore().collection('siteContent').doc('settings_gcal').get();
+                    const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
                     if (settingsSnap.exists) {
                         const settings = settingsSnap.data();
-                        if (settings && settings.apiKey && settings.calendarId) {
+                        const gcal = settings.googleCalendar || {};
+                        if (gcal && gcal.apiKey && gcal.calendarId) {
                             const nowIso = new Date().toISOString();
-                            const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=3`;
+                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=3`;
                             const resp = await fetch(url);
                             if (resp.ok) {
                                 const data = await resp.json();
