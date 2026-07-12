@@ -2371,6 +2371,7 @@ class MinSideManager {
                 };
 
                 // 2. Fetch GCal events
+                let gcalEventsNormalized = [];
                 try {
                     const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
                     if (settingsSnap.exists) {
@@ -2383,7 +2384,7 @@ class MinSideManager {
                             if (resp.ok) {
                                 const data = await resp.json();
                                 const gcalItems = data.items || [];
-                                allEvents.push(...gcalItems.map(normalizeGCalEvent));
+                                gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
                             }
                         }
                     }
@@ -2392,6 +2393,7 @@ class MinSideManager {
                 }
 
                 // 3. Fetch Firestore events
+                let firestoreEventsNormalized = [];
                 try {
                     const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
                     if (fsEventsSnap.exists) {
@@ -2399,15 +2401,46 @@ class MinSideManager {
                         const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
                         const now = new Date();
                         
-                        const processedFs = fsItems
+                        firestoreEventsNormalized = fsItems
                             .map(normalizeFirestoreEvent)
                             .filter(ev => ev.date >= now); // only future events
-                            
-                        allEvents.push(...processedFs);
                     }
                 } catch (e) {
                     console.error("Failed to fetch Firestore events:", e);
                 }
+
+                // Deduplicate and Merge GCal and Firestore events
+                const isSameDay = (d1, d2) => {
+                    return d1.getFullYear() === d2.getFullYear() &&
+                           d1.getMonth() === d2.getMonth() &&
+                           d1.getDate() === d2.getDate();
+                };
+
+                const mergedGCal = [];
+                const matchedFirestoreIds = new Set();
+                
+                gcalEventsNormalized.forEach(gEvent => {
+                    const match = firestoreEventsNormalized.find(fEvent => {
+                        const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
+                        const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
+                        return sameId || sameDayMatch;
+                    });
+                    
+                    if (match) {
+                        matchedFirestoreIds.add(match.id);
+                        mergedGCal.push({
+                            ...gEvent,
+                            ...match,
+                            date: match.date || gEvent.date
+                        });
+                    } else {
+                        mergedGCal.push(gEvent);
+                    }
+                });
+                
+                const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
+                
+                allEvents.push(...mergedGCal, ...uniqueFirestore);
 
                 // 4. Filter events based on course enrollment
                 const filteredEvents = allEvents.filter(ev => {
