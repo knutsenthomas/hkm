@@ -446,150 +446,7 @@ export default async function handler(req, res) {
         try {
           const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-          // Phase 1: Map the query word to the English dictionary keyword
-          const mapPrompt = `Du er en bibeloversetter og ordboksekspert.
-Oversett søkeordet/emnet "${word}" (søkeprosess på språkkode "${lang}") til det tilsvarende engelske bibelordbok-emneordet fra Easton's Bible Dictionary, Smith's Bible Dictionary, International Standard Bible Encyclopedia (ISBE) eller Hitchcock's Bible Names Dictionary.
-Returner KUN det engelske ordet i store bokstaver (f.eks. "TABERNACLE", "GRACE", "QUAILS", "SAMARITAN", "PETER").
-Dersom ordet ikke har noen bibelsk, teologisk eller kristen historisk betydning (f.eks. "iPhone", "pizza", "programmering", "fotball"), svar "NONE".
-Dersom ordet er bibelsk/teologisk, men du er usikker på om det finnes et nøyaktig emneord i disse verkene, forsøk å returnere det mest relevante engelske bibelske ordet i store bokstaver.`;
-
-          const mapResponse = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: mapPrompt,
-            config: {
-              responseMimeType: "text/plain"
-            }
-          });
-
-          const englishKey = mapResponse.text ? mapResponse.text.replace(/["']/g, "").trim().toUpperCase() : "NONE";
-
-          let entryData = null;
-          let definitionsText = "";
-          let refsText = "";
-
-          if (englishKey !== "NONE" && englishKey.length > 0) {
-            const firstLetter = englishKey.charAt(0).toLowerCase();
-            if (firstLetter >= 'a' && firstLetter <= 'z') {
-              try {
-                const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${firstLetter}.json`);
-                if (fs.existsSync(dataPath)) {
-                  const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-                  entryData = fileData[englishKey];
-                  if (!entryData) {
-                    const foundKey = Object.keys(fileData).find(k => k.toLowerCase() === englishKey.toLowerCase() || fileData[k].slug === englishKey.toLowerCase());
-                    if (foundKey) {
-                      entryData = fileData[foundKey];
-                    }
-                  }
-                }
-              } catch (err) {
-                console.error(`Error loading dictionary file for letter ${firstLetter}:`, err);
-              }
-            }
-          }
-
-          let responseData = null;
-
-          if (entryData) {
-            // Term found in local Easton/Smith dictionary dataset!
-            definitionsText = entryData.definitions.map(d => `Source (${d.source}): ${d.text}`).join('\n\n');
-            refsText = entryData.scripture_refs ? entryData.scripture_refs.map(r => r.reference).join(', ') : '';
-
-            const translatePrompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
-${responseLangInstruction}
-
-Oversett og bearbeid følgende bibelordbok-definisjoner for søkeordet "${word}" (engelsk emneord: "${englishKey}") til en fyldig, inspirerende og lærerik forklaring på ${lang === 'en' ? 'engelsk' : lang === 'es' ? 'spansk' : 'norsk'}. Du skal også supplere med og integrere teologisk innsikt fra International Standard Bible Encyclopedia (ISBE) samt navnebetydningen fra Hitchcock's Bible Names Dictionary (dersom ordet er et personnavn) for å gi et mest mulig utfyllende svar.
-
-Kildedefinisjoner (Easton's / Smith's Bible Dictionary):
-${definitionsText}
-
-${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
-${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
-${refsText ? `Opprinnelige skriftreferanser i ordboken: ${refsText}.` : ""}
-
-Instruksjoner for respons-JSON:
-1. "word": Det opprinnelige søkeordet "${word}" (tilpasset med riktig stor/liten bokstav, f.eks. "Vakt" eller "Vaktler").
-2. "definition": En fyldig, teologisk nøyaktig og vakkert formulert oversettelse og bearbeidelse av kildedefinisjonene over på det valgte språket. Del teksten inn i flere avsnitt med linjeskift (\\n\\n) for bedre lesbarhet, og bruk markdown-underoverskrifter (bruk ### for underoverskrifter, f.eks. '### Definisjon' eller '### Bibelsk sammenheng') og lister der det passer for å organisere innholdet. VIKTIG: Du må ALDRI inkludere søkeordet som en hovedoverskrift (f.eks. ikke ha '# Tro' eller lignende) øverst i definisjonen, da ordet allerede vises i app-grensesnittets header.
-3. "category": En passende kategori (f.eks. "Historisk gruppe", "Teologisk begrep", "Bibelsk geografi").
-4. "contextualNote": En kort oppsummering eller kontekstuell merknad om ordets betydning i Bibelen.
-5. "extendedAnalysis": ${extended ? `Siden brukeren ba om en utvidet analyse (extended=true), må du skrive en grundig og dyptgående teologisk og bibelhistorisk analyse/essay om ordet på 300-600 ord. Bruk markdown for formatering (overskrifter som '### Historisk kontekst' eller '### Teologisk betydning', fet skrift, lister). VIKTIG: Du må sette inn tydelige og ekte linjeskift (\\n\\n) før og etter hver overskrift og mellom hvert avsnitt, slik at teksten ikke blir presset sammen på én enkelt linje. Utforsk ordets opprinnelse, bruk i hele Bibelen og praktisk betydning i dag.` : `Siden brukeren IKKE ba om utvidet analyse, må du sette dette feltet to nøyaktig en tom streng "".`}
-6. "originalWords": Dersom ordet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. "charis" for nåde), oppgi det opprinnelige ordet med greske/hebraiske tegn, translitterasjon, uttale (f.eks. "ka'-ris"), språk (gresk eller hebraisk), og direkte betydning. ALDRI inkluder Strong-numre.
-7. "crossReferences": Liste med relevante kryssreferanser (bibelvers). Bruk gjerne referansene oppgitt i kildeteksten (${refsText}) eller andre svært relevante vers. For hver referanse, oppgi standard referanse (f.eks. "Matteus 24:42") og en kort kommentar til verset på det valgte språket.
-
-Returner nøyaktig JSON i henhold til dette skjemaet:
-{
-  "word": "${word}",
-  "definition": "...",
-  "category": "...",
-  "contextualNote": "...",
-  "extendedAnalysis": "...",
-  "originalWords": [
-    {
-      "word": "χάρις eller חֶסֶד",
-      "transliteration": "charis eller chesed",
-      "pronunciation": "ka'-ris eller kche'-sed",
-      "language": "gresk eller hebraisk",
-      "meaning": "nåde, gunst, trofast kjærlighet"
-    }
-  ],
-  "crossReferences": [
-    {
-      "ref": "Standard bibelreferanse (f.eks. Johannes 3:16)",
-      "text": "Vers-tekst eller en kort forklaring på sammenhengen..."
-    }
-  ]
-}`;
-
-            const response = await ai.models.generateContent({
-              model: "gemini-2.5-flash",
-              contents: translatePrompt,
-              config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                  type: Type.OBJECT,
-                  properties: {
-                    word: { type: Type.STRING },
-                    definition: { type: Type.STRING },
-                    category: { type: Type.STRING },
-                    contextualNote: { type: Type.STRING },
-                    extendedAnalysis: { type: Type.STRING },
-                    originalWords: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          word: { type: Type.STRING },
-                          transliteration: { type: Type.STRING },
-                          pronunciation: { type: Type.STRING },
-                          language: { type: Type.STRING },
-                          meaning: { type: Type.STRING }
-                        },
-                        required: ["word", "transliteration", "pronunciation", "language", "meaning"]
-                      }
-                    },
-                    crossReferences: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          ref: { type: Type.STRING },
-                          text: { type: Type.STRING }
-                        },
-                        required: ["ref", "text"]
-                      }
-                    }
-                  },
-                  required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
-                }
-              }
-            });
-
-            if (response.text) {
-              responseData = JSON.parse(response.text);
-            }
-          } else {
-            // Fallback: Word not found in Easton/Smith or key is NONE. Use normal Gemini generator if it's biblically relevant.
-            const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
+          const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
 ${responseLangInstruction}
 
 Vurder først ekstremt nøye om søkeordet eller emnet "${word}" har relevans til Bibelen, kristen teologi, kristendom, kirkehistorie, bibelhistorie, religiøse retninger, bønner eller jødisk-kristne bibelske kontekster/historier.
@@ -620,7 +477,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   "extendedAnalysis": "...",
   "originalWords": [
     {
-      "word": "χάρις eller חֶסֶד",
+      "word": "χάρις eller חֶסֶD",
       "transliteration": "charis eller chesed",
       "pronunciation": "ka'-ris eller kche'-sed",
       "language": "gresk eller hebraisk",
@@ -635,53 +492,53 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   ]
 }`;
 
-            const response = await ai.models.generateContent({
-              model: "gemini-2.5-flash",
-              contents: prompt,
-              config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                  type: Type.OBJECT,
-                  properties: {
-                    word: { type: Type.STRING },
-                    definition: { type: Type.STRING },
-                    category: { type: Type.STRING },
-                    contextualNote: { type: Type.STRING },
-                    extendedAnalysis: { type: Type.STRING },
-                    originalWords: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          word: { type: Type.STRING },
-                          transliteration: { type: Type.STRING },
-                          pronunciation: { type: Type.STRING },
-                          language: { type: Type.STRING },
-                          meaning: { type: Type.STRING }
-                        },
-                        required: ["word", "transliteration", "pronunciation", "language", "meaning"]
-                      }
-                    },
-                    crossReferences: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          ref: { type: Type.STRING },
-                          text: { type: Type.STRING }
-                        },
-                        required: ["ref", "text"]
-                      }
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  word: { type: Type.STRING },
+                  definition: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  contextualNote: { type: Type.STRING },
+                  extendedAnalysis: { type: Type.STRING },
+                  originalWords: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        word: { type: Type.STRING },
+                        transliteration: { type: Type.STRING },
+                        pronunciation: { type: Type.STRING },
+                        language: { type: Type.STRING },
+                        meaning: { type: Type.STRING }
+                      },
+                      required: ["word", "transliteration", "pronunciation", "language", "meaning"]
                     }
                   },
-                  required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
-                }
+                  crossReferences: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        ref: { type: Type.STRING },
+                        text: { type: Type.STRING }
+                      },
+                      required: ["ref", "text"]
+                    }
+                  }
+                },
+                required: ["word", "definition", "category", "contextualNote", "extendedAnalysis", "crossReferences", "originalWords"]
               }
-            });
-
-            if (response.text) {
-              responseData = JSON.parse(response.text);
             }
+          });
+
+          let responseData = null;
+          if (response.text) {
+            responseData = JSON.parse(response.text);
           }
 
           if (responseData) {
