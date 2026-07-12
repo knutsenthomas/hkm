@@ -4197,6 +4197,15 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     background: var(--main-bg) !important;
     border-top: 1px solid var(--border-color) !important;
 }
+.course-lessons-accordion .accordion-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 16px 20px !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    transition: background-color 0.2s ease !important;
+}
 
 /* Lesson cards list row */
 .course-lesson-row {
