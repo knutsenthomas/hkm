@@ -2287,7 +2287,21 @@ class BibleReader {
                 const sup = p.querySelector('sup.v');
                 if (sup && sup.innerText.trim() === String(verseNum)) {
                     this.isProgrammaticScrolling = true;
-                    p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Scroll container programmatically to avoid scrolling the main window/viewport
+                    const pane = this.dom.readingPane.closest('.bible-content-pane');
+                    if (pane) {
+                        const paneRect = pane.getBoundingClientRect();
+                        const pRect = p.getBoundingClientRect();
+                        const targetScrollTop = pane.scrollTop + (pRect.top - paneRect.top) - (paneRect.height / 2) + (pRect.height / 2);
+                        pane.scrollTo({
+                            top: targetScrollTop,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    
                     p.classList.add('verse-temp-highlight');
                     this.highlightedVerseElement = p;
                     
