@@ -136,29 +136,32 @@
         .ms-overview-stats {
             display: grid !important;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-            gap: 20px !important;
-            margin-bottom: 24px !important;
+            gap: 24px !important; /* Premium 24px gap following the 8px grid rule */
+            margin-bottom: 32px !important; /* Balanced vertical rhythm */
         }
 
         /* Bento Stats Card */
         .bento-stat-card {
             background: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 20px !important;
+            border: 1px solid rgba(226, 232, 240, 0.8) !important;
+            border-radius: 24px !important; /* Softer, modern border-radius */
             padding: 24px !important;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
+            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.02), 0 10px 15px -3px rgba(15, 23, 42, 0.04) !important; /* Soft multi-layered elevation */
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
-            min-height: 180px !important;
+            min-height: 188px !important; /* Perfectly aligned to 8px grid */
             cursor: pointer !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease !important; /* Spring motion curves */
             box-sizing: border-box !important;
             text-align: left !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
         .bento-stat-card:hover {
-            transform: translateY(-4px) !important;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
+            transform: translateY(-6px) !important;
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 10px 10px -5px rgba(15, 23, 42, 0.03) !important;
+            border-color: currentColor !important; /* Dynamic color highlights card border on hover */
         }
 
         /* Header Row */
@@ -166,7 +169,7 @@
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
-            margin-bottom: 16px !important;
+            margin-bottom: 20px !important; /* Increased spacing */
             width: 100% !important;
         }
 
@@ -174,15 +177,19 @@
         .bento-icon-wrap {
             width: 48px !important;
             height: 48px !important;
-            border-radius: 12px !important;
+            border-radius: 16px !important; /* Modern squircle geometry */
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
         }
         .bento-icon-wrap .material-symbols-outlined {
             font-size: 26px !important;
             line-height: 1 !important;
             display: inline-block !important;
+        }
+        .bento-stat-card:hover .bento-icon-wrap {
+            transform: scale(1.1) rotate(2deg) !important; /* Playful micro-interaction */
         }
 
         /* Top-right Indicator */
@@ -190,6 +197,11 @@
             color: #94a3b8 !important;
             font-size: 20px !important;
             font-weight: bold !important;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease !important;
+        }
+        .bento-stat-card:hover .bento-indicator {
+            transform: translate(4px, -4px) !important; /* Diagonal micro-slide */
+            color: currentColor !important; /* Matches brand color accent */
         }
 
         /* Muted Label */
@@ -197,7 +209,7 @@
             font-family: 'Inter', sans-serif !important;
             font-size: 11px !important;
             font-weight: 700 !important;
-            letter-spacing: 0.05em !important;
+            letter-spacing: 0.06em !important;
             color: #64748b !important;
             text-transform: uppercase !important;
             margin-bottom: 8px !important;
@@ -208,13 +220,13 @@
         .bento-value-row {
             display: flex !important;
             align-items: center !important;
-            gap: 12px !important;
+            gap: 16px !important; /* Balanced gap spacing */
             margin-bottom: 12px !important;
             width: 100% !important;
         }
         .bento-card-value {
             font-family: 'Work Sans', sans-serif !important;
-            font-size: 28px !important;
+            font-size: 30px !important; /* Increased font weight & size */
             font-weight: 800 !important;
             color: #0f172a !important;
             margin: 0 !important;
@@ -228,12 +240,13 @@
             background-color: #f1f5f9 !important;
             border-radius: 99px !important;
             overflow: hidden !important;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05) !important;
         }
         .bento-progress-bar {
             height: 100% !important;
             background-color: #0d9488 !important; /* teal */
             border-radius: 99px !important;
-            transition: width 0.4s ease !important;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important; /* Smooth loading transition */
         }
 
         /* Footer Description */
@@ -243,6 +256,7 @@
             font-weight: 700 !important;
             margin-top: auto !important;
             margin-bottom: 0 !important;
+            transition: color 0.25s ease !important;
         }
 
         /* Color Themes */
@@ -283,9 +297,16 @@
         }
 
         /* Bento Search Bar */
+        .bento-search-bar {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
         .bento-search-bar:hover {
             background-color: #ffebe5 !important;
             border-color: #ffd0c4 !important;
+            transform: scale(1.02) !important;
+        }
+        .bento-search-bar:active {
+            transform: scale(0.98) !important;
         }
     </style>
 </head>
