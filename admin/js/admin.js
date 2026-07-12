@@ -4545,18 +4545,68 @@ class AdminManager {
                 userCount = Array.isArray(usersSnap) ? usersSnap.length : (usersSnap?.items ? Object.keys(usersSnap.items).length : 0);
             }
 
-            // Fetch donations summary directly from the 'donations' collection
+            // Fetch donations summary directly from the 'donations' collection (filtered for the last 30 days)
             try {
                 const donationsSnap = await firebaseService.db.collection('donations').get();
-                donationCount = donationsSnap.size;
-                donationTotal = donationsSnap.docs.reduce((sum, doc) => sum + (Number(doc.data().amount) || 0), 0);
+                const now = new Date();
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+                let completed30dCount = 0;
+                let completed30dTotal = 0;
+
+                donationsSnap.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (!data) return;
+
+                    const isInKind = !!data.isInKind;
+                    const status = String(data.status || '').toLowerCase();
+                    const type = String(data.type || '').toLowerCase();
+
+                    // Count completed monetary donations (exclude shop products and course payments)
+                    if (!isInKind && ['completed', 'succeeded', 'captured'].includes(status)) {
+                        if (!['butikk', 'kurs', 'course', 'product'].includes(type)) {
+                            const dDate = this.getDonationDate(data);
+                            if (dDate && dDate >= thirtyDaysAgo) {
+                                completed30dCount++;
+                                completed30dTotal += this.normalizeDonationAmountNok(data);
+                            }
+                        }
+                    }
+                });
+
+                donationCount = completed30dCount;
+                donationTotal = completed30dTotal;
             } catch (dErr) {
                 console.warn("[AdminManager] Failed to fetch donations collection:", dErr);
                 // Fallback to getSiteContent summary
                 const donationsSnap = await firebaseService.getSiteContent('donations').catch(() => null);
                 const donations = Array.isArray(donationsSnap) ? donationsSnap : (donationsSnap?.items ? Object.values(donationsSnap.items) : []);
-                donationCount = donations.length;
-                donationTotal = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                
+                const now = new Date();
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+                let completed30dCount = 0;
+                let completed30dTotal = 0;
+
+                donations.forEach(data => {
+                    if (!data) return;
+                    const isInKind = !!data.isInKind;
+                    const status = String(data.status || '').toLowerCase();
+                    const type = String(data.type || '').toLowerCase();
+
+                    if (!isInKind && ['completed', 'succeeded', 'captured'].includes(status)) {
+                        if (!['butikk', 'kurs', 'course', 'product'].includes(type)) {
+                            const dDate = this.getDonationDate(data);
+                            if (dDate && dDate >= thirtyDaysAgo) {
+                                completed30dCount++;
+                                completed30dTotal += this.normalizeDonationAmountNok(data);
+                            }
+                        }
+                    }
+                });
+
+                donationCount = completed30dCount;
+                donationTotal = completed30dTotal;
             }
 
             this.gaData = gaData;
