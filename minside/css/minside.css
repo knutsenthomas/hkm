@@ -3935,10 +3935,10 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     font-size: 18px;
     color: #5c4033;
     font-weight: bold;
-    transform: translateY(4px);
-    display: inline-block;
-    line-height: 1;
     margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Mobile search bar adjustments */
