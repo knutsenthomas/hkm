@@ -288,7 +288,7 @@ class BibleReader {
             fontFamily: 'serif', // 'serif' | 'sans'
             lineHeight: 1.8,
             theme: 'cream', // 'light' | 'cream' | 'dark'
-            layout: 'paragraph' // 'verse' | 'paragraph'
+            layout: 'verse' // 'verse' | 'paragraph' (Verse-by-verse is standard default)
         };
         try {
             const rawSettings = this.safeGetLocalStorage('hkm_bible_settings');
@@ -301,13 +301,13 @@ class BibleReader {
         }
         this.settings = settings;
 
-        // Migration: Force paragraph layout by default once for all users
+        // Migration: Force verse layout by default once for all users
         try {
-            const migrated = this.safeGetLocalStorage('hkm_layout_migrated_v2');
+            const migrated = this.safeGetLocalStorage('hkm_layout_migrated_v3');
             if (!migrated) {
-                this.settings.layout = 'paragraph';
+                this.settings.layout = 'verse';
                 this.safeSetLocalStorage('hkm_bible_settings', JSON.stringify(this.settings));
-                this.safeSetLocalStorage('hkm_layout_migrated_v2', 'true');
+                this.safeSetLocalStorage('hkm_layout_migrated_v3', 'true');
             }
         } catch (e) {
             console.warn("[BibleReader] Migration failed:", e);
