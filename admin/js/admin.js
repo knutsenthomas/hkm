@@ -4630,11 +4630,12 @@ class AdminManager {
             if (catWidgets.length === 0) return;
 
             widgetsHtml += `
-                <div class="hkm-dashboard-col">
-                    <div class="dashboard-col-header">
-                        <span class="material-symbols-outlined">${cat.icon}</span>
+                <div class="hkm-dashboard-section" style="width: 100%;">
+                    <div class="dashboard-col-header" style="margin-bottom: 16px;">
+                        <span class="material-symbols-outlined" style="color: #1B4965;">${cat.icon}</span>
                         <h4>${cat.label}</h4>
                     </div>
+                    <div class="hkm-widgets-grid">
             `;
 
             catWidgets.forEach(id => {
@@ -4711,7 +4712,10 @@ class AdminManager {
                 `;
             });
 
-            widgetsHtml += `</div>`; // Close column
+            widgetsHtml += `
+                    </div>
+                </div>
+            `;
         });
 
         // Build Analytics Footer HTML with real data if available
@@ -4785,23 +4789,17 @@ class AdminManager {
         section.innerHTML = `
             <style>
                 .hkm-dashboard-grid-saas {
-                    display: grid !important;
-                    grid-template-columns: repeat(3, 1fr) !important;
+                    display: flex !important;
+                    flex-direction: column !important;
                     gap: 32px !important;
                     width: 100% !important;
                     margin-top: 32px !important;
-                    align-items: start !important;
                 }
-                @media (max-width: 1024px) {
-                    .hkm-dashboard-grid-saas {
-                        grid-template-columns: 1fr !important;
-                    }
-                }
-                .hkm-dashboard-col {
-                    display: flex !important;
-                    flex-direction: column !important;
+                .hkm-widgets-grid {
+                    display: grid !important;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
                     gap: 24px !important;
-                    min-width: 0 !important;
+                    width: 100% !important;
                 }
                 .dashboard-col-header {
                     display: flex;
