@@ -2316,10 +2316,61 @@ class MinSideManager {
 
                 const getEventImage = (event) => {
                     if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
-                    return event.dashboardImage || event.imageUrl || event.image || event.imageLink || generateEventImage(event.summary);
+                    return event.imageUrl || generateEventImage(event.title);
                 };
 
-                let events = [];
+                const normalizeGCalEvent = (item) => {
+                    const startVal = item.start.dateTime || item.start.date;
+                    const dateObj = new Date(startVal);
+                    return {
+                        id: item.id,
+                        title: item.summary || 'Uten tittel',
+                        description: item.description || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
+                        eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: 'Arrangement'
+                    };
+                };
+
+                const normalizeFirestoreEvent = (item) => {
+                    const dateObj = new Date(item.date);
+                    return {
+                        id: item.id,
+                        title: item.title || 'Uten tittel',
+                        description: item.description || item.seoDescription || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.imageUrl || item.image || '',
+                        eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: item.category || 'Arrangement'
+                    };
+                };
+
+                let allEvents = [];
+                let enrollments = [];
+                const email = firebase.auth().currentUser?.email;
+
+                // 1. Fetch user enrollments
+                if (email) {
+                    try {
+                        const enrollSnap = await firebase.firestore().collection('courseEnrollments')
+                            .where('email', 'in', [email, email.toLowerCase()])
+                            .get();
+                        enrollSnap.forEach(d => enrollments.push(d.data()));
+                    } catch (e) {
+                        console.error("Error fetching course enrollments for dashboard:", e);
+                    }
+                }
+                const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
+
+                const isUserEnrolledInCourse = (courseId) => {
+                    if (isAdmin) return true;
+                    return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
+                };
+
+                // 2. Fetch GCal events
                 try {
                     const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
                     if (settingsSnap.exists) {
@@ -2327,23 +2378,62 @@ class MinSideManager {
                         const gcal = settings.googleCalendar || {};
                         if (gcal && gcal.apiKey && gcal.calendarId) {
                             const nowIso = new Date().toISOString();
-                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=3`;
+                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
                             const resp = await fetch(url);
                             if (resp.ok) {
                                 const data = await resp.json();
-                                events = data.items || [];
+                                const gcalItems = data.items || [];
+                                allEvents.push(...gcalItems.map(normalizeGCalEvent));
                             }
                         }
                     }
                 } catch (e) {
-                    console.error("Failed to load dashboard calendar events:", e);
+                    console.error("Failed to fetch GCal events:", e);
                 }
 
-                if (events.length > 0) {
-                    ovEventsFeed.innerHTML = events.map(item => {
-                        const startVal = item.start.dateTime || item.start.date;
-                        const dateObj = new Date(startVal);
-                        const hasTime = !!item.start.dateTime;
+                // 3. Fetch Firestore events
+                try {
+                    const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
+                    if (fsEventsSnap.exists) {
+                        const fsData = fsEventsSnap.data();
+                        const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
+                        const now = new Date();
+                        
+                        const processedFs = fsItems
+                            .map(normalizeFirestoreEvent)
+                            .filter(ev => ev.date >= now); // only future events
+                            
+                        allEvents.push(...processedFs);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch Firestore events:", e);
+                }
+
+                // 4. Filter events based on course enrollment
+                const filteredEvents = allEvents.filter(ev => {
+                    const cat = String(ev.category || '').toLowerCase();
+                    if (cat === 'kurs' || cat === 'courses') {
+                        // Extract courseId from eventLink
+                        const match = ev.eventLink?.match(/courseId=([^&]+)/);
+                        const courseId = match ? match[1] : null;
+                        if (courseId) {
+                            return isUserEnrolledInCourse(courseId);
+                        }
+                        return false; // hide course events if we can't determine the course ID
+                    }
+                    return true; // show all other events
+                });
+
+                // 5. Sort by date ascending
+                filteredEvents.sort((a, b) => a.date - b.date);
+
+                // 6. Take top 3
+                const topEvents = filteredEvents.slice(0, 3);
+
+                if (topEvents.length > 0) {
+                    ovEventsFeed.innerHTML = topEvents.map(item => {
+                        const dateObj = item.date;
+                        const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
                         
                         const locale = 'no-NO';
                         const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
@@ -2358,7 +2448,7 @@ class MinSideManager {
                         }
                         
                         const imageSrc = getEventImage(item);
-                        const imageAlt = item.summary || 'Arrangement';
+                        const imageAlt = item.title;
                         
                         const rawDesc = item.description || '';
                         const cleanExcerpt = typeof rawDesc === 'string' 
@@ -2368,10 +2458,8 @@ class MinSideManager {
                             ? cleanExcerpt.slice(0, 117) + '...' 
                             : cleanExcerpt;
 
-                        const detailsUrl = `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`;
-
                         return `
-                            <a href="${detailsUrl}" class="ov-event-card">
+                            <a href="${item.eventLink}" class="ov-event-card">
                                 <div class="ov-event-image">
                                     <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
                                     <div class="ov-event-date-badge">
@@ -2380,7 +2468,7 @@ class MinSideManager {
                                     </div>
                                 </div>
                                 <div class="ov-event-content">
-                                    <h4 class="ov-event-title">${this._escapeHtml(item.summary || 'Uten tittel')}</h4>
+                                    <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
                                     ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
                                     <div class="ov-event-meta">
                                         <span class="material-symbols-outlined">calendar_today</span>
