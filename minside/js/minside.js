@@ -1063,14 +1063,16 @@ class MinSideManager {
                             this.applyBottomNavSettings(this.profileData.customBottomNav);
                         } else {
                             localStorage.removeItem('hkm_user_custom_nav');
-                            const designSettings = await window.firebaseService.getPageContent('settings_design');
-                            if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
-                                const cached = localStorage.getItem('hkm_cache_settings_design');
-                                let designObj = cached ? JSON.parse(cached) : {};
-                                designObj.minsideBottomNav = designSettings.minsideBottomNav;
-                                localStorage.setItem('hkm_cache_settings_design', JSON.stringify(designObj));
+                            if (window.firebaseService && typeof window.firebaseService.getPageContent === 'function') {
+                                const designSettings = await window.firebaseService.getPageContent('settings_design');
+                                if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
+                                    const cached = localStorage.getItem('hkm_cache_settings_design');
+                                    let designObj = cached ? JSON.parse(cached) : {};
+                                    designObj.minsideBottomNav = designSettings.minsideBottomNav;
+                                    localStorage.setItem('hkm_cache_settings_design', JSON.stringify(designObj));
 
-                                this.applyBottomNavSettings(designSettings.minsideBottomNav);
+                                    this.applyBottomNavSettings(designSettings.minsideBottomNav);
+                                }
                             }
                         }
                     } catch (e) {
@@ -1744,7 +1746,18 @@ class MinSideManager {
         } catch (e) { console.warn('getMergedProfile:', e); }
 
         const google = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
-        const role = await window.firebaseService.getUserRole(user.uid);
+        
+        let role = 'medlem';
+        try {
+            if (window.firebaseService && typeof window.firebaseService.getUserRole === 'function') {
+                role = await window.firebaseService.getUserRole(user.uid);
+            } else {
+                role = data.role || 'medlem';
+            }
+        } catch (e) {
+            console.warn('getMergedProfile role fetch failed, fallback to local/default:', e);
+            role = data.role || 'medlem';
+        }
 
         return {
             ...data,
