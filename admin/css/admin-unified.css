@@ -4935,6 +4935,12 @@ body.minside-body .nav-link {
   color: #64748b !important;
 }
 
+body.admin-body .nav-item:not([data-nav-category="all"]) .nav-link,
+body.minside-body .nav-item:not([data-nav-category="all"]) .nav-link {
+  margin-left: 16px !important;
+  width: calc(100% - 16px) !important;
+}
+
 body.admin-body .nav-link span:first-child {
   font-size: 20px !important;
   color: inherit !important;
