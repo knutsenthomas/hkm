@@ -4514,14 +4514,14 @@ class AdminManager {
 
         try {
             const [blogData, teachingData, eventData, causesData, indexData, yt, pod, coursesDoc, gaData] = await Promise.all([
-                firebaseService.getPageContent('collection_blog'),
-                firebaseService.getPageContent('collection_teaching'),
-                firebaseService.getPageContent('collection_events'),
-                firebaseService.getPageContent('collection_causes'),
-                firebaseService.getPageContent('settings_index'),
-                firebaseService.getPageContent('settings_youtube'),
-                firebaseService.getPageContent('settings_podcast'),
-                firebaseService.getPageContent('collection_courses'),
+                firebaseService.getPageContent('collection_blog').catch(() => null),
+                firebaseService.getPageContent('collection_teaching').catch(() => null),
+                firebaseService.getPageContent('collection_events').catch(() => null),
+                firebaseService.getPageContent('collection_causes').catch(() => null),
+                firebaseService.getPageContent('settings_index').catch(() => null),
+                firebaseService.getPageContent('settings_youtube').catch(() => null),
+                firebaseService.getPageContent('settings_podcast').catch(() => null),
+                firebaseService.getPageContent('collection_courses').catch(() => null),
                 this.fetchAnalyticsData(this.analyticsRangeDays).catch(() => null)
             ]);
 
@@ -4534,15 +4534,30 @@ class AdminManager {
             podcastCount = Array.isArray(pod) ? pod.length : (pod?.items ? Object.keys(pod.items).length : '0');
             fullEvents = Array.isArray(eventData) ? eventData : (eventData?.items ? Object.values(eventData.items) : []);
 
-            // Count users securely
-            const usersSnap = await firebaseService.getSiteContent('users');
-            userCount = Array.isArray(usersSnap) ? usersSnap.length : (usersSnap?.items ? Object.keys(usersSnap.items).length : 0);
+            // Count users securely directly from the 'users' collection
+            try {
+                const usersSnap = await firebaseService.db.collection('users').get();
+                userCount = usersSnap.size;
+            } catch (uErr) {
+                console.warn("[AdminManager] Failed to fetch users collection:", uErr);
+                // Fallback to getSiteContent summary
+                const usersSnap = await firebaseService.getSiteContent('users').catch(() => null);
+                userCount = Array.isArray(usersSnap) ? usersSnap.length : (usersSnap?.items ? Object.keys(usersSnap.items).length : 0);
+            }
 
-            // Fetch donations summary
-            const donationsSnap = await firebaseService.getSiteContent('donations');
-            const donations = Array.isArray(donationsSnap) ? donationsSnap : (donationsSnap?.items ? Object.values(donationsSnap.items) : []);
-            donationCount = donations.length;
-            donationTotal = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+            // Fetch donations summary directly from the 'donations' collection
+            try {
+                const donationsSnap = await firebaseService.db.collection('donations').get();
+                donationCount = donationsSnap.size;
+                donationTotal = donationsSnap.docs.reduce((sum, doc) => sum + (Number(doc.data().amount) || 0), 0);
+            } catch (dErr) {
+                console.warn("[AdminManager] Failed to fetch donations collection:", dErr);
+                // Fallback to getSiteContent summary
+                const donationsSnap = await firebaseService.getSiteContent('donations').catch(() => null);
+                const donations = Array.isArray(donationsSnap) ? donationsSnap : (donationsSnap?.items ? Object.values(donationsSnap.items) : []);
+                donationCount = donations.length;
+                donationTotal = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+            }
 
             this.gaData = gaData;
         } catch (err) {
@@ -4651,11 +4666,14 @@ class AdminManager {
 
         // Build Analytics Footer HTML with real data if available
         const ga = this.gaData || {};
-        const topPagesArr = ga.topPages && Array.isArray(ga.topPages) 
-            ? ga.topPages.slice(0, 5).map(p => ({ 
-                path: p.title.length > 30 ? p.title.substring(0, 30) + '...' : p.title, 
-                pct: Math.round((parseInt(p.views) / (parseInt(ga.screenPageViews) || 1)) * 100) || 5 
-              }))
+        const topPagesArr = ga.topPages && Array.isArray(ga.topPages) && ga.topPages.length > 0
+            ? ga.topPages.slice(0, 5).map(p => {
+                const title = p.title || p.path || '/';
+                return { 
+                    path: title.length > 30 ? title.substring(0, 30) + '...' : title, 
+                    pct: Math.round((parseInt(p.views) / (parseInt(ga.screenPageViews) || 1)) * 100) || 5 
+                };
+              })
             : [
                 { path: '/hjem', pct: 42 },
                 { path: '/blogg', pct: 28 },
@@ -4706,7 +4724,9 @@ class AdminManager {
                             </div>
                         `).join('')}
                     </div>
-                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                    <a href="#analytics" class="top-nav-tab" data-category="analytics" style="display:flex; align-items:center; gap:8px; margin-top:20px; font-size:13px; color:#1B4965; text-decoration:none; font-weight:600;">
+                        <span>Se detaljert analyse</span>
+                        <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 16px;">arrow_forward</span>
                     </a>
                 </div>
             </div>
