@@ -3982,53 +3982,76 @@ class MinSideManager {
         container.innerHTML = `
         <div>
             <div class="giving-stats">
-                <div class="stat-chip">
+                <!-- Gitt i år -->
+                <div class="stat-chip bento-orange">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
                     <div class="stat-chip-label" id="giving-stat-year-label">${t('giving.givenInYear', { year: new Date().getFullYear() })}</div>
                     <div class="stat-chip-value" id="giving-stat-year-value">—</div>
                 </div>
-                <div class="stat-chip">
+
+                <!-- Siste gave -->
+                <div class="stat-chip bento-brand-blue">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">history</span>
+                    </div>
                     <div class="stat-chip-label">${t('giving.lastGift')}</div>
                     <div class="stat-chip-value" id="giving-stat-last-value">—</div>
                     <div class="stat-chip-sub" id="giving-stat-last-sub"></div>
                 </div>
-                <div class="stat-chip">
+
+                <!-- Totalt antall gaver -->
+                <div class="stat-chip bento-teal">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">done_all</span>
+                    </div>
                     <div class="stat-chip-label">${t('giving.totalGiftsCount')}</div>
                     <div class="stat-chip-value" id="giving-stat-count-value">—</div>
                 </div>
             </div>
 
             <div class="giving-charts-card">
-                <div class="table-card" style="padding: 20px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                <div class="table-card" style="padding: 24px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
                     <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartTrendsTitle')}</h3>
-                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 220px; width: 100%;">
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 200px; width: 100%;">
                         <canvas id="giving-trends-chart"></canvas>
                     </div>
                 </div>
-                <div class="table-card" style="padding: 20px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                <div class="table-card" style="padding: 24px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
                     <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartMethodsTitle')}</h3>
-                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 220px; width: 100%;">
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 200px; width: 100%;">
                         <canvas id="giving-methods-chart"></canvas>
                     </div>
                 </div>
             </div>
 
             <div class="table-card">
-                <div class="table-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 20px;">
-                    <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-main);">${t('giving.givingHistory')}</h3>
+                <div class="table-card-header">
+                    <h3>${t('giving.givingHistory')}</h3>
                     
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <select id="giving-type-filter" class="form-control" style="font-size:12px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; border:1.5px solid var(--border-solid); background:var(--card-bg); color:var(--text-main); font-weight:600; width:110px; cursor:pointer; margin:0;">
+                        <select id="giving-type-filter" class="giving-filter-select">
                             <option value="all">${allTypesLabel}</option>
                             <option value="gave">${typeGiftLabel}</option>
                             <option value="butikk">${typeShopLabel}</option>
                         </select>
-                        <select id="giving-year-filter" class="form-control" style="font-size:12px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; border:1.5px solid var(--border-solid); background:var(--card-bg); color:var(--text-main); font-weight:600; width:100px; cursor:pointer; margin:0;">
+                        <select id="giving-year-filter" class="giving-filter-select" style="width: 100px !important;">
                             <option value="all">${allYearsLabel}</option>
                             ${yearsList.map(y => `<option value="${y}">${y}</option>`).join('')}
                         </select>
-                        <button type="button" class="btn btn-ghost" id="giving-print-report-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; padding:6px 12px !important; border-radius:6px !important; font-size:12px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important; margin:0;">
-                            <span class="material-symbols-outlined" style="font-size:16px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; margin:0 !important;">print</span>
-                            <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">${printReportLabel}</span>
+                        <button type="button" class="btn-giving-print" id="giving-print-report-btn">
+                            <span class="material-symbols-outlined">print</span>
+                            <span>${printReportLabel}</span>
                         </button>
                     </div>
                 </div>
