@@ -700,6 +700,17 @@ const initAdminHeader = () => {
             header.onclick = (e) => {
                 e.preventDefault();
                 const currentlyCollapsed = header.classList.contains('collapsed');
+                
+                if (currentlyCollapsed) {
+                    // Collapse all other categories
+                    categoryHeaders.forEach(otherHeader => {
+                        const otherCat = otherHeader.getAttribute('data-target-category');
+                        if (otherCat !== cat) {
+                            setCategory(otherCat, false);
+                        }
+                    });
+                }
+                
                 setCategory(cat, currentlyCollapsed);
             };
         });
@@ -711,6 +722,13 @@ const initAdminHeader = () => {
                 const navItem = document.querySelector(`.nav-item[data-nav-category] a[data-section="${hash}"]`);
                 const cat = navItem?.closest('.nav-item')?.getAttribute('data-nav-category');
                 if (cat) {
+                    // Collapse all other categories
+                    categoryHeaders.forEach(otherHeader => {
+                        const otherCat = otherHeader.getAttribute('data-target-category');
+                        if (otherCat !== cat) {
+                            setCategory(otherCat, false);
+                        }
+                    });
                     setCategory(cat, true);
                 }
             }
