@@ -449,6 +449,21 @@
                         }
                     });
                 }
+
+                // Auto-redirect if already logged in globally
+                if (typeof firebase !== 'undefined') {
+                    firebase.auth().onAuthStateChanged(async (user) => {
+                        if (user) {
+                            console.log("[HKM] Already logged in globally, routing...");
+                            let count = 0;
+                            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                                await new Promise(r => setTimeout(r, 50));
+                                count++;
+                            }
+                            await routeByRole();
+                        }
+                    });
+                }
             })();
     </script>
     
