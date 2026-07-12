@@ -7942,7 +7942,7 @@ exports.scheduledReadingNotifications = onSchedule({
             body: defaultFallbackBody
           };
           const template = await getEmailTemplate("daily_bible_reading", defaultFallback);
-          if (template && template.body && template.body.includes('font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;')) {
+          if (template && template.body && !template.body.includes('linear-gradient(90deg, #1B4965 0%, #d17d39 50%, #bd4f2a 100%)')) {
             console.log("Updating old email template in Firestore to the new premium design...");
             try {
               await db.collection("email_templates").doc("daily_bible_reading").set({

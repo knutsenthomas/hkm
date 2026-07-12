@@ -1013,6 +1013,7 @@ class BibleReader {
                 
                 const icon = this.dom.dictExtendedBtn.querySelector('.material-symbols-outlined');
                 if (icon) {
+                    icon.textContent = 'sync';
                     icon.classList.add('spin-animation');
                 }
 
@@ -1047,6 +1048,7 @@ class BibleReader {
                     this.dom.dictExtendedBtn.disabled = false;
                 } finally {
                     if (icon) {
+                        icon.textContent = 'psychology';
                         icon.classList.remove('spin-animation');
                     }
                 }
