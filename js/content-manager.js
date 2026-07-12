@@ -4314,6 +4314,10 @@ class ContentManager {
         // Update registration CTA button dynamically
         const registerBtn = document.querySelector('.btn-register');
         if (registerBtn) {
+            // Set dynamic button text or fallback to defaults
+            const defaultText = lang === 'en' ? 'Register Now' : (lang === 'es' ? 'Regístrate Ahora' : 'Meld deg på nå');
+            registerBtn.textContent = event.eventLinkText || defaultText;
+
             if (event.eventLink) {
                 registerBtn.href = event.eventLink;
                 if (event.eventLink.startsWith('http://') || event.eventLink.startsWith('https://')) {
@@ -4328,6 +4332,52 @@ class ContentManager {
                 registerBtn.href = contactPath;
                 registerBtn.removeAttribute('target');
                 registerBtn.removeAttribute('rel');
+            }
+
+            // Remove any pre-existing dynamic Vipps buttons to avoid duplication
+            const oldVipps = registerBtn.parentNode.querySelector('.btn-vipps');
+            if (oldVipps) oldVipps.remove();
+
+            // Detect Vipps number in event description
+            let vippsNumber = '';
+            const descText = event.description || '';
+            const vippsMatch = descText.match(/Vipps:?.*?(\d{5,6})/i);
+            if (vippsMatch) {
+                vippsNumber = vippsMatch[1];
+            }
+
+            if (vippsNumber) {
+                const vippsBtn = document.createElement('a');
+                vippsBtn.href = 'javascript:void(0)';
+                vippsBtn.className = 'btn-vipps';
+                vippsBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #ff5b24; color: white !important; font-weight: 700; padding: 12px 24px; border-radius: 30px; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255, 91, 36, 0.2); font-size: 14.5px; height: 48px; box-sizing: border-box;';
+                vippsBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important;">smartphone</span><span>Vipps til ${vippsNumber}</span>`;
+                
+                vippsBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(vippsNumber).then(() => {
+                        const originalHtml = vippsBtn.innerHTML;
+                        vippsBtn.style.background = '#22c55e';
+                        vippsBtn.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)';
+                        vippsBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important;">check_circle</span><span>Kopiert! ✓</span>`;
+                        setTimeout(() => {
+                            vippsBtn.style.background = '#ff5b24';
+                            vippsBtn.style.boxShadow = '0 4px 12px rgba(255, 91, 36, 0.2)';
+                            vippsBtn.innerHTML = originalHtml;
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy Vipps number:', err);
+                    });
+                });
+
+                // Style parent container to align both buttons side-by-side
+                const parent = registerBtn.parentNode;
+                parent.style.display = 'flex';
+                parent.style.alignItems = 'center';
+                parent.style.flexWrap = 'wrap';
+                parent.style.gap = '14px';
+
+                // Append the Vipps button next to the register button
+                parent.appendChild(vippsBtn);
             }
         }
 
