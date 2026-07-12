@@ -2057,8 +2057,20 @@ class MinSideManager {
                     <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
                 </div>
             </div>
-
-
+            
+            <!-- Calendar Events preview -->
+            <div class="info-card ms-overview-card-gap" id="ov-events-preview-card">
+                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>Kommende arrangementer</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bli med på fellesskap og møter i kalenderen</p>
+                    </div>
+                    <a href="/arrangementer.html" class="btn btn-ghost btn-sm" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important; text-decoration: none;"><span style="display: inline-block; line-height: 1;">Se alle</span><span class="material-symbols-outlined" style="font-size: 16px; display: inline-block; line-height: 1;">arrow_forward</span></a>
+                </div>
+                <div id="ov-events-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </div>
 
             <!-- Recent notifications -->
             <div class="info-card">
@@ -2240,6 +2252,70 @@ class MinSideManager {
                         </button></div>`;
                 }
             }
+
+            // Fetch calendar events
+            (async () => {
+                const ovEventsCard = document.getElementById('ov-events-preview-card');
+                const ovEventsFeed = document.getElementById('ov-events-feed-preview');
+                if (!ovEventsCard || !ovEventsFeed) return;
+
+                let events = [];
+                try {
+                    const settingsSnap = await firebase.firestore().collection('siteContent').doc('settings_gcal').get();
+                    if (settingsSnap.exists) {
+                        const settings = settingsSnap.data();
+                        if (settings && settings.apiKey && settings.calendarId) {
+                            const nowIso = new Date().toISOString();
+                            const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=3`;
+                            const resp = await fetch(url);
+                            if (resp.ok) {
+                                const data = await resp.json();
+                                events = data.items || [];
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to load dashboard calendar events:", e);
+                }
+
+                if (events.length > 0) {
+                    ovEventsFeed.innerHTML = events.map(item => {
+                        const startVal = item.start.dateTime || item.start.date;
+                        const dateObj = new Date(startVal);
+                        const hasTime = !!item.start.dateTime;
+                        const dateOptions = hasTime 
+                            ? { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+                            : { day: 'numeric', month: 'short', year: 'numeric' };
+                        const dateStr = dateObj.toLocaleDateString('no-NO', dateOptions);
+                        
+                        return `
+                            <div class="ov-event-item" style="border: 1px solid var(--border-solid); border-radius: 12px; padding: 12px 16px; background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; min-height: 110px; transition: transform 0.2s ease, border-color 0.2s ease;">
+                                <div>
+                                    <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+                                        <span class="material-symbols-outlined" style="color: var(--accent-color); font-size: 14px;">calendar_today</span>
+                                        <span style="font-size: 11.5px; font-weight: 700; color: var(--accent-color);">${dateStr}</span>
+                                    </div>
+                                    <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0; line-height: 1.3;">${this._escapeHtml(item.summary)}</h4>
+                                    ${item.description ? `<p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${this._escapeHtml(item.description)}</p>` : ''}
+                                </div>
+                                ${item.location ? `
+                                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: auto;">
+                                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--text-muted);">location_on</span>
+                                    <span style="display: inline-block; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">${this._escapeHtml(item.location)}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    ovEventsFeed.innerHTML = `
+                        <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
+                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
+                        </div>
+                    `;
+                }
+            })();
         } catch (e) {
             console.warn('Overview fetch error:', e);
         }
