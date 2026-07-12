@@ -1192,29 +1192,30 @@ body.admin-body .btn-full,
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-muted);
-    border: 1.5px solid #e2e8f0;
+    border: 1px solid var(--border-solid);
     border-radius: 99px;
     background: transparent;
     cursor: pointer;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
 }
 
 .ms-notifications-container .notif-filter-btn:hover {
     color: var(--accent-color);
     border-color: var(--accent-color);
-    background: rgba(209, 125, 57, 0.05);
+    background: var(--accent-light);
+    transform: translateY(-1px);
 }
 
 .ms-notifications-container .notif-filter-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
 }
 
 .ms-notifications-container .notif-filter-btn.active {
     color: #fff;
     border-color: transparent;
     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25);
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
 }
 
 .ms-notifications-container .notif-filter-badge {
@@ -1418,25 +1419,45 @@ body.admin-body .btn-full,
     padding: 64px 24px;
     text-align: center;
     color: var(--text-muted);
-    gap: 14px;
-    max-width: 400px;
+    gap: 16px;
+    max-width: 420px;
+    margin: 40px auto; /* Centered horizontally */
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .empty-state .material-symbols-outlined {
-    font-size: 52px;
-    color: #cbd5e1;
+    font-size: 38px;
+    color: var(--accent-color);
+    background: var(--accent-light);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.06);
+    border: 1px solid rgba(249, 115, 22, 0.08);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.empty-state:hover .material-symbols-outlined {
+    transform: scale(1.06) rotate(4deg);
 }
 
 .empty-state h3 {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: var(--text-main);
+    letter-spacing: -0.01em;
+    margin: 0;
 }
 
 .empty-state p {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
     line-height: 1.6;
+    margin: 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════ */
