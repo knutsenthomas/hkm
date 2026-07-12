@@ -2259,6 +2259,66 @@ class MinSideManager {
                 const ovEventsFeed = document.getElementById('ov-events-feed-preview');
                 if (!ovEventsCard || !ovEventsFeed) return;
 
+                // Image library helpers matching content-manager.js
+                const generateEventImage = (title) => {
+                    const imageLibrary = {
+                        'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
+                        'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
+                        'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
+                        'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
+                        'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
+                        'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
+                        'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
+                        'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
+                        'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
+                        'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
+                        'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
+                        'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
+                        'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
+                        'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
+                        'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
+                    };
+
+                    if (!title) return imageLibrary.default;
+
+                    const titleLower = title.toLowerCase();
+                    const keywordMap = {
+                        'bønn': 'prayer',
+                        'gudstjeneste': 'worship',
+                        'seminar': 'conference',
+                        'konferanse': 'conference',
+                        'undervisning': 'teaching',
+                        'skole': 'teaching',
+                        'kurs': 'teaching',
+                        'bibel': 'bible',
+                        'leseplan': 'bible',
+                        'ungdom': 'youth',
+                        'teens': 'youth',
+                        'barn': 'children',
+                        'søndagsskole': 'children',
+                        'familie': 'family',
+                        'påske': 'easter',
+                        'jul': 'christmas',
+                        'konsert': 'concert',
+                        'musikk': 'concert',
+                        'møte': 'meeting',
+                        'basar': 'family',
+                        'fellesskap': 'gathering'
+                    };
+
+                    for (const [key, category] of Object.entries(keywordMap)) {
+                        if (titleLower.includes(key)) {
+                            return imageLibrary[category];
+                        }
+                    }
+                    return imageLibrary.default;
+                };
+
+                const getEventImage = (event) => {
+                    if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
+                    return event.dashboardImage || event.imageUrl || event.image || event.imageLink || generateEventImage(event.summary);
+                };
+
                 let events = [];
                 try {
                     const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
@@ -2284,28 +2344,50 @@ class MinSideManager {
                         const startVal = item.start.dateTime || item.start.date;
                         const dateObj = new Date(startVal);
                         const hasTime = !!item.start.dateTime;
-                        const dateOptions = hasTime 
-                            ? { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
-                            : { day: 'numeric', month: 'short', year: 'numeric' };
-                        const dateStr = dateObj.toLocaleDateString('no-NO', dateOptions);
                         
+                        const locale = 'no-NO';
+                        const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
+                        const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
+                        const day = dateObj.getDate();
+
+                        const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+                        let timeLabel = '';
+                        if (hasTime) {
+                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+                            timeLabel = `, kl. ${startTime}`;
+                        }
+                        
+                        const imageSrc = getEventImage(item);
+                        const imageAlt = item.summary || 'Arrangement';
+                        
+                        const rawDesc = item.description || '';
+                        const cleanExcerpt = typeof rawDesc === 'string' 
+                            ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
+                            : '';
+                        const limitExcerpt = cleanExcerpt.length > 120 
+                            ? cleanExcerpt.slice(0, 117) + '...' 
+                            : cleanExcerpt;
+
+                        const detailsUrl = `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`;
+
                         return `
-                            <div class="ov-event-item" style="border: 1px solid var(--border-solid); border-radius: 12px; padding: 12px 16px; background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; min-height: 110px; transition: transform 0.2s ease, border-color 0.2s ease;">
-                                <div>
-                                    <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
-                                        <span class="material-symbols-outlined" style="color: var(--accent-color); font-size: 14px;">calendar_today</span>
-                                        <span style="font-size: 11.5px; font-weight: 700; color: var(--accent-color);">${dateStr}</span>
+                            <a href="${detailsUrl}" class="ov-event-card">
+                                <div class="ov-event-image">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                    <div class="ov-event-date-badge">
+                                        <span class="month">${monthUpper}</span>
+                                        <span class="day">${day}</span>
                                     </div>
-                                    <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0; line-height: 1.3;">${this._escapeHtml(item.summary)}</h4>
-                                    ${item.description ? `<p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${this._escapeHtml(item.description)}</p>` : ''}
                                 </div>
-                                ${item.location ? `
-                                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: auto;">
-                                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--text-muted);">location_on</span>
-                                    <span style="display: inline-block; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">${this._escapeHtml(item.location)}</span>
+                                <div class="ov-event-content">
+                                    <h4 class="ov-event-title">${this._escapeHtml(item.summary || 'Uten tittel')}</h4>
+                                    ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
+                                    <div class="ov-event-meta">
+                                        <span class="material-symbols-outlined">calendar_today</span>
+                                        <span>${dateLabel}${timeLabel}</span>
+                                    </div>
                                 </div>
-                                ` : ''}
-                            </div>
+                            </a>
                         `;
                     }).join('');
                 } else {
