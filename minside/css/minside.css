@@ -3381,14 +3381,20 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 }
 
 .notif-settings-card {
-    background-color: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02), 0 2px 8px rgba(15, 23, 42, 0.01);
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-solid) !important;
+    border-radius: 24px !important; /* Premium rounded corner radius */
+    box-shadow: var(--shadow) !important;
     padding: 28px 32px;
     margin-bottom: 24px;
     display: flex;
     flex-direction: column;
     gap: 28px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.notif-settings-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
 }
 
 .notif-card-header {
@@ -3410,8 +3416,9 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 .notif-icon-circle.push,
 .notif-icon-circle.email,
 .notif-icon-circle.time {
-    background-color: rgba(209, 125, 57, 0.1);
-    color: #bd4f2a;
+    background-color: var(--accent-light) !important;
+    color: var(--accent-color) !important;
+    border: 1px solid rgba(209, 125, 57, 0.15) !important;
 }
 
 .notif-card-title-container {
@@ -3423,14 +3430,14 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 .notif-card-title {
     font-size: 17.5px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-main) !important;
     margin: 0;
     line-height: 1.25;
 }
 
 .notif-card-description {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted) !important;
     margin: 0;
     line-height: 1.45;
 }
@@ -3440,6 +3447,12 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     flex-direction: column;
     gap: 22px;
     padding-left: 66px;
+}
+
+@media (max-width: 640px) {
+    .notif-settings-list {
+        padding-left: 0 !important;
+    }
 }
 
 .notif-setting-item {
@@ -3462,7 +3475,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 
 .notif-settings-card.push .notif-setting-sub-icon,
 .notif-settings-card.email .notif-setting-sub-icon {
-    color: #bd4f2a;
+    color: var(--accent-color) !important;
 }
 
 .notif-setting-text {
@@ -3472,15 +3485,15 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 }
 
 .notif-setting-label {
-    font-size: 14px;
+    font-size: 14.5px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-main) !important;
     line-height: 1.3;
 }
 
 .notif-setting-description {
-    font-size: 11.5px;
-    color: #64748b;
+    font-size: 12px;
+    color: var(--text-muted) !important;
     line-height: 1.4;
 }
 
@@ -3506,7 +3519,7 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ebf2fa;
+    background-color: var(--border-solid) !important;
     border-radius: 24px;
     transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -3538,13 +3551,13 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 
 /* Time Picker Select */
 .notif-time-select {
-    background-color: #f0f4f9;
-    border: none;
+    background-color: var(--main-bg) !important;
+    border: 1px solid var(--border-solid) !important;
     border-radius: 12px;
     padding: 10px 16px;
     font-size: 13.5px;
     font-weight: 600;
-    color: #d17d39;
+    color: var(--accent-color) !important;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -3554,11 +3567,12 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
     background-repeat: no-repeat !important;
     background-position: right 14px center !important;
     background-size: 12px !important;
-    transition: background-color 0.2s ease;
+    transition: border-color 0.2s, background-color 0.2s ease !important;
 }
 
 .notif-time-select:hover {
-    background-color: #e5edf5;
+    background-color: var(--accent-light) !important;
+    border-color: var(--accent-color) !important;
 }
 
 /* Footer Section */
