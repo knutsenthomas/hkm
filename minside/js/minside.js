@@ -1,5 +1,13 @@
 import { biblicalCharacters } from '../../js/bibelske-personer-data.js';
 
+// Safely wrap any promise in a timeout to prevent hanging on Safari/iOS browsers
+function withTimeout(promise, ms = 3000) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore operation timed out')), ms))
+    ]);
+}
+
 /* ═══════════════════════════════════════════════════════
    MIN SIDE — PCO-inspired Member Profile
    ═══════════════════════════════════════════════════════ */
@@ -1005,6 +1013,21 @@ class MinSideManager {
     async init() {
         this.setupNavigation();
 
+        if (typeof firebase === 'undefined') {
+            console.error("Firebase SDK is not loaded!");
+            const area = document.getElementById('view-container') || document.getElementById('content-area');
+            if (area) {
+                area.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #1b4965; max-width: 500px; margin: 40px auto; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39; margin-bottom: 16px;">wifi_off</span>
+                        <h3 style="font-weight: 700; margin: 0 0 8px 0; color: #1b4965;">Tilkoblingsfeil (Safari)</h3>
+                        <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin: 0;">Kunne ikke laste inn systemets kjernekomponenter. Vennligst sjekk at du ikke har en innholdsblokkering eller sporingssperre aktivert i Safari som forhindrer lasting av Firebase, og prøv å oppdatere siden.</p>
+                    </div>
+                `;
+            }
+            return;
+        }
+
         // Wait for Firebase to be ready with a small timeout
         let count = 0;
         while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
@@ -1020,8 +1043,11 @@ class MinSideManager {
                     // Load features config
                     let prayerWallEnabled = false;
                     try {
-                        const featuresDoc = await firebase.firestore().collection('content').doc('settings_features').get();
-                        if (featuresDoc.exists) {
+                        const featuresDoc = await withTimeout(
+                            firebase.firestore().collection('content').doc('settings_features').get(),
+                            3000
+                        );
+                        if (featuresDoc && featuresDoc.exists) {
                             prayerWallEnabled = !!featuresDoc.data().prayerWallEnabled;
                         }
                     } catch (err) {
@@ -1741,8 +1767,11 @@ class MinSideManager {
         if (!user) return {};
         let data = {};
         try {
-            const doc = await firebase.firestore().collection('users').doc(user.uid).get();
-            if (doc.exists) data = doc.data() || {};
+            const doc = await withTimeout(
+                firebase.firestore().collection('users').doc(user.uid).get(),
+                3000
+            );
+            if (doc && doc.exists) data = doc.data() || {};
         } catch (e) { console.warn('getMergedProfile:', e); }
 
         const google = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
@@ -1772,16 +1801,16 @@ class MinSideManager {
         if (!user) return;
         try {
             const ref = firebase.firestore().collection('users').doc(user.uid);
-            const doc = await ref.get();
-            if (!doc.exists) {
-                await ref.set({
+            const doc = await withTimeout(ref.get(), 3000);
+            if (doc && !doc.exists) {
+                await withTimeout(ref.set({
                     email: (user.email || '').toLowerCase().trim(),
                     displayName: user.displayName || '',
                     photoURL: user.photoURL || '',
                     role: 'medlem',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                });
+                }), 3000);
                 await this.createAdminNotification({
                     type: 'NEW_USER_REGISTRATION',
                     userId: user.uid,
