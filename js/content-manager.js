@@ -1239,17 +1239,21 @@ class ContentManager {
         const lang = this.getCurrentLanguage();
         let defaultLabel = 'Generell gave (der det trengs mest)';
         let basarLabel = 'Basar';
+        let misjonLabel = 'Misjon';
         if (lang === 'en') {
             defaultLabel = 'General donation (where it is needed most)';
             basarLabel = 'Bazaar';
+            misjonLabel = 'Missions';
         } else if (lang === 'es') {
             defaultLabel = 'Donación general (donde más se necesite)';
             basarLabel = 'Bazar';
+            misjonLabel = 'Misiones';
         }
 
         selectEl.innerHTML = `
             <option value="general">${defaultLabel}</option>
             <option value="basar">${basarLabel}</option>
+            <option value="misjon">${misjonLabel}</option>
         `;
 
         if (causes && Array.isArray(causes)) {

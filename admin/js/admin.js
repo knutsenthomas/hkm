@@ -18992,6 +18992,7 @@ class AdminManager {
                                     <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="general">general</option>
                                         <option value="basar">basar</option>
+                                        <option value="misjon">misjon</option>
                                         <option value="new-building">new-building</option>
                                         <option value="domestic-missions-sandnes">domestic-missions-sandnes</option>
                                     </select>
