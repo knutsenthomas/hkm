@@ -4348,23 +4348,15 @@ class ContentManager {
 
             if (vippsNumber) {
                 const vippsBtn = document.createElement('a');
-                vippsBtn.href = 'javascript:void(0)';
+                const donationPath = lang === 'en' ? '/en/donations.html' : (lang === 'es' ? '/es/donaciones.html' : '/donasjoner.html');
+                vippsBtn.href = donationPath;
                 vippsBtn.className = 'btn-vipps';
                 vippsBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #ff5b24; color: white !important; font-weight: 700; padding: 12px 24px; border-radius: 30px; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255, 91, 36, 0.2); font-size: 14.5px; height: 48px; box-sizing: border-box;';
                 vippsBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important;">smartphone</span><span>Vipps til ${vippsNumber}</span>`;
                 
-                vippsBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(vippsNumber).then(() => {
-                        const originalHtml = vippsBtn.innerHTML;
-                        vippsBtn.style.background = '#22c55e';
-                        vippsBtn.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)';
-                        vippsBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin: 0 !important; display: inline-flex !important; align-items: center !important;">check_circle</span><span>Kopiert! ✓</span>`;
-                        setTimeout(() => {
-                            vippsBtn.style.background = '#ff5b24';
-                            vippsBtn.style.boxShadow = '0 4px 12px rgba(255, 91, 36, 0.2)';
-                            vippsBtn.innerHTML = originalHtml;
-                        }, 2000);
-                    }).catch(err => {
+                vippsBtn.addEventListener('click', (e) => {
+                    // Silent clipboard copy of Vipps number
+                    navigator.clipboard.writeText(vippsNumber).catch(err => {
                         console.error('Failed to copy Vipps number:', err);
                     });
                 });
