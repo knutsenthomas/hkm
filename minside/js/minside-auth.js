@@ -486,57 +486,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function routeByRole() {
-        const service = await waitForFirebaseReady();
-        
-        let user = firebase.auth().currentUser;
-        if (!user) {
-            user = await new Promise((resolve) => {
-                const unsubscribe = firebase.auth().onAuthStateChanged((u) => {
-                    unsubscribe();
-                    resolve(u);
-                });
-            });
-        }
-
         const queryParams = new URLSearchParams(window.location.search);
         const redirectUrl = queryParams.get('redirect');
-
-        if (!user || !service) {
-            if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
-                window.location.href = redirectUrl;
-            } else {
-                window.location.href = '/minside/index.html';
-            }
-            return;
-        }
-
-        let role = 'medlem';
-        let roleLookupFailed = false;
-        try {
-            role = await service.getUserRole(user.uid, { timeoutMs: 2500 });
-        } catch (err) {
-            roleLookupFailed = true;
-            console.warn('Kunne ikke hente rolle:', err);
-        }
-
-        if (roleLookupFailed) {
-            // Avoid misrouting admins to member area when Firestore is temporarily slow.
-            showMessage(t('auth.roleVerificationSlow'), 'success');
-            if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
-                window.location.href = redirectUrl;
-            } else {
-                window.location.href = '/minside/index.html';
-            }
-            return;
-        }
-
-        const normalizedRole = String(role || '').trim().toLowerCase();
-        const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
 
         if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
             window.location.href = redirectUrl;
         } else {
-            window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
+            window.location.href = '/minside/index.html';
         }
     }
 
