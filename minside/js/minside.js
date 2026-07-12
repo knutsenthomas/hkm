@@ -2321,10 +2321,10 @@ class MinSideManager {
             const checked = userCustomNav.includes(id) ? 'checked' : '';
             const item = navLabels[id] || { label: id, icon: 'link' };
             return `
-                <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; background: var(--admin-bg, #f8f9fa); border: 1px solid var(--admin-border, #e2e8f0); cursor: pointer; user-select: none;">
-                    <div style="display: flex; align-items: center; gap: 10px; color: var(--text-main, #1e293b);">
-                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">${item.icon}</span>
-                        <span style="font-weight: 600; font-size: 13.5px;">${item.label}</span>
+                <label class="custom-nav-item">
+                    <div class="custom-nav-item-left">
+                        <span class="material-symbols-outlined">${item.icon}</span>
+                        <span>${item.label}</span>
                     </div>
                     <label class="hkm-switch toggle-orange" style="margin: 0;">
                         <input type="checkbox" class="custom-nav-cb" value="${id}" ${checked}>
@@ -2541,20 +2541,20 @@ class MinSideManager {
                 </div>
 
                 <!-- Mobile Navigation Menu Preferences -->
-                <div class="info-card" style="border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; background: #fff; margin-bottom: 24px;">
-                    <div class="info-card-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-start !important; gap: 10px;">
+                <div class="info-card">
+                    <div class="info-card-header" style="justify-content: flex-start !important; gap: 12px;">
                         <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">phone_android</span>
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #d17d39; letter-spacing: -0.02em;">Navigasjon på mobil</h3>
+                        <h3 style="color: #d17d39;">Navigasjon på mobil</h3>
                     </div>
-                    <div class="ms-card-body-pad" style="padding: 20px 24px !important; display: block !important;">
-                        <p class="ms-danger-copy" style="margin-bottom: 16px !important; color: var(--text-muted, #64748b) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
+                    <div class="ms-card-body-pad" style="padding: 24px !important; display: block !important;">
+                        <p style="margin: 0 0 16px 0; color: var(--text-muted) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
                             Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen på mobil:
                         </p>
-                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
+                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px;">
                             ${customNavHtml}
                         </div>
-                        <button class="btn btn-primary" id="save-custom-nav-btn" style="box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2); border-radius: 10px; padding: 11px 22px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0 !important;">save</span> Lagre menyvalg
+                        <button class="btn btn-primary" id="save-custom-nav-btn" style="border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
+                            <span class="material-symbols-outlined">save</span> Lagre menyvalg
                         </button>
                     </div>
                 </div>
