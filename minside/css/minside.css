@@ -4216,10 +4216,16 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-wrap: nowrap; /* Keep items side-by-side on larger screens */
+    gap: 16px;
     transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02) !important;
+}
+@media (max-width: 576px) {
+    .course-lesson-row {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
 }
 .course-lesson-row:hover {
     border-color: var(--accent-color) !important;

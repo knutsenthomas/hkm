@@ -4394,12 +4394,12 @@ class MinSideManager {
                                         const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
                                         return `
                                         <div class="course-lesson-row">
-                                            <div style="display:flex; align-items:center; gap:12px;">
+                                            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
                                                 <div class="lesson-index-badge">
                                                     ${lIdx + 1}
                                                 </div>
-                                                <div>
-                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2;">
+                                                <div style="flex:1; min-width:0;">
+                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2; word-break:break-word;">
                                                         ${cleanTitle}
                                                     </div>
                                                     ${dateStr ? `
