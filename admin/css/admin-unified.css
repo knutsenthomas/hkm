@@ -4886,13 +4886,14 @@ body.admin-body .sidebar-nav::-webkit-scrollbar-thumb:hover {
 body.admin-body .nav-category-header,
 body.minside-body .nav-category-header {
   margin: 0 !important;
-  padding: 16px 4px !important;
+  padding: 14px 4px !important;
   background-color: transparent !important;
   color: #334155 !important;
   border-radius: 0 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  font-size: 15px !important;
-  font-weight: 500 !important;
+  border-bottom: none !important;
+  font-family: var(--admin-font) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
   display: flex !important;
