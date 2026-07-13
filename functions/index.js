@@ -711,21 +711,30 @@ exports.getAnalyticsOverview = onRequest({
   return cors(req, res, async () => {
     await verifyAdmin(req, res, async () => {
       try {
-      let propertyId = gaPropertyIdParam.value();
-      let clientEmail = gaServiceAccountEmailParam.value();
-      let privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
+      let propertyId = "";
+      let clientEmail = "";
+      let privateKeyRaw = "";
 
-      // Fallback to Firestore if secrets are missing
-      if (!propertyId || !clientEmail || !privateKeyRaw) {
-        console.log("[Analytics] Secrets missing, checking Firestore fallback...");
+      // Load from Firestore first so admin updates take effect immediately
+      try {
         const settingsDoc = await admin.firestore().collection('content').doc('settings_integrations').get();
         if (settingsDoc.exists) {
             const ga = settingsDoc.data().googleAnalytics || {};
-            if (!propertyId) propertyId = ga.propertyId;
-            if (!clientEmail) clientEmail = ga.serviceEmail;
-            if (!privateKeyRaw) privateKeyRaw = ga.privateKey;
+            propertyId = ga.propertyId || "";
+            clientEmail = ga.serviceEmail || "";
+            privateKeyRaw = ga.privateKey || "";
+            console.log("[Analytics] Loaded credentials from Firestore settings_integrations.");
         }
+      } catch (fErr) {
+        console.warn("[Analytics] Error loading from Firestore, using Secrets:", fErr.message);
       }
+
+      // Fallback to Secrets if Firestore is unconfigured
+      if (!propertyId) propertyId = gaPropertyIdParam.value();
+      if (!clientEmail) clientEmail = gaServiceAccountEmailParam.value();
+      if (!privateKeyRaw) privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
+
+      console.log(`[Analytics] Resolved - Property ID: ${propertyId}, Email: ${clientEmail}`);
 
       const privateKey = (privateKeyRaw || "")
         .replace(/\\n/g, "\n")
