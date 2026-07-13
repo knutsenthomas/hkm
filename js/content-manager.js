@@ -1127,18 +1127,18 @@ class ContentManager {
             const priceNok = p.price ? `${p.price} kr` : '';
 
             return `
-                <a href="${url}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full active:scale-[0.98]">
-                    <div class="aspect-square bg-gray-100 dark:bg-slate-700 relative overflow-hidden flex items-center justify-center">
+                <a href="${url}" target="_blank" rel="noopener noreferrer" class="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full active:scale-[0.98]">
+                    <div class="aspect-square bg-white relative overflow-hidden flex items-center justify-center">
                         <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                         ${badgeHtml}
                     </div>
                     <div class="p-6 flex flex-col justify-between flex-grow">
                         <div>
-                            <h3 class="font-bold text-[#1B4965] dark:text-white text-lg mb-1 group-hover:text-[#bd4f2a] transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
+                            <h3 class="font-bold text-[#1B4965] text-lg mb-1 group-hover:text-[#bd4f2a] transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
                                 ${p.name}
                             </h3>
                             ${priceNok ? `<div class="text-[#bd4f2a] font-bold text-base mb-2">${priceNok}</div>` : ''}
-                            <p class="text-gray-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">
+                            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3">
                                 ${cleanDesc}
                             </p>
                         </div>
