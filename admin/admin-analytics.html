@@ -2200,9 +2200,16 @@
                         let giverViews = 0;
 
                         topPages.forEach(p => {
-                            const title = String(p.title || '').toLowerCase();
+                            const title = String(p.title || '').toLowerCase().trim();
                             const v = parseInt(p.views) || 0;
-                            if (title.includes('forside') || title.includes('hjem') || title === '/' || title.includes('kingdom ministry')) {
+                            
+                            const isHome = title === 'his kingdom ministry' || 
+                                           title === '/' || 
+                                           title.startsWith('forside') || 
+                                           title.startsWith('home') || 
+                                           title.startsWith('inicio');
+                                           
+                            if (isHome) {
                                 homeViews += v;
                             } else if (title.includes('undervisning')) {
                                 teachingViews += v;
