@@ -68,17 +68,30 @@
 
         body.admin-analytics-page {
             overflow-x: hidden !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
+            width: 100% !important;
+            max-width: 100% !important;
         }
 
-        body.admin-analytics-page .main-content {
-            width: auto !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            overflow-x: hidden !important;
-            overflow-x: clip !important;
-            box-sizing: border-box !important;
+        @media (min-width: 1025px) {
+            body.admin-analytics-page .main-content {
+                width: calc(100% - var(--sidebar-width, 260px)) !important;
+                max-width: calc(100% - var(--sidebar-width, 260px)) !important;
+                margin-left: var(--sidebar-width, 260px) !important;
+                box-sizing: border-box !important;
+                min-width: 0 !important;
+                overflow-x: hidden !important;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            body.admin-analytics-page .main-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-left: 0 !important;
+                box-sizing: border-box !important;
+                min-width: 0 !important;
+                overflow-x: hidden !important;
+            }
         }
 
         .analytics-container {
