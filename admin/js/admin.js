@@ -4519,7 +4519,7 @@ class AdminManager {
                 firebaseService.getPageContent('collection_events').catch(() => null),
                 firebaseService.getPageContent('collection_causes').catch(() => null),
                 firebaseService.getPageContent('settings_index').catch(() => null),
-                firebaseService.getPageContent('settings_youtube').catch(() => null),
+                this.fetchYouTubeStats().catch(() => null),
                 this.fetchPodcastEpisodesForAdmin().catch(() => null),
                 firebaseService.getPageContent('collection_courses').catch(() => null),
                 this.fetchAnalyticsData(this.analyticsRangeDays).catch(() => null)
