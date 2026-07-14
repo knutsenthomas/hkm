@@ -3,7 +3,17 @@
 <head>
             <!-- Theme Initializer -->
     <script>
-        document.documentElement.setAttribute('data-theme', 'light');
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
     </script>
     <meta charset="UTF-8">
     <title>Migrer statiske bloggposter til CMS</title>
