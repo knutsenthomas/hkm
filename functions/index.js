@@ -8069,6 +8069,27 @@ exports.scheduledReadingNotifications = onSchedule({
             console.error(`Kunne ikke sende leseplan-epost til ${userData.email}:`, emailErr);
           }
         }
+
+        // C. Lagre i user_notifications for historikk på Min Side
+        try {
+          const notifTitle = `📖 Leseplan: Dag ${currentDayNum}`;
+          const notifBody = `Dagens tekst er ${verses} fra leseplanen "${planTitle}".`;
+          await db.collection("user_notifications").add({
+            userId: userId,
+            title: notifTitle,
+            body: notifBody,
+            message: notifBody,
+            type: "push",
+            link: `/bibel.html?plan=${planId}&day=${currentDayNum}`,
+            read: false,
+            silent: true,
+            skipDelivery: true,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+          console.log(`Leseplan-historikk lagret i user_notifications for bruker ${userId}`);
+        } catch (dbErr) {
+          console.error(`Kunne ikke lagre leseplan-historikk i user_notifications for ${userId}:`, dbErr);
+        }
       }
     } catch (userErr) {
       console.error(`Feil under behandling av varsling for bruker ${userDoc.id}:`, userErr);
@@ -8090,6 +8111,13 @@ exports.onNotificationCreated = onDocumentCreated({
   const snapshot = event.data;
   if (!snapshot) return;
   const notifData = snapshot.data();
+
+  // Skip execution if notification is flagged as silent/skipDelivery (e.g. from scheduled reading plans)
+  if (notifData && (notifData.silent === true || notifData.skipDelivery === true)) {
+    console.log(`Notification ${event.params.id} has silent/skipDelivery flag. Skipping trigger delivery.`);
+    return;
+  }
+
   const userId = notifData.userId;
   const title = notifData.title || "Nytt varsel";
   const message = notifData.message || "";
