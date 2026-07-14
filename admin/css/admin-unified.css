@@ -7859,6 +7859,17 @@ html[data-theme="dark"] .user-profile-link .user-name {
   color: #f1f5f9 !important;
 }
 
+/* Hide theme toggle buttons globally while dark mode is disabled */
+#theme-toggle-btn,
+.mobile-theme-toggle-btn,
+.theme-toggle-btn,
+button.theme-toggle-btn,
+[aria-label="Bytt tema"],
+[aria-label="Toggle theme"],
+[aria-label="Cambiar tema"] {
+  display: none !important;
+}
+
 
 
 

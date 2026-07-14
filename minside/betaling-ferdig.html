@@ -4,32 +4,7 @@
 <head>
             <!-- Theme Initializer -->
     <script>
-        (function () {
-            const savedTheme = localStorage.getItem('hkm_theme');
-            const mq = window.matchMedia('(prefers-color-scheme: dark)');
-            function applyTheme(theme) {
-                const active = theme || (mq.matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', active);
-            }
-            applyTheme(savedTheme);
-            if (!savedTheme) {
-                try {
-                    mq.addEventListener('change', function () {
-                        if (!localStorage.getItem('hkm_theme')) {
-                            applyTheme();
-                        }
-                    });
-                } catch (err) {
-                    try {
-                        mq.addListener(function () {
-                            if (!localStorage.getItem('hkm_theme')) {
-                                applyTheme();
-                            }
-                        });
-                    } catch (e2) {}
-                }
-            }
-        })();
+        document.documentElement.setAttribute('data-theme', 'light');
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/minside/betaling-ferdig">
     <meta name="robots" content="noindex, nofollow">

@@ -4,17 +4,7 @@
 <head>
             <!-- Theme Initializer -->
     <script>
-        (function () {
-            const savedTheme = localStorage.getItem('hkm_theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            } else {
-                const hour = new Date().getHours();
-                const isNight = hour >= 22 || hour < 6;
-                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', systemTheme);
-            }
-        })();
+        document.documentElement.setAttribute('data-theme', 'light');
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/podcast">
     <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/podcast">

@@ -9168,6 +9168,17 @@ html[data-theme="dark"] .search-suggestion-item.selected {
     background-color: #0f172a !important;
 }
 
+/* Hide theme toggle buttons globally while dark mode is disabled */
+#theme-toggle-btn,
+.mobile-theme-toggle-btn,
+.theme-toggle-btn,
+button.theme-toggle-btn,
+[aria-label="Bytt tema"],
+[aria-label="Toggle theme"],
+[aria-label="Cambiar tema"] {
+    display: none !important;
+}
+
 
 
 

@@ -4,40 +4,7 @@
 <head>
             <!-- Theme Initializer & FOUT Prevention -->
     <script>
-        (function () {
-            const savedTheme = localStorage.getItem('hkm_theme');
-            const mq = window.matchMedia('(prefers-color-scheme: dark)');
-            function applyTheme(theme) {
-                const active = theme || (mq.matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', active);
-            }
-            applyTheme(savedTheme);
-            if (!savedTheme) {
-                try {
-                    mq.addEventListener('change', function () {
-                        if (!localStorage.getItem('hkm_theme')) {
-                            applyTheme();
-                        }
-                    });
-                } catch (err) {
-                    try {
-                        mq.addListener(function () {
-                            if (!localStorage.getItem('hkm_theme')) {
-                                applyTheme();
-                            }
-                        });
-                    } catch (e) {}
-                }
-            }
-            
-            // Font loading detector to prevent Material Symbols FOUT (icon names flashing as text)
-            document.documentElement.classList.add('prevent-fout');
-            
-            // Safety timeout in case network request hangs or fails
-            setTimeout(function() {
-                document.documentElement.classList.add('fonts-loaded');
-            }, 2500);
-        })();
+        document.documentElement.setAttribute('data-theme', 'light');
     </script>
     <link rel="canonical" href="https://www.hiskingdomministry.no/minside/index">
     <meta name="robots" content="noindex, nofollow">
