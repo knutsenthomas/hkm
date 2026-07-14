@@ -211,8 +211,9 @@ async function getHistoricalCommentaries(refStr) {
     
     if (matchingEntries.length === 0) return [];
     
+    const entriesToFetch = matchingEntries.slice(0, 3);
     const fetchedCommentaries = await Promise.all(
-      matchingEntries.map(async (entry) => {
+      entriesToFetch.map(async (entry) => {
         try {
           const url = `https://raw.githubusercontent.com/HistoricalChristianFaith/Commentaries-Database/master/${encodeURIComponent(entry.p)}`;
           const response = await fetch(url);
@@ -519,6 +520,36 @@ export default async function handler(req, res) {
       }
 
       const cleanWord = word.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'«»]/g, "");
+      const cacheKey = extended ? `${cleanWord}_extended` : cleanWord;
+
+      // Check Firestore Cache first
+      try {
+        const cached = await getCachedDefinition(lang, cacheKey);
+        if (cached) {
+          return res.status(200).json(cached);
+        }
+      } catch (cacheErr) {
+        console.error("Cache read failed:", cacheErr);
+      }
+
+      let responseData = null;
+
+      // Bypass slow Gemini definition lookup if it is a scripture reference
+      const isScripture = !!parseReference(word);
+      if (isScripture) {
+        const labelDef = lang === 'en' ? `Scripture reference and commentaries for ${word}.` : (lang === 'es' ? `Referencia bíblica y comentarios para ${word}.` : `Bibelreferanse og kommentarer for ${word}.`);
+        const labelCat = lang === 'en' ? "Scripture Reference" : (lang === 'es' ? "Referencia Bíblica" : "Bibelreferanse");
+        
+        responseData = {
+          word: word,
+          definition: labelDef,
+          category: labelCat,
+          contextualNote: "",
+          crossReferences: [],
+          originalWords: [],
+          extendedAnalysis: ""
+        };
+      }
 
       // Quick check of hardcoded local fallback dict for basic Norwegian terms (only when not requesting extended analysis)
       const fallbackDict = {
@@ -637,8 +668,6 @@ export default async function handler(req, res) {
         }
       };
 
-      let responseData = null;
-
       if (lang === 'no' && !extended) {
         const fallbackEntry = fallbackDict[cleanWord];
         if (fallbackEntry) {
@@ -655,12 +684,6 @@ export default async function handler(req, res) {
       }
 
       if (!responseData) {
-        // Check Firestore Cache first with separated cache keys
-        const cacheKey = extended ? `${cleanWord}_extended` : cleanWord;
-        const cached = await getCachedDefinition(lang, cacheKey);
-        if (cached) {
-          responseData = cached;
-        } else {
           // Set up languages instructions
           let responseLangInstruction = "Du må svare på flytende, vakkert og varmt norsk. Alle tekster og forklaringer må være på norsk.";
           let rejectCategory = "Ikke bibelrelatert";
@@ -784,7 +807,6 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
             }
           }
         }
-      }
 
       if (!responseData) {
         // No API key or AI lookup failed. Let's do a fallback direct English matching.
@@ -882,6 +904,13 @@ ${JSON.stringify(quotesToTranslate)}`;
         } catch (commErr) {
           console.error("Error retrieving historical commentaries:", commErr);
         }
+      }
+
+      // Save response to cache so subsequent lookups (both words and verses) are instant
+      try {
+        await setCachedDefinition(lang, cacheKey, responseData);
+      } catch (cacheWriteErr) {
+        console.error("Cache write failed:", cacheWriteErr);
       }
 
       return res.status(200).json(responseData);
