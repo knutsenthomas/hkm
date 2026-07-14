@@ -216,18 +216,29 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
         }
 
         .stat-card-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(27, 73, 101, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -4px rgba(27, 73, 101, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
+            border-color: rgba(27, 73, 101, 0.15);
         }
 
         /* Live User Card Styling */
         .live-users-card {
             border-left: 4px solid #bd4f2a;
-            background: linear-gradient(to right, white, #fffcf9);
+            background: linear-gradient(to right, white, #fffdfb);
+        }
+
+        .pageviews-card {
+            border-left: 4px solid #3b82f6;
+            background: linear-gradient(to right, white, #fafdff);
+        }
+
+        .engagement-card {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(to right, white, #fafffc);
         }
 
         .live-indicator-dot {
@@ -483,18 +494,18 @@
         }
 
         .top-page-bar-wrapper {
-            height: 6px;
+            height: 8px;
             background: #f1f5f9;
-            border-radius: 3px;
+            border-radius: 4px;
             overflow: hidden;
             width: 100%;
         }
 
         .top-page-bar {
             height: 100%;
-            border-radius: 3px;
-            background: linear-gradient(to right, #bd4f2a, #d17d39);
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+            background: linear-gradient(to right, #1b4965, #3b82f6);
+            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .top-page-bar.accent {
@@ -817,14 +828,18 @@
         }
         .gsc-metric-box {
             background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px 12px;
+            border-radius: 12px;
             border: 1px solid #e2e8f0;
             text-align: center;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
         .gsc-metric-box:hover {
-            border-color: #d17d39;
+            border-color: rgba(209, 125, 57, 0.3);
+            background: #fffdfb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.03);
         }
         .ai-alert-box {
             background: rgba(209, 125, 57, 0.04);
@@ -850,17 +865,38 @@
             letter-spacing: 0.5px;
         }
         .platform-icon-circle {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #d17d39, #bd4f2a);
-            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 9px;
             font-weight: 800;
             flex-shrink: 0;
+            box-sizing: border-box;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .platform-icon-circle.chatgpt {
+            background: rgba(16, 163, 127, 0.08);
+            color: #10a37f;
+            border: 1px solid rgba(16, 163, 127, 0.15);
+        }
+        .platform-icon-circle.gemini {
+            background: rgba(26, 115, 232, 0.08);
+            color: #1a73e8;
+            border: 1px solid rgba(26, 115, 232, 0.15);
+        }
+        .platform-icon-circle.claude {
+            background: rgba(217, 119, 6, 0.08);
+            color: #d97706;
+            border: 1px solid rgba(217, 119, 6, 0.15);
+        }
+        .platform-icon-circle.perplexity {
+            background: rgba(20, 184, 166, 0.08);
+            color: #14b8a6;
+            border: 1px solid rgba(20, 184, 166, 0.15);
         }
         .ai-query-row {
             margin-bottom: 12px;
@@ -1019,7 +1055,7 @@
                 </div>
 
                 <!-- Sidevisninger Card -->
-                <div class="stat-card-premium">
+                <div class="stat-card-premium pageviews-card">
                     <div class="stat-card-header">
                         <div class="stat-card-title">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #3b82f6;">visibility</span>
@@ -1034,7 +1070,7 @@
                 </div>
 
                 <!-- Snittid Card -->
-                <div class="stat-card-premium">
+                <div class="stat-card-premium engagement-card">
                     <div class="stat-card-header">
                         <div class="stat-card-title">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">schedule</span>
@@ -1302,28 +1338,28 @@
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div class="platform-icon-circle">GPT</div>
+                                        <div class="platform-icon-circle chatgpt">GPT</div>
                                         <span style="font-weight: 600; color: #334155;">ChatGPT (OpenAI-bot)</span>
                                     </div>
                                     <span style="color: #64748b; font-size: 12px;" id="crawl-chatgpt">--</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div class="platform-icon-circle">GEM</div>
+                                        <div class="platform-icon-circle gemini">GEM</div>
                                         <span style="font-weight: 600; color: #334155;">Gemini-Google</span>
                                     </div>
                                     <span style="color: #64748b; font-size: 12px;" id="crawl-gemini">--</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div class="platform-icon-circle">CLD</div>
+                                        <div class="platform-icon-circle claude">CLD</div>
                                         <span style="font-weight: 600; color: #334155;">Claude (Anthropic-bot)</span>
                                     </div>
                                     <span style="color: #64748b; font-size: 12px;" id="crawl-claude">--</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div class="platform-icon-circle">PRP</div>
+                                        <div class="platform-icon-circle perplexity">PRP</div>
                                         <span style="font-weight: 600; color: #334155;">Perplexity</span>
                                     </div>
                                     <span style="color: #64748b; font-size: 12px;" id="crawl-perplexity">--</span>
