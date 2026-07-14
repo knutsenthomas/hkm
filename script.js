@@ -474,6 +474,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Definerte forslag (Smarte snarveier - Dynamisk lokalisert)
     const siteSearchSuggestions = getSiteSearchSuggestions();
     const lang = getCurrentLanguage();
+    let selectedIndex = -1;
+
+    // Helper to get visible results/suggestions elements
+    function getVisibleSearchItems() {
+        if (suggestionsContainer && !suggestionsContainer.classList.contains('hidden')) {
+            return Array.from(suggestionsContainer.querySelectorAll('.search-suggestion-item'));
+        }
+        if (resultsContainer && !resultsContainer.classList.contains('hidden')) {
+            return Array.from(resultsContainer.querySelectorAll('.site-search-result-item'));
+        }
+        return [];
+    }
+
+    // Helper to update selection visual states
+    function selectSearchItem(index, items) {
+        items.forEach(item => item.classList.remove('selected'));
+        if (index >= 0 && index < items.length) {
+            const selectedItem = items[index];
+            selectedItem.classList.add('selected');
+            
+            // Scroll alignment within search suggestions/results container
+            selectedItem.scrollIntoView({ block: 'nearest' });
+        }
+    }
 
     // Inject popular search tags dynamically inside modal
     const modalTitle = searchModal.querySelector('.search-modal-title');
@@ -496,6 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tagValue = btn.getAttribute('data-tag');
                 if (searchInput) {
                     searchInput.value = tagValue;
+                    selectedIndex = -1;
                     if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
                     if (resultsContainer) {
                         resultsContainer.classList.remove('hidden');
@@ -516,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         searchModal.classList.add('active');
         lockBodyScroll('site-search-v2');
+        selectedIndex = -1;
         if (searchInput) {
             searchInput.value = '';
             const searchIcon = document.querySelector('#site-search-modal .search-input-group span.material-symbols-outlined');
@@ -535,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSearchModal() {
         searchModal.classList.remove('active');
         unlockBodyScroll('site-search-v2');
+        selectedIndex = -1;
     }
 
     if (searchTrigger) {
@@ -553,14 +580,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === searchModal) closeSearchModal();
     });
 
-    // Snarveier (Lukk med ESC, åpne med CMD+K / Ctrl+K)
+    // Snarveier (Lukk med ESC, åpne med CMD+K / Ctrl+K, piltaster + enter navigasjon)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && searchModal.classList.contains('active')) {
-            closeSearchModal();
+        if (!searchModal.classList.contains('active')) {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                openSearch();
+            }
+            return;
         }
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+
+        // Search modal is active
+        if (e.key === 'Escape') {
+            closeSearchModal();
+            return;
+        }
+
+        const items = getVisibleSearchItems();
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
             e.preventDefault();
-            openSearch();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            selectSearchItem(selectedIndex, items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            selectSearchItem(selectedIndex, items);
+        } else if (e.key === 'Enter') {
+            if (selectedIndex >= 0 && selectedIndex < items.length) {
+                e.preventDefault();
+                items[selectedIndex].click();
+                closeSearchModal();
+            }
         }
     });
 
@@ -569,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
+            selectedIndex = -1;
             
             // Vis shortcuts hvis veldig kort søk
             if (query.length < 2) {
@@ -593,6 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const query = searchInput.value.trim();
+                if (selectedIndex >= 0) return; // Arrow navigation Enter is handled in keydown
                 if (query) {
                     if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
                     if (resultsContainer) {

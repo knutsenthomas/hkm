@@ -9062,6 +9062,73 @@ html[data-theme="dark"] #header-today-devotional-btn:hover {
     padding-right: 14px !important;
 }
 
+/* ==========================================================================
+   Premium Course Card Hover Micro-Interactions & Spotlight Selection Styles
+   ========================================================================== */
+.course-card, .horizontal-course-card {
+    position: relative !important;
+    overflow: hidden !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease !important;
+}
+
+/* Shine Sweep Sweep effect on hover */
+.course-card::after, .horizontal-course-card::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -50% !important;
+    left: -120% !important;
+    width: 60% !important;
+    height: 200% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28) 50%, transparent) !important;
+    transform: rotate(30deg) !important;
+    transition: none !important;
+    pointer-events: none !important;
+    z-index: 5 !important;
+}
+
+.course-card:hover::after, .horizontal-course-card:hover::after {
+    left: 180% !important;
+    transition: left 0.75s cubic-bezier(0.19, 1, 0.22, 1) !important;
+}
+
+/* 3D lift & soft ambient glow */
+.course-card:hover {
+    transform: translateY(-8px) scale(1.015) rotate(0.01deg) !important;
+    box-shadow: 0 30px 60px -15px rgba(27, 73, 101, 0.16), 0 0 0 1px rgba(209, 125, 57, 0.1) !important;
+    border-color: rgba(209, 125, 57, 0.3) !important;
+}
+
+.horizontal-course-card:hover {
+    transform: translateY(-4px) scale(1.01) rotate(0.01deg) !important;
+    box-shadow: 0 20px 40px -12px rgba(27, 73, 101, 0.12), 0 0 0 1px rgba(209, 125, 57, 0.08) !important;
+    border-color: rgba(209, 125, 57, 0.25) !important;
+}
+
+/* Dark Mode Overrides */
+html[data-theme="dark"] .course-card:hover {
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(209, 125, 57, 0.2) !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+}
+
+html[data-theme="dark"] .horizontal-course-card:hover {
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(209, 125, 57, 0.15) !important;
+    border-color: rgba(209, 125, 57, 0.35) !important;
+}
+
+/* Spotlight keyboard navigation highlights */
+.site-search-result-item.selected, .search-suggestion-item.selected {
+    background-color: #f1f5f9 !important;
+    border-left: 4px solid #d17d39 !important;
+    padding-left: 12px !important;
+    outline: none !important;
+}
+
+html[data-theme="dark"] .site-search-result-item.selected,
+html[data-theme="dark"] .search-suggestion-item.selected {
+    background-color: #0f172a !important;
+}
+
+
 
 
 
