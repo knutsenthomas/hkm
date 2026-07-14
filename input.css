@@ -5573,7 +5573,7 @@ ol.block-list {
     .header-actions-dock:focus-within,
     .header-actions-dock.expanded,
     .header-actions-dock:has(.lang-switcher.active) {
-        width: 240px;
+        width: 255px;
         max-width: 320px;
         padding: 3px 16px 3px 3px;
     }
@@ -5595,7 +5595,7 @@ body:not(.header-dark-start) .header .header-actions-dock {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 175px;
+    width: 190px;
     margin-left: 8px;
     opacity: 0;
     pointer-events: none;
