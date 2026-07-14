@@ -105,6 +105,16 @@ const minsideTranslations = {
         'overview.noNotificationsYet': 'Ingen varslinger ennå.',
         'overview.showAllNotifications': 'Vis alle varslinger',
         'overview.givingNone': 'Ingen',
+        'overview.myProgress': 'Min fremdrift',
+        'overview.continue': 'Fortsett',
+        'overview.upcomingEvents': 'Kommende arrangementer',
+        'overview.upcomingEventsSub': 'Bli med på fellesskap og møter i kalenderen',
+        'overview.latestPrayer': 'Siste fra Bønneveggen',
+        'overview.latestPrayerSub': 'Bær hverandres byrder i bønnefellesskapet',
+        'overview.goToPrayerWall': 'Gå til Bønneveggen',
+        'overview.noEvents': 'Ingen planlagte arrangementer for øyeblikket.',
+        'overview.noPrayersYet': 'Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.',
+        'overview.prayedCountText': '{n} ber',
 
         // Profile
         'profile.contactInfo': 'Kontaktinformasjon',
@@ -397,6 +407,16 @@ const minsideTranslations = {
         'overview.noNotificationsYet': 'No notifications yet.',
         'overview.showAllNotifications': 'Show all notifications',
         'overview.givingNone': 'None',
+        'overview.myProgress': 'My Progress',
+        'overview.continue': 'Continue',
+        'overview.upcomingEvents': 'Upcoming Events',
+        'overview.upcomingEventsSub': 'Join fellowship and meetings in the calendar',
+        'overview.latestPrayer': 'Latest from the Prayer Wall',
+        'overview.latestPrayerSub': "Bear each other's burdens in prayer fellowship",
+        'overview.goToPrayerWall': 'Go to Prayer Wall',
+        'overview.noEvents': 'No scheduled events at the moment.',
+        'overview.noPrayersYet': 'No prayer requests yet. Be the first to post a request on the wall.',
+        'overview.prayedCountText': '{n} praying',
 
         // Profile
         'profile.contactInfo': 'Contact Information',
@@ -689,6 +709,16 @@ const minsideTranslations = {
         'overview.noNotificationsYet': 'No hay notificaciones aún.',
         'overview.showAllNotifications': 'Mostrar todas las notificaciones',
         'overview.givingNone': 'Ninguna',
+        'overview.myProgress': 'Mi progreso',
+        'overview.continue': 'Continuar',
+        'overview.upcomingEvents': 'Próximos eventos',
+        'overview.upcomingEventsSub': 'Únete a la comunión y reuniones en el calendario',
+        'overview.latestPrayer': 'Último del Muro de Oración',
+        'overview.latestPrayerSub': 'Sobrellevad los unos las cargas de los otros',
+        'overview.goToPrayerWall': 'Ir al Muro de Oración',
+        'overview.noEvents': 'No hay eventos programados en este momento.',
+        'overview.noPrayersYet': 'No hay peticiones de oración aún. Sé el primero en publicar una petición.',
+        'overview.prayedCountText': '{n} orando',
 
         // Profile
         'profile.contactInfo': 'Información de Contacto',
@@ -2075,7 +2105,7 @@ class MinSideManager {
                         </div>
                         <span class="material-symbols-outlined bento-indicator">trending_up</span>
                     </div>
-                    <div class="bento-card-label">Min fremdrift</div>
+                    <div class="bento-card-label">${t('overview.myProgress')}</div>
                     <div class="bento-value-row">
                         <span class="bento-card-value" id="ov-progress-text">—</span>
                         <div class="bento-progress-track">
@@ -2090,10 +2120,10 @@ class MinSideManager {
             <div class="info-card ms-overview-card-gap" id="ov-prayer-preview-card" style="display: none;">
                 <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h3>Siste fra Bønneveggen</h3>
-                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bær hverandres byrder i bønnefellesskapet</p>
+                        <h3>${t('overview.latestPrayer')}</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">${t('overview.latestPrayerSub')}</p>
                     </div>
-                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">Gå til Bønneveggen</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 3px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">${t('overview.goToPrayerWall')}</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 3px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
                 </div>
                 <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
                     <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
@@ -2104,10 +2134,10 @@ class MinSideManager {
             <div class="info-card ms-overview-card-gap" id="ov-events-preview-card">
                 <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h3>Kommende arrangementer</h3>
-                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bli med på fellesskap og møter i kalenderen</p>
+                        <h3>${t('overview.upcomingEvents')}</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">${t('overview.upcomingEventsSub')}</p>
                     </div>
-                    <a href="/arrangementer.html" class="btn btn-ghost btn-sm" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important; text-decoration: none;"><span style="display: inline-block; line-height: 1;">Se alle</span><span class="material-symbols-outlined" style="font-size: 16px; display: inline-block; line-height: 1;">arrow_forward</span></a>
+                    <a href="/arrangementer.html" class="btn btn-ghost btn-sm" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important; text-decoration: none;"><span style="display: inline-block; line-height: 1;">${t('overview.seeAll')}</span><span class="material-symbols-outlined" style="font-size: 16px; display: inline-block; line-height: 1;">arrow_forward</span></a>
                 </div>
                 <div id="ov-events-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
                     <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
@@ -2187,7 +2217,7 @@ class MinSideManager {
                 const topPrayers = prayers.slice(0, 3);
                 if (topPrayers.length > 0) {
                     ovPrayerFeed.innerHTML = topPrayers.map(p => {
-                        const name = p.isAnonymous ? 'Anonym' : (p.userName || 'Medlem');
+                        const name = p.isAnonymous ? t('prayer.anonymous') : (p.userName || t('prayer.member'));
                         const count = p.prayedCount || (p.prayedUserIds || []).length || 0;
                         const textSnippet = p.text.length > 80 ? p.text.substring(0, 80) + '...' : p.text;
                         
@@ -2200,14 +2230,14 @@ class MinSideManager {
                                     </div>
                                     <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
                                 </div>
-                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 3.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${count} ber</span></div>
+                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 3.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${t('overview.prayedCountText', { n: count })}</span></div>
                             </div>
                         `;
                     }).join('');
                 } else {
                     ovPrayerFeed.innerHTML = `
                         <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
-                            Ingen bønneemner ennå. Bli den første til å legge inn et bønneemne på veggen.
+                            ${t('overview.noPrayersYet')}
                         </div>
                     `;
                 }
@@ -2260,7 +2290,7 @@ class MinSideManager {
                     const totalDays = activeGlobalPlan.daysCount || (activeGlobalPlan.days ? Object.keys(activeGlobalPlan.days).length : 0) || 1;
                     progressPct = Math.round((completedDays.length / totalDays) * 100);
                     const planTitle = activeGlobalPlan.title || '';
-                    progressTitle = `Fortsett: ${planTitle}`;
+                    progressTitle = `${t('overview.continue')}: ${planTitle}`;
                 }
             }
             const progressTextEl = document.getElementById('ov-progress-text');
@@ -2518,7 +2548,8 @@ class MinSideManager {
                         const dateObj = item.date;
                         const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
                         
-                        const locale = 'no-NO';
+                        const lang = document.documentElement.lang || 'no';
+                        const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
                         const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
                         const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
                         const day = dateObj.getDate();
@@ -2526,8 +2557,14 @@ class MinSideManager {
                         const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
                         let timeLabel = '';
                         if (hasTime) {
-                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-                            timeLabel = `, kl. ${startTime}`;
+                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
+                            if (lang === 'en') {
+                                timeLabel = `, at ${startTime}`;
+                            } else if (lang === 'es') {
+                                timeLabel = `, a las ${startTime}`;
+                            } else {
+                                timeLabel = `, kl. ${startTime}`;
+                            }
                         }
                         
                         const imageSrc = getEventImage(item);
