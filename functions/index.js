@@ -846,13 +846,14 @@ exports.getAnalyticsOverview = onRequest({
           accessToken,
           body: {
             dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
+            dimensions: [{ name: "deviceCategory" }],
             metrics: [
               { name: "organicGoogleSearchClicks" },
               { name: "organicGoogleSearchImpressions" },
               { name: "organicGoogleSearchAveragePosition" },
               { name: "organicGoogleSearchClickThroughRate" }
             ],
-            limit: 1,
+            limit: 10,
           },
         }).catch((err) => {
           console.warn("[Analytics] GSC summary report failed:", err.message);
@@ -926,14 +927,42 @@ exports.getAnalyticsOverview = onRequest({
 
       // Google Search Console parsing
       let gscSummary = null;
-      if (gscSummaryReport && gscSummaryReport.rows && gscSummaryReport.rows[0]) {
-        const row = gscSummaryReport.rows[0];
-        gscSummary = {
-          clicks: row.metricValues[0].value,
-          impressions: row.metricValues[1].value,
-          position: parseFloat(row.metricValues[2].value).toFixed(1),
-          ctr: (parseFloat(row.metricValues[3].value) * 100).toFixed(1) + "%"
-        };
+      if (gscSummaryReport) {
+        if (gscSummaryReport.rows && gscSummaryReport.rows.length > 0) {
+          let totalClicks = 0;
+          let totalImpressions = 0;
+          let weightedPositionSum = 0;
+          
+          gscSummaryReport.rows.forEach(row => {
+            const clicks = parseInt(row.metricValues[0].value) || 0;
+            const impressions = parseInt(row.metricValues[1].value) || 0;
+            const avgPosition = parseFloat(row.metricValues[2].value) || 0;
+            
+            totalClicks += clicks;
+            totalImpressions += impressions;
+            weightedPositionSum += (avgPosition * impressions);
+          });
+          
+          const avgPosition = totalImpressions > 0 ? (weightedPositionSum / totalImpressions) : 0;
+          const totalCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) : 0;
+          
+          gscSummary = {
+            clicks: String(totalClicks),
+            impressions: String(totalImpressions),
+            position: avgPosition.toFixed(1),
+            ctr: (totalCtr * 100).toFixed(1) + "%",
+            noData: false
+          };
+        } else {
+          // Connected, but no rows returned (e.g. for "Siste døgn" due to Google's 2-day delay)
+          gscSummary = {
+            clicks: "0",
+            impressions: "0",
+            position: "-",
+            ctr: "0.0%",
+            noData: true
+          };
+        }
       }
 
       const gscDaily = (gscDailyReport && gscDailyReport.rows || []).map(row => ({
