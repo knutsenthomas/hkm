@@ -3641,7 +3641,7 @@ class MinSideManager {
         const file = e.target.files?.[0];
         if (!file || !this.currentUser) return;
         try {
-            const ref = firebase.storage().ref(`profilePictures/${this.currentUser.uid}`);
+            const ref = firebase.storage().ref(`profiles/${this.currentUser.uid}/avatar`);
             await ref.put(file);
             const url = await ref.getDownloadURL();
             await this.currentUser.updateProfile({ photoURL: url });
