@@ -5604,6 +5604,141 @@ class MinSideManager {
                 .hkm-live-pulse {
                     animation: hkm-pulse 1.5s infinite ease-in-out;
                 }
+
+                /* Dark Mode Overrides for Course Player */
+                html[data-theme="dark"] .hkm-card {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+                }
+                html[data-theme="dark"] .hkm-card h2,
+                html[data-theme="dark"] .hkm-card h2[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-card p {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-card p strong {
+                    color: #cbd5e1 !important;
+                }
+                html[data-theme="dark"] .hkm-meta-label {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-meta-val {
+                    color: #f8fafc !important;
+                }
+                
+                /* Tabs */
+                html[data-theme="dark"] .hkm-tabs-header {
+                    border-bottom-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn {
+                    color: rgba(148, 163, 184, 0.6) !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn[style*="border-right"] {
+                    border-right-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn:hover {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn.active {
+                    color: #d17d39 !important;
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-bottom-color: #d17d39 !important;
+                }
+
+                /* Lessons List */
+                html[data-theme="dark"] .player-lesson-item {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item:hover {
+                    background: #2d3748 !important;
+                    border-color: #4a5568 !important;
+                }
+                html[data-theme="dark"] .player-lesson-item.active {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-color: rgba(209, 125, 57, 0.5) !important;
+                }
+                html[data-theme="dark"] .player-lesson-item span[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item .lesson-title {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item .lesson-meta {
+                    color: #94a3b8 !important;
+                }
+
+                /* Notes Panel */
+                html[data-theme="dark"] #panel-notes h4[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-wrapper {
+                    border-color: #334155 !important;
+                    background: #0f172a !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-toolbar {
+                    background: #1e293b !important;
+                    border-bottom-color: #334155 !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-editor {
+                    background: #0f172a !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-btn {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-btn:hover {
+                    background: #334155 !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-divider {
+                    background: #334155 !important;
+                }
+
+                /* Bible Panel */
+                html[data-theme="dark"] #panel-bible h4[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-bible p[style*="color"] {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-select {
+                    border-color: #334155 !important;
+                    background: #0f172a !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display {
+                    background: #0f172a !important;
+                    border-color: #334155 !important;
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display p {
+                    color: #cbd5e1 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-tool-btn {
+                    border-color: #334155 !important;
+                    background: #1e293b !important;
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-tool-btn:hover:not(:disabled) {
+                    border-color: #d17d39 !important;
+                    color: #d17d39 !important;
+                    background: rgba(209, 125, 57, 0.08) !important;
+                }
+                html[data-theme="dark"] #bible-font-size-indicator {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display::-webkit-scrollbar-thumb,
+                html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb {
+                    background: #475569 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display::-webkit-scrollbar-thumb:hover,
+                html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #64748b !important;
+                }
             </style>
 
             <div class="hkm-player-grid">
