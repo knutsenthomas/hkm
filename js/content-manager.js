@@ -5193,7 +5193,7 @@ class ContentManager {
                 const dashboardEditedTime = new Date(override.dashboardEditedAt).getTime();
                 
                 // Only override admin if GCal has been updated *after* the admin edit, and the text actually changed
-                if (gcalUpdatedTime > dashboardEditedTime) {
+                if (gcalUpdatedTime > dashboardEditedTime && !override.dashboardEdited) {
                     isDescDifferent = gEvent.description && cleanHtml(overrideHtml) !== cleanHtml(gEvent.description);
                 }
             } else {

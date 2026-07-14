@@ -2501,17 +2501,15 @@ class MinSideManager {
                     if (match) {
                         matchedFirestoreIds.add(match.id);
                         
-                        // Prioritize unique GCal description if it differs from the database override
-                        const cleanHtml = (html) => String(html || '').replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+                        // Prioritize database override description, fallback to GCal description
                         const gcalDesc = gEvent.description || '';
                         const fsDesc = match.description || '';
-                        const isDescDifferent = gcalDesc && cleanHtml(fsDesc) !== cleanHtml(gcalDesc);
 
                         mergedGCal.push({
                             ...gEvent,
                             ...match,
                             date: match.date || gEvent.date,
-                            description: isDescDifferent ? gcalDesc : fsDesc
+                            description: fsDesc || gcalDesc
                         });
                     } else {
                         mergedGCal.push(gEvent);
