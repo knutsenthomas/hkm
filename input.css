@@ -8355,6 +8355,11 @@ html[data-theme="dark"] .bg-\[\#f8f9fa\] {
 }
 
 /* 3. About Page (Om Oss) Team and Value Sections */
+html[data-theme="dark"] .vision-values {
+    background: #0f172a !important;
+    background-image: none !important;
+}
+
 html[data-theme="dark"] .team-section {
     background: #0f172a !important;
 }
