@@ -8886,6 +8886,20 @@ html[data-theme="dark"] #header-today-devotional-btn:hover {
     background: rgba(255, 255, 255, 0.12) !important;
 }
 
+/* Mobile Menu Dark Mode Overrides for profile & devotional shortcut circles */
+html[data-theme="dark"] #mobile-menu-profile-link,
+html[data-theme="dark"] #mobile-menu-today-devotional-btn {
+    border-color: #334155 !important;
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+html[data-theme="dark"] #mobile-menu-profile-link:hover,
+html[data-theme="dark"] #mobile-menu-today-devotional-btn:hover {
+    color: #D17D39 !important;
+    border-color: rgba(209, 125, 57, 0.4) !important;
+    background: #334155 !important;
+}
+
 
 /* Facebook Feed Grid & Cards Styles */
 .facebook-feed-grid {

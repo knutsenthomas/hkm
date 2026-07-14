@@ -2447,26 +2447,67 @@ class BibleReader {
             // Render historical commentaries
             if (this.dom.dictHistoricalSection && this.dom.dictHistoricalList) {
                 if (dictRes.historicalCommentaries && dictRes.historicalCommentaries.length > 0) {
-                    this.dom.dictHistoricalList.innerHTML = dictRes.historicalCommentaries.map(c => `
+                    const lang = document.documentElement.lang || 'no';
+                    const labelShowMore = lang === 'en' ? 'Show more' : (lang === 'es' ? 'Mostrar más' : 'Vis mer');
+                    const labelShowLess = lang === 'en' ? 'Show less' : (lang === 'es' ? 'Mostrar menos' : 'Vis mindre');
+                    const labelReadSource = lang === 'en' ? 'Read source' : (lang === 'es' ? 'Leer fuente' : 'Les kilde');
+
+                    this.dom.dictHistoricalList.innerHTML = dictRes.historicalCommentaries.map((c, idx) => {
+                        const isLong = c.quote.length > 180;
+                        const displayQuote = isLong ? c.quote.slice(0, 175) + '...' : c.quote;
+                        const escapedFullQuote = c.quote.replace(/"/g, '&quot;');
+                        const escapedShortQuote = displayQuote.replace(/"/g, '&quot;');
+
+                        return `
                         <div class="dict-commentary-card" style="padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; line-height: 1.6; color: var(--text-base); transition: all 0.2s; box-sizing: border-box; width: 100%;">
                             <div style="font-weight: 700; color: var(--bible-primary); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
                                 <span>${c.author}</span>
                                 <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 400;">${c.sourceTitle}</span>
                             </div>
-                            <div style="font-style: italic; color: var(--text-base); font-size: 12.5px;">"${c.quote}"</div>
+                            <div class="commentary-quote-container">
+                                <div class="commentary-quote-text" style="font-style: italic; color: var(--text-base); font-size: 12.5px;" data-full-quote="${escapedFullQuote}" data-short-quote="${escapedShortQuote}">
+                                    "${displayQuote}"
+                                </div>
+                                ${isLong ? `
+                                <button type="button" class="btn-toggle-quote" style="background: none; border: none; color: var(--bible-primary); font-size: 11.5px; font-weight: 700; cursor: pointer; padding: 4px 0 0 0; display: inline-flex; align-items: center; gap: 2px;">
+                                    <span>${labelShowMore}</span> <span class="material-symbols-outlined" style="font-size: 14px;">expand_more</span>
+                                </button>
+                                ` : ''}
+                            </div>
                             ${c.sourceUrl ? `
                             <div style="margin-top: 8px; text-align: right;">
                                 <a href="${c.sourceUrl}" target="_blank" style="font-size: 11px; color: var(--bible-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 2px;">
-                                    Les kilde <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
+                                    ${labelReadSource} <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
                                 </a>
                             </div>
                             ` : ''}
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
 
-                    // Add premium micro-interactions
+                    // Add premium micro-interactions and toggle logic
                     const cards = this.dom.dictHistoricalList.querySelectorAll('.dict-commentary-card');
                     cards.forEach(card => {
+                        const toggleBtn = card.querySelector('.btn-toggle-quote');
+                        if (toggleBtn) {
+                            toggleBtn.addEventListener('click', () => {
+                                const quoteTextEl = card.querySelector('.commentary-quote-text');
+                                const btnSpan = toggleBtn.querySelector('span');
+                                const btnIcon = toggleBtn.querySelector('.material-symbols-outlined');
+                                const isExpanded = toggleBtn.classList.toggle('expanded');
+                                
+                                if (isExpanded) {
+                                    quoteTextEl.innerText = `"${quoteTextEl.dataset.fullQuote}"`;
+                                    btnSpan.innerText = labelShowLess;
+                                    btnIcon.innerText = 'expand_less';
+                                } else {
+                                    quoteTextEl.innerText = `"${quoteTextEl.dataset.shortQuote}"`;
+                                    btnSpan.innerText = labelShowMore;
+                                    btnIcon.innerText = 'expand_more';
+                                }
+                            });
+                        }
+
                         card.addEventListener('mouseenter', () => {
                             card.style.borderColor = 'var(--bible-primary)';
                             card.style.transform = 'translateY(-1px)';

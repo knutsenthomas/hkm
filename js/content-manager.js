@@ -2305,7 +2305,7 @@ class ContentManager {
                                         ${limitExcerpt}
                                     </p>
                                 ` : ''}
-                                <div class="event-meta" style="font-weight: 600; color: var(--primary-blue); display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
+                                <div class="event-meta" style="font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
                                     <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">calendar_today</span>
                                     <span>${dateLabel}${timeLabel}</span>
                                 </div>

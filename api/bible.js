@@ -836,7 +836,48 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
       const finalRef = scriptureRef || (parseReference(word) ? word : '');
       if (finalRef) {
         try {
-          const historicalCommentaries = await getHistoricalCommentaries(finalRef);
+          let historicalCommentaries = await getHistoricalCommentaries(finalRef);
+          
+          // Translate if language is not English and Gemini API key is available
+          const geminiApiKey = process.env.GEMINI_API_KEY;
+          if (historicalCommentaries && historicalCommentaries.length > 0 && lang !== 'en' && geminiApiKey) {
+            try {
+              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+              const targetLangName = lang === 'es' ? 'spansk' : 'norsk';
+              
+              const quotesToTranslate = historicalCommentaries.map(c => c.quote);
+              const prompt = `Du er en bibeloversetter og teolog. Oversett følgende historiske sitater/kommentarer til ${targetLangName}. 
+Oversettelsen må være flytende, teologisk nøyaktig, og passe til sitatets høytidelige/historiske stil.
+
+Returner kun en gyldig JSON-liste med strenger (de oversatte sitatene i nøyaktig samme rekkefølge):
+${JSON.stringify(quotesToTranslate)}`;
+
+              const translationResp = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt,
+                config: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  }
+                }
+              });
+
+              if (translationResp.text) {
+                const translatedQuotes = JSON.parse(translationResp.text);
+                if (Array.isArray(translatedQuotes) && translatedQuotes.length === historicalCommentaries.length) {
+                  historicalCommentaries = historicalCommentaries.map((c, i) => ({
+                    ...c,
+                    quote: translatedQuotes[i]
+                  }));
+                }
+              }
+            } catch (transErr) {
+              console.warn("Failed to translate historical commentaries:", transErr);
+            }
+          }
+          
           responseData.historicalCommentaries = historicalCommentaries;
         } catch (commErr) {
           console.error("Error retrieving historical commentaries:", commErr);
