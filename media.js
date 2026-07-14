@@ -1159,6 +1159,77 @@ async function initPodcastRSS() {
 
         initPodcastControls();
         renderPodcastEpisodes();
+
+        // Check for 'play', 'episode', or 'id' query parameter to auto-play/scroll to specific episode
+        const urlParams = new URLSearchParams(window.location.search);
+        const playParam = urlParams.get('play') || urlParams.get('episode') || urlParams.get('id');
+        if (playParam) {
+            const decodedParam = decodeURIComponent(playParam).toLowerCase().trim();
+            const matchedEp = allPodcastEpisodes.find(ep => {
+                const epId = (ep.id || '').toLowerCase();
+                const epTitle = (ep.title || '').toLowerCase();
+                const epLink = (ep.link || '').toLowerCase();
+                
+                return epId === decodedParam || 
+                       epTitle === decodedParam || 
+                       epLink === decodedParam ||
+                       epId.includes(decodedParam) || 
+                       epTitle.includes(decodedParam);
+            });
+
+            if (matchedEp) {
+                // Wait slightly for the DOM to settle, then scroll & play
+                setTimeout(() => {
+                    const cardEl = document.querySelector(`[data-episode-id="${CSS.escape(matchedEp.id)}"]`) ||
+                                   document.querySelector(`[data-episode-title="${CSS.escape(matchedEp.title)}"]`);
+                    if (cardEl) {
+                        // Highlight the card
+                        if (!document.getElementById('podcast-highlight-style')) {
+                            const style = document.createElement('style');
+                            style.id = 'podcast-highlight-style';
+                            style.textContent = `
+                                @keyframes episode-pulse {
+                                    0% { box-shadow: 0 0 0 0 rgba(209, 125, 57, 0.4); border-color: rgba(209, 125, 57, 0.4); }
+                                    70% { box-shadow: 0 0 0 10px rgba(209, 125, 57, 0); border-color: rgba(209, 125, 57, 1); }
+                                    100% { box-shadow: 0 0 0 0 rgba(209, 125, 57, 0); border-color: rgba(209, 125, 57, 0.4); }
+                                }
+                                .podcast-card.highlighted-episode {
+                                    border: 2px solid #d17d39 !important;
+                                    animation: episode-pulse 2s infinite;
+                                    border-radius: 16px;
+                                    transition: all 0.3s ease;
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        }
+
+                        cardEl.classList.add('highlighted-episode');
+                        
+                        // Smooth scroll to the card
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // Auto-open summary accordion if it exists
+                        const accordionToggle = cardEl.querySelector('.podcast-row-accordion-toggle');
+                        if (accordionToggle && accordionToggle.getAttribute('aria-expanded') !== 'true') {
+                            accordionToggle.click();
+                        }
+
+                        // Auto-play the episode after a brief delay
+                        const playBtn = cardEl.querySelector('.podcast-row-play-btn');
+                        if (playBtn) {
+                            setTimeout(() => {
+                                playBtn.click();
+                            }, 800);
+                        }
+
+                        // Remove pulse highlight after 6 seconds
+                        setTimeout(() => {
+                            cardEl.classList.remove('highlighted-episode');
+                        }, 6000);
+                    }
+                }, 100);
+            }
+        }
     } catch (error) {
         console.error('[Podcast] Feil ved henting:', error);
         grid.innerHTML = `<p class="text-danger">${t('loadingPodcastError')}</p>`;
@@ -1272,6 +1343,8 @@ function createPodcastCard(episode, indexInView) {
     const card = document.createElement('div');
     card.className = 'podcast-card';
     card.setAttribute('data-category', 'podcast');
+    card.setAttribute('data-episode-id', episode.id || '');
+    card.setAttribute('data-episode-title', episode.title || '');
 
     const lang = document.documentElement.lang || 'no';
     const pubDate = formatPodcastDate(episode.pubDate, lang);

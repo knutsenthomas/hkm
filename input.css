@@ -7510,6 +7510,7 @@ html[data-theme="dark"] .header-dark-start header#header:not(.scrolled):not(.men
 
 /* Target elements with hardcoded colors */
 html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-slate-50,
 html[data-theme="dark"] .card,
 html[data-theme="dark"] .undervisning-card,
 html[data-theme="dark"] .event-card,
@@ -7536,12 +7537,32 @@ html[data-theme="dark"] select {
 
 html[data-theme="dark"] .bg-gray-50,
 html[data-theme="dark"] .bg-gray-100,
+html[data-theme="dark"] .bg-slate-100,
 html[data-theme="dark"] section[class*="bg-gray-"] {
     background-color: #0d1321 !important;
 }
 
 html[data-theme="dark"] .bg-\[\#faf9f6\] {
     background-color: #0f172a !important;
+}
+
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover {
+    background-color: #1e293b !important;
+}
+
+html[data-theme="dark"] .event-date {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-theme="dark"] .event-date .month {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .event-date .day {
+    color: #f8fafc !important;
 }
 
 html[data-theme="dark"] .text-gray-900,

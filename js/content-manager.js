@@ -2305,7 +2305,7 @@ class ContentManager {
                                         ${limitExcerpt}
                                     </p>
                                 ` : ''}
-                                <div class="event-meta" style="font-weight: 600; color: #1B4965; display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
+                                <div class="event-meta" style="font-weight: 600; color: var(--primary-blue); display: flex; align-items: center; gap: 6px; margin-top: auto; font-size: 0.92rem;">
                                     <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">calendar_today</span>
                                     <span>${dateLabel}${timeLabel}</span>
                                 </div>
@@ -4000,8 +4000,11 @@ class ContentManager {
                     epThumb = 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80';
                 }
                 
+                const epId = ep.guid?._text || ep.guid || ep.link?._text || ep.link || epTitle;
+                const podcastLink = `${this.getLocalizedLink('podcast.html')}?play=${encodeURIComponent(epId)}`;
+
                 podcastHtml = `
-                    <a href="/media" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                    <a href="${podcastLink}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
                         <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
                             <img src="${epThumb}" alt="${epTitle}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
                         </div>
@@ -4016,7 +4019,7 @@ class ContentManager {
         } catch (e) {
             console.warn('[ContentManager] Failed to fetch podcast for aggregated list:', e);
             podcastHtml = `
-                <a href="/media" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                <a href="${this.getLocalizedLink('podcast.html')}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
                     <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
                         <img src="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80" alt="Podcast" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
                     </div>
@@ -4577,17 +4580,17 @@ class ContentManager {
 
             if (event.eventAdditionalDates) {
                 const cleanDates = this.sanitizeEventHtml(event.eventAdditionalDates).replace(/\n/g, '<br>');
-                timeHtml += `<div class="event-additional-dates" style="margin-top: 8px; font-size: 0.85rem; color: #475569; display: flex; flex-direction: column; gap: 2px;">
-                    <span style="font-weight: 700; color: #1b4965;">Flere datoer:</span>
-                    <span style="padding-left: 6px; border-left: 2px solid #cbd5e1; color: #64748b; font-weight: 500;">${cleanDates}</span>
+                timeHtml += `<div class="event-additional-dates" style="margin-top: 8px; font-size: 0.85rem; color: var(--text-light); display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; color: var(--primary-blue);">Flere datoer:</span>
+                    <span style="padding-left: 6px; border-left: 2px solid var(--border-color); color: var(--text-light); font-weight: 500;">${cleanDates}</span>
                 </div>`;
             }
 
             if (event.eventSchedule) {
                 const cleanSchedule = this.sanitizeEventHtml(event.eventSchedule).replace(/\n/g, '<br>');
-                timeHtml += `<div class="event-schedule-times" style="margin-top: 8px; font-size: 0.85rem; color: #475569; display: flex; flex-direction: column; gap: 2px;">
-                    <span style="font-weight: 700; color: #1b4965;">Program/Tidspunkter:</span>
-                    <span style="padding-left: 6px; border-left: 2px solid #cbd5e1; color: #64748b; font-weight: 500;">${cleanSchedule}</span>
+                timeHtml += `<div class="event-schedule-times" style="margin-top: 8px; font-size: 0.85rem; color: var(--text-light); display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; color: var(--primary-blue);">Program/Tidspunkter:</span>
+                    <span style="padding-left: 6px; border-left: 2px solid var(--border-color); color: var(--text-light); font-weight: 500;">${cleanSchedule}</span>
                 </div>`;
             }
 

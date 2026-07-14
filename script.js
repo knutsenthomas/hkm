@@ -460,12 +460,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionsContainer = document.getElementById('site-search-suggestions');
     const resultsContainer = document.getElementById('site-search-results-v2');
     
-    // Defer pre-fetching podcast/youtube data to prevent resource contention during initial paint
+    // Defer pre-fetching search data to prevent resource contention during initial paint
     const isSpeedTest = window.firebaseService && typeof window.firebaseService._isSpeedTestingAgent === 'function' && window.firebaseService._isSpeedTestingAgent();
     if (!isSpeedTest) {
         setTimeout(() => {
-            fetchPodcasts();
-            fetchYouTubeVideos();
+            preFetchSearchData();
         }, 4000);
     }
 
@@ -532,9 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openSearch() {
-        // Start pre-fetching podcast/youtube data early if not already loaded
-        if (!window._siteSearchPodcasts) fetchPodcasts();
-        if (!window._siteSearchYouTubeVideos) fetchYouTubeVideos();
+        // Start pre-fetching all search data in the background
+        preFetchSearchData();
 
         if (window.HKM_UI?.isMegaMenuOpen?.()) {
             window.HKM_UI.closeMegaMenu();
@@ -1064,12 +1062,16 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     };
 
     if (isLive) {
-        resultsEl.innerHTML = `
-            <div style="padding: 40px 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
-                <div class="spinner" style="width: 24px; height: 24px; border: 3.5px solid rgba(27,73,101,0.15); border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                <span style="font-size: 14.5px; color: #64748b; font-weight: 600;">Søker...</span>
-            </div>
-        `;
+        // Only show full loading spinner if we don't have cached data to display instantly
+        const hasCachedData = !!(window._siteSearchContentDocs && window._siteSearchReadingPlans && window._siteSearchCourses);
+        if (!hasCachedData) {
+            resultsEl.innerHTML = `
+                <div style="padding: 40px 20px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <div class="spinner" style="width: 24px; height: 24px; border: 3.5px solid rgba(27,73,101,0.15); border-top-color: #1B4965; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <span style="font-size: 14.5px; color: #64748b; font-weight: 600;">Søker...</span>
+                </div>
+            `;
+        }
     } else {
         resultsEl.innerHTML = '<p class="site-search-helper">Søker i innhold...</p>';
     }
@@ -1092,7 +1094,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     // Query tracking to prevent race conditions
     window._latestSearchQuery = qLower;
 
-    // Autocomplete/suggest Bible books based on query prefix
     const lang = getCurrentLanguage();
     const books = BIBLE_BOOKS[lang] || BIBLE_BOOKS['no'];
     const matchedBooks = books.filter(book => {
@@ -1112,7 +1113,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         }
     });
 
-    // Sjekk om søkeprosessen er en direkte bibelreferanse
     if (isBibleReference(q)) {
         results.push({
             type: lang === 'en' ? 'Bible' : (lang === 'es' ? 'Biblia' : 'Bibel'),
@@ -1132,18 +1132,13 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         } catch (e) { return dateStr; }
     };
 
-    // Smart-match hjelper: Sjekker om ord i søket finnes i teksten
-    // Ignorerer vanlige norske "stoppord" for å gjøre søket smartere
     const stopWords = new Set(['om', 'i', 'på', 'og', 'det', 'et', 'en', 'den', 'til', 'fra', 'med', 'for', 'at', 'er', 'var']);
     const qWords = qLower.split(/\s+/).filter(w => w.length > 1 && !stopWords.has(w));
-    
-    // Hvis alle ordene var stoppord, bruk det originale søket som fallback
     const effectiveWords = qWords.length > 0 ? qWords : qLower.split(/\s+/).filter(w => w.length > 0);
 
     const isMatch = (text) => {
         if (!effectiveWords.length) return false;
         const t = (text || '').toLowerCase();
-        
         let matchCount = 0;
         let requiredMatches = effectiveWords.length;
         
@@ -1152,14 +1147,11 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 matchCount++;
                 continue;
             }
-            
-            // Håndter vanlige skrivefeil
-            if (word === 'omm' || word === 'om') { matchCount++; continue; } // ignorer typo av stoppord
+            if (word === 'omm' || word === 'om') { matchCount++; continue; }
             if (word.includes('podas') || word.includes('podkast')) { if (t.includes('podcast')) matchCount++; continue; }
             if (word.includes('bøn') || word === 'bønn') { if (t.includes('bønn') || t.includes('be')) matchCount++; continue; }
             if (word.includes('møte') || word.includes('arrang')) { if (t.includes('arrangement')) matchCount++; continue; }
             
-            // Enkel fuzzy for lengre ord: sjekk om 80% av ordet finnes i teksten
             if (word.length >= 5) {
                 const subWord = word.substring(0, word.length - 1);
                 if (t.includes(subWord)) {
@@ -1167,47 +1159,80 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                     continue;
                 }
             }
-            
-            // Hvis det er et veldig kort ord som ikke matcher, kan vi kanskje tillate at det feiler hvis andre viktige ord matcher
             if (word.length <= 3) {
-                requiredMatches--; // Krever ikke at små ord må matche perfekt
+                requiredMatches--;
             }
         }
-        
-        // Returner true hvis vi har nok treff (tillater 1 feil for søk med >= 3 ord)
         const threshold = effectiveWords.length >= 3 ? requiredMatches - 1 : requiredMatches;
         return matchCount >= threshold && matchCount > 0;
     };
 
+    // UI renderer helper to update the DOM reactively
+    const updateUI = () => {
+        const activeQuery = (document.getElementById('site-search-input-v2')?.value || '').trim().toLowerCase();
+        if (activeQuery !== qLower) return;
+
+        if (!results.length) {
+            resultsEl.innerHTML = `<p class="site-search-helper">${lang === 'en' ? 'No results found.' : (lang === 'es' ? 'No se encontraron resultados.' : 'Ingen treff for dette søket.')}</p>`;
+            return;
+        }
+
+        const groups = {};
+        results.forEach((r) => {
+            if (!groups[r.type]) groups[r.type] = [];
+            groups[r.type].push(r);
+        });
+
+        let html = '';
+        for (const [type, items] of Object.entries(groups)) {
+            html += `
+                <div class="search-result-group">
+                    <div class="search-result-group-title">${escapeHtml(type)}</div>
+                    <div class="search-result-group-items">
+                        ${items.map(r => `
+                            <div class="site-search-result-item" onclick="if(!event.target.closest('a')) window.location.href='${r.url}'">
+                                <div class="search-result-item-content">
+                                    <div class="search-result-item-title">${escapeHtml(r.title)}</div>
+                                    ${r.snippet ? `<div class="search-result-item-snippet" ${r.type.includes('Bibel') || r.type.includes('Bible') || r.type.includes('Biblia') ? 'style="white-space: normal !important;"' : ''}>${escapeHtml(r.snippet)}</div>` : ''}
+                                    ${r.versesHtml ? `<div class="search-result-verses" style="margin-top: 8px;">${r.versesHtml}</div>` : ''}
+                                </div>
+                                ${r.meta ? `<span class="search-result-item-meta">${escapeHtml(r.meta)}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        resultsEl.innerHTML = html;
+    };
+
     try {
-        // Start parallel Bible dictionary lookup early
-        let biblePromise = Promise.resolve(null);
-        if (q.length >= 2) {
-            const lang = getCurrentLanguage();
-            biblePromise = fetch(`/api/bible/dictionary?word=${encodeURIComponent(q)}&lang=${lang}`)
-                .then(res => res.ok ? res.json() : null)
-                .catch(err => {
-                    console.warn('[Search] Bible search failed:', err);
-                    return null;
-                });
-        }
+        // Fetch core Firestore search data in parallel if not cached
+        const contentPromise = window._siteSearchContentDocs ? Promise.resolve(window._siteSearchContentDocs) : firebase.firestore().collection('content').get().then(snap => {
+            const docs = {};
+            snap.forEach(doc => { docs[doc.id] = doc.data(); });
+            window._siteSearchContentDocs = docs;
+            return docs;
+        });
 
-        // Pre-fetch all documents in content collection in one call to be extremely fast and always dynamic
-        let contentDocs = window._siteSearchContentDocs;
-        if (!contentDocs) {
-            contentDocs = {};
-            try {
-                const contentSnap = await firebase.firestore().collection('content').get();
-                contentSnap.forEach(doc => {
-                    contentDocs[doc.id] = doc.data();
-                });
-                window._siteSearchContentDocs = contentDocs;
-            } catch (e) {
-                console.warn('[Search] Failed to pre-fetch content collection, using fallbacks:', e);
-            }
-        }
+        const readingPlansPromise = window._siteSearchReadingPlans ? Promise.resolve(window._siteSearchReadingPlans) : firebaseService.getCollection('reading_plans').then(plans => {
+            window._siteSearchReadingPlans = plans;
+            return plans;
+        });
 
-        // 1) Faste og dynamiske sider
+        const coursesPromise = window._siteSearchCourses ? Promise.resolve(window._siteSearchCourses) : firebaseService.getPageContent('collection_courses').then(courseData => {
+            const courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
+            window._siteSearchCourses = courses;
+            return courses;
+        });
+
+        const [contentDocs, readingPlans, courses] = await Promise.all([
+            contentPromise,
+            readingPlansPromise,
+            coursesPromise
+        ]);
+
+        // 1) Faste og og dynamiske sider
         const pages = [
             { id: 'index', label: { no: 'Forside', en: 'Home', es: 'Inicio' }, url: 'index', keywords: 'hjem forside welcome velkommen' },
             { id: 'om-oss', label: { no: 'Om oss', en: 'About us', es: 'Sobre nosotros' }, url: 'om-oss', keywords: 'hvem er vi organisasjon historie history who we are ledelse' },
@@ -1235,7 +1260,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'tidslinje-imperier', label: { no: 'Imperienes tidslinje', en: 'Timeline of Empires', es: 'Línea de Tiempo de Imperios' }, url: 'ressurser/tidslinje-imperier', keywords: 'bibel tidslinje historie riker imperier babylon persia hellas roma timeline empire empires kingdoms history' }
         ];
 
-        // Find any other page documents dynamically in Firestore
         const pageDocs = [];
         Object.keys(contentDocs).forEach(id => {
             if (!id.startsWith('collection_') && !id.startsWith('settings_') && id !== 'hero_slides') {
@@ -1243,7 +1267,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             }
         });
 
-        // Merge hardcoded pages with any newly found pages in Firestore
         const allPages = [...pages];
         pageDocs.forEach(id => {
             if (!pages.some(p => p.id === id)) {
@@ -1257,36 +1280,25 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             }
         });
 
-        const pagePromises = allPages.map(async (page) => {
-            const lang = getCurrentLanguage();
+        allPages.forEach((page) => {
             const labelText = page.label[lang] || page.label['no'];
             const keywordsText = page.keywords || '';
-            
             const localCombined = [labelText, keywordsText].join(' ').toLowerCase();
             let isStaticMatch = isMatch(localCombined);
 
             let data = contentDocs[page.id];
-            
-            // Fallback: If not in pre-fetched collection docs, try fetching individually
-            if (!data) {
-                try {
-                    data = await firebaseService.getPageContent(page.id);
-                } catch (e) {
-                    console.warn(`Could not fetch page content for search: ${page.id}`, e);
-                }
-            }
-
             if (data) {
                 const entries = collectTextEntries(data);
                 const hit = entries.find(entry => entry.text && isMatch(entry.text));
                 if (hit) {
-                    return {
+                    results.push({
                         type: lang === 'en' ? 'Page' : (lang === 'es' ? 'Página' : 'Side'),
                         title: labelText,
                         meta: hit.path,
                         url: getLocalizedUrl(page.url),
                         snippet: makeSnippet(hit.text, q)
-                    };
+                    });
+                    return;
                 }
             }
 
@@ -1382,28 +1394,23 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                     snippet = (defaultExcerpts[lang] && defaultExcerpts[lang][page.id]) || (defaultExcerpts['no'][page.id]) || '';
                 }
 
-                return {
+                results.push({
                     type: lang === 'en' ? 'Page' : (lang === 'es' ? 'Página' : 'Side'),
                     title: labelText,
                     meta: lang === 'en' ? 'Information' : (lang === 'es' ? 'Información' : 'Informasjon'),
                     url: getLocalizedUrl(page.url),
                     snippet: makeSnippet(snippet, q)
-                };
+                });
             }
-            return null;
         });
-        
-        const pageResults = (await Promise.all(pagePromises)).filter(Boolean);
-        results.push(...pageResults);
 
-        // 2) Samlinger: blogg, arrangementer, undervisning og andre dynamiske samlinger
+        // 2) Samlinger
         const collections = [
             { id: 'blog', docId: 'collection_blog', label: { no: 'Blogginnlegg', en: 'Blog Post', es: 'Entrada del Blog' }, url: 'blogg-post.html' },
             { id: 'events', docId: 'collection_events', label: { no: 'Arrangement', en: 'Event', es: 'Evento' }, url: 'arrangement-detaljer.html' },
             { id: 'teaching', docId: 'collection_teaching', label: { no: 'Undervisning', en: 'Sermon', es: 'Enseñanza' }, url: 'blogg-post.html' }
         ];
 
-        // Find any other collections in Firestore dynamically
         Object.keys(contentDocs).forEach(id => {
             if (id.startsWith('collection_')) {
                 const colId = id.replace('collection_', '');
@@ -1419,37 +1426,19 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             }
         });
 
-        const collectionPromises = collections.map(async (col) => {
-            let raw = contentDocs[col.docId];
-            if (!raw) {
-                try {
-                    raw = await firebaseService.getPageContent(col.docId);
-                } catch (e) {
-                    console.warn(`Could not fetch collection for search: ${col.docId}`, e);
-                }
-            }
+        collections.forEach((col) => {
+            const raw = contentDocs[col.docId];
             const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
-            const colResults = [];
-            const lang = getCurrentLanguage();
-
             items.forEach((item) => {
                 const combined = [
                     col.label[lang] || col.label['no'],
-                    'blogg',
-                    'nyheter',
-                    'undervisning',
-                    'arrangement',
-                    item.title,
-                    item.content,
-                    item.category,
-                    item.author,
-                    item.seoTitle,
-                    item.seoDescription
+                    'blogg', 'nyheter', 'undervisning', 'arrangement',
+                    item.title, item.content, item.category, item.author, item.seoTitle, item.seoDescription
                 ].filter(Boolean).join(' ').toLowerCase();
 
                 if (isMatch(combined)) {
                     const stableId = item.__stableId || item.id || item.externalGuid || item.wixGuid || item.postId || item.legacyId || item.slug || item.title || '';
-                    colResults.push({
+                    results.push({
                         type: col.label[lang] || col.label['no'],
                         title: item.title || '(uten tittel)',
                         meta: formatDate(item.date) || item.category || '',
@@ -1458,88 +1447,112 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                     });
                 }
             });
-            return colResults;
         });
-        
-        const allCollectionResults = await Promise.all(collectionPromises);
-        allCollectionResults.forEach(res => results.push(...res));
 
-        // 3) Podcast-episoder (via felles RSS-proxy med språktilpasning)
-        const [podcastEpisodes, transcriptsMap] = await Promise.all([
-            fetchPodcasts(),
-            fetchPodcastTranscripts()
-        ]);
-
-        if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
-            const lang = getCurrentLanguage();
-
-            podcastEpisodes.forEach(ep => {
-                const epId = ep.guid || ep.link || ep.title;
-                const transcript = transcriptsMap ? transcriptsMap[epId] : null;
+        // 5.5) Bibel Leseplaner
+        if (Array.isArray(readingPlans) && readingPlans.length) {
+            readingPlans.forEach(plan => {
                 const combined = [
-                    'podcast', 'lyd', 'episode', 
-                    ep.title, 
-                    ep.description, 
-                    transcript
+                    lang === 'en' ? 'reading plan bible' : (lang === 'es' ? 'plan de lectura biblia' : 'leseplan bibel leseplaner'),
+                    plan.title, plan.subtitle, plan.description
                 ].filter(Boolean).join(' ').toLowerCase();
 
+                if (isMatch(combined)) {
+                    results.push({
+                        type: lang === 'en' ? 'Reading Plan' : (lang === 'es' ? 'Plan de Lectura' : 'Leseplan'),
+                        title: plan.title || 'Leseplan',
+                        meta: plan.subtitle || (plan.durationDays ? `${plan.durationDays} dager` : ''),
+                        url: getLocalizedUrl(`leseplan-detaljer.html?id=${plan.id}`),
+                        snippet: makeSnippet(plan.description || '', q)
+                    });
+                }
+            });
+        }
+
+        // 5.7) Bibelske personer
+        let characters = [];
+        try {
+            const module = await import('./js/bibelske-personer-data.js');
+            characters = module.biblicalCharacters || [];
+        } catch (e) {
+            console.warn('[Search] Failed to load biblical characters dynamically:', e);
+        }
+
+        if (Array.isArray(characters) && characters.length) {
+            characters.forEach(person => {
+                const nameText = person.name[lang] || person.name['no'] || '';
+                const roleText = person.role[lang] || person.role['no'] || '';
+                const eraText = person.era[lang] || person.era['no'] || '';
+                const summaryText = person.summary[lang] || person.summary['no'] || '';
+                const storyText = person.story[lang] || person.story['no'] || '';
+                const significanceText = person.theologicalSignificance[lang] || person.theologicalSignificance['no'] || '';
+                
+                const combined = [
+                    lang === 'en' ? 'biblical character person' : (lang === 'es' ? 'personaje bíblico persona' : 'bibelsk person personer bibelen'),
+                    nameText, roleText, eraText, summaryText, storyText, significanceText
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                if (isMatch(combined)) {
+                    results.push({
+                        type: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'),
+                        title: nameText,
+                        meta: roleText,
+                        url: getLocalizedUrl(`ressurser/bibelsk-person-detaljer.html?id=${person.id}`),
+                        snippet: makeSnippet(summaryText || storyText || '', q)
+                    });
+                }
+            });
+        }
+
+        // 6) Kurs & Undervisning
+        courses.forEach(course => {
+            const combined = ['kurs', 'undervisning', 'serie', 'course', 'curso', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
+            if (isMatch(combined)) {
+                results.push({
+                    type: lang === 'en' ? 'Course' : (lang === 'es' ? 'Curso' : 'Kurs'),
+                    title: course.title || 'Kurs',
+                    meta: course.category || (lang === 'en' ? 'Teaching' : (lang === 'es' ? 'Enseñanza' : 'Undervisning')),
+                    url: getLocalizedUrl('kurs'),
+                    snippet: makeSnippet(course.description || '', q)
+                });
+            }
+        });
+
+        // 7) Search already-cached async sources
+        if (window._siteSearchPodcasts) {
+            window._siteSearchPodcasts.forEach(ep => {
+                const epId = ep.guid || ep.link || ep.title;
+                const transcript = window._siteSearchPodcastTranscripts ? window._siteSearchPodcastTranscripts[epId] : null;
+                const combined = ['podcast', 'lyd', 'episode', ep.title, ep.description, transcript].filter(Boolean).join(' ').toLowerCase();
                 if (isMatch(combined)) {
                     results.push({
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
                         meta: formatDate(ep.pubDate),
-                        url: ep.link || getLocalizedUrl('podcast'),
+                        url: getLocalizedUrl(`podcast.html?play=${encodeURIComponent(ep.guid || ep.link || ep.title)}`),
                         snippet: makeSnippet(transcript || ep.description || '', q)
                     });
                 }
             });
         }
 
-        // 4) YouTube-videoer
-        const youtubeVideos = await fetchYouTubeVideos();
-
-        if (Array.isArray(youtubeVideos) && youtubeVideos.length) {
-            const lang = getCurrentLanguage();
-            youtubeVideos.forEach(v => {
-                const title = v.title;
-                const description = v.description || '';
-                const combined = ['video', 'youtube', 'film', 'podcast', 'lyd', 'undervisning', title, description].filter(Boolean).join(' ').toLowerCase();
+        if (window._siteSearchYouTubeVideos) {
+            window._siteSearchYouTubeVideos.forEach(v => {
+                const combined = ['video', 'youtube', 'film', 'podcast', 'lyd', 'undervisning', v.title, v.description].filter(Boolean).join(' ').toLowerCase();
                 if (isMatch(combined)) {
                     results.push({
                         type: 'YouTube',
-                        title: title || '(uten tittel)',
+                        title: v.title || '(uten tittel)',
                         meta: formatDate(v.pubDate),
                         url: v.link || getLocalizedUrl('youtube'),
-                        snippet: makeSnippet(description, q)
+                        snippet: makeSnippet(v.description, q)
                     });
                 }
             });
         }
 
-        // 5) Kalender-hendelser (Google Calendar via settings_gcal med språktilpasset type)
-        let calendarEvents = window._siteSearchCalendarEvents;
-        if (typeof calendarEvents === 'undefined') {
-            calendarEvents = [];
-            window._siteSearchCalendarEvents = calendarEvents;
-            try {
-                const settings = contentDocs['settings_gcal'] || await firebaseService.getPageContent('settings_gcal');
-                if (settings && settings.apiKey && settings.calendarId) {
-                    const nowIso = new Date().toISOString();
-                    const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=50`;
-                    const resp = await fetch(url);
-                    if (resp.ok) {
-                        const data = await resp.json();
-                        calendarEvents = data.items || [];
-                        window._siteSearchCalendarEvents = calendarEvents;
-                    }
-                }
-            } catch (e) {
-                console.warn('Kunne ikke hente kalender-hendelser for søk:', e);
-            }
-        }
-        if (Array.isArray(calendarEvents) && calendarEvents.length) {
-            const lang = getCurrentLanguage();
-            calendarEvents.forEach(ev => {
+        if (window._siteSearchCalendarEvents) {
+            window._siteSearchCalendarEvents.forEach(ev => {
                 const summary = ev.summary || '';
                 const description = ev.description || '';
                 const location = ev.location || '';
@@ -1557,182 +1570,213 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             });
         }
 
-        // 5.5) Bibel Leseplaner (Reading Plans fra Firestore)
-        let readingPlans = window._siteSearchReadingPlans;
-        if (!readingPlans) {
-            try {
-                readingPlans = await firebaseService.getCollection('reading_plans');
-                window._siteSearchReadingPlans = readingPlans;
-            } catch (e) {
-                console.warn('Kunne ikke hente leseplaner for søk:', e);
-                readingPlans = [];
-            }
-        }
+        // Render initial fast/cached results instantly!
+        updateUI();
+        restoreIcon();
 
-        if (Array.isArray(readingPlans) && readingPlans.length) {
-            const lang = getCurrentLanguage();
-            readingPlans.forEach(plan => {
-                const combined = [
-                    lang === 'en' ? 'reading plan bible' : (lang === 'es' ? 'plan de lectura biblia' : 'leseplan bibel leseplaner'),
-                    plan.title,
-                    plan.subtitle,
-                    plan.description
-                ].filter(Boolean).join(' ').toLowerCase();
-
-                if (isMatch(combined)) {
-                    results.push({
-                        type: lang === 'en' ? 'Reading Plan' : (lang === 'es' ? 'Plan de Lectura' : 'Leseplan'),
-                        title: plan.title || 'Leseplan',
-                        meta: plan.subtitle || (plan.durationDays ? `${plan.durationDays} dager` : ''),
-                        url: getLocalizedUrl(`leseplan-detaljer.html?id=${plan.id}`),
-                        snippet: makeSnippet(plan.description || '', q)
-                    });
-                }
-            });
-        }
-
-        // 5.7) Bibelske personer (fra js/bibelske-personer-data.js - loaded dynamically)
-        let characters = [];
-        try {
-            const module = await import('./js/bibelske-personer-data.js');
-            characters = module.biblicalCharacters || [];
-        } catch (e) {
-            console.warn('[Search] Failed to load biblical characters dynamically:', e);
-        }
-
-        if (Array.isArray(characters) && characters.length) {
-            const lang = getCurrentLanguage();
-            characters.forEach(person => {
-                const nameText = person.name[lang] || person.name['no'] || '';
-                const roleText = person.role[lang] || person.role['no'] || '';
-                const eraText = person.era[lang] || person.era['no'] || '';
-                const summaryText = person.summary[lang] || person.summary['no'] || '';
-                const storyText = person.story[lang] || person.story['no'] || '';
-                const significanceText = person.theologicalSignificance[lang] || person.theologicalSignificance['no'] || '';
-                
-                const combined = [
-                    lang === 'en' ? 'biblical character person' : (lang === 'es' ? 'personaje bíblico persona' : 'bibelsk person personer bibelen'),
-                    nameText,
-                    roleText,
-                    eraText,
-                    summaryText,
-                    storyText,
-                    significanceText
-                ].filter(Boolean).join(' ').toLowerCase();
-
-                if (isMatch(combined)) {
-                    results.push({
-                        type: lang === 'en' ? 'Biblical Character' : (lang === 'es' ? 'Personaje Bíblico' : 'Bibelsk person'),
-                        title: nameText,
-                        meta: roleText,
-                        url: getLocalizedUrl(`ressurser/bibelsk-person-detaljer.html?id=${person.id}`),
-                        snippet: makeSnippet(summaryText || storyText || '', q)
-                    });
-                }
-            });
-        }
-
-        // 6) Kurs & Undervisning (Dypere søk med språktilpasset type)
-        let courses = window._siteSearchCourses;
-        if (!courses) {
-            try {
-                const courseData = await firebaseService.getPageContent('collection_courses');
-                courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
-                window._siteSearchCourses = courses;
-            } catch (e) {
-                console.warn('Kunne ikke hente kurs for søk:', e);
-                courses = [];
-            }
-        }
-        const lang = getCurrentLanguage();
-        courses.forEach(course => {
-            const combined = ['kurs', 'undervisning', 'serie', 'course', 'curso', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
-            if (isMatch(combined)) {
-                results.push({
-                    type: lang === 'en' ? 'Course' : (lang === 'es' ? 'Curso' : 'Kurs'),
-                    title: course.title || 'Kurs',
-                    meta: course.category || (lang === 'en' ? 'Teaching' : (lang === 'es' ? 'Enseñanza' : 'Undervisning')),
-                    url: getLocalizedUrl('kurs'),
-                    snippet: makeSnippet(course.description || '', q)
-                });
-            }
-        });
-
-        // Await the Bible dictionary search results
-        const bibleResult = await biblePromise;
-        if (bibleResult && bibleResult.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(bibleResult.category.toLowerCase())) {
-            const searchLang = getCurrentLanguage();
+        // 8) Lazy-load the remaining asynchronous network-based searches
+        
+        // Dictionary fetch
+        if (q.length >= 2) {
+            if (!window._siteSearchBibleDictCache) window._siteSearchBibleDictCache = {};
             
-            // Build cross-references / verses html
-            let versesHtml = '';
-            if (Array.isArray(bibleResult.crossReferences) && bibleResult.crossReferences.length > 0) {
-                const bibleUrlBase = getLocalizedUrl('bibel.html');
-                versesHtml = bibleResult.crossReferences.map(refObj => {
-                    const cleanRef = refObj.ref.trim();
-                    const href = `${bibleUrlBase}?ref=${encodeURIComponent(cleanRef)}`;
-                    return `<a href="${href}" class="search-tag-btn" style="display: inline-block !important; font-size: 11px !important; margin: 4px 4px 0 0 !important; text-decoration: none !important;">${cleanRef}</a>`;
-                }).join('');
-            }
+            const runDictMatch = (dictData) => {
+                if (dictData && dictData.category && !['ikke bibelrelatert', 'not bible-related', 'no relacionado con la biblia'].includes(dictData.category.toLowerCase())) {
+                    let versesHtml = '';
+                    if (Array.isArray(dictData.crossReferences) && dictData.crossReferences.length > 0) {
+                        const bibleUrlBase = getLocalizedUrl('bibel.html');
+                        versesHtml = dictData.crossReferences.map(refObj => {
+                            const cleanRef = refObj.ref.trim();
+                            return `<a href="${bibleUrlBase}?ref=${encodeURIComponent(cleanRef)}" class="search-tag-btn" style="display: inline-block !important; font-size: 11px !important; margin: 4px 4px 0 0 !important; text-decoration: none !important;">${cleanRef}</a>`;
+                        }).join('');
+                    }
+                    
+                    const alreadyExists = results.some(r => r.type.includes('Bibel & Ordbok') && r.title === dictData.word);
+                    if (!alreadyExists) {
+                        results.push({
+                            type: lang === 'en' ? 'Bible & Dictionary' : (lang === 'es' ? 'Biblia y Diccionario' : 'Bibel & Ordbok'),
+                            title: dictData.word || q,
+                            meta: dictData.category,
+                            url: getLocalizedUrl(`bibel.html?dict=${encodeURIComponent(dictData.word || q)}`),
+                            snippet: makeSnippet(dictData.definition || dictData.contextualNote || '', q),
+                            versesHtml: versesHtml
+                        });
+                        updateUI();
+                    }
+                }
+            };
 
-            results.push({
-                type: searchLang === 'en' ? 'Bible & Dictionary' : (searchLang === 'es' ? 'Biblia y Diccionario' : 'Bibel & Ordbok'),
-                title: bibleResult.word || q,
-                meta: bibleResult.category,
-                url: getLocalizedUrl(`bibel.html?dict=${encodeURIComponent(bibleResult.word || q)}`),
-                snippet: makeSnippet(bibleResult.definition || bibleResult.contextualNote || '', q),
-                versesHtml: versesHtml
-            });
+            if (window._siteSearchBibleDictCache[qLower]) {
+                runDictMatch(window._siteSearchBibleDictCache[qLower]);
+            } else {
+                fetch(`/api/bible/dictionary?word=${encodeURIComponent(q)}&lang=${lang}`)
+                    .then(res => res.ok ? res.json() : null)
+                    .then(dictData => {
+                        if (dictData) {
+                            window._siteSearchBibleDictCache[qLower] = dictData;
+                            runDictMatch(dictData);
+                        }
+                    })
+                    .catch(err => console.warn('[Search] Dictionary search failed:', err));
+            }
+        }
+
+        // Podcasts & Transcripts
+        if (!window._siteSearchPodcasts || !window._siteSearchPodcastTranscripts) {
+            Promise.all([fetchPodcasts(), fetchPodcastTranscripts()])
+                .then(([episodes, transcriptsMap]) => {
+                    const activeQuery = (document.getElementById('site-search-input-v2')?.value || '').trim().toLowerCase();
+                    if (activeQuery !== qLower) return;
+
+                    let addedNew = false;
+                    episodes.forEach(ep => {
+                        const epId = ep.guid || ep.link || ep.title;
+                        const transcript = transcriptsMap ? transcriptsMap[epId] : null;
+                        const combined = ['podcast', 'lyd', 'episode', ep.title, ep.description, transcript].filter(Boolean).join(' ').toLowerCase();
+
+                        if (isMatch(combined)) {
+                            const alreadyExists = results.some(r => r.type === 'Podcast' && r.title === ep.title);
+                            if (!alreadyExists) {
+                                results.push({
+                                    type: 'Podcast',
+                                    title: ep.title || '(uten tittel)',
+                                    meta: formatDate(ep.pubDate),
+                                    url: getLocalizedUrl(`podcast.html?play=${encodeURIComponent(ep.guid || ep.link || ep.title)}`),
+                                    snippet: makeSnippet(transcript || ep.description || '', q)
+                                });
+                                addedNew = true;
+                            }
+                        }
+                    });
+                    if (addedNew) updateUI();
+                })
+                .catch(err => console.warn('[Search] Async podcast search failed:', err));
+        }
+
+        // YouTube Videos
+        if (!window._siteSearchYouTubeVideos) {
+            fetchYouTubeVideos()
+                .then(youtubeVideos => {
+                    const activeQuery = (document.getElementById('site-search-input-v2')?.value || '').trim().toLowerCase();
+                    if (activeQuery !== qLower) return;
+
+                    let addedNew = false;
+                    youtubeVideos.forEach(v => {
+                        const combined = ['video', 'youtube', 'film', 'podcast', 'lyd', 'undervisning', v.title, v.description].filter(Boolean).join(' ').toLowerCase();
+                        if (isMatch(combined)) {
+                            const alreadyExists = results.some(r => r.type === 'YouTube' && r.title === v.title);
+                            if (!alreadyExists) {
+                                results.push({
+                                    type: 'YouTube',
+                                    title: v.title || '(uten tittel)',
+                                    meta: formatDate(v.pubDate),
+                                    url: v.link || getLocalizedUrl('youtube'),
+                                    snippet: makeSnippet(v.description, q)
+                                });
+                                addedNew = true;
+                            }
+                        }
+                    });
+                    if (addedNew) updateUI();
+                })
+                .catch(err => console.warn('[Search] Async YouTube search failed:', err));
+        }
+
+        // Google Calendar
+        if (typeof window._siteSearchCalendarEvents === 'undefined') {
+            (async () => {
+                try {
+                    const settings = contentDocs['settings_gcal'] || await firebaseService.getPageContent('settings_gcal');
+                    if (settings && settings.apiKey && settings.calendarId) {
+                        const nowIso = new Date().toISOString();
+                        const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=50`;
+                        const resp = await fetch(url);
+                        if (resp.ok) {
+                            const data = await resp.json();
+                            const events = data.items || [];
+                            window._siteSearchCalendarEvents = events;
+                            
+                            const activeQuery = (document.getElementById('site-search-input-v2')?.value || '').trim().toLowerCase();
+                            if (activeQuery !== qLower) return;
+
+                            let addedNew = false;
+                            events.forEach(ev => {
+                                const summary = ev.summary || '';
+                                const description = ev.description || '';
+                                const location = ev.location || '';
+                                const combined = ['kalender', 'arrangement', 'event', 'møte', 'calendario', 'evento', summary, description, location].filter(Boolean).join(' ').toLowerCase();
+                                if (isMatch(combined)) {
+                                    const alreadyExists = results.some(r => r.type.includes('Kalender') && r.title === summary);
+                                    if (!alreadyExists) {
+                                        const start = ev.start && (ev.start.dateTime || ev.start.date);
+                                        results.push({
+                                            type: lang === 'en' ? 'Calendar' : (lang === 'es' ? 'Calendario' : 'Kalender'),
+                                            title: summary || '(uten tittel)',
+                                            meta: formatDate(start),
+                                            url: getLocalizedUrl('arrangementer'),
+                                            snippet: makeSnippet(description || location || '', q)
+                                        });
+                                        addedNew = true;
+                                    }
+                                }
+                            });
+                            if (addedNew) updateUI();
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Search] Async calendar search failed:', e);
+                }
+            })();
         }
 
     } catch (err) {
         console.error('Feil ved søk:', err);
         resultsEl.innerHTML = '<p class="site-search-helper">Det oppstod en feil ved søk. Prøv igjen senere.</p>';
         restoreIcon();
-        return;
+    }
+}
+
+/**
+ * Forhåndshenter Firestore-samlinger og eksterne APIer parallelt i bakgrunnen
+ */
+function preFetchSearchData() {
+    if (window._siteSearchPreFetchStarted) return;
+    window._siteSearchPreFetchStarted = true;
+
+    // 1) Forhåndshent Firestore content-samling
+    if (!window._siteSearchContentDocs && window.firebase) {
+        firebase.firestore().collection('content').get()
+            .then(snap => {
+                const docs = {};
+                snap.forEach(doc => { docs[doc.id] = doc.data(); });
+                window._siteSearchContentDocs = docs;
+            })
+            .catch(err => console.warn('[Search] Bakgrunn-prefetch content feilet:', err));
     }
 
-    restoreIcon();
+    const firebaseService = window.firebaseService;
+    if (firebaseService) {
+        // 2) Forhåndshent leseplaner
+        if (!window._siteSearchReadingPlans) {
+            firebaseService.getCollection('reading_plans')
+                .then(plans => { window._siteSearchReadingPlans = plans; })
+                .catch(err => console.warn('[Search] Bakgrunn-prefetch leseplaner feilet:', err));
+        }
 
-    // Verify query is still active to avoid race condition/jumping
-    const activeQuery = (document.getElementById('site-search-input-v2')?.value || '').trim().toLowerCase();
-    if (activeQuery !== qLower) {
-        return;
+        // 3) Forhåndshent kurs
+        if (!window._siteSearchCourses) {
+            firebaseService.getPageContent('collection_courses')
+                .then(courseData => {
+                    window._siteSearchCourses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
+                })
+                .catch(err => console.warn('[Search] Bakgrunn-prefetch kurs feilet:', err));
+        }
     }
 
-    if (!results.length) {
-        const lang = getCurrentLanguage();
-        resultsEl.innerHTML = `<p class="site-search-helper">${lang === 'en' ? 'No results found.' : (lang === 'es' ? 'No se encontraron resultados.' : 'Ingen treff for dette søket.')}</p>`;
-        return;
-    }
-
-    const groups = {};
-    results.forEach((r) => {
-        if (!groups[r.type]) groups[r.type] = [];
-        groups[r.type].push(r);
-    });
-
-    let html = '';
-    for (const [type, items] of Object.entries(groups)) {
-        html += `
-            <div class="search-result-group">
-                <div class="search-result-group-title">${escapeHtml(type)}</div>
-                <div class="search-result-group-items">
-                    ${items.map(r => `
-                        <div class="site-search-result-item" onclick="if(!event.target.closest('a')) window.location.href='${r.url}'">
-                            <div class="search-result-item-content">
-                                <div class="search-result-item-title">${escapeHtml(r.title)}</div>
-                                ${r.snippet ? `<div class="search-result-item-snippet" ${r.type.includes('Bibel') || r.type.includes('Bible') || r.type.includes('Biblia') ? 'style="white-space: normal !important;"' : ''}>${escapeHtml(r.snippet)}</div>` : ''}
-                                ${r.versesHtml ? `<div class="search-result-verses" style="margin-top: 8px;">${r.versesHtml}</div>` : ''}
-                            </div>
-                            ${r.meta ? `<span class="search-result-item-meta">${escapeHtml(r.meta)}</span>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-
-    resultsEl.innerHTML = html;
+    // 4) Forhåndshent eksterne kilder (podcaster, youtube, transkripsjoner)
+    fetchPodcasts();
+    fetchYouTubeVideos();
+    fetchPodcastTranscripts();
 }
 
 /**
