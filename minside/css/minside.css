@@ -3183,6 +3183,16 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
 html[data-theme="dark"] .nav-category-header {
   color: #94a3b8 !important;
 }
+/* Prevent dark mode input styles from adding dark boxes/borders to borderless search inputs */
+html[data-theme="dark"] .family-search-box input,
+html[data-theme="dark"] #global-search-input {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #f8fafc !important;
+}
 
 /* Prayer Wall Premium Layout & Components */
 .prayer-wall-header {
