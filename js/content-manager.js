@@ -3971,7 +3971,24 @@ class ContentManager {
                 const ep = episodes[0];
                 const epTitle = ep.title?._text || ep.title || '';
                 const epDesc = ep.description?._text || ep.description || ep["itunes:summary"]?._text || ep["itunes:summary"] || '';
-                const epThumb = channel?.image?.url?._text || channel?.image?.url || (ep["itunes:image"] && (ep["itunes:image"]._attr?.href || ep["itunes:image"].href)) || 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80';
+                let epThumb = '';
+                const img = ep["itunes:image"];
+                if (Array.isArray(img)) {
+                    epThumb = img[0]?.$?.href || img[0]?.href || '';
+                } else if (img && typeof img === 'object') {
+                    epThumb = img.$?.href || img.href || '';
+                }
+                if (!epThumb) {
+                    const chanImg = channel?.image;
+                    if (Array.isArray(chanImg)) {
+                        epThumb = chanImg[0]?.url || chanImg[0]?.href || '';
+                    } else if (chanImg && typeof chanImg === 'object') {
+                        epThumb = chanImg.url || chanImg.href || '';
+                    }
+                }
+                if (!epThumb) {
+                    epThumb = 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80';
+                }
                 
                 podcastHtml = `
                     <a href="/media" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
