@@ -839,7 +839,15 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         const letter = cleanWord.charAt(0).toLowerCase();
         if (letter >= 'a' && letter <= 'z') {
           try {
-            const dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
+            const langFolder = lang === 'es' ? 'es' : (lang === 'no' ? 'no' : '');
+            let dataPath = langFolder
+              ? path.join(process.cwd(), 'api', 'bible-dictionary-data', langFolder, `${letter}.json`)
+              : path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
+
+            if (langFolder && !fs.existsSync(dataPath)) {
+              dataPath = path.join(process.cwd(), 'api', 'bible-dictionary-data', `${letter}.json`);
+            }
+
             if (fs.existsSync(dataPath)) {
               const fileData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
               const upperWord = cleanWord.toUpperCase();
