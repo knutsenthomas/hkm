@@ -7244,6 +7244,12 @@ html[data-theme="dark"] body.admin-body .nav-link.active .material-symbols-outli
   background-color: transparent !important;
 }
 
+/* Dark mode category header readability */
+html[data-theme="dark"] body.admin-body .nav-category-header,
+html[data-theme="dark"] body.minside-body .nav-category-header {
+  color: #94a3b8 !important;
+}
+
 
 /* Force hardcoded section content & header backgrounds */
 html[data-theme="dark"] .section-content > .section-header:not(.in-topbar),

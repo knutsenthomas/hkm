@@ -3180,6 +3180,9 @@ html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
   color: #fb923c !important;
   background-color: transparent !important;
 }
+html[data-theme="dark"] .nav-category-header {
+  color: #94a3b8 !important;
+}
 
 /* Prayer Wall Premium Layout & Components */
 .prayer-wall-header {
