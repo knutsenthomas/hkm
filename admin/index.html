@@ -1605,7 +1605,7 @@
     <script type="module" src="js/google-tasks-init.jsx"></script>
     <script type="module" src="js/reading-plans-init.jsx"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
-    <script type="module" src="js/admin.js?v=20260711_V1"></script>
+    <script type="module" src="js/admin.js?v=20260714_V1"></script>
     <script type="module">
         window.addEventListener('load', () => {
             if (!window.adminManager) {
@@ -1636,6 +1636,73 @@
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
+        }
+
+        /* --- MODERN COURSE EDITOR STYLES --- */
+        .admin-input {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1.5px solid #e2e8f0 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+        }
+        .admin-input:focus {
+            outline: none !important;
+            border-color: #1B4965 !important;
+            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            background: #fff !important;
+        }
+        .lesson-row-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+        }
+        .lesson-row-item:hover {
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03) !important;
+            border-color: #cbd5e1 !important;
+            transform: translateY(-1px);
+        }
+        .lesson-drag-handle:hover {
+            color: #1B4965 !important;
+        }
+        .lesson-row-ghost {
+            opacity: 0.4 !important;
+            background: #cbd5e1 !important;
+            border: 2px dashed #94a3b8 !important;
+        }
+        .lesson-delete-btn:hover {
+            background: #fecaca !important;
+            transform: scale(1.05);
+        }
+        .lesson-delete-btn:active {
+            transform: scale(0.95);
+        }
+        .rte-wrapper {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .rte-wrapper:focus-within {
+            border-color: #1B4965 !important;
+            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.12) !important;
+        }
+        .rte-toolbar {
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding: 6px 8px !important;
+            gap: 4px !important;
+        }
+        .rte-btn {
+            border-radius: 6px !important;
+            transition: all 0.2s ease !important;
+        }
+        .rte-btn:hover {
+            background: #e2e8f0 !important;
+            color: #1B4965 !important;
+        }
+        .rte-editor {
+            min-height: 120px !important;
+            padding: 12px !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
         }
     </style>
     <!-- Unsplash Image Search Modal -->

@@ -22213,6 +22213,21 @@ class AdminManager {
 
         modal.style.display = 'block';
 
+        // Initialize Sortable on lessonsContainer
+        if (typeof Sortable !== 'undefined') {
+            if (this.lessonsSortable) {
+                this.lessonsSortable.destroy();
+            }
+            this.lessonsSortable = Sortable.create(lessonsContainer, {
+                animation: 200,
+                handle: '.lesson-drag-handle',
+                ghostClass: 'lesson-row-ghost',
+                onEnd: () => {
+                    this._updateLessonIndices();
+                }
+            });
+        }
+
         // --- Unsplash Listener for Kurs ---
         const unsplashBtn = document.getElementById('course-unsplash-btn');
         const imgInput = document.getElementById('course-image');
@@ -22245,33 +22260,36 @@ class AdminManager {
         const id = lessonId || `lesson_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         row.dataset.id = id;
 
-        row.style.cssText = 'display:flex;flex-direction:column;gap:10px;background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;';
+        row.style.cssText = 'display:flex;flex-direction:column;gap:10px;background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;position:relative;';
         row.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:0.95rem;color:#1e293b;">
-                <span>Leksjon ${index}</span>
-                <button type="button" style="background:#fee2e2;color:#ef4444;border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;"
-                    onclick="this.closest('div.lesson-row-item').remove()">✕</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:0.95rem;color:#1e293b;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:4px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="material-symbols-outlined lesson-drag-handle" style="cursor:grab;font-size:1.2rem;color:#94a3b8;user-select:none;transition:color 0.2s;" title="Dra for å endre rekkefølge">drag_indicator</span>
+                    <span class="lesson-header-index">Leksjon ${index}</span>
+                </div>
+                <button type="button" class="lesson-delete-btn" style="background:#fee2e2;color:#ef4444;border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;"
+                    onclick="this.closest('div.lesson-row-item').remove(); window.adminManager._updateLessonIndices();">✕</button>
             </div>
             <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
                 <input type="text" placeholder="Tittel" value="${lessonTitle}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-title">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-title admin-input">
                 <input type="number" placeholder="Pris (NOK)" value="${price}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-price">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-price admin-input">
                 <input type="datetime-local" placeholder="Dato/Tid" value="${date}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-date">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-date admin-input">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <input type="url" placeholder="Zoom Møtelenke" value="${zoomUrl}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-zoom">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-zoom admin-input">
                 <input type="url" placeholder="Videoopptak URL (f.eks. Vimeo)" value="${videoUrl}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-video">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-video admin-input">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <input type="text" placeholder="Ressurs-navn (f.eks. Arbeidsark PDF)" value="${resource}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource">
+                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource admin-input">
                 <div style="display:flex;gap:8px;">
                     <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
-                        style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url">
+                        style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url admin-input">
                     <button type="button" class="lesson-upload-btn" style="padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;line-height:1;" title="Last opp fil fra mobil/PC">
                         <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;transform:none !important;line-height:1;">cloud_upload</span>
                     </button>
@@ -22339,6 +22357,17 @@ class AdminManager {
 
         // Wire up rich text editor toolbar
         this._wireRteToolbar(`rte-toolbar-${id}`, `lesson-description-editor-${id}`);
+    }
+
+    _updateLessonIndices() {
+        const container = document.getElementById('lessons-container');
+        if (!container) return;
+        Array.from(container.children).forEach((row, i) => {
+            const indexSpan = row.querySelector('.lesson-header-index');
+            if (indexSpan) {
+                indexSpan.textContent = `Leksjon ${i + 1}`;
+            }
+        });
     }
 
     _wireRteToolbar(toolbarId, editorId) {
