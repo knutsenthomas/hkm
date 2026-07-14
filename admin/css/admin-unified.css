@@ -7226,10 +7226,22 @@ html[data-theme="dark"] .nav-link:hover {
   background-color: #334155 !important;
   color: #ffffff !important;
 }
-html[data-theme="dark"] .nav-link.active,
-html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
+html[data-theme="dark"] body.minside-body .nav-link.active {
   background-color: #2d1e18 !important;
-  color: #ffffff !important;
+  color: #fb923c !important;
+}
+html[data-theme="dark"] body.minside-body .nav-link.active .material-symbols-outlined {
+  color: #fb923c !important;
+  background-color: transparent !important;
+}
+
+html[data-theme="dark"] body.admin-body .nav-link.active {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] body.admin-body .nav-link.active .material-symbols-outlined {
+  color: #38bdf8 !important;
+  background-color: transparent !important;
 }
 
 

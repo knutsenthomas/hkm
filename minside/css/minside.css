@@ -3172,10 +3172,13 @@ html[data-theme="dark"] .nav-link:hover {
   background-color: #334155 !important;
   color: #ffffff !important;
 }
-html[data-theme="dark"] .nav-link.active,
-html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
+html[data-theme="dark"] .nav-link.active {
   background-color: #2d1e18 !important;
-  color: #ffffff !important;
+  color: #fb923c !important;
+}
+html[data-theme="dark"] .nav-link.active .material-symbols-outlined {
+  color: #fb923c !important;
+  background-color: transparent !important;
 }
 
 /* Prayer Wall Premium Layout & Components */
