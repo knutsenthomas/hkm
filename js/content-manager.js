@@ -1441,7 +1441,17 @@ class ContentManager {
                         if (!snap.empty) {
                             const latestPhoto = snap.docs[0].data().photoURL;
                             if (latestPhoto && latestPhoto !== avatarUrl) {
-                                renderAvatar(latestPhoto);
+                                const isHkmAuthor = authorLower.includes('hilde') || authorLower.includes('thomas');
+                                if (isHkmAuthor) {
+                                    if (latestPhoto.includes('firebasestorage.googleapis.com')) {
+                                        renderAvatar(latestPhoto);
+                                    }
+                                } else {
+                                    const isDefaultGoogle = latestPhoto.includes('default-user') || latestPhoto.includes('placeholder');
+                                    if (!isDefaultGoogle) {
+                                        renderAvatar(latestPhoto);
+                                    }
+                                }
                             }
                         }
                     })
