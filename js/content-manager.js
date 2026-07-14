@@ -4040,7 +4040,28 @@ class ContentManager {
             `;
         }
 
-        this.setHTMLIfChanged(rightContainer, newsHtml + podcastHtml + teachingHtml, 'aggregated:right');
+        // 2d. Second News item (to fill height matching the left card)
+        const secondNews = localizedBlogItems[1];
+        let secondNewsHtml = '';
+        if (secondNews) {
+            const stableId = secondNews.__stableId || this.getContentItemStableId(secondNews);
+            const newsLink = this.getLocalizedLink('blogg-post.html') + '?id=' + encodeURIComponent(stableId);
+            const newsImage = this.getContentItemImage(secondNews) || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=300&auto=format&fit=crop';
+            secondNewsHtml = `
+                <a href="${newsLink}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
+                        <img src="${newsImage}" alt="${secondNews.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.nyheter}</span>
+                        <h4 class="text-sm md:text-base font-bold text-[#1B4965] group-hover:text-[#CC712B] transition-colors duration-200 line-clamp-2 leading-snug mb-1">${secondNews.title}</h4>
+                        <p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed m-0">${this.generateExcerpt(secondNews.content, secondNews.title)}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        this.setHTMLIfChanged(rightContainer, newsHtml + podcastHtml + teachingHtml + secondNewsHtml, 'aggregated:right');
     }
 
     setupBlogFiltersAndSearch(posts, selector) {
