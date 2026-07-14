@@ -409,11 +409,30 @@ function encodeFirestoreFields(obj) {
   return fields;
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 3000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (err) {
+    clearTimeout(id);
+    throw err;
+  }
+}
+
 async function getCachedDefinition(lang, cleanWord) {
+  if (!API_KEY || !BASE_URL) {
+    return null;
+  }
   const docId = `${lang}_${encodeURIComponent(cleanWord).replace(/%/g, '_')}`;
   const url = `${BASE_URL}/bible_dictionary_cache/${docId}?key=${API_KEY}`;
   try {
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, {}, 3000);
     if (response.ok) {
       const payload = await response.json();
       if (payload && payload.fields) {
@@ -421,26 +440,29 @@ async function getCachedDefinition(lang, cleanWord) {
       }
     }
   } catch (err) {
-    console.error("Error reading from Firestore cache:", err);
+    console.error("Error reading from Firestore cache:", err.message);
   }
   return null;
 }
 
 async function setCachedDefinition(lang, cleanWord, data) {
+  if (!API_KEY || !BASE_URL) {
+    return;
+  }
   const docId = `${lang}_${encodeURIComponent(cleanWord).replace(/%/g, '_')}`;
   const url = `${BASE_URL}/bible_dictionary_cache/${docId}?key=${API_KEY}`;
   try {
     const encodedFields = encodeFirestoreFields(data);
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fields: encodedFields })
-    });
+    }, 3000);
     if (!response.ok) {
       console.warn("Failed to write to Firestore cache:", response.status, await response.text());
     }
   } catch (err) {
-    console.error("Error writing to Firestore cache:", err);
+    console.error("Error writing to Firestore cache:", err.message);
   }
 }
 
@@ -526,7 +548,10 @@ export default async function handler(req, res) {
       try {
         const cached = await getCachedDefinition(lang, cacheKey);
         if (cached) {
-          return res.status(200).json(cached);
+          const isScripture = !!parseReference(word);
+          if (!isScripture || (cached.historicalCommentaries && cached.historicalCommentaries.length > 0)) {
+            return res.status(200).json(cached);
+          }
         }
       } catch (cacheErr) {
         console.error("Cache read failed:", cacheErr);
