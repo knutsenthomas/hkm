@@ -344,13 +344,20 @@
                 }
             }
 
+            const resource = String(lesson?.resource || '').trim();
+            const resourceUrl = String(lesson?.resourceUrl || '').trim();
+            const description = String(lesson?.description || '').trim();
+
             lessons.push({
                 id: lessonId,
                 title: lessonTitle,
                 videoUrl,
                 price: lessonPrice,
                 date: lessonDate,
-                zoomUrl
+                zoomUrl,
+                resource,
+                resourceUrl,
+                description
             });
         });
 
