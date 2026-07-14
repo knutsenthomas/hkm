@@ -1208,6 +1208,12 @@
                             <a href="https://support.google.com/analytics/answer/13086215" target="_blank" class="btn-premium btn-premium-primary" style="display: inline-block; font-size: 12px; text-decoration: none; padding: 8px 16px; border-radius: 8px;">Slik kobler du dem sammen</a>
                         </div>
 
+                        <!-- GSC No Data Notice (for short periods due to delay) -->
+                        <div id="gsc-no-data-notice" style="display: none; padding: 14px; background: rgba(209, 125, 57, 0.04); border: 1px solid rgba(209, 125, 57, 0.15); border-radius: 12px; margin: 16px 0; font-size: 12px; color: #64748b; line-height: 1.5; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: #d17d39; font-size: 20px; flex-shrink: 0;">info</span>
+                            <span>Google Search Console-data har vanligvis <strong>2 dagers forsinkelse</strong>. Velg «Siste 7 dager» eller en lengre periode for å se statistikk.</span>
+                        </div>
+
                         <!-- GSC Metrics Row -->
                         <div class="gsc-metric-container" id="gsc-metrics-row">
                             <div class="gsc-metric-box">
@@ -2129,10 +2135,22 @@
                         const gscChartContainer = document.getElementById('gsc-chart-container');
 
                         if (data.gscSummary) {
-                            // Hide warning notice, show data
+                            const gscNoDataNotice = document.getElementById('gsc-no-data-notice');
                             if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'none';
-                            if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
-                            if (gscChartContainer) gscChartContainer.style.display = 'block';
+                            
+                            if (data.gscSummary.noData) {
+                                // Connected but no data in this period
+                                if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
+                                if (gscChartContainer) gscChartContainer.style.display = 'none';
+                                if (gscNoDataNotice) {
+                                    gscNoDataNotice.style.display = 'flex';
+                                }
+                            } else {
+                                // Connected and has data
+                                if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
+                                if (gscChartContainer) gscChartContainer.style.display = 'block';
+                                if (gscNoDataNotice) gscNoDataNotice.style.display = 'none';
+                            }
 
                             // Populate real summary values
                             const clicksVal = parseInt(data.gscSummary.clicks) || 0;
@@ -2143,7 +2161,7 @@
                             document.getElementById('gsc-position-val').textContent = data.gscSummary.position || '0.0';
 
                             // Populate real daily values to chart
-                            if (data.gscDaily && data.gscDaily.length > 0) {
+                            if (data.gscDaily && data.gscDaily.length > 0 && !data.gscSummary.noData) {
                                 const gscChartLabels = data.gscDaily.map((d, i) => {
                                     const rawDate = d.date || '';
                                     if (/^\d{8}$/.test(rawDate)) {
@@ -2162,7 +2180,7 @@
                                 gscChart.data.datasets[1].data = gscImpressionsDaily;
                                 gscChart.update();
                             } else {
-                                // Default/clear chart if no daily rows
+                                // Default/clear chart if no daily rows or no data
                                 gscChart.data.labels = chartLabels;
                                 gscChart.data.datasets[0].data = chartLabels.map(() => 0);
                                 gscChart.data.datasets[1].data = chartLabels.map(() => 0);
@@ -2170,9 +2188,11 @@
                             }
                         } else {
                             // Show warning notice, hide data
+                            const gscNoDataNotice = document.getElementById('gsc-no-data-notice');
                             if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'block';
                             if (gscMetricsRow) gscMetricsRow.style.display = 'none';
                             if (gscChartContainer) gscChartContainer.style.display = 'none';
+                            if (gscNoDataNotice) gscNoDataNotice.style.display = 'none';
                         }
 
                         // Gen AI real traffic updates
