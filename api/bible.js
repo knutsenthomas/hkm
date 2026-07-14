@@ -857,13 +857,39 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
         }
 
         if (directEntry) {
+          let definitionText = directEntry.definitions.map(d => `[${d.source}] ${d.text}`).join('\n\n');
+          const geminiApiKey = process.env.GEMINI_API_KEY;
+          
+          if (lang !== 'en' && geminiApiKey) {
+            try {
+              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+              const targetLangName = lang === 'es' ? 'spansk' : 'norsk';
+              const prompt = `Du er en teologisk oversetter. Oversett følgende bibelordbok-definisjon til ${targetLangName}. 
+Behold referanser og kildeangivelser (som [Easton] eller [Smith]) intakt. Oversettelsen skal være flytende, forståelig og presis.
+
+Tekst som skal oversettes:
+${definitionText}`;
+
+              const translationResp = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt
+              });
+
+              if (translationResp.text) {
+                definitionText = translationResp.text.trim();
+              }
+            } catch (transErr) {
+              console.warn("Failed to translate offline dictionary entry:", transErr.message);
+            }
+          }
+
           responseData = {
             word: directEntry.name,
-            definition: directEntry.definitions.map(d => `[${d.source}] ${d.text}`).join('\n\n'),
-            category: "Easton/Smith Dictionary",
+            definition: definitionText,
+            category: lang === 'en' ? "Easton/Smith Dictionary" : (lang === 'es' ? "Diccionario Easton/Smith" : "Easton/Smith bibelordbok"),
             contextualNote: `Source: ${directEntry.sources.join(', ')}`,
             originalWords: [],
-            crossReferences: directEntry.scripture_refs ? directEntry.scripture_refs.map(r => ({ ref: r.reference, text: "Bibelreferanse fra ordboken." })) : [],
+            crossReferences: directEntry.scripture_refs ? directEntry.scripture_refs.map(r => ({ ref: r.reference, text: lang === 'en' ? "Scripture reference from dictionary." : (lang === 'es' ? "Referencia bíblica del diccionario." : "Bibelreferanse fra ordboken.") })) : [],
             extendedAnalysis: ""
           };
         } else {
