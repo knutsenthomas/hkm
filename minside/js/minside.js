@@ -2145,7 +2145,7 @@ class MinSideManager {
             </div>
 
             <!-- Recent notifications -->
-            <div class="info-card">
+            <div class="info-card no-border">
                 <div class="info-card-header">
                     <h3>${t('overview.recentNotifications')}</h3>
                     <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('notifications')">
