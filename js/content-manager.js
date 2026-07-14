@@ -862,33 +862,38 @@ class ContentManager {
 
             // Defer loading of heavy below-the-fold content (1.5 MB of data!)
             // this keeps FCP/LCP extremely fast!
-            const triggerEl = document.getElementById('blogg') || document.getElementById('blog');
+            const triggerEl = document.getElementById('aktivitet-seksjon') || document.getElementById('blogg') || document.getElementById('blog');
             const loadDeferredContent = async () => {
                 if (window.deferredContentLoaded) return;
                 window.deferredContentLoaded = true;
                 
                 try {
-                    const [blogData, teachingData, causes, testimonialsData] = await Promise.all([
+                    const [blogData, teachingData, causes, testimonialsData, events] = await Promise.all([
                         this.getContentDoc('collection_blog', { silent: true }),
                         this.getContentDoc('collection_teaching', { silent: true }),
                         this.loadCauses(),
-                        this.getContentDoc('collection_testimonials', { silent: true })
+                        this.getContentDoc('collection_testimonials', { silent: true }),
+                        this.loadEvents()
                     ]);
 
                     const testimonials = this.getCollectionItems(testimonialsData);
                     this.renderTestimonials(testimonials);
 
-                    const blogItems = this.getDedupedBlogItems(blogData);
-                    const localizedBlogItems = this.localizeBlogItems(blogItems);
-                    if (localizedBlogItems.length > 0) {
-                        this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
-                    }
+                    if (document.getElementById('aktivitet-seksjon')) {
+                        await this.renderAggregatedActivity(blogData, teachingData, events);
+                    } else {
+                        const blogItems = this.getDedupedBlogItems(blogData);
+                        const localizedBlogItems = this.localizeBlogItems(blogItems);
+                        if (localizedBlogItems.length > 0) {
+                            this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+                        }
 
-                    const teachingItems = this.getCollectionItems(teachingData);
-                    const frontTeachingContainer = document.getElementById('siste-undervisning');
-                    if (teachingItems.length > 0 && frontTeachingContainer) {
-                        frontTeachingContainer.style.display = 'block';
-                        this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
+                        const teachingItems = this.getCollectionItems(teachingData);
+                        const frontTeachingContainer = document.getElementById('siste-undervisning');
+                        if (teachingItems.length > 0 && frontTeachingContainer) {
+                            frontTeachingContainer.style.display = 'block';
+                            this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
+                        }
                     }
 
                     this.renderCauses(causes);
@@ -3794,6 +3799,231 @@ class ContentManager {
 
             this.setHTMLIfChanged(container, html, `blog:${selector}`);
         }
+    }
+
+    async renderAggregatedActivity(blogData, teachingData, events) {
+        const leftContainer = document.getElementById('featured-activity-left');
+        const rightContainer = document.getElementById('activity-list-right');
+        if (!leftContainer || !rightContainer) return;
+
+        const lang = this.getCurrentLanguage();
+        const translations = {
+            no: {
+                label: 'Aktuell aktivitet',
+                title: 'Siste undervisning & nyheter',
+                seeAll: 'SE ALT',
+                upcoming: 'KOMMENDE',
+                signUp: 'Meld deg på',
+                readMore: 'Les mer',
+                nyheter: 'Nyheter',
+                podcast: 'Podcast',
+                undervisning: 'Undervisning'
+            },
+            en: {
+                label: 'Current Activity',
+                title: 'Latest Teaching & News',
+                seeAll: 'SEE ALL',
+                upcoming: 'UPCOMING',
+                signUp: 'Sign up',
+                readMore: 'Read more',
+                nyheter: 'News',
+                podcast: 'Podcast',
+                undervisning: 'Teaching'
+            },
+            es: {
+                label: 'Actividad Reciente',
+                title: 'Últimas Enseñanzas y Noticias',
+                seeAll: 'VER TODO',
+                upcoming: 'PRÓXIMO',
+                signUp: 'Inscribirse',
+                readMore: 'Leer más',
+                nyheter: 'Noticias',
+                podcast: 'Podcast',
+                undervisning: 'Enseñanza'
+            }
+        };
+        const t = translations[lang] || translations['no'];
+
+        // --- 1. LEFT COLUMN: FEATURED HIGHLIGHT (Upcoming Event) ---
+        const now = new Date();
+        const futureEvents = (events || []).filter(e => {
+            if (e.isHoliday) return false;
+            return !this.isEventPast(e);
+        });
+
+        futureEvents.sort((a, b) => {
+            const dA = this.parseEventDate(a.start || a.date) || new Date(0);
+            const dB = this.parseEventDate(b.start || b.date) || new Date(0);
+            return dA - dB;
+        });
+
+        let leftHtml = '';
+        if (futureEvents.length > 0) {
+            const featuredEvent = futureEvents[0];
+            const startValue = featuredEvent.start || featuredEvent.date;
+            const startDate = this.parseEventDate(startValue);
+            const hasTime = this.eventHasTime(startValue);
+            const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'nb-NO');
+            const dateLabel = startDate
+                ? startDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+                : '';
+            let timeLabel = '';
+            if (hasTime && startDate) {
+                const startTime = startDate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+                timeLabel = ` • ${startTime}`;
+            }
+
+            const eventKey = this.getEventKey(featuredEvent);
+            const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
+            const imageSrc = this._getEventImage(featuredEvent) || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=800&auto=format&fit=crop';
+            const rawDesc = featuredEvent.seoDescription || featuredEvent.excerpt || featuredEvent.description || featuredEvent.content || '';
+            const cleanExcerpt = typeof rawDesc === 'string' ? rawDesc.replace(/<[^>]*>?/gm, '').trim() : '';
+            const limitExcerpt = cleanExcerpt.length > 150 ? cleanExcerpt.slice(0, 147) + '...' : cleanExcerpt;
+
+            leftHtml = `
+                <div class="flex flex-col bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 shrink-0">
+                        <span class="absolute top-4 left-4 bg-[#CC712B] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-md tracking-wider uppercase z-10 shadow-sm">${t.upcoming}</span>
+                        <img src="${imageSrc}" alt="${featuredEvent.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                    </div>
+                    <div class="p-6 md:p-8 flex flex-col gap-3 flex-grow">
+                        <div class="text-[12px] font-semibold text-slate-400 tracking-wider">${dateLabel}${timeLabel}</div>
+                        <h3 class="text-xl md:text-2xl font-bold text-[#1B4965] hover:text-[#CC712B] transition-colors leading-tight">
+                            <a href="${detailsUrl}" style="text-decoration:none; color:inherit;">${featuredEvent.title || 'Uten tittel'}</a>
+                        </h3>
+                        <p class="text-slate-500 text-sm md:text-base leading-relaxed line-clamp-3">
+                            ${limitExcerpt}
+                        </p>
+                        <a href="${detailsUrl}" class="text-[#CC712B] font-bold text-sm md:text-base flex items-center gap-2 hover:gap-3 transition-all mt-auto self-start group" style="text-decoration:none;">
+                            ${t.signUp} <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Fallback: Use latest blog post if there is no upcoming event
+            const blogItems = this.getDedupedBlogItems(blogData);
+            const localizedBlogItems = this.localizeBlogItems(blogItems);
+            const fallbackPost = localizedBlogItems[0];
+            if (fallbackPost) {
+                const stableId = fallbackPost.__stableId || this.getContentItemStableId(fallbackPost);
+                const detailsUrl = this.getLocalizedLink('blogg-post.html') + '?id=' + encodeURIComponent(stableId);
+                const imageSrc = this.getContentItemImage(fallbackPost) || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=800&auto=format&fit=crop';
+                const dateLabel = fallbackPost.date ? this.formatDate(fallbackPost.date) : '';
+                leftHtml = `
+                    <div class="flex flex-col bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+                        <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 shrink-0">
+                            <span class="absolute top-4 left-4 bg-[#1B4965] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-md tracking-wider uppercase z-10 shadow-sm">${fallbackPost.category || t.nyheter}</span>
+                            <img src="${imageSrc}" alt="${fallbackPost.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                        </div>
+                        <div class="p-6 md:p-8 flex flex-col gap-3 flex-grow">
+                            <div class="text-[12px] font-semibold text-slate-400 tracking-wider">${dateLabel}</div>
+                            <h3 class="text-xl md:text-2xl font-bold text-[#1B4965] hover:text-[#CC712B] transition-colors leading-tight">
+                                <a href="${detailsUrl}" style="text-decoration:none; color:inherit;">${fallbackPost.title || 'Uten tittel'}</a>
+                            </h3>
+                            <p class="text-slate-500 text-sm md:text-base leading-relaxed line-clamp-3">
+                                ${this.generateExcerpt(fallbackPost.content, fallbackPost.title)}
+                            </p>
+                            <a href="${detailsUrl}" class="text-[#CC712B] font-bold text-sm md:text-base flex items-center gap-2 hover:gap-3 transition-all mt-auto self-start group" style="text-decoration:none;">
+                                ${t.readMore} <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        this.setHTMLIfChanged(leftContainer, leftHtml, 'aggregated:left');
+
+        // --- 2. RIGHT COLUMN: 3 ROWS (News, Podcast, Teaching) ---
+        // 2a. News item
+        const blogItems = this.getDedupedBlogItems(blogData);
+        const localizedBlogItems = this.localizeBlogItems(blogItems);
+        const latestNews = localizedBlogItems[0];
+        let newsHtml = '';
+        if (latestNews) {
+            const stableId = latestNews.__stableId || this.getContentItemStableId(latestNews);
+            const newsLink = this.getLocalizedLink('blogg-post.html') + '?id=' + encodeURIComponent(stableId);
+            const newsImage = this.getContentItemImage(latestNews) || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=300&auto=format&fit=crop';
+            newsHtml = `
+                <a href="${newsLink}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
+                        <img src="${newsImage}" alt="${latestNews.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.nyheter}</span>
+                        <h4 class="text-sm md:text-base font-bold text-[#1B4965] group-hover:text-[#CC712B] transition-colors duration-200 line-clamp-2 leading-snug mb-1">${latestNews.title}</h4>
+                        <p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed m-0">${this.generateExcerpt(latestNews.content, latestNews.title)}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        // 2b. Podcast item (Fetch newest via proxy)
+        let podcastHtml = '';
+        try {
+            const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
+            const items = channel?.item;
+            const episodes = Array.isArray(items) ? items : [items];
+            if (episodes && episodes.length > 0) {
+                const ep = episodes[0];
+                const epTitle = ep.title?._text || ep.title || '';
+                const epDesc = ep.description?._text || ep.description || ep["itunes:summary"]?._text || ep["itunes:summary"] || '';
+                const epThumb = channel?.image?.url?._text || channel?.image?.url || (ep["itunes:image"] && (ep["itunes:image"]._attr?.href || ep["itunes:image"].href)) || 'https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80';
+                
+                podcastHtml = `
+                    <a href="/media" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
+                            <img src="${epThumb}" alt="${epTitle}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.podcast}</span>
+                            <h4 class="text-sm md:text-base font-bold text-[#1B4965] group-hover:text-[#CC712B] transition-colors duration-200 line-clamp-2 leading-snug mb-1">${epTitle}</h4>
+                            <p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed m-0">${epDesc.replace(/<[^>]*>?/gm, '').trim()}</p>
+                        </div>
+                    </a>
+                `;
+            }
+        } catch (e) {
+            console.warn('[ContentManager] Failed to fetch podcast for aggregated list:', e);
+            podcastHtml = `
+                <a href="/media" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
+                        <img src="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?auto=format&fit=crop&w=300&q=80" alt="Podcast" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.podcast}</span>
+                        <h4 class="text-sm md:text-base font-bold text-[#1B4965] group-hover:text-[#CC712B] transition-colors duration-200 line-clamp-2 leading-snug mb-1">His Kingdom Ministry Podcast</h4>
+                        <p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed m-0">Lytt til ukentlige episoder med inspirerende samtaler og undervisning.</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        // 2c. Teaching item
+        const teachingItems = this.getCollectionItems(teachingData);
+        const latestTeaching = teachingItems[0];
+        let teachingHtml = '';
+        if (latestTeaching) {
+            const teachingLink = this.getLocalizedLink('blogg-post.html') + '?id=' + encodeURIComponent(latestTeaching.id || latestTeaching.title);
+            const teachingImage = this.getContentItemImage(latestTeaching) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=300&q=80';
+            teachingHtml = `
+                <a href="${teachingLink}" class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.99] transition-all duration-200 group" style="text-decoration:none; color:inherit;">
+                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shrink-0 shadow-sm relative bg-slate-100">
+                        <img src="${teachingImage}" alt="${latestTeaching.title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <span class="text-[10px] font-extrabold text-[#d17d39] uppercase tracking-wider mb-1 block">${t.undervisning}</span>
+                        <h4 class="text-sm md:text-base font-bold text-[#1B4965] group-hover:text-[#CC712B] transition-colors duration-200 line-clamp-2 leading-snug mb-1">${latestTeaching.title}</h4>
+                        <p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed m-0">${this.generateExcerpt(latestTeaching.content, latestTeaching.title)}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        this.setHTMLIfChanged(rightContainer, newsHtml + podcastHtml + teachingHtml, 'aggregated:right');
     }
 
     setupBlogFiltersAndSearch(posts, selector) {

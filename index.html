@@ -81,7 +81,7 @@
     <!-- Firebase Config & Service -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/firebase-service.js?v=2026.05.10.1"></script>
-    <script type="module" src="js/content-manager.js?v=2026.05.10.8"></script>
+    <script type="module" src="js/content-manager.js?v=2026.07.14.1"></script>
 
     <!-- Error Logger -->
     <script type="module" src="js/error-logger.js"></script>
@@ -800,43 +800,52 @@
         </div>
     </section>
 
-    <!-- Teaching / Undervisning (Dynamic) -->
-    <section class="teaching-front" id="siste-undervisning"
-        style="display: none; padding: 100px 0 50px 0; background-color: #f8fafc;">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label" data-content-key="teaching.label">Aktuelt</span>
-                <h2 class="section-title" data-content-key="teaching.title">Siste undervisning</h2>
-                <p class="section-description" data-content-key="teaching.description">Lytt og lær fra våre nyeste
-                    ressurser, seminarer og bibelstudier.</p>
+    <!-- Aggregated Activity Section (Siste undervisning & nyheter) -->
+    <section class="activity-front py-16 md:py-24 bg-white" id="aktivitet-seksjon">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-10 md:mb-12">
+                <div>
+                    <span class="text-[11px] font-extrabold text-[#d17d39] uppercase tracking-widest mb-2 block">Aktuell aktivitet</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-[#1B4965] tracking-tight leading-tight m-0 font-display">Siste undervisning & nyheter</h2>
+                </div>
+                <a href="/blogg" class="text-[#d17d39] font-bold text-sm md:text-base flex items-center gap-2 hover:gap-3 transition-all hover:text-[#bd4f2a]" style="text-decoration:none;">
+                    SE ALT <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
 
-            <div class="media-grid" id="front-teaching-grid">
-                <!-- Teaching items loaded dynamically -->
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 md:gap-12">
+                <!-- Left: Featured Highlight (Large Card) -->
+                <div id="featured-activity-left" class="h-full">
+                    <div class="animate-pulse bg-slate-100 rounded-2xl h-96"></div>
+                </div>
 
-            <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="/media" class="btn btn-outline" data-content-key="teaching.btnText">Se alle ressurser</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog / News -->
-    <section class="blog" id="blogg">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-label" data-content-key="blog.label">Siste nytt</span>
-                <h2 class="section-title" data-content-key="blog.title">Nyheter og blogg</h2>
-                <p class="section-description" data-content-key="blog.description">Les våre siste artikler og
-                    oppdateringer.</p>
-            </div>
-
-            <div class="blog-grid">
-                <!-- Blog posts loaded dynamically -->
-            </div>
-
-            <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="/blogg" class="btn btn-outline" data-content-key="blog.btnText">Se alle nyheter</a>
+                <!-- Right: List of 3 items (News, Podcast, Teaching) -->
+                <div id="activity-list-right" class="flex flex-col gap-6 md:gap-8 justify-between">
+                    <div class="animate-pulse flex gap-4 items-center">
+                        <div class="w-20 h-20 bg-slate-100 rounded-2xl shrink-0"></div>
+                        <div class="flex-grow flex flex-col gap-2">
+                            <div class="h-4 bg-slate-100 rounded w-1/4"></div>
+                            <div class="h-5 bg-slate-100 rounded w-3/4"></div>
+                            <div class="h-4 bg-slate-100 rounded w-5/6"></div>
+                        </div>
+                    </div>
+                    <div class="animate-pulse flex gap-4 items-center">
+                        <div class="w-20 h-20 bg-slate-100 rounded-2xl shrink-0"></div>
+                        <div class="flex-grow flex flex-col gap-2">
+                            <div class="h-4 bg-slate-100 rounded w-1/4"></div>
+                            <div class="h-5 bg-slate-100 rounded w-3/4"></div>
+                            <div class="h-4 bg-slate-100 rounded w-5/6"></div>
+                        </div>
+                    </div>
+                    <div class="animate-pulse flex gap-4 items-center">
+                        <div class="w-20 h-20 bg-slate-100 rounded-2xl shrink-0"></div>
+                        <div class="flex-grow flex flex-col gap-2">
+                            <div class="h-4 bg-slate-100 rounded w-1/4"></div>
+                            <div class="h-5 bg-slate-100 rounded w-3/4"></div>
+                            <div class="h-4 bg-slate-100 rounded w-5/6"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
