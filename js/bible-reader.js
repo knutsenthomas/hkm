@@ -3692,7 +3692,7 @@ class BibleReader {
                 .bible-theme-dark .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.15) !important; }
                 .bible-theme-dark .hkm-yv-body { background: #0f172a !important; }
                 .bible-theme-dark .hkm-yv-footer { background: #0f172a !important; border-top-color: #1e293b !important; }
-                .bible-theme-dark .hkm-yv-nav-circle-btn { background: #1e293b !important; color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-yv-nav-circle-btn:not(.active) { background: #1e293b !important; color: #cbd5e1 !important; }
                 .bible-theme-dark .hkm-yv-nav-circle-btn:hover { background: #334155 !important; color: #f8fafc !important; }
                 .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
                 
@@ -3716,7 +3716,7 @@ class BibleReader {
                 .bible-theme-cream .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.1) !important; }
                 .bible-theme-cream .hkm-yv-body { background: #fbf6eb !important; }
                 .bible-theme-cream .hkm-yv-footer { background: #fbf6eb !important; border-top-color: #ecdcb9 !important; }
-                .bible-theme-cream .hkm-yv-nav-circle-btn { background: #f4ebd8 !important; color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-nav-circle-btn:not(.active) { background: #f4ebd8 !important; color: #4a5568 !important; }
                 .bible-theme-cream .hkm-yv-nav-circle-btn:hover { background: #ecdcb9 !important; color: #1B4965 !important; }
                 .bible-theme-cream .hkm-yv-footer-pill { background: #f4ebd8 !important; border-color: #ecdcb9 !important; color: #718096 !important; }
                 /* Dark Mode theme for Reading Plan Dashboard */
