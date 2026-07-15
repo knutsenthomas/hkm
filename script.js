@@ -2632,10 +2632,21 @@ let publicUiRevealDone = false;
 
 function revealPublicUI(reason = 'unknown') {
     if (publicUiRevealDone || !document.body) return;
+    
+    // Flicker prevention: delay reveal for reading plans or deep links until bible-reader is ready
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('plan') || urlParams.has('ref')) {
+        if (reason !== 'bible-reader-ready' && reason !== 'post-load-fallback') {
+            console.log(`Delaying UI reveal for plan/ref parameter (${reason})`);
+            return;
+        }
+    }
+    
     publicUiRevealDone = true;
     document.body.classList.remove('cms-loading');
     console.log(`Public UI revealed (${reason})`);
 }
+window.revealPublicUI = revealPublicUI;
 
 window.addEventListener('cmsContentLoaded', () => {
     revealPublicUI('cms-content-loaded');

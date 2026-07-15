@@ -500,7 +500,11 @@ class BibleReader {
         }
         
         // Remove loading state once reader initialization (including deep-link / reading plan setup) is complete
-        document.body.classList.remove('cms-loading');
+        if (typeof window.revealPublicUI === 'function') {
+            window.revealPublicUI('bible-reader-ready');
+        } else {
+            document.body.classList.remove('cms-loading');
+        }
     }
 
     setupDOMElements() {
