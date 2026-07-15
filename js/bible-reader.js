@@ -6392,8 +6392,57 @@ class BibleReader {
         if (headerTitleText.includes(':')) {
             headerTitleText = headerTitleText.split(':')[0].trim();
         }
-        if (headerTitleText.length > 25) {
-            headerTitleText = headerTitleText.substring(0, 22) + '...';
+        if (headerTitleText.includes('-')) {
+            headerTitleText = headerTitleText.split('-')[0].trim();
+        }
+        if (headerTitleText.includes('–')) {
+            headerTitleText = headerTitleText.split('–')[0].trim();
+        }
+        if (headerTitleText.includes('|')) {
+            headerTitleText = headerTitleText.split('|')[0].trim();
+        }
+
+        // Abbreviate common long plan titles to fit nicely in mobile headers
+        if (lang === 'en') {
+            headerTitleText = headerTitleText
+                .replace(/Gospel of John/gi, 'John')
+                .replace(/Gospel of Matthew/gi, 'Matthew')
+                .replace(/Gospel of Mark/gi, 'Mark')
+                .replace(/Gospel of Luke/gi, 'Luke')
+                .replace(/Acts of the Apostles/gi, 'Acts')
+                .replace(/Revelation/gi, 'Rev.')
+                .replace(/First/gi, '1st')
+                .replace(/Second/gi, '2nd')
+                .replace(/Third/gi, '3rd');
+        } else if (lang === 'es') {
+            headerTitleText = headerTitleText
+                .replace(/Evangelio de Juan/gi, 'Juan')
+                .replace(/Evangelio de Mateo/gi, 'Mateo')
+                .replace(/Evangelio de Marcos/gi, 'Marcos')
+                .replace(/Evangelio de Lucas/gi, 'Lucas')
+                .replace(/Hechos de los Apóstoles/gi, 'Hechos')
+                .replace(/Apocalipsis/gi, 'Apoc.')
+                .replace(/Primero/gi, '1.º')
+                .replace(/Segundo/gi, '2.º');
+        } else {
+            // Default: Norwegian
+            headerTitleText = headerTitleText
+                .replace(/Johannesevangeliet/gi, 'Johannesev.')
+                .replace(/Matteusevangeliet/gi, 'Matteusev.')
+                .replace(/Markusevangeliet/gi, 'Markusev.')
+                .replace(/Lukasevangeliet/gi, 'Lukasev.')
+                .replace(/Apostlenes gjerninger/gi, 'Apostlenes gj.')
+                .replace(/Åpenbaringen/gi, 'Åpenb.')
+                .replace(/Første/gi, '1.')
+                .replace(/Andre/gi, '2.')
+                .replace(/Tredje/gi, '3.')
+                .replace(/Fjerde/gi, '4.')
+                .replace(/Femte/gi, '5.');
+        }
+
+        // Strict limit truncation as fallback if it remains too long (e.g. custom plans)
+        if (headerTitleText.length > 20) {
+            headerTitleText = headerTitleText.substring(0, 17) + '...';
         }
         // Step Label mapping
         let stepLabel = 'BIBEL';
