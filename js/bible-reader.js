@@ -4427,6 +4427,21 @@ class BibleReader {
         }
         style.innerHTML = `
             /* YouVersion Dashboard Layout styles */
+            @media (max-width: 1024px) {
+                #bible-sidebar {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: -100% !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    height: 100dvh !important;
+                    z-index: 999999 !important;
+                    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                }
+                #bible-sidebar.active {
+                    left: 0 !important;
+                }
+            }
             .hkm-rp-day-strip-v3 {
                 display: flex !important;
                 gap: 10px !important;
@@ -4525,7 +4540,7 @@ class BibleReader {
             .hkm-rp-close-btn-mobile:active {
                 transform: scale(0.95) !important;
             }
-            @media (max-width: 768px) {
+            @media (max-width: 1024px) {
                 .hkm-rp-close-btn-mobile {
                     display: flex !important;
                 }
