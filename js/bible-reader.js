@@ -4455,7 +4455,6 @@ class BibleReader {
                 html:has(#bible-sidebar.reading-plan-active.active),
                 body:has(#bible-sidebar.reading-plan-active.active) {
                     overflow: hidden !important;
-                    position: fixed !important;
                     width: 100% !important;
                     height: 100% !important;
                     height: 100dvh !important;
