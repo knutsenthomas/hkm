@@ -3672,6 +3672,54 @@ class BibleReader {
                 .hkm-yv-nav-circle-btn.active:active { transform: scale(0.95) !important; }
                 .hkm-yv-footer-pill { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; padding: 8px 16px !important; border-radius: 99px !important; font-size: 12px !important; font-weight: 800 !important; color: #64748b !important; letter-spacing: 0.08em !important; text-transform: uppercase !important; }
                 
+                /* Dark Mode theme for Devotional Wizard */
+                .bible-theme-dark .hkm-devotional-overlay { background: #0f172a !important; }
+                .bible-theme-dark .hkm-devotional-content { background: #0f172a !important; }
+                .bible-theme-dark .hkm-devotional-step-title { color: #f8fafc !important; }
+                .bible-theme-dark .hkm-devotional-text-serif { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-devotional-text-serif p { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-devotional-prayer-box { background: #1e293b !important; color: #cbd5e1 !important; border-left-color: #d17d39 !important; }
+                .bible-theme-dark .hkm-devotional-reflection-textarea { background: #1e293b !important; border-color: #475569 !important; color: #f1f5f9 !important; }
+                .bible-theme-dark .hkm-celebration-title { color: #f8fafc !important; }
+                .bible-theme-dark .hkm-celebration-desc { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-yv-wrapper { background: #0f172a !important; }
+                .bible-theme-dark .hkm-yv-header { background: #0f172a !important; border-bottom-color: #1e293b !important; }
+                .bible-theme-dark .hkm-yv-header-btn-close { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-yv-header-btn-close:hover { background: #1e293b !important; }
+                .bible-theme-dark .hkm-yv-header-text { color: #f8fafc !important; }
+                .bible-theme-dark .hkm-yv-action-btn { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-yv-action-btn:hover { background: #1e293b !important; color: #f8fafc !important; }
+                .bible-theme-dark .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.15) !important; }
+                .bible-theme-dark .hkm-yv-body { background: #0f172a !important; }
+                .bible-theme-dark .hkm-yv-footer { background: #0f172a !important; border-top-color: #1e293b !important; }
+                .bible-theme-dark .hkm-yv-nav-circle-btn { background: #1e293b !important; color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-yv-nav-circle-btn:hover { background: #334155 !important; color: #f8fafc !important; }
+                .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
+                
+                /* Cream Mode theme for Devotional Wizard */
+                .bible-theme-cream .hkm-devotional-overlay { background: #fbf6eb !important; }
+                .bible-theme-cream .hkm-devotional-content { background: #fbf6eb !important; }
+                .bible-theme-cream .hkm-devotional-step-title { color: #1B4965 !important; }
+                .bible-theme-cream .hkm-devotional-text-serif { color: #2d3748 !important; }
+                .bible-theme-cream .hkm-devotional-text-serif p { color: #2d3748 !important; }
+                .bible-theme-cream .hkm-devotional-prayer-box { background: #f4ebd8 !important; color: #4a5568 !important; border-left-color: #d17d39 !important; }
+                .bible-theme-cream .hkm-devotional-reflection-textarea { background: #fbf6eb !important; border-color: #d2c4a9 !important; color: #2d3748 !important; }
+                .bible-theme-cream .hkm-celebration-title { color: #1B4965 !important; }
+                .bible-theme-cream .hkm-celebration-desc { color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-wrapper { background: #fbf6eb !important; }
+                .bible-theme-cream .hkm-yv-header { background: #fbf6eb !important; border-bottom-color: #ecdcb9 !important; }
+                .bible-theme-cream .hkm-yv-header-btn-close { color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-header-btn-close:hover { background: #f4ebd8 !important; }
+                .bible-theme-cream .hkm-yv-header-text { color: #1B4965 !important; }
+                .bible-theme-cream .hkm-yv-action-btn { color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-action-btn:hover { background: #f4ebd8 !important; color: #1B4965 !important; }
+                .bible-theme-cream .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.1) !important; }
+                .bible-theme-cream .hkm-yv-body { background: #fbf6eb !important; }
+                .bible-theme-cream .hkm-yv-footer { background: #fbf6eb !important; border-top-color: #ecdcb9 !important; }
+                .bible-theme-cream .hkm-yv-nav-circle-btn { background: #f4ebd8 !important; color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-nav-circle-btn:hover { background: #ecdcb9 !important; color: #1B4965 !important; }
+                .bible-theme-cream .hkm-yv-footer-pill { background: #f4ebd8 !important; border-color: #ecdcb9 !important; color: #718096 !important; }
+                
                 @keyframes hkmFadeIn {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
