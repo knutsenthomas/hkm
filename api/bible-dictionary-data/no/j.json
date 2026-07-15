@@ -1,0 +1,3285 @@
+{
+  "JAAKAN": {
+    "name": "Jaakan",
+    "slug": "jaakan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Han vrir, en av sønnene til Eser, sønn av Seir horitten (1 Krøn. 1:42)."
+      },
+      {
+        "source": "SMI",
+        "text": "(han skal omringe), samme som Jakan, stamfaren til Bene-Jaakan. (10:6)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:42",
+        "original": "1 Chr. 1:42"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAAKOBAH": {
+    "name": "Jaakobah",
+    "slug": "jaakobah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hælholder, en form av navnet Jakob, en av Simeons etterkommere (1 Krøn. 4:36)."
+      },
+      {
+        "source": "SMI",
+        "text": "(undergraver), en av fyrstene blant Simeons familier. (1 Krønikebok 4:36) (ca. 710 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:36",
+        "original": "1 Chr. 4:36"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAALA": {
+    "name": "Jaala",
+    "slug": "jaala",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En villgeit, en av Netinimene, hvis etterkommere vendte tilbake fra fangenskapet (Neh. 7:58)."
+      },
+      {
+        "source": "SMI",
+        "text": "(villgeit). Bene-Jaala var blant etterkommerne av «Salomos tjenere» som vendte tilbake fra Babylon med Serubabel. (Nehemja 7:58) (før 536 f.Kr.) Navnet forekommer også som Ja-alah."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 7:58",
+        "original": "Neh. 7:58"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAALAH": {
+    "name": "Jaalah",
+    "slug": "jaalah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(villgeit). (Esra 2:56)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:56",
+        "original": "Ezra 2:56"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAALAM": {
+    "name": "Jaalam",
+    "slug": "jaalam",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Skjuler, den andre av Esaus tre sønner med Oholibama (1 Mos. 36:5, 14)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Gud skjuler), en sønn av Esau (1 Mosebok 36:5,14,18), jf. 1 Krøn 1:35. Og et overhode for en stamme i Edom. (1790 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:5",
+        "original": "Gen. 36:5"
+      },
+      {
+        "reference": "Genesis 36:14",
+        "original": "Gen 36:14"
+      },
+      {
+        "reference": "Genesis 36:18",
+        "original": "Genesis 36:18"
+      },
+      {
+        "reference": "1 Chronicles 1:35",
+        "original": "1Chr 1:35"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAANAI": {
+    "name": "Jaanai",
+    "slug": "jaanai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sørgende, en av de fremste gadittene (1 Krøn. 5:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Herren svarer), en ledende mann i Gads stamme. (1 Krønikebok 5:12)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:12",
+        "original": "1 Chr. 5:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAARE-OREGIM": {
+    "name": "Jaare-oregim",
+    "slug": "jaare-oregim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Vevernes skoger, en betlehemitt (2 Sam. 21:19), og far til Elhanan, som drepte Goliat. I 1 Krøn. 20:5 kalles han JAIR."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 21:19",
+        "original": "2 Sam. 21:19"
+      },
+      {
+        "reference": "1 Chronicles 20:5",
+        "original": "1 Chr. 20:5"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAAREOREGIM": {
+    "name": "Jaareoregim",
+    "slug": "jaareoregim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(vevernes skoger), (2 Samuelsbok 21:19) en betlehemitt, og far til Elhanan som drepte Goliat. I det parallelle avsnittet (1 Krønikebok 20:5) finnes Jair i stedet for Jaare, og Oregim er utelatt. (1063 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 21:19",
+        "original": "2 Samuel 21:19"
+      },
+      {
+        "reference": "1 Chronicles 20:5",
+        "original": "1 Chronicles 20:5"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAASAU": {
+    "name": "Jaasau",
+    "slug": "jaasau",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Skaper/Tilvirker, en israelitt som avviste sin hedenske kone etter tilbakekomsten (Esra 10:37)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Herren skapte), en av Bene-Bani som hadde giftet seg med en fremmed kvinne. (Esra 10:37) (459 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:37",
+        "original": "Ezra 10:37"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAASIEL": {
+    "name": "Jaasiel",
+    "slug": "jaasiel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Laget av Gud, en av Davids livvakter, sønn av Abner (1 Krøn. 27:21), kalt Jasiel i 1 Krøn. 11:47."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Gud trøster), sønn av den store Abner. (1 Krønikebok 27:21) (1046-1014 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 27:21",
+        "original": "1 Chr. 27:21"
+      },
+      {
+        "reference": "1 Chronicles 11:47",
+        "original": "1 Chr. 11:47"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAAZ-ANIAH": {
+    "name": "Jaaz-aniah",
+    "slug": "jaaz-aniah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hørt av Herren. (1.) Sønn av Jeremia, og en av de fremste rekabittene (Jer. 35:3). (2.) Sønn av Sjafan (Esek. 8:11). (3.) Sønn av Asur, en av de tjuefem mennene Esekiel så (11:1) ved templets østport. (4.) En ma'akatitt (2 Kong. 25:23; Jer. 40:8; 42:1). Han kalles også Asarja (Jer. 43:2)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 35:3",
+        "original": "Jer. 35:3"
+      },
+      {
+        "reference": "Ezekiel 8:11",
+        "original": "Ezek. 8:11"
+      },
+      {
+        "reference": "2 Kings 25:23",
+        "original": "2 Kings 25:23"
+      },
+      {
+        "reference": "Jeremiah 40:8",
+        "original": "Jer. 40:8"
+      },
+      {
+        "reference": "Jeremiah 42:1",
+        "original": "Jer 42:1"
+      },
+      {
+        "reference": "Jeremiah 43:2",
+        "original": "Jer. 43:2"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAAZANIAH": {
+    "name": "Jaazaniah",
+    "slug": "jaazaniah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(som Herren hører)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 25:23",
+        "original": "2 Kings 25:23"
+      },
+      {
+        "reference": "Jeremiah 41:11",
+        "original": "Jeremiah 41:11"
+      },
+      {
+        "reference": "Jeremiah 43:4",
+        "original": "Jeremiah 43:4"
+      },
+      {
+        "reference": "Jeremiah 43:5",
+        "original": "Jeremiah 43:5"
+      },
+      {
+        "reference": "Ezekiel 8:11",
+        "original": "Ezekiel 8:11"
+      },
+      {
+        "reference": "Ezekiel 11:1",
+        "original": "Ezekiel 11:1"
+      },
+      {
+        "reference": "Jeremiah 35:3",
+        "original": "Jeremiah 35:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAAZER": {
+    "name": "Jaazer",
+    "slug": "jaazer",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Han (Gud) hjelper, en amorittisk by øst for Jordan, og tildelt Gad, sammen med nærliggende steder i Gilead (4 Mos. 32:1, 35; Jos. 13:25). Den ble tildelt de merarittiske levittene (21:39). På Davids tid var den okkupert av hebronittene, dvs. Kohats etterkommere (1 Krøn. 26:31). Den er nevnt i «byrdene» proklamert over Moab (Jes. 16:8, 9; Jer. 48:32). Dens beliggenhet er markert av den moderne ruinen kalt Sar eller Seir, omtrent 10 mil vest for Amman, og 12 mil fra Hesjbon. «Vinmarkene som en gang dekket åssidene er borte; og de ville beduinene fra ørkenen i øst gjør all form for dyrking umulig.»"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 32:1",
+        "original": "Num. 32:1"
+      },
+      {
+        "reference": "Numbers 32:35",
+        "original": "Num 32:35"
+      },
+      {
+        "reference": "Joshua 13:25",
+        "original": "Josh. 13:25"
+      },
+      {
+        "reference": "1 Chronicles 26:31",
+        "original": "1 Chr. 26:31"
+      },
+      {
+        "reference": "Isaiah 16:8",
+        "original": "Isa. 16:8"
+      },
+      {
+        "reference": "Isaiah 16:9",
+        "original": "Isa. 16:9"
+      },
+      {
+        "reference": "Jeremiah 48:32",
+        "original": "Jer. 48:32"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAAZER, OR JAZER": {
+    "name": "Jaazer, Or Jazer",
+    "slug": "jaazer-or-jazer",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Herren hjelper), en by øst for Jordan, i eller nær Gilead. (4 Mosebok 32:1,3; 1 Krønikebok 26:31) Vi hører først om den i amorittenes besittelse, og som inntatt av Israel etter Hesjbon, på deres vei derfra til Basan. (4 Mosebok 21:32) Den synes å ha gitt navn til et distrikt av avhengige eller «datterbyer», (4 Mosebok 21:32) Autoriserte oversettelse «landsbyer», 1 Makk. 5:8, «Jasers land». (4 Mosebok 32:1)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 32:1",
+        "original": "Numbers 32:1"
+      },
+      {
+        "reference": "Numbers 32:3",
+        "original": "Numbers 32:3"
+      },
+      {
+        "reference": "1 Chronicles 26:31",
+        "original": "1 Chronicles 26:31"
+      },
+      {
+        "reference": "Numbers 21:32",
+        "original": "Numbers 21:32"
+      },
+      {
+        "reference": "1Macc 5:8",
+        "original": "1 Macc. 5:8"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAAZIAH": {
+    "name": "Jaaziah",
+    "slug": "jaaziah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Trøstet av Herren, en etterkommer av levitten Merari (1 Krøn. 24:26, 27)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Herren trøster), tilsynelatende en tredje sønn, eller en etterkommer, eller levitten Merari. (1 Krønikebok 24:26,27) (før 1014 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 24:26",
+        "original": "1 Chr. 24:26"
+      },
+      {
+        "reference": "1 Chronicles 24:27",
+        "original": "1 Chr. 24:27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAAZIEL": {
+    "name": "Jaaziel",
+    "slug": "jaaziel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Trøstet av Gud, en levittisk musiker (1 Krøn 15:18)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Herren trøster), en av levittene David utpekte til å utføre musikktjenesten foran arken. (1 Krønikebok 15:18) (ca. 1014 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 15:18",
+        "original": "1 Chr. 15:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABAL": {
+    "name": "Jabal",
+    "slug": "jabal",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En strøm, en etterkommer av Kain og bror av Jubal; «stamfar til dem som bor i telt og holder buskap» (1 Mos 4:20). Denne beskrivelsen indikerer at han levde et vandrende liv."
+      },
+      {
+        "source": "SMI",
+        "text": "(strøm), sønn av Lamek og Ada (1 Mosebok 4:20) og bror av Jubal. Han beskrives som stamfar til dem som bor i telt og holder buskap."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 4:20",
+        "original": "Gen. 4:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABBOK": {
+    "name": "Jabbok",
+    "slug": "jabbok",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En utgytelse, eller en brytekamp. En av elvene øst for Jordan som den faller ut i, omtrent midtveis mellom Genesaretsjøen og Dødehavet, eller omtrent 72 km nedenfor Genesaretsjøen. Den har sitt utspring på østsiden av Gilead-fjellene og renner ca. 105 km gjennom en vill og dyp kløft. Den utgjorde grensen mellom ammonittenes territorium og landet til Og, kongen av Basan (Jos 12:1-5; 4 Mos 21:24); også mellom Rubens stamme og den halve Manasse-stammen (4 Mos 21:24; 5 Mos 3:16). På sin ferd vestover over slettene forsvinner den mer enn én gang under jorden. «Naturen langs dens bredder er sannsynligvis den mest pittoreske i Palestina; og ruinene av byer, landsbyer og festninger som preger de omkringliggende fjellsidene, gjør landet like interessant som det er vakkert.» Denne elven kalles nå Zerka, eller den blå elv."
+      },
+      {
+        "source": "SMI",
+        "text": "(tømming), en elv som krysser Gilead-fjellkjeden, jf. (Josva 12:2,5) og munner ut i Jordan i øst, omtrent midtveis mellom Genesaretsjøen og Dødehavet. I oldtiden var den grensen for Ammons barn. (4 Mosebok 21:24; 5 Mosebok 2:37; 3:16) Det var på Jaboks sørlige bredd at møtet mellom Jakob og Esau fant sted (1 Mosebok 32:22), og denne elven ble senere, i sin vestlige del, grensen mellom kongerikene Sihon og Og. (Josva 12:2,5) Dens moderne navn er Wady Zurka."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 12:1-5",
+        "original": "Josh. 12:1-5"
+      },
+      {
+        "reference": "Numbers 21:24",
+        "original": "Num. 21:24"
+      },
+      {
+        "reference": "Deuteronomy 3:16",
+        "original": "Deut. 3:16"
+      },
+      {
+        "reference": "Joshua 12:2",
+        "original": "Joshua 12:2"
+      },
+      {
+        "reference": "Joshua 12:5",
+        "original": "Joshua 12:5"
+      },
+      {
+        "reference": "Numbers 2:37",
+        "original": "Numbers 2:37"
+      },
+      {
+        "reference": "Numbers 3:16",
+        "original": "Numbers 3:16"
+      },
+      {
+        "reference": "Genesis 32:22",
+        "original": "Genesis 32:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABESH": {
+    "name": "Jabesh",
+    "slug": "jabesh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Tørr. (1.) Se Jabesj-Gilead (1 Sam 11:3, 9, 10). (2.) Far til Sjallum (2 Kong 15:10, 13, 14), som tilranet seg Israels trone etter Sakarjas død."
+      },
+      {
+        "source": "SMI",
+        "text": "(tørr)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 11:3",
+        "original": "1 Sam. 11:3"
+      },
+      {
+        "reference": "1 Samuel 11:9",
+        "original": "1 Sam. 11:9"
+      },
+      {
+        "reference": "1 Samuel 11:10",
+        "original": "1 Sam. 11:10"
+      },
+      {
+        "reference": "2 Kings 15:10",
+        "original": "2 Kings 15:10"
+      },
+      {
+        "reference": "2 Kings 15:13",
+        "original": "2 Kings 15:13"
+      },
+      {
+        "reference": "2 Kings 15:14",
+        "original": "2 Kings 15:14"
+      },
+      {
+        "reference": "1 Chronicles 27:21",
+        "original": "1 Chronicles 27:21"
+      },
+      {
+        "reference": "Numbers 32:1-42",
+        "original": "Numbers 32:1-42"
+      },
+      {
+        "reference": "Judges 21:8-14",
+        "original": "Judges 21:8-14"
+      },
+      {
+        "reference": "1 Samuel 11:1-15",
+        "original": "1 Samuel 11:1-15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABESH-GILEAD": {
+    "name": "Jabesh-Gilead",
+    "slug": "jabesh-gilead",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En by øst for Jordan, på toppen av en av de grønne åsene i Gilead, innenfor grensene til den halve Manasse-stammen, og i fullt utsyn fra Bet-Sjan. Den nevnes først i forbindelse med hevnaksjonen mot dens innbyggere fordi de hadde nektet å komme opp til Mispa for å delta med Israel mot Benjamins stamme (Dom 21:8-14). Etter slagene ved Gibea var den stammen nesten utryddet, bare seks hundre menn var igjen. En ekspedisjon ble sendt mot Jabesj-Gilead, og alle dens innbyggere ble drept med sverd, unntatt fire hundre jomfruer, som de førte bort som fanger og sendte for å «forkynne fred» til benjaminittene som hadde flyktet til Rimmons klippe. Disse fangene ble gitt til dem som hustruer, slik at stammen kunne reddes fra utryddelse (Dom 21). Denne byen ble senere inntatt av Nahas, ammonittenes konge, men ble befridd av Saul, Israels nyvalgte konge. Som takk for denne befrielsen, førti år senere, tok mennene fra Jabesj-Gilead ned kroppene til Saul og hans tre sønner fra murene i Bet-Sjan, og etter å ha brent dem, gravla de knoklene under et tre nær byen (1 Sam 31:11-13). David takket dem for denne fromme handlingen (2 Sam 2:4-6), og overførte senere levningene til det kongelige gravkammer (2 Sam 21:14). Den identifiseres med ruinene av ed-Deir, omtrent 9,7 km sør for Pella, nord for Wadi Yabis."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 21:8-14",
+        "original": "Judg. 21:8-14"
+      },
+      {
+        "reference": "Judges 21",
+        "original": "Judg. 21"
+      },
+      {
+        "reference": "1 Samuel 31:11-13",
+        "original": "1 Sam. 31:11-13"
+      },
+      {
+        "reference": "2 Samuel 2:4-6",
+        "original": "2 Sam. 2:4-6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JABEZ": {
+    "name": "Jabez",
+    "slug": "jabez",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lidelse. (1.) En etterkommer av Juda, om hvem det er nedtegnet at «Gud ga ham det han ba om» (1 Krøn 4:9, 10). (2.) Et sted bebodd av flere skriftlærd-familier (1 Krøn 2:55)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sorg)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:9",
+        "original": "1 Chr. 4:9"
+      },
+      {
+        "reference": "1 Chronicles 4:10",
+        "original": "1 Chr. 4:10"
+      },
+      {
+        "reference": "1 Chronicles 2:55",
+        "original": "1 Chr. 2:55"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABIN": {
+    "name": "Jabin",
+    "slug": "jabin",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Den som skjelner; den vise. (1.) En konge av Hasor på den tiden Israel inntok Kanaan (Jos 11:1-14), hvis nederlag, og nederlaget til den nordlige høvdingen han hadde inngått en forbund med mot Josva, var den avgjørende handlingen i erobringen av landet (11:21-23; jf. 14:6-15). Dette store slaget, utkjempet ved Merom-sjøen, var det siste av Josvas slag som vi har noen nedtegnelse om. Her møtte israelittene for første gang kanaaneernes jernvogner og hester. (2.) En annen konge av Hasor, kalt «Kanaans konge», som overveldet israelittene i nord hundre og seksti år etter Josvas død, og i tjue år holdt dem i smertefull underkastelse. Hele befolkningen var lammet av frykt og ga etter for håpløs motløshet (Dom 5:6-11), helt til Debora og Barak vekket den nasjonale ånd og, ved å samle ti tusen menn, vant en stor og avgjørende seier over Jabin på Jizreeldalen (Dom 4:10-16; jf. Sal 83:9). Dette var Israels første store seier siden Josvas dager. De trengte aldri å kjempe et nytt slag med kanaaneerne (Dom 5:31)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Gud iakttar)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 11:1-14",
+        "original": "Josh. 11:1-14"
+      },
+      {
+        "reference": "Judges 5:6-11",
+        "original": "Judg. 5:6-11"
+      },
+      {
+        "reference": "Judges 4:10-16",
+        "original": "Judg. 4:10-16"
+      },
+      {
+        "reference": "Psalms 83:9",
+        "original": "Ps. 83:9"
+      },
+      {
+        "reference": "Judges 5:31",
+        "original": "Judg. 5:31"
+      },
+      {
+        "reference": "Joshua 11:1-3",
+        "original": "Joshua 11:1-3"
+      },
+      {
+        "reference": "Judges 4:2",
+        "original": "Judges 4:2"
+      },
+      {
+        "reference": "Judges 4:13",
+        "original": "Judges 4:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABNEEL": {
+    "name": "Jabneel",
+    "slug": "jabneel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bygd av Gud. (1.) En by på Judas nordgrense (Jos 15:11), senere kalt Jamnia av grekerne, det moderne Yebna, 17,7 km sør for Jaffa. Etter Jerusalems fall (år 70 e.Kr.) ble den en av Judeas mest folkerike byer og sete for en berømt skole. (2.) En by på grensen til Naftali (Jos 19:33). Dens senere navn var Kefr Yemmah, «landsbyen ved sjøen», på sørbredden av Merom-sjøen."
+      },
+      {
+        "source": "SMI",
+        "text": "(Guds bygning)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:11",
+        "original": "Josh. 15:11"
+      },
+      {
+        "reference": "Joshua 19:33",
+        "original": "Josh. 19:33"
+      },
+      {
+        "reference": "2 Chronicles 26:6",
+        "original": "2 Chronicles 26:6"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JABNEH": {
+    "name": "Jabneh",
+    "slug": "jabneh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bygning (2 Krøn 26:6), identisk med Jabneel (Jos 15:11)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Guds bygning), (2 Krønikebok 26:6) [se Jabneel]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 26:6",
+        "original": "2 Chr. 26:6"
+      },
+      {
+        "reference": "Joshua 15:11",
+        "original": "Josh. 15:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JACHAN": {
+    "name": "Jachan",
+    "slug": "jachan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sørgende, en av de fremste gadittiske «brødrene» i Basan (1 Krøn 5:13)."
+      },
+      {
+        "source": "SMI",
+        "text": "(lidelse), en av sju høvdinger i Gads stamme. (1 Krønikebok 5:13)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:13",
+        "original": "1 Chr. 5:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JACHIN": {
+    "name": "Jachin",
+    "slug": "jachin",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fast. (1.) Simeons fjerde sønn (1 Mos 46:10), også kalt Jarib (1 Krøn 4:24). (2.) Overhode for en av presteskapets ordninger (den tjueførste) (1 Krøn 24:17). (3.) En av prestene som vendte tilbake fra eksilet (1 Krøn 9:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(han skal etablere)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:10",
+        "original": "Gen. 46:10"
+      },
+      {
+        "reference": "1 Chronicles 4:24",
+        "original": "1 Chr. 4:24"
+      },
+      {
+        "reference": "1 Chronicles 24:17",
+        "original": "1 Chr. 24:17"
+      },
+      {
+        "reference": "1 Chronicles 9:10",
+        "original": "1 Chr. 9:10"
+      },
+      {
+        "reference": "1 Kings 7:21",
+        "original": "1 Kings 7:21"
+      },
+      {
+        "reference": "2 Chronicles 3:17",
+        "original": "2 Chronicles 3:17"
+      },
+      {
+        "reference": "Exodus 6:15",
+        "original": "Exodus 6:15"
+      },
+      {
+        "reference": "Numbers 26:12",
+        "original": "Numbers 26:12"
+      },
+      {
+        "reference": "Nehemiah 11:10",
+        "original": "Nehemiah 11:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JACHIN AND BOAZ": {
+    "name": "Jachin and Boaz",
+    "slug": "jachin-and-boaz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Navnene på to bronsesøyler som ble reist i Salomos tempel (1 Kong 7:15-22). Hver var atten alen høy og tolv i omkrets (Jer 52:21, 23; 1 Kong 7:17-21). De hadde utvilsomt en symbolsk betydning."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 7:15-22",
+        "original": "1 Kings 7:15-22"
+      },
+      {
+        "reference": "Jeremiah 52:21",
+        "original": "Jer. 52:21"
+      },
+      {
+        "reference": "Jeremiah 52:23",
+        "original": "Jer. 52:23"
+      },
+      {
+        "reference": "1 Kings 7:17-21",
+        "original": "1 Kings 7:17-21"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JACINTH": {
+    "name": "Jacinth",
+    "slug": "jacinth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Egentlig en blomst av rødlig blått eller dyp purpur (hyasint), og derav en edelsten av den fargen (Åp 21:20). Den har blitt antatt å betegne den samme steinen som ligursteinen (hebr. leshem) nevnt i 2 Mos 28:19 som den første steinen i tredje rad i yppersteprestens brystplate. I Åp 9:17 er ordet rett og slett en fargebeskrivelse."
+      },
+      {
+        "source": "SMI",
+        "text": "En edelsten, som utgjør en av grunnvollene i murene til det nye Jerusalem. (Åpenbaringen 21:20) Kalt hyasint i den reviderte utgaven. Dette er ganske enkelt en annen engelsk gjengivelse av samme greske original. Den er sannsynligvis identisk med ligursteinen i (2 Mosebok 28:19). Jakhint eller hyasint er en rød variant av zirkon, som finnes i kvadratiske prismer i hvit, grå, rød, rødbrun, gul eller blekgrønn farge. Uttrykket i (Åpenbaringen 9:17) «av jakhint», er simpelthen en beskrivelse av en mørk purpurfarge."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Revelation 21:20",
+        "original": "Rev. 21:20"
+      },
+      {
+        "reference": "Exodus 28:19",
+        "original": "Ex. 28:19"
+      },
+      {
+        "reference": "Revelation 9:17",
+        "original": "Rev. 9:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JACOB": {
+    "name": "Jacob",
+    "slug": "jacob",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En som følger like bak en annens hæler; en bedrager (1 Mos 25:26; 27:36; Hos 12:2-4). Han var den andre av Isaks tvillingsønner med Rebekka. Han ble sannsynligvis født i Lahai-Roi, da hans far var femtini år og Abraham hundre og femtini år gammel. I likhet med sin far var han av en rolig og mild natur, og da han vokste opp, levde han som gjeter, mens hans bror Esau ble en driftig jeger. Hans omgang med Esau viste imidlertid mye smålig egoisme og list (1 Mos 25:29-34). Da Isak var omtrent 160 år gammel, konspirerte Jakob og hans mor for å bedra den aldrende patriarken (1 Mos 27), med sikte på å sikre overføring av førstefødselsretten til ham selv. Førstefødselsretten sikret den som hadde den (1) overlegen rang i familien (1 Mos 49:3); (2) en dobbelt del av den fedrene arven (5 Mos 21:17); (3) presteembedet i familien (4 Mos 8:17-19); og (4) løftet om Ætten som alle jordens folkeslag skulle bli velsignet gjennom (1 Mos 22:18). Snart etter at han hadde mottatt sin fars velsignelse (1 Mos 27), ble Jakob bevisst sin skyld; og redd for Esaus vrede, sendte Isak ham bort, på Rebekkas forslag, til Haran, 640 km eller mer, for å finne en hustru blant sine søskenbarn, Labans, syrerens, familie (1 Mos 28). Der møtte han Rakel (1 Mos 29). Laban ville ikke gi ham sin datter i ekteskap før han hadde tjent sju år; men for Jakob «syntes disse årene bare som noen få dager, for den kjærlighet han hadde til henne.» Men da de sju årene var gått, bedro Laban listig Jakob og ga ham sin datter Lea. Ytterligere sju års tjeneste måtte fullføres sannsynligvis før han fikk den elskede Rakel. Men «livslang sorg, vanære og prøvelser, i Guds gjengjeldende forsyn, fulgte som en konsekvens av denne doble foreningen.» Ved slutten av de fjorten års tjeneste ønsket Jakob å vende tilbake til sine foreldre, men på Labans bønn ble han hos ham ytterligere seks år, mens han gjette hans flokker (1 Mos 31:41). Han reiste så av sted med sin familie og eiendom «for å dra til sin far Isak i Kanaans land» (1 Mos 31). Laban ble sint da han hørte at Jakob hadde reist, og forfulgte ham, og innhentet ham etter sju dager. Møtet var av en smertefull art. Etter mye beskyldninger og bebreidelser rettet mot Jakob, blir Laban til slutt forsonet, og tar et kjærlig farvel med sine døtre, og vender tilbake til sitt hjem i Padan-Aram. Og nå er all forbindelse mellom israelittene og Mesopotamia slutt. Kort tid etter å ha skilt lag med Laban, blir han møtt av en engleskare, som for å hilse ham velkommen hjem til løftets land (1 Mos 32:1, 2). Han kalte stedet Mahanaim, dvs. «den doble leiren», sannsynligvis hans egen leir og englenes leir. Englevisjonen var motstykket til den han tidligere hadde sett i Betel, da den trette, ensomme vandreren, tjue år tidligere, på vei til Padan-Aram, så Guds engler stige opp og ned på stigen hvis topp nådde til himmelen (1 Mos 28:12). Han hører nå med bestyrtelse om broren Esaus tilnærming med en skare på 400 mann for å møte ham. I stor sjelekamp forbereder han seg på det verste. Han føler at han nå bare må stole på Gud, og han vender seg til ham i alvorlig bønn, og sender foran seg en storslått gave til Esau, «en gave til min herre Esau fra din tjener Jakob.» Jakobs familie ble deretter transportert over Jabbok; men han selv ble tilbake, og tilbrakte natten i samfunn med Gud. Mens han var opptatt med dette, viste en i form av en mann seg som brytet med ham. I denne mystiske kampen seiret Jakob, og som et minne om det ble hans navn endret til Israel (Guds bryter); og stedet der dette skjedde, kalte han Peniel, «for», sa han, «jeg har sett Gud ansikt til ansikt, og mitt liv er bevart» (1 Mos 32:25-31). Etter denne angstfylte natten fortsatte Jakob sin vei, haltende, mystisk svekket av kampen, men sterk i forsikringen om Guds gunst. Esau kom frem og møtte ham; men hans hevntørst var dempet, og brødrene møttes som venner, og resten av deres liv opprettholdt de vennskapelige forhold. Etter et kort opphold i Sukkot, flyttet Jakob videre og slo opp sitt telt nær Sikem (se der), 1 Mos 33:18; men til slutt, under guddommelig veiledning, flyttet han til Betel, hvor han bygde et alter til Gud (1 Mos 35:6, 7), og hvor Gud viste seg for ham og fornyet den abrahamittiske pakten. Mens han reiste fra Betel til Efrata (det kanaaneiske navnet på Betlehem), døde Rakel i fødselen av sin andre sønn Benjamin (1 Mos 35:16-20), femten eller seksten år etter Josefs fødsel. Han nådde deretter den gamle familieresidensen i Mamre, for å vente ved sin fars, Isaks, dødsleie. Den fullstendige forsoningen mellom Esau og Jakob ble vist ved at de forente seg i patriarkens begravelse (1 Mos 35:27-29). Jakob ble kort tid etter dypt bedrøvet over tapet av sin elskede sønn Josef på grunn av brødrenes sjalusi (1 Mos 37:33). Deretter følger"
+      },
+      {
+        "source": "SMI",
+        "text": "(bedrager), Isaks og Rebekkas andre sønn. Han ble født sammen med Esau, sannsynligvis ved Lahai-Rois brønn, omkring 1837 f.Kr. Hans historie er fortalt i den siste halvdelen av Første Mosebok. Han kjøpte førstefødselsretten fra sin bror Esau, og tilegnet seg deretter den velsignelsen som var ment for Esau, ved å praktisere et velkjent bedrag mot Isak. (Jakob oppnådde ikke velsignelsen på grunn av sitt bedrag, men til tross for det. Det som var lovet, ville han ha mottatt på en god måte; men Jakob og hans mor, som mistrodde Guds løfte, søkte den lovede velsignelsen på en feilaktig måte, og mottok med den problemer og sorg. — RED.) Jakob, i sitt 78. år, ble sendt fra familiehjemmet for å unngå sin bror og for å søke en hustru blant sine slektninger i Padan-Aram. Da han passerte gjennom Betel, åpenbarte Gud seg for ham. Etter et tidsrom på tjueen år vendte han tilbake fra Padan-Aram med to hustruer, to medhustruer, elleve sønner og en datter, samt store eiendeler. Han unnslapp Labans vredefulle forfølgelse, et møte med Esau, og kanaaneernes hevn, fremprovosert av drapet på Sikem; og i hver av disse tre krisene ble han hjulpet og styrket av Guds inngripen, og som et tegn på den nåden han vant gjennom en natt med brytekamp med Gud, ble hans navn ved Jabbok endret til Israel. Debora og Rakel døde før han nådde Hebron; Josef, Jakobs yndlingssønn, ble solgt til Egypt elleve år før Isaks død; og Jakob hadde sannsynligvis overskredet sitt 130. år da han dro dit. Han ble presentert for Farao, og bodde i sytten år i Ramesses og Gosen, og døde i sitt 147. år. Hans kropp ble balsamert, båret med stor omhu og pomp inn i Kanaans land, og gravlagt sammen med sine fedre og sin hustru Lea, i Makpelahulen. Jakobs eksempel er sitert av den første og den siste av de mindre profetene. I tillegg til den hyppige omtale av hans navn i forbindelse med navnene på de to andre patriarkene, er det tydelige henvisninger til hendelsene i Jakobs liv i fire bøker i Det nye testamente – (Johannes 1:51; 4:5,12; Apostlenes gjerninger 7:12,16; Romerne 9:11-13; Hebreerne 11:21; 12:16)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:26",
+        "original": "Gen. 25:26"
+      },
+      {
+        "reference": "Genesis 27:36",
+        "original": "Gen 27:36"
+      },
+      {
+        "reference": "Hosea 12:2-4",
+        "original": "Hos. 12:2-4"
+      },
+      {
+        "reference": "Genesis 25:29-34",
+        "original": "Gen. 25:29-34"
+      },
+      {
+        "reference": "Genesis 27",
+        "original": "Gen. 27"
+      },
+      {
+        "reference": "Genesis 49:3",
+        "original": "Gen. 49:3"
+      },
+      {
+        "reference": "Deuteronomy 21:17",
+        "original": "Deut. 21:17"
+      },
+      {
+        "reference": "Numbers 8:17-19",
+        "original": "Num. 8:17-19"
+      },
+      {
+        "reference": "Genesis 22:18",
+        "original": "Gen. 22:18"
+      },
+      {
+        "reference": "Genesis 31",
+        "original": "Gen. 31"
+      },
+      {
+        "reference": "Exodus 1:5",
+        "original": "Ex. 1:5"
+      },
+      {
+        "reference": "Deuteronomy 10:22",
+        "original": "Deut. 10:22"
+      },
+      {
+        "reference": "Acts 7:14",
+        "original": "Acts 7:14"
+      },
+      {
+        "reference": "Genesis 48",
+        "original": "Gen. 48"
+      },
+      {
+        "reference": "Micah 1:5",
+        "original": "Micah 1:5"
+      },
+      {
+        "reference": "Romans 9:11-13",
+        "original": "Rom. 9:11-13"
+      },
+      {
+        "reference": "Hebrews 12:16",
+        "original": "Heb. 12:16"
+      },
+      {
+        "reference": "Hebrews 11:21",
+        "original": "Heb 11:21"
+      },
+      {
+        "reference": "John 1:51",
+        "original": "John 1:51"
+      },
+      {
+        "reference": "John 4:5",
+        "original": "John 4:5"
+      },
+      {
+        "reference": "John 4:12",
+        "original": "John 4:12"
+      },
+      {
+        "reference": "Acts 7:12",
+        "original": "Acts 7:12"
+      },
+      {
+        "reference": "Acts 7:16",
+        "original": "Acts 7:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JACOBS WELL": {
+    "name": "Jacobs Well",
+    "slug": "jacobs-well",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "En dyp kilde i nærheten av Sikem (kalt Sykar i Kristi tid og Nablus i dag). Den ble sannsynligvis gravd ut av Jakob, hvis navn den bærer. På brønnkanten satt Jesus og samtalte med den samaritanske kvinnen. (Joh 4:5-26) Den ligger omtrent 0,8 km sørøst for Nablus, ved foten av fjellet Gerisim. Den er omtrent 2,7 meter i diameter og 23 meter dyp. Til tider er den tørr; til andre tider inneholder den noen få meter vann."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "John 4:5-26",
+        "original": "John 4:5-26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JACOB’S WELL": {
+    "name": "Jacob’s Well",
+    "slug": "jacob-s-well",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Johannes 4:5, 6). Dette er et av de få stedene i Palestina hvor det ikke er uenighet. Det ble gravd av Jakob, derav navnet, på det «jordstykket» han kjøpte av Hamors sønner (1 Mos. 33:19). Det eksisterer fremdeles, men selv om det etter kraftig regn inneholder litt vann, er det nå vanligvis ganske tørt. Det ligger ved inngangen til dalen mellom Ebal og Gerisim, omtrent 3 kilometer sørøst for Sikem. Brønnen er omtrent 2,7 meter i diameter og 23 meter dyp, selv om den i oldtiden uten tvil var mye dypere, sannsynligvis dobbelt så dyp. Å grave en slik brønn må ha vært et svært møysommelig og kostbart foretak. «Dessverre har Jakobs brønn ikke unngått den malplasserte religiøse ærbødigheten som ikke kan nøye seg med å la objektet være som det er, men må bygge et helligdom over det for å beskytte og hellige det. En rekke bygninger av ulik stil og alder har fylt opp området, tilstoppet brønnen og skjemmet ut stedets naturlige skjønnhet og enkelhet. For tiden er avfallet i brønnen fjernet; men det er fortsatt en kuppelstruktur over den, og man skuer ned i sjakten hugget inn i den levende fjellgrunnen og ser på 21 meters dyp vannflaten glitre med et blekblått lys i mørket, mens man legger merke til hvordan kalksteinsblokkene som danner kanten, er blitt slitt glatte, eller furet av århundrers tau» (Hugh Macmillan). Ved inngangen til inngjerdingen rundt brønnen er en av trepolene som holder telegraftrådene mellom Jerusalem og Haifa, plantet i bakken."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "John 4:5",
+        "original": "John 4:5"
+      },
+      {
+        "reference": "John 4:6",
+        "original": "John 4:6"
+      },
+      {
+        "reference": "Genesis 33:19",
+        "original": "Gen. 33:19"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JADA": {
+    "name": "Jada",
+    "slug": "jada",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(vis), sønn av Onam og bror til Sjammai, i slektsregisteret over Jerahmeels sønner med hans kone Atarah. (1 Krønikebok 2:28,32) (f.Kr. etter 1445.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:28",
+        "original": "1 Chronicles 2:28"
+      },
+      {
+        "reference": "1 Chronicles 2:32",
+        "original": "1 Chronicles 2:32"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JADAU": {
+    "name": "Jadau",
+    "slug": "jadau",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(kjærlig), en av Bene-Nebo som hadde tatt en fremmed kone. (Esra 10:43) (f.Kr. 459.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:43",
+        "original": "Ezra 10:43"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JADDUA": {
+    "name": "Jaddua",
+    "slug": "jaddua",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Kjent. (1.) En av høvdingene som undertegnet pakten (Neh. 10:21). (2.) Den siste ypperstepresten nevnt i Det gamle testamente (Neh. 12:11, 22), sønn av Jonatan."
+      },
+      {
+        "source": "SMI",
+        "text": "(kjent)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 10:21",
+        "original": "Neh. 10:21"
+      },
+      {
+        "reference": "Nehemiah 12:11",
+        "original": "Neh. 12:11"
+      },
+      {
+        "reference": "Nehemiah 12:22",
+        "original": "Neh 12:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JADON": {
+    "name": "Jadon",
+    "slug": "jadon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dommer, en meronotitt som hjalp til med å gjenoppbygge Jerusalems murer (Neh. 3:7)."
+      },
+      {
+        "source": "SMI",
+        "text": "(dommer), meronotitten, som hjalp til med å reparere muren i Jerusalem. (Nehemja 3:7) (f.Kr. 446.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 3:7",
+        "original": "Neh. 3:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAEL": {
+    "name": "Jael",
+    "slug": "jael",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fjellgeit, Heber kenittens kone (Dom. 4:17-22). Da kanaaneerne ble beseiret av Barak, flyktet Sisera, Jabins hærfører, og søkte tilflukt hos den vennligsinnede stammen til Heber, under eiketrærne i Saanannim. Da han nærmet seg, inviterte Jael ham inn i sitt telt. Det gjorde han, og da han lå utmattet på gulvet, falt han i dyp søvn. Da tok hun i sin venstre hånd en av de store trepluggene («teltpluggen») som festet teltets tau, og i sin høyre hånd klubben, eller «hammeren», som ble brukt til å drive den ned i jorden. Stille nærmet hun seg sin sovende gjest, og med et velrettet slag drev hun pluggen gjennom hans tinninger og ned i jorden (Dom. 5:27). Deretter ledet hun Barak, som var i forfølgelse, inn i sitt telt og viste ham stolt hva hun hadde gjort. (Se SISERA; DEBORA.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(fjellgeit), Heber kenittens kone. (f.Kr. 1316.) I den halsbrekkende flukten som fulgte etter kanaaneernes nederlag ved Megiddo på Esdraelonsletten, flyktet deres hærfører Sisera til teltet til den kenittiske høvdingkvinnen, i Kedesj i Naftali, seks kilometer nordvest for Meromsjøen. Han aksepterte Jaels invitasjon til å komme inn, og hun kastet et teppe over ham der han lå utmattet på gulvet. Da tørst hindret søvn, og han ba om vann, ga hun ham kjernemelk i sitt fineste kar. Til slutt, med en følelse av fullkommen trygghet, falt han i dyp søvn. Da tok Jael en av de store trepluggene som festet teltets tau, og med ett fryktelig slag med en klubbe drev hun den gjennom Siseras tinninger dypt ned i jorden. (Dommerne 5:27) Hun ventet så på å møte den forfølgende Barak, og ledet ham inn i sitt telt slik at hun i hans nærvær kunne kreve æren for gjerningen! Mange har antatt at hun med denne handlingen oppfylte Deboras ord, (Dommerne 4:9) og derfor har de antatt at Jael var drevet av en guddommelig og skjult innflytelse. Men Bibelen gir ingen antydning om en slik inspirasjon."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 4:17-22",
+        "original": "Judg. 4:17-22"
+      },
+      {
+        "reference": "Judges 5:27",
+        "original": "Judg. 5:27"
+      },
+      {
+        "reference": "Judges 4:9",
+        "original": "Judges 4:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAGUR": {
+    "name": "Jagur",
+    "slug": "jagur",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Oppholdssted, en by på Judas sørlige grense (Jos. 15:21)."
+      },
+      {
+        "source": "SMI",
+        "text": "(losji), en by i Juda, en av de sørligste, ved Edoms grense. (Josva 15:21)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:21",
+        "original": "Josh. 15:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAH": {
+    "name": "Jah",
+    "slug": "jah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En sammentrekning for Jehova (Sal. 68:4)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Jehova), den forkortede formen av Jehova, brukt kun i poesi. Den forekommer ofte i hebraisk, men med ett eneste unntak, (Salmene 68:4) er den gjengitt som «Herren» i Authorized Version. Identiteten mellom Jah og Jehova er sterkt markert i to passasjer i Jesaja – (Jesaja 12:2; 26:4) [Jehova]."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 68:4",
+        "original": "Ps. 68:4"
+      },
+      {
+        "reference": "Isaiah 12:2",
+        "original": "Isaiah 12:2"
+      },
+      {
+        "reference": "Isaiah 26:4",
+        "original": "Isaiah 26:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHATH": {
+    "name": "Jahath",
+    "slug": "jahath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Forening. (1.) En sønn av Sjim’i, og sønnesønn av Gersjom (1 Krøn. 23:10). (2.) En av Sjelomot’s sønner, av Kahats familie (1 Krøn. 24:22). (3.) En levitt av Meraris familie, en av tilsynsmennene for tempelreparasjonene under Josjia (2 Krøn. 34:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forening)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:10",
+        "original": "1 Chr. 23:10"
+      },
+      {
+        "reference": "1 Chronicles 24:22",
+        "original": "1 Chr. 24:22"
+      },
+      {
+        "reference": "2 Chronicles 34:12",
+        "original": "2 Chr. 34:12"
+      },
+      {
+        "reference": "1 Chronicles 6:20",
+        "original": "1 Chronicles 6:20"
+      },
+      {
+        "reference": "1 Chronicles 23:11",
+        "original": "1 Chronicles 23:11"
+      },
+      {
+        "reference": "1 Chronicles 4:2",
+        "original": "1 Chronicles 4:2"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHAZ": {
+    "name": "Jahaz",
+    "slug": "jahaz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nedtråkket (også kalt Jahasa, Jos. 13:18; Jahasa, 21:36; Jahsa, 1 Krøn. 6:78), en by der Sihon ble beseiret, i Moabs grenseområder og i ammonittenes land bortenfor Jordan, og nord for Arnon-elven (4 Mos. 21:23; 5 Mos. 2:32). Den lå i Rubens stamme og ble tildelt de merarittiske levittene (Jos. 13:18; 21:36). Her ble det avgjørende slaget utkjempet hvor Sihon (q.v.) ble fullstendig knust, og hans territorium (det moderne Belka) kom i Israels besittelse. Denne byen er nevnt i profetenes fordømmelser mot Moab (Jes. 15:4; Jer. 48:34)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:18",
+        "original": "Josh. 13:18"
+      },
+      {
+        "reference": "1 Chronicles 6:78",
+        "original": "1 Chr. 6:78"
+      },
+      {
+        "reference": "Numbers 21:23",
+        "original": "Num. 21:23"
+      },
+      {
+        "reference": "Deuteronomy 2:32",
+        "original": "Deut. 2:32"
+      },
+      {
+        "reference": "Joshua 21:36",
+        "original": "Josh 21:36"
+      },
+      {
+        "reference": "Isaiah 15:4",
+        "original": "Isa. 15:4"
+      },
+      {
+        "reference": "Jeremiah 48:34",
+        "original": "Jer. 48:34"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAHAZ, ALSO JAHAZA, JAHAZAH AND JUHZAH": {
+    "name": "Jahaz, Also Jahaza, Jahazah And Juhzah",
+    "slug": "jahaz-also-jahaza-jahazah-and-juhzah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(nedtråkket). Under disse fire formene gis i Authorized Version navnet på et sted som på hebraisk fremstår som Yahats og Yahtsah. Ved Jahaz ble det avgjørende slaget utkjempet mellom Israels barn og Sihon, amorittenes konge. (4 Mosebok 21:23; 5 Mosebok 2:32; Dommerne 11:20) Det var i Rubens tildeling. (Josva 13:18) Som mange andre steder øst for Dødehavet må spørsmålet om dets beliggenhet avvente ytterligere forskning."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 21:23",
+        "original": "Numbers 21:23"
+      },
+      {
+        "reference": "Numbers 2:32",
+        "original": "Numbers 2:32"
+      },
+      {
+        "reference": "Judges 11:20",
+        "original": "Judges 11:20"
+      },
+      {
+        "reference": "Joshua 13:18",
+        "original": "Joshua 13:18"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHAZA": {
+    "name": "Jahaza",
+    "slug": "jahaza",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(nedtråkket). (Josva 13:18) [Jahaz, Også Jahaza, Jahazah Og Juhzah]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:18",
+        "original": "Joshua 13:18"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHAZAH": {
+    "name": "Jahazah",
+    "slug": "jahazah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(nedtråkket). (Josva 21:36; Jeremia 48:21) [Jahaz, Også Jahaza, Jahazah Og Juhzah]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21:36",
+        "original": "Joshua 21:36"
+      },
+      {
+        "reference": "Jeremiah 48:21",
+        "original": "Jeremiah 48:21"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHAZIEL": {
+    "name": "Jahaziel",
+    "slug": "jahaziel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sett av Gud. (1.) Den tredje sønnen til Hebron (1 Krøn. 23:19). (2.) En benjamittisk høvding som sluttet seg til David i Siklag (1 Krøn. 12:4). (3.) En prest som fulgte med flyttingen av arken til Jerusalem (1 Krøn. 16:6). (4.) Sønnen til Sakarja, en levitt av Asafs familie (2 Krøn. 20:14-17). Han oppmuntret Josjafat mot moabittene og ammonittene."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Gud våker over)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:19",
+        "original": "1 Chr. 23:19"
+      },
+      {
+        "reference": "1 Chronicles 12:4",
+        "original": "1 Chr. 12:4"
+      },
+      {
+        "reference": "1 Chronicles 16:6",
+        "original": "1 Chr. 16:6"
+      },
+      {
+        "reference": "2 Chronicles 20:14-17",
+        "original": "2 Chr. 20:14-17"
+      },
+      {
+        "reference": "1 Chronicles 24:23",
+        "original": "1 Chronicles 24:23"
+      },
+      {
+        "reference": "2 Chronicles 20:14",
+        "original": "2 Chronicles 20:14"
+      },
+      {
+        "reference": "Ezra 8:5",
+        "original": "Ezra 8:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHDAI": {
+    "name": "Jahdai",
+    "slug": "jahdai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Griper, en etterkommer av Kaleb, av Hesrons familie (1 Krøn. 2:47)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som Jehova leder), en mann som ser ut til å bli brått skutt inn i Kalebs slektsregister, som far til seks sønner. (1 Krønikebok 2:47)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:47",
+        "original": "1 Chr. 2:47"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHDIEL": {
+    "name": "Jahdiel",
+    "slug": "jahdiel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Herren gjør glad), en høvding fra Manasse på østsiden av Jordan. (1 Krønikebok 5:24) (ca. 320 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:24",
+        "original": "1 Chronicles 5:24"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHDO": {
+    "name": "Jahdo",
+    "slug": "jahdo",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(forent), en gaditt, (1 Krønikebok 5:14) sønn av Buz og far til Jeshishai."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:14",
+        "original": "1 Chronicles 5:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHLEEL": {
+    "name": "Jahleel",
+    "slug": "jahleel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den som håper på Herren), den tredje av Sebulons tre sønner, (1 Mosebok 46:14; 4 Mosebok 26:26) grunnleggeren av jahleelittenes slekt. (ca. 1706 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:14",
+        "original": "Genesis 46:14"
+      },
+      {
+        "reference": "Numbers 26:26",
+        "original": "Numbers 26:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHMAI": {
+    "name": "Jahmai",
+    "slug": "jahmai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Herren vokter), en mann fra Jissakar, en av overhodene for Tolas hus. (1 Krønikebok 7:2) (ca. 1491 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:2",
+        "original": "1 Chronicles 7:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHNZIAH": {
+    "name": "Jahnziah",
+    "slug": "jahnziah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Herren våker over), sønn av Tikva, tilsynelatende en prest. (Esra 10:15)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:15",
+        "original": "Ezra 10:15"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHZAH": {
+    "name": "Jahzah",
+    "slug": "jahzah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(nedtrampet). (1 Krønikebok 6:78) [Jahaz, også Jahaza, Jahazah og Juhzah]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:78",
+        "original": "1 Chronicles 6:78"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAHZEEL": {
+    "name": "Jahzeel",
+    "slug": "jahzeel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Tildelt av Gud, den første av Naftalis sønner (1 Mosebok 46:24)."
+      },
+      {
+        "source": "SMI",
+        "text": "(den Gud tildeler), den første av Naftalis fire sønner, (1 Mosebok 46:24; 4 Mosebok 26:48) grunnleggeren av jahzeelittenes slekt. (ca. 1306 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:24",
+        "original": "Gen. 46:24"
+      },
+      {
+        "reference": "Numbers 26:48",
+        "original": "Numbers 26:48"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHZERAH": {
+    "name": "Jahzerah",
+    "slug": "jahzerah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Den som vender tilbake, sønn av Mesjullam og far til Adiel (1 Krønikebok 9:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(den Gud fører tilbake), en prest fra Immers hus. (1 Krønikebok 9:12)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 9:12",
+        "original": "1 Chr. 9:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAHZIEL": {
+    "name": "Jahziel",
+    "slug": "jahziel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Gud tildeler), den samme som Jahzeel. (1 Krønikebok 7:13)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:13",
+        "original": "1 Chronicles 7:13"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAILER": {
+    "name": "Jailer",
+    "slug": "jailer",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(fra Filippi), Apostlenes gjerninger 16:23. Omvendelsen av den romerske fangevokteren, en mann som tilhørte en klasse som «i regelen var ufølsom og herdet av vane, og dessuten tilbøyelig til å forakte jødene, som var bærerne av evangeliebodskapet,» er et av de tilfellene som illustrerer dets universalitet og kraft."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Acts 16:23",
+        "original": "Acts 16:23"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAIR": {
+    "name": "Jair",
+    "slug": "jair",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Den som opplyser. (1.) Segubs sønn. Han vokste opp med sin mor i Gilead, hvor han hadde eiendommer (1 Krønikebok 2:22). Han utmerket seg i et felttog mot Basan og slo seg ned i den delen av Argob som grenset til Gilead. De små byene han inntok der, ble kalt Havot-Jair, dvs. «Jairs landsbyer» (4 Mosebok 32:41; 5 Mosebok 3:14; Josva 13:30). (2.) Israels åttende dommer, som han styrte i tjueto år. Hans rikdom er beskrevet i Dommernes bok 10:3-5. Han hadde tretti sønner, som alle red på «eselføll». De eide tretti av de seksti byene (1 Kongebok 4:13; 1 Krønikebok 2:23) som utgjorde det gamle Havot-Jair. (3.) En benjaminit, far til Mordekai, Esters onkel (Ester 2:5). (4.) Far til Elhanan, som drepte Lahmi, Goliats bror (1 Krønikebok 20:5)."
+      },
+      {
+        "source": "SMI",
+        "text": "(den som opplyser)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:22",
+        "original": "1 Chr. 2:22"
+      },
+      {
+        "reference": "Numbers 32:41",
+        "original": "Num. 32:41"
+      },
+      {
+        "reference": "Deuteronomy 3:14",
+        "original": "Deut. 3:14"
+      },
+      {
+        "reference": "Joshua 13:30",
+        "original": "Josh. 13:30"
+      },
+      {
+        "reference": "Judges 10:3-5",
+        "original": "Judg. 10:3-5"
+      },
+      {
+        "reference": "1 Kings 4:13",
+        "original": "1 Kings 4:13"
+      },
+      {
+        "reference": "1 Chronicles 2:23",
+        "original": "1 Chr. 2:23"
+      },
+      {
+        "reference": "Esther 2:5",
+        "original": "Esther 2:5"
+      },
+      {
+        "reference": "1 Chronicles 20:5",
+        "original": "1 Chr. 20:5"
+      },
+      {
+        "reference": "1 Chronicles 20:6",
+        "original": "1 Chronicles 20:6"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAIRITE": {
+    "name": "Jairite",
+    "slug": "jairite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(etterkommer av Jair). Ira JAIRITTEN var prest (Autorisert oversettelse: «høvding») for David (2 Samuelsbok 20:26)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 20:26",
+        "original": "2 Samuel 20:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAIRUS": {
+    "name": "Jairus",
+    "slug": "jairus",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En synagogeforstander i Kapernaum, hvis eneste datter Jesus gjenoppvekket fra de døde (Markus 5:22; Lukas 8:41). Han gikk inn i dødens rom, ledsaget av Peter, Jakob og Johannes, samt jentens far og mor. Han gikk frem til sengen hvor liket lå, og sa: Talitha kumi, dvs. «Lille jente, stå opp!» Straks vendte jentens ånd tilbake til henne, og hun reiste seg med det samme; og «for straks å styrke det livet som hadde vendt tilbake til henne, og for å bevise at hun sannelig ikke var et gjenferd, men hadde vendt tilbake til en dødelig tilværelses realiteter, befalte han at hun skulle få noe å spise» (Markus 5:43)."
+      },
+      {
+        "source": "SMI",
+        "text": "(den Gud opplyser)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Mark 5:22",
+        "original": "Mark 5:22"
+      },
+      {
+        "reference": "Luke 8:41",
+        "original": "Luke 8:41"
+      },
+      {
+        "reference": "Mark 5:43",
+        "original": "Mark 5:43"
+      },
+      {
+        "reference": "Matthew 9:18",
+        "original": "Matthew 9:18"
+      },
+      {
+        "reference": "Esther 11:2",
+        "original": "Esther 11:2"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAKAMEAN": {
+    "name": "Jakamean",
+    "slug": "jakamean",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den som samler folket), en levitt på kong Davids tid; den fjerde av Hebrons sønner, Kohats sønn. (1 Krønikebok 23:19; 24:23) (ca. 1014 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:19",
+        "original": "1 Chronicles 23:19"
+      },
+      {
+        "reference": "1 Chronicles 24:23",
+        "original": "1 Chronicles 24:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAKAN": {
+    "name": "Jakan",
+    "slug": "jakan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(vis), sønn av horitten Eser. (1 Krønikebok 1:42) Den samme som Jaakan. [Se også Akan]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:42",
+        "original": "1 Chronicles 1:42"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAKEH": {
+    "name": "Jakeh",
+    "slug": "jakeh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gudfryktig, far til Agur (Salomos ordspråk 30:1). Intet er kjent om ham."
+      },
+      {
+        "source": "SMI",
+        "text": "(gudfryktig). [Salomos ordspråk]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Proverbs 30:1",
+        "original": "Prov. 30:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAKIM": {
+    "name": "Jakim",
+    "slug": "jakim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Grunnlegger. (1.) Overhode for det tolvte presteavsnitt (1 Krønikebok 24:12). (2.) En benjaminitt (1 Krønikebok 8:19). (3.) Margnotat i Matteus 1:11 betyr Jojakim."
+      },
+      {
+        "source": "SMI",
+        "text": "(den Gud oppreiser)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 24:12",
+        "original": "1 Chr. 24:12"
+      },
+      {
+        "reference": "1 Chronicles 8:19",
+        "original": "1 Chr. 8:19"
+      },
+      {
+        "reference": "Matthew 1:11",
+        "original": "Matt. 1:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JALON": {
+    "name": "Jalon",
+    "slug": "jalon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Innbygger, den siste av de fire sønnene til Esra, av Judas stamme (1 Krønikebok 4:17)."
+      },
+      {
+        "source": "SMI",
+        "text": "(boende), en av Esras sønner. (1 Krønikebok 4:17)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:17",
+        "original": "1 Chr. 4:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAMBRES": {
+    "name": "Jambres",
+    "slug": "jambres",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En av dem som motsto Moses i Egypt (2 Timoteus 3:8). (Se JANNES.)"
+      },
+      {
+        "source": "SMI",
+        "text": "[Jannes OG Jambres]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Timothy 3:8",
+        "original": "2 Tim. 3:8"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAMES": {
+    "name": "James",
+    "slug": "james",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Sønn av Sebedeus og Salome; en eldre bror av apostelen Johannes. Han var en av de tolv. Han var fisker av yrke, i partnerskap med Peter (Matteus 20:20; 27:56). Sammen med Johannes og Peter var han til stede ved forklarelsen på fjellet (Matteus 17:1; Markus 9:2), ved oppvekkelsen av Jairus’ datter (Markus 5:37-43), og i hagen sammen med vår Herre (14:33). Sannsynligvis på grunn av deres dristighet og energi, ble han og Johannes kalt Boanerges, dvs. «tordensønner». Han var den første martyr blant apostlene, halshogd av kong Herodes Agrippa (Apostlenes gjerninger 12:1, 2), i år 44 e.Kr. (Sammenlign Matteus 4:21; 20:20-23). (2.) Sønn av Alfaios, eller Klopas, «Herrens bror» eller nær slektning eller fetter av vår Herre (Galaterne 1:18, 19), kalt Jakob «den yngre», eller «den lille», sannsynligvis fordi han var lav av vekst. Han er nevnt sammen med de andre apostlene (Matteus 10:3; Markus 3:18; Lukas 6:15). Han hadde et eget møte med vår Herre etter hans oppstandelse (1 Korinterbrev 15:7), og er nevnt som en av omskjærelsens apostler (Apostlenes gjerninger 1:13). Han ser ut til å ha inntatt stillingen som leder for menigheten i Jerusalem, hvor han presiderte over det rådet som ble holdt for å behandle saken om hedningene (Apostlenes gjerninger 12:17; 15:13-29; 21:18-24). Denne Jakob var forfatteren av brevet som bærer hans navn."
+      },
+      {
+        "source": "SMI",
+        "text": "(den greske formen av Jakob, som fortrenger)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 20:20",
+        "original": "Matt. 20:20"
+      },
+      {
+        "reference": "Matthew 27:56",
+        "original": "Matt 27:56"
+      },
+      {
+        "reference": "Matthew 17:1",
+        "original": "Matt. 17:1"
+      },
+      {
+        "reference": "Mark 9:2",
+        "original": "Mark 9:2"
+      },
+      {
+        "reference": "Mark 5:37-43",
+        "original": "Mark 5:37-43"
+      },
+      {
+        "reference": "Acts 12:1",
+        "original": "Acts 12:1"
+      },
+      {
+        "reference": "Acts 12:2",
+        "original": "Acts 12:2"
+      },
+      {
+        "reference": "Matthew 4:21",
+        "original": "Matt. 4:21"
+      },
+      {
+        "reference": "Matthew 20:20-23",
+        "original": "Matt 20:20-23"
+      },
+      {
+        "reference": "Galatians 1:18",
+        "original": "Gal. 1:18"
+      },
+      {
+        "reference": "Galatians 1:19",
+        "original": "Gal. 1:19"
+      },
+      {
+        "reference": "Matthew 10:3",
+        "original": "Matt. 10:3"
+      },
+      {
+        "reference": "Mark 3:18",
+        "original": "Mark 3:18"
+      },
+      {
+        "reference": "Luke 6:15",
+        "original": "Luke 6:15"
+      },
+      {
+        "reference": "1 Corinthians 15:7",
+        "original": "1 Cor. 15:7"
+      },
+      {
+        "reference": "Acts 1:13",
+        "original": "Acts 1:13"
+      },
+      {
+        "reference": "Acts 12:17",
+        "original": "Acts 12:17"
+      },
+      {
+        "reference": "Acts 15:13-29",
+        "original": "Acts 15:13-29"
+      },
+      {
+        "reference": "Mark 1:20",
+        "original": "Mark 1:20"
+      },
+      {
+        "reference": "Matthew 10:2",
+        "original": "Matthew 10:2"
+      },
+      {
+        "reference": "Mark 3:14",
+        "original": "Mark 3:14"
+      },
+      {
+        "reference": "Luke 6:13",
+        "original": "Luke 6:13"
+      },
+      {
+        "reference": "Mark 10:37",
+        "original": "Mark 10:37"
+      },
+      {
+        "reference": "Luke 9:54",
+        "original": "Luke 9:54"
+      },
+      {
+        "reference": "Mark 15:40",
+        "original": "Mark 15:40"
+      },
+      {
+        "reference": "John 19:25",
+        "original": "John 19:25"
+      },
+      {
+        "reference": "Matthew 13:55",
+        "original": "Matthew 13:55"
+      },
+      {
+        "reference": "Mark 6:3",
+        "original": "Mark 6:3"
+      },
+      {
+        "reference": "Luke 6:16",
+        "original": "Luke 6:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAMES THE LESS": {
+    "name": "James The Less",
+    "slug": "james-the-less",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Kalt den yngre fordi han var yngre eller lavere av vekst enn Jakob, Sebedeus’ sønn. Han var sønn av Alfaios eller Klopas og vår Herres bror (se ovenfor); ble kalt til apostolatet, sammen med sin yngre bror Judas, våren år 28. En gang i løpet av de førti dagene som gikk mellom oppstandelsen og himmelfarten, viste Herren seg for ham. (1 Korinterbrev 15:7) Ti år senere finner vi Jakob på linje med Peter, og sammen med ham bestemte han om apostelen Paulus skulle tas opp i fellesskapet med menigheten i Jerusalem; og fra da av finner vi ham alltid lik, eller i sitt eget område overlegen, selv de fremste apostlene, Peter, Johannes og Paulus. (Apostlenes gjerninger 9:27; Galaterne 1:18,19) Denne fremtredende posisjonen er tydelig gjennom hele apostlenes senere historie, enten vi leser den i Apostlenes gjerninger, i brevene eller hos kirkelige forfattere. (Apostlenes gjerninger 12:17; 15:13,19; 21:18; Galaterne 2:9) Ifølge tradisjonen ble Jakob kastet ned fra templet av de skriftlærde og fariseerne; han ble deretter steinet, og hjernen hans ble knust med en valkers klubbe."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Corinthians 15:7",
+        "original": "1 Corinthians 15:7"
+      },
+      {
+        "reference": "Acts 9:27",
+        "original": "Acts 9:27"
+      },
+      {
+        "reference": "Galatians 1:18",
+        "original": "Galatians 1:18"
+      },
+      {
+        "reference": "Galatians 1:19",
+        "original": "Galatians 1:19"
+      },
+      {
+        "reference": "Acts 12:17",
+        "original": "Acts 12:17"
+      },
+      {
+        "reference": "Acts 15:13",
+        "original": "Acts 15:13"
+      },
+      {
+        "reference": "Acts 15:19",
+        "original": "Acts 15:19"
+      },
+      {
+        "reference": "Acts 21:18",
+        "original": "Acts 21:18"
+      },
+      {
+        "reference": "Galatians 2:9",
+        "original": "Galatians 2:9"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAMES, EPISTLE OF": {
+    "name": "James, Epistle of",
+    "slug": "james-epistle-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Forfatteren var Jakob den yngre, Herrens bror, en av de tolv apostlene. Han var en av kirkens tre søyler (Galaterne 2:9). (2.) Det var adressert til jødene i diasporaen, «de tolv stammene som er spredt omkring». (3.) Stedet og tidspunktet for brevets skriving var Jerusalem, hvor Jakob bodde, og, ut fra intern bevisføring, perioden mellom Paulus’ to fengslinger i Roma, sannsynligvis rundt år 62 e.Kr. (4.) Forfatterens hensikt var å understreke kristenlivets praktiske plikter. «De jødiske svakhetene han advarer dem mot er: formalisme, som lot Guds tjeneste bestå i vaskinger og ytre seremonier, mens han minner dem (1:27) om at den heller består i aktiv kjærlighet og renhet; fanatisme, som under religiøs iver rev Jerusalem i stykker (1:20); fatalisme, som la sine synder på Gud (1:13); smålighet, som bøyde seg for de rike (2:2); falskhet, som hadde gjort ord og eder til lek (3:2-12); partiskhet (3:14); baktalelse (4:11); skryt (4:16); undertrykkelse (5:4). Den store lærdommen han gir dem som kristne er tålmodighet, tålmodighet i prøvelser (1:2), tålmodighet i gode gjerninger (1:22-25), tålmodighet under provokasjon (3:17), tålmodighet under undertrykkelse (5:7), tålmodighet under forfølgelse (5:10); og grunnlaget for deres tålmodighet er at Herrens komme nærmer seg, som skal rette opp all urett (5:8).» «Rettferdiggjørelse ved gjerninger», som Jakob argumenterer for, er rettferdiggjørelse for mennesker, rettferdiggjørelsen av vår troserklæring gjennom et konsekvent liv. Paulus argumenterer for læren om «rettferdiggjørelse ved tro»; men det er rettferdiggjørelse for Gud, det å bli ansett og akseptert som rettferdig i kraft av Kristi rettferdighet, som mottas ved tro."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Galatians 2:9",
+        "original": "Gal. 2:9"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAMES, THE GENERAL EPISTLE OF": {
+    "name": "James, The General Epistle Of",
+    "slug": "james-the-general-epistle-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Forfatteren av dette brevet var med all sannsynlighet Jakob, Alfaios’ sønn, og vår Herres bror. Det ble skrevet fra Jerusalem, som apostelen Jakob ikke ser ut til å ha forlatt. Det ble sannsynligvis skrevet rundt år 62 e.Kr., i perioden mellom Paulus’ to fengslinger. Dets hovedformål er ikke å undervise i lære, men å forbedre moralen. Jakob er Det nye testamentets morallærer. Han skrev for jødekristne, enten i Jerusalem eller utenlands, for å advare dem mot syndene de som jøder var mest utsatt for, og for å trøste og formane dem under lidelsene de som kristne var mest utsatt for."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAMIN": {
+    "name": "Jamin",
+    "slug": "jamin",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(høyre hånd)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 6:15",
+        "original": "Exod 6:15"
+      },
+      {
+        "reference": "1 Chronicles 4:24",
+        "original": "1Chr 4:24"
+      },
+      {
+        "reference": "Numbers 26:12",
+        "original": "Numbers 26:12"
+      },
+      {
+        "reference": "1 Chronicles 2:27",
+        "original": "1 Chronicles 2:27"
+      },
+      {
+        "reference": "Nehemiah 8:7",
+        "original": "Nehemiah 8:7"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAMLECH": {
+    "name": "Jamlech",
+    "slug": "jamlech",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Gud gjør til konge), en av de fremste mennene i Simeons stamme. (1 Krønikebok 4:34)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:34",
+        "original": "1 Chronicles 4:34"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAMNIN": {
+    "name": "Jamnin",
+    "slug": "jamnin",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Jabneel]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JANNA": {
+    "name": "Janna",
+    "slug": "janna",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(blomstrende), sønn av Josef og far til Melki, i Kristi slektstavle. (Lukas 3:24) I den reviderte utgaven skrevet JANNAI."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Luke 3:24",
+        "original": "Luke 3:24"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JANNES": {
+    "name": "Jannes",
+    "slug": "jannes",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En av egypterne som «motsto Moses» (2 Timoteus 3:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "og Jambres, navnene på to egyptiske magikere som motarbeidet Moses. 2 Mosebok 7:9-13; 2 Timoteus 3:8,9. (ca. 1492 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Timothy 3:8",
+        "original": "2 Tim. 3:8"
+      },
+      {
+        "reference": "Exodus 7:9-13",
+        "original": "Exod 7:9-13"
+      },
+      {
+        "reference": "2 Timothy 3:9",
+        "original": "2Tim 3:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JANOAH": {
+    "name": "Janoah",
+    "slug": "janoah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Eller Janoha, hvile. (1.) En by på den nordøstlige grensen av Efraim, i Jordandalen (Josva 16:6, 7). Identifisert med det moderne Yanun, 8 miles sørøst for Nablus. (2.) En by i Nord-Palestina, innenfor Naftalis grenser. Den ble inntatt av kongen av Assyria (2 Kongebok 15:29)."
+      },
+      {
+        "source": "SMI",
+        "text": "(hvile), et sted tilsynelatende i det nordlige Galilea, eller «Naftalis land», – ett av dem som Tiglat-Pileser inntok under sitt første innfall i Palestina. (2 Kongebok 15:29) Ingen spor av det finnes andre steder."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 16:6",
+        "original": "Josh. 16:6"
+      },
+      {
+        "reference": "Joshua 16:7",
+        "original": "Josh. 16:7"
+      },
+      {
+        "reference": "2 Kings 15:29",
+        "original": "2 Kings 15:29"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JANOHAH": {
+    "name": "Janohah",
+    "slug": "janohah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(hvile), et sted på Efraims grense (Josva 16:6,7) øst for Neapolis. Litt mindre enn tolv miles fra Nablus og omtrent sørøst i retning, to miles fra Akrabeh ligger landsbyen Yanun, utvilsomt identisk med det gamle Janoha."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 16:6",
+        "original": "Joshua 16:6"
+      },
+      {
+        "reference": "Joshua 16:7",
+        "original": "Joshua 16:7"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JANUM": {
+    "name": "Janum",
+    "slug": "janum",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Slummer, en by i Judas fjellområde (Jos 15:53)."
+      },
+      {
+        "source": "SMI",
+        "text": "(slummer), en by i Judas fjellområde, tilsynelatende ikke langt fra Hebron. (Josva 15:53)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:53",
+        "original": "Josh. 15:53"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAPHETH": {
+    "name": "Japheth",
+    "slug": "japheth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Vid utbredelse: «Gud skal utvide Jafet» (hebr. Yaphat Elohim le-Yephet, 1 Mos 9:27. Noen avleder imidlertid navnet fra yaphah, «å være vakker»; derav hvit), en av Noahs sønner, sist nevnt i rekkefølgen (1 Mos 5:32; 6:10; 7:13), kanskje førstefødt (10:21; jf. 9:24). Han og hans kone var to av de åtte som ble reddet i arken (1 Pet 3:20). Han var stamfar til mange stammer som bebodde det østlige Europa og det nordlige Asia (1 Mos 10:2-5). En handling av sønnelig fromhet (9:20-27) var anledningen til Noahs profeti om utvidelsen av hans etterkommere. Etter syndfloden ble jorden befolket på nytt av Noahs etterkommere, «Jafets sønner» (1 Mos 10:2), «Hams sønner» (6) og «Sems sønner» (22). Det er viktig å merke seg at moderne etnologisk vitenskap, som resonnerer fra en grundig analyse av fakta, har kommet til den konklusjon at det er en tredelt inndeling av den menneskelige familie, som på en bemerkelsesverdig måte tilsvarer det store etnologiske kapittelet i Første Mosebok (10). De tre store rasene som således skilles ut, kalles semittiske, ariske og turanske (allofyliske). «Bortsett fra tilfeller der de anvendte etniske navnene er av tvilsom anvendelse, kan det ikke med rimelighet bestrides at forfatteren [av 1 Mos 10] i sin beretning om Jafets sønner har gruppert sammen kymrerne eller kelterne (Gomer), mederne (Madai) og jonerne eller grekerne (Javan), og derved forutsett det som i moderne tid er blitt kjent som ‘den indoeuropeiske teori’, eller den essensielle enheten mellom den ariske (asiatiske) rase og de viktigste rasene i Europa, angitt av kelterne og jonerne. Heller ikke kan det tviles på at han under ett overhode ‘Sems barn’ har samlet assyrerne (Assur), syrerne (Aram), hebreerne (Eber) og de joktanske araberne (Joktan), fire av de viktigste rasene som moderne etnologi anerkjenner under overskriften ‘semittiske’. Videre, under overskriften ‘Hams sønner’, har forfatteren ordnet ‘Kusj’, dvs. etiopierne; ‘Misraim’, folket i Egypt; ‘Sjeba og Dedan’, eller visse av søraraberne; og ‘Nimrod’, eller det gamle folket i Babylon, fire raser mellom hvilke de nyeste lingvistiske undersøkelser har etablert et nær slektskap» (Rawlinsons Hist. Illustrations)."
+      },
+      {
+        "source": "SMI",
+        "text": "(utvidelse), en av Noahs tre sønner. Jafets etterkommere bebodde «hedningenes øyer» (1 Mos 10:5) – det vil si kystlandene ved Middelhavet i Europa og Lilleasia – hvorfra de spredte seg nordover over hele det europeiske kontinentet og en betydelig del av Asia."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 9:27",
+        "original": "Gen. 9:27"
+      },
+      {
+        "reference": "Genesis 5:32",
+        "original": "Gen. 5:32"
+      },
+      {
+        "reference": "Genesis 6:10",
+        "original": "Gen 6:10"
+      },
+      {
+        "reference": "Genesis 7:13",
+        "original": "Gen 7:13"
+      },
+      {
+        "reference": "1 Peter 3:20",
+        "original": "1 Pet. 3:20"
+      },
+      {
+        "reference": "Genesis 10:2-5",
+        "original": "Gen. 10:2-5"
+      },
+      {
+        "reference": "Genesis 10:2",
+        "original": "Gen. 10:2"
+      },
+      {
+        "reference": "Genesis 10",
+        "original": "Gen. 10"
+      },
+      {
+        "reference": "Genesis 10:5",
+        "original": "Genesis 10:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAPHIA": {
+    "name": "Japhia",
+    "slug": "japhia",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Strålende. (1.) Kongen av Lakisj, som sluttet seg til forbundet mot Josva (Jos 10:3), og ble beseiret og drept. I en av Amarna-tavlene omtaler han seg selv som konge av Geser. Kalles også Horam (Jos 10:33). (2.) En av Davids sønner (2 Sam 5:15), født i Jerusalem. (3.) En by på den sørlige grensen av Sebulon (Jos 19:12); nå Yafa, 2 engelske mil sørvest for Nasaret."
+      },
+      {
+        "source": "SMI",
+        "text": "(strålende). Sebulons grense steg fra Daberat til Jafia, og gikk derfra videre til Gat-Hefer. (Josva 19:12) Yafa, to engelske mil sør for Nasaret, er trolig identisk med Jafia."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 10:3",
+        "original": "Josh. 10:3"
+      },
+      {
+        "reference": "Joshua 10:33",
+        "original": "Josh. 10:33"
+      },
+      {
+        "reference": "2 Samuel 5:15",
+        "original": "2 Sam. 5:15"
+      },
+      {
+        "reference": "Joshua 19:12",
+        "original": "Josh. 19:12"
+      },
+      {
+        "reference": "1 Chronicles 3:7",
+        "original": "1 Chronicles 3:7"
+      },
+      {
+        "reference": "1 Chronicles 14:6",
+        "original": "1 Chronicles 14:6"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAPHLELI": {
+    "name": "Japhleli",
+    "slug": "japhleli",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(jafletitten). Grensen til «jafletittene» er et av grensemerkene på Efraims sørlige grenselinje. (Josva 16:3)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 16:3",
+        "original": "Joshua 16:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAPHLET": {
+    "name": "Japhlet",
+    "slug": "japhlet",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(som Gud frelser) en etterkommer av Asjer gjennom Beria. (1 Krønikebok 7:32,33)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:32",
+        "original": "1 Chronicles 7:32"
+      },
+      {
+        "reference": "1 Chronicles 7:33",
+        "original": "1 Chronicles 7:33"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAPHO": {
+    "name": "Japho",
+    "slug": "japho",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Skjønnhet, en havneby i Dan (Jos 19:46); kalt Joppe (se der) i 2 Krøn 2:16; Esra 3:7; Jona 1:3; og i Det nye testamentet."
+      },
+      {
+        "source": "SMI",
+        "text": "(skjønnhet). (John 19:46) Den hebraiske formen for det mer kjente Joppe, eller Japho. (2 Krønikebok 2:16; Esra 3:7; Jona 1:3) I sin moderne form er det Yafa."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:46",
+        "original": "Josh. 19:46"
+      },
+      {
+        "reference": "2 Chronicles 2:16",
+        "original": "2 Chr. 2:16"
+      },
+      {
+        "reference": "Ezra 3:7",
+        "original": "Ezra 3:7"
+      },
+      {
+        "reference": "Jonah 1:3",
+        "original": "Jonah 1:3"
+      },
+      {
+        "reference": "John 19:46",
+        "original": "John 19:46"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JARAH": {
+    "name": "Jarah",
+    "slug": "jarah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(honning), en etterkommer av Saul; sønn av Mika og oldebarn av Mefibosjet. (1 Krønikebok 9:42) jf. 1 Krøn 9:40"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 9:42",
+        "original": "1 Chronicles 9:42"
+      },
+      {
+        "reference": "1 Chronicles 9:40",
+        "original": "1Chr 9:40"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAREB": {
+    "name": "Jareb",
+    "slug": "jareb",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(motstander) skal forklares enten som et egennavn for et land eller en person, som et substantiv i apposisjon, eller som et verb fra roten rub, «å stride/forhandle». Alle disse betydningene er representert i Authorized Version og marginalnotatene, (Hosea 5:13; 10:6) og den mest foretrukne er satt inn i teksten. Jareb er mest sannsynlig navnet på en assyrisk by eller et annet navn for landet selv."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Hosea 5:13",
+        "original": "Hosea 5:13"
+      },
+      {
+        "reference": "Hosea 10:6",
+        "original": "Hosea 10:6"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JARED": {
+    "name": "Jared",
+    "slug": "jared",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Avstamning. (1.) Den fjerde før-syndflodske patriark i slektslinjen fra Set (1 Mos 5:15-20; Luk 3:37), Enoks far; kalt Jered i 1 Krøn 1:2. (2.) Trolig en sønn av Esra (1 Krøn 4:18)."
+      },
+      {
+        "source": "SMI",
+        "text": "(avstamning), en av de før-syndflodske patriarker, og Enoks far (1 Mos 5:15,16,18-20; Luk 3:37). I Krønikebøkene er navnet gitt som Jered i Authorized Version."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 5:15-20",
+        "original": "Gen. 5:15-20"
+      },
+      {
+        "reference": "Luke 3:37",
+        "original": "Luke 3:37"
+      },
+      {
+        "reference": "1 Chronicles 1:2",
+        "original": "1 Chr. 1:2"
+      },
+      {
+        "reference": "1 Chronicles 4:18",
+        "original": "1 Chr. 4:18"
+      },
+      {
+        "reference": "Genesis 5:15",
+        "original": "Genesis 5:15"
+      },
+      {
+        "reference": "Genesis 5:16",
+        "original": "Genesis 5:16"
+      },
+      {
+        "reference": "Genesis 5:18-20",
+        "original": "Genesis 5:18-20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JARESIAH": {
+    "name": "Jaresiah",
+    "slug": "jaresiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Herren nærer), en benjaminitt, en av Bene-Jehoram. (1 Krønikebok 8:17)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:17",
+        "original": "1 Chronicles 8:17"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JARHA": {
+    "name": "Jarha",
+    "slug": "jarha",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "den egyptiske tjeneren til Sesjan, omkring Elis tid, som hans herre ga sin datter og arving i ekteskap; (1 Krønikebok 2:34,35) (f.Kr. før 1491)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:34",
+        "original": "1 Chronicles 2:34"
+      },
+      {
+        "reference": "1 Chronicles 2:35",
+        "original": "1 Chronicles 2:35"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JARIB": {
+    "name": "Jarib",
+    "slug": "jarib",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En motstander. (1.) En sønn av Simeon (1 Krøn 4:24). (2.) En av høvdingene sendt av Esra for å hente prestene til Jerusalem (Esra 8:16). (3.) Esra 10:18."
+      },
+      {
+        "source": "SMI",
+        "text": "(motstander)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:24",
+        "original": "1 Chr. 4:24"
+      },
+      {
+        "reference": "Ezra 8:16",
+        "original": "Ezra 8:16"
+      },
+      {
+        "reference": "Ezra 10:18",
+        "original": "Ezra 10:18"
+      },
+      {
+        "reference": "Exodus 6",
+        "original": "Exod 6"
+      },
+      {
+        "reference": "Numbers 26",
+        "original": "Numb 26"
+      },
+      {
+        "reference": "1Macc 14:29",
+        "original": "1 Macc. 14:29"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JARIMOTH": {
+    "name": "Jarimoth",
+    "slug": "jarimoth",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(høyder). 1 Esd. 9:28. [Jeremot]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1Esd 9:28",
+        "original": "1 Esd. 9:28"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JARMUTH": {
+    "name": "Jarmuth",
+    "slug": "jarmuth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Høyde. (1.) En by på Judas slette (Jos 15:35), opprinnelig bosted for en av de kanaaneiske kongene (10:3, 5, 23). Den er identifisert med det moderne Yarmuk, en landsby omtrent 7 engelske mil nordøst for Beit-Jibrin. (2.) En levittisk by i Issakars stamme (Jos 21:29), antatt av noen å være Samuels Rama (1 Sam 19:22)."
+      },
+      {
+        "source": "SMI",
+        "text": "(høy)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:35",
+        "original": "Josh. 15:35"
+      },
+      {
+        "reference": "Joshua 21:29",
+        "original": "Josh. 21:29"
+      },
+      {
+        "reference": "1 Samuel 19:22",
+        "original": "1 Sam. 19:22"
+      },
+      {
+        "reference": "Joshua 16:35",
+        "original": "Joshua 16:35"
+      },
+      {
+        "reference": "Joshua 10:3",
+        "original": "Joshua 10:3"
+      },
+      {
+        "reference": "Joshua 10:5",
+        "original": "Joshua 10:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAROAH": {
+    "name": "Jaroah",
+    "slug": "jaroah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(måne), en overhode fra Gads stamme (1 Krønikebok 5:14)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:14",
+        "original": "1 Chronicles 5:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JASHEN": {
+    "name": "Jashen",
+    "slug": "jashen",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sover, også kalt Hashem (1 Krøn 11:34); en person, hvorav flere av hans sønner var i Davids livgarde (2 Sam 23:32)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sover). Bene-Jashen – «Jashens sønner» – er nevnt i fortegnelsen over heltene i Davids garde (2 Samuel 23:32) (ca. 1046 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 11:34",
+        "original": "1 Chr. 11:34"
+      },
+      {
+        "reference": "2 Samuel 23:32",
+        "original": "2 Sam. 23:32"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JASHER": {
+    "name": "Jasher",
+    "slug": "jasher",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Rettferdig/oppreist. «Boken om Jasher», gjengitt i Septuaginta (LXX) som «Den rettferdiges bok», og i Vulgata som «De rettferdiges bok», var sannsynligvis en form for nasjonal, hellig sangsamling, en samling sanger til ære for Israels helter, en «bok med gyldne gjerninger», en nasjonal antologi. Vi har kun to eksempler fra boken: (1) Josvas ord som han talte til Herren ved krisen i slaget ved Bet-Horon (Jos 10:12, 13); og (2) «Buesangen», den vakre og rørende, sørgmodige elegien som David komponerte i anledning Sauls og Jonatans død (2 Sam 1:18-27)."
+      },
+      {
+        "source": "SMI",
+        "text": "(oppreist), Boken om («de rettferdiges bok»), henvist til i bare to passasjer i Det gamle testamente: (Josva 10:13) og 2 Sam 1:18. Den var sannsynligvis skrevet på vers; og det er antatt at det var en samling av gamle nedtegnelser om ærede menn eller edle gjerninger. Den er fullstendig tapt."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 10:12",
+        "original": "Josh. 10:12"
+      },
+      {
+        "reference": "Joshua 10:13",
+        "original": "Josh. 10:13"
+      },
+      {
+        "reference": "2 Samuel 1:18-27",
+        "original": "2 Sam. 1:18-27"
+      },
+      {
+        "reference": "2 Samuel 1:18",
+        "original": "2Sam 1:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JASHOBEAM": {
+    "name": "Jashobeam",
+    "slug": "jashobeam",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bosatt blant folket; eller den folket vender seg til, hakmonitten (1 Krøn 11:11), en av Davids fremste helter som sluttet seg til ham i Siklag (12:6). Han var den første av de tre som brøt gjennom filisternes hær for å hente vann til David fra brønnen i Betlehem (2 Sam 23:13-17). Han kalles også Adino esnitten (8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(den folket vender seg til), nevnt først blant de fremste av Davids mektige menn (1 Krønikebok 11:11) (ca. 1046 f.Kr.). Han kom til David i Siklag. Hans utmerkende bragd var at han drepte 300 (eller 800) menn (2 Samuel 23:8) på én gang."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 11:11",
+        "original": "1 Chr. 11:11"
+      },
+      {
+        "reference": "2 Samuel 23:13-17",
+        "original": "2 Sam. 23:13-17"
+      },
+      {
+        "reference": "2 Samuel 23:8",
+        "original": "2 Samuel 23:8"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JASHUB": {
+    "name": "Jashub",
+    "slug": "jashub",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Han som vender tilbake. (1.) Den tredje av Issakars fire sønner (1 Krøn 7:1); også kalt Job (1 Mos 46:13). (2.) Esra 10:29."
+      },
+      {
+        "source": "SMI",
+        "text": "(han vender)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:1",
+        "original": "1 Chr. 7:1"
+      },
+      {
+        "reference": "Genesis 46:13",
+        "original": "Gen. 46:13"
+      },
+      {
+        "reference": "Ezra 10:29",
+        "original": "Ezra 10:29"
+      },
+      {
+        "reference": "Numbers 26:24",
+        "original": "Numbers 26:24"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JASHUBILEHEM": {
+    "name": "Jashubilehem",
+    "slug": "jashubilehem",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den som vender tilbake for mat), en person eller et sted nevnt blant etterkommerne av Sjelah, Judas sønn med Batsjua, kanaaneerkvinnen (1 Krønikebok 4:22)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:22",
+        "original": "1 Chronicles 4:22"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JASIEL": {
+    "name": "Jasiel",
+    "slug": "jasiel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Gud skapte), den sistnevnte på listen over Davids helter i (1 Krønikebok 11:47)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 11:47",
+        "original": "1 Chronicles 11:47"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JASON": {
+    "name": "Jason",
+    "slug": "jason",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Han som vil helbrede, Paulus' og Silas' vert i Tessalonika. Jødene angrep hans hus for å ta Paulus til fange, men da de ikke fant ham, dro de Jason frem for byens hersker (Apg 17:5-9). Han var tilsynelatende en av Paulus' slektninger (Rom 16:21), og fulgte ham fra Tessalonika til Korint."
+      },
+      {
+        "source": "SMI",
+        "text": "(den som vil helbrede), kalt tessaloniker, huset Paulus og Silas, og ble som følge av dette angrepet av den jødiske mobben (Apg 17:5,6,7,9) (år 48 e.Kr.). Han er sannsynligvis den samme som Jason nevnt i (Romerne 16:21). Det antas at Jason og Sekundus (Apg 20:4) var den samme personen."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Acts 17:5-9",
+        "original": "Acts 17:5-9"
+      },
+      {
+        "reference": "Romans 16:21",
+        "original": "Rom. 16:21"
+      },
+      {
+        "reference": "Acts 17:5",
+        "original": "Acts 17:5"
+      },
+      {
+        "reference": "Acts 17:6",
+        "original": "Acts 17:6"
+      },
+      {
+        "reference": "Acts 17:7",
+        "original": "Acts 17:7"
+      },
+      {
+        "reference": "Acts 17:9",
+        "original": "Acts 17:9"
+      },
+      {
+        "reference": "Acts 20:4",
+        "original": "Acts 20:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JASPER": {
+    "name": "Jasper",
+    "slug": "jasper",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Hebr. yashpheh, «glitrende»), en edelsten i forskjellige farger, en av de tolv som var innfelt i yppersteprestens brystplate (2 Mos 28:20). Den er nevnt i beskrivelsen av det nye Jerusalem (Åp 21:18, 19). Den var «svært kostbar», «klar som krystall» (21:11). Den var et symbol på Guds herlighet (4:3)."
+      },
+      {
+        "source": "SMI",
+        "text": "en kostbar stein som ofte nevnes i Skriften. Den var den siste av de tolv som ble innfelt i yppersteprestens brystplate (2 Mosebok 28:20; 39:13), og den første av de tolv som ble brukt i grunnvollene til det nye Jerusalem (Åpenbaringen 21:19). Steinens egenskaper, slik de er spesifisert i Skriften (Åpenbaringen 21:11), er at den «var svært kostbar» og «som krystall»; vi kan også utlede fra (Åpenbaringen 4:3) at det var en stein med strålende og gjennomsiktig lys. Steinen vi kaller «jaspis» stemmer ikke overens med denne beskrivelsen. Det er ingen tvil om at diamanten ville ha passet bedre til beskrivelsen i Åpenbaringens bok."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 28:20",
+        "original": "Ex. 28:20"
+      },
+      {
+        "reference": "Revelation 21:18",
+        "original": "Rev. 21:18"
+      },
+      {
+        "reference": "Revelation 21:19",
+        "original": "Rev 21:19"
+      },
+      {
+        "reference": "Exodus 39:13",
+        "original": "Exodus 39:13"
+      },
+      {
+        "reference": "Revelation 21:11",
+        "original": "Revelation 21:11"
+      },
+      {
+        "reference": "Revelation 4:3",
+        "original": "Revelation 4:3"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JATHNIEL": {
+    "name": "Jathniel",
+    "slug": "jathniel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Gud gir), en korhittisk levitt, den fjerde i Mesjelemjas familie (1 Krønikebok 26:2) (ca. 1014 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 26:2",
+        "original": "1 Chronicles 26:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JATTIR": {
+    "name": "Jattir",
+    "slug": "jattir",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fremragende, en by i Judas fjelland (Jos 15:48; 21:14)."
+      },
+      {
+        "source": "SMI",
+        "text": "(fremragende), en by i Judas fjellområder (Josva 15:48), en av gruppen som inkluderte Soko, Esjtemoa osv. Se også (Josva 21:14; 1 Samuel 30:27; 1 Krønikebok 6:57). Av Robinson er den identifisert med ’Attir, seks miles nord for Molada og ti miles sør for Hebron."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:48",
+        "original": "Josh. 15:48"
+      },
+      {
+        "reference": "Joshua 21:14",
+        "original": "Josh 21:14"
+      },
+      {
+        "reference": "1 Samuel 30:27",
+        "original": "1 Samuel 30:27"
+      },
+      {
+        "reference": "1 Chronicles 6:57",
+        "original": "1 Chronicles 6:57"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAVAN": {
+    "name": "Javan",
+    "slug": "javan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Den fjerde «sønnen» til Jafet (1 Mos 10:2), hvis etterkommere bosatte seg i Hellas, det vil si Jonia, som bærer navnet Javan på hebraisk. Aleksander den store kalles «kongen av Javan» (gjengitt som «Grekenland», Dan 8:21; 10:20; sml. 11:2; Sak 9:13). Dette ordet ble universelt brukt av østlige nasjoner som det generiske navnet på den greske rase. (2.) En by eller et distrikt i Arabia Felix, hvorfra syrerne fikk jern, kassia og kalmus (Esek 27:19)."
+      },
+      {
+        "source": "SMI",
+        "text": "(leire)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:2",
+        "original": "Gen. 10:2"
+      },
+      {
+        "reference": "Daniel 8:21",
+        "original": "Dan. 8:21"
+      },
+      {
+        "reference": "Daniel 10:20",
+        "original": "Dan 10:20"
+      },
+      {
+        "reference": "Zechariah 9:13",
+        "original": "Zech. 9:13"
+      },
+      {
+        "reference": "Ezekiel 27:19",
+        "original": "Ezek. 27:19"
+      },
+      {
+        "reference": "Genesis 10:4",
+        "original": "Genesis 10:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAVELIN": {
+    "name": "Javelin",
+    "slug": "javelin",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Hebr. hanit, et spyd, fra dets fleksibilitet (1 Sam 18:10, 11; 19:9, 10; 20:33). (2.) Hebr. romah, et spyd for tungt bevæpnede tropper, så kalt fra dets gjennomtrengende kraft (4 Mos 25:7). (Se VÅPEN.)"
+      },
+      {
+        "source": "SMI",
+        "text": "[Våpen, Rustning]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 18:10",
+        "original": "1 Sam. 18:10"
+      },
+      {
+        "reference": "1 Samuel 18:11",
+        "original": "1 Sam. 18:11"
+      },
+      {
+        "reference": "1 Samuel 19:9",
+        "original": "1 Sam. 19:9"
+      },
+      {
+        "reference": "1 Samuel 19:10",
+        "original": "1 Sam. 19:10"
+      },
+      {
+        "reference": "1 Samuel 20:33",
+        "original": "1 Sam. 20:33"
+      },
+      {
+        "reference": "Numbers 25:7",
+        "original": "Num. 25:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "JAW-BONE": {
+    "name": "Jaw-bone",
+    "slug": "jaw-bone",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fra et esel ga Samson et våpen for den store nedslaktingen av filisterne (Dom 15:15), hvor han drepte tusen mann. I vers 19 leser den autoriserte oversettelsen: «Gud åpnet en fordypning som var i kjeven, og det kom vann ut derfra.» Dette er en feiloversettelse av ordene. Gjengivelsen skulle være som i den reviderte versjonen: «Gud åpnet fordypningen som er i Lehi,» osv., der Lehi (se egen oppføring) er navnet på høyden hvor denne konflikten fant sted, muligens såkalt fordi den hadde form som en kjeve."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 15:15",
+        "original": "Judg. 15:15"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "JAZER": {
+    "name": "Jazer",
+    "slug": "jazer",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehova hjelper). [Jaazer, eller Jazer]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "JAZIZ": {
+    "name": "Jaziz",
+    "slug": "jaziz",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(den Gud beveger), en hagaritt som hadde ansvar for kong Davids flokker (1 Krønikebok 27:31) (ca. 1046 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 27:31",
+        "original": "1 Chronicles 27:31"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  }
+}

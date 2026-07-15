@@ -1,0 +1,4000 @@
+{
+  "KABZEEL": {
+    "name": "Kabzeel",
+    "slug": "kabzeel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Guds samling, en by helt sør i Juda, nær Idumea (Jos 15:21), fødestedet til Benaja, en av Davids fremste krigere (2 Sam 23:20; 1 Krøn 11:22). Den ble også kalt Jekabseel (Neh 11:25) etter fangenskapet."
+      },
+      {
+        "source": "SMI",
+        "text": "(samlet av Gud), en av Judas stammes «byer» (Josva 15:21), hjemstedet til den store helten Benaja, Jojadas sønn (2 Samuel 23:20; 1 Krønikebok 11:22). Etter fangenskapet ble den gjenbosatt av jødene og fremstår som Jekabseel."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:21",
+        "original": "Josh. 15:21"
+      },
+      {
+        "reference": "2 Samuel 23:20",
+        "original": "2 Sam. 23:20"
+      },
+      {
+        "reference": "1 Chronicles 11:22",
+        "original": "1 Chr. 11:22"
+      },
+      {
+        "reference": "Nehemiah 11:25",
+        "original": "Neh. 11:25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KADESH": {
+    "name": "Kadesh",
+    "slug": "kadesh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hellig, eller Kades-Barnea, hellig vandringsørken, et sted ved Palestinas sørøstlige grense, omtrent 265 kilometer fra Horeb. Den lå i «ørkenen» eller «Sin-ørkenen» (1 Mos 14:7; 4 Mos 13:3-26; 14:29-33; 20:1; 27:14), på grensen til Edom (20:16). Fra dette stedet, i samsvar med folkets ønske, sendte Moses ut «tolv speidere» for å utforske landet. Etter å ha gransket det i alle dets områder, kom speiderne tilbake med en ond rapport; Josva og Kaleb alene ga en god rapport om landet (13:18-31). Påvirket av den motløse rapporten, oppga folket alt håp om å komme inn i det lovede land. De ble en betydelig tid i Kades. (Se HORMA; KORA.) På grunn av sin vantro ble de dømt av Gud til å vandre i ørkenen i trettiåtte år. De tok sin ferd fra Kades inn i Parans ørkener, «langs veien til Rødehavet» (5 Mos 2:1). (Én teori er at de i løpet av disse trettiåtte årene oppholdt seg i og omkring Kades.) Ved slutten av disse vandringsårene ble stammene for annen gang samlet i Kades. Under oppholdet her døde Mirjam og ble gravlagt. Her murret folket over mangel på vann, slik deres forfedre tidligere hadde gjort i Refidim; og Moses, irritert av deres bebreidelser, «slo klippen to ganger med sin stav», i stedet for å «tale til klippen for deres øyne», slik Herren hadde befalt ham (jf. 4 Mos 27:14; 5 Mos 9:23; Sal 106:32, 33). På grunn av denne handlingen, der Aron også var involvert, skulle ingen av dem få sette foten i det lovede land (4 Mos 20:12, 24). Kongen av Edom ville ikke la dem passere gjennom hans territorium, og derfor begynte de en marsj østover og «kom til fjellet Hor» (20:22). Dette stedet er identifisert med ‘Ain el-Kadeis, omtrent 19 kilometer øst-sørøst for Beerseba. (Se SPIONER.)"
+      },
+      {
+        "source": "EAS",
+        "text": "Hettittenes hellige by, på venstre bredd av Orontes, omtrent 6,4 kilometer sør for Homs-sjøen. Den er identifisert med den store haugen Tell Neby Mendeh, rundt 15 til 30 meter høy og 365 meter lang. På ruinene av Karnak-tempelet i Egypt er det funnet en inskripsjon som forteller om Ramses IIs erobring av denne byen. (Se FARAO.) Her har billedhuggeren «i dypt arbeid meislet inn i steinen, med dristig utførelse av de enkelte delene, krigernes prosesjon, slaget foran Kades, stormingen av festningen, fiendens nederlag og egypternes leirliv.» (Se HETTITTER.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:7",
+        "original": "Gen. 14:7"
+      },
+      {
+        "reference": "Numbers 13:3-26",
+        "original": "Num. 13:3-26"
+      },
+      {
+        "reference": "Numbers 14:29-33",
+        "original": "Num 14:29-33"
+      },
+      {
+        "reference": "Numbers 20:1",
+        "original": "Num 20:1"
+      },
+      {
+        "reference": "Numbers 27:14",
+        "original": "Num 27:14"
+      },
+      {
+        "reference": "Deuteronomy 2:1",
+        "original": "Deut. 2:1"
+      },
+      {
+        "reference": "Deuteronomy 9:23",
+        "original": "Deut. 9:23"
+      },
+      {
+        "reference": "Psalms 106:32",
+        "original": "Ps. 106:32"
+      },
+      {
+        "reference": "Psalms 106:33",
+        "original": "Ps. 106:33"
+      },
+      {
+        "reference": "Numbers 20:12",
+        "original": "Num. 20:12"
+      },
+      {
+        "reference": "Numbers 20:24",
+        "original": "Num. 20:24"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KADESH, KADESHBARNEA": {
+    "name": "Kadesh, Kadeshbarnea",
+    "slug": "kadesh-kadeshbarnea",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Kades betyr hellig; det er det samme ordet som det arabiske navnet på Jerusalem, el-Khuds. Barnea betyr vandringsørken.) Dette stedet, åstedet for Mirjams død, var det fjerneste punktet israelittene nådde på sin direkte vei til Kanaan; det var også stedet hvorfra speiderne ble sendt, og hvor folket, ved deres tilbakekomst, brøt ut i murring, hvoretter deres strengt straffende vandringstid begynte. (4 Mos 13:3, 26; 14:29-33; 20:1; 2:14) Det er sannsynlig at begrepet «Kades», selv om det ble brukt for å betegne en «by», likevel også hadde en bredere anvendelse på en region der Kades-Meriba helt sikkert, og Kades-Barnea sannsynligvis, indikerer et presist sted. I (1 Mos 14:7) er Kades identifisert med En-Misjpat, «dommens kilde». Det har blitt antatt, fra (4 Mos 13:21, 26) og 4 Mos 20:1 ... at det var to steder med navnet Kades, det ene i Parans ørken og det andre i Sins ørken; men det er mer sannsynlig at bare ett sted menes, og at Sin bare er en del av den store Parans ørken. (Det har vært stor tvil om den nøyaktige beliggenheten til Kades; men pastor H. Clay Trumbull fra Philadelphia, som besøkte stedet i 1881, lyktes i å gjøre det nesten sikkert at stedet for Kades er Ain Kadis (også stavet Gadis og Quadis); «det nøyaktig samme navnet, bokstav for bokstav på arabisk og hebraisk, som den bibelske kilden Kades – den 'hellige kilde', som navnet betyr – som strømmet fram da Moses slo klippen.» Den ligger 64 kilometer sør for Beerseba og 265 kilometer nordøst for Horeb, like nedenfor Palestinas sørlige grense. Den ble oppdaget i 1842 av pastor J. Rowlands fra Queen’s College, Cambridge, England, hvis oppdagelse ble støttet av den store tyske geografen Ritter, av E.S. Palmer i hans «Desert of the Exodus», og av «Imperial Bible Dictionary». Dr. Trumbull beskriver det slik: — «Det er en omfattende oase, en rekke brønner, hvis vann strømmer ut under en slik overhengende klippe som nevnes i bibelhistorien; og den åpner seg inn i en vid slette eller wadi som er stor nok til å ha tjent som leirplass for hele Israels hær. Omfattende primitive ruiner ligger på åsene i nærheten. Sletten eller wadi, også kalt Quadis, er omsluttet av omkringliggende åser slik at den utgjør en svært ønskelig posisjon for et folk som israelittene på grensen til fiendtlig territorium — en slik posisjon som ledere som Moses og Josva sannsynligvis ville ha valgt.» «Den var dekket av gress og blomster. Fikentrær fulle av frukt sto langs kalksteinsåsene. Busker i rikdom og variasjon fantes i overflod. Fra fjellkjeden nord for det vakre oase-amfiteateret sto 'den store enkeltmassen eller den lille åsen av solid stein' som Rowlands så på som klippen (sela) som Moses slo for å få den til å 'gi fra seg sitt vann' da dens strøm hadde opphørt. Under denne klippen kom den rikelige bekken. En brønn, murt opp med eldgammel kalkstein, var det første mottaket for vannet. Ikke langt fra denne var en annen brønn, liknende murt, forsynt fra samme kilde. Rundt begge disse brønnene var det gamle vanntrau av kalkstein. Flere dammer, ikke murt opp, ble også forsynt fra bekken. Vannet var klart og søtt og rikelig. To av dammene var tilstrekkelige for bading.» — Red.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 13:3",
+        "original": "Numbers 13:3"
+      },
+      {
+        "reference": "Numbers 13:26",
+        "original": "Numbers 13:26"
+      },
+      {
+        "reference": "Numbers 14:29-33",
+        "original": "Numbers 14:29-33"
+      },
+      {
+        "reference": "Numbers 20:1",
+        "original": "Numbers 20:1"
+      },
+      {
+        "reference": "Numbers 2:14",
+        "original": "Numbers 2:14"
+      },
+      {
+        "reference": "Genesis 14:7",
+        "original": "Genesis 14:7"
+      },
+      {
+        "reference": "Numbers 13:21",
+        "original": "Numbers 13:21"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KADMIEL": {
+    "name": "Kadmiel",
+    "slug": "kadmiel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Foran Gud; dvs. hans tjener, en av levittene som vendte tilbake med Serubbabel fra fangenskapet (Neh 9:4; 10:9; 12:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(foran Gud), en av levittene som med sin familie vendte tilbake fra Babylon med Serubbabel. (Esra 2:40; Nehemja 7:43) Han og hans hus er nevnt i historien ved tre anledninger – (Esra 3:9; Nehemja 9:4,5; 10:9) (f.Kr. 535-410)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 9:4",
+        "original": "Neh. 9:4"
+      },
+      {
+        "reference": "Nehemiah 10:9",
+        "original": "Neh 10:9"
+      },
+      {
+        "reference": "Nehemiah 12:8",
+        "original": "Neh 12:8"
+      },
+      {
+        "reference": "Ezra 2:40",
+        "original": "Ezra 2:40"
+      },
+      {
+        "reference": "Nehemiah 7:43",
+        "original": "Nehemiah 7:43"
+      },
+      {
+        "reference": "Ezra 3:9",
+        "original": "Ezra 3:9"
+      },
+      {
+        "reference": "Nehemiah 9:5",
+        "original": "Nehemiah 9:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KADMONITES": {
+    "name": "Kadmonites",
+    "slug": "kadmonites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Østlendinger, navnet på en kanaaneisk stamme som bodde i den nordøstlige delen av Palestina på Abrahams tid (1 Mos 15:19). Trolig var de identiske med «østens barn», som bodde i landet mellom Palestina og Eufrat."
+      },
+      {
+        "source": "SMI",
+        "text": "(Østlendinger), et folk nevnt bare i (1 Mosebok 15:19); en av nasjonene som på den tiden okkuperte landet (Kanaan) som ble lovet Abrahams etterkommere. Navnet er sannsynligvis et synonym for Bene-Kedem – «Østens barn»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Gen. 15:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KALLAI": {
+    "name": "Kallai",
+    "slug": "kallai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas raske tjener), en prest i Jojakims, Jesuas sønns, dager. Han representerte Sallas familie. (Nehemja 12:20) (f.Kr. etter 536)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 12:20",
+        "original": "Nehemiah 12:20"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KANAH": {
+    "name": "Kanah",
+    "slug": "kanah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Takrør-rik; sivbekk. (1.) En bekk som dannet grensen mellom Efraim og Manasse, fra Middelhavet østover til Tappuah (Jos 16:8). Den er identifisert med de sivrike bekkene som utgjør Wadi Talaik, som munner ut i havet mellom Joppe og Caesarea. Andre identifiserer den med elven Aujeh. (2.) En by i nord i Asjer (Jos 19:28). Den er identifisert med ‘Ain-Kana, en landsby på en dalskråning omtrent 11 kilometer sørøst for Tyrus. Omtrent 1,6 kilometer nord for dette stedet ligger mange kolossale ruiner spredt omkring. Og i siden av en nærliggende kløft er det utskåret figurer av menn, kvinner og barn i fjellet. Disse antas å være av fønikisk opprinnelse."
+      },
+      {
+        "source": "SMI",
+        "text": "(et sted med siv)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 16:8",
+        "original": "Josh. 16:8"
+      },
+      {
+        "reference": "Joshua 19:28",
+        "original": "Josh. 19:28"
+      },
+      {
+        "reference": "Joshua 17:9",
+        "original": "Joshua 17:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KAREAH": {
+    "name": "Kareah",
+    "slug": "kareah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Skallet, far til Johanan og Jonatan, som en tid var lojale mot Gedalja, Babylons guvernør i Jerusalem (Jer 40:8, 13, 15, 16)."
+      },
+      {
+        "source": "SMI",
+        "text": "(skallet), far til Johanan og Jonatan, som støttet Gedaljas autoritet og hevnet hans drap. (Jeremia 40:8, 13, 15, 16; 41:11, 13, 14, 16; 42:1, 8; 43:2, 4, 5) (f.Kr. før 588)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 40:8",
+        "original": "Jer. 40:8"
+      },
+      {
+        "reference": "Jeremiah 40:13",
+        "original": "Jer 40:13"
+      },
+      {
+        "reference": "Jeremiah 40:15",
+        "original": "Jer 40:15"
+      },
+      {
+        "reference": "Jeremiah 40:16",
+        "original": "Jer 40:16"
+      },
+      {
+        "reference": "Jeremiah 41:11",
+        "original": "Jeremiah 41:11"
+      },
+      {
+        "reference": "Jeremiah 41:13",
+        "original": "Jeremiah 41:13"
+      },
+      {
+        "reference": "Jeremiah 41:14",
+        "original": "Jeremiah 41:14"
+      },
+      {
+        "reference": "Jeremiah 41:16",
+        "original": "Jeremiah 41:16"
+      },
+      {
+        "reference": "Jeremiah 42:1",
+        "original": "Jeremiah 42:1"
+      },
+      {
+        "reference": "Jeremiah 42:8",
+        "original": "Jeremiah 42:8"
+      },
+      {
+        "reference": "Jeremiah 43:2",
+        "original": "Jeremiah 43:2"
+      },
+      {
+        "reference": "Jeremiah 43:4",
+        "original": "Jeremiah 43:4"
+      },
+      {
+        "reference": "Jeremiah 43:5",
+        "original": "Jeremiah 43:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARKAA": {
+    "name": "Karkaa",
+    "slug": "karkaa",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Et gulv; bunn, et sted mellom Adar og Asmon, omtrent midtveis mellom Middelhavet og Dødehavet (Jos 15:3)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:3",
+        "original": "Josh. 15:3"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KARKAA, OR KARKAA": {
+    "name": "Karkaa, Or Karkaa",
+    "slug": "karkaa-or-karkaa",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(grunnvoll), et av landemerkene på Judas stammes sørlige grense. (Josva 15:3) Beliggenheten er ukjent."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:3",
+        "original": "Joshua 15:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KARKOR": {
+    "name": "Karkor",
+    "slug": "karkor",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Grunnlag, et sted i den åpne ørkenen øst for Jordan (Dom 8:10), ikke langt forbi Sukkot og Penuel, i sør. Her innhentet Gideon og overvant en flyktende flokk midianitter under Seba og Salmunna, som han tok til fange."
+      },
+      {
+        "source": "SMI",
+        "text": "(grunnvoll), stedet hvor Seba og Salmunna igjen ble overvunnet av Gideon (Dommerne 8:10), må ha vært øst for Jordan."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 8:10",
+        "original": "Judg. 8:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARTAH": {
+    "name": "Kartah",
+    "slug": "kartah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "By, en by i Sebulons stamme tildelt levittene av Meraris familie (Jos 21:34). Den er identisk med Kattat (19:15), og kanskje også med Kitron (Dom 1:30)."
+      },
+      {
+        "source": "SMI",
+        "text": "(by), en by i Sebulon, tildelt Meraritt-levittene. (Josva 21:34)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21:34",
+        "original": "Josh. 21:34"
+      },
+      {
+        "reference": "Judges 1:30",
+        "original": "Judg. 1:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARTAN": {
+    "name": "Kartan",
+    "slug": "kartan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dobbeltby, en by i Naftali, tildelt Gersonitt-levittene og en av tilfluktsbyene (Jos 21:32). Den lå sannsynligvis nær den nordvestlige bredden av Genesaretsjøen, identisk med den ødelagte landsbyen el-Katanah."
+      },
+      {
+        "source": "SMI",
+        "text": "(dobbeltby), en by i Naftali, tildelt Gersonitt-levittene. (Josva 21:32) I den parallelle listen i (1 Krønikebok 6:1) vises navnet, vers (1 Krønikebok 6:76) i den mer utvidede formen KIRYATAYIM."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21:32",
+        "original": "Josh. 21:32"
+      },
+      {
+        "reference": "1 Chronicles 6:1",
+        "original": "1 Chronicles 6:1"
+      },
+      {
+        "reference": "1 Chronicles 6:76",
+        "original": "1 Chronicles 6:76"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KATTATH": {
+    "name": "Kattath",
+    "slug": "kattath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Jos 19:15), en by i Asjer, er identifisert med Kana el Jelil. (Se KANA.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(liten), en av byene i Sebulons stamme. (Josva 19:15)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:15",
+        "original": "Josh. 19:15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDAR": {
+    "name": "Kedar",
+    "slug": "kedar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Mørkhudet, den andre sønnen til Ismael (1 Mos 25:13). Det er navnet på de nomadiske arabiske stammene, beduinene generelt (Jes 21:16; 42:11; 60:7; Jer 2:10; Esek 27:21), som bodde i det nordvestlige Arabia. De bodde i svarte hår-telt (Høys 1:5). Å «bo i Kedars telt» var å være avskåret fra tilbedelsen av den sanne Gud (Sal 120:5). Kedarittene led under Nebukadnesar (Jer 49:28, 29)."
+      },
+      {
+        "source": "SMI",
+        "text": "(mørkhudet), den andre i rekken av Ismaels sønner (1 Mosebok 25:13; 1 Krønikebok 1:29) og navnet på en stor arabisk stamme bosatt nordvest på halvøya og ved grensene til Palestina. «Kedars herlighet» er nedtegnet av profeten Jesaja (Jesaja 21:13-17) i byrden over Arabia; og dens betydning kan også utledes fra «Kedars fyrster» nevnt av Esekiel (Esekiel 27:21), samt stammens pastorale karakter. De ser også ut til å ha vært, som dagens vandrende stammer, «bueskyttere» og «mektige menn». (Jesaja 21:17) jf. Salme 120:5. At de også bosatte seg i landsbyer eller byer finner vi fra Jesaja. (Jesaja 42:11) Stammen synes å ha vært en av de mest fremtredende av alle de ismaelittiske stammene, og derfor kaller rabbinerne araberne universelt med dette navnet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:13",
+        "original": "Gen. 25:13"
+      },
+      {
+        "reference": "Isaiah 21:16",
+        "original": "Isa. 21:16"
+      },
+      {
+        "reference": "Isaiah 42:11",
+        "original": "Isa 42:11"
+      },
+      {
+        "reference": "Isaiah 60:7",
+        "original": "Isa 60:7"
+      },
+      {
+        "reference": "Jeremiah 2:10",
+        "original": "Jer. 2:10"
+      },
+      {
+        "reference": "Ezekiel 27:21",
+        "original": "Ezek. 27:21"
+      },
+      {
+        "reference": "Song of Solomon 1:5",
+        "original": "Cant. 1:5"
+      },
+      {
+        "reference": "Psalms 120:5",
+        "original": "Ps. 120:5"
+      },
+      {
+        "reference": "Jeremiah 49:28",
+        "original": "Jer. 49:28"
+      },
+      {
+        "reference": "Jeremiah 49:29",
+        "original": "Jer 49:29"
+      },
+      {
+        "reference": "1 Chronicles 1:29",
+        "original": "1 Chronicles 1:29"
+      },
+      {
+        "reference": "Isaiah 21:13-17",
+        "original": "Isaiah 21:13-17"
+      },
+      {
+        "reference": "Isaiah 21:17",
+        "original": "Isaiah 21:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDEMAH": {
+    "name": "Kedemah",
+    "slug": "kedemah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Østover; den sistnevnte av Ismaels sønner (1 Mos 25:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(østover), den yngste av Ismaels sønner (1 Mos 25:15; 1 Krøn 1:31)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:15",
+        "original": "Gen. 25:15"
+      },
+      {
+        "reference": "1 Chronicles 1:31",
+        "original": "1 Chronicles 1:31"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDEMOTH": {
+    "name": "Kedemoth",
+    "slug": "kedemoth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Begynnelser; østligst. En by i Rubens stamme, tildelt levittene fra Meraris slekt (Jos 13:18). Den lå ikke langt nordøst for Dibon-Gad, øst for Dødehavet."
+      },
+      {
+        "source": "SMI",
+        "text": "(begynnelser), en av byene i området øst for Dødehavet, tildelt Rubens stamme (Jos 13:18), gitt av de merarittiske levittene (Jos 21:37; 1 Krøn 6:79). Den ga muligens navn til «Kedemots villmark», eller ukultivert beitemark (4 Mos 21:33; 5 Mos 2:26,27) osv."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:18",
+        "original": "Josh. 13:18"
+      },
+      {
+        "reference": "Joshua 21:37",
+        "original": "Joshua 21:37"
+      },
+      {
+        "reference": "1 Chronicles 6:79",
+        "original": "1 Chronicles 6:79"
+      },
+      {
+        "reference": "Numbers 21:33",
+        "original": "Numbers 21:33"
+      },
+      {
+        "reference": "Numbers 2:26",
+        "original": "Numbers 2:26"
+      },
+      {
+        "reference": "Numbers 2:27",
+        "original": "Numbers 2:27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDESH": {
+    "name": "Kedesh",
+    "slug": "kedesh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Helligdom. (1.) Et sted lengst sør i Juda (Jos 15:23). Trolig det samme som Kadesj-Barnea (se dette). (2.) En by i Jissakar (1 Krøn 6:72). Muligens Tell Abu Kadeis, nær Lejjun. (3.) En «festningsby» i Naftali, en av fristedene (Jos 19:37; Dom 4:6). Den ble tildelt de gersjonittiske levittene (Jos 21:32). Den var opprinnelig en kongelig kanaaneisk by (Jos 12:22) og var Baraks hjemsted (Dom 4:6); og her samlet han og Debora stammene Sebulon og Naftali før kampen med Sisera på Jisreelsletten, «for Herren blant de mektige» (9, 10). I Pekahs regjeringstid ble den inntatt av Tiglat-Pileser (2 Kong 15:29). Den lå nær «sletten» (snarere «eika») i Saanaim, og er identifisert med det moderne Kedes, i åsene fire miles nordvest for Huleh-sjøen. Noen har ment at Kedesh i fortellingen, der Barak samlet sine tropper, ikke var stedet i Øvre Galilea med dette navnet, som lå 30 miles fra Jisreelsletten, men Kedish, ved Galilea-sjøens bredd, 12 miles fra Tabor."
+      },
+      {
+        "source": "SMI",
+        "text": "(en helligdom)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:23",
+        "original": "Josh. 15:23"
+      },
+      {
+        "reference": "1 Chronicles 6:72",
+        "original": "1 Chr. 6:72"
+      },
+      {
+        "reference": "Joshua 19:37",
+        "original": "Josh. 19:37"
+      },
+      {
+        "reference": "Judges 4:6",
+        "original": "Judg. 4:6"
+      },
+      {
+        "reference": "Joshua 21:32",
+        "original": "Josh. 21:32"
+      },
+      {
+        "reference": "Joshua 12:22",
+        "original": "Josh. 12:22"
+      },
+      {
+        "reference": "2 Kings 15:29",
+        "original": "2 Kings 15:29"
+      },
+      {
+        "reference": "Joshua 20:7",
+        "original": "Joshua 20:7"
+      },
+      {
+        "reference": "1 Chronicles 6:76",
+        "original": "1 Chronicles 6:76"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDRON": {
+    "name": "Kedron",
+    "slug": "kedron",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dalen, nå ganske smal, mellom Oljeberget og Moria-fjellet. Den øvre delen kalles Josjafats dal. LXX (Septuaginta), i 1 Kong 15:13, oversetter med «av sedertreet». Ordet betyr «svart», og kan henvise til vannets farge eller ravinens dysterhet, eller sedertrærnes mørkegrønne farge som vokste der. Joh 18:1, «Kedron», bare her i Det nye testamentet. (Se KIDRON)."
+      },
+      {
+        "source": "SMI",
+        "text": "egentlig Kidron. [Kidron, eller Kedron]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 15:13",
+        "original": "1 Kings 15:13"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEFR KENNA": {
+    "name": "Kefr Kenna",
+    "slug": "kefr-kenna",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Se Kana]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KEHELATHAH": {
+    "name": "Kehelathah",
+    "slug": "kehelathah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Forsamling; en av israelittenes leirplasser i ørkenen (4 Mos 33:22, 23)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forsamling), en av israelittenes leirplasser i ørkenen (4 Mos 33:22), hvorav intet er kjent."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 33:22",
+        "original": "Num. 33:22"
+      },
+      {
+        "reference": "Numbers 33:23",
+        "original": "Num. 33:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEILAH": {
+    "name": "Keilah",
+    "slug": "keilah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Citadell; en by i Judas lavland (Jos 15:44). David reddet den fra filisternes angrep (1 Sam 23:1-8); men innbyggerne viste seg utro mot ham ved å forsøke å overgi ham til Saul (13), så han og hans menn «drog ut fra Keila og gikk dit de kunne komme». De flyktet til Haret-åsen, omtrent 3 miles østover, og derfra via Hebron til Sif (se dette). «Og David var i Sifs ørken, i en skog» (1 Sam 23:15). Her søkte Jonatan ham opp, «og styrket hans hånd i Gud». Dette var det siste møtet mellom David og Jonatan (23:16-18). Det er det moderne Khurbet Kila. Andre identifiserer det med Khuweilfeh, mellom Beit Jibrin (Eleutheropolis) og Beer-Sjeba, nevnt i Amarnabrevene."
+      },
+      {
+        "source": "SMI",
+        "text": "(festning), en by i Sjefela, eller Judas lavland (Jos 15:44). Dens hovedinteresse ligger i dens forbindelse med David (1 Sam 23:7-13). Den representeres av Kila, et sted med ruiner, langs den nedre veien fra Beit Jibria til Hebron."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:44",
+        "original": "Josh. 15:44"
+      },
+      {
+        "reference": "1 Samuel 23:1-8",
+        "original": "1 Sam. 23:1-8"
+      },
+      {
+        "reference": "1 Samuel 23:15",
+        "original": "1 Sam. 23:15"
+      },
+      {
+        "reference": "1 Samuel 23:7-13",
+        "original": "1 Samuel 23:7-13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEILAH THE GARMITE": {
+    "name": "Keilah The Garmite",
+    "slug": "keilah-the-garmite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "tilsynelatende en etterkommer av den store Kaleb (1 Krøn 4:19). Det er ingen åpenbar forbindelse med byen Keila."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:19",
+        "original": "1 Chronicles 4:19"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KELAIAH": {
+    "name": "Kelaiah",
+    "slug": "kelaiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas raske budbringer) = Kelita (Esra 10:23)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:23",
+        "original": "Ezra 10:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KELITA": {
+    "name": "Kelita",
+    "slug": "kelita",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dverg; en levitt som hjalp Esra med å forklare loven for folket (Neh 8:7; 10:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forsamling), en av levittene som vendte tilbake med Esra (Esra 10:23). Han hjalp til med å forklare loven (Neh 8:7) og signerte pakten med Nehemja (Neh 10:10) (ca. 459-410 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 8:7",
+        "original": "Neh. 8:7"
+      },
+      {
+        "reference": "Nehemiah 10:10",
+        "original": "Neh 10:10"
+      },
+      {
+        "reference": "Ezra 10:23",
+        "original": "Ezra 10:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEMUEL": {
+    "name": "Kemuel",
+    "slug": "kemuel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Guds hjelper, eller Guds forsamling. (1.) Nahors tredje sønn (1 Mos 22:21). (2.) Sjiftans sønn, utpekt på vegne av Efraims stamme til å dele Kanaans land (4 Mos 34:24). (3.) En levitt (1 Krøn 27:17)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Guds forsamling)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 22:21",
+        "original": "Gen. 22:21"
+      },
+      {
+        "reference": "Numbers 34:24",
+        "original": "Num. 34:24"
+      },
+      {
+        "reference": "1 Chronicles 27:17",
+        "original": "1 Chr. 27:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENAN": {
+    "name": "Kenan",
+    "slug": "kenan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(besittelse) = Kenan, Enos’ sønn (1 Krøn 1:2)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:2",
+        "original": "1 Chronicles 1:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENATH": {
+    "name": "Kenath",
+    "slug": "kenath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Besittelse; en by i Gilead. Den ble inntatt av Nobah, som kalte den ved sitt eget navn (4 Mos 32:42). Den er identifisert med Kunawat, i hellingene av Jebel Hauran (Basan-fjellet), 60 miles øst for sørenden av Galilea-sjøen."
+      },
+      {
+        "source": "SMI",
+        "text": "(besittelse), en av byene øst for Jordan, med sine «datterbyer» (autorisert oversettelse «landsbyer»), tatt i besittelse av en viss Nobah, som deretter kalte den ved sitt eget navn (4 Mos 32:42)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 32:42",
+        "original": "Num. 32:42"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENAZ": {
+    "name": "Kenaz",
+    "slug": "kenaz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jeger. (1.) En av Elifas’ sønner, Esaus sønn. Han ble høvding for en edomittisk stamme (1 Mos 36:11, 15, 42). (2.) Kalebs yngre bror og Otniëls far (Jos 15:17), hvis familie var viktig i Israel helt frem til Davids tid (1 Krøn 27:15). Noen mener at Otniël (Dom 1:13), og ikke Kenas, var Kalebs bror. (3.) Kalebs barnebarn (1 Krøn 4:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(jakt)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:11",
+        "original": "Gen. 36:11"
+      },
+      {
+        "reference": "Genesis 36:15",
+        "original": "Gen. 36:15"
+      },
+      {
+        "reference": "Genesis 36:42",
+        "original": "Gen. 36:42"
+      },
+      {
+        "reference": "Joshua 15:17",
+        "original": "Josh. 15:17"
+      },
+      {
+        "reference": "1 Chronicles 27:15",
+        "original": "1 Chr. 27:15"
+      },
+      {
+        "reference": "Judges 1:13",
+        "original": "Judg. 1:13"
+      },
+      {
+        "reference": "1 Chronicles 4:15",
+        "original": "1 Chr. 4:15"
+      },
+      {
+        "reference": "1 Chronicles 1:53",
+        "original": "1 Chronicles 1:53"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENEZITE": {
+    "name": "Kenezite",
+    "slug": "kenezite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "eller Ken’isitt (etterkommer av Kenas), (1 Mos 15:19) en edomittisk stamme (4 Mos 32:12; Jos 14:6,14)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Genesis 15:19"
+      },
+      {
+        "reference": "Numbers 32:12",
+        "original": "Numbers 32:12"
+      },
+      {
+        "reference": "Joshua 14:6",
+        "original": "Joshua 14:6"
+      },
+      {
+        "reference": "Joshua 14:14",
+        "original": "Joshua 14:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENITE, THE": {
+    "name": "Kenite, The",
+    "slug": "kenite-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "og kenittene (smedene) bebodde det fjellrike og ørkenaktige området mellom sørlige Palestina og Sinai-fjellene, øst for Akababukten. De var en gren av den større midjanittiske nasjonen – basert på det faktum at Jetro, som i Exodus (se (2 Mosebok 2:15,16; 4:19) osv.) er fremstilt som boende i Midjans land, og som prest eller fyrste for den nasjonen, i (Dommerne 1:16; 4:11) like tydelig sies å ha vært en kenitt. De viktige tjenestene kenittenes sjeik utførte for Moses i en tid med stort press og vanskeligheter, ble av sistnevnte belønnet med et løfte om varig vennskap mellom de to folkene. De ser ut til å ha fulgt hebreerne under deres vandringer (4 Mosebok 24:21,22; Dommerne 1:16) sml. 2 Krønikebok 28:15. Men da Israels vandringer var over, forlot de byenes nærhet og søkte seg til friere omgivelser – til «Juda-ørkenen, som ligger sør for Arad.» (Dommerne 1:16) Men én av stammens sjeiker, ved navn Heber, hadde vandret nordover i stedet for sørover. (Dommerne 4:11) Den mest bemerkelsesverdige utviklingen av dette folket finnes i rekabittenes sekt eller familie."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 2:15",
+        "original": "Exodus 2:15"
+      },
+      {
+        "reference": "Exodus 2:16",
+        "original": "Exodus 2:16"
+      },
+      {
+        "reference": "Exodus 4:19",
+        "original": "Exodus 4:19"
+      },
+      {
+        "reference": "Judges 1:16",
+        "original": "Judges 1:16"
+      },
+      {
+        "reference": "Judges 4:11",
+        "original": "Judges 4:11"
+      },
+      {
+        "reference": "Numbers 24:21",
+        "original": "Numbers 24:21"
+      },
+      {
+        "reference": "Numbers 24:22",
+        "original": "Numbers 24:22"
+      },
+      {
+        "reference": "2 Chronicles 28:15",
+        "original": "2Chr 28:15"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENITES": {
+    "name": "Kenites",
+    "slug": "kenites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Smeder, navnet på en stamme som bebodde ørkenen mellom sørlige Palestina og Sinai-fjellene. Jetro tilhørte denne stammen (Dommerne 1:16). Han kalles en «midjanitt» (4 Mosebok 10:29), og derav trekker man den konklusjon at midjanittene og kenittene var den samme stammen. De var vandrende smeder, «den gamle orientalske verdens sigøynere og omreisende blikkenslagere. De dannet et viktig laug i en tid da metallurgikunsten var forbeholdt få» (Sayces Races, etc.). De viste godhet mot Israel på deres reise gjennom ørkenen. De fulgte dem på deres marsj så langt som til Jeriko (Dommerne 1:16), og vendte så tilbake til sine gamle tilholdssteder blant amalekittene, i ørkenen sør for Juda. De opprettholdt senere vennskapelige forhold til israelittene da disse bosatte seg i Kanaan (Dommerne 4:11, 17-21; 1 Samuelsbok 27:10; 30:29). Rekabittene tilhørte denne stammen (1 Krønikebok 2:55) og i Jeremias dager (35:7-10) nevnes de som fortsetter sine nomadiske vaner. Saul ba dem forlate amalekittene (1 Samuelsbok 15:6) da han, i lydighet mot den guddommelige befalingen, var i ferd med å «slå Amalek». Og hans grunn var: «for dere viste godhet mot alle Israels barn da de kom opp fra Egypt.» Dermed er «Gud ikke urettferdig så han glemmer godheten vist mot sitt folk; men det skal huskes en annen dag, senest på den store dagen, og gjengjeldes i de rettferdiges oppstandelse» (M. Henrys kommentar). De nevnes for siste gang i Skriften i 1 Samuelsbok 27:10; sml. 30:20."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 1:16",
+        "original": "Judg. 1:16"
+      },
+      {
+        "reference": "Numbers 10:29",
+        "original": "Num. 10:29"
+      },
+      {
+        "reference": "Judges 4:11",
+        "original": "Judg. 4:11"
+      },
+      {
+        "reference": "Judges 4:17",
+        "original": "Judg. 4:17"
+      },
+      {
+        "reference": "1 Samuel 27:10",
+        "original": "1 Sam. 27:10"
+      },
+      {
+        "reference": "1 Samuel 30:29",
+        "original": "1 Sam. 30:29"
+      },
+      {
+        "reference": "1 Chronicles 2:55",
+        "original": "1 Chr. 2:55"
+      },
+      {
+        "reference": "1 Samuel 15:6",
+        "original": "1 Sam. 15:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KENIZZITE": {
+    "name": "Kenizzite",
+    "slug": "kenizzite",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Navnet på en stamme som det refereres til i pakten Gud inngikk med Abraham (1 Mosebok 15:19). De er ikke nevnt blant de opprinnelige innbyggerne i Kanaan (2 Mosebok 3:8; Josva 3:10), og sannsynligvis bebodde de en del av Arabia, i grensestrøkene til Syria. (2.) En betegnelse gitt til Kaleb (R.V., 4 Mosebok 32:12; A.V., Kenezite)."
+      },
+      {
+        "source": "SMI",
+        "text": "(1 Mosebok 15:19) [Kenezitt]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Gen. 15:19"
+      },
+      {
+        "reference": "Exodus 3:8",
+        "original": "Ex. 3:8"
+      },
+      {
+        "reference": "Joshua 3:10",
+        "original": "Josh. 3:10"
+      },
+      {
+        "reference": "Numbers 32:12",
+        "original": "Num. 32:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KERCHIEF": {
+    "name": "Kerchief",
+    "slug": "kerchief",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nevnt kun i Esekiel 13:18, 21, som et klesplagg eller prydgjenstand festet til hodet på Israels avgudsdyrkende kvinner. Den nøyaktige betydningen av ordet er usikker. Det ser ut til å ha vært et langt, løst sjal, slik orientalske kvinner svøper seg i (Rut 3:15; Jesaja 3:22). Noen mener at det var et langt slør eller hodeplagg, som ved sin form betegnet bærerens posisjon."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezekiel 13:18",
+        "original": "Ezek. 13:18"
+      },
+      {
+        "reference": "Ezekiel 13:21",
+        "original": "Ezek. 13:21"
+      },
+      {
+        "reference": "Ruth 3:15",
+        "original": "Ruth 3:15"
+      },
+      {
+        "reference": "Isaiah 3:22",
+        "original": "Isa. 3:22"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KEREN-HAPPUCH": {
+    "name": "Keren-happuch",
+    "slug": "keren-happuch",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Horn for ansiktssminke = kosmetikkboks, navnet på Jobs tredje datter (Job 42:14), født etter at velstanden hadde vendt tilbake til ham."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job. 42:14"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KERENHAPPUCH": {
+    "name": "Kerenhappuch",
+    "slug": "kerenhappuch",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(skjønnhetens horn), den yngste av Jobs døtre, født til ham i perioden med hans gjenoppståtte velstand. (Job 42:14)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job 42:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KERIOTH": {
+    "name": "Kerioth",
+    "slug": "kerioth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Byer. (1.) En by i Juda sørland (Josva 15:25). Judas Iskariot var sannsynligvis fra dette stedet, og derav hans navn Iskariot. Den er identifisert med ruinene el-Kureitein, omtrent 16 km sør for Hebron. (Se HAZOR [4]). (2.) En by i Moab (Jeremia 48:24, 41), kalt Kiriot (Amos 2:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "(byer)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:25",
+        "original": "Josh. 15:25"
+      },
+      {
+        "reference": "Jeremiah 48:24",
+        "original": "Jer. 48:24"
+      },
+      {
+        "reference": "Jeremiah 48:41",
+        "original": "Jer. 48:41"
+      },
+      {
+        "reference": "Amos 2:2",
+        "original": "Amos 2:2"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEROS": {
+    "name": "Keros",
+    "slug": "keros",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(krummet), en av nettinittene, hvis etterkommere vendte tilbake med Serubabel. (Esra 2:44; Nehemia 7:47)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:44",
+        "original": "Ezra 2:44"
+      },
+      {
+        "reference": "Nehemiah 7:47",
+        "original": "Nehemiah 7:47"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KESITAH": {
+    "name": "Kesitah",
+    "slug": "kesitah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1 Mosebok 33:19, R.V., marg., et hebraisk ord, oversatt, A.V., flertall «pengestykker», marg., «lam»; Josva 24:32, «sølvstykker»; Job 42:11, «pengestykke»). Kesitah var sannsynligvis et pengestykke av en bestemt vekt, støpt i form av et lam. Egypts monumenter viser at slike vekter ble brukt. (Se STYKKER.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 33:19",
+        "original": "Gen. 33:19"
+      },
+      {
+        "reference": "Joshua 24:32",
+        "original": "Josh. 24:32"
+      },
+      {
+        "reference": "Job 42:11",
+        "original": "Job 42:11"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KETTLE": {
+    "name": "Kettle",
+    "slug": "kettle",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En stor gryte til matlaging. Det samme hebraiske ordet (dud, «kokende») er også oversatt «gryte» (Salmene 81:6), «kokekar» (2 Krønikebok 35:13), «kurv» (Jeremia 24:2). Den ble brukt til å tilberede fredsofrene (1 Samuelsbok 2:13, 14)."
+      },
+      {
+        "source": "SMI",
+        "text": "et kar for kulinariske eller offerformål. (1 Samuelsbok 2:14) Det hebraiske ordet er også oversatt «kurv» i (Jeremia 24:2), «kokekar» i (2 Krønikebok 35:13) og «gryte» i (Job 41:20)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 81:6",
+        "original": "Ps. 81:6"
+      },
+      {
+        "reference": "2 Chronicles 35:13",
+        "original": "2 Chr. 35:13"
+      },
+      {
+        "reference": "Jeremiah 24:2",
+        "original": "Jer. 24:2"
+      },
+      {
+        "reference": "1 Samuel 2:13",
+        "original": "1 Sam. 2:13"
+      },
+      {
+        "reference": "1 Samuel 2:14",
+        "original": "1 Sam. 2:14"
+      },
+      {
+        "reference": "Job 41:20",
+        "original": "Job 41:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEY": {
+    "name": "Key",
+    "slug": "key",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ofte nevnt i Skriften. På hebraisk kalles den maphteah, dvs. åpneren (Dommerne 3:25); og i Det greske nye testamente kleis, fra dens bruk til å lukke (Matteus 16:19; Lukas 11:52; Åpenbaringen 1:18, osv.). Figurer av gamle egyptiske nøkler finnes ofte på monumentene, også av assyriske låser og nøkler av tre, og av stor størrelse (sml. Jesaja 22:22). Ordet brukes billedlig om makt, autoritet eller embete (Jesaja 22:22; Åpenbaringen 3:7; Åpenbaringen 1:8; sml. 9:1; 20:1; sml. også Matteus 16:19; 18:18). «Kunnskapens nøkkel» (Lukas 11:52; sml. Matteus 23:13) er middelet til å oppnå kunnskap om Guds rike. «Nøklemakten» er et uttrykk i alminnelig bruk for å betegne omfanget av kirkelig autoritet."
+      },
+      {
+        "source": "SMI",
+        "text": "Nøkkelen til en innfødt orientalsk lås er et trestykke, fra syv tommer til to fot langt, utstyrt med tråder eller korte nagler, som, når de settes inn sidelengs i den hule bolten som fungerer som lås, løfter andre stifter inne i låsbolten slik at bolten kan trekkes tilbake. (Nøkler var noen ganger av bronse eller jern, og så store at én var så mye en mann kunne bære. De brukes i Skriften som et symbol på autoritet og makt. Å gi nøkler til en person betyr å betro ham en viktig oppgave. (Matteus 16:19) I England i moderne tid mottar visse regjeringstjenestemenn, ved innsettelse i embetet, en gyllen nøkkel.—RED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 3:25",
+        "original": "Judg. 3:25"
+      },
+      {
+        "reference": "Matthew 16:19",
+        "original": "Matt. 16:19"
+      },
+      {
+        "reference": "Luke 11:52",
+        "original": "Luke 11:52"
+      },
+      {
+        "reference": "Revelation 1:18",
+        "original": "Rev. 1:18"
+      },
+      {
+        "reference": "Isaiah 22:22",
+        "original": "Isa. 22:22"
+      },
+      {
+        "reference": "Revelation 3:7",
+        "original": "Rev. 3:7"
+      },
+      {
+        "reference": "Revelation 1:8",
+        "original": "Rev. 1:8"
+      },
+      {
+        "reference": "Matthew 18:18",
+        "original": "Matt 18:18"
+      },
+      {
+        "reference": "Matthew 23:13",
+        "original": "Matt. 23:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEZIA": {
+    "name": "Kezia",
+    "slug": "kezia",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Kassia, navnet på Jobs andre datter (42:14), født etter at velstanden hadde vendt tilbake til ham."
+      },
+      {
+        "source": "SMI",
+        "text": "(kassia), den andre av Jobs døtre født til ham etter hans gjenopprettelse. (Job 42:14) (ca. 1950 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job 42:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEZIZ": {
+    "name": "Keziz",
+    "slug": "keziz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bratt; avskåret, en by i Benjamins stamme (Josva 18:21)."
+      },
+      {
+        "source": "SMI",
+        "text": "(avskåret), Keziz-dalen, en av Benjamins «byer», (Josva 18:21) og stammens østgrense."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 18:21",
+        "original": "Josh. 18:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIBROTH-HATTAAVAH": {
+    "name": "Kibroth-hattaavah",
+    "slug": "kibroth-hattaavah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Begjærets eller lystens graver, et av israelittenes leirsteder i ørkenen. Det var sannsynligvis i Wadi Murrah, og er identifisert med Erweis el-Ebeirig, hvor restene av en gammel leirplass er funnet, omtrent 30 miles nordøst for Sinai, og nøyaktig en dagsreise fra ‘Ain Hudherah. «Her begynte reisens vanskeligheter. Først brøt klager ut blant folket, sannsynligvis over varmen, slitet og forsakelsene under marsjen; og da straffet Gud dem umiddelbart med lyn, som falt på den bakre delen av leiren og drepte mange, men opphørte ved Moses’ forbønn (4 Mosebok 11:1, 2). Deretter grep avsky mengden over å ikke ha noe å spise unntatt manna dag etter dag, ingen variasjon, ikke kjøtt, ikke fisk, ikke velsmakende grønnsaker, ikke saftige frukter... Folket avskydde den 'lette maten' og ropte til Moses: 'Gi oss kjøtt, gi oss kjøtt, så vi kan spise!'» I denne nødsituasjonen ropte Moses, i fortvilelse, til Gud. Et svar kom. Gud sendte «en enorm svermer av vaktler, som folket mettstilte sin fråtsende appetitt med i en hel måned. Da falt straffen over dem: de avskydde maten de hadde ønsket; den avlet sykdom i dem; den guddommelige vreden forverret sykdommen til en pest, og en stor dødelighet var konsekvensen. De døde ble gravlagt utenfor leiren; og til minne om menneskets synd og den guddommelige vreden ble dette navnet, Kibrot-Hattaava, Begjærets Graver, gitt til stedet for deres grav» (4 Mosebok 11:34, 35; 33:16, 17; 5 Mosebok 9:22; sml. Salme 78:30, 31)., Rawlinsons Moses, s. 175. Fra denne leirplassen reiste de i nordøstlig retning til Haserot."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 11:1",
+        "original": "Num. 11:1"
+      },
+      {
+        "reference": "Numbers 11:2",
+        "original": "Num 11:2"
+      },
+      {
+        "reference": "Numbers 11:34",
+        "original": "Num. 11:34"
+      },
+      {
+        "reference": "Numbers 11:35",
+        "original": "Num. 11:35"
+      },
+      {
+        "reference": "Deuteronomy 9:22",
+        "original": "Deut. 9:22"
+      },
+      {
+        "reference": "Psalms 78:30",
+        "original": "Ps. 78:30"
+      },
+      {
+        "reference": "Psalms 78:31",
+        "original": "Ps. 78:31"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIBROTHHATTAAVAH": {
+    "name": "Kibrothhattaavah",
+    "slug": "kibrothhattaavah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "dvs. som i margen, lystens graver. En stasjon for israelittene i ørkenen, hvor de, lei av manna og lengtende etter kjøtt, murret mot Gud. Da sendte Gud dem vaktler i overflod, men slo mange av dem med en plage så de døde. Stedet ligger omtrent tre dagsreiser fra Sinai, nær Akababukten og Wady el Hudherah (Haserot)."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIBZAIM": {
+    "name": "Kibzaim",
+    "slug": "kibzaim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "To hauger, en by i Efraim, tildelt de kohatittiske levittene og utpekt som en fristad (Jos 21:22). Den kalles også Jokmeam (1 Krøn 6:68)."
+      },
+      {
+        "source": "SMI",
+        "text": "(to hauger), en by i Efraim-fjellet, som med sine «forsteder» ble gitt til de kohatittiske levittene. (Josva 21:22) I den parallelle listen i (1 Krøn 6:1) er JOKBEAM satt inn i stedet for Kibsaim. vers (1 Krøn 6:68)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21",
+        "original": "Josh. 21"
+      },
+      {
+        "reference": "1 Chronicles 6:68",
+        "original": "1 Chr. 6:68"
+      },
+      {
+        "reference": "Joshua 21:22",
+        "original": "Joshua 21:22"
+      },
+      {
+        "reference": "1 Chronicles 6:1",
+        "original": "1 Chronicles 6:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KID": {
+    "name": "Kid",
+    "slug": "kid",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ungdyret av geiten. Det ble mye brukt som mat (1 Mos 27:9; 38:17; Dom 6:19; 14:6). Moseloven forbød å koke et kje i morens melk, en lov som er gjentatt tre ganger (2 Mos 23:19; 34:26; 5 Mos 14:21). Blant de ulike årsakene som er gitt for denne loven, fremstår den mest tilfredsstillende som ser på det som «en protest mot grusomhet og et brudd på naturens orden.» Et kje kokt i morens melk er «en grov, usunn rett, og beregnet på å tenne dyriske og voldsomme lidenskaper, og av denne grunn kan Moses ha forbudt det. Dessuten er det selv i dag forbundet med umåteholden festing; og opprinnelig, mistenker jeg,» sier Dr. Thomson (Land and the Book), «var det knyttet til avgudsofferkult.»"
+      },
+      {
+        "source": "SMI",
+        "text": "[Geit]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 27:9",
+        "original": "Gen. 27:9"
+      },
+      {
+        "reference": "Genesis 38:17",
+        "original": "Gen 38:17"
+      },
+      {
+        "reference": "Judges 6:19",
+        "original": "Judg. 6:19"
+      },
+      {
+        "reference": "Judges 14:6",
+        "original": "Judg 14:6"
+      },
+      {
+        "reference": "Exodus 23:19",
+        "original": "Ex. 23:19"
+      },
+      {
+        "reference": "Exodus 34:26",
+        "original": "Ex 34:26"
+      },
+      {
+        "reference": "Deuteronomy 14:21",
+        "original": "Deut. 14:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIDRON": {
+    "name": "Kidron",
+    "slug": "kidron",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "= Kedron = Cedron, urent/grumsete, den vintertorenten som flyter gjennom Josafats dal, på østsiden av Jerusalem, mellom byen og Oljeberget. Denne dalen er i Skriften kun kjent under navnet «Kedronbekken». David krysset denne bekken barbent og gråtende da han flyktet fra Absalom (2 Sam 15:23, 30), og den ble ofte krysset av vår Herre på hans reiser frem og tilbake (Joh 18:1). Her brente Asa sin mors obskøne avguder (1 Kong 15:13), og her ble Atalja henrettet (2 Kong 11:16). Senere ble den et oppsamlingssted for all slags urenheter (2 Krøn 29:16; 30:14); og i Josias tid var denne dalen byens felles gravsted (2 Kong 23:6; jf. Jer 26:23). Gjennom denne fjellravinen renner det ikke vann, unntatt etter kraftige regnskyll i fjellene rundt Jerusalem. Dens lengde fra kilden til En-Rogel er 2 3/4 mil. Dens bratte, steinete bredder er fylt med gamle graver, spesielt venstre bredd overfor tempelområdet. Jødenes største ønske er å bli begravet der, ut fra tanken om at Kidron er «Josafats dal» nevnt i Joel 3:2. Nedenfor En-Rogel har Kidron ingen historisk eller hellig interesse. Den løper i en buktende kurs gjennom Judea-ørkenen til Dødehavets nordvestlige bredd. Hele dens lengde, i en rett linje, er bare rundt 20 mil, men på denne strekningen er fallet omtrent 3 912 fot. (Se KEDRON.) Nyere utgravninger har avdekket at Kidrons gamle leie er omtrent 40 fot lavere enn det nåværende leiet, og omtrent 70 fot nærmere helligdommens mur."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 15:23",
+        "original": "2 Sam. 15:23"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2 Sam. 15:30"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      },
+      {
+        "reference": "1 Kings 15:13",
+        "original": "1 Kings 15:13"
+      },
+      {
+        "reference": "2 Kings 11:16",
+        "original": "2 Kings 11:16"
+      },
+      {
+        "reference": "2 Chronicles 29:16",
+        "original": "2 Chr. 29:16"
+      },
+      {
+        "reference": "2 Chronicles 30:14",
+        "original": "2 Chr. 30:14"
+      },
+      {
+        "reference": "2 Kings 23:6",
+        "original": "2 Kings 23:6"
+      },
+      {
+        "reference": "Jeremiah 26:23",
+        "original": "Jer. 26:23"
+      },
+      {
+        "reference": "Joel 3:2",
+        "original": "Joel 3:2"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIDRON, OR KEDRON": {
+    "name": "Kidron, Or Kedron",
+    "slug": "kidron-or-kedron",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(urent/grumsete), Bekken, en flomelv eller dal, ikke en «bekk», eller, som i margen i Revised Version, «kløft»; gresk vintertorrent. Den lå nær Jerusalem, mellom byen og Oljeberget. Den er nå vanligvis kjent som «Josafats dal». Kanalen i Josafats dal er ikke mer enn et tørt leie av en vintertorrent, med spor etter å ha blitt oversvømt av store vannmasser. Den ble krysset av David under flukten hans (2 Sam 15:23) jf. 2 Sam 15:30, og av vår Herre på vei til Getsemane (Joh 18:1) jf. Mark 14:26; Luk 22:39. Den særegne egenskapen ved Kidron-dalen – nevnt i Det gamle testamente – er den urenheten som synes å ha blitt tilskrevet den. I Josias tid var det byens felles gravsted (2 Kong 23:6) jf. Jer 26:23."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 15:23",
+        "original": "2 Samuel 15:23"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2Sam 15:30"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      },
+      {
+        "reference": "Mark 14:26",
+        "original": "Mark 14:26"
+      },
+      {
+        "reference": "Luke 22:39",
+        "original": "Luke 22:39"
+      },
+      {
+        "reference": "2 Kings 23:6",
+        "original": "2 Kings 23:6"
+      },
+      {
+        "reference": "Jeremiah 26:23",
+        "original": "Jere 26:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINAH": {
+    "name": "Kinah",
+    "slug": "kinah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En elegi, en by helt sør i Juda (Jos 15:22). Den lå sannsynligvis ikke langt fra Dødehavet, i Wadi Fikreh."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:22",
+        "original": "Josh. 15:22"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINE": {
+    "name": "Kine",
+    "slug": "kine",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Hebr. entall parah, dvs. «fruktbar»), nevnt i Faraos drøm (1 Mos 41:18). Her betegner ordet «bøfler», som beitet på siv og starr ved elvebredden."
+      },
+      {
+        "source": "SMI",
+        "text": "flertall av ku. [Se Okse, Ungokse]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 41",
+        "original": "Gen. 41"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KING": {
+    "name": "King",
+    "slug": "king",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Brukt i Skriften svært generelt for å betegne en som er investert med autoritet, enten omfattende eller begrenset. Det var trettien konger i Kanaan (Jos 12:9, 24), som Josva undertvang. Adonibesek undertvang sytti konger (Dom 1:7). I Det nye testamente omtales den romerske keiseren som en konge (1 Pet 2:13, 17); og Herodes Antipas, som bare var en tetrark, kalles også en konge (Matt 14:9; Mark 6:22). Denne tittelen anvendes på Gud (1 Tim 1:17), og på Kristus, Guds Sønn (1 Tim 6:15, 16; Matt 27:11). Guds folk kalles også «konger» (Dan 7:22, 27; Matt 19:28; Åp 1:6, etc.). Døden kalles «forferdelsernes konge» (Job 18:14). Jehova var den jødiske nasjonens eneste Konge (1 Sam 8:7; Jes 33:22). Men det kom en tid i folkets historie da en konge ble etterspurt, for at de skulle være som andre nasjoner (1 Sam 8:5). Profeten Samuel protesterte, men folket ropte: «Nei, vi vil ha en konge over oss!» Samuels sønners dårlige oppførsel var den umiddelbare årsaken til dette kravet. De hebraiske kongene regjerte ikke i egen rett, eller i navnet til folket som hadde valgt dem, men delvis som tjenere og delvis som representanter for Jehova, Israels sanne Konge (1 Sam 10:1). Grensene for kongens makt ble foreskrevet (1 Sam 10:25). Hans hoffembedsmenn var: (1) historieskriveren eller erindringsmesteren (2 Sam 8:16; 1 Kong 4:3); (2) skriveren (2 Sam 8:17; 20:25); (3) forvalteren av huset, sjefsstewarden (Jes 22:15); (4) «kongens venn», en fortrolig følgesvenn (1 Kong 4:5); (5) oppsynsmannen for garderoben (2 Kong 22:14); (6) kommandanten for livvakten (2 Sam 20:23); (7) offiserer over kongens skatter, etc. (1 Krøn 27:25-31); (8) øverstkommanderende for hæren (1 Krøn 27:34); (9) den kongelige rådgiveren (1 Krøn 27:32; 2 Sam 16:20-23). (For katalog over konger av Israel og Juda, se kronologisk tabell i tillegg.)"
+      },
+      {
+        "source": "SMI",
+        "text": "«En øverste hersker, en som er investert med suveren autoritet over en nasjon, stamme eller et land.» – Webster. I Bibelen innebærer ikke ordet nødvendigvis stor makt eller stort landområde. Mange personer kalles konger som vi heller ville kalle høvdinger eller ledere. Ordet brukes i Bibelen om Gud som universets suverene hersker, og om Kristus, Guds Sønn, som kirkens hode og regent. Hebreerne ble styrt av en konge i en periode på rundt 500 år før Jerusalems ødeleggelse, 586 f.Kr. Den umiddelbare årsaken til at en kongelig styreform ble innført i stedet for dommernes, ser ut til å ha vært beleiringen av Jabesj-Gilead av ammonittkongen Nahasj. (1 Sam 11:1; 12:12) Overbevisningen ser ut til å ha tvunget seg frem hos israelittene at de ikke kunne motstå sin formidable nabo med mindre de stilte seg under en konges herredømme, slik som de omkringliggende nasjonene. Den opprinnelige ideen om en hebraisk konge var todelt: for det første at han skulle lede folket i kamp i krigstid; og for det andre at han skulle utøve dom og rettferdighet for dem i krig og fred. (1 Sam 8:20) I begge henseender ble det ønskede mål oppnådd. I tillegg til å være øverstkommanderende for hæren, øverste dommer og absolutt herre over sine undersåtters liv, utøvde kongen makt til å ilegge dem skatter og kreve personlig tjeneste og arbeidskraft fra dem. I tillegg til disse jordiske maktene hadde Israels konge et mer ærefryktinngytende krav på respekt og lydighet. Han var Jehovas stedfortreder (1 Sam 10:1; 16:13), og så å si hans sønn, hvis han var rettferdig og hellig. (2 Sam 7:14; Sal 2:6,7; 89:26,27) Han var blitt utvalgt som en innviet hersker. Over ham var den hellige salvingsoljen blitt utøst, som hittil utelukkende hadde vært forbeholdt Jehovas prester. Han hadde blitt, faktisk, ettertrykkelig «Herrens salvede». Han hadde et hoff av orientalsk prakt. Kongen var kledd i kongelige kapper (1 Kong 22:10; 2 Krøn 18:9), hans insignier var en krone eller et diadem av rent gull, eller kanskje strålende med edelstener (2 Sam 1:10; 12:30; 2 Kong 11:12; Sal 21:3), og et kongelig septer. De som nærmet seg ham, viste ham ærbødighet, bøyde seg ned og berørte bakken med pannen (1 Sam 24:8; 2 Sam 19:24), og dette ble gjort selv av en konges hustru, Salomos mor (1 Kong 1:16). Hans offiserer og undersåtter kalte seg hans tjenere eller slaver. Han hadde et stort harem, som ble bevoktet av evnukker. Tronfølgeloven er noe uklar, men det virker mest sannsynlig at kongen i sin levetid utnevnte sin etterfølger. Samtidig, hvis ingen partiskhet for en favorittkone eller -sønn grep inn, ville det alltid være en naturlig tilbøyelighet til hengivenhet til fordel for den eldste sønn."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 12:9",
+        "original": "Josh. 12:9"
+      },
+      {
+        "reference": "Joshua 12:24",
+        "original": "Josh. 12:24"
+      },
+      {
+        "reference": "Judges 1:7",
+        "original": "Judg. 1:7"
+      },
+      {
+        "reference": "1 Peter 2:13",
+        "original": "1 Pet. 2:13"
+      },
+      {
+        "reference": "1 Peter 2:17",
+        "original": "1 Pet. 2:17"
+      },
+      {
+        "reference": "Matthew 14:9",
+        "original": "Matt. 14:9"
+      },
+      {
+        "reference": "Mark 6:22",
+        "original": "Mark 6:22"
+      },
+      {
+        "reference": "1 Timothy 1:17",
+        "original": "1 Tim. 1:17"
+      },
+      {
+        "reference": "1 Timothy 6:15",
+        "original": "1 Tim. 6:15"
+      },
+      {
+        "reference": "1 Timothy 6:16",
+        "original": "1 Tim. 6:16"
+      },
+      {
+        "reference": "Matthew 27:11",
+        "original": "Matt. 27:11"
+      },
+      {
+        "reference": "Daniel 7:22",
+        "original": "Dan. 7:22"
+      },
+      {
+        "reference": "Daniel 7:27",
+        "original": "Dan. 7:27"
+      },
+      {
+        "reference": "Matthew 19:28",
+        "original": "Matt. 19:28"
+      },
+      {
+        "reference": "Revelation 1:6",
+        "original": "Rev. 1:6"
+      },
+      {
+        "reference": "Job 18:14",
+        "original": "Job 18:14"
+      },
+      {
+        "reference": "1 Samuel 8:7",
+        "original": "1 Sam. 8:7"
+      },
+      {
+        "reference": "Isaiah 33:22",
+        "original": "Isa. 33:22"
+      },
+      {
+        "reference": "1 Samuel 8:5",
+        "original": "1 Sam. 8:5"
+      },
+      {
+        "reference": "1 Samuel 10:1",
+        "original": "1 Sam. 10:1"
+      },
+      {
+        "reference": "1 Samuel 10:25",
+        "original": "1 Sam. 10:25"
+      },
+      {
+        "reference": "2 Samuel 8:16",
+        "original": "2 Sam. 8:16"
+      },
+      {
+        "reference": "1 Kings 4:3",
+        "original": "1 Kings 4:3"
+      },
+      {
+        "reference": "2 Samuel 8:17",
+        "original": "2 Sam. 8:17"
+      },
+      {
+        "reference": "2 Samuel 20:25",
+        "original": "2 Sam. 20:25"
+      },
+      {
+        "reference": "Isaiah 22:15",
+        "original": "Isa. 22:15"
+      },
+      {
+        "reference": "1 Kings 4:5",
+        "original": "1 Kings 4:5"
+      },
+      {
+        "reference": "2 Kings 22:14",
+        "original": "2 Kings 22:14"
+      },
+      {
+        "reference": "2 Samuel 20:23",
+        "original": "2 Sam. 20:23"
+      },
+      {
+        "reference": "1 Chronicles 27:25-31",
+        "original": "1 Chr. 27:25-31"
+      },
+      {
+        "reference": "1 Chronicles 27:34",
+        "original": "1 Chr. 27:34"
+      },
+      {
+        "reference": "1 Chronicles 27:32",
+        "original": "1 Chr. 27:32"
+      },
+      {
+        "reference": "2 Samuel 16:20-23",
+        "original": "2 Sam. 16:20-23"
+      },
+      {
+        "reference": "1 Samuel 11:1",
+        "original": "1 Samuel 11:1"
+      },
+      {
+        "reference": "1 Samuel 12:12",
+        "original": "1 Samuel 12:12"
+      },
+      {
+        "reference": "1 Samuel 8:20",
+        "original": "1 Samuel 8:20"
+      },
+      {
+        "reference": "1 Samuel 16:13",
+        "original": "1 Samuel 16:13"
+      },
+      {
+        "reference": "2 Samuel 7:14",
+        "original": "2 Samuel 7:14"
+      },
+      {
+        "reference": "Psalms 2:6",
+        "original": "Psalms 2:6"
+      },
+      {
+        "reference": "Psalms 2:7",
+        "original": "Psalms 2:7"
+      },
+      {
+        "reference": "Psalms 89:26",
+        "original": "Psalms 89:26"
+      },
+      {
+        "reference": "Psalms 89:27",
+        "original": "Psalms 89:27"
+      },
+      {
+        "reference": "1 Kings 22:10",
+        "original": "1 Kings 22:10"
+      },
+      {
+        "reference": "2 Chronicles 18:9",
+        "original": "2 Chronicles 18:9"
+      },
+      {
+        "reference": "2 Samuel 1:10",
+        "original": "2 Samuel 1:10"
+      },
+      {
+        "reference": "2 Samuel 12:30",
+        "original": "2 Samuel 12:30"
+      },
+      {
+        "reference": "2 Kings 11:12",
+        "original": "2 Kings 11:12"
+      },
+      {
+        "reference": "Psalms 21:3",
+        "original": "Psalms 21:3"
+      },
+      {
+        "reference": "1 Samuel 24:8",
+        "original": "1 Samuel 24:8"
+      },
+      {
+        "reference": "2 Samuel 19:24",
+        "original": "2 Samuel 19:24"
+      },
+      {
+        "reference": "1 Kings 1:16",
+        "original": "1 Kings 1:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KINGDOM OF GOD": {
+    "name": "Kingdom of God",
+    "slug": "kingdom-of-god",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Matt 6:33; Mark 1:14, 15; Luk 4:43) = «Kristi rike» (Matt 13:41; 20:21) = «Kristi og Guds rike» (Ef 5:5) = «Davids rike» (Mark 11:10) = «riket» (Matt 8:12; 13:19) = «himmelriket» (Matt 3:2; 4:17; 13:41), alle betegner det samme under forskjellige aspekter, nemlig: (1) Kristi mellommenneskelige autoritet, eller hans herredømme på jorden; (2) velsignelsene og fordelene av alle slag som strømmer fra dette herredømmet; (3) dette rikets undersåtter samlet sett, eller Kirken."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 6:33",
+        "original": "Matt. 6:33"
+      },
+      {
+        "reference": "Mark 1:14",
+        "original": "Mark 1:14"
+      },
+      {
+        "reference": "Mark 1:15",
+        "original": "Mark 1:15"
+      },
+      {
+        "reference": "Luke 4:43",
+        "original": "Luke 4:43"
+      },
+      {
+        "reference": "Matthew 13:41",
+        "original": "Matt. 13:41"
+      },
+      {
+        "reference": "Matthew 20:21",
+        "original": "Matt 20:21"
+      },
+      {
+        "reference": "Ephesians 5:5",
+        "original": "Eph. 5:5"
+      },
+      {
+        "reference": "Mark 11:10",
+        "original": "Mark 11:10"
+      },
+      {
+        "reference": "Matthew 8:12",
+        "original": "Matt. 8:12"
+      },
+      {
+        "reference": "Matthew 13:19",
+        "original": "Matt 13:19"
+      },
+      {
+        "reference": "Matthew 3:2",
+        "original": "Matt. 3:2"
+      },
+      {
+        "reference": "Matthew 4:17",
+        "original": "Matt 4:17"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINGLY OFFICE OF CHRIST": {
+    "name": "Kingly office of Christ",
+    "slug": "kingly-office-of-christ",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En av de tre spesielle relasjonene Kristus har til sitt folk. Kristi embete som mellommann omfatter tre forskjellige funksjoner, nemlig en profets, en prests og en konges. Dette er ikke tre separate embeter, men tre funksjoner av ett mellommannsembete. Kristus er Konge og suverent Hode over sin kirke og over alle ting for sin kirke (Ef 1:22; 4:15; Kol 1:18; 2:19). Han utøver dette mellommannskongeembetet i sin kirke, over sin kirke, og over alle ting til fordel for sin kirke. Denne kongeligheten skiller seg fra den som essensielt tilhører ham som Gud, for den er gitt ham av Faderen som belønning for hans lydighet og lidelser (Fil 2:6-11), og har som sitt spesielle formål oppbyggingen og herligheten av hans gjenløste kirke. Den knytter seg dessuten ikke til hans guddommelige natur som sådan, men til hans person som Gud-menneske. Kristi mellommannskonge-rike kan sees som å omfatte: (1) hans maktens rike, eller hans forsynsmessige styre av universet; (2) hans nådens rike, som er fullstendig åndelig i sine undersåtter og administrasjon; og (3) hans herlighetens rike, som er fullbyrdelsen av all hans forsynsmessige og nådefylte administrasjon. Kristus opprettholdt og utøvde funksjonen som mellommannskonge, så vel som Profet og Prest, fra menneskets fall, da han begynte sitt mellommannsverk; likevel kan det sies at han ble offentlig og formelt innsatt på tronen da han fór opp til det høye og satte seg ved Faderens høyre hånd (Sal 2:6; Jer 23:5; Jes 9:6), etter at hans verk av fornedrelse og lidelse på jorden var «fullført»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ephesians 1:22",
+        "original": "Eph. 1:22"
+      },
+      {
+        "reference": "Ephesians 4:15",
+        "original": "Eph 4:15"
+      },
+      {
+        "reference": "Colossians 1:18",
+        "original": "Col. 1:18"
+      },
+      {
+        "reference": "Colossians 2:19",
+        "original": "Col 2:19"
+      },
+      {
+        "reference": "Philippians 2:6-11",
+        "original": "Phil. 2:6-11"
+      },
+      {
+        "reference": "Psalms 2:6",
+        "original": "Ps. 2:6"
+      },
+      {
+        "reference": "Jeremiah 23:5",
+        "original": "Jer. 23:5"
+      },
+      {
+        "reference": "Isaiah 9:6",
+        "original": "Isa. 9:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINGS": {
+    "name": "Kings",
+    "slug": "kings",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "av Juda og Israel. For listen, se tabellen på slutten av dette bindet."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINGS, FIRST AND SECOND BOOKS OF": {
+    "name": "Kings, First And Second Books Of",
+    "slug": "kings-first-and-second-books-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "opprinnelig kun én bok i den hebraiske kanon, fra i Septuaginta (LXX) og Vulgata som de tredje og fjerde kongebøkene (Samuelsbøkene var de første og andre). Det må huskes at inndelingen mellom Kongebøkene og Samuelsbøkene er like kunstig, og at de historiske bøkene som begynner med Dommerne og slutter med 2 Kongebok, i realiteten fremstår som ett verk, som gir en sammenhengende historie om Israel fra Josvas tid til Jojakins død. Kongebøkene inneholder historien fra Davids død og Salomos tiltredelse til ødeleggelsen av Juda rike og Jerusalems ødeleggelse, med en supplerende merknad om en hendelse som skjedde etter et intervall på tjueseks år – nemlig Jojakins frigjøring fra fengselet i Babylon – og en ytterligere utvidelse til Jojakins død, hvis tidspunkt ikke er kjent, men som sannsynligvis ikke var lenge etter hans frigjøring. Historien omfatter derfor hele tiden for det israelittiske monarkiet, eksklusivt Sauls og Davids regjeringstid. Når det gjelder utenlandske nasjoners anliggender og Israels forhold til dem, er de historiske merknadene i disse bøkene, selv om de er knappe i de tidligere tider, svært verdifulle og i slående samsvar med de nyeste tilleggene til vår kunnskap om samtidens verdslige historie. En svært viktig hjelp til en riktig forståelse av historien i disse bøkene, og til utfyllingen av dens oversikt, finnes i profetene, og spesielt i Jesaja og Jeremia. Tid når skrevet.—De ble utvilsomt skrevet under fangenskapet, sannsynligvis etter det tjuesjette året. Forfatterskap.—Når det gjelder forfatterskapet til bøkene, byr det på liten vanskelighet. Den jødiske tradisjonen som tilskriver dem Jeremia, støttes av de sterkeste interne bevis, i tillegg til språkets. Kilder til informasjon.—Det fantes en regelmessig serie med statlige annaler for både Juda rike og Israels rike, som omfattet hele tiden som er behandlet i Kongebøkene, eller i det minste til slutten av Jojakims regjeringstid. (2 Kong 24:5) Disse annalene siteres konstant ved navn som «Salomos krønikebok» (1 Kong 11:41) og etter Salomo «Juda kongers krønikebok» eller «Israels kongers krønikebok», f.eks. (1 Kong 14:29; 15:7; 16:5,14,20; 2 Kong 10:34; 24:5) osv.; og det er tydelig at forfatteren av Kongebøkene hadde begge foran seg da han utarbeidet sin historie, hvor de to kongedømmenes regjeringstid er harmonisert og disse annalene stadig henvises til. Men i tillegg til disse nasjonale annalene fantes det også, på den tiden Kongebøkene ble samlet, separate verk av de forskjellige profetene som hadde levd i Juda og Israel. Autoritet.—Deres kanoniske autoritet har aldri vært omstridt, og det er derfor unødvendig å fremlegge vitnesbyrd om deres autentisitet som kan finnes hos Josefus, Eusebius, Hieronymus, Augustin, osv. De regnes blant profetene, i den tredelte inndelingen av de hellige skrifter; en posisjon i samsvar med antagelsen om at de ble samlet av Jeremia, og inneholder fortellingene fra de forskjellige profetene i rekkefølge. De siteres ofte av vår Herre og av apostlene."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 24:5",
+        "original": "2 Kings 24:5"
+      },
+      {
+        "reference": "1 Kings 11:41",
+        "original": "1 Kings 11:41"
+      },
+      {
+        "reference": "1 Kings 14:29",
+        "original": "1 Kings 14:29"
+      },
+      {
+        "reference": "1 Kings 15:7",
+        "original": "1 Kings 15:7"
+      },
+      {
+        "reference": "1 Kings 16:5",
+        "original": "1 Kings 16:5"
+      },
+      {
+        "reference": "1 Kings 16:14",
+        "original": "1 Kings 16:14"
+      },
+      {
+        "reference": "1 Kings 16:20",
+        "original": "1 Kings 16:20"
+      },
+      {
+        "reference": "2 Kings 10:34",
+        "original": "2 Kings 10:34"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINGS, THE BOOKS OF": {
+    "name": "Kings, The Books of",
+    "slug": "kings-the-books-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "De to Kongebøkene utgjorde opprinnelig bare én bok i de hebraiske skrifter. Den nåværende inndelingen i to bøker ble først foretatt av Septuaginta (LXX), som nå, sammen med Vulgata, nummererer dem som de tredje og fjerde Kongebøkene, der de to Samuelsbøkene er de første og andre Kongebøkene. De inneholder annalene fra det jødiske samveldet fra Salomos tiltredelse til rikets undertrykkelse av Nebukadnesar og babylonerne (tilsynelatende en periode på omtrent fire hundre og femtitre år). Krønikebøkene (se der) er mer omfattende i sitt innhold enn Kongebøkene. Sistnevnte synkroniserer med 1 Krøn 28 – 2 Krøn 36:21. Mens Krønikebøkene gir større fremtredende plass til det prestelige eller levittiske embetet, gis det i Kongebøkene større fremtredende plass til det kongelige. Forfatterskapet til disse bøkene er usikkert. Det finnes deler av dem og av Jeremia som er nesten identiske, f.eks. 2 Kong 24:18-25 og Jer 52; 39:1-10; 40:7-41:10. Det er også mange utilsiktede sammenfall mellom Jeremia og Kongebøkene (2 Kong 21-23 og Jer 7:15; 15:4; 19:3, etc.), og hendelser nedtegnet i Kongebøkene som Jeremia hadde personlig kunnskap om. Disse faktaene støtter i noen grad tradisjonen om at Jeremia var forfatteren av Kongebøkene. Men den mer sannsynlige antakelsen er at Esra, etter fangenskapet, kompilerte dem fra dokumenter skrevet kanskje av David, Salomo, Natan, Gad og Iddo, og at han arrangerte dem i den rekkefølgen de nå eksisterer. I den tredelte inndelingen av Skriftene av jødene, er disse bøkene rangert blant «Profetene». De siteres eller henvises ofte til av vår Herre og hans apostler (Matt 6:29; 12:42; Luk 4:25, 26; 10:4; jf. 2 Kong 4:29; Mark 1:6; jf. 2 Kong 1:8; Matt 3:4, etc.). Fortellingens kilder henvises til (1) «Salomos krønikebok» (1 Kong 11:41); (2) «Juda kongers krønikebok» (14:29; 15:7, 23, etc.); (3) «Israels kongers krønikebok» (14:19; 15:31; 16:14, 20, 27, etc.). Datoen for dens sammensetning var en gang mellom 561 f.Kr., datoen for det siste kapitlet (2 Kong 25), da Jojakin ble frigjort fra fangenskapet av Evil-Merodak, og 538 f.Kr., datoen for Kyros’ frihetsedikt."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 28",
+        "original": "1 Chr. 28"
+      },
+      {
+        "reference": "2 Chronicles 36:21",
+        "original": "2 Chr. 36:21"
+      },
+      {
+        "reference": "2 Kings 24:18-25",
+        "original": "2 Kings 24:18-25"
+      },
+      {
+        "reference": "Jeremiah 52",
+        "original": "Jer. 52"
+      },
+      {
+        "reference": "Jeremiah 39:1-10",
+        "original": "Jer 39:1-10"
+      },
+      {
+        "reference": "Jeremiah 40:7-41:10",
+        "original": "Jer 40:7-41:10"
+      },
+      {
+        "reference": "2 Kings 21",
+        "original": "2 Kings 21"
+      },
+      {
+        "reference": "Jeremiah 7:15",
+        "original": "Jer. 7:15"
+      },
+      {
+        "reference": "Jeremiah 15:4",
+        "original": "Jer 15:4"
+      },
+      {
+        "reference": "Jeremiah 19:3",
+        "original": "Jer 19:3"
+      },
+      {
+        "reference": "Matthew 6:29",
+        "original": "Matt. 6:29"
+      },
+      {
+        "reference": "Matthew 12:42",
+        "original": "Matt 12:42"
+      },
+      {
+        "reference": "Luke 4:25",
+        "original": "Luke 4:25"
+      },
+      {
+        "reference": "Luke 4:26",
+        "original": "Luke 4:26"
+      },
+      {
+        "reference": "2 Kings 4:29",
+        "original": "2 Kings 4:29"
+      },
+      {
+        "reference": "Mark 1:6",
+        "original": "Mark 1:6"
+      },
+      {
+        "reference": "2 Kings 1:8",
+        "original": "2 Kings 1:8"
+      },
+      {
+        "reference": "Matthew 3:4",
+        "original": "Matt. 3:4"
+      },
+      {
+        "reference": "1 Kings 11:41",
+        "original": "1 Kings 11:41"
+      },
+      {
+        "reference": "2 Kings 25",
+        "original": "2 Kings 25"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KING’S DALE": {
+    "name": "King’s dale",
+    "slug": "king-s-dale",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nevnt kun i 1 Mos 14:17; 2 Sam 18:18, navnet gitt til «Sjavve-dalen», hvor kongen av Sodoma møtte Abram."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:17",
+        "original": "Gen. 14:17"
+      },
+      {
+        "reference": "2 Samuel 18:18",
+        "original": "2 Sam. 18:18"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINSMAN": {
+    "name": "Kinsman",
+    "slug": "kinsman",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebr. goel, fra en rot som betyr å løse ut, gjenløse. Goel var blant hebreerne den nærmeste levende mannlige blodslektningen. Visse viktige forpliktelser påhvilte ham overfor sin nærmeste slektning. (1.) Hvis noen på grunn av fattigdom ikke var i stand til å løse ut sin arvelodd, var det slektningens plikt å løse den ut (3 Mos 25:25, 28; Rut 3:9, 12). Han var også forpliktet til å løse ut sin slektning som hadde solgt seg selv til slaveri (3 Mos 25:48, 49). Gud er sitt folks Goel fordi han gjenløser dem (2 Mos 6:6; Jes 43:1; 41:14; 44:6, 22; 48:20; Sal 103:4; Job 19:25, etc.). (2.) Goel var også hevneren (se der) av blod (4 Mos 35:21) i tilfelle av drap på den nærmeste slektningen."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 25:25",
+        "original": "Lev. 25:25"
+      },
+      {
+        "reference": "Leviticus 25:28",
+        "original": "Lev 25:28"
+      },
+      {
+        "reference": "Ruth 3:9",
+        "original": "Ruth 3:9"
+      },
+      {
+        "reference": "Ruth 3:12",
+        "original": "Ruth 3:12"
+      },
+      {
+        "reference": "Leviticus 25:48",
+        "original": "Lev. 25:48"
+      },
+      {
+        "reference": "Leviticus 25:49",
+        "original": "Lev. 25:49"
+      },
+      {
+        "reference": "Exodus 6:6",
+        "original": "Ex. 6:6"
+      },
+      {
+        "reference": "Isaiah 43:1",
+        "original": "Isa. 43:1"
+      },
+      {
+        "reference": "Isaiah 41:14",
+        "original": "Isa 41:14"
+      },
+      {
+        "reference": "Isaiah 44:6",
+        "original": "Isa 44:6"
+      },
+      {
+        "reference": "Isaiah 44:22",
+        "original": "Isa 44:22"
+      },
+      {
+        "reference": "Isaiah 48:20",
+        "original": "Isa 48:20"
+      },
+      {
+        "reference": "Psalms 103:4",
+        "original": "Ps. 103:4"
+      },
+      {
+        "reference": "Job 19:25",
+        "original": "Job 19:25"
+      },
+      {
+        "reference": "Numbers 35:21",
+        "original": "Num. 35:21"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIR": {
+    "name": "Kir",
+    "slug": "kir",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En mur eller festning, et sted dit Tiglat-Pileser førte syrerne i fangenskap etter at han hadde inntatt byen Damaskus (2 Kong 16:9; Amos 1:5; 9:7). Jesaja (22:6), som også var samtidig med disse hendelsene, nevner det sammen med Elam. Noen har antatt at Kir er en variant av Kusj (Susiana), sør for Elam."
+      },
+      {
+        "source": "SMI",
+        "text": "(festning) nevnes av Amos (Amos 9:7) som landet syrerne (arameerne) en gang ble «ført opp fra»; dvs. tilsynelatende som landet de hadde bodd i før de utvandret til regionen nord for Palestina. (Det er uenighet om Kirs beliggenhet, da noen antar det er identisk med Carma, en by i Media, i sør, ved elven Mardus; andre plasserer det i Armenia, ved elven Kar.—Red.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 16:9",
+        "original": "2 Kings 16:9"
+      },
+      {
+        "reference": "Amos 1:5",
+        "original": "Amos 1:5"
+      },
+      {
+        "reference": "Amos 9:7",
+        "original": "Amos 9:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIR OF MOAB": {
+    "name": "Kir of Moab",
+    "slug": "kir-of-moab",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jes. 15:1. De to festningsverkene i Moab var Ar og Kir, hvorav sistnevnte sannsynligvis er Kir-hareseth (16:7) som følger."
+      },
+      {
+        "source": "SMI",
+        "text": "(Moabs festning), en av de to viktigste festningene i Moab, den andre var Ar i Moab. Navnet forekommer bare i (Jesaja 15:1), selv om stedet sannsynligvis er referert til under navnene Kir-heres, Kir-hareseth, osv. Det er nesten identisk med navnet Kerak, som stedet for en viktig by i en høy og svært sterk posisjon sørøst for Dødehavet er kjent under i dag. Dens beliggenhet er virkelig bemerkelsesverdig. Den er bygget på toppen av en bratt ås, omringet av en dyp og smal dal, som igjen er fullstendig omsluttet av fjell som reiser seg høyere enn byen og overser den fra alle sider."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Isaiah 15:1",
+        "original": "Isa. 15:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIR-HARASETH": {
+    "name": "Kir-haraseth",
+    "slug": "kir-haraseth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bygget festning, en by og festning i Moab, det moderne Kerak, en liten by på toppen av en bratt ås, omtrent 6 engelske mil fra Rabbath-Moab og 10 engelske mil fra Dødehavet; også kalt Kir-haresj, Kir-hareseth, Kir-heres (Jes. 16:7, 11; Jer. 48:31, 36). Etter Akabs død kastet Mesja, kongen av Moab (se MOABITTSTEINEN), av seg troskapseden til Israels konge, og kjempet med hell for sitt kongerikes uavhengighet. Etter dette inngikk Joram, Israels konge, i et forsøk på å gjenvinne sitt herredømme over Moab, en allianse med Josjafat, Judas konge, og med Edoms konge. De tre kongene førte sine hærer mot Mesja, som ble drevet tilbake for å søke tilflukt i Kir-hareseth. Moabittene ble drevet til fortvilelse. Mesja tok da sin eldste sønn, som skulle ha regjert i hans sted, og ofret ham som et brennoffer på festningens mur i de allierte hærenes påsyn. «Da ble det stor vrede mot Israel; og de dro bort fra ham og vendte tilbake til sitt eget land.» Inntrengerne evakuerte Moabs land, og Mesja oppnådde sitt lands uavhengighet (2 Kong 3:20-27)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Isaiah 16:7",
+        "original": "Isa. 16:7"
+      },
+      {
+        "reference": "Isaiah 16:11",
+        "original": "Isa. 16:11"
+      },
+      {
+        "reference": "Jeremiah 48:31",
+        "original": "Jer. 48:31"
+      },
+      {
+        "reference": "Jeremiah 48:36",
+        "original": "Jer 48:36"
+      },
+      {
+        "reference": "2 Kings 3:20-27",
+        "original": "2 Kings 3:20-27"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRHARASETH": {
+    "name": "Kirharaseth",
+    "slug": "kirharaseth",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(teglfestning), (2 Kong 3:25) Kir-haresj, (Jesaja 16:11) Kir-hares, (Jeremia 48:31,36) Disse fire navnene er alle brukt om ett sted, sannsynligvis KIR I MOAB, se dette."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 3:25",
+        "original": "2 Kings 3:25"
+      },
+      {
+        "reference": "Isaiah 16:11",
+        "original": "Isaiah 16:11"
+      },
+      {
+        "reference": "Jeremiah 48:31",
+        "original": "Jeremiah 48:31"
+      },
+      {
+        "reference": "Jeremiah 48:36",
+        "original": "Jeremiah 48:36"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRIAH": {
+    "name": "Kiriah",
+    "slug": "kiriah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "tilsynelatende et gammelt eller arkaisk ord, som betyr en by eller tettsted. Det kan sammenlignes med ordet «borg» eller «by» i vårt eget språk. Nært beslektet med Kiriah er Keret, tilsynelatende en fønikisk form, som forekommer sporadisk. (Job 29:7; Salomos Ordspråk 8:3) Som egennavn forekommer det i Bibelen i formene Keriot, Kartah, Kartan, i tillegg til de umiddelbart følgende."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 29:7",
+        "original": "Job 29:7"
+      },
+      {
+        "reference": "Proverbs 8:3",
+        "original": "Proverbs 8:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRIATHAIM": {
+    "name": "Kiriathaim",
+    "slug": "kiriathaim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[KIRJATAIM]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRIOTH": {
+    "name": "Kirioth",
+    "slug": "kirioth",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(to byer), et sted i Moab hvis palasser ble truet av Amos med ødeleggelse ved ild (Amos 2:2), med mindre ordet simpelthen betyr «byene», noe som sannsynligvis også er tilfellet i (Jeremia 48:4)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Amos 2:2",
+        "original": "Amos 2:2"
+      },
+      {
+        "reference": "Jeremiah 48:4",
+        "original": "Jeremiah 48:4"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATH": {
+    "name": "Kirjath",
+    "slug": "kirjath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "By, en by som tilhørte Benjamin (Jos. 18:28), det moderne Kuriet el-‘Enab, dvs. «druebyen», omtrent 7 1/2 engelske mil vest-nordvest for Jerusalem."
+      },
+      {
+        "source": "SMI",
+        "text": "(en by), den siste av byene som ble oppregnet som tilhørende Benjamins stamme (Josva 18:28), sannsynligvis identisk med det bedre kjente stedet Kirjat-Jearim."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 18:28",
+        "original": "Josh. 18:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIRJATH-ARBA": {
+    "name": "Kirjath-arba",
+    "slug": "kirjath-arba",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Arbas by, det opprinnelige navnet på Hebron (qv.), såkalt etter navnet på grunnleggeren, en av anakittene (1 Mos 23:2; 35:27; Jos 15:13). Den ble gitt til Kaleb av Josva som hans del. Jødene tolker navnet som «de fires by», dvs. Abrahams, Isaks, Jakobs og Adams by, som alle, hevder de, ble begravet der."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 23:2",
+        "original": "Gen. 23:2"
+      },
+      {
+        "reference": "Genesis 35:27",
+        "original": "Gen 35:27"
+      },
+      {
+        "reference": "Joshua 15:13",
+        "original": "Josh. 15:13"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATH-HUZOTH": {
+    "name": "Kirjath-huzoth",
+    "slug": "kirjath-huzoth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gatenes by, 4 Mos 22:39, en moabittisk by, som noen identifiserer med Kirjataim. Balak mottok og underholdt Bileam her, som han hadde invitert fra Petor, blant «fjellene i øst», bortenfor Eufrat, for å uttale en forbannelse over israelittene, hvis fremgang han ellers ikke hadde håp om å stanse. Det var sannsynligvis fra toppen av Attarus, den høye plassen nær byen, at spåmannen først så Israels leirer."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 22:39",
+        "original": "Num. 22:39"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATH-JEARIM": {
+    "name": "Kirjath-jearim",
+    "slug": "kirjath-jearim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Byen Jaars; dvs. av skoger eller lunder, en gibeonittisk by (Jos. 9:17) på grensen til Benjamin, og til denne stammen ble den tildelt (18:15, 28). Arken ble brakt til dette stedet (1 Sam 7:1, 2) fra Bet-Sjemesj og ble betrodd til Abinadab, en levitt. Her forble den til den ble flyttet av David til Jerusalem (2 Sam 6:2, 3, 12; 1 Krøn 15:1-29; jf. Salme 132). Den ble også kalt Ba’alah (Jos. 15:9) og Kirjat-Ba’al (60). Den har vanligvis blitt identifisert med Kuriet el-‘Enab (dvs. «druebyen»), blant åsene, omtrent 8 engelske mil nordøst for ‘Ain Shems (dvs. Bet-Sjemesj). Meningen om at den skal identifiseres med ‘Erma, 4 engelske mil øst for ‘Ain Shems, ved utkanten av Sorek-dalen, synes imidlertid å ha bedre støtte. (Se KIRJAT.) Ordene i Salme 132:6, «Vi fant den i skogens enger», refererer til arkens opphold i Kirjat-Jearim. «Skog» er her oversettelsen av det hebraiske ordet *jaar*, som er entallsformen av *jearim*."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 9:17",
+        "original": "Josh. 9:17"
+      },
+      {
+        "reference": "1 Samuel 7:1",
+        "original": "1 Sam. 7:1"
+      },
+      {
+        "reference": "1 Samuel 7:2",
+        "original": "1 Sam. 7:2"
+      },
+      {
+        "reference": "2 Samuel 6:2",
+        "original": "2 Sam. 6:2"
+      },
+      {
+        "reference": "2 Samuel 6:3",
+        "original": "2 Sam. 6:3"
+      },
+      {
+        "reference": "2 Samuel 6:12",
+        "original": "2 Sam. 6:12"
+      },
+      {
+        "reference": "1 Chronicles 15:1-29",
+        "original": "1 Chr. 15:1-29"
+      },
+      {
+        "reference": "Psalms 132",
+        "original": "Ps. 132"
+      },
+      {
+        "reference": "Joshua 15:9",
+        "original": "Josh. 15:9"
+      },
+      {
+        "reference": "Psalms 132:6",
+        "original": "Ps. 132:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATH-SANNAH": {
+    "name": "Kirjath-sannah",
+    "slug": "kirjath-sannah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sannahs by; dvs. av palmen(?), Jos. 15:49; det samme som Kirjat-Sefer (15:16; Dom 1:11) og Debir (qv.), en kanaaneisk kongeby inkludert i Juda (Jos. 10:38; 15:49), og sannsynligvis det viktigste lærestedet blant hetittene. Den lå omtrent 12 engelske mil sørvest for Hebron."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:49",
+        "original": "Josh. 15:49"
+      },
+      {
+        "reference": "Judges 1:11",
+        "original": "Judg. 1:11"
+      },
+      {
+        "reference": "Joshua 10:38",
+        "original": "Josh. 10:38"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATH-SEPHER": {
+    "name": "Kirjath-sepher",
+    "slug": "kirjath-sepher",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bøkenes by, Jos. 15:15; det samme som Kirjat-Sannah (qv.), nå representert ved dalen ed-Dhaberiyeh, sørvest for Hebron. Navnet på denne byen er et bevis på at kanaaneerne kjente til skrift og bøker. «Byen inneholdt sannsynligvis en anerkjent skole, eller var et orakelsted og bolig for en lærd prest.» «Bøkene» var sannsynligvis inngraverte steiner eller tegl."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:15",
+        "original": "Josh. 15:15"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATHAIM": {
+    "name": "Kirjathaim",
+    "slug": "kirjathaim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "To byer; en dobbeltby. (1.) En frihavn i Naftali (1 Krøn 6:76). (2.) En by øst for Jordan (1 Mos 14:5; 5 Mos 2:9, 10). Den ble tildelt Rubens stamme (4 Mos 32:37). På Esekiels tid (25:9) var den en av de fire byene som utgjorde «Moabs ære» (jf. Jer. 48:1, 23). Den har blitt identifisert med el-Kureiyat, 11 engelske mil sørvest for Medeba, på sørsiden av Jebel Attarus, det gamle Atarot."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:76",
+        "original": "1 Chr. 6:76"
+      },
+      {
+        "reference": "Genesis 14:5",
+        "original": "Gen. 14:5"
+      },
+      {
+        "reference": "Deuteronomy 2:9",
+        "original": "Deut. 2:9"
+      },
+      {
+        "reference": "Deuteronomy 2:10",
+        "original": "Deut. 2:10"
+      },
+      {
+        "reference": "Numbers 32:37",
+        "original": "Num. 32:37"
+      },
+      {
+        "reference": "Jeremiah 48:1",
+        "original": "Jer. 48:1"
+      },
+      {
+        "reference": "Jeremiah 48:23",
+        "original": "Jer. 48:23"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIRJATHARBA": {
+    "name": "Kirjatharba",
+    "slug": "kirjatharba",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Arbas by), et tidlig navn på byen som etter erobringen vanligvis er kjent som Hebron. (Josva 14:15; Dommerne 1:10) Identiteten til Kirjat-Arba med Hebron blir stadig bekreftet. (1 Mosebok 23:2; 35:27; Josva 14:15; 15:13,54; 20:7; 21:11)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 14:15",
+        "original": "Joshua 14:15"
+      },
+      {
+        "reference": "Judges 1:10",
+        "original": "Judges 1:10"
+      },
+      {
+        "reference": "Genesis 23:2",
+        "original": "Genesis 23:2"
+      },
+      {
+        "reference": "Genesis 35:27",
+        "original": "Genesis 35:27"
+      },
+      {
+        "reference": "Joshua 15:13",
+        "original": "Joshua 15:13"
+      },
+      {
+        "reference": "Joshua 15:54",
+        "original": "Joshua 15:54"
+      },
+      {
+        "reference": "Joshua 20:7",
+        "original": "Joshua 20:7"
+      },
+      {
+        "reference": "Joshua 21:11",
+        "original": "Joshua 21:11"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHARIM": {
+    "name": "Kirjatharim",
+    "slug": "kirjatharim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(skogens by), en forkortet form av navnet Kirjat-Jearim, som bare forekommer i (Esra 2:25)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:25",
+        "original": "Ezra 2:25"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHBAAL": {
+    "name": "Kirjathbaal",
+    "slug": "kirjathbaal",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[KIRJAT-JEARIM]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHHUZOTH": {
+    "name": "Kirjathhuzoth",
+    "slug": "kirjathhuzoth",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(gatenes by), et sted dit Balak fulgte Bileam umiddelbart etter hans ankomst til Moab, (4 Mosebok 22:39), og som ikke er nevnt noe annet sted. Det ser ut til å ha ligget mellom Arnon (Wadi Mojeb) og Bamot-Baal. Jf. v. (4 Mosebok 22:36) og 4 Mos 22:41"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 22:39",
+        "original": "Numbers 22:39"
+      },
+      {
+        "reference": "Numbers 22:36",
+        "original": "Numbers 22:36"
+      },
+      {
+        "reference": "Numbers 22:41",
+        "original": "Numb 22:41"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHJEARIM": {
+    "name": "Kirjathjearim",
+    "slug": "kirjathjearim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(skogens by), først nevnt som en av de fire gibeonittbyene, (Josva 9:17). Den forekommer deretter som et av kjennetegnene for Judas nordgrense, kap. (Josva 15:9), og som punktet der Benjamins vestlige og sørlige grense møttes, kap. (Josva 18:14,15). I de to siste avsnittene finner vi at den bar et annet, kanskje eldre, navn – den store kanaaneiske guden Baals navn, nemlig Ba'ala og KIRJAT-BAAL. På dette stedet ble arken i tjue år. (1 Samuel 7:2) Ved slutten av den tiden mistet Kirjat-Jearim sin hellige skatt, da David flyttet den til Obed-Edoms, gittittens, hus. (1 Krønikebok 13:5,6; 2 Krønikebok 1:4; 2 Samuel 6:2) osv. For Eusebius og Hieronymus ser den ut til å ha vært velkjent. De beskriver den som en landsby på den niende mil mellom Jerusalem og Diospolis (Lydda). Disse kravene er nøyaktig oppfylt i den lille moderne landsbyen Kuriet-el-Enab – nå vanligvis kjent som Abu Gosh, fra røverhøvdingen hvis hovedkvarter det var – på veien fra Jaffa og Jerusalem."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 9:17",
+        "original": "Joshua 9:17"
+      },
+      {
+        "reference": "Joshua 15:9",
+        "original": "Joshua 15:9"
+      },
+      {
+        "reference": "Joshua 18:14",
+        "original": "Joshua 18:14"
+      },
+      {
+        "reference": "Joshua 18:15",
+        "original": "Joshua 18:15"
+      },
+      {
+        "reference": "1 Samuel 7:2",
+        "original": "1 Samuel 7:2"
+      },
+      {
+        "reference": "1 Chronicles 13:5",
+        "original": "1 Chronicles 13:5"
+      },
+      {
+        "reference": "1 Chronicles 13:6",
+        "original": "1 Chronicles 13:6"
+      },
+      {
+        "reference": "2 Chronicles 1:4",
+        "original": "2 Chronicles 1:4"
+      },
+      {
+        "reference": "2 Samuel 6:2",
+        "original": "2 Samuel 6:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHSANNAH": {
+    "name": "Kirjathsannah",
+    "slug": "kirjathsannah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(bøkenes by). [Debir]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIRJATHSEPHER": {
+    "name": "Kirjathsepher",
+    "slug": "kirjathsepher",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(bøkenes by). (Josva 15:15,16; Dommerne 1:11,12) [Debir]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:15",
+        "original": "Joshua 15:15"
+      },
+      {
+        "reference": "Joshua 15:16",
+        "original": "Joshua 15:16"
+      },
+      {
+        "reference": "Judges 1:11",
+        "original": "Judges 1:11"
+      },
+      {
+        "reference": "Judges 1:12",
+        "original": "Judges 1:12"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KISH": {
+    "name": "Kish",
+    "slug": "kish",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En bue. (1.) En levitt fra Meraris slekt (1 Krønikebok 23:21; 24:29). (2.) En benjamitt fra Jerusalem (1 Krønikebok 8:30; 9:36). (3.) En levitt i Hiskias tid (2 Krønikebok 29:12). (4.) Mordekais oldefar (Ester 2:5). (5.) En benjamitt, Abiels sønn og kong Sauls far (1 Samuel 9:1, 3; 10:11, 21; 14:51; 2 Samuel 21:14). Alt som er nedtegnet om ham, er at han sendte sin sønn Saul ut for å lete etter eslene hans som hadde gått seg vill, og at han ble gravlagt i Sela. Kalt Cis, Apostlenes gjerninger 13:21 (Rev. Vers., Kisj)."
+      },
+      {
+        "source": "SMI",
+        "text": "(en bue)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:21",
+        "original": "1 Chr. 23:21"
+      },
+      {
+        "reference": "1 Chronicles 24:29",
+        "original": "1 Chr. 24:29"
+      },
+      {
+        "reference": "1 Chronicles 8:30",
+        "original": "1 Chr. 8:30"
+      },
+      {
+        "reference": "1 Chronicles 9:36",
+        "original": "1 Chr. 9:36"
+      },
+      {
+        "reference": "2 Chronicles 29:12",
+        "original": "2 Chr. 29:12"
+      },
+      {
+        "reference": "Esther 2:5",
+        "original": "Esther 2:5"
+      },
+      {
+        "reference": "1 Samuel 9:1",
+        "original": "1 Sam. 9:1"
+      },
+      {
+        "reference": "1 Samuel 9:3",
+        "original": "1 Sam. 9:3"
+      },
+      {
+        "reference": "1 Samuel 10:11",
+        "original": "1 Sam. 10:11"
+      },
+      {
+        "reference": "1 Samuel 10:21",
+        "original": "1 Sam. 10:21"
+      },
+      {
+        "reference": "1 Samuel 14:51",
+        "original": "1 Sam. 14:51"
+      },
+      {
+        "reference": "2 Samuel 21:14",
+        "original": "2 Sam. 21:14"
+      },
+      {
+        "reference": "Acts 13:21",
+        "original": "Acts 13:21"
+      },
+      {
+        "reference": "1 Chronicles 23:22",
+        "original": "1 Chronicles 23:22"
+      },
+      {
+        "reference": "1 Chronicles 24:28",
+        "original": "1 Chronicles 24:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KISHI": {
+    "name": "Kishi",
+    "slug": "kishi",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas bue), en meraritt, og far til forfaderen til sangeren Etan. (1 Krønikebok 6:44)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:44",
+        "original": "1 Chronicles 6:44"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KISHION": {
+    "name": "Kishion",
+    "slug": "kishion",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hardhet, en by i Jissakar tildelt de gersjonittiske levittene (Josva 19:20), den samme som Kisjon (21:28)."
+      },
+      {
+        "source": "SMI",
+        "text": "(hardhet), en av byene på grensen til Jissakars stamme, (Josva 19:20), som med sine forsteder ble tildelt de gersjonittiske levittene. (Josva 21:28) Autoriserte Versjon Kisjon."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:20",
+        "original": "Josh. 19:20"
+      },
+      {
+        "reference": "Joshua 21:28",
+        "original": "Joshua 21:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KISHON": {
+    "name": "Kishon",
+    "slug": "kishon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Slynget, en vinterbekk i Sentral-Palestina, som springer ut ved foten av Tabor og Gilboa, og som renner i nordlig retning gjennom slettene Jisreel og Akko, og munner ut i Middelhavet i det nordøstlige hjørnet av Akko-bukten, ved foten av Karmel. Den er avløpet der vannet fra Jisreelsletten og de omkringliggende fjellene finner veien til havet. Den bærer det moderne navnet Nahr el-Mokattah, dvs. «slaktens elv» (jf. 1 Kongebok 18:40). I Deboras triumfsang (Dommerne 5:21) omtales den som «den gamle elv», enten (1) fordi den hadde strømmet i evigheter, eller (2), ifølge Targum, fordi den var «bekken der tegn og under ble vist Israel i fordums tid»; eller (3) sannsynligvis refererer det til bedriftene i den regionen blant de gamle kanaaneerne, for den tilstøtende Jisreelsletten var Palestinas store slagmark. Dette var stedet for Siseras nederlag (Dommerne 4:7, 13), og for ødeleggelsen av Baals profeter av Elia (1 Kongebok 18:40). «Når Kisjon var på sitt høyeste, ville den, delvis på grunn av sine kvikksand, være like ufremkommelig som selve havet for en tilbaketrekkeende hær.» (Se DEBORA)."
+      },
+      {
+        "source": "SMI",
+        "text": "(slynget), Elven, en fossende bekk eller vinterelv i Sentral-Palestina, åstedet for to av Israels historie mest storslåtte bedrifter – Siseras nederlag, Dommerne 4, og ødeleggelsen av Baals profeter av Elia. (1 Kongebok 18:40) Nahr Mukutta, Kisjons moderne motstykke, er avløpet der vannet fra Jisreelsletten og fjellene som omslutter den sletten, finner veien gjennom Akko-sletten til Middelhavet. Den delen av Kisjon der Baals profeter ble slaktet av Elia, lå utvilsomt like nedenfor stedet på Karmel hvor offeret hadde funnet sted."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 18:40",
+        "original": "1 Kings 18:40"
+      },
+      {
+        "reference": "Judges 5:21",
+        "original": "Judg. 5:21"
+      },
+      {
+        "reference": "Judges 4:7",
+        "original": "Judg. 4:7"
+      },
+      {
+        "reference": "Judges 4:13",
+        "original": "Judg. 4:13"
+      },
+      {
+        "reference": "Judges 4",
+        "original": "Judges 4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KISON": {
+    "name": "Kison",
+    "slug": "kison",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(slynget), en unøyaktig gjengivelse av navnet Kisjon. (Salmene 83:9)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 83:9",
+        "original": "Psalms 83:9"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KISS": {
+    "name": "Kiss",
+    "slug": "kiss",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Affeksjon (1 Mosebok 27:26, 27; 29:13; Lukas 7:38, 45); forsoning (1 Mosebok 33:4; 2 Samuel 14:33); avskjed (1 Mosebok 31:28, 55; Rut 1:14; 2 Samuel 19:39); hyllest (Salmene 2:12; 1 Samuel 10:1); omtalt som mellom foreldre og barn (1 Mosebok 27:26; 31:28, 55; 48:10; 50:1; 2 Mosebok 18:7; Rut 1:9, 14); mellom mannlige slektninger (1 Mosebok 29:13; 33:4; 45:15). Den ledsaget sosial tilbedelse som et symbol på broderkjærlighet (Romerne 16:16; 1 Korinterbrev 16:20; 2 Korinterbrev 13:12; 1 Tessalonikerbrev 5:26; 1 Peter 5:14). Tilbedelsen av avguder skjedde ved å kysse bildet eller hånden mot bildet (1 Kongebok 19:18; Hosea 13:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "Leppekyss som et tegn på kjærlig hilsen var vanlig blant nære slektninger av begge kjønn, i både patriarkalsk og senere tid. (1 Mosebok 29:11; Salomos høysang 8:1) Mellom individer av samme kjønn, og i begrenset grad mellom dem av forskjellige kjønn, har et kyss på kinnet som et tegn på respekt eller en hilsen alltid vært vanlig i Østen, og kan knapt sies å være utryddet selv i Europa. I den kristne kirke ble kjærlighetens kyss praktisert ikke bare som en vennlig hilsen, men som en handling symbolsk for kjærlighet og kristent broderskap. (Romerne 16:16; 1 Korinterbrev 16:20; 2 Korinterbrev 13:12; 1 Tessalonikerbrev 5:6; 1 Peter 5:14) Det ble innlemmet i de tidlige kristne liturgier, og har blitt videreført i noen av de som nå er i bruk. Blant araberne kysser kvinner og barn skjeggene til sine ektemenn eller fedre. Den overordnede gjengjelder hilsenen med et kyss på pannen. I Egypt kysser en underordnet hånden til en overordnet, vanligvis på håndryggen, men noen ganger, som en spesiell gunst, også i håndflaten. For å vitne om fullstendig underkastelse, og når man ber om tjenester, blir føttene ofte kysset i stedet for hånden. En suverens skriftlige dekreter blir kysset som tegn på respekt; selv bakken blir noen ganger kysset av orientalere i fullheten av sin underkastelse. (1 Mosebok 41:40; 1 Samuel 24:8; Salmene 72:9) osv. Kyss omtales i Skriften som et tegn på respekt eller tilbedelse av avguder. (1 Kongebok 19:18; Hosea 13:2)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 27:26",
+        "original": "Gen. 27:26"
+      },
+      {
+        "reference": "Genesis 27:27",
+        "original": "Gen. 27:27"
+      },
+      {
+        "reference": "Luke 7:38",
+        "original": "Luke 7:38"
+      },
+      {
+        "reference": "Luke 7:45",
+        "original": "Luke 7:45"
+      },
+      {
+        "reference": "Genesis 33:4",
+        "original": "Gen. 33:4"
+      },
+      {
+        "reference": "2 Samuel 14:33",
+        "original": "2 Sam. 14:33"
+      },
+      {
+        "reference": "Genesis 31:28",
+        "original": "Gen. 31:28"
+      },
+      {
+        "reference": "Genesis 31:55",
+        "original": "Gen 31:55"
+      },
+      {
+        "reference": "Ruth 1:14",
+        "original": "Ruth 1:14"
+      },
+      {
+        "reference": "2 Samuel 19:39",
+        "original": "2 Sam. 19:39"
+      },
+      {
+        "reference": "Psalms 2:12",
+        "original": "Ps. 2:12"
+      },
+      {
+        "reference": "1 Samuel 10:1",
+        "original": "1 Sam. 10:1"
+      },
+      {
+        "reference": "Genesis 48:10",
+        "original": "Gen 48:10"
+      },
+      {
+        "reference": "Genesis 50:1",
+        "original": "Gen 50:1"
+      },
+      {
+        "reference": "Exodus 18:7",
+        "original": "Ex. 18:7"
+      },
+      {
+        "reference": "Ruth 1:9",
+        "original": "Ruth 1:9"
+      },
+      {
+        "reference": "Genesis 29:13",
+        "original": "Gen. 29:13"
+      },
+      {
+        "reference": "Genesis 45:15",
+        "original": "Gen 45:15"
+      },
+      {
+        "reference": "Romans 16:16",
+        "original": "Rom. 16:16"
+      },
+      {
+        "reference": "1 Corinthians 16:20",
+        "original": "1 Cor. 16:20"
+      },
+      {
+        "reference": "2 Corinthians 13:12",
+        "original": "2 Cor. 13:12"
+      },
+      {
+        "reference": "1 Thessalonians 5:26",
+        "original": "1 Thess. 5:26"
+      },
+      {
+        "reference": "1 Peter 5:14",
+        "original": "1 Pet. 5:14"
+      },
+      {
+        "reference": "1 Kings 19:18",
+        "original": "1 Kings 19:18"
+      },
+      {
+        "reference": "Hosea 13:2",
+        "original": "Hos. 13:2"
+      },
+      {
+        "reference": "Genesis 29:11",
+        "original": "Genesis 29:11"
+      },
+      {
+        "reference": "1 Thessalonians 5:6",
+        "original": "1 Thessalonians 5:6"
+      },
+      {
+        "reference": "Genesis 41:40",
+        "original": "Genesis 41:40"
+      },
+      {
+        "reference": "1 Samuel 24:8",
+        "original": "1 Samuel 24:8"
+      },
+      {
+        "reference": "Psalms 72:9",
+        "original": "Psalms 72:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KITE": {
+    "name": "Kite",
+    "slug": "kite",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En uren og skarpsynt rovfugl (3 Mosebok 11:14; 5 Mosebok 14:13). Det hebraiske ordet som brukes, ’ajet, er gjengitt «gribb» i Job 28:7 i Authorized Version, «falk» i Revised Version. Det er sannsynligvis rød glente (Milvus regalis), en fugl med gjennomtrengende syn og svevende vaner som finnes over hele Palestina."
+      },
+      {
+        "source": "SMI",
+        "text": "(hebr. ajja), en grisk og skarpsynt rovfugl som tilhører haukefamilien. Det hebraiske ordet slik gjengitt forekommer i tre passasjer – (3 Mosebok 11:14; 14:13; Job 28:7) I de to førstnevnte er det oversatt «glente» i Authorized Version, i den sistnevnte «gribb». Den er oppført blant de tjue fuglenavnene nevnt i (14:1) ... som ble ansett som urene under Moseloven og forbudt å brukes som mat av israelittene."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 11:14",
+        "original": "Lev. 11:14"
+      },
+      {
+        "reference": "Deuteronomy 14:13",
+        "original": "Deut. 14:13"
+      },
+      {
+        "reference": "Job 28:7",
+        "original": "Job 28:7"
+      },
+      {
+        "reference": "Leviticus 14:13",
+        "original": "Leviticus 14:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KITHLISH": {
+    "name": "Kithlish",
+    "slug": "kithlish",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En manns mur, en by på Judas slette (Josva 15:40). Den har blitt identifisert med Jelameh."
+      },
+      {
+        "source": "SMI",
+        "text": "(manns mur), en av Judas byer, i Sjefela eller lavlandet. (Josva 15:40)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:40",
+        "original": "Josh. 15:40"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KITTIM": {
+    "name": "Kittim",
+    "slug": "kittim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1. Mos 10:4). (Se CHITTIM.)"
+      },
+      {
+        "source": "SMI",
+        "text": "To ganger skrevet i den autoriserte versjonen for Chittim. (1. Mosebok 10:4; 1. Krønikebok 1:7)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:4",
+        "original": "Gen. 10:4"
+      },
+      {
+        "reference": "1 Chronicles 1:7",
+        "original": "1 Chronicles 1:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KNEAD": {
+    "name": "Knead",
+    "slug": "knead",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Å forberede deig i bakeprosessen (1. Mos 18:6; 1. Sam 28:24; Hos 7:4)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 18:6",
+        "original": "Gen. 18:6"
+      },
+      {
+        "reference": "1 Samuel 28:24",
+        "original": "1 Sam. 28:24"
+      },
+      {
+        "reference": "Hosea 7:4",
+        "original": "Hos. 7:4"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KNEADING-TROUGH": {
+    "name": "Kneading-trough",
+    "slug": "kneading-trough",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Beholderen der deigen, etter å ha blitt blandet og syrnet, ble latt til å svelle eller gjære (2. Mos 8:3; 12:34; 5. Mos 28:5, 7). Deigen i karene under utgangen var fortsatt usyret, fordi folket ble tvunget til å dra i all hast."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 8:3",
+        "original": "Ex. 8:3"
+      },
+      {
+        "reference": "Exodus 12:34",
+        "original": "Ex 12:34"
+      },
+      {
+        "reference": "Deuteronomy 28:5",
+        "original": "Deut. 28:5"
+      },
+      {
+        "reference": "Deuteronomy 28:7",
+        "original": "Deut. 28:7"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KNEADINGTROUGHS": {
+    "name": "Kneadingtroughs",
+    "slug": "kneadingtroughs",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Brød]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KNIFE": {
+    "name": "Knife",
+    "slug": "knife",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Hebraisk hereb, «ødeleggeren», et skarpt instrument for omskjærelse (Jos 5:2, 3, bokstavelig talt «kniver av flint»; jf. 2. Mos 4:25); en barberkniv (Esek 5:1); et graveringsverktøy (2. Mos 20:25); en øks (Esek 26:9). (2.) Hebraisk maakeleth, en stor kniv for slakting og oppdeling av mat (1. Mos 22:6, 10; Ordsp 30:14). (3.) Hebraisk sakkin, en kniv til ethvert formål, en bordkniv (Ordsp 23:2). (4.) Hebraisk mahalaph, en slakterkniv for å slakte offerdyr (Esra 1:9). (5.) Mindre kniver (hebraisk ta’ar, Jer 36:26) ble brukt til å spisse penner. Beskjæringsknivene nevnt i Jes 18:5 (hebraisk mizmaroth) var trolig buede kniver."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 5:2",
+        "original": "Josh. 5:2"
+      },
+      {
+        "reference": "Joshua 5:3",
+        "original": "Josh. 5:3"
+      },
+      {
+        "reference": "Exodus 4:25",
+        "original": "Ex. 4:25"
+      },
+      {
+        "reference": "Ezekiel 5:1",
+        "original": "Ezek. 5:1"
+      },
+      {
+        "reference": "Exodus 20:25",
+        "original": "Ex. 20:25"
+      },
+      {
+        "reference": "Ezekiel 26:9",
+        "original": "Ezek. 26:9"
+      },
+      {
+        "reference": "Genesis 22:6",
+        "original": "Gen. 22:6"
+      },
+      {
+        "reference": "Genesis 22:10",
+        "original": "Gen. 22:10"
+      },
+      {
+        "reference": "Proverbs 30:14",
+        "original": "Prov. 30:14"
+      },
+      {
+        "reference": "Proverbs 23:2",
+        "original": "Prov. 23:2"
+      },
+      {
+        "reference": "Ezra 1:9",
+        "original": "Ezra 1:9"
+      },
+      {
+        "reference": "Jeremiah 36:26",
+        "original": "Jer. 36:26"
+      },
+      {
+        "reference": "Isaiah 18:5",
+        "original": "Isa. 18:5"
+      },
+      {
+        "reference": "Leviticus 7:33",
+        "original": "Leviticus 7:33"
+      },
+      {
+        "reference": "Leviticus 7:34",
+        "original": "Leviticus 7:34"
+      },
+      {
+        "reference": "Leviticus 8:15",
+        "original": "Leviticus 8:15"
+      },
+      {
+        "reference": "Leviticus 8:20",
+        "original": "Leviticus 8:20"
+      },
+      {
+        "reference": "Leviticus 8:25",
+        "original": "Leviticus 8:25"
+      },
+      {
+        "reference": "Leviticus 9:13",
+        "original": "Leviticus 9:13"
+      },
+      {
+        "reference": "Numbers 18:18",
+        "original": "Numbers 18:18"
+      },
+      {
+        "reference": "1 Samuel 9:24",
+        "original": "1 Samuel 9:24"
+      },
+      {
+        "reference": "Jeremiah 36:23",
+        "original": "Jeremiah 36:23"
+      },
+      {
+        "reference": "Numbers 6:5",
+        "original": "Numbers 6:5"
+      },
+      {
+        "reference": "Numbers 6:9",
+        "original": "Numbers 6:9"
+      },
+      {
+        "reference": "Numbers 6:19",
+        "original": "Numbers 6:19"
+      },
+      {
+        "reference": "1 Kings 18:28",
+        "original": "1 Kings 18:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KNOCK": {
+    "name": "Knock",
+    "slug": "knock",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Selv om orientalerne er svært nøye med sitt privatliv, banker de aldri på når de skal inn i rommet ditt, men går inn uten advarsel eller seremoni. Det er nesten umulig å lære en arabisk tjener å banke på døren din. De gir varsel ved ytterporten enten ved å kalle eller banke. Å stå og kalle er en svært vanlig og respektfull måte. Slik befalte Moses den som holdt et pant, å stå utenfor og rope til eieren om å komme ut (5. Mos 24:10). Dette var for å unngå voldelig inntrenging fra grusomme kreditorer. Peter sto og banket på ytterdøren (Apg 12:13, 16), og de tre mennene som Kornelius sendte til Joppe, spurte og 'sto foran porten' (10:17, 18). Tanken er at vokteren av ditt privatliv skal plasseres ved inngangen.» Banking brukes som et tegn på påtrengenhet (Matt 7:7, 8; Luk 13:25), og på Kristi komme (Luk 12:36; Åp 3:20)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 24:10",
+        "original": "Deut. 24:10"
+      },
+      {
+        "reference": "Acts 12:13",
+        "original": "Acts 12:13"
+      },
+      {
+        "reference": "Acts 12:16",
+        "original": "Acts 12:16"
+      },
+      {
+        "reference": "Matthew 7:7",
+        "original": "Matt. 7:7"
+      },
+      {
+        "reference": "Matthew 7:8",
+        "original": "Matt. 7:8"
+      },
+      {
+        "reference": "Luke 13:25",
+        "original": "Luke 13:25"
+      },
+      {
+        "reference": "Luke 12:36",
+        "original": "Luke 12:36"
+      },
+      {
+        "reference": "Revelation 3:20",
+        "original": "Rev. 3:20"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KNOP": {
+    "name": "Knop",
+    "slug": "knop",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En form for arkitektonisk ornament. (1.) Hebraisk kaphtor (2. Mos 25:31-36), forekommer i beskrivelsen av lysestaken. Det var en dekorativ hevelse under koppene på lysestaken, sannsynligvis en etterligning av mandelfrukten. (2.) Hebraisk peka’im, finnes bare i 1. Kongebok 6:18 og 7:24, et ornament som ligner et lite gresskar eller et egg, på sedertrepanelene i tempelet og på støpningene på kanten av bronsehavet."
+      },
+      {
+        "source": "SMI",
+        "text": "et ord som brukes i den autoriserte versjonen for å oversette to termer som refererer til et arkitektonisk eller ornamentalt objekt, men som ikke har noe felles."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 25:31-36",
+        "original": "Ex. 25:31-36"
+      },
+      {
+        "reference": "1 Kings 6:18",
+        "original": "1 Kings 6:18"
+      },
+      {
+        "reference": "Exodus 37:17-22",
+        "original": "Exod 37:17-22"
+      },
+      {
+        "reference": "1 Kings 7:24",
+        "original": "1Kin 7:24"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KOA": {
+    "name": "Koa",
+    "slug": "koa",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hankamel, forekommer kun i Esek 23:23, en provins eller et sted i det babylonske riket, brukt i dette avsnittet sammen med Shoa (qv)."
+      },
+      {
+        "source": "SMI",
+        "text": "(hankamel) er et ord som kun forekommer i (Esekiel 23:23). Det kan kanskje ha vært en by eller et distrikt i Babylonia; eller det kan være et fellesnavn som betyr «fyrste» eller «adelsmann»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezekiel 23:23",
+        "original": "Ezek. 23:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KOHATH": {
+    "name": "Kohath",
+    "slug": "kohath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Forsamling, Levis andre sønn, og far til Amram (1. Mos 46:11). Han kom ned til Egypt med Jakob og levde til en alder av hundre og treogtredve år (2. Mos 6:18)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forsamling), den andre av Levis tre sønner, fra hvem levittenes tre hovedinndelinger fikk sin opprinnelse og sitt navn. (1. Mosebok 46:11; 2. Mosebok 6:16) Under tabernaklets reiser hadde Kohaths sønner (kohathittene) ansvaret for de mest hellige delene av karene. (4. Mosebok 4:1) ... Av Kohaths personlige historie vet vi ingenting, bortsett fra at han kom ned til Egypt med Levi og Jakob, (1. Mosebok 46:11) at hans søster var Jokebed, (2. Mosebok 6:20) og at han levde til en alder av 133 år. (2. Mosebok 6:18) (ca. 1491 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:11",
+        "original": "Gen. 46:11"
+      },
+      {
+        "reference": "Exodus 6:18",
+        "original": "Ex. 6:18"
+      },
+      {
+        "reference": "Exodus 6:16",
+        "original": "Exodus 6:16"
+      },
+      {
+        "reference": "Numbers 4:1",
+        "original": "Numbers 4:1"
+      },
+      {
+        "reference": "Exodus 6:20",
+        "original": "Exodus 6:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KOHATHITES": {
+    "name": "Kohathites",
+    "slug": "kohathites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Kohaths etterkommere. De utgjorde den første av levittenes tre avdelinger (2. Mos 6:16, 18; 4. Mos 3:17). Under israelittenes vandringer hadde de ansvaret for de aller helligste delene av tabernaklets kar, inkludert arken (4. Mos 4). Deres plass under marsj og leirslagning var sør for tabernaklet (4. Mos 3:29, 31). Deres antall til forskjellige tider er spesifisert (3:28; 4:36; 26:57, 62). Samuel var fra denne avdelingen."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 6:16",
+        "original": "Ex. 6:16"
+      },
+      {
+        "reference": "Exodus 6:18",
+        "original": "Ex. 6:18"
+      },
+      {
+        "reference": "Numbers 3:17",
+        "original": "Num. 3:17"
+      },
+      {
+        "reference": "Numbers 4",
+        "original": "Num. 4"
+      },
+      {
+        "reference": "Numbers 3:29",
+        "original": "Num. 3:29"
+      },
+      {
+        "reference": "Numbers 3:31",
+        "original": "Num. 3:31"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KOLAIAH": {
+    "name": "Kolaiah",
+    "slug": "kolaiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas stemme)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 11:7",
+        "original": "Nehemiah 11:7"
+      },
+      {
+        "reference": "Jeremiah 29:21",
+        "original": "Jeremiah 29:21"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KORAH": {
+    "name": "Korah",
+    "slug": "korah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Is, hagl. (1.) Esaus tredje sønn, med Oholibama (1. Mos 36:14; 1. Krøn 1:35). (2.) En levitt, sønn av Jishar, Amrams bror, Moses og Arons far (2. Mos 6:21). Innstiftelsen av det aronske prestedømmet og den levittiske tjenesten ved Sinai var en stor religiøs revolusjon. Det gamle prestedømmet, utført av familieoverhodene, forsvant. Dette ga opphav til murring og misnøye, mens israelittene var leiret ved Kadesj for første gang, noe som kulminerte i et opprør mot Moses og Aron, ledet av Korah, Datan og Abiram. To hundre og femti fyrster, «menn av anseelse» – det vil si velkjente menn fra de andre stammene – sluttet seg til denne sammensvergelsen. Hele selskapet krevde av Moses og Aron at den gamle tilstanden skulle gjenopprettes, og hevdet at «de tok for mye på seg» (4. Mos 16:1-3). Morgenen etter utbruddet stilte Korah og hans medhjelpere seg ved inngangen til tabernaklet, og «tok hver sin røkelseskar, la ild i dem og la røkelse på dem». Men umiddelbart brøt «ild fra Herren» ut og ødela dem alle (4. Mos 16:35). Datan og Abiram «kom ut og stilte seg i døren til teltene sine, med sine koner, sine sønner og sine små barn», og det skjedde at «jorden revnet under dem; og jorden åpnet sin munn og slukte dem». En plage begynte deretter blant folket som sympatiserte med opprøret, og ble først stanset da Aron trådte frem mellom de levende og de døde, og gjorde «soning for folket» (16:47). Etterkommerne av Korahs sønner som ikke deltok i opprøret, steg senere til fremtredende stilling i den levittiske tjenesten."
+      },
+      {
+        "source": "SMI",
+        "text": "(skallethet)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:14",
+        "original": "Gen. 36:14"
+      },
+      {
+        "reference": "1 Chronicles 1:35",
+        "original": "1 Chr. 1:35"
+      },
+      {
+        "reference": "Exodus 6:21",
+        "original": "Ex. 6:21"
+      },
+      {
+        "reference": "Numbers 16:1-3",
+        "original": "Num. 16:1-3"
+      },
+      {
+        "reference": "Numbers 16:35",
+        "original": "Num. 16:35"
+      },
+      {
+        "reference": "Genesis 36:5",
+        "original": "Genesis 36:5"
+      },
+      {
+        "reference": "Genesis 36:18",
+        "original": "Genesis 36:18"
+      },
+      {
+        "reference": "Genesis 36:5-9",
+        "original": "Genesis 36:5-9"
+      },
+      {
+        "reference": "Genesis 36:16",
+        "original": "Genesis 36:16"
+      },
+      {
+        "reference": "1 Chronicles 2:43",
+        "original": "1 Chronicles 2:43"
+      },
+      {
+        "reference": "Numbers 16",
+        "original": "Numbers 16"
+      },
+      {
+        "reference": "Numbers 26:9-11",
+        "original": "Numbers 26:9-11"
+      },
+      {
+        "reference": "Jude 1:1",
+        "original": "Jude 1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KORAHITE": {
+    "name": "Korahite",
+    "slug": "korahite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(1. Krønikebok 9:19,31) Koritt, eller Korathitt, den delen av kohathittene som nedstammet fra Korah. De var en viktig gren av sangerne, (2. Krønikebok 20:19) derav finner vi elleve salmer (eller tolv, hvis Salme 43 er inkludert under samme tittel som Salme 42) viet eller tildelt Korahs sønner, nemlig Salme 42, 44-49, 84, 85, 87, 88."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 9:19",
+        "original": "1 Chronicles 9:19"
+      },
+      {
+        "reference": "1 Chronicles 9:31",
+        "original": "1 Chronicles 9:31"
+      },
+      {
+        "reference": "2 Chronicles 20:19",
+        "original": "2 Chronicles 20:19"
+      },
+      {
+        "reference": "Psalms 43",
+        "original": "Psal 43"
+      },
+      {
+        "reference": "Psalms 42",
+        "original": "Psal 42"
+      },
+      {
+        "reference": "Psalms 42:0-0;",
+        "original": "Psal 42,44"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KORAHITES": {
+    "name": "Korahites",
+    "slug": "korahites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Den delen av kohathittene som nedstammet fra Korah. (1.) De var en viktig gren av sangerne i kohathitt-divisjonen (2. Krøn 20:19). Det er elleve salmer (42-49; 84; 85; 87; 88) tilegnet Korahs sønner. (2.) Noen av Korahs sønner var også «dørvoktere» i tempelet (1. Krøn 9:17-19); en av dem var over «ting som ble laget i panner» (31), dvs. bakingen i panner for kjøtt-offeret (3. Mos 2:5)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 20:19",
+        "original": "2 Chr. 20:19"
+      },
+      {
+        "reference": "1 Chronicles 9:17-19",
+        "original": "1 Chr. 9:17-19"
+      },
+      {
+        "reference": "Leviticus 2:5",
+        "original": "Lev. 2:5"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KORE": {
+    "name": "Kore",
+    "slug": "kore",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Rype. (1.) En levitt og tempelvokter av korahittene, sønn av Asaf. Han var far til Shallum og Mesjelemja, tempeldørvoktere (1. Krøn 9:19; 26:1). (2.) En levittisk dørvokter ved den østlige porten til tempelet (2. Krøn 31:14). (3.) I 1. Krøn 26:19 bør ordet være «Korahitter», som i den reviderte versjonen."
+      },
+      {
+        "source": "SMI",
+        "text": "(rype)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 9:19",
+        "original": "1 Chr. 9:19"
+      },
+      {
+        "reference": "1 Chronicles 26:1",
+        "original": "1 Chr. 26:1"
+      },
+      {
+        "reference": "2 Chronicles 31:14",
+        "original": "2 Chr. 31:14"
+      },
+      {
+        "reference": "1 Chronicles 26:19",
+        "original": "1 Chr. 26:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KORHITES": {
+    "name": "Korhites",
+    "slug": "korhites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En levittisk familie som stammet fra Korah (2 Mos 6:24; 1 Krøn 12:6; 26:1; 2 Krøn 20:19)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 6:24",
+        "original": "Ex. 6:24"
+      },
+      {
+        "reference": "1 Chronicles 12:6",
+        "original": "1 Chr. 12:6"
+      },
+      {
+        "reference": "1 Chronicles 26:1",
+        "original": "1 Chr. 26:1"
+      },
+      {
+        "reference": "2 Chronicles 20:19",
+        "original": "2 Chr. 20:19"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KOZ": {
+    "name": "Koz",
+    "slug": "koz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Torn. (1.) En etterkommer av Juda. I 1 Krøn 4:8 står det «Koz»; i R.V. står det «Hakkoz». (2.) En prest, overhode for den syvende presteskapsavdelingen (Esra 2:61; Neh 3:4, 21; 7:63). I 1 Krøn 24:10 har ordet den bestemte artikkelen foran seg, og det tolkes som en del av navnet «Hakkoz»."
+      },
+      {
+        "source": "SMI",
+        "text": "(torn), (Esra 2:61; Nehemja 3:4,21) = Koz = Hakkoz."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:8",
+        "original": "1 Chr. 4:8"
+      },
+      {
+        "reference": "Ezra 2:61",
+        "original": "Ezra 2:61"
+      },
+      {
+        "reference": "Nehemiah 3:4",
+        "original": "Neh. 3:4"
+      },
+      {
+        "reference": "Nehemiah 3:21",
+        "original": "Neh. 3:21"
+      },
+      {
+        "reference": "1 Chronicles 24:10",
+        "original": "1 Chr. 24:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KUSHAIAH": {
+    "name": "Kushaiah",
+    "slug": "kushaiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas bue), den samme som Kisj eller Kisji, faren til Etan meraritten (1 Krøn 15:17)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 15:17",
+        "original": "1 Chronicles 15:17"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  }
+}

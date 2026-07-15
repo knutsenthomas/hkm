@@ -1,0 +1,264 @@
+{
+  "YARN": {
+    "name": "Yarn",
+    "slug": "yarn",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Finnes bare i 1 Kongebok 10:28, 2 Krønikebok 1:16. Det hebraiske ordet mikveh, som oversettes med «en strenging sammen», betyr snarere en hær, en flokk eller en rekke hester. Den autoriserte oversettelsen (King James Version) har: «Og Salomo hadde hester bragt ut av Egypt, og lingarn: kongens kjøpmenn mottok lingarnet til en pris»; men Den reviderte oversettelsen (Revised Version) gjengir korrekt: «Og hestene som Salomo hadde, ble bragt ut av Egypt; kongens kjøpmenn mottok dem i flokker, hver flokk til en pris.»"
+      },
+      {
+        "source": "SMI",
+        "text": "Omtalen av «garn» finnes i en svært uklar passasje i (1 Kongebok 10:28; 2 Krønikebok 1:16). Den hebraiske Textus Receptus er tvilsom. Gesenius tolker det som «antall» og anvender det like mye på kjøpmennene som på hestene: «En gruppe av kongens kjøpmenn kjøpte en flokk (hester) til en gitt pris.»"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 10:28",
+        "original": "1 Kings 10:28"
+      },
+      {
+        "reference": "1 Kings 10:2",
+        "original": "1 Kings 10:2"
+      },
+      {
+        "reference": "2 Chronicles 1:16",
+        "original": "2 Chronicles 1:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YEAR": {
+    "name": "Year",
+    "slug": "year",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebraisk: shanah, som betyr «gjentakelse» eller «omdreining». (1 Mos 1:14; 5:3). Blant de gamle egypterne bestod året av tolv måneder med tretti dager hver, med fem ekstra dager for å fullføre jordens omdreining rundt solen. Jødene regnet året på to måter: (1) etter en hellig kalender, hvor året begynte rundt vårjevndøgn, med måneden Abib; og (2) etter en borgerlig kalender, hvor året begynte rundt høstjevndøgn, med måneden Nisan. Måneden Tisri er nå begynnelsen på det jødiske året."
+      },
+      {
+        "source": "SMI",
+        "text": "Den høyeste alminnelige tidsinndelingen. To typer år var kjent for, og tilsynelatende brukt av, hebreerne."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 1:14",
+        "original": "Gen. 1:14"
+      },
+      {
+        "reference": "Genesis 5:3",
+        "original": "Gen 5:3"
+      },
+      {
+        "reference": "Psalms 74:17",
+        "original": "Psalms 74:17"
+      },
+      {
+        "reference": "Zechariah 14:18",
+        "original": "Zechariah 14:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YEAR OF JUBILEE": {
+    "name": "Year Of Jubilee",
+    "slug": "year-of-jubilee",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Se Jubelåret, ÅR]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "YEAR, SABBATICAL": {
+    "name": "Year, Sabbatical",
+    "slug": "year-sabbatical",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Se Sabbatår, ÅR]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "YESHEBI": {
+    "name": "Yeshebi",
+    "slug": "yeshebi",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Det hebraiske ordet som er gjengitt «innbyggere» i Josva 17:7, men sannsynligvis snarere navnet på landsbyen Yeshepheh, antakelig Yassuf, 8 miles sør for Sikem."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 17:7",
+        "original": "Josh. 17:7"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "YOKE": {
+    "name": "Yoke",
+    "slug": "yoke",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Festet på halsen til okser for å feste dragreipene som de kunne trekke plogen med, osv. (4 Mos 19:2; 5 Mos 21:3). Det var et buet trestykke kalt ’ol. (2.) I Jeremia 27:2; 28:10, 12 er ordet som er gjengitt «åk» i den autoriserte oversettelsen (Authorized Version) motah, som egentlig betyr en «stav», eller som i den reviderte oversettelsen (Revised Version), en «bjelke». Begge disse hebraiske ordene brukes billedlig om strengt trelldom, lidelse eller underkastelse (3 Mos 26:13; 1 Kong 12:4; Jes 47:6; Klagesangene 1:14; 3:27). I Det nye testamente brukes ordet «åk» også for å betegne trelldom (Matt 11:29, 30; Apg 15:10; Gal 5:1). (3.) I 1 Samuel 11:7, 1 Kongebok 19:21, Job 1:3 er ordet som er oversatt slik tzemed, som betegner et par, to okser som er spent for eller sammenkoblet, og derfor i 1 Samuel 14:14 representerer det så mye land som et oksepar kunne pløye på en dag, lik det latinske jugum. I Jesaja 5:10 er dette ordet i flertall oversatt med «mål land»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 19:2",
+        "original": "Num. 19:2"
+      },
+      {
+        "reference": "Deuteronomy 21:3",
+        "original": "Deut. 21:3"
+      },
+      {
+        "reference": "Jeremiah 27:2",
+        "original": "Jer. 27:2"
+      },
+      {
+        "reference": "Jeremiah 28:10",
+        "original": "Jer 28:10"
+      },
+      {
+        "reference": "Jeremiah 28:12",
+        "original": "Jer 28:12"
+      },
+      {
+        "reference": "Leviticus 26:13",
+        "original": "Lev. 26:13"
+      },
+      {
+        "reference": "1 Kings 12:4",
+        "original": "1 Kings 12:4"
+      },
+      {
+        "reference": "Isaiah 47:6",
+        "original": "Isa. 47:6"
+      },
+      {
+        "reference": "Lamentations 1:14",
+        "original": "Lam. 1:14"
+      },
+      {
+        "reference": "Lamentations 3:27",
+        "original": "Lam 3:27"
+      },
+      {
+        "reference": "Matthew 11:29",
+        "original": "Matt. 11:29"
+      },
+      {
+        "reference": "Matthew 11:30",
+        "original": "Matt. 11:30"
+      },
+      {
+        "reference": "Acts 15:10",
+        "original": "Acts 15:10"
+      },
+      {
+        "reference": "Galatians 5:1",
+        "original": "Gal. 5:1"
+      },
+      {
+        "reference": "1 Samuel 11:7",
+        "original": "1 Sam. 11:7"
+      },
+      {
+        "reference": "1 Samuel 11:1",
+        "original": "1 Sam. 11:1"
+      },
+      {
+        "reference": "Job 1:3",
+        "original": "Job 1:3"
+      },
+      {
+        "reference": "1 Samuel 14:14",
+        "original": "1 Sam. 14:14"
+      },
+      {
+        "reference": "Isaiah 5:10",
+        "original": "Isa. 5:10"
+      },
+      {
+        "reference": "1 Kings 12:9-11",
+        "original": "1 Kings 12:9-11"
+      },
+      {
+        "reference": "Isaiah 9:4",
+        "original": "Isaiah 9:4"
+      },
+      {
+        "reference": "Jeremiah 5:5",
+        "original": "Jeremiah 5:5"
+      },
+      {
+        "reference": "Jeremiah 28:13",
+        "original": "Jeremiah 28:13"
+      },
+      {
+        "reference": "1 Kings 19:19",
+        "original": "1 Kings 19:19"
+      },
+      {
+        "reference": "1 Kings 19:21",
+        "original": "1 Kings 19:21"
+      },
+      {
+        "reference": "Judges 19:10",
+        "original": "Judges 19:10"
+      },
+      {
+        "reference": "2 Kings 5:17",
+        "original": "2 Kings 5:17"
+      },
+      {
+        "reference": "Isaiah 21:7",
+        "original": "Isaiah 21:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YOKE-FELLOW": {
+    "name": "Yoke-fellow",
+    "slug": "yoke-fellow",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Fil 4:3), en av apostelens medarbeidere. Noen har antatt at Epafroditus er ment. Wycliffe gjengir uttrykket «the german felowe», dvs. «du, ekte [=ektefødt] kamerat.»"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Philippians 4:3",
+        "original": "Phil. 4:3"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  }
+}

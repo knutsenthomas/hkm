@@ -1,0 +1,1558 @@
+{
+  "UCAL": {
+    "name": "Ucal",
+    "slug": "ucal",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Navnet på en person som Agurs ord er rettet til (Ordsp 30:1)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Jeg er sterk). Ifølge den mottatte teksten i (Salomos ordspråk 30:1) må Ithiel og Ucal betraktes som egennavn; og i så fall må de være navnene på disipler eller sønner av Agur, sønn av Jake, en ukjent vismann blant hebreerne. Men det er stor uklarhet knyttet til dette skriftstedet. Ewald betrakter både Ithiel og Ucal som symbolske navn, brukt av poeten for å betegne to klasser av tenkere som han henvender seg til."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Proverbs 30:1",
+        "original": "Prov. 30:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UEL": {
+    "name": "Uel",
+    "slug": "uel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Guds vilje), en av Banis slekt, som under fangenskapet hadde giftet seg med en fremmed kvinne. (Esra 10:34) (ca. 458 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:34",
+        "original": "Ezra 10:34"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UKNAZ": {
+    "name": "Uknaz",
+    "slug": "uknaz",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "I margen til (1 Krønikebok 4:16) er ordene «også Kenas» i teksten gjengitt som «Uknaz», som et egennavn."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:16",
+        "original": "1 Chronicles 4:16"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ULAI": {
+    "name": "Ulai",
+    "slug": "ulai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Grekerne kalte den Eulaeus; en elv i Susiana. Den var sannsynligvis den østlige grenen av Choaspes (Kerkhan), som delte seg i to grener omtrent 32 km ovenfor byen Susa. Derfor snakker Daniel (8:2, 16) om å stå «mellom Ulais bredder», dvs. mellom de to strømmene av den delte elven."
+      },
+      {
+        "source": "SMI",
+        "text": "(rent vann) er nevnt av Daniel, (Daniel 8:2, 16) som en elv nær Susa, der han så sitt syn om væren og geitebukken. Den har vanligvis blitt identifisert med Eulaeus hos greske og romerske geografer, en stor elv i umiddelbar nærhet av den byen. Eulaeus har av mange blitt identifisert med Choaspes, som uten tvil er den moderne Kerkhah, en bielv til Tigris, som flyter inn i den litt nedenfor Kurnah. Nyere undersøkelser viser at Choaspes en gang delte seg i to strømmer omtrent 32 km ovenfor Susa. Den østlige var Ulai. Denne forgreningen forklarer (Daniel 8:16)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Daniel 8:2",
+        "original": "Daniel 8:2"
+      },
+      {
+        "reference": "Daniel 8:16",
+        "original": "Daniel 8:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ULAM": {
+    "name": "Ulam",
+    "slug": "ulam",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(forhall, portiko)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:17",
+        "original": "1 Chronicles 7:17"
+      },
+      {
+        "reference": "1 Chronicles 8:39",
+        "original": "1 Chronicles 8:39"
+      },
+      {
+        "reference": "1 Chronicles 8:40",
+        "original": "1 Chronicles 8:40"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ULLA": {
+    "name": "Ulla",
+    "slug": "ulla",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(åk), en asjeritt, overhode for en familie i sin stamme. (1 Krønikebok 7:30) (ca. 1014 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:30",
+        "original": "1 Chronicles 7:30"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UMMAH": {
+    "name": "Ummah",
+    "slug": "ummah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nærhet, en by i Asjers område (Jos 19:30)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forbund), en av byene i Asjers tildelte land. (Josva 10:30) kun. Sannsynligvis ’Alma, i kystens høyland, omtrent åtte kilometer øst-nordøst for Ras en-Nakhura."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:30",
+        "original": "Josh. 19:30"
+      },
+      {
+        "reference": "Joshua 10:30",
+        "original": "Joshua 10:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UNCLEAN MEATS": {
+    "name": "Unclean Meats",
+    "slug": "unclean-meats",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Dette omfattet dyr som var kvalt, eller døde av seg selv eller av rovdyr eller rovfugler; ethvert dyr som ikke både hadde kløvde klover og tygget drøv; og visse andre mindre dyr klassifisert som «kravlende dyr»; visse fuglearter nevnt i 3. Mosebok 11 og 5. Mosebok 14, tjue eller tjueen i alt; alt i vannet som ikke hadde både finner og skjell; ethvert bevinget insekt som i tillegg til fire ben ikke hadde to bakben til å hoppe med. Dessuten ting som var ofret til avguder; og alt blod eller det som inneholdt blod (unntatt kanskje fiskeblod, da det ser ut til at bare blod fra dyr og fugler var forbudt) (3. Mosebok 7:26); og derfor kjøtt skåret fra levende dyr; samt alt fett, i hvert fall det som var samlet i klumper blant innvollene, og sannsynligvis overalt der det var merkbart og kunne skilles ut fra kjøttet. (3. Mosebok 3:14-17; 7:23). Spising av blod var forbudt selv for «den fremmede som bor iblant dere» (3. Mosebok 17:10; 12:14). Når det gjelder blod, stammer forbudet faktisk fra erklæringen til Noah mot «kjøtt med livet i, det er blodet» i (1. Mosebok 9:4), som kanskje av Moses ble ansett som fortsatt bindende for alle Noahs etterkommere. Det er verdt å merke seg at den praktiske effekten av den fastsatte regelen er å utelukke alle rovdyr blant firbeinte dyr, og, så langt vi kan tolke nomenklaturen, rovfugler blant fugler. De ble sannsynligvis utelukket fordi de ikke var uvillige til å spise menneskekadaver, og i de fleste østlige land fungerte de som rengjørere på slagmarker og ved galger. Blant fiskene inneholder de som var tillatt, utvilsomt de sunneste variantene, bortsett fra at de utelukker østers. Praktisk sett ga loven et rikelig utvalg av tillatte kjøttsorter. Siden orientalere har sinn som er følsomme for undervisning gjennom typer, kan det være liten tvil om at slike seremonielle skillelinjer ikke bare bidro til å holde jøder og hedninger adskilt (og dermed hindret jødene i å bli forurenset med avgudsdyrkelsen hos hedningene), men også var en stadig påminnelse for førstnevnte om at han og sistnevnte ikke var på samme nivå for Gud. Derfor, da den seremonien ble endret, ser vi at dette var selve symbolet som ble valgt for å instruere apostelen Peter i sannheten om at Gud ikke gjør «forskjell på folk». Det gjenstår å nevne sakens hygieniske aspekt. Svin sies å være spesielt utsatt for sykdommer i egne kropper. Dette betyr sannsynligvis at de lettere enn andre skapninger blir ledet til den urene føden som produserer det. Når det gjelder de tillatte dyrene for mat, sammenlignet med de forbudte, er det ingen tvil om hvilken side balansen av sunnhet ligger på."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 14",
+        "original": "Deuteronomy 14"
+      },
+      {
+        "reference": "Leviticus 7:26",
+        "original": "Leviticus 7:26"
+      },
+      {
+        "reference": "Leviticus 3:14-17",
+        "original": "Leviticus 3:14-17"
+      },
+      {
+        "reference": "Leviticus 7:23",
+        "original": "Leviticus 7:23"
+      },
+      {
+        "reference": "Leviticus 17:10",
+        "original": "Leviticus 17:10"
+      },
+      {
+        "reference": "Leviticus 12:14",
+        "original": "Leviticus 12:14"
+      },
+      {
+        "reference": "Genesis 9:4",
+        "original": "Genesis 9:4"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UNCLEANNESS": {
+    "name": "Uncleanness",
+    "slug": "uncleanness",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Den særskilte ideen knyttet til seremoniell urenhet blant hebreerne var at den for en tid utestengte en person fra sosiale privilegier, og satte hans statsborgerskap blant Guds folk midlertidig i bero. Det er en intens virkelighet i det faktum at den guddommelige loven tar tak i et menneske gjennom kjødets vanlige skrøpeligheter, og setter sitt preg, så å si, i den laveste leiren han er formet av. Helligheten knyttet til menneskekroppen er parallell med den som omga selve paktens ark. Det er som om Jehova dermed ville lære mennesker at «selv hårene på deres hode var alle talt» for ham, og at «i hans bok var alle deres lemmer skrevet». Slik ble det innskjerpet en såkalt kroppslig hellighet. Israelittene skulle heller ikke bare være «atskilt fra andre folk», men de skulle være «hellige for Gud» (3. Mosebok 20:24, 26), «et kongerike av prester og et hellig folk». Viktigheten for fysisk velvære av påbudene som krevde hyppig vasking, uansett spesielle påskudd, kan bare svakt verdsettes i vårt kjøligere og fuktigere klima. Urenhet, med henvisning til mennesker, kan deles inn i tre grader:"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 20:24",
+        "original": "Leviticus 20:24"
+      },
+      {
+        "reference": "Leviticus 20:26",
+        "original": "Leviticus 20:26"
+      },
+      {
+        "reference": "Numbers 19:11-18",
+        "original": "Numbers 19:11-18"
+      },
+      {
+        "reference": "Leviticus 12:2-5",
+        "original": "Leviticus 12:2-5"
+      },
+      {
+        "reference": "Genesis 3:16",
+        "original": "Genesis 3:16"
+      },
+      {
+        "reference": "1 Timothy 2:14",
+        "original": "1 Timothy 2:14"
+      },
+      {
+        "reference": "Leviticus 22:2-8",
+        "original": "Leviticus 22:2-8"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UNCTION": {
+    "name": "Unction",
+    "slug": "unction",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1 Johannes 2:20, 27; revidert versjon, «salvelse»). Konger, profeter og prester ble salvet, som tegn på å motta guddommelig nåde. Alle troende er, i en sekundær forstand, det Kristus var i en primær forstand, «Herrens salvede»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 John 2:20",
+        "original": "1 John 2:20"
+      },
+      {
+        "reference": "1 John 2:27",
+        "original": "1 John 2:27"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UNDERGIRDING": {
+    "name": "Undergirding",
+    "slug": "undergirding",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Apostlenes gjerninger 27:17) [Båtforsterkning]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Acts 27:17",
+        "original": "Acts 27:17"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UNICORN": {
+    "name": "Unicorn",
+    "slug": "unicorn",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Beskrevet som et dyr av stor villskap og styrke (4. Mos 23:22, revidert versjon, «villokse», marg., «okse-antilope»; 24:8; Jes 34:7, revidert versjon, «ville okser»), og utemmeleg (Job 39:9). Det var i virkeligheten et tohornet dyr; men den nøyaktige referansen til ordet som er gjengitt slik (re’em) er tvilsom. Noen har antatt at det er bøffelen; andre, den hvite antilopen, kalt rim av araberne. Mest sannsynlig betegner ordet imidlertid Bos primigenius («ur-oksen»), som nå er utdødd over hele verden. Dette var tyskernes uroks, og uroksen beskrevet av Cæsar (Gallerkrigen, vi. 28) som boende i Hercynerskogen. Ordet som er gjengitt slik, er funnet i en assyrisk inskripsjon skrevet over villoksen eller bisonen, som noen også antar er det dyret som er ment (jf. 5. Mos 33:17; Sal 22:21; 29:6; 92:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "gjengivelsen i King James-versjonen av det hebraiske ordet re’em, et ord som forekommer syv ganger i Det gamle testamente som navnet på et stort vilt dyr. Re’em i den hebraiske Bibelen har imidlertid ingenting å gjøre med det enhornede dyret fra greske og romerske forfattere, slik det fremgår av (5. Mosebok 33:17) der det i Josefs velsignelse sies: «Hans herlighet er som hans oksekalvs førstefødte, og hans horn er som et enhjørnings horns;» ikke, som teksten i King James-versjonen gjengir det, «enhjørningers horn». Værens to horn er «Efraims titusener og Manasses tusener». Denne teksten utelukker fullstendig et enhornet dyr. Gitt at re’em omtales som et tohornet dyr av stor styrke og villskap, at det tydeligvis var godt kjent og ofte sett av jødene, at det er nevnt som et dyr egnet for offerformål, og at det ofte er assosiert med okser og storfe, mener vi at det ikke kan være tvil om at en eller annen art av villokse er ment. Allusjonen i (Salme 92:10) «Men du skal løfte opp mitt horn, som en re’em,» synes å peke på måten Bovidae (oksefamilien) bruker hornene sine, ved å senke hodet og deretter kaste det opp. Men det er umulig å fastslå hvilken spesiell art av villokse som menes; sannsynligvis er en gigantisk uroks ment. (Det er sannsynlig at det var den gigantiske Bos primigenius, eller uroksen, nå utdødd, men som Cæsar sier om: «Disse urokser er knapt mindre enn elefanter i størrelse, men i sin natur, farge og form er de okser. Stor er deres styrke og stor deres hastighet; de skåner verken menneske eller dyr når de først har fått øye på dem» —Bell. Gall. vi. 20.—RED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 23:22",
+        "original": "Num. 23:22"
+      },
+      {
+        "reference": "Isaiah 34:7",
+        "original": "Isa. 34:7"
+      },
+      {
+        "reference": "Job 39:9",
+        "original": "Job 39:9"
+      },
+      {
+        "reference": "Deuteronomy 33:17",
+        "original": "Deut. 33:17"
+      },
+      {
+        "reference": "Psalms 22:21",
+        "original": "Ps. 22:21"
+      },
+      {
+        "reference": "Psalms 29:6",
+        "original": "Ps 29:6"
+      },
+      {
+        "reference": "Psalms 92:10",
+        "original": "Ps 92:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UNNI": {
+    "name": "Unni",
+    "slug": "unni",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lidende. (1.) En levitt som David utnevnte til å delta i å bringe arken opp til Jerusalem fra Obed-Edoms hus ved å spille på strengeinstrumenter ved den anledningen (1 Krøn 15:18, 20). (2.) En levitt som vendte tilbake med Serubabel fra fangenskapet (Neh 12:9)."
+      },
+      {
+        "source": "SMI",
+        "text": "(nedtrykt)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 15:18",
+        "original": "1 Chr. 15:18"
+      },
+      {
+        "reference": "1 Chronicles 15:20",
+        "original": "1 Chr. 15:20"
+      },
+      {
+        "reference": "Nehemiah 12:9",
+        "original": "Neh. 12:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UPHARSIN": {
+    "name": "Upharsin",
+    "slug": "upharsin",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Og de deler, ett av ordene skrevet av den mystiske hånden på veggen i Belsasars palass (Dan 5:25). Det er et rent kaldeisk ord. «Peres» er bare en enklere form av det samme ordet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Daniel 5:25",
+        "original": "Dan. 5:25"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UPHAZ": {
+    "name": "Uphaz",
+    "slug": "uphaz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sannsynligvis et annet navn for Ofir (Jer 10:9). Noen anser det imidlertid som navnet på en indisk koloni i Yemen, sørlige Arabia; andre som et sted ved eller nær elven Hyphasis (nå Ghaggar), den sørøstlige grensen av Punjab."
+      },
+      {
+        "source": "SMI",
+        "text": "(Jeremia 10:9; Daniel 10:5) [Ofir]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 10:9",
+        "original": "Jer. 10:9"
+      },
+      {
+        "reference": "Daniel 10:5",
+        "original": "Daniel 10:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "URBANE, OR URBANE": {
+    "name": "Urbane, Or Urbane",
+    "slug": "urbane-or-urbane",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(av byen; høflig), den greske formen av det latinske Urbanus, slik det er gjengitt i den reviderte oversettelsen (Revised Version). Han var en kristen disippel som er med i den lange listen over dem apostelen Paulus hilser i sitt brev til Roma. (Rom 16:9) (55 e.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Romans 16:9",
+        "original": "Romans 16:9"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "URBANUS": {
+    "name": "Urbanus",
+    "slug": "urbanus",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "formen som er gitt i den reviderte oversettelsen (Revised Version) for Urbane."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "URI": {
+    "name": "Uri",
+    "slug": "uri",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(ildfull)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 31:2",
+        "original": "Exodus 31:2"
+      },
+      {
+        "reference": "Exodus 35:30",
+        "original": "Exodus 35:30"
+      },
+      {
+        "reference": "Exodus 38:22",
+        "original": "Exodus 38:22"
+      },
+      {
+        "reference": "1 Chronicles 2:20",
+        "original": "1 Chronicles 2:20"
+      },
+      {
+        "reference": "2 Chronicles 1:5",
+        "original": "2 Chronicles 1:5"
+      },
+      {
+        "reference": "1 Kings 4:19",
+        "original": "1 Kings 4:19"
+      },
+      {
+        "reference": "Ezra 10:24",
+        "original": "Ezra 10:24"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "URIAH": {
+    "name": "Uriah",
+    "slug": "uriah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Herren er mitt lys. (1.) En hetitt, ektemannen til Batseba, som David først forførte, og deretter, etter Urias’ død, giftet seg med. Han var en av Davids «helter». Den triste historien om de grusomme urettene David påførte ham og hans sørgelige død er enkelt fortalt i den hellige beretningen (2 Sam 11:2-12:26). (Se BATSEBA; DAVID.) (2.) En prest fra Akas’ hus (Jes 8:2). (3.) Faren til Meremot, nevnt i Esra 8:33."
+      },
+      {
+        "source": "SMI",
+        "text": "(Herrens lys)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 11:2-12:26",
+        "original": "2 Sam. 11:2-12:26"
+      },
+      {
+        "reference": "Isaiah 8:2",
+        "original": "Isa. 8:2"
+      },
+      {
+        "reference": "Ezra 8:33",
+        "original": "Ezra 8:33"
+      },
+      {
+        "reference": "1 Chronicles 11:41",
+        "original": "1 Chronicles 11:41"
+      },
+      {
+        "reference": "2 Samuel 23:39",
+        "original": "2 Samuel 23:39"
+      },
+      {
+        "reference": "2 Samuel 11:11",
+        "original": "2 Samuel 11:11"
+      },
+      {
+        "reference": "2 Samuel 23:34",
+        "original": "2 Samuel 23:34"
+      },
+      {
+        "reference": "2 Samuel 12:3",
+        "original": "2 Samuel 12:3"
+      },
+      {
+        "reference": "2 Samuel 12:11",
+        "original": "2 Samuel 12:11"
+      },
+      {
+        "reference": "2 Kings 16:10-16",
+        "original": "2 Kings 16:10-16"
+      },
+      {
+        "reference": "2 Kings 16:10",
+        "original": "2 Kings 16:10"
+      },
+      {
+        "reference": "Nehemiah 3:4",
+        "original": "Nehemiah 3:4"
+      },
+      {
+        "reference": "Nehemiah 3:21",
+        "original": "Nehemiah 3:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "URIAS": {
+    "name": "Urias",
+    "slug": "urias",
+    "definitions": [],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 1:6",
+        "original": "Matthew 1:6"
+      },
+      {
+        "reference": "1Esd 9:43",
+        "original": "1 Esdr. 9:43"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "URIEL": {
+    "name": "Uriel",
+    "slug": "uriel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gud er mitt lys. (1.) En levitt fra Kahats familie (1 Krøn 6:24). (2.) Overhode for kahatittene da arken ble brakt opp til Jerusalem (1 Krøn 15:5, 11). (3.) Faren til Mikaia, en av Rehabeams hustruer, og mor til Abia (2 Krøn 13:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Guds ild), en engel som kun er nevnt i 2 Esra 4:1,36; 5:20; 10:28."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:24",
+        "original": "1 Chr. 6:24"
+      },
+      {
+        "reference": "1 Chronicles 15:5",
+        "original": "1 Chr. 15:5"
+      },
+      {
+        "reference": "1 Chronicles 15:11",
+        "original": "1 Chr. 15:11"
+      },
+      {
+        "reference": "2 Chronicles 13:2",
+        "original": "2 Chr. 13:2"
+      },
+      {
+        "reference": "2 Chronicles 11:20",
+        "original": "2 Chronicles 11:20"
+      },
+      {
+        "reference": "2Esd 4:1",
+        "original": "2 Esdr. 4:1"
+      },
+      {
+        "reference": "2Esd 4:36",
+        "original": "2 Esdr. 4:36"
+      },
+      {
+        "reference": "2Esd 5:20",
+        "original": "2 Esdr. 5:20"
+      },
+      {
+        "reference": "2Esd 10:28",
+        "original": "2 Esdr. 10:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "URIJAH": {
+    "name": "Urijah",
+    "slug": "urijah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Herren er mitt lys. (1.) En yppersteprest i Akas’ tid (2 Kong 16:10-16), på hvis befaling han konstruerte et avgudsisk alter, likt et kongen hadde sett i Damaskus, til å settes opp i stedet for bronsealteret. (2.) En av prestene som sto ved Esras talerstols høyre side da han leste og utla loven (Neh 8:4). (3.) En profet fra Kirjat-Jearim i kong Jojakims regjeringstid over Juda (Jer 26:20-23). Han flyktet til Egypt fra kongens grusomhet, men etter å ha blitt bragt tilbake, ble han halshugget og hans kropp «kastet i fellesgravene.»"
+      },
+      {
+        "source": "SMI",
+        "text": "(Herrens lys)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 16:10-16",
+        "original": "2 Kings 16:10-16"
+      },
+      {
+        "reference": "Nehemiah 8:4",
+        "original": "Neh. 8:4"
+      },
+      {
+        "reference": "Jeremiah 26:20-23",
+        "original": "Jer. 26:20-23"
+      },
+      {
+        "reference": "2 Kings 16:10",
+        "original": "2 Kings 16:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "URIM": {
+    "name": "Urim",
+    "slug": "urim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lys (Vulg. «doctrina»; LXX. «revelation»). Se TUMMIM."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "URIM AND THUMMIM": {
+    "name": "Urim And Thummim",
+    "slug": "urim-and-thummim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(lys og fullkommenhet). Da de jødiske eksilantene på deres tilbakekomst fra Babylon ble møtt av et spørsmål de ikke hadde data til å besvare, ble de enige om å utsette avgjørelsen av vanskeligheten til det skulle stå fram «en prest med Urim og Tummim.» (Esra 2:63; Neh 7:65) Spørsmålet om hva disse Urim og Tummim selv var, ser ut til å måtte vente like lenge på et endelig og tilfredsstillende svar. På alle sider møter vi tilståelser av uvitenhet. Urim betyr «lys», og Tummim «fullkommenhet». Skriftlige utsagn. — De mystiske ordene møter oss for første gang, som om de ikke trengte forklaring, i beskrivelsen av yppersteprestens drakt. Over efoden skal det være en «domsbrystplate» av gull, skarlagen, purpur og fint lin, brettet kvadratisk og dobbelt, en «favn» i lengde og bredde. I den skal det settes fire rader med edelstener, hver stein med navnet på en Israels stamme inngravert, slik at Aron «kan bære dem på sitt hjerte.» Deretter kommer en ytterligere befaling. Inne i brystplaten, slik som paktens tavler ble plassert inne i arken (2 Mos 25:16; 28:30), skal «Urim og Tummim» plasseres, lyset og fullkommenheten; og de skal også være på Arons hjerte når han går inn for Herren. (2 Mos 28:15-30) Ikke et ord beskriver dem. De nevnes som ting som allerede er kjent for både Moses og folket, naturlig forbundet med yppersteprestens funksjoner som mellommann mellom Jehova og hans folk. Befalingen blir oppfylt. (3 Mos 8:8) De går fra Aron til Eleasar sammen med den hellige efoden og andre pontifikale gjenstander. (4 Mos 20:28) Når Josva høytidelig utnevnes til å etterfølge den store helten og lovgiveren, blir han bedt om å stå foran presten Eleasar, «som skal spørre råd for ham etter Urims dom», og dette rådet skal bestemme bevegelsene til Israels hær. (4 Mos 27:21) I Moses’ velsignelser fremstår de som Levis stammes kronende herlighet: «dine Tummim og dine Urim er hos din Hellige.» (5 Mos 33:8,9) På hvilken måte Urim og Tummim ble konsultert er helt usikkert. Josefus og rabbinerne antok at steinene ga det orakulære svaret gjennom overnaturlig belysning; men det synes å være langt enklere og mer i samsvar med de forskjellige beretningene om forespørsler gjort med Urim og Tummim (1 Sam 14:3,18,19; 23:2,4,9,11,12; 28:6; Dom 20:28; 2 Sam 5:23), osv., å anta at svaret ble gitt enkelt og greit ved Herrens ord til ypperstepresten, jf. (Joh 11:51), når han, kledd med efoden og brystplaten, hadde spurt Herren. Et slikt syn stemmer overens med den sanne forestillingen om brystplaten."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:63",
+        "original": "Ezra 2:63"
+      },
+      {
+        "reference": "Nehemiah 7:65",
+        "original": "Nehemiah 7:65"
+      },
+      {
+        "reference": "Exodus 25:16",
+        "original": "Exodus 25:16"
+      },
+      {
+        "reference": "Exodus 28:30",
+        "original": "Exodus 28:30"
+      },
+      {
+        "reference": "Exodus 28:15-30",
+        "original": "Exodus 28:15-30"
+      },
+      {
+        "reference": "Leviticus 8:8",
+        "original": "Leviticus 8:8"
+      },
+      {
+        "reference": "Numbers 20:28",
+        "original": "Numbers 20:28"
+      },
+      {
+        "reference": "Numbers 27:21",
+        "original": "Numbers 27:21"
+      },
+      {
+        "reference": "1 Samuel 14:3",
+        "original": "1 Samuel 14:3"
+      },
+      {
+        "reference": "1 Samuel 14:18",
+        "original": "1 Samuel 14:18"
+      },
+      {
+        "reference": "1 Samuel 14:19",
+        "original": "1 Samuel 14:19"
+      },
+      {
+        "reference": "1 Samuel 23:2",
+        "original": "1 Samuel 23:2"
+      },
+      {
+        "reference": "1 Samuel 23:4",
+        "original": "1 Samuel 23:4"
+      },
+      {
+        "reference": "1 Samuel 23:9",
+        "original": "1 Samuel 23:9"
+      },
+      {
+        "reference": "1 Samuel 23:11",
+        "original": "1 Samuel 23:11"
+      },
+      {
+        "reference": "1 Samuel 23:12",
+        "original": "1 Samuel 23:12"
+      },
+      {
+        "reference": "1 Samuel 28:6",
+        "original": "1 Samuel 28:6"
+      },
+      {
+        "reference": "Judges 20:28",
+        "original": "Judges 20:28"
+      },
+      {
+        "reference": "2 Samuel 5:23",
+        "original": "2 Samuel 5:23"
+      },
+      {
+        "reference": "John 11:51",
+        "original": "John 11:51"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "USURY": {
+    "name": "Usury",
+    "slug": "usury",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Summen som betales for bruken av penger, altså rente; ikke, som i moderne forstand, ublu rente. Jødene var forbudt å kreve ågerrente (3 Mos 25:36, 37), dog bare i sine transaksjoner med hverandre (5 Mos 23:19, 20). Brudd på denne loven ble ansett som en stor forbrytelse (Sal 15:5; Ordsp 28:8; Jer 15:10). Etter hjemkomsten, og senere, ble denne loven mye neglisjert (Neh 5:7, 10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Ordet ågerrente har i moderne engelsk kommet til å bety overdreven rente på utlånte penger, enten formelt ulovlig eller i det minste undertrykkende. I Skriftene hadde imidlertid ordet ikke denne betydningen, men betydde ganske enkelt rente av enhver type på penger. Jødene var forbudt ved Moseloven å ta renter fra sine brødre, men fikk lov til å ta det fra utlendinger. Forbudet vokste ut av folkets agrariske status, hvor vanlige forretningslån ikke var nødvendige, og lån som var påkrevd skulle kun gis til venner og brødre i nød. – RED.) Praksisen med å pantsette land, noen ganger til ublu renter, vokste frem blant jødene under fangenskapet, i direkte brudd på loven. (3 Mos 25:36,37; Esek 18:8,13,17) Vi finner at renten nådde 1 av 100 per måned, tilsvarende de romerske centesimae usurae, eller 12 prosent per år."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 25:36",
+        "original": "Lev. 25:36"
+      },
+      {
+        "reference": "Leviticus 25:37",
+        "original": "Lev. 25:37"
+      },
+      {
+        "reference": "Deuteronomy 23:19",
+        "original": "Deut. 23:19"
+      },
+      {
+        "reference": "Deuteronomy 23:20",
+        "original": "Deut. 23:20"
+      },
+      {
+        "reference": "Psalms 15:5",
+        "original": "Ps. 15:5"
+      },
+      {
+        "reference": "Proverbs 28:8",
+        "original": "Prov. 28:8"
+      },
+      {
+        "reference": "Jeremiah 15:10",
+        "original": "Jer. 15:10"
+      },
+      {
+        "reference": "Nehemiah 5:7",
+        "original": "Neh. 5:7"
+      },
+      {
+        "reference": "Nehemiah 5:10",
+        "original": "Neh. 5:10"
+      },
+      {
+        "reference": "Ezekiel 18:8",
+        "original": "Ezekiel 18:8"
+      },
+      {
+        "reference": "Ezekiel 18:13",
+        "original": "Ezekiel 18:13"
+      },
+      {
+        "reference": "Ezekiel 18:17",
+        "original": "Ezekiel 18:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UT": {
+    "name": "Ut",
+    "slug": "ut",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(skogkledd)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:23",
+        "original": "Genesis 10:23"
+      },
+      {
+        "reference": "1 Chronicles 1:17",
+        "original": "1 Chronicles 1:17"
+      },
+      {
+        "reference": "Genesis 22:21",
+        "original": "Genesis 22:21"
+      },
+      {
+        "reference": "Genesis 36:28",
+        "original": "Genesis 36:28"
+      },
+      {
+        "reference": "Job 1:1",
+        "original": "Job 1:1"
+      },
+      {
+        "reference": "Job 1:3",
+        "original": "Job 1:3"
+      },
+      {
+        "reference": "Job 1:15",
+        "original": "Job 1:15"
+      },
+      {
+        "reference": "Job 1:17",
+        "original": "Job 1:17"
+      },
+      {
+        "reference": "Lamentations 4:21",
+        "original": "Lamentations 4:21"
+      },
+      {
+        "reference": "Job 30:6",
+        "original": "Job 30:6"
+      },
+      {
+        "reference": "Job 30:7",
+        "original": "Job 30:7"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UTA": {
+    "name": "Uta",
+    "slug": "uta",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "1 Esra 5:30. Det ser ut til å være en forvanskning av Akkub. (Esra 2:45)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1Esd 5:30",
+        "original": "1 Esdr. 5:30"
+      },
+      {
+        "reference": "Ezra 2:45",
+        "original": "Ezra 2:45"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UTHAI": {
+    "name": "Uthai",
+    "slug": "uthai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(hjelpsom),"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 9:4",
+        "original": "1 Chronicles 9:4"
+      },
+      {
+        "reference": "Ezra 8:14",
+        "original": "Ezra 8:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UTHII": {
+    "name": "Uthii",
+    "slug": "uthii",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "1 Esra 8:40. [Uthai,2]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1Esd 8:40",
+        "original": "1 Esdr. 8:40"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZ": {
+    "name": "Uz",
+    "slug": "uz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fruktbart land. (1.) Arams sønn, og Sems sønnesønn (1 Mos 10:23; 1 Krøn 1:17). (2.) En av de horittiske «høvdingene» i Edoms land (1 Mos 36:28). (3.) Nahors eldste sønn, Abrahams bror (1 Mos 22:21, revidert versjon)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:23",
+        "original": "Gen. 10:23"
+      },
+      {
+        "reference": "1 Chronicles 1:17",
+        "original": "1 Chr. 1:17"
+      },
+      {
+        "reference": "Genesis 36:28",
+        "original": "Gen. 36:28"
+      },
+      {
+        "reference": "Genesis 22:21",
+        "original": "Gen. 22:21"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UZ, THE LAND OF": {
+    "name": "Uz, The land of",
+    "slug": "uz-the-land-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Der Job bodde (Job 1:1; Jer 25:20; Klages 4:21), sannsynligvis et sted øst eller sørøst for Palestina og nord for Edom. Det er nevnt i Skriften kun i disse tre passasjene."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 25:20",
+        "original": "Jer. 25:20"
+      },
+      {
+        "reference": "Lamentations 4:21",
+        "original": "Lam. 4:21"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UZAI": {
+    "name": "Uzai",
+    "slug": "uzai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(sterk), far til Palal som assisterte Nehemja med å gjenoppbygge bymuren. (Nehemja 3:25) (F.Kr. før 446)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 3:25",
+        "original": "Nehemiah 3:25"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZAL": {
+    "name": "Uzal",
+    "slug": "uzal",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En vandrer, en etterkommer av Joktan (1 Mos 10:27; 1 Krøn 1:21), tilsynelatende grunnleggeren av en av de arabiske stammene; navnet er sannsynligvis også brukt om provinsen de bebodde og deres hovedstad."
+      },
+      {
+        "source": "SMI",
+        "text": "(separert), den sjette sønnen til Joktan (1 Mos 10:27; 1 Krøn 1:21), hvis bosetninger tydelig kan spores i det gamle navnet San’a, hovedstaden i Jemen (et distrikt i Arabia), som opprinnelig var Awzal. På grunn av sin beliggenhet i sentrum av den beste delen av det riket, må den alltid ha vært en viktig by. (San’a ligger omtrent 150 miles fra Aden og 100 miles fra kysten av Rødehavet. Det er en av de mest imponerende byene i Arabia – red.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:27",
+        "original": "Gen. 10:27"
+      },
+      {
+        "reference": "1 Chronicles 1:21",
+        "original": "1 Chr. 1:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UZZA": {
+    "name": "Uzza",
+    "slug": "uzza",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Styrke, en hage der Manasse og Amon ble begravet (2 Kong 21:18, 26). Den lå sannsynligvis nær kongens palass i Jerusalem, eller kan ha utgjort en del av palassområdet. Manasse kan sannsynligvis ha ervervet den fra noen med dette navnet."
+      },
+      {
+        "source": "SMI",
+        "text": "(styrke)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 21:18",
+        "original": "2 Kings 21:18"
+      },
+      {
+        "reference": "2 Kings 21:26",
+        "original": "2 Kings 21:26"
+      },
+      {
+        "reference": "1 Chronicles 8:7",
+        "original": "1 Chronicles 8:7"
+      },
+      {
+        "reference": "1 Chronicles 13:7",
+        "original": "1 Chronicles 13:7"
+      },
+      {
+        "reference": "1 Chronicles 13:9",
+        "original": "1 Chronicles 13:9"
+      },
+      {
+        "reference": "1 Chronicles 13:10",
+        "original": "1 Chronicles 13:10"
+      },
+      {
+        "reference": "1 Chronicles 13:11",
+        "original": "1 Chronicles 13:11"
+      },
+      {
+        "reference": "Ezra 2:49",
+        "original": "Ezra 2:49"
+      },
+      {
+        "reference": "Nehemiah 7:51",
+        "original": "Nehemiah 7:51"
+      },
+      {
+        "reference": "1 Chronicles 6:29",
+        "original": "1 Chronicles 6:29"
+      },
+      {
+        "reference": "1 Chronicles 23:10",
+        "original": "1 Chronicles 23:10"
+      },
+      {
+        "reference": "1 Chronicles 23:11",
+        "original": "1 Chronicles 23:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UZZA, OR UZZAH": {
+    "name": "Uzza, Or Uzzah",
+    "slug": "uzza-or-uzzah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(styrke), en av Abinadabs sønner, i hvis hus i Kirjat-Jearim arken hvilte i tjue år. Ussa var sannsynligvis den andre, og Akio den tredje. Begge fulgte med da David først tok på seg å føre den til Jerusalem. (F.Kr. 1043.) Akio gikk tilsynelatende foran den nye vognen (1 Krøn 13:7) den var plassert på, og Ussa gikk ved siden av. «Ved Nakons treskeplass» (2 Sam 6:6) eller Kidon (1 Krøn 13:9) snublet kanskje oksene da de gled på den glatte steinen. Ussa grep tak i arken for å hindre den i å falle. Vanhelligelsen ble straffet med hans øyeblikkelige død til stor sorg for David, som kalte stedet Peres-Ussa (bruddet over Ussa). Men Ussas skjebne var ikke bare straffen for hans egen overilt handling. Den ureglementerte måten å transportere arken på, som skulle ha blitt båret på levittenes skuldre, var den primære årsaken til hans uhellige gjerning; og David anerkjente det tydelig som en straff over folket generelt, «fordi vi ikke søkte ham etter den rette forskrift»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 13:7",
+        "original": "1 Chronicles 13:7"
+      },
+      {
+        "reference": "2 Samuel 6:6",
+        "original": "2 Samuel 6:6"
+      },
+      {
+        "reference": "1 Chronicles 13:9",
+        "original": "1 Chronicles 13:9"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZZA, THE GARDEN OF": {
+    "name": "Uzza, The Garden Of",
+    "slug": "uzza-the-garden-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Stedet der Manasse, Judas konge, og hans sønn Amon ble begravet. (2 Kong 21:18, 26) Det var hagen som tilhørte Manasses palass. v. 18. Det faktum at den nevnes viser at det ikke var der kongenes vanlige gravsteder lå. Det er imidlertid ingen spor som angir dens beliggenhet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 21:18",
+        "original": "2 Kings 21:18"
+      },
+      {
+        "reference": "2 Kings 21:26",
+        "original": "2 Kings 21:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZZAH": {
+    "name": "Uzzah",
+    "slug": "uzzah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Styrke, en sønn av Abinadab, i hvis hus mennene fra Kirjat-Jearim plasserte arken da den ble brakt tilbake fra filisternes land (1 Sam 7:1). Han og hans bror Akio kjørte vognen som arken var plassert på da David forsøkte å føre den opp til Jerusalem. Da oksene snublet, strakte Ussa ut sin hånd for å stabilisere arken, i direkte brudd på den guddommelige loven (4 Mos 4:15), og ble umiddelbart slått til døde. Stedet der dette skjedde ble deretter kalt Peres-Ussa (1 Krøn 13:11). David fryktet da å fortsette, og plasserte arken i huset til Obed-Edom fra Gat (2 Sam 6:2-11; 1 Krøn 13:6-13)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 7:1",
+        "original": "1 Sam. 7:1"
+      },
+      {
+        "reference": "Numbers 4:15",
+        "original": "Num. 4:15"
+      },
+      {
+        "reference": "1 Chronicles 13:11",
+        "original": "1 Chr. 13:11"
+      },
+      {
+        "reference": "2 Samuel 6:2-11",
+        "original": "2 Sam. 6:2-11"
+      },
+      {
+        "reference": "1 Chronicles 13:6-13",
+        "original": "1 Chr. 13:6-13"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UZZEN-SHERAH": {
+    "name": "Uzzen-sherah",
+    "slug": "uzzen-sherah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En by sannsynligvis nær Bet-Horon. Den fikk sitt navn fra Efraims datter (1 Krøn 7:24)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:24",
+        "original": "1 Chr. 7:24"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "UZZENSHERAH": {
+    "name": "Uzzensherah",
+    "slug": "uzzensherah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Sjeras øre (eller punkt)) en by grunnlagt eller gjenoppbygd av Sjera, en efraimittisk kvinne, datter av enten Efraim selv eller Beria. Den nevnes kun i (1 Krøn 7:24) i forbindelse med de to Bet-Horonene."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:24",
+        "original": "1 Chronicles 7:24"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZZI": {
+    "name": "Uzzi",
+    "slug": "uzzi",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Herren er min styrke. (1.) Bukkis sønn, og en etterkommer av Aron (1 Krøn 6:5, 51; Esra 7:4). (2.) En sønnesønn av Jissakar (1 Krøn 7:2, 3). (3.) Belas sønn, og Benjamins sønnesønn (1 Krøn 7:7). (4.) En benjaminitt, en høvding i stammen (1 Krøn 9:8). (5.) Banis sønn. Han hadde tilsyn med levittene etter tilbakekomsten fra fangenskapet (Neh 11:22). (6.) Overhodet for Jedajas hus, en av «prestenes høvdinger» (Neh 12:19). (7.) En prest som assisterte ved innvielsen av Jerusalems murer (Neh 12:42)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sterk)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:5",
+        "original": "1 Chr. 6:5"
+      },
+      {
+        "reference": "1 Chronicles 6:51",
+        "original": "1 Chr. 6:51"
+      },
+      {
+        "reference": "Ezra 7:4",
+        "original": "Ezra 7:4"
+      },
+      {
+        "reference": "1 Chronicles 7:2",
+        "original": "1 Chr. 7:2"
+      },
+      {
+        "reference": "1 Chronicles 7:3",
+        "original": "1 Chr. 7:3"
+      },
+      {
+        "reference": "1 Chronicles 7:7",
+        "original": "1 Chr. 7:7"
+      },
+      {
+        "reference": "1 Chronicles 9:8",
+        "original": "1 Chr. 9:8"
+      },
+      {
+        "reference": "Nehemiah 11:22",
+        "original": "Neh. 11:22"
+      },
+      {
+        "reference": "Nehemiah 12:19",
+        "original": "Neh. 12:19"
+      },
+      {
+        "reference": "Nehemiah 12:42",
+        "original": "Neh. 12:42"
+      },
+      {
+        "reference": "1 Chronicles 6:61",
+        "original": "1 Chronicles 6:61"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UZZIA": {
+    "name": "Uzzia",
+    "slug": "uzzia",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehovas styrke), en av Davids vakter, og tilsynelatende en innfødt fra Asjtarot bortenfor Jordan. (1 Krøn 11:44) (F.Kr. 1053)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 11:44",
+        "original": "1 Chronicles 11:44"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "UZZIAH": {
+    "name": "Uzziah",
+    "slug": "uzziah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En sammentrukket form av Asarja, Herren er min styrke. (1.) En av Amasjas sønner, som folket gjorde til konge over Juda i sin fars sted (2 Kong 14:21; 2 Krøn 26:1). Hans lange regjeringstid på omtrent femtito år var «den mest velstående, bortsett fra Josafats tid siden Salomos dager». Han var en energisk og dyktig hersker, og «hans navn spredte seg vidt, helt til Egypts grense» (2 Krøn 26:8, 14). I den tidligere delen av hans regjeringstid, under Sakarjas innflytelse, var han trofast mot Herren og «gjorde det som var rett i Herrens øyne» (2 Kong 15:3; 2 Krøn 26:4, 5); men mot slutten av hans lange liv «ble hans hjerte hovmodig til hans undergang», og han inntok ubetenksomt presteembetet (2 Krøn 26:16), og gikk inn i helligdommen for å ofre røkelse på gullalteret. Ypperstepresten Asarja så tendensen i en slik dristig handling fra kongens side, og med en gruppe på åtti prester sto han ham imot (2 Krøn 26:17) og sa: «Det tilkommer ikke deg, Ussias, å brenne røkelse.» Ussias ble plutselig rammet av spedalskhet mens han holdt på med å ofre røkelse (26:19-21), og han ble drevet ut fra tempelet og tvunget til å bo i «et eget hus» til den dagen han døde (2 Kong 15:5, 27; 2 Krøn 26:3). Han ble begravet i en separat grav «på gravplassen som tilhørte kongene» (2 Kong 15:7; 2 Krøn 26:23). «Den ensomme graven i den kongelige nekropol ville veltalende vitne for kommende generasjoner om at all jordisk monarki må bøye seg for den urokkelige orden av den guddommelige vilje, og at ingen innblanding kunne tolereres med den utfoldelsen av Guds hensikter, som, i tidens fylde, ville åpenbare Kristus, den sanne Yppersteprest og Konge for evig» (Dr. Greens Kongeriket Israel, etc.). (2.) Far til Jonatan, en av Davids tilsynsmenn (1 Krøn 27:25)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Jehovas styrke)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 14:21",
+        "original": "2 Kings 14:21"
+      },
+      {
+        "reference": "2 Chronicles 26:1",
+        "original": "2 Chr. 26:1"
+      },
+      {
+        "reference": "2 Chronicles 26:8",
+        "original": "2 Chr. 26:8"
+      },
+      {
+        "reference": "2 Chronicles 26:14",
+        "original": "2 Chr. 26:14"
+      },
+      {
+        "reference": "2 Kings 15:3",
+        "original": "2 Kings 15:3"
+      },
+      {
+        "reference": "2 Chronicles 26:4",
+        "original": "2 Chr. 26:4"
+      },
+      {
+        "reference": "2 Chronicles 26:5",
+        "original": "2 Chr. 26:5"
+      },
+      {
+        "reference": "2 Chronicles 26:16",
+        "original": "2 Chr. 26:16"
+      },
+      {
+        "reference": "2 Chronicles 26:17",
+        "original": "2 Chr. 26:17"
+      },
+      {
+        "reference": "2 Kings 15:5",
+        "original": "2 Kings 15:5"
+      },
+      {
+        "reference": "2 Kings 15:27",
+        "original": "2 Kings 15:27"
+      },
+      {
+        "reference": "2 Chronicles 26:3",
+        "original": "2 Chr. 26:3"
+      },
+      {
+        "reference": "2 Kings 15:7",
+        "original": "2 Kings 15:7"
+      },
+      {
+        "reference": "2 Chronicles 26:23",
+        "original": "2 Chr. 26:23"
+      },
+      {
+        "reference": "1 Chronicles 27:25",
+        "original": "1 Chr. 27:25"
+      },
+      {
+        "reference": "Exodus 30:7",
+        "original": "Exodus 30:7"
+      },
+      {
+        "reference": "Exodus 30:8",
+        "original": "Exodus 30:8"
+      },
+      {
+        "reference": "Numbers 16:40",
+        "original": "Numbers 16:40"
+      },
+      {
+        "reference": "Numbers 18:7",
+        "original": "Numbers 18:7"
+      },
+      {
+        "reference": "2 Chronicles 27:2",
+        "original": "2 Chronicles 27:2"
+      },
+      {
+        "reference": "Amos 1:1",
+        "original": "Amos 1:1"
+      },
+      {
+        "reference": "Zechariah 14:5",
+        "original": "Zechariah 14:5"
+      },
+      {
+        "reference": "1 Chronicles 6:24",
+        "original": "1 Chronicles 6:24"
+      },
+      {
+        "reference": "Ezra 10:21",
+        "original": "Ezra 10:21"
+      },
+      {
+        "reference": "Nehemiah 11:4",
+        "original": "Nehemiah 11:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UZZIEL": {
+    "name": "Uzziel",
+    "slug": "uzziel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Guds styrke. (1.) En av Kehats sønner, og Arons onkel (2 Mos 6:18; 3 Mos 10:4). (2.) En simeonittisk kaptein (1 Krøn 4:39-43). (3.) Belas sønn, og Benjamins sønnesønn (1 Krøn 7:7). (4.) En av Hemans sønner (1 Krøn 25:4); også kalt Asarel (v. 18). (5.) Jedutuns sønn (2 Krøn 29:14). (6.) Harhajas sønn (Neh 3:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(min styrke er Gud)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 6:18",
+        "original": "Ex. 6:18"
+      },
+      {
+        "reference": "Leviticus 10:4",
+        "original": "Lev. 10:4"
+      },
+      {
+        "reference": "1 Chronicles 4:39-43",
+        "original": "1 Chr. 4:39-43"
+      },
+      {
+        "reference": "1 Chronicles 7:7",
+        "original": "1 Chr. 7:7"
+      },
+      {
+        "reference": "1 Chronicles 25:4",
+        "original": "1 Chr. 25:4"
+      },
+      {
+        "reference": "2 Chronicles 29:14",
+        "original": "2 Chr. 29:14"
+      },
+      {
+        "reference": "Nehemiah 3:8",
+        "original": "Neh. 3:8"
+      },
+      {
+        "reference": "Exodus 6:22",
+        "original": "Exodus 6:22"
+      },
+      {
+        "reference": "1 Chronicles 4:42",
+        "original": "1 Chronicles 4:42"
+      },
+      {
+        "reference": "2 Chronicles 29:18",
+        "original": "2 Chronicles 29:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "UZZIELITES, THE": {
+    "name": "Uzzielites, The",
+    "slug": "uzzielites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "etterkommerne av Ussiel, og en av de fire store familiene til kehatittene. (4 Mos 3:27; 1 Krøn 26:23)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 3:27",
+        "original": "Numbers 3:27"
+      },
+      {
+        "reference": "1 Chronicles 26:23",
+        "original": "1 Chronicles 26:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  }
+}
