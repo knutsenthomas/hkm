@@ -4409,7 +4409,7 @@ class BibleReader {
             this.updateUrlParams();
             // Auto-open devotional wizard on mobile
             if (window.innerWidth <= 1024) {
-                this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
+                await this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
             }
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
