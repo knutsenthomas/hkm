@@ -3626,7 +3626,7 @@ class BibleReader {
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
-                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 9999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
                 .hkm-devotional-content { background: #ffffff !important; width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; position: relative !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
                 .hkm-devotional-step-title { font-size: 22px; font-weight: 700; color: #1B4965; margin-bottom: 16px; line-height: 1.3; }
                 .hkm-devotional-text-serif { font-family: 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
@@ -5495,6 +5495,30 @@ class BibleReader {
                                 <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.95);">book_2</span>
                             </div>
                         </div>
+
+                        ${!this.currentUser ? `
+                        <!-- Premium Sign-in Reminder -->
+                        <div class="hkm-rp-login-reminder" style="background: rgba(209, 125, 57, 0.06); border: 1px dashed #d17d39; border-radius: 12px; padding: 16px; margin: 0 0 16px 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px; flex-shrink: 0; margin-top: 2px;">info</span>
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #1B4965;">
+                                        ${lang === 'en' ? 'Not Logged In' : (lang === 'es' ? 'Sesión no iniciada' : 'Ikke logget inn')}
+                                    </h4>
+                                    <p style="margin: 0; font-size: 13px; line-height: 1.4; color: var(--text-light);">
+                                        ${lang === 'en' 
+                                            ? 'Progress is not saved. Log in to sync your completed days and notes.' 
+                                            : (lang === 'es' 
+                                                ? 'Tu progreso no se guardará. Inicia sesión para sincronizar tus días y notas.' 
+                                                : 'Fremdriften din lagres ikke. Logg inn for å synkronisere fullførte dager og lagre svar.')}
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="/minside/login.html" class="hkm-btn-secondary" style="height: 34px !important; font-size: 12px !important; padding: 0 16px !important; align-self: flex-start; text-decoration: none !important; border-radius: 6px !important; border-color: #d17d39 !important; color: #d17d39 !important; display: inline-flex; align-items: center; justify-content: center;">
+                                ${lang === 'en' ? 'Log In' : (lang === 'es' ? 'Iniciar sesión' : 'Logg inn her')}
+                            </a>
+                        </div>
+                        ` : ''}
 
                         <!-- 3. Horizontal day selector strip -->
                         <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 16px 0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
