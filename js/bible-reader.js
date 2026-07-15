@@ -314,7 +314,7 @@ class BibleReader {
         }
 
         // Sync with global dark mode theme
-        const activeGlobalTheme = this.safeGetLocalStorage('hkm_theme') || 'light';
+        const activeGlobalTheme = this.safeGetLocalStorage('hkm_theme') || document.documentElement.getAttribute('data-theme') || 'light';
         if (activeGlobalTheme === 'dark') {
             this.settings.theme = 'dark';
         } else if (this.settings.theme === 'dark') {
