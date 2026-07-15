@@ -5204,7 +5204,7 @@ class BibleReader {
         if (!planSidebar) {
             planSidebar = document.createElement('div');
             planSidebar.id = 'reading-plan-sidebar-content';
-            planSidebar.style.cssText = 'padding: 0; overflow-y: auto; height: calc(100% - 60px);';
+            planSidebar.style.cssText = 'padding: 0; overflow: hidden; height: calc(100% - 60px);';
             this.dom.sidebar.appendChild(planSidebar);
         }
         planSidebar.style.display = 'block';
@@ -5477,13 +5477,13 @@ class BibleReader {
                     </div>
 
                     <!-- 5. Checklist Items (no outer border or cards, clean list style like screenshot) -->
-                    <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 80px;">
+                    <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
                         ${checklistItemsHtml}
                     </div>
                 </div>
 
                 <!-- 6. Sticky Bottom Action Button -->
-                <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10;">
+                <div style="padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10; flex-shrink: 0; width: 100%;">
                     <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
                             style="width: 100% !important; background: #000000 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
                             onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
