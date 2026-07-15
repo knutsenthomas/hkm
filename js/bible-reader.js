@@ -3719,7 +3719,26 @@ class BibleReader {
                 .bible-theme-cream .hkm-yv-nav-circle-btn { background: #f4ebd8 !important; color: #4a5568 !important; }
                 .bible-theme-cream .hkm-yv-nav-circle-btn:hover { background: #ecdcb9 !important; color: #1B4965 !important; }
                 .bible-theme-cream .hkm-yv-footer-pill { background: #f4ebd8 !important; border-color: #ecdcb9 !important; color: #718096 !important; }
-                
+                /* Dark Mode theme for Reading Plan Dashboard */
+                .bible-theme-dark .hkm-rp-title { color: #f8fafc !important; }
+                .bible-theme-dark .hkm-rp-subtitle { color: #94a3b8 !important; }
+                .bible-theme-dark .hkm-rp-card { background: #1e1e1e !important; border-color: #2d2d2d !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; }
+                .bible-theme-dark .hkm-rp-progress-bar { background: #2d2d2d !important; }
+                .bible-theme-dark .hkm-rp-day-item { color: #cbd5e1 !important; }
+                .bible-theme-dark .hkm-rp-day-item:hover { background: #27272a !important; border-color: #3f3f46 !important; }
+                .bible-theme-dark .hkm-rp-day-item.active { background: rgba(209, 125, 57, 0.15) !important; border-color: rgba(209, 125, 57, 0.3) !important; }
+                .bible-theme-dark .hkm-rp-day-checkbox { border-color: #475569 !important; }
+
+                /* Cream Mode theme for Reading Plan Dashboard */
+                .bible-theme-cream .hkm-rp-title { color: #1B4965 !important; }
+                .bible-theme-cream .hkm-rp-subtitle { color: #70675a !important; }
+                .bible-theme-cream .hkm-rp-card { background: #ffffff !important; border-color: #e6dfd3 !important; box-shadow: 0 4px 12px rgba(44, 39, 32, 0.03) !important; }
+                .bible-theme-cream .hkm-rp-progress-bar { background: #e6dfd3 !important; }
+                .bible-theme-cream .hkm-rp-day-item { color: #2c2720 !important; }
+                .bible-theme-cream .hkm-rp-day-item:hover { background: #f7f4ec !important; border-color: #ecdcb9 !important; }
+                .bible-theme-cream .hkm-rp-day-item.active { background: rgba(209, 125, 57, 0.08) !important; border-color: rgba(209, 125, 57, 0.2) !important; }
+                .bible-theme-cream .hkm-rp-day-checkbox { border-color: #d2c4a9 !important; }
+
                 @keyframes hkmFadeIn {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
@@ -4127,14 +4146,14 @@ class BibleReader {
         const t_loginBtn = this.getTranslation('login_btn', 'Logg inn');
 
         let loginNotice = '';
-        if (!this.currentUser) {
-            loginNotice = `
-                <div style="background: rgba(27, 73, 101, 0.05); border: 1px solid rgba(27, 73, 101, 0.15); border-radius: 12px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: #475569; line-height: 1.4;">
-                    <p style="margin-bottom: 8px;">${t_logInToSave}</p>
-                    <a href="/minside/login.html" class="hkm-btn-primary" style="height: 30px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;">${t_loginBtn}</a>
-                </div>
-            `;
-        }
+         if (!this.currentUser) {
+             loginNotice = `
+                 <div style="background: var(--highlight-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.4;">
+                     <p style="margin-bottom: 8px;">${t_logInToSave}</p>
+                     <a href="/minside/login.html" class="hkm-btn-primary" style="height: 30px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;">${t_loginBtn}</a>
+                 </div>
+             `;
+         }
 
         if (plans.length === 0) {
             container.innerHTML = `
@@ -4152,7 +4171,7 @@ class BibleReader {
         container.innerHTML = `
             <div style="padding: 16px;">
                 ${loginNotice}
-                <h3 style="font-size: 15px; font-weight: 700; color: #1B4965; margin-bottom: 16px;">${t_browsePlans}</h3>
+                <h3 style="font-size: 15px; font-weight: 700; color: var(--text-base); margin-bottom: 16px;">${t_browsePlans}</h3>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     ${plans.map(p => {
@@ -4170,10 +4189,10 @@ class BibleReader {
                             </div>
                             ` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; flex-grow: 1;">${p.title}</h4>
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0; flex-grow: 1;">${p.title}</h4>
                                 <span style="font-size: 11px; font-weight: 700; background: rgba(209, 125, 57, 0.1); color: #d17d39; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">${totalDays} ${this.getTranslation('days', 'dager')}</span>
                             </div>
-                            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">${p.description || ''}</p>
                             
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 <button class="hkm-btn-secondary" style="height: 32px !important; padding: 0 12px !important; font-size: 12px !important; border-radius: 6px !important;" onclick="window.bibleReader.togglePlanPreview('${p.id}')">
@@ -4195,10 +4214,10 @@ class BibleReader {
                             </div>
                             
                             <!-- Plan Preview Days -->
-                            <div id="plan-preview-${p.id}" style="display: none; margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 12px; max-height: 200px; overflow-y: auto;">
+                            <div id="plan-preview-${p.id}" style="display: none; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 12px; max-height: 200px; overflow-y: auto;">
                                 ${p.days.map(d => `
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; cursor: pointer;" onclick="window.bibleReader.showDayVerses('${d.verses.replace(/'/g, "\\'")}')">
-                                    <span style="font-weight: 600; color: #475569;">Dag ${d.dayNumber}:</span>
+                                    <span style="font-weight: 600; color: var(--text-base);">Dag ${d.dayNumber}:</span>
                                     <span style="color: #d17d39; text-decoration: underline;">${d.verses}</span>
                                 </div>
                                 `).join('')}
@@ -5207,6 +5226,250 @@ class BibleReader {
             body.prayer-app-mode .hkm-rp-sidebar-card .card-header .icon {
                 color: #bd4f2a !important;
             }
+
+            /* ==========================================================================
+               HKM Reading Plan - Dynamic Theme Overrides (Dark & Cream Mode)
+               ========================================================================== */
+
+            /* 1. Dark Mode Theme Overrides */
+            .bible-theme-dark #bible-sidebar.reading-plan-active {
+                background: #121212 !important;
+                color: #e2e8f0 !important;
+                border-left-color: #2d2d2d !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-wrapper {
+                background: #121212 !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-header-row {
+                background: #1e1e1e !important;
+                border-bottom-color: #2d2d2d !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-title {
+                color: #f8fafc !important;
+            }
+            .bible-theme-dark .hkm-rp-back-btn {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-action-btn {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-close-btn-mobile {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-days-count-title {
+                color: #e2e8f0 !important;
+            }
+            .bible-theme-dark .hkm-rp-checklist-item {
+                background: #1e1e1e !important;
+                border-bottom-color: #2d2d2d !important;
+            }
+            .bible-theme-dark .hkm-rp-checklist-item:hover {
+                background: #27272a !important;
+            }
+            .bible-theme-dark .hkm-rp-checklist-item span {
+                color: #e2e8f0 !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3 {
+                background: #1e1e1e !important;
+                border-color: #2d2d2d !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3 .day-num {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3.active {
+                background: #1e1e1e !important;
+                border-color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3.active .day-num {
+                color: #ffffff !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3.completed {
+                background: #27272a !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3 .day-date {
+                color: #94a3b8 !important;
+            }
+            .bible-theme-dark .hkm-rp-login-reminder {
+                background: rgba(209, 125, 57, 0.1) !important;
+                border-color: #d17d39 !important;
+            }
+            .bible-theme-dark .hkm-rp-login-reminder h4.hkm-rp-login-title {
+                color: #f8fafc !important;
+            }
+            .bible-theme-dark .hkm-rp-login-reminder p {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-card,
+            .bible-theme-dark .hkm-rp-sidebar-card {
+                background: #1e1e1e !important;
+                border-color: #2d2d2d !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+            }
+            .bible-theme-dark .hkm-rp-card h4,
+            .bible-theme-dark .hkm-rp-sidebar-card h4,
+            .bible-theme-dark .hkm-rp-sidebar-card h3 {
+                color: #e2e8f0 !important;
+            }
+            .bible-theme-dark .hkm-rp-card p,
+            .bible-theme-dark .hkm-rp-sidebar-card p {
+                color: #94a3b8 !important;
+            }
+            .bible-theme-dark .hkm-rp-card span,
+            .bible-theme-dark .hkm-rp-sidebar-card span {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card .card-header {
+                border-color: #2d2d2d !important;
+            }
+            .bible-theme-dark .hkm-rp-resource-item {
+                background: #27272a !important;
+                border-color: #2d2d2d !important;
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-resource-item:hover {
+                background: #3f3f46 !important;
+                border-color: #cbd5e1 !important;
+                color: #ffffff !important;
+            }
+            .bible-theme-dark .hkm-rp-sidebar-card textarea {
+                background: #121212 !important;
+                border-color: #2d2d2d !important;
+                color: #e2e8f0 !important;
+            }
+            .bible-theme-dark .hkm-rp-card .hkm-btn-secondary {
+                border-color: #d17d39 !important;
+                color: #d17d39 !important;
+            }
+            .bible-theme-dark .hkm-rp-card .hkm-btn-secondary:hover {
+                background: rgba(209, 125, 57, 0.1) !important;
+            }
+            .bible-theme-dark #rp-save-status {
+                color: #cbd5e1 !important;
+            }
+            .bible-theme-dark .hkm-rp-progress-badge {
+                color: #cbd5e1 !important;
+                background: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            /* 2. Cream Mode Theme Overrides */
+            .bible-theme-cream #bible-sidebar.reading-plan-active {
+                background: #fdfbf7 !important;
+                color: #2c2720 !important;
+                border-left-color: #e6dfd3 !important;
+            }
+            .bible-theme-cream .hkm-rp-sidebar-wrapper {
+                background: #fdfbf7 !important;
+            }
+            .bible-theme-cream .hkm-rp-sidebar-header-row {
+                background: #f7f4ec !important;
+                border-bottom-color: #e6dfd3 !important;
+            }
+            .bible-theme-cream .hkm-rp-sidebar-title {
+                color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-back-btn {
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-action-btn {
+                color: #70675a !important;
+            }
+            .bible-theme-cream .hkm-rp-close-btn-mobile {
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-days-count-title {
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-checklist-item {
+                background: #ffffff !important;
+                border-bottom-color: #e6dfd3 !important;
+            }
+            .bible-theme-cream .hkm-rp-checklist-item:hover {
+                background: #f7f4ec !important;
+            }
+            .bible-theme-cream .hkm-rp-checklist-item span {
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3 {
+                background: #ffffff !important;
+                border-color: #e6dfd3 !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3 .day-num {
+                color: #70675a !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3.active {
+                background: #ffffff !important;
+                border-color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3.active .day-num {
+                color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3.completed {
+                background: #f7f4ec !important;
+            }
+            .bible-theme-cream .hkm-rp-day-strip-bubble-v3 .day-date {
+                color: #968c7f !important;
+            }
+            .bible-theme-cream .hkm-rp-login-reminder {
+                background: rgba(209, 125, 57, 0.04) !important;
+                border-color: #d17d39 !important;
+            }
+            .bible-theme-cream .hkm-rp-login-reminder h4.hkm-rp-login-title {
+                color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-login-reminder p {
+                color: #70675a !important;
+            }
+            .bible-theme-cream .hkm-rp-card,
+            .bible-theme-cream .hkm-rp-sidebar-card {
+                background: #ffffff !important;
+                border-color: #e6dfd3 !important;
+                box-shadow: 0 4px 12px rgba(44, 39, 32, 0.04) !important;
+            }
+            .bible-theme-cream .hkm-rp-card h4,
+            .bible-theme-cream .hkm-rp-sidebar-card h4,
+            .bible-theme-cream .hkm-rp-sidebar-card h3 {
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-card p,
+            .bible-theme-cream .hkm-rp-sidebar-card p {
+                color: #70675a !important;
+            }
+            .bible-theme-cream .hkm-rp-card span,
+            .bible-theme-cream .hkm-rp-sidebar-card span {
+                color: #968c7f !important;
+            }
+            .bible-theme-cream .hkm-rp-sidebar-card .card-header {
+                border-color: #e6dfd3 !important;
+            }
+            .bible-theme-cream .hkm-rp-resource-item {
+                background: #f7f4ec !important;
+                border-color: #e6dfd3 !important;
+                color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-resource-item:hover {
+                background: #ffffff !important;
+                border-color: #1B4965 !important;
+                color: #1B4965 !important;
+            }
+            .bible-theme-cream .hkm-rp-sidebar-card textarea {
+                background: #fdfbf7 !important;
+                border-color: #e6dfd3 !important;
+                color: #2c2720 !important;
+            }
+            .bible-theme-cream .hkm-rp-card .hkm-btn-secondary {
+                border-color: #d17d39 !important;
+                color: #d17d39 !important;
+            }
+            .bible-theme-cream .hkm-rp-card .hkm-btn-secondary:hover {
+                background: rgba(209, 125, 57, 0.04) !important;
+            }
+            .bible-theme-cream #rp-save-status {
+                color: #70675a !important;
+            }
+            .bible-theme-cream .hkm-rp-progress-badge {
+                color: #1B4965 !important;
+                background: rgba(27, 73, 101, 0.08) !important;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -5464,7 +5727,7 @@ class BibleReader {
         const progressPct = Math.round((userPlan.completedDays?.length || 0) / totalDays * 100);
 
         // 2. Generate Checkboxes
-        const uncompletedCircle = `<div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0; box-sizing: border-box; background: transparent;"></div>`;
+        const uncompletedCircle = `<div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-color); flex-shrink: 0; box-sizing: border-box; background: transparent;"></div>`;
         const completedCircle = `
             <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #10b981; background: #10b981; display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-sizing: border-box;">
                 <span class="material-symbols-outlined" style="font-size: 14px; font-weight: 900; line-height: 1; display: block;">check</span>
@@ -5550,7 +5813,7 @@ class BibleReader {
                             <div style="display: flex; align-items: flex-start; gap: 12px;">
                                 <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px; flex-shrink: 0; margin-top: 2px;">info</span>
                                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                                    <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #1B4965;">
+                                    <h4 class="hkm-rp-login-title" style="margin: 0; font-size: 14px; font-weight: 700; color: #1B4965;">
                                         ${lang === 'en' ? 'Not Logged In' : (lang === 'es' ? 'Sesión no iniciada' : 'Ikke logget inn')}
                                     </h4>
                                     <p style="margin: 0; font-size: 13px; line-height: 1.4; color: var(--text-light);">
@@ -5567,22 +5830,22 @@ class BibleReader {
                             </a>
                         </div>
                         ` : ''}
-
+ 
                         <!-- 3. Horizontal day selector strip -->
                         <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 16px 0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                             ${dayItemsHtml}
                         </div>
-
+ 
                         <!-- 4. Active Day title & progress row -->
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px; margin-bottom: 16px; margin-top: 8px;">
                             <h3 class="hkm-rp-days-count-title" style="font-size: 16px; font-weight: 800; color: var(--text-base); margin: 0;">
                                 ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
                             </h3>
-                            <span style="font-size: 12px; font-weight: 700; color: #1B4965; background: rgba(27, 73, 101, 0.08); padding: 4px 10px; border-radius: 99px; font-family: 'Inter', sans-serif;">
+                            <span class="hkm-rp-progress-badge" style="font-size: 12px; font-weight: 700; color: #1B4965; background: rgba(27, 73, 101, 0.08); padding: 4px 10px; border-radius: 99px; font-family: 'Inter', sans-serif;">
                                 ${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}
                             </span>
                         </div>
-
+ 
                         <!-- 5. Checklist Items -->
                         <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
                             ${checklistItemsHtml}
@@ -5590,12 +5853,12 @@ class BibleReader {
                         
                     </div>
                 </div>
-
+ 
                 <!-- 6. Sticky Bottom Action Button -->
                 <div style="padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10; flex-shrink: 0; width: 100%; display: flex; justify-content: center;">
                     <div style="max-width: 800px; width: 100%; box-sizing: border-box;">
                         <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
-                                style="width: 100% !important; background: #000000 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
+                                style="width: 100% !important; background: var(--text-base) !important; color: var(--bg-base) !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
                                 onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
                                 onmouseout="this.style.filter='none'; this.style.transform='none';"
                                 onmousedown="this.style.transform='scale(0.98)';"
@@ -5608,7 +5871,7 @@ class BibleReader {
                         </button>
                     </div>
                 </div>
-
+ 
             </div>
         `;
 
