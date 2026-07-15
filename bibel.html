@@ -64,6 +64,10 @@
     <!-- Loader Safety Net -->
     <script>
         (function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var isDeepLink = urlParams.has('plan') || urlParams.has('ref');
+            var timeoutDuration = isDeepLink ? 15000 : 4000;
+            
             setTimeout(function() {
                 if (document.body && document.body.classList.contains('cms-loading')) {
                     console.warn('CMS loading timeout - forcing visibility');
@@ -71,7 +75,7 @@
                     var loader = document.getElementById('loader-wrapper');
                     if (loader) loader.style.display = 'none';
                 }
-            }, 4000);
+            }, timeoutDuration);
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">

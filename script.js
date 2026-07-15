@@ -2654,9 +2654,13 @@ window.addEventListener('cmsContentLoaded', () => {
 
 // Safety fallback if CMS bootstrapping stalls.
 window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDeepLink = urlParams.has('plan') || urlParams.has('ref');
+    const fallbackDuration = isDeepLink ? 15000 : 7000;
+    
     window.setTimeout(() => {
         revealPublicUI('post-load-fallback');
-    }, 7000);
+    }, fallbackDuration);
 });
 
 // ===================================
