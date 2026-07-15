@@ -4480,23 +4480,15 @@ class BibleReader {
             }
 
             .hkm-rp-day-strip-bubble-v3.completed {
-                background: var(--bg-sidebar) !important;
+                background: #f1f5f9 !important;
+                border-color: transparent !important;
+            }
+            .bible-theme-dark .hkm-rp-day-strip-bubble-v3.completed {
+                background: #27272a !important;
+                border-color: transparent !important;
             }
             .hkm-rp-day-strip-bubble-v3 .check-badge {
-                position: absolute !important;
-                top: -4px !important;
-                right: -4px !important;
-                width: 16px !important;
-                height: 16px !important;
-                border-radius: 50% !important;
-                background: #10b981 !important;
-                color: #ffffff !important;
-                font-size: 10px !important;
-                font-weight: bold !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2) !important;
+                display: none !important;
             }
             
             .hkm-rp-checklist-item {
@@ -4514,11 +4506,11 @@ class BibleReader {
             }
             .hkm-rp-close-btn-mobile {
                 display: none !important;
-                background: rgba(27, 73, 101, 0.06) !important;
-                border: 1px solid rgba(27, 73, 101, 0.15) !important;
-                padding: 0 !important;
+                background: none !important;
+                border: none !important;
+                padding: 8px !important;
                 cursor: pointer !important;
-                color: var(--bible-primary) !important;
+                color: var(--text-base) !important;
                 align-items: center !important;
                 justify-content: center !important;
                 border-radius: 50% !important;
@@ -4528,7 +4520,7 @@ class BibleReader {
                 transition: all 0.2s ease !important;
             }
             .hkm-rp-close-btn-mobile:hover {
-                background: rgba(27, 73, 101, 0.12) !important;
+                background: var(--highlight-bg) !important;
             }
             .hkm-rp-close-btn-mobile:active {
                 transform: scale(0.95) !important;
@@ -4536,7 +4528,6 @@ class BibleReader {
             @media (max-width: 768px) {
                 .hkm-rp-close-btn-mobile {
                     display: flex !important;
-                    margin-right: 12px !important;
                 }
             }
 
@@ -5355,79 +5346,132 @@ class BibleReader {
                 <button class="hkm-rp-day-strip-bubble-v3 ${completedClass} ${activeClass}" 
                         onclick="window.bibleReader.selectReadingPlanDay(${d})"
                         style="box-sizing: border-box;">
-                    <span class="day-num">${d}</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
+                        <span class="day-num">${d}</span>
+                        ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 11px; font-weight: 900; color: #10b981; line-height: 1;">check</span>' : ''}
+                    </div>
                     <span class="day-date">${dateLabel}</span>
-                    ${isCompleted ? '<span class="material-symbols-outlined check-badge">check</span>' : ''}
                 </button>
             `;
         }
 
-        // 2. Checklist items for this day
-        // Task 1: Andakt
-        // Task 2: Verses/Scripture
-        const checkIconHtml = isCurrentDayCompleted 
-            ? `<div class="hkm-task-circle completed" style="width: 24px; height: 24px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; flex-shrink: 0; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">✓</div>`
-            : `<div class="hkm-task-circle" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0;"></div>`;
+        // Calculate progress percentage
+        const progressPct = Math.round((userPlan.completedDays?.length || 0) / totalDays * 100);
 
+        // 2. Generate Checkboxes
+        const uncompletedCircle = `<div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0; box-sizing: border-box; background: transparent;"></div>`;
+        const completedCircle = `
+            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #10b981; background: #10b981; display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-sizing: border-box;">
+                <span class="material-symbols-outlined" style="font-size: 14px; font-weight: 900; line-height: 1; display: block;">check</span>
+            </div>
+        `;
+        const checkCircleHtml = isCurrentDayCompleted ? completedCircle : uncompletedCircle;
+
+        // Parse verses into individual passages if separated by comma/semicolon
+        const rawVerses = dayConfig ? dayConfig.verses : '';
+        let passages = [];
+        if (rawVerses) {
+            passages = rawVerses.split(/[,;]/).map(p => p.trim()).filter(Boolean);
+        }
+        if (passages.length === 0) {
+            passages = ['Bibeltekst'];
+        }
+
+        let checklistItemsHtml = '';
+        
+        // Task 1: Devotional (Andakt)
+        checklistItemsHtml += `
+            <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    ${checkCircleHtml}
+                    <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
+                </div>
+                <span class="material-symbols-outlined" style="color: var(--text-light); font-size: 20px;">chevron_right</span>
+            </div>
+        `;
+
+        // Task 2+: Scripture chapters (one row per passage)
+        passages.forEach((passage) => {
+            checklistItemsHtml += `
+                <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        ${checkCircleHtml}
+                        <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${passage}</span>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--text-light); font-size: 20px;">chevron_right</span>
+                </div>
+            `;
+        });
+
+        // 3. Render HTML
         container.innerHTML = `
-            <div class="hkm-rp-sidebar-wrapper" style="padding: 24px 16px; background: transparent; min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px;">
+            <div class="hkm-rp-sidebar-wrapper" style="background: var(--bg-base); min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; height: 100%; position: relative;">
                 
-                <!-- Title Row with back arrow -->
-                <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; gap: 12px;">
-                    <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(27, 73, 101, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
-                        <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
-                    </button>
-                    <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${displayTitle}</h2>
-                    <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-                    </button>
-                </div>
-
-                <!-- Horizontal day selector strip -->
-                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 4px 16px 4px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
-                    ${dayItemsHtml}
-                </div>
-
-                <!-- Active Day subtitle -->
-                <h3 class="hkm-rp-days-count-title" style="font-size: 18px; font-weight: 800; color: var(--text-base); margin: 0;">
-                    ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
-                </h3>
-
-                <!-- Checklist Items (Direct layout, no wrapper card) -->
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <!-- 1. Andakt Task -->
-                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.borderColor='var(--bible-primary)';" onmouseout="this.style.transform='none'; this.style.borderColor='var(--border-color)';">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            ${checkIconHtml}
-                            <span style="font-size: 15px; font-weight: 700; color: var(--text-base);">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
-                        </div>
-                        <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 20px;">chevron_right</span>
+                <!-- 1. Top Header Bar -->
+                <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
+                        </button>
+                        <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
                     </div>
-
-                    <!-- 2. Scripture Task -->
-                    <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.borderColor='var(--bible-primary)';" onmouseout="this.style.transform='none'; this.style.borderColor='var(--border-color)';">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            ${checkIconHtml}
-                            <span style="font-size: 15px; font-weight: 700; color: var(--text-base);">${dayConfig ? dayConfig.verses : 'Bibeltekst'}</span>
-                        </div>
-                        <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 20px;">chevron_right</span>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.toggleLeftSidebarMode()">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+                        </button>
+                        <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Bottom Solid Brand Button -->
-                <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
-                        style="width: 100% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 52px !important; font-size: 14px !important; font-weight: 800; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; box-shadow: 0 4px 15px rgba(209, 125, 57, 0.25) !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;"
-                        onmouseover="this.style.filter='brightness(1.08)'; this.style.transform='translateY(-1px)';" 
-                        onmouseout="this.style.filter='none'; this.style.transform='none';"
-                        onmousedown="this.style.transform='scale(0.98)';"
-                        onmouseup="this.style.transform='translateY(-1px)';"
-                        onmouseleave="this.style.filter='none'; this.style.transform='none';">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
-                    <span>${isCurrentDayCompleted 
-                        ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
-                        : (lang === 'en' ? 'Start Reading' : (lang === 'es' ? 'Comenzar lectura' : 'Start lesing'))
-                    }</span>
-                </button>
+                <!-- Scrollable Body Content -->
+                <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                    
+                    <!-- 2. Banner Card -->
+                    <div class="hkm-rp-banner-card" style="margin: 16px; padding: 24px; border-radius: 16px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; ${globalPlan.imageUrl || globalPlan.image ? `background-image: linear-gradient(rgba(27, 73, 101, 0.55), rgba(15, 23, 42, 0.85)), url(${globalPlan.imageUrl || globalPlan.image}); background-size: cover; background-position: center;` : 'background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%);'} color: #ffffff; box-shadow: 0 8px 24px rgba(27, 73, 101, 0.12);">
+                        <h1 style="margin: 0; font-size: 20px; font-weight: 800; line-height: 1.25; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); max-width: 85%; font-family: 'Inter', sans-serif;">${globalPlan.title}</h1>
+                        <div style="display: flex; align-items: center; gap: 8px; z-index: 2;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.95);">book_2</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Horizontal day selector strip -->
+                    <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 16px 16px 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                        ${dayItemsHtml}
+                    </div>
+
+                    <!-- 4. Active Day title & progress row -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-bottom: 16px; margin-top: 8px;">
+                        <h3 class="hkm-rp-days-count-title" style="font-size: 16px; font-weight: 800; color: var(--text-base); margin: 0;">
+                            ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
+                        </h3>
+                        <span style="font-size: 12px; font-weight: 700; color: #1B4965; background: rgba(27, 73, 101, 0.08); padding: 4px 10px; border-radius: 99px; font-family: 'Inter', sans-serif;">
+                            ${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}
+                        </span>
+                    </div>
+
+                    <!-- 5. Checklist Items (no outer border or cards, clean list style like screenshot) -->
+                    <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 80px;">
+                        ${checklistItemsHtml}
+                    </div>
+                </div>
+
+                <!-- 6. Sticky Bottom Action Button -->
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10;">
+                    <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
+                            style="width: 100% !important; background: #000000 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
+                            onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
+                            onmouseout="this.style.filter='none'; this.style.transform='none';"
+                            onmousedown="this.style.transform='scale(0.98)';"
+                            onmouseup="this.style.transform='translateY(-1px)';"
+                            onmouseleave="this.style.filter='none'; this.style.transform='none';">
+                        <span>${isCurrentDayCompleted 
+                            ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
+                            : (lang === 'en' ? 'Start Reading' : (lang === 'es' ? 'Comenzar lesing' : 'Start lesing'))
+                        }</span>
+                    </button>
+                </div>
 
             </div>
         `;
