@@ -4426,8 +4426,14 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            /* Desktop/Tablet landscape: Full screen reading plan */
+            /* Desktop/Tablet landscape: Full screen reading plan and lock scroll */
             @media (min-width: 1025px) {
+                html:has(#bible-sidebar.reading-plan-active),
+                body:has(#bible-sidebar.reading-plan-active) {
+                    overflow: hidden !important;
+                    height: 100% !important;
+                    height: 100dvh !important;
+                }
                 #bible-sidebar.reading-plan-active {
                     width: 100% !important;
                     max-width: 100% !important;
@@ -4444,8 +4450,16 @@ class BibleReader {
                 }
             }
 
-            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
+            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open, and lock scroll */
             @media (max-width: 1024px) {
+                html:has(#bible-sidebar.reading-plan-active.active),
+                body:has(#bible-sidebar.reading-plan-active.active) {
+                    overflow: hidden !important;
+                    position: fixed !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    height: 100dvh !important;
+                }
                 #bible-sidebar {
                     position: fixed !important;
                     top: 0 !important;
