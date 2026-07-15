@@ -4441,6 +4441,9 @@ class BibleReader {
                 #bible-sidebar.active {
                     left: 0 !important;
                 }
+                .reading-plan-active #sidebar-mobile-controls {
+                    display: none !important;
+                }
             }
             .hkm-rp-day-strip-v3 {
                 display: flex !important;
@@ -5144,6 +5147,9 @@ class BibleReader {
         } else {
             document.body.classList.remove('prayer-app-mode');
         }
+        if (this.dom.sidebar) {
+            this.dom.sidebar.classList.add('reading-plan-active');
+        }
 
         // 1. Hide books list and search in left sidebar
         const booksListWrapper = document.querySelector('.books-list-wrapper');
@@ -5253,6 +5259,10 @@ class BibleReader {
         this.activePlanId = null;
         this.activePlanData = null;
         this.activePlanDay = null;
+
+        if (this.dom.sidebar) {
+            this.dom.sidebar.classList.remove('reading-plan-active');
+        }
 
         // Restore normal left sidebar elements
         const booksListWrapper = document.querySelector('.books-list-wrapper');
