@@ -4426,7 +4426,25 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            /* YouVersion Dashboard Layout styles */
+            /* Desktop/Tablet landscape: Full screen reading plan */
+            @media (min-width: 1025px) {
+                #bible-sidebar.reading-plan-active {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    left: 0 !important;
+                    position: relative !important;
+                    flex: 1 !important;
+                    border-right: none !important;
+                }
+                #bible-sidebar.reading-plan-active + .bible-reading-area {
+                    display: none !important;
+                }
+                #bible-sidebar.reading-plan-active ~ #bible-nav-right {
+                    display: none !important;
+                }
+            }
+
+            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
             @media (max-width: 1024px) {
                 #bible-sidebar {
                     position: fixed !important;
@@ -4440,6 +4458,15 @@ class BibleReader {
                 }
                 #bible-sidebar.active {
                     left: 0 !important;
+                }
+                #bible-sidebar.reading-plan-active {
+                    left: -100% !important;
+                }
+                #bible-sidebar.reading-plan-active.active {
+                    left: 0 !important;
+                }
+                #bible-sidebar.reading-plan-active.active + .bible-reading-area {
+                    display: none !important;
                 }
                 .reading-plan-active #sidebar-mobile-controls {
                     display: none !important;
@@ -5433,69 +5460,76 @@ class BibleReader {
             <div class="hkm-rp-sidebar-wrapper" style="background: var(--bg-base); min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; height: 100%; position: relative;">
                 
                 <!-- 1. Top Header Bar -->
-                <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
-                            <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
-                        </button>
-                        <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 4px;">
-                        <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.toggleLeftSidebarMode()">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-                        </button>
-                        <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-                        </button>
+                <div class="hkm-rp-sidebar-header-row" style="display: flex; align-items: center; justify-content: center; padding: 14px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 800px; box-sizing: border-box;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
+                            </button>
+                            <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.toggleLeftSidebarMode()">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+                            </button>
+                            <button class="hkm-rp-close-btn-mobile" onclick="document.getElementById('bible-sidebar').classList.remove('active')">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Scrollable Body Content -->
-                <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
-                    
-                    <!-- 2. Banner Card -->
-                    <div class="hkm-rp-banner-card" style="margin: 16px; padding: 24px; border-radius: 16px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; ${globalPlan.imageUrl || globalPlan.image ? `background-image: linear-gradient(rgba(27, 73, 101, 0.55), rgba(15, 23, 42, 0.85)), url(${globalPlan.imageUrl || globalPlan.image}); background-size: cover; background-position: center;` : 'background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%);'} color: #ffffff; box-shadow: 0 8px 24px rgba(27, 73, 101, 0.12);">
-                        <h1 style="margin: 0; font-size: 20px; font-weight: 800; line-height: 1.25; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); max-width: 85%; font-family: 'Inter', sans-serif;">${globalPlan.title}</h1>
-                        <div style="display: flex; align-items: center; gap: 8px; z-index: 2;">
-                            <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.95);">book_2</span>
+                <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 0 16px;">
+                    <div style="max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+                        
+                        <!-- 2. Banner Card -->
+                        <div class="hkm-rp-banner-card" style="margin: 16px 0; padding: 24px; border-radius: 16px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; ${globalPlan.imageUrl || globalPlan.image ? `background-image: linear-gradient(rgba(27, 73, 101, 0.55), rgba(15, 23, 42, 0.85)), url(${globalPlan.imageUrl || globalPlan.image}); background-size: cover; background-position: center;` : 'background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%);'} color: #ffffff; box-shadow: 0 8px 24px rgba(27, 73, 101, 0.12);">
+                            <h1 style="margin: 0; font-size: 20px; font-weight: 800; line-height: 1.25; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); max-width: 85%; font-family: 'Inter', sans-serif;">${globalPlan.title}</h1>
+                            <div style="display: flex; align-items: center; gap: 8px; z-index: 2;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.95);">book_2</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 3. Horizontal day selector strip -->
-                    <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 16px 16px 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
-                        ${dayItemsHtml}
-                    </div>
+                        <!-- 3. Horizontal day selector strip -->
+                        <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 16px 0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                            ${dayItemsHtml}
+                        </div>
 
-                    <!-- 4. Active Day title & progress row -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-bottom: 16px; margin-top: 8px;">
-                        <h3 class="hkm-rp-days-count-title" style="font-size: 16px; font-weight: 800; color: var(--text-base); margin: 0;">
-                            ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
-                        </h3>
-                        <span style="font-size: 12px; font-weight: 700; color: #1B4965; background: rgba(27, 73, 101, 0.08); padding: 4px 10px; border-radius: 99px; font-family: 'Inter', sans-serif;">
-                            ${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}
-                        </span>
-                    </div>
+                        <!-- 4. Active Day title & progress row -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px; margin-bottom: 16px; margin-top: 8px;">
+                            <h3 class="hkm-rp-days-count-title" style="font-size: 16px; font-weight: 800; color: var(--text-base); margin: 0;">
+                                ${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}
+                            </h3>
+                            <span style="font-size: 12px; font-weight: 700; color: #1B4965; background: rgba(27, 73, 101, 0.08); padding: 4px 10px; border-radius: 99px; font-family: 'Inter', sans-serif;">
+                                ${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}
+                            </span>
+                        </div>
 
-                    <!-- 5. Checklist Items (no outer border or cards, clean list style like screenshot) -->
-                    <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
-                        ${checklistItemsHtml}
+                        <!-- 5. Checklist Items -->
+                        <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
+                            ${checklistItemsHtml}
+                        </div>
+                        
                     </div>
                 </div>
 
                 <!-- 6. Sticky Bottom Action Button -->
-                <div style="padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10; flex-shrink: 0; width: 100%;">
-                    <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
-                            style="width: 100% !important; background: #000000 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
-                            onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
-                            onmouseout="this.style.filter='none'; this.style.transform='none';"
-                            onmousedown="this.style.transform='scale(0.98)';"
-                            onmouseup="this.style.transform='translateY(-1px)';"
-                            onmouseleave="this.style.filter='none'; this.style.transform='none';">
-                        <span>${isCurrentDayCompleted 
-                            ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
-                            : (lang === 'en' ? 'Start Reading' : (lang === 'es' ? 'Comenzar lesing' : 'Start lesing'))
-                        }</span>
-                    </button>
+                <div style="padding: 16px; background: var(--bg-base); border-top: 1px solid var(--border-color); box-sizing: border-box; z-index: 10; flex-shrink: 0; width: 100%; display: flex; justify-content: center;">
+                    <div style="max-width: 800px; width: 100%; box-sizing: border-box;">
+                        <button class="hkm-rp-start-btn" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
+                                style="width: 100% !important; background: #000000 !important; color: #ffffff !important; border: none !important; border-radius: 99px !important; height: 50px !important; font-size: 14px !important; font-weight: 700; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;"
+                                onmouseover="this.style.filter='brightness(1.15)'; this.style.transform='translateY(-1px)';" 
+                                onmouseout="this.style.filter='none'; this.style.transform='none';"
+                                onmousedown="this.style.transform='scale(0.98)';"
+                                onmouseup="this.style.transform='translateY(-1px)';"
+                                onmouseleave="this.style.filter='none'; this.style.transform='none';">
+                            <span>${isCurrentDayCompleted 
+                                ? (lang === 'en' ? 'Read again' : (lang === 'es' ? 'Leer de nuevo' : 'Les på nytt')) 
+                                : (lang === 'en' ? 'Start Reading' : (lang === 'es' ? 'Comenzar lesing' : 'Start lesing'))
+                            }</span>
+                        </button>
+                    </div>
                 </div>
 
             </div>
