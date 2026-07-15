@@ -498,6 +498,9 @@ class BibleReader {
                 this.lookupWord(lexParam);
             }, 500);
         }
+        
+        // Remove loading state once reader initialization (including deep-link / reading plan setup) is complete
+        document.body.classList.remove('cms-loading');
     }
 
     setupDOMElements() {

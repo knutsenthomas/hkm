@@ -544,6 +544,10 @@ class ContentManager {
         if (isLoading) {
             body.classList.add('cms-loading');
         } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('plan') || urlParams.has('ref')) {
+                return;
+            }
             body.classList.remove('cms-loading');
         }
     }
