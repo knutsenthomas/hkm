@@ -3626,8 +3626,8 @@ class BibleReader {
                 .hkm-rp-day-checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.2s; flex-shrink: 0; }
                 .hkm-rp-day-checkbox.completed { background: #10b981; border-color: #10b981; color: #ffffff; }
                 .hkm-rp-day-checkbox.completed .material-symbols-outlined { font-size: 14px; font-weight: bold; }
-                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: rgba(15, 23, 42, 0.75) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
-                .hkm-devotional-content { background: #ffffff !important; width: 90% !important; max-width: 640px !important; height: 85% !important; max-height: 800px !important; border-radius: 24px !important; padding: 0 !important; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15) !important; display: flex !important; flex-direction: column !important; position: relative !important; animation: hkmFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
+                .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
+                .hkm-devotional-content { background: #ffffff !important; width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; position: relative !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
                 .hkm-devotional-step-title { font-size: 22px; font-weight: 700; color: #1B4965; margin-bottom: 16px; line-height: 1.3; }
                 .hkm-devotional-text-serif { font-family: 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
                 .hkm-devotional-text-serif p { display: block !important; position: relative !important; margin-bottom: 16px !important; font-size: 18px !important; line-height: 1.8 !important; font-family: 'Georgia', serif !important; }
@@ -3645,6 +3645,12 @@ class BibleReader {
                 .hkm-yv-header-title { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 !important; margin: 0 16px !important; min-width: 0 !important; }
                 .hkm-yv-header-avatar { width: 28px !important; height: 28px !important; border-radius: 50% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 13px !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important; }
                 .hkm-yv-header-text { font-size: 15px !important; font-weight: 700 !important; color: #1B4965 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+                .hkm-yv-header-text-full { display: inline-block !important; }
+                .hkm-yv-header-text-short { display: none !important; }
+                @media (max-width: 768px) {
+                    .hkm-yv-header-text-full { display: none !important; }
+                    .hkm-yv-header-text-short { display: inline-block !important; }
+                }
                 .hkm-yv-header-actions { display: flex !important; align-items: center !important; gap: 4px !important; }
                 .hkm-yv-action-btn { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important; transition: all 0.2s !important; }
                 .hkm-yv-action-btn:hover { background: #f1f5f9 !important; color: #1e293b !important; }
@@ -3669,10 +3675,6 @@ class BibleReader {
                 @keyframes hkmFadeIn {
                     from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
-                }
-                @media (max-width: 1024px) {
-                    .hkm-devotional-overlay { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-                    .hkm-devotional-content { width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; display: flex !important; flex-direction: column !important; box-shadow: none !important; animation: none !important; }
                 }
             `;
             document.head.appendChild(style);
@@ -6388,23 +6390,24 @@ class BibleReader {
             plan.title.toLowerCase().includes('oración')
         );
 
-        let headerTitleText = plan.title || '';
-        if (headerTitleText.includes(':')) {
-            headerTitleText = headerTitleText.split(':')[0].trim();
+        let fullTitleText = plan.title || '';
+        if (fullTitleText.includes(':')) {
+            fullTitleText = fullTitleText.split(':')[0].trim();
         }
-        if (headerTitleText.includes('-')) {
-            headerTitleText = headerTitleText.split('-')[0].trim();
+        if (fullTitleText.includes('-')) {
+            fullTitleText = fullTitleText.split('-')[0].trim();
         }
-        if (headerTitleText.includes('–')) {
-            headerTitleText = headerTitleText.split('–')[0].trim();
+        if (fullTitleText.includes('–')) {
+            fullTitleText = fullTitleText.split('–')[0].trim();
         }
-        if (headerTitleText.includes('|')) {
-            headerTitleText = headerTitleText.split('|')[0].trim();
+        if (fullTitleText.includes('|')) {
+            fullTitleText = fullTitleText.split('|')[0].trim();
         }
 
         // Abbreviate common long plan titles to fit nicely in mobile headers
+        let shortTitleText = fullTitleText;
         if (lang === 'en') {
-            headerTitleText = headerTitleText
+            shortTitleText = shortTitleText
                 .replace(/Gospel of John/gi, 'John')
                 .replace(/Gospel of Matthew/gi, 'Matthew')
                 .replace(/Gospel of Mark/gi, 'Mark')
@@ -6415,7 +6418,7 @@ class BibleReader {
                 .replace(/Second/gi, '2nd')
                 .replace(/Third/gi, '3rd');
         } else if (lang === 'es') {
-            headerTitleText = headerTitleText
+            shortTitleText = shortTitleText
                 .replace(/Evangelio de Juan/gi, 'Juan')
                 .replace(/Evangelio de Mateo/gi, 'Mateo')
                 .replace(/Evangelio de Marcos/gi, 'Marcos')
@@ -6426,7 +6429,7 @@ class BibleReader {
                 .replace(/Segundo/gi, '2.º');
         } else {
             // Default: Norwegian
-            headerTitleText = headerTitleText
+            shortTitleText = shortTitleText
                 .replace(/Johannesevangeliet/gi, 'Johannesev.')
                 .replace(/Matteusevangeliet/gi, 'Matteusev.')
                 .replace(/Markusevangeliet/gi, 'Markusev.')
@@ -6440,9 +6443,12 @@ class BibleReader {
                 .replace(/Femte/gi, '5.');
         }
 
-        // Strict limit truncation as fallback if it remains too long (e.g. custom plans)
-        if (headerTitleText.length > 20) {
-            headerTitleText = headerTitleText.substring(0, 17) + '...';
+        // Truncate fallback if title remains too long
+        if (shortTitleText.length > 20) {
+            shortTitleText = shortTitleText.substring(0, 17) + '...';
+        }
+        if (fullTitleText.length > 40) {
+            fullTitleText = fullTitleText.substring(0, 37) + '...';
         }
         // Step Label mapping
         let stepLabel = 'BIBEL';
@@ -6568,8 +6574,9 @@ class BibleReader {
                     </button>
                     
                     <div class="hkm-yv-header-title">
-                        <span class="hkm-yv-header-avatar">${headerTitleText.charAt(0)}</span>
-                        <span class="hkm-yv-header-text">${headerTitleText}</span>
+                        <span class="hkm-yv-header-avatar">${fullTitleText.charAt(0)}</span>
+                        <span class="hkm-yv-header-text hkm-yv-header-text-full">${fullTitleText}</span>
+                        <span class="hkm-yv-header-text hkm-yv-header-text-short">${shortTitleText}</span>
                     </div>
                     
                     <div class="hkm-yv-header-actions">
