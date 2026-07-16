@@ -7879,6 +7879,85 @@ html[data-theme="dark"] .user-profile-link .user-name {
   color: #f1f5f9 !important;
 }
 
+/* Overview Hero Card & Actions Dark Mode Overrides */
+html[data-theme="dark"] #overview-section .overview-hero-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-card::before,
+html[data-theme="dark"] #overview-section .overview-hero-card::after {
+  display: none !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-eyebrow {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-title,
+html[data-theme="dark"] #overview-section .overview-hero-text {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action {
+  background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action:hover {
+  box-shadow: 0 6px 16px rgba(209, 125, 57, 0.35) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action-secondary {
+  background: #0f172a !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action-secondary:hover {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+/* Stat Cards Dark Mode Overrides */
+html[data-theme="dark"] .stat-card.modern {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .stat-card.modern:hover {
+  border-color: #d17d39 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .stat-card.modern .stat-label {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .stat-card.modern .stat-value {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .dashboard-col-header {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .stat-card.modern .stat-icon-wrap {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .stat-card.modern .stat-icon-wrap .material-symbols-outlined {
+  color: #cbd5e1 !important;
+}
+
 
 
 
