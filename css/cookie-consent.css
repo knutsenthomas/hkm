@@ -229,3 +229,49 @@
         width: 100%;
     }
 }
+
+/* Dark Mode styles for Cookie Consent */
+html[data-theme="dark"] #cookie-consent-banner {
+    background-color: #1e293b !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .cookie-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .cookie-text {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .cookie-options {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .cookie-option label {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .btn-cookie-selection {
+    background-color: transparent !important;
+    border-color: #D17D39 !important;
+    color: #D17D39 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .btn-cookie-selection:hover {
+    background-color: rgba(209, 125, 57, 0.1) !important;
+    color: #f97316 !important;
+    border-color: #f97316 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .btn-cookie-deny {
+    background-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] #cookie-consent-banner .btn-cookie-deny:hover {
+    background-color: #475569 !important;
+    color: #f8fafc !important;
+}
