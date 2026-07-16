@@ -9747,5 +9747,13 @@ html[data-theme="dark"] .podcast-table tr:hover {
   background: var(--admin-surface-muted, #0f172a) !important;
 }
 
+/* Logo & Favicon Image Preview container white background fix in dark mode */
+html[data-theme="dark"] .design-ui-preview-image {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+
 
 
