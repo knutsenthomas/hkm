@@ -7352,6 +7352,8 @@ html[data-theme="dark"] .custom-table,
 html[data-theme="dark"] .logs-table {
   background-color: #1e293b !important;
   color: #f8fafc !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
 }
 
 html[data-theme="dark"] th,
