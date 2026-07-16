@@ -9837,6 +9837,38 @@ html[data-theme="dark"] .premium-range-header label {
   color: var(--admin-text-muted, #cbd5e1) !important;
 }
 
+/* Lighter help text, bold text, and paragraphs inside the design shell in dark mode */
+html[data-theme="dark"] .design-ui-shell p {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+html[data-theme="dark"] .design-ui-shell strong {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .design-ui-help-item {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .design-ui-help-item strong {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .design-ui-callout {
+  border-color: rgba(209, 125, 57, 0.2) !important;
+  background-color: rgba(209, 125, 57, 0.05) !important;
+  background: rgba(209, 125, 57, 0.05) !important;
+}
+
+html[data-theme="dark"] .design-ui-callout-title {
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .design-ui-callout p {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+
 
 
 
