@@ -7838,6 +7838,50 @@ html[data-theme="dark"] .side-card-title {
     color: #f8fafc !important;
 }
 
+/* Inner chart container background and border override */
+html[data-theme="dark"] .big-card div[style*="background"] {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+/* SVG Chart lines and grid elements */
+html[data-theme="dark"] #analytics-svg-chart-container svg line {
+    stroke: #334155 !important;
+}
+
+html[data-theme="dark"] #analytics-svg-chart-container svg text {
+    fill: #94a3b8 !important;
+}
+
+/* Progress bar background tracks in dark mode */
+html[data-theme="dark"] .side-card div[style*="height:6px"] {
+    background: #0f172a !important;
+}
+
+/* Progress bar fill overrides to brand accent color */
+html[data-theme="dark"] .side-card div[style*="height:6px"] > div {
+    background: #d17d39 !important;
+}
+
+/* Text elements inside progress bar lists */
+html[data-theme="dark"] .side-card span[style*="color"] {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .side-card span[style*="color: var(--admin-text-muted)"],
+html[data-theme="dark"] .side-card span[style*="color: var(--admin-text-muted"] {
+    color: #94a3b8 !important;
+}
+
+/* Detail link text in dark mode */
+html[data-theme="dark"] .side-card a.top-nav-tab {
+    color: #d17d39 !important;
+}
+
+html[data-theme="dark"] .side-card a.top-nav-tab:hover {
+    color: #f97316 !important;
+}
+
 html[data-theme="dark"] body.admin-body #overview-section .analytics-range-select {
     background-color: #0f172a !important;
     color: #f8fafc !important;
@@ -7852,15 +7896,20 @@ html[data-theme="dark"] body.admin-body #overview-section .analytics-range-selec
 /* ==========================================================================
    Dark Mode Overrides for Topbar Header Buttons & Navigation
    ========================================================================== */
-html[data-theme="dark"] body.admin-body .main-header .notification-btn {
+html[data-theme="dark"] body.admin-body .main-header .notification-btn,
+html[data-theme="dark"] body.admin-body .notification-btn,
+html[data-theme="dark"] .notification-btn {
     background: #1e293b !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid #334155 !important;
     color: #f1f5f9 !important;
 }
 
-html[data-theme="dark"] body.admin-body .main-header .notification-btn:hover {
+html[data-theme="dark"] body.admin-body .main-header .notification-btn:hover,
+html[data-theme="dark"] body.admin-body .notification-btn:hover,
+html[data-theme="dark"] .notification-btn:hover {
     background: #334155 !important;
-    color: var(--accent-color, #f97316) !important;
+    color: #d17d39 !important;
+    border-color: #d17d39 !important;
 }
 
 html[data-theme="dark"] body.admin-body .notification-dot {
@@ -7872,6 +7921,7 @@ html[data-theme="dark"] body.admin-body .mobile-nav-toggle {
     border-color: #334155 !important;
     color: #f1f5f9 !important;
 }
+
 
 
 

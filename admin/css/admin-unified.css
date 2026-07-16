@@ -8563,52 +8563,90 @@ html[data-theme="dark"] .hkm-todo-drawer {
   background: var(--admin-surface, #1e293b) !important;
   color: var(--admin-text, #f8fafc) !important;
   border-left-color: var(--admin-border, #334155) !important;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.4) !important;
 }
-html[data-theme="dark"] .todo-header {
+html[data-theme="dark"] .todo-drawer-header {
   border-bottom-color: var(--admin-border, #334155) !important;
 }
-html[data-theme="dark"] .todo-header h3 {
+html[data-theme="dark"] .todo-drawer-header h3 {
   color: var(--admin-text, #f8fafc) !important;
 }
-html[data-theme="dark"] .todo-item {
+html[data-theme="dark"] .todo-drawer-close {
+  color: var(--admin-text-muted, #94a3b8) !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] .todo-drawer-close:hover {
   background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-drawer-quick-add {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-drawer-quick-add input[type="text"],
+html[data-theme="dark"] .todo-drawer-quick-add select,
+html[data-theme="dark"] .todo-drawer-quick-add input[type="date"] {
+  background: var(--admin-surface, #1e293b) !important;
   border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
-html[data-theme="dark"] .todo-item-title {
+html[data-theme="dark"] .todo-drawer-item {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
   color: var(--admin-text, #f8fafc) !important;
 }
-html[data-theme="dark"] .todo-item-desc {
+html[data-theme="dark"] .todo-drawer-item:hover {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+html[data-theme="dark"] .todo-drawer-item.completed {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-drawer-item-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-drawer-item-desc {
   color: var(--admin-text-muted, #94a3b8) !important;
 }
-html[data-theme="dark"] .todo-input-container {
-  background: var(--admin-surface-muted, #0f172a) !important;
-  border-top-color: var(--admin-border, #334155) !important;
-}
-html[data-theme="dark"] .todo-input,
-html[data-theme="dark"] .todo-search-input {
-  background: var(--admin-surface, #1e293b) !important;
+html[data-theme="dark"] .todo-drawer-checkbox {
   border-color: var(--admin-border, #334155) !important;
-  color: var(--admin-text, #f8fafc) !important;
-}
-html[data-theme="dark"] .todo-detail-panel {
-  background: var(--admin-surface, #1e293b) !important;
-  border-left-color: var(--admin-border, #334155) !important;
-}
-html[data-theme="dark"] .todo-detail-header {
-  border-bottom-color: var(--admin-border, #334155) !important;
-}
-html[data-theme="dark"] .todo-detail-body {
   background: var(--admin-surface-muted, #0f172a) !important;
 }
-html[data-theme="dark"] .todo-detail-comment-box {
-  background: var(--admin-surface, #1e293b) !important;
-  border-color: var(--admin-border, #334155) !important;
-  color: var(--admin-text, #f8fafc) !important;
+html[data-theme="dark"] .todo-drawer-checkbox.checked {
+  background: var(--admin-accent-color, #d17d39) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
 }
-html[data-theme="dark"] .todo-detail-comment {
-  background: var(--admin-surface, #1e293b) !important;
-  border-color: var(--admin-border, #334155) !important;
+html[data-theme="dark"] .todo-drawer-badge.priority-high {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+html[data-theme="dark"] .todo-drawer-badge.priority-medium {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fde047 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+html[data-theme="dark"] .todo-drawer-badge.priority-low {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #86efac !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+html[data-theme="dark"] .todo-drawer-badge.todo-date-badge {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+html[data-theme="dark"] .todo-drawer-badge.todo-date-badge.overdue {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+html[data-theme="dark"] .todo-drawer-actions button {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-drawer-actions button:hover {
+  color: var(--admin-text, #f8fafc) !important;
 }
 
 /* 6. AI Inspiration Banner Suggestions Cards */
@@ -8690,3 +8728,191 @@ html[data-theme="dark"] [style*="background:#fffbeb"] {
   border-color: rgba(245, 158, 11, 0.4) !important;
   color: #fde047 !important;
 }
+
+/* 9. Sideinnhold & Seksjonsforhåndsvisning (og andre sider med inline hvite elementer) */
+html[data-theme="dark"] .section-content [style*="background:#fff"],
+html[data-theme="dark"] .section-content [style*="background: #fff"],
+html[data-theme="dark"] .section-content [style*="background:white"],
+html[data-theme="dark"] .section-content [style*="background: white"],
+html[data-theme="dark"] .section-content [style*="background:#ffffff"],
+html[data-theme="dark"] .section-content [style*="background: #ffffff"],
+html[data-theme="dark"] .section-content [style*="background:rgb(255,255,255)"],
+html[data-theme="dark"] .section-content [style*="background:rgb(255, 255, 255)"],
+html[data-theme="dark"] .section-content [style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] .section-content [style*="background:linear-gradient"],
+html[data-theme="dark"] .section-content [style*="background: linear-gradient"] {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .section-content [style*="color:#0f172a"],
+html[data-theme="dark"] .section-content [style*="color: #0f172a"],
+html[data-theme="dark"] .section-content [style*="color:rgb(15,23,42)"],
+html[data-theme="dark"] .section-content [style*="color:rgb(15, 23, 42)"],
+html[data-theme="dark"] .section-content [style*="color: rgb(15, 23, 42)"],
+html[data-theme="dark"] .section-content [style*="color:#1e293b"],
+html[data-theme="dark"] .section-content [style*="color: #1e293b"],
+html[data-theme="dark"] .section-content [style*="color:rgb(30,41,59)"],
+html[data-theme="dark"] .section-content [style*="color:rgb(30, 41, 59)"],
+html[data-theme="dark"] .section-content [style*="color: rgb(30, 41, 59)"] {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .section-content [style*="color:#64748b"],
+html[data-theme="dark"] .section-content [style*="color: #64748b"],
+html[data-theme="dark"] .section-content [style*="color:#94a3b8"],
+html[data-theme="dark"] .section-content [style*="color: #94a3b8"] {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-live-badge] {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+  border: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-post-preview] {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-post-preview] div[style*="background:#e2e8f0"],
+html[data-theme="dark"] .section-content [data-facebook-post-preview] div[style*="background: #e2e8f0"] {
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-post-preview] img {
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-live-preview] a {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .section-content [data-facebook-live-preview] a:hover {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .section-content [data-preview-key="pageCta"] {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .section-content [data-preview-key="pageCta"]:hover {
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+/* 10. CRM & Segmenter Page Styles (crm.css Overrides) */
+html[data-theme="dark"] .crm-tool-option {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  background: rgba(209, 125, 57, 0.05) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option.is-selected {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  background: rgba(209, 125, 57, 0.1) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option-indicator {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option.is-selected .crm-tool-option-indicator {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-option-desc {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .crm-tool-action-btn {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-action-btn:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  background: rgba(209, 125, 57, 0.05) !important;
+}
+
+html[data-theme="dark"] .crm-tool-action-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-field-label {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .crm-tool-input {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-input:focus {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .crm-tool-copy-box {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .crm-tool-confirm-card {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #fde047 !important;
+}
+
+/* Status Messages in Dark Mode */
+html[data-theme="dark"] .status-message.info {
+  color: #93c5fd !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+html[data-theme="dark"] .status-message.success {
+  color: #86efac !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+}
+
+html[data-theme="dark"] .status-message.warning {
+  color: #fde047 !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+html[data-theme="dark"] .status-message.error {
+  color: #fca5a5 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+html[data-theme="dark"] .label-pill {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
