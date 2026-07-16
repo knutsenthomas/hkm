@@ -8851,6 +8851,65 @@ html[data-theme="dark"] .studio-feed-card.newsletter_draft-type .card-type-badge
   color: #facc15 !important;
 }
 
+/* HKM Studio Drafts and Templates in Dark Mode */
+html[data-theme="dark"] .dashboard-card-column h4 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .dashboard-card-column .badge {
+  background-color: rgba(209, 125, 57, 0.15) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .template-item.card {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .template-item.card:hover {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .template-item.card div > div {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .template-item.card div > div + div {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .template-item.card div[style*="background: #fff7ed"],
+html[data-theme="dark"] .template-item.card div[style*="background: rgb(255, 247, 237)"] {
+  background-color: rgba(209, 125, 57, 0.15) !important;
+  background: rgba(209, 125, 57, 0.15) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .template-item.card div[style*="background: #e0f2fe"],
+html[data-theme="dark"] .template-item.card div[style*="background: rgb(224, 242, 254)"] {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] #dashboard-drafts-list div[style*="border: 1px dashed"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #dashboard-drafts-list div[style*="border: 1px dashed"] h5 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #dashboard-drafts-list div[style*="border: 1px dashed"] p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
 /* 5. Task Checklist Todo Drawer */
 html[data-theme="dark"] .hkm-todo-drawer {
   background: var(--admin-surface, #1e293b) !important;
