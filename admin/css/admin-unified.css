@@ -8976,3 +8976,239 @@ html[data-theme="dark"] .label-pill {
   color: var(--admin-text-muted, #94a3b8) !important;
 }
 
+/* Card grids (collection-item-card & item-card) in Dark Mode */
+html[data-theme="dark"] .collection-item-card,
+html[data-theme="dark"] .item-card,
+html[data-theme="dark"] .media-card,
+html[data-theme="dark"] .media-card.media-folder,
+html[data-theme="dark"] .premium-media-card {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .collection-item-card:hover,
+html[data-theme="dark"] .item-card:hover,
+html[data-theme="dark"] .media-card:hover,
+html[data-theme="dark"] .premium-media-card:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  box-shadow: 0 16px 34px rgba(209, 125, 57, 0.2) !important;
+}
+
+html[data-theme="dark"] .collection-item-card .item-title,
+html[data-theme="dark"] .item-card h4,
+html[data-theme="dark"] .media-card h4,
+html[data-theme="dark"] .premium-media-card h4 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .collection-item-card .item-meta,
+html[data-theme="dark"] .item-card p,
+html[data-theme="dark"] .item-card p[style*="color"] {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .collection-item-card .item-badge-synced {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .item-thumb,
+html[data-theme="dark"] .media-preview.folder-preview {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+/* Courses Rich Text Editor (RTE) & Interface in Dark Mode */
+html[data-theme="dark"] .rte-wrapper {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .rte-toolbar {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .rte-editor {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .rte-btn {
+  color: var(--admin-text-muted, #94a3b8) !important;
+  background-color: transparent !important;
+}
+
+html[data-theme="dark"] .rte-btn:hover {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .rte-btn.active {
+  background-color: rgba(209, 125, 57, 0.15) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .rte-divider {
+  background-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .sub-tab-btn {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .sub-tab-btn:hover {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .sub-tab-btn.active {
+  color: var(--admin-accent-color, #d17d39) !important;
+  border-bottom-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+/* Modals & Panels in Course/Design Managers */
+html[data-theme="dark"] #courses-section .design-ui-header,
+html[data-theme="dark"] #courses-section .design-ui-panel,
+html[data-theme="dark"] #courses-section .design-ui-workspace,
+html[data-theme="dark"] #courses-section .design-ui-shell,
+html[data-theme="dark"] #courses-tab-view .design-ui-header,
+html[data-theme="dark"] #enrollments-tab-view .design-ui-header,
+html[data-theme="dark"] #finance-tab-view .design-ui-header {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] #courses-section .section-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #courses-section div[style*="border-bottom"] {
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+/* Course Modals */
+html[data-theme="dark"] #course-modal > div,
+html[data-theme="dark"] #lesson-modal > div,
+html[data-theme="dark"] #course-modal div[style*="background:white"],
+html[data-theme="dark"] #course-modal div[style*="background: white"],
+html[data-theme="dark"] #lesson-modal div[style*="background:white"],
+html[data-theme="dark"] #lesson-modal div[style*="background: white"] {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid var(--admin-border, #334155) !important;
+}
+
+/* Override general popup windows and inline styles */
+html[data-theme="dark"] div[style*="background:#fff; border-radius:16px"],
+html[data-theme="dark"] div[style*="background: #fff; border-radius: 16px"],
+html[data-theme="dark"] div[style*="background:white; border-radius:24px"],
+html[data-theme="dark"] div[style*="background: white; border-radius: 24px"],
+html[data-theme="dark"] div[style*="background:#ffffff; border-radius:24px"],
+html[data-theme="dark"] div[style*="background: #ffffff; border-radius: 24px"] {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] div[style*="background:#f8fafc"],
+html[data-theme="dark"] div[style*="background: #f8fafc"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] button[style*="background: #f1f5f9"],
+html[data-theme="dark"] button[style*="background:#f1f5f9"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] button[style*="background: #fff"],
+html[data-theme="dark"] button[style*="background:#fff"] {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] thead[style*="background: #fafbfc"],
+html[data-theme="dark"] thead[style*="background:#fafbfc"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+/* Empty lists placeholders */
+html[data-theme="dark"] div[style*="border:2px dashed #e2e8f0"],
+html[data-theme="dark"] div[style*="border: 2px dashed #e2e8f0"],
+html[data-theme="dark"] div[style*="border:2px dashed #cbd5e1"],
+html[data-theme="dark"] div[style*="border: 2px dashed #cbd5e1"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+/* Course list thumbnails */
+html[data-theme="dark"] #courses-list div[style*="background:#fff7ed"],
+html[data-theme="dark"] #courses-list div[style*="background: #fff7ed"] {
+  background-color: rgba(249, 115, 22, 0.15) !important;
+  background: rgba(249, 115, 22, 0.15) !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+}
+
+/* Kommunikasjon Stat Icons */
+html[data-theme="dark"] .stat-icon[style*="background: #eff6ff"],
+html[data-theme="dark"] .stat-icon[style*="background:#eff6ff"] {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+}
+html[data-theme="dark"] .stat-icon[style*="background: #f0fdf4"],
+html[data-theme="dark"] .stat-icon[style*="background:#f0fdf4"] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+html[data-theme="dark"] .stat-icon[style*="background: #fff7ed"],
+html[data-theme="dark"] .stat-icon[style*="background:#fff7ed"] {
+  background-color: rgba(249, 115, 22, 0.15) !important;
+  background: rgba(249, 115, 22, 0.15) !important;
+}
+
+/* Inline Badges Overrides */
+html[data-theme="dark"] span[style*="background: #e0f2fe"],
+html[data-theme="dark"] span[style*="background:#e0f2fe"] {
+  background-color: rgba(3, 105, 161, 0.15) !important;
+  background: rgba(3, 105, 161, 0.15) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] span[style*="background: #fef3c7"],
+html[data-theme="dark"] span[style*="background:#fef3c7"] {
+  background-color: rgba(180, 83, 9, 0.15) !important;
+  background: rgba(180, 83, 9, 0.15) !important;
+  color: #fbbf24 !important;
+}
+html[data-theme="dark"] span[style*="background: #fff7ed"],
+html[data-theme="dark"] span[style*="background:#fff7ed"] {
+  background-color: rgba(234, 88, 12, 0.15) !important;
+  background: rgba(234, 88, 12, 0.15) !important;
+  color: #f97316 !important;
+}
+html[data-theme="dark"] span[style*="background: #e0e7ff"],
+html[data-theme="dark"] span[style*="background:#e0e7ff"] {
+  background-color: rgba(67, 56, 202, 0.15) !important;
+  background: rgba(67, 56, 202, 0.15) !important;
+  color: #818cf8 !important;
+}
+html[data-theme="dark"] tr:hover td {
+  background-color: #334155 !important;
+}
+
