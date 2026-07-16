@@ -148,6 +148,7 @@ body.hide-critical-deletes .hkm-modal-btn-delete {
   --admin-border: #e2e8f0;
   --admin-text: #1e293b;
   --admin-text-muted: #64748b;
+  --admin-accent-color: #1B4965;
   --admin-accent: #d17d39;
   --admin-accent-dark: #bd4f2a;
   --admin-orange-gradient: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
@@ -7173,6 +7174,7 @@ html[data-theme="dark"] {
   --admin-border: #334155;
   --admin-text: #f8fafc;
   --admin-text-muted: #94a3b8;
+  --admin-accent-color: #d17d39;
   
   --admin-page-bg: #0f172a;
   --admin-page-panel: #1e293b;

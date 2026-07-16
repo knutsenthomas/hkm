@@ -7771,6 +7771,104 @@ body.admin-body .section-content > .design-ui-header .section-subtitle {
     width: auto !important;
 }
 
+/* ==========================================================================
+   Dark Mode Overrides for Overview Section (Welcome Card & Actions)
+   ========================================================================== */
+html[data-theme="dark"] #overview-section .overview-hero-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-card::before,
+html[data-theme="dark"] #overview-section .overview-hero-card::after {
+    display: none !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-eyebrow {
+    color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-title,
+html[data-theme="dark"] #overview-section .overview-hero-text {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action {
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action:hover {
+    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.35) !important;
+    transform: translateY(-2px) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action-secondary {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] #overview-section .overview-hero-action-secondary:hover {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ==========================================================================
+   Dark Mode Overrides for Analytics Bottom Row Cards (.big-card, .side-card)
+   ========================================================================== */
+html[data-theme="dark"] .big-card,
+html[data-theme="dark"] .side-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .big-card-title,
+html[data-theme="dark"] .side-card-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #overview-section .analytics-range-select {
+    background: #2d1e18 !important;
+    color: #ffedd5 !important;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #ffedd5 50%),
+        linear-gradient(135deg, #ffedd5 50%, transparent 50%) !important;
+}
+
+/* ==========================================================================
+   Dark Mode Overrides for Topbar Header Buttons & Navigation
+   ========================================================================== */
+html[data-theme="dark"] body.admin-body .main-header .notification-btn {
+    background: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] body.admin-body .main-header .notification-btn:hover {
+    background: #334155 !important;
+    color: var(--accent-color, #f97316) !important;
+}
+
+html[data-theme="dark"] body.admin-body .notification-dot {
+    border-color: #1e293b !important;
+}
+
+html[data-theme="dark"] body.admin-body .mobile-nav-toggle {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+
 
 
 

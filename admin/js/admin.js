@@ -4752,33 +4752,33 @@ class AdminManager {
             <div class="analytics-bottom-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-top: 32px;">
                 <div class="big-card">
                     <div class="big-card-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                        <span style="font-weight:700; color:#1e293b;">Trafikkovervåking (Google Analytics)</span>
+                        <span style="font-weight:700; color: var(--admin-text, #1e293b);">Trafikkovervåking (Google Analytics)</span>
                         <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode">
                             ${[1, 7, 14, 30, 60, 90, 180, 365].map(days => `
                                 <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days).toUpperCase()}</option>
                             `).join('')}
                         </select>
                     </div>
-                    <div style="height: 300px; background: white; border: 1px solid #f1f5f9; border-radius: 12px; display: flex; flex-direction: column; align-items: stretch; color: #94a3b8; padding: 24px;">
+                    <div style="height: 300px; background: var(--admin-surface, white); border: 1px solid var(--admin-border, #f1f5f9); border-radius: 12px; display: flex; flex-direction: column; align-items: stretch; color: var(--admin-text-muted, #94a3b8); padding: 24px;">
                         ${sparklineHtml}
                     </div>
                 </div>
                 <div class="side-card">
-                    <div class="side-card-title" style="font-weight:700; color:#1e293b; margin-bottom: 16px;">Mest leste sider</div>
+                    <div class="side-card-title" style="font-weight:700; color: var(--admin-text, #1e293b); margin-bottom: 16px;">Mest leste sider</div>
                     <div style="display:flex; flex-direction:column; gap: 16px; margin-top: 16px;">
                         ${topPagesArr.map(p => `
                             <div>
                                 <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
-                                    <span style="color:#475569; font-weight: 500;">${this.escapeHtml(p.path)}</span>
-                                    <span style="color:#64748b;">${p.pct}%</span>
+                                    <span style="color: var(--admin-text, #475569); font-weight: 500;">${this.escapeHtml(p.path)}</span>
+                                    <span style="color: var(--admin-text-muted, #64748b);">${p.pct}%</span>
                                 </div>
-                                <div style="width:100%; height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
-                                    <div style="width:${p.pct}%; height:100%; background:#1B4965; border-radius:3px;"></div>
+                                <div style="width:100%; height:6px; background: var(--admin-surface-muted, #f1f5f9); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${p.pct}%; height:100%; background: var(--admin-accent-color, #1B4965); border-radius:3px;"></div>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    <a href="#analytics" class="top-nav-tab" data-category="analytics" style="display:flex; align-items:center; gap:8px; margin-top:20px; font-size:13px; color:#1B4965; text-decoration:none; font-weight:600;">
+                    <a href="#analytics" class="top-nav-tab" data-category="analytics" style="display:flex; align-items:center; gap:8px; margin-top:20px; font-size:13px; color: var(--admin-accent-color, #1B4965); text-decoration:none; font-weight:600;">
                         <span>Se detaljert analyse</span>
                         <span class="material-symbols-outlined" aria-hidden="true" style="font-size: 16px;">arrow_forward</span>
                     </a>
@@ -4806,7 +4806,7 @@ class AdminManager {
                     align-items: center;
                     gap: 12px;
                     margin-bottom: 8px;
-                    color: #1e293b;
+                    color: var(--admin-text, #1e293b);
                 }
                 .dashboard-col-header h4 {
                     margin: 0;
@@ -4814,8 +4814,8 @@ class AdminManager {
                     font-weight: 700;
                 }
                 .stat-card.modern {
-                    background: white !important;
-                    border: 1px solid #e2e8f0 !important;
+                    background: var(--admin-surface, white) !important;
+                    border: 1px solid var(--admin-border, #e2e8f0) !important;
                     border-radius: 12px !important;
                     padding: 24px !important;
                     display: flex !important;
@@ -4825,21 +4825,21 @@ class AdminManager {
                     box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
                 }
                 .stat-card.modern:hover {
-                    border-color: #d17d39 !important;
+                    border-color: var(--admin-accent-color, #d17d39) !important;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
                     transform: translateY(-2px);
                 }
                 .stat-label {
                     font-size: 11px !important;
                     font-weight: 700 !important;
-                    color: #64748b !important;
+                    color: var(--admin-text-muted, #64748b) !important;
                     text-transform: uppercase !important;
                     letter-spacing: 0.05em !important;
                 }
                 .stat-value {
                     font-size: 28px !important;
                     font-weight: 800 !important;
-                    color: #1e293b !important;
+                    color: var(--admin-text, #1e293b) !important;
                     margin: 0 !important;
                 }
                 .trend-indicator {
@@ -4899,12 +4899,12 @@ class AdminManager {
                 }
                 .overview-hero-action-secondary {
                     height: 42px !important;
-                    background: #ffffff !important;
-                    color: #475569 !important;
+                    background: var(--admin-surface-muted, #ffffff) !important;
+                    color: var(--admin-text-muted, #475569) !important;
                     border-radius: 8px !important;
                     padding: 0 12px !important;
                     font-weight: 600 !important;
-                    border: 1px solid #cbd5e1 !important;
+                    border: 1px solid var(--admin-border, #cbd5e1) !important;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
                     cursor: pointer !important;
                     display: flex !important;
@@ -4918,9 +4918,9 @@ class AdminManager {
                     margin: 0 !important;
                 }
                 .overview-hero-action-secondary:hover {
-                    background: #f8fafc !important;
-                    color: #0f172a !important;
-                    border-color: #94a3b8 !important;
+                    background: var(--admin-surface, #f8fafc) !important;
+                    color: var(--admin-text, #0f172a) !important;
+                    border-color: var(--admin-border, #94a3b8) !important;
                     transform: translateY(-1px) !important;
                 }
                 .overview-hero-action .material-symbols-outlined,
@@ -4934,6 +4934,31 @@ class AdminManager {
                     line-height: 1 !important;
                     width: 18px !important;
                     height: 18px !important;
+                }
+                
+                /* Dark Mode overrides for local page layout */
+                html[data-theme="dark"] .dashboard-col-header {
+                    color: var(--admin-text, #f8fafc) !important;
+                }
+                html[data-theme="dark"] .stat-card.modern {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                }
+                html[data-theme="dark"] .stat-label {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .stat-value {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .overview-hero-action-secondary {
+                    background: #0f172a !important;
+                    color: #cbd5e1 !important;
+                    border-color: #334155 !important;
+                }
+                html[data-theme="dark"] .overview-hero-action-secondary:hover {
+                    background: #1e293b !important;
+                    color: #f8fafc !important;
+                    border-color: #475569 !important;
                 }
             </style>
             <div class="overview-hero-card" style="background: var(--admin-orange-gradient); border-radius: 16px; padding: 48px; position: relative; overflow: hidden; color: white;">
@@ -5115,7 +5140,7 @@ class AdminManager {
             const yVal = minVal + (i / gridSteps) * range;
             const yPos = paddingTop + chartHeight - (i / gridSteps) * chartHeight;
             gridHtml += `
-                <line x1="${paddingLeft}" y1="${yPos}" x2="${width - paddingRight}" y2="${yPos}" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="4,4" />
+                <line x1="${paddingLeft}" y1="${yPos}" x2="${width - paddingRight}" y2="${yPos}" stroke="var(--border-color, #f1f5f9)" stroke-width="1" stroke-dasharray="4,4" />
                 <text x="${paddingLeft - 8}" y="${yPos + 4}" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="end">${Math.round(yVal)}</text>
             `;
         }
