@@ -9776,6 +9776,54 @@ html[data-theme="dark"] .preview-toggle:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
+/* Force mockup card components to adapt to Dark Mode in the admin panel */
+html[data-theme="dark"] .design-ui-preview-frame {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-brand {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-chip {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #typography-preview-text {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #design-preview-body-copy {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-card {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-card-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-card-text {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-btn-secondary {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+
 
 
 
