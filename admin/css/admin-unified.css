@@ -8652,6 +8652,86 @@ html[data-theme="dark"] .bulk-actions {
   border-top-color: var(--admin-border, #334155) !important;
 }
 
+/* Push Notification Dashboard in Dark Mode */
+html[data-theme="dark"] .inbox-push-dashboard {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .push-dashboard-header {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .push-title-text h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .push-title-text p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .push-icon-box {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+html[data-theme="dark"] .design-ui-panel {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .design-ui-panel-header {
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-panel-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .log-filter-btn {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .log-filter-btn.active {
+  background-color: var(--admin-accent-color, #d17d39) !important;
+  background: var(--admin-accent-color, #d17d39) !important;
+  color: #ffffff !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .log-item {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .log-item:hover {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .log-item-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .log-item-meta {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+html[data-theme="dark"] .log-item-date {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
 /* 5. Task Checklist Todo Drawer */
 html[data-theme="dark"] .hkm-todo-drawer {
   background: var(--admin-surface, #1e293b) !important;
