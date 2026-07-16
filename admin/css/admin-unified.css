@@ -8734,6 +8734,123 @@ html[data-theme="dark"] .log-item-date {
   color: var(--admin-text-muted, #94a3b8) !important;
 }
 
+/* HKM Studio Feed & Cards in Dark Mode */
+html[data-theme="dark"] .studio-feed-section h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .studio-feed-section h3 span {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .studio-tabs-container {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .studio-tab {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .studio-tab:hover {
+  color: var(--admin-text, #f8fafc) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-theme="dark"] .studio-tab.active {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-media {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-excerpt {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-footer {
+  border-top-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-meta-item {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-meta-item span.material-symbols-outlined {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-edit-btn {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-edit-btn:hover {
+  background-color: var(--admin-accent-color, #d17d39) !important;
+  background: var(--admin-accent-color, #d17d39) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-delete-btn {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+}
+
+html[data-theme="dark"] .studio-feed-card .card-delete-btn:hover {
+  background-color: #ef4444 !important;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .studio-feed-card.blog-type .card-type-badge {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .studio-feed-card.teaching-type .card-type-badge {
+  background: rgba(52, 211, 153, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .studio-feed-card.newsletter-type .card-type-badge {
+  background: rgba(251, 146, 60, 0.15) !important;
+  color: #fb923c !important;
+}
+
+html[data-theme="dark"] .studio-feed-card.newsletter_draft-type .card-type-badge {
+  background: rgba(250, 204, 21, 0.15) !important;
+  color: #facc15 !important;
+}
+
 /* 5. Task Checklist Todo Drawer */
 html[data-theme="dark"] .hkm-todo-drawer {
   background: var(--admin-surface, #1e293b) !important;
