@@ -9256,3 +9256,25 @@ html[data-theme="dark"] .stat-card {
   color: var(--admin-text, #f8fafc) !important;
 }
 
+/* Icon Buttons in Dark Mode */
+html[data-theme="dark"] .icon-btn {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .icon-btn:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+  background-color: rgba(209, 125, 57, 0.15) !important;
+  background: rgba(209, 125, 57, 0.15) !important;
+}
+
+html[data-theme="dark"] .icon-btn.delete:hover {
+  border-color: #ef4444 !important;
+  color: #fca5a5 !important;
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+}
+
