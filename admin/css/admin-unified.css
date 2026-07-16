@@ -7277,11 +7277,15 @@ html[data-theme="dark"] body.minside-body .nav-link.active .material-symbols-out
   background-color: transparent !important;
 }
 
-html[data-theme="dark"] body.admin-body .nav-link.active {
+html[data-theme="dark"] body.admin-body .nav-link.active,
+html[data-theme="dark"] body.crm-body .nav-link.active,
+html[data-theme="dark"] body.builder-active .nav-link.active {
   background-color: rgba(56, 189, 248, 0.15) !important;
   color: #38bdf8 !important;
 }
-html[data-theme="dark"] body.admin-body .nav-link.active .material-symbols-outlined {
+html[data-theme="dark"] body.admin-body .nav-link.active .material-symbols-outlined,
+html[data-theme="dark"] body.crm-body .nav-link.active .material-symbols-outlined,
+html[data-theme="dark"] body.builder-active .nav-link.active .material-symbols-outlined {
   color: #38bdf8 !important;
   background-color: transparent !important;
 }
@@ -8412,7 +8416,11 @@ html[data-theme="dark"] .contacts-grid {
   background: var(--admin-surface, #1e293b) !important;
   border-color: var(--admin-border, #334155) !important;
 }
-html[data-theme="dark"] .table-header {
+html[data-theme="dark"] .table-header,
+html[data-theme="dark"] .card-header,
+html[data-theme="dark"] .logs-header {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  background-color: var(--admin-surface-muted, #0f172a) !important;
   border-bottom-color: var(--admin-border, #334155) !important;
 }
 html[data-theme="dark"] .modal-content {
