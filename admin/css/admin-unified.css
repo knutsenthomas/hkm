@@ -7187,6 +7187,7 @@ body.admin-body div:focus-visible {
    DARK THEME OVERRIDES (Admin Panel)
    ========================================================================== */
 html[data-theme="dark"] {
+  color-scheme: dark !important;
   background-color: #0f172a !important;
   --admin-surface: #1e293b;
 
@@ -7360,7 +7361,7 @@ html[data-theme="dark"] tr:hover td {
 }
 
 /* Form Controls */
-html[data-theme="dark"] input,
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
 html[data-theme="dark"] textarea,
 html[data-theme="dark"] select,
 html[data-theme="dark"] .form-control,
@@ -9660,4 +9661,91 @@ html[data-theme="dark"] .contact-drawer .close-btn {
 html[data-theme="dark"] .contact-drawer .close-btn:hover {
   color: var(--admin-text, #f8fafc) !important;
 }
+
+/* Premium Color Picker styling in dark mode */
+html[data-theme="dark"] .premium-color-wrapper {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .premium-color-hex {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border: none !important;
+}
+
+html[data-theme="dark"] .premium-color-picker-input {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Logo & Favicon Upload Cards in Dark Mode */
+html[data-theme="dark"] .design-ui-upload-card {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-upload-card-preview {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background-image: radial-gradient(#334155 1.5px, transparent 1.5px) !important;
+  border-right-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-upload-card-placeholder {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .design-ui-upload-card-label {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .design-ui-upload-card-hint {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+/* Secondary Button styling in dark mode */
+html[data-theme="dark"] body.admin-body .btn-secondary,
+html[data-theme="dark"] body.crm-body .btn-secondary,
+html[data-theme="dark"] body.builder-active .btn-secondary {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] body.admin-body .btn-secondary:hover,
+html[data-theme="dark"] body.crm-body .btn-secondary:hover,
+html[data-theme="dark"] body.builder-active .btn-secondary:hover {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+/* Circular Edit / Icon Buttons in Dark Mode */
+html[data-theme="dark"] .btn-icon-round {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .btn-icon-round:hover {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-accent-color, #d17d39) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+/* Podcast table row hover background in dark mode */
+html[data-theme="dark"] .podcast-table tr:hover {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+
 

@@ -13433,7 +13433,7 @@ class AdminManager {
             if (previewText) {
                 previewText.style.fontFamily = `'${headingFont}', sans-serif`;
                 previewText.style.fontSize = `${h1Size}px`;
-                previewText.style.color = palette.textColor;
+                previewText.style.setProperty('color', palette.textColor, 'important');
             }
             if (previewBox) {
                 previewBox.style.fontFamily = `'${mainFont}', sans-serif`;
@@ -13441,7 +13441,7 @@ class AdminManager {
             if (previewBody) {
                 previewBody.style.fontFamily = `'${mainFont}', sans-serif`;
                 previewBody.style.fontSize = `${bodySize}px`;
-                previewBody.style.color = palette.textLightColor;
+                previewBody.style.setProperty('color', palette.textLightColor, 'important');
             }
             if (previewCardTitle) {
                 previewCardTitle.style.fontFamily = `'${headingFont}', sans-serif`;
@@ -13452,12 +13452,12 @@ class AdminManager {
             }
             if (previewPrimaryBtn) {
                 previewPrimaryBtn.style.fontFamily = `'${mainFont}', sans-serif`;
-                previewPrimaryBtn.style.background = palette.primaryColor;
+                previewPrimaryBtn.style.setProperty('background', palette.primaryColor, 'important');
             }
             if (previewSecondaryBtn) {
                 previewSecondaryBtn.style.fontFamily = `'${mainFont}', sans-serif`;
-                previewSecondaryBtn.style.borderColor = palette.secondaryColor;
-                previewSecondaryBtn.style.color = palette.secondaryColor;
+                previewSecondaryBtn.style.setProperty('border-color', palette.secondaryColor, 'important');
+                previewSecondaryBtn.style.setProperty('color', palette.secondaryColor, 'important');
             }
             updatePalettePreview(palette);
 
