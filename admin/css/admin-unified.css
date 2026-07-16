@@ -7960,6 +7960,203 @@ html[data-theme="dark"] .stat-card.modern .stat-icon-wrap .material-symbols-outl
   color: #cbd5e1 !important;
 }
 
+/* ==========================================================================
+   ADDITIONAL COMPREHENSIVE DARK MODE OVERRIDES
+   ========================================================================== */
+
+/* 1. Sideinnhold (#content-section) */
+html[data-theme="dark"] #content-section .content-sidebar-head {
+  background: var(--admin-surface, #1e293b) !important;
+  border-bottom: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #content-section .content-sidebar-head h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #content-section .content-sidebar-head p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] #content-section .page-list {
+  background: var(--admin-surface, #1e293b) !important;
+}
+
+html[data-theme="dark"] #content-section .page-item {
+  color: var(--admin-text-muted, #94a3b8) !important;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] #content-section .page-item:hover {
+  background-color: #2d1e18 !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+  border-color: rgba(209, 125, 57, 0.3) !important;
+}
+
+html[data-theme="dark"] #content-section .content-editor-toolbar {
+  background: var(--admin-surface, #1e293b) !important;
+  border-bottom: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #content-section .editing-page-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields {
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group {
+  background: var(--admin-surface, #1e293b) !important;
+  border: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .form-group label {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] #content-section #editor-fields .img-preview-mini {
+  border-color: var(--admin-border, #334155) !important;
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+}
+
+/* 2. Mediebibliotek (#media-section) */
+html[data-theme="dark"] .media-library-stats .stat-card {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .media-library-stats .stat-card h4 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .media-library-stats .stat-card p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .media-controls-bar {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] #media-location-select,
+html[data-theme="dark"] #media-sort-select {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #btn-new-folder {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] #btn-new-folder:hover {
+  background: #2d1e18 !important;
+  color: #ff8854 !important;
+}
+
+html[data-theme="dark"] #media-dropzone {
+  border-color: var(--admin-border, #334155) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] #media-dropzone h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #media-dropzone p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .media-item .media-preview {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .media-item .folder-preview {
+  background: var(--admin-surface, #1e293b) !important;
+}
+
+html[data-theme="dark"] .media-item .folder-preview span {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+html[data-theme="dark"] .media-item .media-name {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .media-item .media-meta {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+/* 3. Podcast & General kinetic/media cards */
+html[data-theme="dark"] .card.kinetic-card,
+html[data-theme="dark"] .media-card,
+html[data-theme="dark"] .premium-media-card {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+/* 4. CRM & Inbox general overrides */
+html[data-theme="dark"] .welcome-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] body.crm-body .btn-icon {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .inbox-row-icon {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .inbox-row--unread .inbox-row-icon {
+  background: #2d1e18 !important;
+  border-color: rgba(209, 125, 57, 0.4) !important;
+  color: #ff8854 !important;
+}
+
+/* 5. Modals, dropzones, panels, filter dropdowns & templates */
+html[data-theme="dark"] .admin-modal-header {
+  background: var(--admin-surface, #1e293b) !important;
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .admin-modal-body {
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] #video-drop-zone {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-panel,
+html[data-theme="dark"] .cause-item {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] #enrollment-course-filter,
+html[data-theme="dark"] #enrollment-status-filter {
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .hkm-email-card,
+html[data-theme="dark"] .hkm-email-header {
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
 
 
 
