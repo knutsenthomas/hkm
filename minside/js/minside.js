@@ -5274,7 +5274,9 @@ class MinSideManager {
                     font-weight: 600;
                     color: rgba(100, 116, 139, 0.6);
                     background: transparent;
-                    border: none;
+                    border-top: none;
+                    border-left: none;
+                    border-right: 1px solid #e2e8f0;
                     border-bottom: 2px solid transparent;
                     cursor: pointer;
                     display: flex;
@@ -5282,6 +5284,9 @@ class MinSideManager {
                     justify-content: center;
                     gap: 8px;
                     transition: all 0.3s ease;
+                }
+                .hkm-tab-btn:last-child {
+                    border-right: none;
                 }
                 .hkm-tab-btn:hover {
                     color: #1e293b;
@@ -5634,6 +5639,10 @@ class MinSideManager {
                 }
                 html[data-theme="dark"] .hkm-tab-btn {
                     color: rgba(148, 163, 184, 0.6) !important;
+                    border-right-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn:last-child {
+                    border-right-color: transparent !important;
                 }
                 html[data-theme="dark"] .hkm-tab-btn[style*="border-right"] {
                     border-right-color: #334155 !important;
@@ -5785,11 +5794,11 @@ class MinSideManager {
                 <div class="hkm-player-sidebar">
                     <div class="hkm-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
                         <!-- Tabs Header -->
-                        <div class="hkm-tabs-header" style="display: flex; border-bottom: 1px solid #e2e8f0;">
-                            <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons" style="border-right: 1px solid #e2e8f0;">
+                        <div class="hkm-tabs-header" style="display: flex;">
+                            <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons">
                                 <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
                             </button>
-                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="notes" style="border-right: 1px solid #e2e8f0;">
+                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="notes">
                                 <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
                             </button>
                             <button class="hkm-tab-btn sidebar-tab-btn" data-tab="bible">

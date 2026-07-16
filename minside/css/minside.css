@@ -4904,3 +4904,31 @@ html[data-theme="dark"] .bento-teal .bento-icon-wrap {
 html[data-theme="dark"] .bento-teal .bento-card-desc {
     color: #2dd4bf !important;
 }
+
+/* Dark Mode Override for inline styled cards and borders in Min Side */
+html[data-theme="dark"] #view-container [style*="background:#fff"],
+html[data-theme="dark"] #view-container [style*="background: #fff"],
+html[data-theme="dark"] #view-container [style*="background:white"],
+html[data-theme="dark"] #view-container [style*="background: white"],
+html[data-theme="dark"] #view-container [style*="background:#ffffff"],
+html[data-theme="dark"] #view-container [style*="background: #ffffff"],
+html[data-theme="dark"] #view-container [style*="background:rgb(255,255,255)"],
+html[data-theme="dark"] #view-container [style*="background:rgb(255, 255, 255)"],
+html[data-theme="dark"] #view-container [style*="background: rgb(255, 255, 255)"] {
+  background: var(--card-bg, #1e293b) !important;
+  border-color: var(--border-solid, #334155) !important;
+  color: var(--text-main, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #view-container [style*="border: 1px solid #e2e8f0"],
+html[data-theme="dark"] #view-container [style*="border:1px solid #e2e8f0"],
+html[data-theme="dark"] #view-container [style*="border: 1px solid rgb(226, 232, 240)"],
+html[data-theme="dark"] #view-container [style*="border:1px solid rgb(226, 232, 240)"] {
+  border-color: var(--border-solid, #334155) !important;
+}
+
+html[data-theme="dark"] #view-container [style*="border-bottom: 1px solid #e2e8f0"],
+html[data-theme="dark"] #view-container [style*="border-bottom:1px solid #e2e8f0"] {
+  border-bottom-color: var(--border-solid, #334155) !important;
+}
+

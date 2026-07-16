@@ -2737,13 +2737,13 @@ class AdminManager {
                 transition: opacity 0.3s ease;
             `;
             loaderOverlay.innerHTML = `
-                <div class="card" style="padding: 40px !important; text-align: center !important; max-width: 480px !important; width: 90% !important; height: auto !important; min-height: auto !important; border-radius: 24px !important; background: white !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box !important;">
+                <div class="card" style="padding: 40px !important; text-align: center !important; max-width: 480px !important; width: 90% !important; height: auto !important; min-height: auto !important; border-radius: 24px !important; background: var(--admin-surface, white) !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box !important;">
                     <div style="width: 80px; height: 80px; margin: 0 auto 24px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(209, 125, 57, 0.25);">
                         <span class="material-symbols-outlined" style="font-size: 36px; color: white; animation: spin 2s linear infinite;">auto_awesome</span>
                     </div>
-                    <h3 style="font-size: 20px; font-weight: 800; color: #1e293b; margin: 0 0 12px; font-family: 'Inter', sans-serif !important;">Oppretter AI-utkast</h3>
-                    <p style="font-size: 14px; color: #64748b; font-weight: 500; margin: 0 0 24px; line-height: 1.6; font-family: 'Inter', sans-serif !important;">Vennligst vent mens vår AI-assistent skriver et engasjerende blogginnlegg for <strong>"${this.escapeHtml(parsed.title)}"</strong>. Dette tar normalt 5-10 sekunder.</p>
-                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; position: relative;">
+                    <h3 style="font-size: 20px; font-weight: 800; color: var(--admin-text, #1e293b); margin: 0 0 12px; font-family: 'Inter', sans-serif !important;">Oppretter AI-utkast</h3>
+                    <p style="font-size: 14px; color: var(--admin-text-muted, #64748b); font-weight: 500; margin: 0 0 24px; line-height: 1.6; font-family: 'Inter', sans-serif !important;">Vennligst vent mens vår AI-assistent skriver et engasjerende blogginnlegg for <strong>"${this.escapeHtml(parsed.title)}"</strong>. Dette tar normalt 5-10 sekunder.</p>
+                    <div style="width: 100%; height: 6px; background: var(--admin-border, #e2e8f0); border-radius: 3px; overflow: hidden; position: relative;">
                         <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, #d17d39, #bd4f2a); border-radius: 3px; animation: loading-bar 1.5s infinite ease-in-out;"></div>
                     </div>
                 </div>
@@ -8430,7 +8430,7 @@ class AdminManager {
                     ${actionsHtml}
                 </div>
             </div>
-            <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 20px !important; border: 1px solid #f1f5f9 !important; background: white !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
+            <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 20px !important; border: 1px solid var(--admin-border, #f1f5f9) !important; background: var(--admin-surface, white) !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
                 <div id="${collectionId}-list" class="table-container full-bleed">
                     <div class="loader">Laster ${title.toLowerCase()}...</div>
                 </div>
@@ -8813,7 +8813,7 @@ class AdminManager {
             ${overviewHtml}
             <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <table style="width: 100%; min-width: 800px; border-collapse: collapse; text-align: left; table-layout: auto;">
-                    <thead style="background: #fafbfc; border-bottom: 1px solid #f1f5f9;">
+                    <thead style="background: var(--admin-surface-muted, #fafbfc); border-bottom: 1px solid var(--admin-border, #f1f5f9);">
                         <tr>
                             <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; min-width: 280px;">Innhold</th>
                             <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; min-width: 120px; white-space: nowrap;">Dato</th>
@@ -26873,8 +26873,8 @@ class AdminManager {
                 position: absolute;
                 left: 0;
                 right: 0;
-                background: #ffffff !important;
-                border: 1px solid #e2e8f0 !important;
+                background: var(--admin-surface, #ffffff) !important;
+                border: 1px solid var(--admin-border, #e2e8f0) !important;
                 border-radius: 8px !important;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
                 z-index: 1000 !important;
@@ -26894,7 +26894,7 @@ class AdminManager {
                 border: none !important;
                 background: none !important;
                 padding: 8px 16px !important;
-                color: #1a202c !important;
+                color: var(--admin-text, #1a202c) !important;
                 text-align: left !important;
                 cursor: pointer !important;
                 border-radius: 8px !important;
@@ -26902,7 +26902,7 @@ class AdminManager {
                 box-sizing: border-box !important;
             }
             .admin-address-result-row:hover {
-                background: #f7fafc !important;
+                background: var(--admin-surface-muted, #f7fafc) !important;
             }
             .admin-address-result-row:active {
                 transform: scale(0.99) !important;

@@ -7376,6 +7376,11 @@ html[data-theme="dark"] textarea::placeholder {
   color: #64748b !important;
 }
 
+html[data-theme="dark"] .form-group label {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+
 html[data-theme="dark"] select {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -7518,7 +7523,7 @@ html[data-theme="dark"] #dashboard-main-header,
 html[data-theme="dark"] .top-bar {
   background: #1e293b !important;
   background-color: #1e293b !important;
-  border-bottom: 1px solid #334155 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
 }
 
 /* Force main content background below the header to be dark navy */
@@ -7708,7 +7713,7 @@ html[data-theme="dark"] .btn-icon {
 /* Dark mode support */
 html[data-theme="dark"] #dashboard-main-header.main-header {
   background: rgba(15, 23, 42, 0.85) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
 }
 
 /* Header Content Alignment */
