@@ -398,18 +398,22 @@ body.crm-body {
 }
 
 /* Round corner cells of .crm-table to align with parent borders */
-.crm-table tr:first-child th:first-child,
-.crm-table tr:first-child td:first-child {
+.crm-table thead tr:first-child th:first-child {
     border-top-left-radius: 16px !important;
 }
-.crm-table tr:first-child th:last-child,
-.crm-table tr:first-child td:last-child {
+.crm-table thead tr:first-child th:last-child {
     border-top-right-radius: 16px !important;
 }
-.crm-table tr:last-child td:first-child {
+.crm-table:not(:has(thead)) tbody tr:first-child td:first-child {
+    border-top-left-radius: 16px !important;
+}
+.crm-table:not(:has(thead)) tbody tr:first-child td:last-child {
+    border-top-right-radius: 16px !important;
+}
+.crm-table tbody tr:last-child td:first-child {
     border-bottom-left-radius: 16px !important;
 }
-.crm-table tr:last-child td:last-child {
+.crm-table tbody tr:last-child td:last-child {
     border-bottom-right-radius: 16px !important;
 }
 
