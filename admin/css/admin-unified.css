@@ -7207,14 +7207,34 @@ html[data-theme="dark"] body.builder-active {
 /* Sidebar PC background overrides */
 @media (min-width: 992px) {
   html[data-theme="dark"] body.builder-active .sidebar,
-  html[data-theme="dark"] body.builder-active #admin-sidebar,
-  html[data-theme="dark"] .sidebar {
+  html[data-theme="dark"] body.builder-active #admin-sidebar {
     background: #1e293b !important;
     border-right: 1px solid #334155 !important;
   }
   html[data-theme="dark"] body.builder-recipients-open .recipients-drawer {
     background: #1e293b !important;
   }
+}
+
+/* Sidebar and mobile bottom navigation overrides for Dark Mode */
+html[data-theme="dark"] .sidebar {
+  background: #1e293b !important;
+  border-right: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav {
+  background: rgba(30, 41, 59, 0.92) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav .mobile-nav-item.active {
+  color: var(--accent-orange, #d17d39) !important;
 }
 
 /* Sidebar Navigation Items */
