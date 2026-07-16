@@ -9278,3 +9278,19 @@ html[data-theme="dark"] .icon-btn.delete:hover {
   background: rgba(239, 68, 68, 0.15) !important;
 }
 
+/* Stat Items (Metrics Bar) in Dark Mode */
+html[data-theme="dark"] .stat-item {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .stat-item .stat-value {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .stat-item .stat-label {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+
