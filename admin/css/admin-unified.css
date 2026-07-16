@@ -9040,6 +9040,144 @@ html[data-theme="dark"] .todo-drawer-actions button:hover {
   color: var(--admin-text, #f8fafc) !important;
 }
 
+/* 5b. Task Manager Dashboard (Full-Page View) */
+html[data-theme="dark"] .todo-main-card {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+  border-color: rgba(51, 65, 85, 0.5) !important;
+}
+html[data-theme="dark"] .todo-sidebar-card {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button.active-filter {
+  background-color: rgba(27, 73, 101, 0.25) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button.active-filter span {
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button span {
+  color: var(--admin-text-muted, #94a3b8);
+}
+html[data-theme="dark"] .todo-sidebar-card button.active-filter span.text-\[10px\],
+html[data-theme="dark"] .todo-sidebar-card button.active-filter span[class*="rounded-full"] {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .todo-sidebar-card button span.text-\[10px\],
+html[data-theme="dark"] .todo-sidebar-card button span[class*="rounded-full"] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-main-card h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-badge {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] .todo-search-input {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-search-input::placeholder {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-quick-add-form {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-quick-add-form input {
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-quick-add-form textarea {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-quick-add-form .bg-slate-50 {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-quick-add-form .bg-slate-50:hover {
+  background-color: var(--admin-surface, #1e293b) !important;
+}
+html[data-theme="dark"] .todo-empty-card {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-empty-card h4 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-task-item {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-task-item:hover {
+  border-color: var(--admin-accent-color, #d17d39) !important;
+}
+html[data-theme="dark"] .todo-task-item h4 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-task-item p {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-task-item .bg-slate-50 {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-completed-item {
+  background-color: rgba(30, 41, 59, 0.3) !important;
+  border-color: rgba(51, 65, 85, 0.4) !important;
+}
+html[data-theme="dark"] .todo-completed-item h4 {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-completed-item p {
+  color: rgba(148, 163, 184, 0.6) !important;
+}
+html[data-theme="dark"] .todo-completed-item .bg-slate-50 {
+  background-color: rgba(15, 23, 42, 0.2) !important;
+  border-color: rgba(51, 65, 85, 0.2) !important;
+  color: rgba(148, 163, 184, 0.5) !important;
+}
+html[data-theme="dark"] .todo-modal-container {
+  background-color: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+html[data-theme="dark"] .todo-modal-container .bg-slate-50\/50 {
+  background-color: rgba(15, 23, 42, 0.4) !important;
+}
+html[data-theme="dark"] .todo-modal-container input,
+html[data-theme="dark"] .todo-modal-container textarea,
+html[data-theme="dark"] .todo-modal-container select {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-modal-container select option {
+  background-color: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-modal-container label {
+  color: var(--admin-text-muted, #94a3b8) !important;
+}
+html[data-theme="dark"] .todo-modal-container .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+html[data-theme="dark"] .todo-modal-container .bg-slate-100:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* 6. AI Inspiration Banner Suggestions Cards */
 html[data-theme="dark"] #ai-suggestions-view-area h4 {
   color: var(--admin-text, #f8fafc) !important;

@@ -449,7 +449,7 @@ export default function TodoApp() {
                 </button>
 
                 {/* Sidebar Navigation Options */}
-                <div className="bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm flex flex-col gap-1">
+                <div className="bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm flex flex-col gap-1 todo-sidebar-card">
                     <span className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">Hurtigvalg</span>
                     
                     <button 
@@ -458,7 +458,7 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isAllActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isAllActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
                         <span 
                             className={`material-symbols-outlined text-base ${isAllActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -490,7 +490,7 @@ export default function TodoApp() {
                             setFilterAssignee('me');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isMeActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isMeActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
                         <span 
                             className={`material-symbols-outlined text-base ${isMeActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -522,7 +522,7 @@ export default function TodoApp() {
                             setFilterAssignee('global');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isGlobalActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isGlobalActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
                         <span 
                             className={`material-symbols-outlined text-base ${isGlobalActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -554,7 +554,7 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('high');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isStarredActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isStarredActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
                         <span 
                             className={`material-symbols-outlined text-base ${isStarredActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -586,7 +586,7 @@ export default function TodoApp() {
                             setFilterAssignee('all');
                             setFilterPriority('all');
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isCompletedViewActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isCompletedViewActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
                         <span 
                             className={`material-symbols-outlined text-base ${isCompletedViewActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -627,7 +627,7 @@ export default function TodoApp() {
                                     setFilterAssignee(u.uid);
                                     setFilterPriority('all');
                                 }}
-                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isUserActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isUserActive ? 'bg-[#1B4965]/5 text-[#1B4965] active-filter' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <span 
                                     className={`material-symbols-outlined text-base ${isUserActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
@@ -658,7 +658,7 @@ export default function TodoApp() {
             </div>
 
             {/* Right Main Content Panel */}
-            <div className="flex-grow bg-[#f8fafc]/50 rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col gap-6 w-full">
+            <div className="flex-grow bg-[#f8fafc]/50 rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col gap-6 w-full todo-main-card">
                 
                 {/* Style tag for butter-smooth CSS animations */}
                 <style dangerouslySetInnerHTML={{ __html: `
@@ -704,7 +704,7 @@ export default function TodoApp() {
                     <div className="flex-shrink-0">
                         <div className="flex items-center gap-3 flex-nowrap">
                             <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight whitespace-nowrap">{activeViewTitle}</h3>
-                            <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm whitespace-nowrap flex-shrink-0">
+                            <span className="todo-badge text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm whitespace-nowrap flex-shrink-0">
                                 {viewMode === 'completed' 
                                     ? `${completedTasks.length} ${completedTasks.length === 1 ? 'fullført' : 'fullførte'}` 
                                     : `${activeTasks.length} ${activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}`
@@ -733,7 +733,7 @@ export default function TodoApp() {
                     <div className="flex flex-col gap-4">
                         {completedTasks.length === 0 ? (
                             /* Premium completed empty state vector illustration */
-                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center">
+                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center todo-empty-card">
                                 <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
                                     <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="60" cy="60" r="50" fill="url(#completedEmptyGrad)" fillOpacity="0.06" />
@@ -865,7 +865,7 @@ export default function TodoApp() {
                         {/* Premium Standalone Inline Quick-Add Card */}
                         <form 
                             onSubmit={handleInlineQuickAdd} 
-                            className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm ${
+                            className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm todo-quick-add-form ${
                                 isQuickAddExpanded 
                                     ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
                                     : 'py-3 px-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
@@ -1006,7 +1006,7 @@ export default function TodoApp() {
                         <div className="flex flex-col gap-4">
                             {activeTasks.length === 0 ? (
                                 /* Premium empty state vector drawing illustration */
-                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center">
+                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center todo-empty-card">
                                     <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
                                         <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
@@ -1061,7 +1061,7 @@ export default function TodoApp() {
                                     return (
                                         <div 
                                             key={t.id} 
-                                            className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
+                                            className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear todo-task-item"
                                         >
                                             {/* Styled circular Checkbox */}
                                             <div 
@@ -1175,7 +1175,7 @@ export default function TodoApp() {
                                         {completedTasks.map(t => (
                                             <div 
                                                 key={t.id} 
-                                                className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative"
+                                                className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative todo-completed-item"
                                             >
                                                 {/* Checked status checkbox */}
                                                 <div 
@@ -1242,7 +1242,7 @@ export default function TodoApp() {
                     />
                     
                     {/* Modal Content container */}
-                    <div className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95">
+                    <div className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 todo-modal-container">
                         
                         {/* Header */}
                         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
