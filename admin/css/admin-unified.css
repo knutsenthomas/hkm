@@ -9754,6 +9754,29 @@ html[data-theme="dark"] .design-ui-preview-image {
   border-color: var(--admin-border, #334155) !important;
 }
 
+/* Live Preview Canvas & Device Toggles in Dark Mode */
+html[data-theme="dark"] .design-ui-live-preview {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .design-ui-preview-toggles {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] .preview-toggle.active {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .preview-toggle:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+
 
 
 
