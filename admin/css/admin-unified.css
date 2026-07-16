@@ -9212,3 +9212,47 @@ html[data-theme="dark"] tr:hover td {
   background-color: #334155 !important;
 }
 
+/* Generic Blanket Safety Net for Dark Mode: Overrides ALL inline white/light backgrounds and borders on divs/sections/cards */
+html[data-theme="dark"] div[style*="background: white"],
+html[data-theme="dark"] div[style*="background:white"],
+html[data-theme="dark"] div[style*="background: #fff"],
+html[data-theme="dark"] div[style*="background:#fff"],
+html[data-theme="dark"] div[style*="background: #ffffff"],
+html[data-theme="dark"] div[style*="background:#ffffff"],
+html[data-theme="dark"] div[style*="background: rgb(255, 255, 255)"],
+html[data-theme="dark"] div[style*="background:rgb(255, 255, 255)"] {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] div[style*="background:#f8fafc"],
+html[data-theme="dark"] div[style*="background: #f8fafc"],
+html[data-theme="dark"] div[style*="background:#f1f5f9"],
+html[data-theme="dark"] div[style*="background: #f1f5f9"],
+html[data-theme="dark"] div[style*="background:#fafbfc"],
+html[data-theme="dark"] div[style*="background: #fafbfc"] {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+  border-color: var(--admin-border, #334155) !important;
+}
+
+/* Hardcoded light borders */
+html[data-theme="dark"] div[style*="border: 1px solid #e2e8f0"],
+html[data-theme="dark"] div[style*="border:1px solid #e2e8f0"],
+html[data-theme="dark"] div[style*="border: 1px solid #f1f5f9"],
+html[data-theme="dark"] div[style*="border:1px solid #f1f5f9"],
+html[data-theme="dark"] div[style*="border: 1px solid #cbd5e1"],
+html[data-theme="dark"] div[style*="border:1px solid #cbd5e1"] {
+  border-color: var(--admin-border, #334155) !important;
+}
+
+/* Force dark background for stat cards with inline styling */
+html[data-theme="dark"] .stat-card {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  border-color: var(--admin-border, #334155) !important;
+  color: var(--admin-text, #f8fafc) !important;
+}
+
