@@ -9831,6 +9831,13 @@ html[data-theme="dark"] #live-preview-area {
   --design-surface: var(--admin-surface-muted, #0f172a) !important;
 }
 
+/* Lighter labels for readability inside the design section and range sliders in dark mode */
+html[data-theme="dark"] .design-ui-shell label,
+html[data-theme="dark"] .premium-range-header label {
+  color: var(--admin-text-muted, #cbd5e1) !important;
+}
+
+
 
 
 
