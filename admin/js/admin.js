@@ -13433,7 +13433,7 @@ class AdminManager {
             if (previewText) {
                 previewText.style.fontFamily = `'${headingFont}', sans-serif`;
                 previewText.style.fontSize = `${h1Size}px`;
-                previewText.style.setProperty('color', palette.textColor, 'important');
+                previewText.style.setProperty('color', 'var(--design-text)', 'important');
             }
             if (previewBox) {
                 previewBox.style.fontFamily = `'${mainFont}', sans-serif`;
@@ -13441,7 +13441,7 @@ class AdminManager {
             if (previewBody) {
                 previewBody.style.fontFamily = `'${mainFont}', sans-serif`;
                 previewBody.style.fontSize = `${bodySize}px`;
-                previewBody.style.setProperty('color', palette.textLightColor, 'important');
+                previewBody.style.setProperty('color', 'var(--design-muted)', 'important');
             }
             if (previewCardTitle) {
                 previewCardTitle.style.fontFamily = `'${headingFont}', sans-serif`;

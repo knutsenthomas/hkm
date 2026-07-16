@@ -9823,6 +9823,15 @@ html[data-theme="dark"] .design-ui-preview-btn-secondary {
   border-color: var(--admin-border, #334155) !important;
 }
 
+/* Force CSS Variables to use light colors for typography readability inside dark live preview frame */
+html[data-theme="dark"] #live-preview-area {
+  --design-text: var(--admin-text, #f8fafc) !important;
+  --design-muted: var(--admin-text-muted, #cbd5e1) !important;
+  --design-bg: var(--admin-surface, #1e293b) !important;
+  --design-surface: var(--admin-surface-muted, #0f172a) !important;
+}
+
+
 
 
 
