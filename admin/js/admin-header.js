@@ -899,6 +899,53 @@ const initAdminHeader = () => {
             });
         }
 
+        // 3. Inject theme switcher if missing
+        let themeToggle = actionsContainer.querySelector('#admin-theme-toggle');
+        if (!themeToggle) {
+            themeToggle = document.createElement('button');
+            themeToggle.id = 'admin-theme-toggle';
+            themeToggle.className = 'notification-btn';
+            themeToggle.title = 'Bytt tema';
+            themeToggle.style.marginRight = '8px';
+            
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const iconName = currentTheme === 'dark' ? 'light_mode' : 'dark_mode';
+            
+            themeToggle.innerHTML = `<span class="material-symbols-outlined theme-toggle-icon" style="font-size: 20px;">${iconName}</span>`;
+            
+            // Insert it before profile link
+            const profileLink = actionsContainer.querySelector('.user-profile-link');
+            if (profileLink) {
+                actionsContainer.insertBefore(themeToggle, profileLink);
+            } else {
+                actionsContainer.appendChild(themeToggle);
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                const active = document.documentElement.getAttribute('data-theme') || 'light';
+                const nextTheme = active === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', nextTheme);
+                localStorage.setItem('hkm_theme', nextTheme);
+                
+                const icon = themeToggle.querySelector('.theme-toggle-icon');
+                if (icon) {
+                    icon.textContent = nextTheme === 'dark' ? 'light_mode' : 'dark_mode';
+                }
+                
+                window.dispatchEvent(new CustomEvent('hkmThemeChanged', { detail: { theme: nextTheme } }));
+            });
+
+            // Listen for theme change events to sync icon if changed elsewhere
+            window.addEventListener('hkmThemeChanged', (e) => {
+                const updatedTheme = e.detail.theme;
+                const icon = themeToggle.querySelector('.theme-toggle-icon');
+                if (icon) {
+                    icon.textContent = updatedTheme === 'dark' ? 'light_mode' : 'dark_mode';
+                }
+            });
+        }
+
         // 2. Inject language switcher if missing
         let langSwitcher = actionsContainer.querySelector('.header-lang-switcher');
         if (!langSwitcher) {

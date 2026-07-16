@@ -1938,6 +1938,46 @@
             // No initial static/fictional data is populated on load.
             clearAnalyticsToEmpty();
 
+            function updateChartColors(theme) {
+                const isDark = theme === 'dark';
+                const gridColor = isDark ? '#334155' : '#f1f5f9';
+                const tickColor = isDark ? '#94a3b8' : '#64748b';
+                const legendColor = isDark ? '#94a3b8' : '#475569';
+
+                if (trafficChart) {
+                    trafficChart.options.scales.x.ticks.color = tickColor;
+                    trafficChart.options.scales.y.ticks.color = tickColor;
+                    trafficChart.options.scales.y.grid.color = gridColor;
+                    trafficChart.options.plugins.legend.labels.color = legendColor;
+                    trafficChart.update();
+                }
+                if (gscChart) {
+                    gscChart.options.scales.x.ticks.color = tickColor;
+                    gscChart.options.scales.y.ticks.color = tickColor;
+                    gscChart.options.scales.y.grid.color = gridColor;
+                    if (gscChart.options.scales.y1) {
+                        gscChart.options.scales.y1.ticks.color = tickColor;
+                    }
+                    gscChart.update();
+                }
+            }
+
+            // Sync charts with current theme on load
+            const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateChartColors(initialTheme);
+
+            // Listen for theme change events to dynamically update chart colors
+            window.addEventListener('hkmThemeChanged', (e) => {
+                const nextTheme = e.detail.theme;
+                updateChartColors(nextTheme);
+                
+                // Redraw Google GeoChart if it exists
+                if (typeof drawRegionsMapReal === 'function') {
+                    lastDrawnCitiesJSON = null;
+                    drawRegionsMapReal(lastLoadedCities || []);
+                }
+            });
+
             // 3. Reell GA4 Datainnhenting og API-integrasjon
 
             async function loadRealAnalytics(days) {
@@ -2572,13 +2612,14 @@
                 }
 
                 var dataTable = google.visualization.arrayToDataTable(chartData);
+                const isDarkGeo = document.documentElement.getAttribute('data-theme') === 'dark';
                 var options = {
                     region: hasForeignVisitors ? 'world' : 'NO', // Zoom inn på Norge hvis kun Norge, ellers hele verden
                     displayMode: 'markers', // Vis byer som sirkler/markører
-                    colorAxis: {colors: ['#e2e8f0', '#d17d39']}, 
-                    backgroundColor: '#f8fafc',
-                    datalessRegionColor: '#f1f5f9',
-                    defaultColor: '#f8fafc',
+                    colorAxis: {colors: [isDarkGeo ? '#334155' : '#e2e8f0', '#d17d39']}, 
+                    backgroundColor: isDarkGeo ? '#1e293b' : '#f8fafc',
+                    datalessRegionColor: isDarkGeo ? '#0f172a' : '#f1f5f9',
+                    defaultColor: isDarkGeo ? '#1e293b' : '#f8fafc',
                     legend: 'none',
                     tooltip: { textStyle: { fontName: 'Inter', fontSize: 13 } }
                 };
