@@ -8687,6 +8687,8 @@ html[data-theme="dark"] .design-ui-panel {
 }
 
 html[data-theme="dark"] .design-ui-panel-header {
+  background: var(--admin-surface, #1e293b) !important;
+  background-color: var(--admin-surface, #1e293b) !important;
   border-bottom-color: var(--admin-border, #334155) !important;
 }
 
