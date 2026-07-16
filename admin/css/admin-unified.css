@@ -496,6 +496,26 @@ button.btn {
   box-shadow: 0 10px 24px rgba(14, 165, 233, 0.32);
 }
 
+.btn-danger {
+  background-color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.24);
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+  background: #dc2626;
+  border-color: #b91c1c;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.32);
+}
+
+.btn-danger:active {
+  background-color: #b91c1c;
+  background: #b91c1c;
+}
+
 .btn-outline {
   background: #fff;
   color: var(--admin-text);
@@ -9292,5 +9312,19 @@ html[data-theme="dark"] .stat-item .stat-value {
 
 html[data-theme="dark"] .stat-item .stat-label {
   color: var(--admin-text-muted, #94a3b8) !important;
+}
+
+/* Danger Buttons in Dark Mode */
+html[data-theme="dark"] .btn-danger {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+}
+
+html[data-theme="dark"] .btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.3) !important;
+  background: rgba(239, 68, 68, 0.3) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
 }
 
