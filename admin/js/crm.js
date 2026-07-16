@@ -2115,19 +2115,6 @@ class CRMManager {
         overlay.classList.add('is-open');
         drawer.classList.add('is-open');
 
-        // Initial loading state in drawer
-        body.innerHTML = `
-            <div class="drawer-section">
-                <div class="skeleton skeleton-avatar" style="width:80px; height:80px; margin-bottom:16px;"></div>
-                <div class="skeleton skeleton-text" style="width:200px; height:24px; margin-bottom:8px;"></div>
-                <div class="skeleton skeleton-text" style="width:150px;"></div>
-            </div>
-            <div class="drawer-section">
-                <div class="drawer-section-title">Aktivitetslogg</div>
-                <div class="loader"></div>
-            </div>
-        `;
-
         // Render real profile info
         const firstName = contact.firstName || '';
         const lastName = contact.lastName || '';

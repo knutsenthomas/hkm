@@ -9239,6 +9239,9 @@ html[data-theme="dark"] span[style*="background:#e0e7ff"] {
 html[data-theme="dark"] tr:hover td {
   background-color: #334155 !important;
 }
+html[data-theme="dark"] td {
+  transition: background-color 0.15s ease !important;
+}
 
 /* Generic Blanket Safety Net for Dark Mode: Overrides ALL inline white/light backgrounds and borders on divs/sections/cards */
 html[data-theme="dark"] div[style*="background: white"],
@@ -9334,5 +9337,60 @@ html[data-theme="dark"] .btn-danger:hover {
   background-color: rgba(239, 68, 68, 0.3) !important;
   background: rgba(239, 68, 68, 0.3) !important;
   border-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+/* Contact Detail Drawer in Dark Mode */
+html[data-theme="dark"] .contact-drawer {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+  color: var(--admin-text, #f8fafc) !important;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4) !important;
+  border-left: 1px solid var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .drawer-header {
+  border-bottom-color: var(--admin-border, #334155) !important;
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .drawer-header h2 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .drawer-body {
+  background-color: var(--admin-surface, #1e293b) !important;
+  background: var(--admin-surface, #1e293b) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .drawer-section {
+  border-bottom-color: var(--admin-border, #334155) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .drawer-section-title {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .contact-drawer h3 {
+  color: var(--admin-text, #f8fafc) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .skeleton {
+  background-color: var(--admin-surface-muted, #0f172a) !important;
+  background: var(--admin-surface-muted, #0f172a) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .loader {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-top-color: var(--admin-accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .contact-drawer .close-btn {
+  color: var(--admin-text-muted, #94a3b8) !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .contact-drawer .close-btn:hover {
+  color: var(--admin-text, #f8fafc) !important;
 }
 
