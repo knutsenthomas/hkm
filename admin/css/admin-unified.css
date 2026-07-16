@@ -9390,11 +9390,8 @@ html[data-theme="dark"] .sub-tab-btn.active {
   border-bottom-color: var(--admin-accent-color, #d17d39) !important;
 }
 
-/* Modals & Panels in Course/Design Managers */
 html[data-theme="dark"] #courses-section .design-ui-header,
 html[data-theme="dark"] #courses-section .design-ui-panel,
-html[data-theme="dark"] #courses-section .design-ui-workspace,
-html[data-theme="dark"] #courses-section .design-ui-shell,
 html[data-theme="dark"] #courses-tab-view .design-ui-header,
 html[data-theme="dark"] #enrollments-tab-view .design-ui-header,
 html[data-theme="dark"] #finance-tab-view .design-ui-header {
@@ -9402,6 +9399,14 @@ html[data-theme="dark"] #finance-tab-view .design-ui-header {
   background: var(--admin-surface, #1e293b) !important;
   border-color: var(--admin-border, #334155) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] #courses-section .design-ui-workspace,
+html[data-theme="dark"] #courses-section .design-ui-shell {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 html[data-theme="dark"] #courses-section .section-title {
