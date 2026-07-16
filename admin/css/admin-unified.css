@@ -7353,8 +7353,10 @@ html[data-theme="dark"] .logs-table td {
   background: transparent !important;
 }
 
+html[data-theme="dark"] tr:hover,
 html[data-theme="dark"] tr:hover td {
   background-color: #334155 !important;
+  background: #334155 !important;
 }
 
 /* Form Controls */
@@ -9236,10 +9238,13 @@ html[data-theme="dark"] span[style*="background:#e0e7ff"] {
   background: rgba(67, 56, 202, 0.15) !important;
   color: #818cf8 !important;
 }
+html[data-theme="dark"] tr:hover,
 html[data-theme="dark"] tr:hover td {
   background-color: #334155 !important;
+  background: #334155 !important;
 }
-html[data-theme="dark"] td {
+html[data-theme="dark"] td,
+html[data-theme="dark"] tr {
   transition: background-color 0.15s ease !important;
 }
 
