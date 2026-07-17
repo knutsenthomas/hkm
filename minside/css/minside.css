@@ -1747,6 +1747,35 @@ html[data-theme="dark"] .data-table tbody tr:hover {
     transform: scale(0.97) !important;
 }
 
+.table-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+    .table-card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+        padding: 20px 24px !important;
+    }
+    .table-card-actions {
+        width: 100% !important;
+        gap: 8px !important;
+    }
+    .giving-filter-select {
+        flex: 1 1 calc(50% - 4px) !important;
+        min-width: 100px !important;
+        width: auto !important;
+    }
+    .btn-giving-print {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+}
+
 /* ══════════════════════════════════════════════════════════════════
    COURSES
    ══════════════════════════════════════════════════════════════════ */

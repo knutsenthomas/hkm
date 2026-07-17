@@ -4404,7 +4404,7 @@ class MinSideManager {
                 <div class="table-card-header">
                     <h3>${t('giving.givingHistory')}</h3>
                     
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div class="table-card-actions">
                         <select id="giving-type-filter" class="giving-filter-select">
                             <option value="all">${allTypesLabel}</option>
                             <option value="gave">${typeGiftLabel}</option>
