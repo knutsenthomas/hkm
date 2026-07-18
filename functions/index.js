@@ -225,7 +225,7 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         if (geminiKey) {
           try {
             const genAI = new GoogleGenerativeAI(geminiKey.trim());
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
             const result = await model.generateContent(structurePrompt);
             textResult = (await result.response).text();
           } catch (geminiErr) {
@@ -308,7 +308,7 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         if (geminiKey) {
           try {
             const genAI = new GoogleGenerativeAI(geminiKey.trim());
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
             const result = await model.generateContent(draftPrompt);
             textResult = (await result.response).text();
           } catch (geminiErr) {
@@ -374,7 +374,7 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
     // Prøv Gemini først (billigst/raskest)
     if (geminiKey) {
       const genAI = new GoogleGenerativeAI(geminiKey.trim());
-      const models = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
       for (const m of models) {
         try {
           const model = genAI.getGenerativeModel({ model: m });
@@ -433,7 +433,7 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] },
     // 1. Prøv Google Gemini (2.0 Flash og Lite)
     if (geminiKey) {
       const genAI = new GoogleGenerativeAI(geminiKey.trim());
-      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
       
       for (const modelName of modelsToTry) {
         try {
@@ -541,8 +541,7 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
     const genAI = new GoogleGenerativeAI(geminiKey);
     const transcriptionModelCandidates = [
       "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-2.0-flash-lite",
+      "gemini-2.5-flash-lite",
     ];
     const transcriptionPrompt = [
       {
@@ -6304,7 +6303,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     // 1. Prøv Gemini (Primary & Fallback models)
     try {
       const genAI = new GoogleGenerativeAI(cleanKey);
-      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"];
+      const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"];
       
       for (const modelName of modelsToTry) {
         try {
@@ -6582,7 +6581,7 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
 
   try {
     const genAI = new GoogleGenerativeAI(geminiKey);
-    const modelCandidates = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    const modelCandidates = ['gemini-2.5-flash', 'gemini-1.5-flash'];
     for (const modelName of modelCandidates) {
       const model = genAI.getGenerativeModel({ model: modelName });
       try {
@@ -7124,7 +7123,7 @@ exports.scheduledAiSuggestions = onSchedule({
     ].join("\n");
 
     const genAI = new GoogleGenerativeAI(geminiKey.trim());
-    const model = genAI.getGenerativeModel({model: "gemini-2.0-flash"});
+    const model = genAI.getGenerativeModel({model: "gemini-2.5-flash"});
     const result = await model.generateContent(prompt);
     const textResult = (await result.response).text().trim();
 
