@@ -791,7 +791,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
 }`;
 
               const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-3.5-flash",
                 contents: prompt,
                 config: {
                   responseMimeType: "application/json",
@@ -890,7 +890,7 @@ Tekst som skal oversettes:
 ${definitionText}`;
 
               const translationResp = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-3.5-flash",
                 contents: prompt
               });
 
@@ -945,7 +945,7 @@ Returner kun en gyldig JSON-liste med strenger (de oversatte sitatene i nøyakti
 ${JSON.stringify(quotesToTranslate)}`;
 
               const translationResp = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-3.5-flash",
                 contents: prompt,
                 config: {
                   responseMimeType: "application/json",
@@ -1014,7 +1014,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
 ]`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3.5-flash",
             contents: prompt,
             config: {
               responseMimeType: "application/json",

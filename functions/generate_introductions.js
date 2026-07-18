@@ -33,7 +33,7 @@ if (!geminiApiKey) {
 }
 
 async function generateIntroductionWithGemini(plan) {
-  const model = 'gemini-2.5-flash';
+  const model = 'gemini-3.5-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
 
   const daysVersesList = (plan.days || []).map(d => ({

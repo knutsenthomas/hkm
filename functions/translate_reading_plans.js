@@ -34,7 +34,7 @@ if (!geminiApiKey) {
 
 // Translation Helper
 async function translateJSONWithGemini(sourceObj, targetLang) {
-  const model = 'gemini-2.5-flash';
+  const model = 'gemini-3.5-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
 
   const langMap = {
