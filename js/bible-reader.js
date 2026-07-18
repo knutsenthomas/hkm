@@ -1327,30 +1327,34 @@ class BibleReader {
         // Hide toolbar, clear highlight, and show/hide floating nav on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
         const floatingNav = document.getElementById('floating-bible-nav');
-        let lastScrollTop = 0;
+        let lastScrollTop = mainContentPane ? mainContentPane.scrollTop : 0;
         
         if (mainContentPane) {
             mainContentPane.addEventListener('scroll', () => {
-                if (this.dom.verseToolbar) {
-                    this.dom.verseToolbar.style.display = 'none';
-                }
-                // Clear highlighted verse if the user scrolls manually
-                if (this.highlightedVerseElement && !this.isProgrammaticScrolling) {
-                    this.highlightedVerseElement.classList.remove('verse-temp-highlight');
-                    this.highlightedVerseElement = null;
+                const scrollTop = mainContentPane.scrollTop;
+                const scrollDiff = Math.abs(scrollTop - lastScrollTop);
+                
+                if (scrollDiff > 10) {
+                    if (this.dom.verseToolbar) {
+                        this.dom.verseToolbar.style.display = 'none';
+                    }
+                    // Clear highlighted verse if the user scrolls manually
+                    if (this.highlightedVerseElement && !this.isProgrammaticScrolling) {
+                        this.highlightedVerseElement.classList.remove('verse-temp-highlight');
+                        this.highlightedVerseElement = null;
+                    }
                 }
                 
                 // Hide/show floating book selector on scroll
                 if (floatingNav) {
-                    const scrollTop = mainContentPane.scrollTop;
                     // Only hide if we scrolled down past 50px
                     if (scrollTop > lastScrollTop && scrollTop > 50) {
                         floatingNav.classList.add('hidden-nav');
                     } else {
                         floatingNav.classList.remove('hidden-nav');
                     }
-                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
                 }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
             });
         }
 
