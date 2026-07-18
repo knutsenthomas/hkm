@@ -9168,19 +9168,12 @@ html[data-theme="dark"] .search-suggestion-item.selected {
     background-color: #0f172a !important;
 }
 
+/* Hide scrollbars globally across the entire website while keeping scroll functionality */
+* {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*::-webkit-scrollbar {
+    display: none !important;  /* Chrome, Safari, and Opera */
+}
