@@ -9310,36 +9310,3 @@ html[data-theme="dark"] .skeleton-text::after {
     height: 16px !important;
 }
 
-/* Premium Hero Text Animations (Fade in Up on active slide transition) */
-.hero-slide .hero-title,
-.hero-slide .hero-subtitle,
-.hero-slide .slide-buttons {
-    opacity: 0;
-}
-
-.hero-slide.active .hero-title {
-    animation: hkmHeroFadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
-.hero-slide.active .hero-subtitle {
-    animation: hkmHeroFadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-    animation-delay: 0.2s !important;
-}
-
-.hero-slide.active .slide-buttons {
-    animation: hkmHeroFadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-    animation-delay: 0.4s !important;
-}
-
-@keyframes hkmHeroFadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
