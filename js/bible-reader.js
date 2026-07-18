@@ -1536,7 +1536,17 @@ class BibleReader {
                             // Calculate position relative to scrollable pane to handle inline layout correctly
                             const pane = this.dom.readingPane.closest('.bible-content-pane');
                             const paneRect = pane.getBoundingClientRect();
-                            const y = e.clientY - paneRect.top + pane.scrollTop - 10;
+                            const clickRelativeY = e.clientY - paneRect.top;
+                            const y = clickRelativeY + pane.scrollTop - 10;
+                            
+                            // If the click is near the top of the reading pane (less than 350px),
+                            // position the toolbar below the click to avoid getting cut off at the top.
+                            const showBelow = clickRelativeY < 350;
+                            if (showBelow) {
+                                this.dom.verseToolbar.classList.add('position-below');
+                            } else {
+                                this.dom.verseToolbar.classList.remove('position-below');
+                            }
                             
                             this.dom.verseToolbar.style.left = '50%';
                             this.dom.verseToolbar.style.top = `${y}px`;
