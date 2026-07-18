@@ -3157,14 +3157,20 @@ html[data-theme="dark"] .user-profile-link:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
+html[data-theme="dark"] body.minside-body .main-header [id="ph-avatar"],
+html[data-theme="dark"] body.minside-body .main-header .user-avatar,
+html[data-theme="dark"] body.minside-body .user-profile-link [id="ph-avatar"],
+html[data-theme="dark"] body.minside-body .user-profile-link .user-avatar,
 html[data-theme="dark"] [id="ph-avatar"],
 html[data-theme="dark"] .user-avatar {
-  border-color: #1e293b !important;
+  border: 2px solid #1e293b !important;
 }
 
+html[data-theme="dark"] body.minside-body .main-header .user-profile-link:hover [id="ph-avatar"],
+html[data-theme="dark"] body.minside-body .main-header .user-profile-link:hover .user-avatar,
 html[data-theme="dark"] .user-profile-link:hover [id="ph-avatar"],
 html[data-theme="dark"] .user-profile-link:hover .user-avatar {
-  border-color: #334155 !important;
+  border: 2px solid #334155 !important;
 }
 
 html[data-theme="dark"] body.minside-body .main-header .user-name,
