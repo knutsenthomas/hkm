@@ -8308,47 +8308,7 @@ class MinSideManager {
                 </button>
             </div>
 
-            <!-- New note form (hidden by default) -->
-            <div class="new-note-form is-hidden" id="new-note-form">
-                <div class="form-group">
-                    <label>${t('notes.title')}</label>
-                    <input id="note-title-input" placeholder="${t('notes.titlePlaceholder')}" autocomplete="off">
-                </div>
-                <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
-                    <label>Kategori</label>
-                    <select id="note-category-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-solid); background: var(--main-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;">
-                        <option value="">Ingen kategori</option>
-                        ${categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
-                    <label>${t('notes.content')}</label>
-                    <div class="rte-wrapper">
-                        <div class="rte-toolbar" id="rte-toolbar-new">
-                            <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
-                            <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
-                            <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
-                            <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
-                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
-                            <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                            <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
-                        </div>
-                        <div class="rte-editor" id="note-body-editor" contenteditable="true"
-                            data-placeholder="${t('notes.contentPlaceholder')}"></div>
-                    </div>
-                </div>
-                <div class="ms-actions-row-end">
-                    <button class="btn btn-ghost btn-sm" id="cancel-note-btn">${t('common.cancel')}</button>
-                    <button class="btn btn-primary btn-sm" id="save-note-btn">
-                        <span class="material-symbols-outlined">save</span>
-                        ${t('notes.saveNote')}
-                    </button>
-                </div>
-            </div>
+
 
             <!-- Personal notes list -->
             <div id="personal-notes-list" class="${currentView === 'list' ? 'personal-notes-list' : 'personal-notes-grid'}">
@@ -8433,61 +8393,108 @@ class MinSideManager {
             }
         });
 
-        // Wire RTE toolbar
-        this._wireRteToolbar('rte-toolbar-new', 'note-body-editor');
-
-        // Toggle new note form
+        // New note click event (opens full screen editor)
         document.getElementById('new-note-btn')?.addEventListener('click', () => {
-            const form = document.getElementById('new-note-form');
-            if (!form) return;
-            const willOpen = form.classList.contains('is-hidden');
-            form.classList.toggle('is-hidden');
-            if (willOpen) document.getElementById('note-title-input')?.focus();
-        });
+            container.innerHTML = `
+            <div class="full-screen-note-editor" style="width: 100%; display: flex; flex-direction: column; min-height: calc(100vh - 200px); box-sizing: border-box;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                    <h2 style="font-size: 24px; font-weight: 700; color: var(--accent-color, #d17d39); margin:0;">${t('notes.newNote') || 'Nytt notat'}</h2>
+                    <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back')}
+                    </button>
+                </div>
+                
+                <div class="new-note-form" id="new-note-form" style="display: flex; flex-direction: column; flex-grow: 1; box-shadow: none; border: none; padding: 0; background: transparent; gap: 20px;">
+                    <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.title')}</label>
+                        <input id="note-title-input" placeholder="${t('notes.titlePlaceholder')}" autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border-solid); background: var(--main-bg); color: var(--text-main);">
+                    </div>
+                    <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">Kategori</label>
+                        <select id="note-category-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-solid); background: var(--main-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;">
+                            <option value="">Ingen kategori</option>
+                            ${categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group ms-form-group-gap-12" style="margin: 0; flex-grow: 1; display: flex; flex-direction: column;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.content')}</label>
+                        <div class="rte-wrapper" style="border: 1px solid var(--border-solid); border-radius: 12px; overflow: hidden; background: var(--main-bg); flex-grow: 1; display: flex; flex-direction: column;">
+                            <div class="rte-toolbar" id="rte-toolbar-new" style="border-bottom: 1px solid var(--border-solid); background: var(--card-bg); padding: 8px 12px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+                                <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                                <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                                <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                                <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                                <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                                <div class="rte-divider"></div>
+                                <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
+                            </div>
+                            <div class="rte-editor" id="note-body-editor" contenteditable="true" style="flex-grow: 1; min-height: 400px; padding: 20px; outline: none; color: var(--text-main); font-size: 15px; line-height: 1.6; overflow-y: auto;" data-placeholder="${t('notes.contentPlaceholder')}"></div>
+                        </div>
+                    </div>
+                    <div class="ms-actions-row-end" style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0;">
+                        <button class="btn btn-ghost" id="cancel-note-btn" style="padding: 10px 24px; font-weight: 600;">${t('common.cancel')}</button>
+                        <button class="btn btn-primary" id="save-note-btn" style="padding: 10px 28px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; font-weight: 600;">
+                            <span class="material-symbols-outlined">save</span>
+                            ${t('notes.saveNote')}
+                        </button>
+                    </div>
+                </div>
+            </div>`;
 
-        document.getElementById('cancel-note-btn')?.addEventListener('click', () => {
-            document.getElementById('new-note-form')?.classList.add('is-hidden');
-            document.getElementById('note-title-input').value = '';
-            document.getElementById('note-body-editor').innerHTML = '';
-        });
+            // Wire RTE toolbar
+            this._wireRteToolbar('rte-toolbar-new', 'note-body-editor');
+            document.getElementById('note-title-input')?.focus();
 
-        // Save new note
-        document.getElementById('save-note-btn')?.addEventListener('click', async () => {
-            const title = document.getElementById('note-title-input').value.trim();
-            const category = document.getElementById('note-category-select').value;
-            const editor = document.getElementById('note-body-editor');
-            const text = editor?.innerHTML?.trim() || '';
-            const plain = editor?.innerText?.trim() || '';
-            if (!plain) { editor?.focus(); return; }
-
-            const btn = document.getElementById('save-note-btn');
-            btn.disabled = true; btn.textContent = t('common.saving');
-
-            try {
-                const ref = await firebase.firestore().collection('personal_notes').add({
-                    userId: uid,
-                    title: title || t('notes.untitled'),
-                    text,
-                    category: category || '',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                });
-                // Add to state and re-render
-                personalNotes.unshift(this._normalizeNoteDoc({
-                    id: ref.id,
-                    title: title || t('notes.untitled'),
-                    text,
-                    category: category || '',
-                    userId: uid,
-                    createdAt: { toDate: () => new Date() }
-                }, 'personal'));
+            const closeNewEditor = () => {
                 this._renderNotesUI(container, personalNotes, hkmNotes, categories);
-            } catch (e) {
-                console.error('Save note error:', e);
-                alert(t('notes.saveError') + ': ' + e.message);
-                btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('notes.saveNote')}`;
-            }
+            };
+
+            // Wire cancel / close buttons
+            container.querySelector('.close-editor-btn')?.addEventListener('click', closeNewEditor);
+            document.getElementById('cancel-note-btn')?.addEventListener('click', closeNewEditor);
+
+            // Save handler
+            document.getElementById('save-note-btn')?.addEventListener('click', async () => {
+                const title = document.getElementById('note-title-input').value.trim();
+                const category = document.getElementById('note-category-select').value;
+                const editor = document.getElementById('note-body-editor');
+                const text = editor?.innerHTML?.trim() || '';
+                const plain = editor?.innerText?.trim() || '';
+                if (!plain) { editor?.focus(); return; }
+
+                const btn = document.getElementById('save-note-btn');
+                btn.disabled = true; btn.textContent = t('common.saving');
+
+                try {
+                    const ref = await firebase.firestore().collection('personal_notes').add({
+                        userId: uid,
+                        title: title || t('notes.untitled'),
+                        text,
+                        category: category || '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                    
+                    personalNotes.unshift(this._normalizeNoteDoc({
+                        id: ref.id,
+                        title: title || t('notes.untitled'),
+                        text,
+                        category: category || '',
+                        userId: uid,
+                        createdAt: { toDate: () => new Date() }
+                    }, 'personal'));
+                    closeNewEditor();
+                } catch (e) {
+                    console.error('Save note error:', e);
+                    alert(t('notes.saveError') + ': ' + e.message);
+                    btn.disabled = false;
+                    btn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('notes.saveNote')}`;
+                }
+            });
         });
 
         // Edit buttons
