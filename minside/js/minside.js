@@ -6343,7 +6343,8 @@ class MinSideManager {
                             title: `Notater: Leksjon ${activeLessonIndex + 1} - ${cleanLTitle}`,
                             text: noteText,
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            category: 'Kurs'
                         });
                         noteDocId = docRef.id;
                     }
@@ -7964,7 +7965,8 @@ class MinSideManager {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     isReadingPlanNote: true,
                     readingPlanId: planId,
-                    dayNumber: dayNumber
+                    dayNumber: dayNumber,
+                    category: 'Leseplan'
                 });
         }
     }
@@ -8211,7 +8213,7 @@ class MinSideManager {
 
         // Seed default categories if none found/accessible
         if (categories.length === 0) {
-            const defaultNames = ['Leseplan', 'Bønn', 'Personlig', 'Refleksjon'];
+            const defaultNames = ['Leseplan', 'Kurs', 'Bønn', 'Personlig', 'Refleksjon'];
             categories = defaultNames.map((name, i) => ({ id: `default-${i}`, name }));
         } else {
             categories.sort((a, b) => a.name.localeCompare(b.name));
