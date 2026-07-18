@@ -223,7 +223,7 @@ async function getHistoricalCommentaries(refStr) {
     
     if (matchingEntries.length === 0) return [];
     
-    const entriesToFetch = matchingEntries.slice(0, 3);
+    const entriesToFetch = matchingEntries.slice(0, 2);
     const fetchedCommentaries = await Promise.all(
       entriesToFetch.map(async (entry) => {
         try {
@@ -245,7 +245,7 @@ async function getHistoricalCommentaries(refStr) {
       })
     );
     
-    return fetchedCommentaries.flat();
+    return fetchedCommentaries.flat().slice(0, 2);
   } catch (err) {
     console.error(`Error reading commentaries index for ${safeBookName}:`, err);
     return [];
@@ -930,6 +930,9 @@ ${definitionText}`;
         try {
           let historicalCommentaries = await getHistoricalCommentaries(finalRef);
           
+          // Limit to max 2
+          historicalCommentaries = historicalCommentaries.slice(0, 2);
+
           // Translate if language is not English and Gemini API key is available
           const geminiApiKey = process.env.GEMINI_API_KEY;
           if (historicalCommentaries && historicalCommentaries.length > 0 && lang !== 'en' && geminiApiKey) {
@@ -940,6 +943,7 @@ ${definitionText}`;
               const quotesToTranslate = historicalCommentaries.map(c => c.quote);
               const prompt = `Du er en bibeloversetter og teolog. Oversett følgende historiske sitater/kommentarer til ${targetLangName}. 
 Oversettelsen må være flytende, teologisk nøyaktig, og passe til sitatets høytidelige/historiske stil.
+Hvert sitat skal være kortfattet og konsist. Hvis sitatet er veldig langt (over 500 tegn), oppsummer bare hovedpoenget i oversettelsen.
 
 Returner kun en gyldig JSON-liste med strenger (de oversatte sitatene i nøyaktig samme rekkefølge):
 ${JSON.stringify(quotesToTranslate)}`;
