@@ -347,6 +347,25 @@ service cloud.firestore {
          request.resource.data.userId == request.auth.uid);
     }
 
+    // Categories created by users for their notes
+    match /personal_note_categories/{catId} {
+      allow create: if signedIn() &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow read, delete: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid &&
+         hasKey(request.resource.data, 'userId') &&
+         request.resource.data.userId == request.auth.uid);
+    }
+
     // Shared/user notes (typically admin-authored, user-readable)
     match /user_notes/{noteId} {
       allow read: if isAdmin() ||

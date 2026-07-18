@@ -8172,7 +8172,7 @@ class MinSideManager {
         // Fetch both personal notes and HKM notes in parallel
         let personalNotes = [], hkmNotes = [], categories = [];
         try {
-            const [personalSnap, hkmSnap, catSnap] = await Promise.all([
+            const [personalSnap, hkmSnap] = await Promise.all([
                 firebase.firestore()
                     .collection('personal_notes')
                     .where('userId', '==', uid)
@@ -8180,17 +8180,12 @@ class MinSideManager {
                 firebase.firestore()
                     .collection('user_notes')
                     .where('userId', '==', uid)
-                    .get(),
-                firebase.firestore()
-                    .collection('personal_note_categories')
-                    .where('userId', '==', uid)
                     .get()
             ]);
             personalSnap.forEach(d => personalNotes.push(this._normalizeNoteDoc(d, 'personal')));
             hkmSnap.forEach(d => hkmNotes.push(this._normalizeNoteDoc(d, 'shared')));
-            catSnap.forEach(d => categories.push({ id: d.id, ...d.data() }));
             
-            // Sort
+            // Sort notes
             const sortByDate = (a, b) => {
                 const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
                 const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
@@ -8198,10 +8193,28 @@ class MinSideManager {
             };
             personalNotes.sort(sortByDate);
             hkmNotes.sort(sortByDate);
-            categories.sort((a, b) => a.name.localeCompare(b.name));
         } catch (e) {
-            console.warn('renderNotes fetch:', e);
+            console.warn('renderNotes main fetch:', e);
             this._notify(t('notifications.loadErrorNotice'), 'warning');
+        }
+
+        // Fetch categories separately so any rules/permissions issue doesn't crash the whole notes view
+        try {
+            const catSnap = await firebase.firestore()
+                .collection('personal_note_categories')
+                .where('userId', '==', uid)
+                .get();
+            catSnap.forEach(d => categories.push({ id: d.id, ...d.data() }));
+        } catch (e) {
+            console.warn('renderNotes categories fetch error (normal if rules not deployed yet):', e);
+        }
+
+        // Seed default categories if none found/accessible
+        if (categories.length === 0) {
+            const defaultNames = ['Leseplan', 'Bønn', 'Personlig', 'Refleksjon'];
+            categories = defaultNames.map((name, i) => ({ id: `default-${i}`, name }));
+        } else {
+            categories.sort((a, b) => a.name.localeCompare(b.name));
         }
 
         this._renderNotesUI(container, personalNotes, hkmNotes, categories);
