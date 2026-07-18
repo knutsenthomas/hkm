@@ -830,12 +830,13 @@
         }
 
         /* Light Mode Adjustment */
-        html[data-theme="light"] .floating-chapter-popover .chapter-item {
+        html[data-theme="light"] .floating-chapter-popover .chapter-item:not(.active) {
             background: rgba(0, 0, 0, 0.02) !important;
             border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            color: var(--text-base) !important;
         }
         
-        html[data-theme="light"] .floating-chapter-popover .chapter-item:hover {
+        html[data-theme="light"] .floating-chapter-popover .chapter-item:not(.active):hover {
             background: rgba(0, 0, 0, 0.05) !important;
         }
 
@@ -1802,105 +1803,60 @@
             background: rgba(27, 73, 101, 0.12) !important;
             border-radius: 4px !important;
         }        /* Premium Floating Verse Toolbar */
+        /* Premium Floating Verse Toolbar (Popover Card Style) */
         #verse-context-toolbar {
-            position: absolute !important;
-            background: var(--bg-card) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 9999px !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.1) !important;
-            padding: 6px 10px !important;
+            position: fixed !important;
+            bottom: 80px !important;
+            top: auto !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 320px !important;
+            max-width: calc(100vw - 32px) !important;
+            background: rgba(30, 41, 59, 0.8) !important;
+            backdrop-filter: blur(16px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 20px !important;
+            padding: 16px !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+            z-index: 10002 !important; /* Stand above bottom nav and everything else */
             display: none;
-            align-items: center;
-            gap: 6px !important;
-            z-index: 1000;
-            transform: translate(-50%, -125%) !important;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            flex-direction: column;
+            box-sizing: border-box !important;
+            animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
         }
 
-        .toolbar-action-btn {
-            background: none !important;
-            border: none !important;
-            cursor: pointer !important;
-            color: var(--text-base) !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 36px !important;
-            height: 36px !important;
-            border-radius: 50% !important;
-            transition: all 0.2s ease !important;
-            position: relative !important;
+        html[data-theme="light"] #verse-context-toolbar {
+            background: rgba(255, 255, 255, 0.85) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
         }
 
-        .toolbar-action-btn:hover {
-            background: var(--active-bg) !important;
-            color: var(--bible-primary) !important;
-            transform: translateY(-2px) !important;
+        #verse-context-toolbar .floating-book-item {
+            text-transform: none !important;
+            font-family: inherit !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            width: 100% !important;
+            box-shadow: none !important;
+            margin-bottom: 6px !important;
         }
 
-        .toolbar-action-btn:active {
-            transform: scale(0.92) !important;
+        html[data-theme="light"] #verse-context-toolbar .floating-book-item {
+            background: rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
         }
 
-        #toolbar-btn-lookup {
-            color: var(--bible-primary) !important; /* Use theme primary color (orange/blue) for Lexicon */
-        }
-        #toolbar-btn-lookup:hover {
-            background: var(--active-bg) !important;
-        }
-
-        #toolbar-btn-clear {
-            color: #bd4f2a !important; /* Soft red for close button */
-        }
-        #toolbar-btn-clear:hover {
-            background: var(--active-bg) !important;
-        }
-
-        .toolbar-divider {
-            width: 1px !important;
-            height: 20px !important;
-            background: var(--border-color) !important;
-            margin: 0 4px !important;
-        }
-
-        /* Premium CSS Tooltip using data-tooltip */
-        .toolbar-action-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-6px) scale(0.9);
-            background: rgba(15, 23, 42, 0.95);
-            color: #ffffff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 500;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 1001;
-        }
-
-        .toolbar-action-btn:hover::after {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-6px) scale(1);
-        }
-
-        /* Mobile adjustment for floating verse toolbar */
-        @media (max-width: 768px) {
-            .toolbar-btn-text {
-                display: none !important;
+        @keyframes popoverFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.95);
             }
-            #verse-context-toolbar {
-                gap: 4px !important;
-                padding: 4px 8px !important;
+            to {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
             }
+        }
             
             /* Floating bible navigation on mobile */
             .floating-bible-nav {
@@ -2828,31 +2784,45 @@
                 </div>
 
                 <!-- Verse Context Actions Toolbar -->
-                <div id="verse-context-toolbar">
-                    <button id="toolbar-btn-bookmark" class="toolbar-action-btn" data-tooltip="Bokmerk">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">bookmark</span>
-                    </button>
-                    <button id="toolbar-btn-range" class="toolbar-action-btn" data-tooltip="Velg område">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">select_all</span>
-                    </button>
-                    <div class="toolbar-divider"></div>
-                    <button id="toolbar-btn-lookup" class="toolbar-action-btn" data-tooltip="Forklar i Bibeleksikon">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
-                    </button>
-                    <div class="toolbar-divider"></div>
-                    <button id="toolbar-btn-share" class="toolbar-action-btn" data-tooltip="Del vers">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
-                    </button>
-                    <button id="toolbar-btn-download" class="toolbar-action-btn" data-tooltip="Lagre på maskin">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                    </button>
-                    <button id="toolbar-btn-save-user" class="toolbar-action-btn" data-tooltip="Lagre på Min Side">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
-                    </button>
-                    <div class="toolbar-divider"></div>
-                    <button id="toolbar-btn-clear" class="toolbar-action-btn" data-tooltip="Nullstill valg">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-                    </button>
+                <div class="floating-chapter-popover" id="verse-context-toolbar" style="display: none; bottom: 80px !important; top: auto !important; left: 50% !important; transform: translateX(-50%) !important; width: 300px !important; max-height: 400px; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Valg for vers</span>
+                        <button id="toolbar-btn-clear" style="display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; color: #bd4f2a; cursor: pointer; padding: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <button id="toolbar-btn-bookmark" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">bookmark</span>
+                            <span id="toolbar-bookmark-text">Bokmerk</span>
+                        </button>
+
+                        <button id="toolbar-btn-range" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">select_all</span>
+                            <span>Velg flere vers</span>
+                        </button>
+
+                        <button id="toolbar-btn-lookup" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">menu_book</span>
+                            <span>Forklar i Bibeleksikon</span>
+                        </button>
+
+                        <button id="toolbar-btn-share" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">share</span>
+                            <span>Del vers</span>
+                        </button>
+
+                        <button id="toolbar-btn-download" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">download</span>
+                            <span>Kopier / Last ned</span>
+                        </button>
+
+                        <button id="toolbar-btn-save-user" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">edit_note</span>
+                            <span>Lagre på Min Side</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -3250,7 +3220,7 @@
     <!-- JavaScript -->
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.07.18.4"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.07.18.5"></script>
     <script type="module" src="js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
