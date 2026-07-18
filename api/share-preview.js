@@ -355,6 +355,7 @@ export default async function handler(req, res) {
     <meta name="twitter:title" content="${escapeHtml(title)}">
     <meta name="twitter:description" content="${escapeHtml(limitDesc)}">
     <meta name="twitter:image" content="${escapeHtml(imageUrl)}">
+    <link rel="canonical" href="${escapeHtml(absolutePageUrl)}">
     `;
 
     // 1. Remove existing title tag
@@ -371,7 +372,10 @@ export default async function handler(req, res) {
     html = html.replace(/<meta\s+(?:property|name)="twitter:[^"]*"\s+content="[^"]*"\s*\/?>/gi, '');
     html = html.replace(/<meta\s+content="[^"]*"\s+(?:property|name)="twitter:[^"]*"\s*\/?>/gi, '');
 
-    // 5. Inject new tags right before </head>
+    // 5. Remove existing canonical tag to prevent duplicates
+    html = html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/gi, '');
+
+    // 6. Inject new tags right before </head>
     html = html.replace('</head>', `${ogTags}\n</head>`);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
