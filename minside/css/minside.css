@@ -5013,3 +5013,23 @@ html[data-theme="dark"] .ms-rp-prayer-focus-box * {
   border-left-color: #d17d39 !important;
 }
 
+/* Modal dark theme overrides */
+html[data-theme="dark"] .hkm-modal-container {
+  background: var(--card-bg, #1e293b) !important;
+  border-color: var(--border-solid, #334155) !important;
+  color: var(--text-main, #f8fafc) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-theme="dark"] .hkm-modal-title {
+  color: var(--text-main, #f8fafc) !important;
+}
+
+html[data-theme="dark"] #notif-modal .hkm-modal-title {
+  color: var(--accent-color, #d17d39) !important;
+}
+
+html[data-theme="dark"] .hkm-modal-message {
+  color: var(--text-muted, #94a3b8) !important;
+}
+

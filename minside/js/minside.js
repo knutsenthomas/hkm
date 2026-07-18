@@ -8512,14 +8512,14 @@ class MinSideManager {
                     <span class="material-symbols-outlined ms-icon-button-icon">close</span>
                 </button>
             </div>
-            ${notif.body ? `<div class="hkm-modal-message" style="text-align:left; white-space:pre-wrap; line-height:1.6; color:var(--text);">${notif.body}</div>` : ''}
+            ${notif.body ? `<div class="hkm-modal-message" style="text-align:left; white-space:pre-wrap; line-height:1.6; color: var(--text-main, #0f172a);">${notif.body}</div>` : ''}
             ${notif.link ? `<div style="margin-top: 24px;">
                 <a href="${notif.link}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;">
                     ${t('notifications.openLink')} <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
                 </a>
             </div>` : ''}
-            <div class="hkm-modal-actions ms-modal-actions-top" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 16px;">
-                <button class="btn btn-ghost hkm-modal-btn" id="delete-notif-modal" style="color: var(--danger); justify-content: center;">
+            <div class="hkm-modal-actions ms-modal-actions-top" style="margin-top: 32px; border-top: 1px solid var(--border-solid, #e2e8f0); padding-top: 16px;">
+                <button class="btn btn-ghost hkm-modal-btn" id="delete-notif-modal" style="color: #ef4444; justify-content: center;">
                     <span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}
                 </button>
             </div>
