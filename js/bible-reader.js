@@ -1833,12 +1833,10 @@ class BibleReader {
         this.selectedChapterId = chapterId;
         
         // Highlight in grid
-        if (this.dom.chapterGrid) {
-            this.dom.chapterGrid.querySelectorAll('.chapter-item').forEach(el => {
-                if (el.dataset.id === chapterId) el.classList.add('active');
-                else el.classList.remove('active');
-            });
-        }
+        document.querySelectorAll('.chapter-grid .chapter-item, #floating-chapter-grid .chapter-item').forEach(el => {
+            if (el.dataset.id === chapterId) el.classList.add('active');
+            else el.classList.remove('active');
+        });
 
         // Show loading spinner
         if (this.dom.readingPane) {

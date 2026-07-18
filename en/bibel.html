@@ -754,9 +754,11 @@
             transform-origin: bottom center;
             width: 320px;
             background: var(--bg-card) !important;
-            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--border-color) !important;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             padding: 16px;
             display: none;
             flex-direction: column;
@@ -770,6 +772,43 @@
             display: flex;
             transform: translateX(-50%) scale(1);
             opacity: 1;
+        }
+
+        .floating-chapter-popover .chapter-item {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: var(--text-base) !important;
+            border-radius: 12px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            aspect-ratio: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .floating-chapter-popover .chapter-item:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: var(--bible-primary) !important;
+            transform: scale(1.05) !important;
+        }
+
+        .floating-chapter-popover .chapter-item.active {
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary) !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.4) !important;
+        }
+
+        /* Light Mode Adjustment */
+        html[data-theme="light"] .floating-chapter-popover .chapter-item {
+            background: rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        }
+        
+        html[data-theme="light"] .floating-chapter-popover .chapter-item:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
         }
 
         @media (max-width: 768px) {
@@ -2839,9 +2878,12 @@
 
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
-                    <div style="font-weight: 700; font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <button class="btn btn-xs btn-outline" style="font-size: 11px; padding: 2px 8px; border-radius: 6px; color: var(--accent-color, #d17d39); border-color: var(--accent-color, #d17d39); background: transparent; cursor: pointer;" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const sidebar = document.getElementById('bible-sidebar'); if (sidebar) sidebar.classList.add('active');">Select book</button>
-                        <span class="material-symbols-outlined" style="cursor: pointer; font-size: 18px;" onclick="document.getElementById('floating-chapter-popover').classList.remove('active')">close</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Select chapter</span>
+                        <button style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const sidebar = document.getElementById('bible-sidebar'); if (sidebar) sidebar.classList.add('active');">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>Select book</span>
+                        </button>
                     </div>
                     <div class="chapter-grid" id="floating-chapter-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 250px; overflow-y: auto;">
                         <!-- Loaded dynamically -->
@@ -3048,7 +3090,7 @@
     <!-- JavaScript -->
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.18.1"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.07.18.2"></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
