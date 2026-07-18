@@ -3,10 +3,7 @@ import path from 'path';
 
 // Firebase Firestore REST API configuration
 const PROJECT_ID = 'his-kingdom-ministry';
-const API_KEY = process.env.FIREBASE_API_KEY;
-if (!API_KEY) {
-  console.warn("Warning: FIREBASE_API_KEY is not defined in the environment variables.");
-}
+const API_KEY = process.env.FIREBASE_API_KEY || "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
 // Helper to decode Firestore REST fields to standard JSON objects
