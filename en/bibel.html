@@ -1755,19 +1755,30 @@
             
             /* Floating bible navigation on mobile */
             .floating-bible-nav {
-                opacity: 1 !important;
-                bottom: 24px !important;
-                padding: 8px 18px !important;
-                gap: 16px !important;
-                transform: translateX(-50%) translateZ(0) !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                transform: translateZ(0) !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                border: none !important;
+                border-top: 1px solid var(--border-color) !important;
+                padding: 12px 24px !important;
+                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1) !important;
                 z-index: 2000 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+                gap: 0 !important;
+                opacity: 1 !important;
             }
             .floating-bible-nav:hover {
-                transform: translateX(-50%) translateZ(0) !important;
+                transform: translateZ(0) !important;
                 opacity: 1 !important;
             }
             .floating-bible-nav.hidden-nav {
-                transform: translateX(-50%) translateY(100px) translateZ(0) !important;
+                transform: translateY(100%) translateZ(0) !important;
                 opacity: 0 !important;
                 pointer-events: none !important;
             }
