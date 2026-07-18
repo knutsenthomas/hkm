@@ -8361,31 +8361,25 @@ class MinSideManager {
                 const note = personalNotes.find(n => n.id === id);
                 if (!note) return;
 
-                // Create a modal overlay element
-                let modal = document.getElementById(`edit-note-modal-${note.id}`);
-                if (modal) modal.remove();
-
-                modal = document.createElement('div');
-                modal.id = `edit-note-modal-${note.id}`;
-                modal.className = 'hkm-modal-overlay';
-                modal.innerHTML = `
-                <div class="hkm-modal-container ms-note-modal-wide">
-                    <div class="ms-note-modal-header">
-                        <h3 class="ms-note-modal-title" style="font-size: 18px; font-weight: 700; color: #d17d39; margin: 0;">${t('notes.editNote') || 'Rediger notat'}</h3>
-                        <button type="button" class="ms-icon-button close-modal-btn" style="cursor: pointer;">
-                            <span class="material-symbols-outlined ms-icon-button-icon">close</span>
+                // Replace container innerHTML with a full screen note editor workspace
+                container.innerHTML = `
+                <div class="full-screen-note-editor" style="max-width: 800px; margin: 0 auto; padding: 24px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--accent-color, #d17d39); margin:0;">${t('notes.editNote') || 'Rediger notat'}</h2>
+                        <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back') || 'Tilbake'}
                         </button>
                     </div>
                     
-                    <div class="new-note-form inline-edit-form" id="edit-note-form-${note.id}" style="border: none; padding: 0; margin: 0; box-shadow: none; display: block;">
+                    <div class="new-note-form" id="edit-note-form-${note.id}" style="display: block; box-shadow: none; border: 1px solid var(--border-solid); padding: 32px; border-radius: 20px; background: var(--card-bg);">
                         <div class="form-group">
-                            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 6px; text-transform: uppercase;">${t('notes.title')}</label>
-                            <input id="edit-note-title-${note.id}" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off" style="width: 100%;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.title')}</label>
+                            <input id="edit-note-title-${note.id}" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border-solid); background: var(--main-bg); color: var(--text-main);">
                         </div>
-                        <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
-                            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 6px; text-transform: uppercase;">${t('notes.content')}</label>
-                            <div class="rte-wrapper">
-                                <div class="rte-toolbar" id="rte-toolbar-edit-${note.id}">
+                        <div class="form-group ms-form-group-gap-12" style="margin-top: 20px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.content')}</label>
+                            <div class="rte-wrapper" style="border: 1px solid var(--border-solid); border-radius: 12px; overflow: hidden; background: var(--main-bg);">
+                                <div class="rte-toolbar" id="rte-toolbar-edit-${note.id}" style="border-bottom: 1px solid var(--border-solid); background: var(--card-bg); padding: 8px 12px;">
                                     <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
                                     <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
                                     <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
@@ -8398,12 +8392,12 @@ class MinSideManager {
                                     <div class="rte-divider"></div>
                                     <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
                                 </div>
-                                <div class="rte-editor" id="edit-note-body-${note.id}" contenteditable="true" style="min-height: 200px;"></div>
+                                <div class="rte-editor" id="edit-note-body-${note.id}" contenteditable="true" style="min-height: 300px; padding: 20px; outline: none; color: var(--text-main); font-size: 15px; line-height: 1.6;"></div>
                             </div>
                         </div>
-                        <div class="ms-actions-row-end" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 8px;">
-                            <button class="btn btn-ghost" id="cancel-edit-btn-${note.id}" style="font-weight: 600;">${t('common.cancel')}</button>
-                            <button class="btn btn-primary" id="save-edit-btn-${note.id}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none;">
+                        <div class="ms-actions-row-end" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                            <button class="btn btn-ghost" id="cancel-edit-btn-${note.id}" style="padding: 10px 24px; font-weight: 600;">${t('common.cancel')}</button>
+                            <button class="btn btn-primary" id="save-edit-btn-${note.id}" style="padding: 10px 28px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; font-weight: 600;">
                                 <span class="material-symbols-outlined">save</span>
                                 ${t('notes.save')}
                             </button>
@@ -8411,38 +8405,30 @@ class MinSideManager {
                     </div>
                 </div>`;
 
-                document.body.appendChild(modal);
-
                 // Set initial content in editor
-                const editor = modal.querySelector(`#edit-note-body-${note.id}`);
+                const editor = container.querySelector(`#edit-note-body-${note.id}`);
                 if (editor) editor.innerHTML = note.text || '';
 
                 // Wire up RTE toolbar
                 this._wireRteToolbar(`rte-toolbar-edit-${note.id}`, `edit-note-body-${note.id}`);
-                modal.querySelector(`#edit-note-title-${note.id}`)?.focus();
+                container.querySelector(`#edit-note-title-${note.id}`)?.focus();
 
-                // Force reflow and add active class for fade-in animation
-                modal.offsetHeight;
-                modal.classList.add('active');
-
-                const closeModal = () => {
-                    modal.classList.remove('active');
-                    setTimeout(() => modal.remove(), 300);
+                const closeEditor = () => {
+                    this._renderNotesUI(container, personalNotes, hkmNotes);
                 };
 
-                // Close listeners
-                modal.querySelector('.close-modal-btn')?.addEventListener('click', closeModal);
-                modal.querySelector(`#cancel-edit-btn-${note.id}`)?.addEventListener('click', closeModal);
-                modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+                // Close and Cancel buttons listener
+                container.querySelector('.close-editor-btn')?.addEventListener('click', closeEditor);
+                container.querySelector(`#cancel-edit-btn-${note.id}`)?.addEventListener('click', closeEditor);
 
                 // Save button listener
-                modal.querySelector(`#save-edit-btn-${note.id}`)?.addEventListener('click', async () => {
-                    const newTitle = modal.querySelector(`#edit-note-title-${note.id}`).value.trim() || t('notes.untitled');
+                container.querySelector(`#save-edit-btn-${note.id}`)?.addEventListener('click', async () => {
+                    const newTitle = container.querySelector(`#edit-note-title-${note.id}`).value.trim() || t('notes.untitled');
                     const newText = editor?.innerHTML?.trim() || '';
                     const plain = editor?.innerText?.trim() || '';
                     if (!plain) { editor?.focus(); return; }
 
-                    const saveBtn = modal.querySelector(`#save-edit-btn-${note.id}`);
+                    const saveBtn = container.querySelector(`#save-edit-btn-${note.id}`);
                     saveBtn.disabled = true;
                     saveBtn.textContent = t('notes.saving');
 
@@ -8454,8 +8440,7 @@ class MinSideManager {
                         });
                         note.title = newTitle;
                         note.text = newText;
-                        closeModal();
-                        this._renderNotesUI(container, personalNotes, hkmNotes);
+                        closeEditor();
                     } catch (e) {
                         alert(t('notes.updateError') + ': ' + e.message);
                         saveBtn.disabled = false;
