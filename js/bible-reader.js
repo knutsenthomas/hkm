@@ -281,6 +281,7 @@ class BibleReader {
         this.history = history;
 
         this.selectedVerses = [];
+        this.dictCache = {};
 
         // UI Settings
         let settings = {
@@ -2551,19 +2552,39 @@ class BibleReader {
         const dictRelatedBox = document.getElementById('dict-related-resources');
         if (dictRelatedBox) dictRelatedBox.innerHTML = '';
 
-        try {
-            const params = new URLSearchParams({
-                word: word,
-                context: contextText || '',
-                scriptureRef: refText || '',
-                lang: document.documentElement.lang || 'no'
-            });
+        let dictRes = null;
+        let resources = null;
 
-            // Parallel load AI definition and relevant site resources
-            const [dictRes, resources] = await Promise.all([
-                fetch(`/api/bible/dictionary?${params.toString()}`).then(r => r.json()),
-                this.searchLocalResources(word)
-            ]);
+        const cacheKey = `${word.trim().toLowerCase()}_${document.documentElement.lang || 'no'}`;
+        if (this.dictCache && this.dictCache[cacheKey]) {
+            const cachedData = this.dictCache[cacheKey];
+            dictRes = cachedData.dictRes;
+            resources = cachedData.resources;
+        }
+
+        try {
+            if (!dictRes) {
+                const params = new URLSearchParams({
+                    word: word,
+                    context: contextText || '',
+                    scriptureRef: refText || '',
+                    lang: document.documentElement.lang || 'no'
+                });
+
+                // Parallel load AI definition and relevant site resources
+                const [fetchedDictRes, fetchedResources] = await Promise.all([
+                    fetch(`/api/bible/dictionary?${params.toString()}`).then(r => r.json()),
+                    this.searchLocalResources(word)
+                ]);
+
+                dictRes = fetchedDictRes;
+                resources = fetchedResources;
+
+                // Save to client-side memory cache
+                if (this.dictCache) {
+                    this.dictCache[cacheKey] = { dictRes, resources };
+                }
+            }
 
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';

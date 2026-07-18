@@ -2,6 +2,18 @@ import { GoogleGenAI, Type } from "@google/genai";
 import fs from 'fs';
 import path from 'path';
 
+// Global caching of the GoogleGenAI instance to optimize serverless cold starts
+let globalAi = null;
+function getGenAI() {
+  if (!globalAi) {
+    const key = process.env.GEMINI_API_KEY;
+    if (key) {
+      globalAi = new GoogleGenAI({ apiKey: key });
+    }
+  }
+  return globalAi;
+}
+
 // Translation map of Norwegian/Spanish book names and abbreviations to English canonical names
 const bookTranslationMap = {
   // Norwegian to English
@@ -719,7 +731,6 @@ export default async function handler(req, res) {
             responseLangInstruction = "You must respond in fluent, beautiful, and warm English. All definitions, category, contextualNote, cross-references explanations, and the meaning of original words MUST be in English. The rejection message must also be in English.";
             rejectCategory = "Not Bible-related";
             rejectDefinition = "The search deviates from Bible-related topics. This AI dictionary is reserved for Bible study and only allows searches for concepts or words related to the Bible, Christian theology, faith, church history, or biblical geography/history.";
-            rejectNote = "Search rejected due to lack of theological or biblical relevance.";
           } else if (lang === 'es') {
             responseLangInstruction = "Debes responder en un español fluido, hermoso y cálido. Todas las definiciones, categorías, notas contextuales, referencias cruzadas y explicaciones DEBEN estar en español.";
             rejectCategory = "No relacionado con la Biblia";
@@ -731,7 +742,7 @@ export default async function handler(req, res) {
 
           if (geminiApiKey) {
             try {
-              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+              const ai = getGenAI();
 
               const prompt = `Du er en ekspert på teologi, bibelhistorie og bibelske språk (hebraisk, arameisk og gresk). 
 ${responseLangInstruction}
@@ -747,10 +758,10 @@ Dersom emnet/ordet "${word}" overhode ikke har noen relevans eller tilknytning t
 Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og lengden til hva brukeren søker etter på en fyldig, inspirerende og lærerik måte. Ta utgangspunkt i og integrer definisjoner, navnebetydninger og forklaringer fra anerkjente verk som Easton's Bible Dictionary, Smith's Bible Dictionary, International Standard Bible Encyclopedia (ISBE) og Hitchcock's Bible Names Dictionary:
 1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
 2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
-3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium. Del teksten inn i flere avsnitt med linjeskift (\\n\\n) for bedre lesbarhet, og bruk markdown-underoverskrifter (bruk ### for underoverskrifter, f.eks. '### Teologisk betydning' eller '### Kontekst') og lister der det passer for å organisere innholdet. VIKTIG: Du må ALDRI inkludere søkeordet som en hovedoverskrift (f.eks. ikke ha '# Tro' eller lignende) øverst i definisjonen, da ordet allerede vises i app-grensesnittets header.
+3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis, tilpasset bibelstudium. Del teksten inn i flere avsnitt med linjeskift (\n\n) for bedre lesbarhet, og bruk markdown-underoverskrifter (bruk ### for underoverskrifter, f.eks. '### Teologisk betydning' eller '### Kontekst') og lister der det passer for å organisere innholdet. VIKTIG: Du må ALDRI inkludere søkeordet som en hovedoverskrift (f.eks. ikke ha '# Tro' eller lignende) øverst i definisjonen, da ordet allerede vises i app-grensesnittets header.
 4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte betydning på det valgte språket (norsk/engelsk/spansk).
 5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
-6. "extendedAnalysis": ${extended ? `Siden brukeren ba om en utvidet analyse (extended=true), må du skrive en grundig og dyptgående teologisk og bibelhistorisk analyse/essay om ordet på 300-600 ord. Bruk markdown for formatering (overskrifter som '### Historisk kontekst' eller '### Teologisk betydning', fet skrift, lister). VIKTIG: Du må sette inn tydelige og ekte linjeskift (\\n\\n) før og etter hver overskrift og mellom hvert avsnitt, slik at teksten ikke blir presset sammen på én enkelt linje. Utforsk ordets opprinnelse, bruk i hele Bibelen og praktisk betydning i dag.` : `Siden brukeren IKKE ba om utvidet analyse, må du sette dette feltet to nøyaktig en tom streng "".`}
+6. "extendedAnalysis": ${extended ? `Siden brukeren ba om en utvidet analyse (extended=true), må du skrive en grundig og dyptgående teologisk og bibelhistorisk analyse/essay om ordet på 300-600 ord. Bruk markdown for formatering (overskrifter som '### Historisk kontekst' eller '### Teologisk betydning', fet skrift, lister). VIKTIG: Du må sette inn tydelige og ekte linjeskift (\n\n) før og etter hver overskrift og mellom hvert avsnitt, slik at teksten ikke blir presset sammen på én enkelt linje. Utforsk ordets opprinnelse, bruk i hele Bibelen og praktisk betydning i dag.` : `Siden brukeren IKKE ba om utvidet analyse, må du sette dette feltet to nøyaktig en tom streng "".`}
 
 ${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
 ${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
@@ -758,15 +769,15 @@ ${context ? `Her er verskonteksten ordet står i: "${context}".` : ""}
 Returner nøyaktig JSON i henhold til dette skjemaet:
 {
   "word": "${word}",
-  "definition": "En definisjon eller forklaring her...",
-  "category": "Kategori her...",
-  "contextualNote": "Kort oppsummering...",
-  "extendedAnalysis": "...",
+  "definition": "Hoveddefinisjon...",
+  "category": "Kategori...",
+  "contextualNote": "Kontekstnote...",
+  "extendedAnalysis": "Utvidet analyse...",
   "originalWords": [
     {
-      "word": "χάρις eller חֶסֶD",
-      "transliteration": "charis eller chesed",
-      "pronunciation": "ka'-ris eller kche'-sed",
+      "word": "originalspråklig ord i greske eller hebraiske tegn",
+      "transliteration": "translitterasjon...",
+      "pronunciation": "uttale...",
       "language": "gresk eller hebraisk",
       "meaning": "nåde, gunst, trofast kjærlighet"
     }
@@ -780,7 +791,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
 }`;
 
               const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.0-flash",
                 contents: prompt,
                 config: {
                   responseMimeType: "application/json",
@@ -870,7 +881,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
           
           if (lang !== 'en' && geminiApiKey) {
             try {
-              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+              const ai = getGenAI();
               const targetLangName = lang === 'es' ? 'spansk' : 'norsk';
               const prompt = `Du er en teologisk oversetter. Oversett følgende bibelordbok-definisjon til ${targetLangName}. 
 Behold referanser og kildeangivelser (som [Easton] eller [Smith]) intakt. Oversettelsen skal være flytende, forståelig og presis.
@@ -879,7 +890,7 @@ Tekst som skal oversettes:
 ${definitionText}`;
 
               const translationResp = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.0-flash",
                 contents: prompt
               });
 
@@ -923,7 +934,7 @@ ${definitionText}`;
           const geminiApiKey = process.env.GEMINI_API_KEY;
           if (historicalCommentaries && historicalCommentaries.length > 0 && lang !== 'en' && geminiApiKey) {
             try {
-              const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+              const ai = getGenAI();
               const targetLangName = lang === 'es' ? 'spansk' : 'norsk';
               
               const quotesToTranslate = historicalCommentaries.map(c => c.quote);
@@ -934,7 +945,7 @@ Returner kun en gyldig JSON-liste med strenger (de oversatte sitatene i nøyakti
 ${JSON.stringify(quotesToTranslate)}`;
 
               const translationResp = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.0-flash",
                 contents: prompt,
                 config: {
                   responseMimeType: "application/json",
@@ -985,7 +996,7 @@ ${JSON.stringify(quotesToTranslate)}`;
       const geminiApiKey = process.env.GEMINI_API_KEY;
       if (geminiApiKey) {
         try {
-          const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+          const ai = getGenAI();
           const prompt = `Du er en ekspert på bibelstudier og teologi.
 Finn 4 til 6 svært relevante kryssreferanser (andre bibelvers eller kapitler i Bibelen) som handler om det samme, utfyller eller har en klar sammenheng med kapittelet eller skriftstedet "${chapterName}".
 For hver kryssreferanse skal du oppgi:
@@ -1003,7 +1014,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
 ]`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.0-flash",
             contents: prompt,
             config: {
               responseMimeType: "application/json",
