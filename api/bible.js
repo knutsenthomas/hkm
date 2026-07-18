@@ -559,7 +559,7 @@ export default async function handler(req, res) {
       // Check Firestore Cache first
       try {
         const cached = await getCachedDefinition(lang, cacheKey);
-        if (cached) {
+        if (cached && (!extended || cached.extendedAnalysis)) {
           const isScripture = !!parseReference(word);
           if (!isScripture || (cached.historicalCommentaries && cached.historicalCommentaries.length > 0)) {
             return res.status(200).json(cached);
