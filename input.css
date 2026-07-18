@@ -9177,3 +9177,136 @@ html[data-theme="dark"] .search-suggestion-item.selected {
 *::-webkit-scrollbar {
     display: none !important;  /* Chrome, Safari, and Opera */
 }
+
+/* ==========================================================================
+   Global UX/UI Design Enhancements
+   ========================================================================== */
+
+/* Custom focus-visible outline for better keyboard accessibility */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #d17d39 !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 4px rgba(209, 125, 57, 0.15) !important;
+}
+
+/* Landscape Mode adjustments for smaller phone screens */
+@media (max-width: 900px) and (orientation: landscape) {
+    .page-hero, .hero-section, .subpage-hero {
+        padding-top: 60px !important;
+        padding-bottom: 60px !important;
+        min-height: auto !important;
+    }
+    h1, .page-hero-title, .hero-title {
+        font-size: 2.25rem !important;
+        line-height: 1.15 !important;
+    }
+    h2, .section-title {
+        font-size: 1.75rem !important;
+        line-height: 1.2 !important;
+    }
+    .section, .section-padding {
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+    }
+}
+
+/* Global Card hover transition for non-course cards (blog, events, features) */
+.blog-card, .event-card, .giving-card, .hkm-card, .feature-item {
+    position: relative !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease !important;
+    will-change: transform, box-shadow;
+}
+.blog-card:hover, .event-card:hover, .giving-card:hover, .hkm-card:hover, .feature-item:hover {
+    transform: translateY(-6px) scale(1.01) !important;
+    box-shadow: 0 20px 40px -10px rgba(27, 73, 101, 0.12) !important;
+    border-color: rgba(209, 125, 57, 0.25) !important;
+}
+html[data-theme="dark"] .blog-card:hover,
+html[data-theme="dark"] .event-card:hover,
+html[data-theme="dark"] .giving-card:hover,
+html[data-theme="dark"] .hkm-card:hover,
+html[data-theme="dark"] .feature-item:hover {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(209, 125, 57, 0.35) !important;
+}
+
+/* Shimmering Skeleton Loader Animations */
+.skeleton, .skeleton-card, .skeleton-block, .skeleton-image, .skeleton-text {
+    background: #e2e8f0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+    animation: hkm-shimmer-opacity 1.8s ease-in-out infinite !important;
+}
+html[data-theme="dark"] .skeleton,
+html[data-theme="dark"] .skeleton-card,
+html[data-theme="dark"] .skeleton-block,
+html[data-theme="dark"] .skeleton-image,
+html[data-theme="dark"] .skeleton-text {
+    background: #27272a !important;
+}
+
+/* Add shimmer sheen overlay */
+.skeleton::after, .skeleton-card::after, .skeleton-block::after, .skeleton-image::after, .skeleton-text::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: translateX(-100%) !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4) 50%, transparent) !important;
+    animation: hkm-shimmer-sweep 1.8s infinite !important;
+}
+html[data-theme="dark"] .skeleton::after,
+html[data-theme="dark"] .skeleton-card::after,
+html[data-theme="dark"] .skeleton-block::after,
+html[data-theme="dark"] .skeleton-image::after,
+html[data-theme="dark"] .skeleton-text::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05) 50%, transparent) !important;
+}
+
+@keyframes hkm-shimmer-opacity {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.55; }
+}
+
+@keyframes hkm-shimmer-sweep {
+    100% {
+        transform: translateX(100%) !important;
+    }
+}
+
+/* Specific skeleton component overrides */
+.skeleton-image {
+    width: 100% !important;
+    height: 200px !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+.skeleton-text {
+    height: 14px !important;
+    margin-bottom: 8px !important;
+}
+.skeleton-text.title {
+    height: 22px !important;
+    width: 80% !important;
+    margin-bottom: 12px !important;
+}
+.skeleton-text.meta {
+    width: 40% !important;
+    margin-bottom: 16px !important;
+}
+.skeleton-text.excerpt-1 {
+    width: 100% !important;
+}
+.skeleton-text.excerpt-2 {
+    width: 90% !important;
+    margin-bottom: 16px !important;
+}
+.skeleton-text.link {
+    width: 30% !important;
+    height: 16px !important;
+}
+

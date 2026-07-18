@@ -267,6 +267,14 @@ const modalStyles = `
     box-shadow: 0 0 0 4px rgba(255, 91, 36, 0.12) !important;
     background: #ffffff !important;
 }
+.hkm-input.touched:invalid {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.02) !important;
+}
+.hkm-input.touched:valid {
+    border-color: #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.02) !important;
+}
 .hkm-amount-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

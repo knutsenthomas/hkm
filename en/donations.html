@@ -88,6 +88,41 @@
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
         
     <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
+    <style>
+        /* Amount buttons custom premium styling & active/selected state */
+        .amount-btn {
+            border: 2px solid #e2e8f0 !important;
+            background: #ffffff !important;
+            color: var(--text-dark) !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .amount-btn:hover {
+            border-color: #d17d39 !important;
+            background: rgba(209, 125, 57, 0.05) !important;
+            transform: translateY(-2px) !important;
+        }
+        .amount-btn.selected {
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+            color: #ffffff !important;
+            border-color: #bd4f2a !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
+        }
+        
+        /* Real-time input validation styles */
+        .donation-form input:focus, .donation-form select:focus, .donation-form textarea:focus {
+            border-color: #d17d39 !important;
+            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15) !important;
+            outline: none !important;
+        }
+        .donation-form input.touched:invalid, .donation-form textarea.touched:invalid, .donation-form select.touched:invalid {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.02) !important;
+        }
+        .donation-form input.touched:valid, .donation-form textarea.touched:valid, .donation-form select.touched:valid {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.02) !important;
+        }
+    </style>
 </head>
 
 <body class="cms-loading">

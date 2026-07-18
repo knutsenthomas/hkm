@@ -32,6 +32,20 @@ class ContentManager {
             }
         });
 
+        // Universal form interaction tracking for real-time validation feedback
+        if (typeof document !== 'undefined') {
+            document.addEventListener('blur', (e) => {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+                    e.target.classList.add('touched');
+                }
+            }, true);
+            document.addEventListener('input', (e) => {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+                    e.target.classList.add('touched');
+                }
+            }, true);
+        }
+
         this.init();
         this.agendaMonthsToShow = 1;
     }
