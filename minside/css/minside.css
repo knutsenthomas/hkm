@@ -5033,3 +5033,16 @@ html[data-theme="dark"] .hkm-modal-message {
   color: var(--text-muted, #94a3b8) !important;
 }
 
+/* Button dark theme overrides */
+html[data-theme="dark"] .btn-ghost {
+  background: transparent !important;
+  color: var(--text-muted, #94a3b8) !important;
+  border-color: var(--border-solid, #334155) !important;
+}
+
+html[data-theme="dark"] .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-main, #f8fafc) !important;
+  border-color: var(--accent-color, #d17d39) !important;
+}
+
