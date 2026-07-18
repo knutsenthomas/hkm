@@ -872,18 +872,47 @@ class BibleReader {
             }
         });
 
+        // Reading Mode Sync Helper
+        const syncReadingModeButtons = (isActive) => {
+            const btns = [
+                document.getElementById('btn-toggle-reading-mode'),
+                document.getElementById('mobile-reading-mode-btn'),
+                document.getElementById('floating-reading-mode-btn')
+            ];
+            btns.forEach(btn => {
+                if (btn) {
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
+                    }
+                    const text = isActive ? 'Avslutt lesemodus' : 'Aktiver lesemodus';
+                    if (btn.tagName.toLowerCase() === 'div' || btn.tagName.toLowerCase() === 'button') {
+                        btn.title = text;
+                    }
+                    btn.classList.toggle('active', isActive);
+                    const textSpan = btn.querySelector('.btn-text');
+                    if (textSpan) {
+                        textSpan.innerText = text;
+                    }
+                }
+            });
+        };
+
         // Reading Mode Toggle
         const toggleReadingModeBtn = document.getElementById('btn-toggle-reading-mode');
         if (toggleReadingModeBtn) {
             toggleReadingModeBtn.addEventListener('click', () => {
                 const isActive = document.body.classList.toggle('reading-mode-active');
-                
-                // Update button icon & tooltip
-                const icon = toggleReadingModeBtn.querySelector('.material-symbols-outlined');
-                if (icon) {
-                    icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
-                }
-                toggleReadingModeBtn.title = isActive ? 'Avslutt lesemodus' : 'Aktiver lesemodus';
+                syncReadingModeButtons(isActive);
+            });
+        }
+
+        // Floating Nav Reading Mode Toggle
+        const floatingReadingModeBtn = document.getElementById('floating-reading-mode-btn');
+        if (floatingReadingModeBtn) {
+            floatingReadingModeBtn.addEventListener('click', () => {
+                const isActive = document.body.classList.toggle('reading-mode-active');
+                syncReadingModeButtons(isActive);
             });
         }
 
@@ -932,11 +961,7 @@ class BibleReader {
         if (mobileReadingModeBtn) {
             mobileReadingModeBtn.addEventListener('click', () => {
                 const isActive = document.body.classList.toggle('reading-mode-active');
-                // Sync desktop reading mode button icon
-                const icon = document.getElementById('btn-toggle-reading-mode')?.querySelector('.material-symbols-outlined');
-                if (icon) {
-                    icon.innerText = isActive ? 'close_fullscreen' : 'chrome_reader_mode';
-                }
+                syncReadingModeButtons(isActive);
                 // Close sidebar on mobile
                 if (this.dom.sidebar) {
                     this.dom.sidebar.classList.remove('active');
