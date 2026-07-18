@@ -3094,7 +3094,7 @@
                 </button>
             </div>
             <div class="tabs-header">
-                <div class="tab-btn active" id="tab-btn-bookmarks" onclick="
+                <div class="tab-btn active" id="tab-btn-bookmarks" title="Favorites" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-bookmarks').classList.add('active');
                     document.getElementById('bookmarks-list').style.display = 'block';
@@ -3102,8 +3102,10 @@
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
                     document.getElementById('tab-reading-plan-content').style.display = 'none';
-                ">Favorites</div>
-                <div class="tab-btn" id="tab-btn-history" onclick="
+                ">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">bookmark</span>
+                </div>
+                <div class="tab-btn" id="tab-btn-history" title="History" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-history').classList.add('active');
                     document.getElementById('history-list').style.display = 'block';
@@ -3111,8 +3113,10 @@
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
                     document.getElementById('tab-reading-plan-content').style.display = 'none';
-                ">History</div>
-                <div class="tab-btn" id="tab-btn-related" onclick="
+                ">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">history</span>
+                </div>
+                <div class="tab-btn" id="tab-btn-related" title="Resources" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-related').classList.add('active');
                     document.getElementById('related-list').style.display = 'block';
@@ -3120,8 +3124,10 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
                     document.getElementById('tab-reading-plan-content').style.display = 'none';
-                ">Resources</div>
-                <div class="tab-btn" id="tab-btn-notes" onclick="
+                ">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">auto_stories</span>
+                </div>
+                <div class="tab-btn" id="tab-btn-notes" title="Notes" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-notes').classList.add('active');
                     document.getElementById('notes-list').style.display = 'block';
@@ -3129,8 +3135,10 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('tab-reading-plan-content').style.display = 'none';
-                ">Notes</div>
-                <div class="tab-btn" id="tab-btn-reading-plan" onclick="
+                ">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">edit_note</span>
+                </div>
+                <div class="tab-btn" id="tab-btn-reading-plan" title="Reading Plan" onclick="
                     document.querySelectorAll('.bible-nav-right .tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('tab-btn-reading-plan').classList.add('active');
                     document.getElementById('tab-reading-plan-content').style.display = 'block';
@@ -3138,7 +3146,9 @@
                     document.getElementById('history-list').style.display = 'none';
                     document.getElementById('related-list').style.display = 'none';
                     document.getElementById('notes-list').style.display = 'none';
-                ">Reading Plan</div>
+                ">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">calendar_today</span>
+                </div>
             </div>
 
             <div class="tabs-content">
