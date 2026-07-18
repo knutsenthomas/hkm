@@ -7871,46 +7871,42 @@ exports.scheduledReadingNotifications = onSchedule({
         const readingContentHtml = `
           <div style="background-color: #FCF9F5;">
             <!-- Personal Greeting -->
-            <section style="margin-bottom: 60px; text-align: center; max-width: 480px; margin-left: auto; margin-right: auto;">
-              <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 42px; line-height: 52px; font-weight: 700; color: #121c2c; margin: 0 0 24px 0; font-style: italic;">Hei \${name}</h2>
-              <p style="font-family: 'Inter', sans-serif; font-size: 19px; line-height: 30px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
+            <section style="margin-bottom: 32px; text-align: center; max-width: 440px; margin-left: auto; margin-right: auto;">
+              <h2 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; font-style: italic;">Hei \${name}</h2>
+              <p style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 26px; font-weight: 400; color: #56423b; margin: 0; font-style: italic; opacity: 0.8;">
                 Måtte dagens ord bringe deg stillhet, refleksjon og fornyet styrke.
               </p>
             </section>
 
-            <!-- Reading Section Card -->
-            <section style="margin-bottom: 64px; margin-left: 16px;">
-              <div style="display: inline-block; padding: 4px 0; color: #1B4965; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 16px;">
+            <!-- Reading Section Card (Original style + premium details) -->
+            <section style="margin-bottom: 32px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05); text-align: left;">
+              <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
                 BIBELTEKST
               </div>
-              <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 32px; line-height: 40px; font-weight: 700; color: #121c2c; margin: 0 0 16px 0; line-height: 1.2;">
-                \${planTitle}:<br/><span style="color: rgba(209, 125, 57, 0.8); font-weight: 400; font-style: italic;">Dag \${currentDayNum}</span>
+              <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 22px; line-height: 30px; font-weight: 700; color: #121c2c; margin: 0 0 8px 0;">
+                \${planTitle} - Dag \${currentDayNum}
               </h3>
-              <div style="display: flex; align-items: center; gap: 12px; color: #56423b; font-family: 'Inter', sans-serif; font-size: 16px; border-top: 1px solid rgba(221, 193, 182, 0.2); padding-top: 24px; max-width: 280px;">
-                <span style="font-size: 15px; font-weight: 600; color: #56423b;">📖 Bibeltekst: \${verses}</span>
+              <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
+                📖 Bibeltekst: \${verses}
+              </p>
+            </section>
+
+            <!-- Devotional Section Card (Original style + premium details) -->
+            <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.02); border-top: 1px solid rgba(209, 125, 57, 0.05); border-right: 1px solid rgba(209, 125, 57, 0.05); border-bottom: 1px solid rgba(209, 125, 57, 0.05); text-align: left;">
+              <div style="display: inline-block; padding: 2px 6px; background-color: rgba(209, 125, 57, 0.08); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+                ANDAKT &amp; BØNN
+              </div>
+              <h4 style="font-family: 'Merriweather', Georgia, serif; font-size: 18px; line-height: 26px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
+                Dagens andakt og bønn
+              </h4>
+              <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">
+                \${prayerFocus}
               </div>
             </section>
 
-            <!-- Devotional Section -->
-            <section style="margin-bottom: 80px; position: relative;">
-              <!-- Asymmetrical accent -->
-              <div style="position: absolute; left: -48px; top: 0; bottom: 0; width: 6px; background-color: rgba(209, 125, 57, 0.2);"></div>
-              <div style="padding: 8px;">
-                <div style="display: inline-block; padding: 4px 0; color: #d17d39; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 32px;">
-                  ANDAKT &amp; BØNN
-                </div>
-                <h4 style="font-family: 'Merriweather', Georgia, serif; font-size: 24px; line-height: 32px; font-weight: 600; color: #121c2c; margin: 0 0 40px 0; line-height: 1.3; max-width: 500px;">
-                  Dagens andakt og bønn
-                </h4>
-                <div style="font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.8; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">
-                  \${prayerFocus}
-                </div>
-              </div>
-            </section>
-
-            <!-- CTA Button -->
-            <div style="text-align: center; margin-bottom: 96px;">
-              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background-color: #1B4965; color: #ffffff; padding: 18px 56px; border-radius: 32px 8px 32px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(27, 73, 101, 0.2);">
+            <!-- CTA Button (Asymmetrical, Orange Gradient) -->
+            <div style="text-align: center; margin-bottom: 48px;">
+              <a href="https://www.hiskingdomministry.no/bibel.html?plan=\${planId}&day=\${currentDayNum}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
                 LES PLAN
               </a>
             </div>
@@ -7972,39 +7968,35 @@ exports.scheduledReadingNotifications = onSchedule({
       </p>
     </section>
 
-    <!-- Reading Section Card -->
-    <section style="margin-bottom: 40px; margin-left: 8px;">
-      <div style="display: inline-block; padding: 2px 0; color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 16px;">
+    <!-- Reading Section Card (Original style + premium details) -->
+    <section style="margin-bottom: 32px; background-color: #ffffff; border-left: 4px solid #1B4965; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(27, 73, 101, 0.02); border-top: 1px solid rgba(27, 73, 101, 0.05); border-right: 1px solid rgba(27, 73, 101, 0.05); border-bottom: 1px solid rgba(27, 73, 101, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(27, 73, 101, 0.08); color: #1B4965; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
         BIBELTEKST
       </div>
-      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 26px; line-height: 34px; font-weight: 700; color: #121c2c; margin: 0 0 12px 0; line-height: 1.2;">
-        {{title}}:<br/><span style="color: rgba(209, 125, 57, 0.8); font-weight: 400; font-style: italic;">Dag {{day}}</span>
+      <h3 style="font-family: 'Merriweather', Georgia, serif; font-size: 22px; line-height: 30px; font-weight: 700; color: #121c2c; margin: 0 0 8px 0;">
+        {{title}} - Dag {{day}}
       </h3>
-      <div style="display: flex; align-items: center; gap: 8px; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; border-top: 1px solid rgba(221, 193, 182, 0.2); padding-top: 16px; max-width: 280px;">
-        <span style="font-size: 14px; font-weight: 600; color: #56423b;">📖 Bibeltekst: {{passage}}</span>
+      <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
+        📖 Bibeltekst: {{passage}}
+      </p>
+    </section>
+
+    <!-- Devotional Section Card (Original style + premium details) -->
+    <section style="margin-bottom: 40px; background-color: #ffffff; border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 20px 24px; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.02); border-top: 1px solid rgba(209, 125, 57, 0.05); border-right: 1px solid rgba(209, 125, 57, 0.05); border-bottom: 1px solid rgba(209, 125, 57, 0.05);">
+      <div style="display: inline-block; padding: 2px 6px; background-color: rgba(209, 125, 57, 0.08); color: #d17d39; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; border-radius: 4px; margin-bottom: 12px;">
+        ANDAKT &amp; BØNN
+      </div>
+      <h4 style="font-family: 'Merriweather', Georgia, serif; font-size: 18px; line-height: 26px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
+        Dagens andakt og bønn
+      </h4>
+      <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">
+        {{devotional}}
       </div>
     </section>
 
-    <!-- Devotional Section -->
-    <section style="margin-bottom: 48px; position: relative;">
-      <!-- Asymmetrical accent -->
-      <div style="position: absolute; left: -32px; top: 0; bottom: 0; width: 4px; background-color: rgba(209, 125, 57, 0.2);"></div>
-      <div style="padding: 4px 8px;">
-        <div style="display: inline-block; padding: 2px 0; color: #d17d39; font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 20px;">
-          ANDAKT &amp; BØNN
-        </div>
-        <h4 style="font-family: 'Merriweather', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; color: #121c2c; margin: 0 0 20px 0; line-height: 1.3; max-width: 500px;">
-          Dagens andakt og bønn
-        </h4>
-        <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">
-          {{devotional}}
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Button -->
+    <!-- CTA Button (Asymmetrical, Orange Gradient) -->
     <div style="text-align: center; margin-bottom: 48px;">
-      <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background-color: #1B4965; color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);">
+      <a href="https://www.hiskingdomministry.no/bibel.html?plan={{planId}}&day={{day}}" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; padding: 14px 44px; border-radius: 24px 8px 24px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 0.2em; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);">
         LES PLAN
       </a>
     </div>
