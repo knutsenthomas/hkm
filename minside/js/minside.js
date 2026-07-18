@@ -8287,16 +8287,16 @@ class MinSideManager {
                     </p>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <div class="view-toggle-buttons" style="display:inline-flex; border: 1.5px solid var(--border-solid); border-radius: 12px; overflow:hidden; padding: 2px; background: var(--card-bg);">
-                        <button class="view-btn" id="view-grid-btn" style="padding: 6px 10px; border:none; background: ${currentView === 'grid' ? 'var(--main-bg)' : 'transparent'}; border-radius: 8px; color: ${currentView === 'grid' ? 'var(--accent-color)' : 'var(--text-muted)'}; display:flex; align-items:center; cursor:pointer; transition: all 0.2s;" title="Rutenett">
+                    <div class="notes-view-toggle-container" style="display:inline-flex; border: 1.5px solid var(--border-solid); border-radius: 12px; overflow:hidden; padding: 2px; background: var(--card-bg); height: 38px; box-sizing: border-box; align-items: center;">
+                        <button class="notes-view-btn" id="view-grid-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'grid' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 8px !important; color: ${currentView === 'grid' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Rutenett">
                             <span class="material-symbols-outlined" style="font-size:20px;">grid_view</span>
                         </button>
-                        <button class="view-btn" id="view-list-btn" style="padding: 6px 10px; border:none; background: ${currentView === 'list' ? 'var(--main-bg)' : 'transparent'}; border-radius: 8px; color: ${currentView === 'list' ? 'var(--accent-color)' : 'var(--text-muted)'}; display:flex; align-items:center; cursor:pointer; transition: all 0.2s;" title="Liste">
+                        <button class="notes-view-btn" id="view-list-btn" style="width: 34px !important; height: 34px !important; border:none !important; background: ${currentView === 'list' ? 'var(--main-bg)' : 'transparent'} !important; border-radius: 8px !important; color: ${currentView === 'list' ? 'var(--accent-color)' : 'var(--text-muted)'} !important; display:flex !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; transition: all 0.2s !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; min-width: 0 !important;" title="Liste">
                             <span class="material-symbols-outlined" style="font-size:20px;">format_list_bulleted</span>
                         </button>
                     </div>
-                    <button class="btn btn-primary" id="new-note-btn">
-                        <span class="material-symbols-outlined">add</span>
+                    <button class="btn btn-primary" id="new-note-btn" style="height: 38px !important; padding: 0 16px !important; font-size: 13.5px !important; font-weight: 700 !important; border-radius: 10px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; margin: 0 !important; width: auto !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; border: none !important; color: #ffffff !important; cursor: pointer !important; box-sizing: border-box !important;">
+                        <span class="material-symbols-outlined" style="font-size: 18px !important;">add</span>
                         ${t('notes.newNote')}
                     </button>
                 </div>
