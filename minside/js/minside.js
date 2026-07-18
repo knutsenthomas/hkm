@@ -8410,10 +8410,10 @@ class MinSideManager {
         document.getElementById('new-note-btn')?.addEventListener('click', () => {
             container.innerHTML = `
             <div class="full-screen-note-editor" style="width: 100%; display: flex; flex-direction: column; min-height: calc(100vh - 200px); box-sizing: border-box;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
-                    <h2 style="font-size: 24px; font-weight: 700; color: var(--accent-color, #d17d39); margin:0;">${t('notes.newNote') || 'Nytt notat'}</h2>
-                    <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back')}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; gap: 12px; flex-wrap: nowrap; width: 100%;">
+                    <h2 style="font-size: clamp(18px, 4vw, 24px); font-weight: 700; color: var(--accent-color, #d17d39); margin:0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 0;">${t('notes.newNote') || 'Nytt notat'}</h2>
+                    <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px !important; height: 38px !important; width: auto !important; min-width: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; margin: 0 !important; font-size: 13.5px !important; font-weight: 600 !important; box-sizing: border-box !important; flex-shrink: 0 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 18px !important;">arrow_back</span> ${t('common.back')}
                     </button>
                 </div>
                 
@@ -8520,10 +8520,10 @@ class MinSideManager {
                 // Replace container innerHTML with a full screen note editor workspace
                 container.innerHTML = `
                 <div class="full-screen-note-editor" style="width: 100%; display: flex; flex-direction: column; min-height: calc(100vh - 200px); box-sizing: border-box;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--accent-color, #d17d39); margin:0;">${t('notes.editNote') || 'Rediger notat'}</h2>
-                        <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back')}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; gap: 12px; flex-wrap: nowrap; width: 100%;">
+                        <h2 style="font-size: clamp(18px, 4vw, 24px); font-weight: 700; color: var(--accent-color, #d17d39); margin:0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 0;">${t('notes.editNote') || 'Rediger notat'}</h2>
+                        <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px !important; height: 38px !important; width: auto !important; min-width: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; margin: 0 !important; font-size: 13.5px !important; font-weight: 600 !important; box-sizing: border-box !important; flex-shrink: 0 !important;">
+                            <span class="material-symbols-outlined" style="font-size: 18px !important;">arrow_back</span> ${t('common.back')}
                         </button>
                     </div>
                     
