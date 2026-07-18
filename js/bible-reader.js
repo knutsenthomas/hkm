@@ -2862,7 +2862,11 @@ class BibleReader {
 
     parseMarkdown(text) {
         if (!text) return '';
-        let html = text.trim().replace(/\r/g, '');
+        
+        // Clean up any literal '\n' string representations and replace with real newlines
+        let html = text.trim()
+            .replace(/\\n/g, '\n')
+            .replace(/\r/g, '');
 
         // Preprocessing: Fix missing spacing/newlines before and after header tags (e.g. "word.### Heading" -> "word.\n\n### Heading")
         html = html.replace(/([^#\n])(#{1,3}\s+)/g, '$1\n\n$2');
