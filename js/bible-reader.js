@@ -1647,16 +1647,16 @@ class BibleReader {
         toast.id = 'bible-toast';
         toast.style.cssText = `
             position: fixed;
-            bottom: 80px;
+            top: 110px;
             left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #1B4965;
+            transform: translateX(-50%) translateY(-20px);
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
             color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 24px;
+            border-radius: 30px;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(209, 125, 57, 0.25), 0 4px 10px rgba(0, 0, 0, 0.12);
             z-index: 10001;
             opacity: 0;
             transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease;
@@ -1667,7 +1667,7 @@ class BibleReader {
         `;
         
         toast.innerHTML = `
-            <span class="material-symbols-outlined" style="font-size: 18px; color: #fef08a;">info</span>
+            <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">info</span>
             <span>${message}</span>
         `;
         
@@ -1687,7 +1687,7 @@ class BibleReader {
     dismissToast() {
         const existing = document.getElementById('bible-toast');
         if (existing) {
-            existing.style.transform = 'translateX(-50%) translateY(20px)';
+            existing.style.transform = 'translateX(-50%) translateY(-20px)';
             existing.style.opacity = '0';
             setTimeout(() => existing.remove(), 300);
         }
