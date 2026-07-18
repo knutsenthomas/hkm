@@ -26226,7 +26226,7 @@ class AdminManager {
                 const templateId = document.getElementById('edit-template-id').value;
                 if (isCodeView) {
                     // Switch to visual (Quill)
-                    if (templateId === 'daily_bible_reading' || templateId === 'course_registration') {
+                    if (['daily_bible_reading', 'course_registration', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
                         const confirmSwitch = confirm("Advarsel: Hvis du veksler til visuell editor på denne malen, vil den avanserte HTML-strukturen og alle designstiler bli slettet. Vil du fortsette?");
                         if (!confirmSwitch) return;
                     }
@@ -26490,7 +26490,7 @@ class AdminManager {
         const warningEl = document.getElementById('template-editor-warning');
 
         // Setup warning & default view mode
-        if (templateId === 'daily_bible_reading' || templateId === 'course_registration') {
+        if (['daily_bible_reading', 'course_registration', 'welcome_email', 'newsletter_confirmation'].includes(templateId)) {
             if (rawTextarea) {
                 rawTextarea.value = bodyContent;
                 rawTextarea.style.display = 'block';
