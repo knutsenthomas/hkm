@@ -1537,15 +1537,33 @@ class BibleReader {
                             const pane = this.dom.readingPane.closest('.bible-content-pane');
                             const paneRect = pane.getBoundingClientRect();
                             const clickRelativeY = e.clientY - paneRect.top;
-                            const y = clickRelativeY + pane.scrollTop - 10;
+                            const paneHeight = pane.clientHeight;
                             
-                            // If the click is near the top of the reading pane (less than 350px),
-                            // position the toolbar below the click to avoid getting cut off at the top.
+                            // Estimate toolbar height as 380px for layout bounding
+                            const toolbarHeight = 380;
+                            
+                            // Determine position (above or below clicked verse)
                             const showBelow = clickRelativeY < 350;
+                            
+                            let y;
                             if (showBelow) {
                                 this.dom.verseToolbar.classList.add('position-below');
+                                // Position below click
+                                let topY = clickRelativeY + 15;
+                                // Bound bottom edge to prevent cutoff/overlap with bottom elements
+                                if (topY + toolbarHeight > paneHeight - 16) {
+                                    topY = Math.max(16, paneHeight - toolbarHeight - 16);
+                                }
+                                y = topY + pane.scrollTop;
                             } else {
                                 this.dom.verseToolbar.classList.remove('position-below');
+                                // Position above click
+                                let bottomY = clickRelativeY - 10;
+                                // Bound top edge to prevent cutoff at the top
+                                if (bottomY - toolbarHeight < 16) {
+                                    bottomY = toolbarHeight + 16;
+                                }
+                                y = bottomY + pane.scrollTop;
                             }
                             
                             this.dom.verseToolbar.style.left = '50%';
