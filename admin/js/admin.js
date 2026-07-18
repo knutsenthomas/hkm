@@ -26275,38 +26275,44 @@ class AdminManager {
                         const emailSubject = subject.replace("{{name}}", "Test-bruker");
                         const htmlBody = body.replace("{{name}}", "Test-bruker");
                         testSubject = emailSubject;
-                        testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
-                                ${htmlBody}
-                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-                                    Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                        Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     } else if (templateId === 'course_registration') {
                         const emailSubject = subject.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
                         const htmlBody = body.replace("{{name}}", "Test-bruker").replace("{{courseTitle}}", "Identitet i Kristus");
                         testSubject = emailSubject;
-                        testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
-                                ${htmlBody}
-                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-                                    Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                        Dette er en automatisk utsendt test-e-post fra His Kingdom Ministry.
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     } else if (templateId === 'newsletter_confirmation') {
                         const emailSubject = subject.replace("{{email}}", email);
                         const htmlBody = body.replace("{{email}}", email);
                         testSubject = emailSubject;
-                        testHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
-                                ${htmlBody}
-                                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-                                    Du kan melde deg av når som helst ved å svare på denne e-posten.
+                        testHtml = (htmlBody.includes('FCF9F5') || htmlBody.includes('hkm-email-container'))
+                            ? htmlBody
+                            : `
+                                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 12px;">
+                                    ${htmlBody}
+                                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                                        Du kan melde deg av når som helst ved å svare på denne e-posten.
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     } else if (templateId === 'daily_bible_reading') {
                         const planId = "P0goQTHeFCsRjwHrxI9m";
                         const planTitle = "Johannesevangeliet";
