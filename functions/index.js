@@ -4694,10 +4694,16 @@ exports.onUserCreate = onDocumentCreated({
     <!-- Closing -->
     <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 40px; margin-bottom: 16px; text-align: left;">
       <p style="font-family: 'Inter', sans-serif; font-size: 15px; color: #56423b; font-style: italic; margin: 0 0 20px 0;">Vennlig hilsen,</p>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); display: inline-block; vertical-align: middle; margin-right: 8px;"></div>
-        <p style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; vertical-align: middle;">HIS KINGDOM MINISTRY</p>
-      </div>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
     </section>
   </div>
 
@@ -4815,10 +4821,16 @@ exports.onNewsletterSubscribe = onDocumentCreated({
     <!-- Closing -->
     <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 40px; margin-bottom: 16px; text-align: left;">
       <p style="font-family: 'Inter', sans-serif; font-size: 15px; color: #56423b; font-style: italic; margin: 0 0 20px 0;">Vennlig hilsen,</p>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); display: inline-block; vertical-align: middle; margin-right: 8px;"></div>
-        <p style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; vertical-align: middle;">HIS KINGDOM MINISTRY</p>
-      </div>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
     </section>
   </div>
 
@@ -8135,10 +8147,16 @@ exports.scheduledReadingNotifications = onSchedule({
     <!-- Closing -->
     <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 40px; margin-bottom: 16px; text-align: left;">
       <p style="font-family: 'Inter', sans-serif; font-size: 15px; color: #56423b; font-style: italic; margin: 0 0 20px 0;">Vennlig hilsen,</p>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); display: inline-block; vertical-align: middle; margin-right: 8px;"></div>
-        <p style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; vertical-align: middle;">HIS KINGDOM MINISTRY</p>
-      </div>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
     </section>
   </div>
 
@@ -8557,10 +8575,16 @@ exports.onCourseEnrollmentCreated = onDocumentCreated({
     <!-- Closing -->
     <section style="border-top: 1px solid rgba(221, 193, 182, 0.1); padding-top: 40px; margin-bottom: 16px; text-align: left;">
       <p style="font-family: 'Inter', sans-serif; font-size: 15px; color: #56423b; font-style: italic; margin: 0 0 20px 0;">Vennlig hilsen,</p>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); display: inline-block; vertical-align: middle; margin-right: 8px;"></div>
-        <p style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; vertical-align: middle;">HIS KINGDOM MINISTRY</p>
-      </div>
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 12px;">
+            <div style="width: 32px; height: 1px; background-color: rgba(27, 73, 101, 0.3); font-size: 1px; line-height: 1px; overflow: hidden;"></div>
+          </td>
+          <td style="vertical-align: middle; line-height: 1;">
+            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: #1B4965; text-transform: uppercase; letter-spacing: 0.3em; margin: 0; display: inline-block; line-height: 1; vertical-align: middle;">HIS KINGDOM MINISTRY</span>
+          </td>
+        </tr>
+      </table>
     </section>
   </div>
 
