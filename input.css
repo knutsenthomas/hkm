@@ -5357,6 +5357,8 @@ ol.block-list {
 }
 
 .hero-content {
+    position: relative;
+    z-index: 2;
     width: 100%;
     max-width: 1440px;
     color: white;
@@ -9319,9 +9321,9 @@ html[data-theme="dark"] .skeleton-text::after {
     height: 220px;
     transform: translateY(-50%);
     pointer-events: none;
-    z-index: 0;
-    opacity: 0.55;
-    mix-blend-mode: screen;
+    z-index: -1; /* Render behind text but inside .hero-content on top of bg */
+    opacity: 0.85; /* Increase visibility */
+    /* Mix-blend-mode removed to prevent washing out on bright sunset gradients */
     animation: hkmGlowWiggle 9s ease-in-out infinite;
 }
 
