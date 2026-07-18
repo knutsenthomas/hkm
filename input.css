@@ -9310,3 +9310,48 @@ html[data-theme="dark"] .skeleton-text::after {
     height: 16px !important;
 }
 
+/* Hero Floating Glowing Wave Animation */
+.hero-wave-container {
+    position: absolute;
+    top: 45%;
+    left: -10%;
+    width: 120%;
+    height: 220px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    animation: hkmGlowWiggle 9s ease-in-out infinite;
+}
+
+.hero-wave-container svg {
+    width: 100%;
+    height: 100%;
+}
+
+.hkm-glow-path {
+    stroke-dasharray: 800 600;
+    stroke-dashoffset: 1400;
+    animation: hkmGlowFlow 24s linear infinite;
+}
+
+@keyframes hkmGlowWiggle {
+    0%, 100% {
+        transform: translateY(-50%) skewX(0deg) scaleY(1);
+    }
+    50% {
+        transform: translateY(-52%) skewX(2.5deg) scaleY(1.07);
+    }
+}
+
+@keyframes hkmGlowFlow {
+    0% {
+        stroke-dashoffset: 1400;
+    }
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+
