@@ -1564,6 +1564,7 @@ class MinSideManager {
             updatedAt: raw.updatedAt || null,
             source: raw.source || fallbackSource,
             userId: raw.userId || this.currentUser?.uid || '',
+            category: typeof raw.category === 'string' ? raw.category.trim() : '',
         };
     }
 
@@ -8169,9 +8170,9 @@ class MinSideManager {
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
 
         // Fetch both personal notes and HKM notes in parallel
-        let personalNotes = [], hkmNotes = [];
+        let personalNotes = [], hkmNotes = [], categories = [];
         try {
-            const [personalSnap, hkmSnap] = await Promise.all([
+            const [personalSnap, hkmSnap, catSnap] = await Promise.all([
                 firebase.firestore()
                     .collection('personal_notes')
                     .where('userId', '==', uid)
@@ -8180,10 +8181,16 @@ class MinSideManager {
                     .collection('user_notes')
                     .where('userId', '==', uid)
                     .get(),
+                firebase.firestore()
+                    .collection('personal_note_categories')
+                    .where('userId', '==', uid)
+                    .get()
             ]);
             personalSnap.forEach(d => personalNotes.push(this._normalizeNoteDoc(d, 'personal')));
             hkmSnap.forEach(d => hkmNotes.push(this._normalizeNoteDoc(d, 'shared')));
-            // Sort client-side (avoids composite index requirement)
+            catSnap.forEach(d => categories.push({ id: d.id, ...d.data() }));
+            
+            // Sort
             const sortByDate = (a, b) => {
                 const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
                 const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
@@ -8191,16 +8198,18 @@ class MinSideManager {
             };
             personalNotes.sort(sortByDate);
             hkmNotes.sort(sortByDate);
+            categories.sort((a, b) => a.name.localeCompare(b.name));
         } catch (e) {
             console.warn('renderNotes fetch:', e);
             this._notify(t('notifications.loadErrorNotice'), 'warning');
         }
 
-        this._renderNotesUI(container, personalNotes, hkmNotes);
+        this._renderNotesUI(container, personalNotes, hkmNotes, categories);
     }
 
-    _renderNotesUI(container, personalNotes, hkmNotes) {
+    _renderNotesUI(container, personalNotes, hkmNotes, categories = []) {
         const currentView = localStorage.getItem('hkm_notes_view') || 'grid';
+        const selectedCategory = localStorage.getItem('hkm_notes_selected_category') || 'all';
 
         const stripHtml = (html) => {
             const tmp = document.createElement('DIV');
@@ -8211,7 +8220,8 @@ class MinSideManager {
         const makePNote = (n) => `
         <div class="personal-note-card" data-id="${n.id}">
             <div class="personal-note-card-top">
-                <div class="personal-note-title">${n.title || t('notes.untitled')}</div>
+                <div class="personal-note-title" style="margin-bottom:4px;">${n.title || t('notes.untitled')}</div>
+                ${n.category ? `<span class="category-badge" style="display:inline-block; font-size: 10px; font-weight: 700; background: rgba(209, 125, 57, 0.1); color: var(--accent-color, #d17d39); padding: 2px 6px; border-radius: 6px; margin-bottom: 8px; align-self: flex-start; text-transform: uppercase; letter-spacing: 0.05em;">${n.category}</span>` : ''}
                 <div class="personal-note-body rte-content">${n.text || ''}</div>
             </div>
             <div class="personal-note-card-bottom">
@@ -8230,7 +8240,10 @@ class MinSideManager {
         const makePNoteRow = (n) => `
         <div class="personal-note-row" data-id="${n.id}">
             <div class="personal-note-row-left">
-                <div class="personal-note-row-title">${n.title || t('notes.untitled')}</div>
+                <div class="personal-note-row-title" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    ${n.title || t('notes.untitled')}
+                    ${n.category ? `<span class="category-badge" style="font-size: 9px; font-weight: 700; background: rgba(209, 125, 57, 0.1); color: var(--accent-color, #d17d39); padding: 1.5px 5px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.05em;">${n.category}</span>` : ''}
+                </div>
                 <div class="personal-note-row-body">${stripHtml(n.text || '')}</div>
                 <div class="personal-note-row-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
             </div>
@@ -8243,6 +8256,11 @@ class MinSideManager {
                 </button>
             </div>
         </div>`;
+
+        // Filter personal notes by selected category
+        const filteredPersonalNotes = selectedCategory === 'all'
+            ? personalNotes
+            : personalNotes.filter(n => n.category === selectedCategory);
 
         container.innerHTML = `
         <div class="notes-container">
@@ -8271,13 +8289,39 @@ class MinSideManager {
                 </div>
             </div>
 
+            <!-- Category Filtering Bar -->
+            <div class="category-filter-container" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; padding: 12px 0; border-bottom: 1px solid var(--border-solid); gap: 16px; flex-wrap: wrap;">
+                <div class="category-pills" style="display:flex; gap:8px; overflow-x:auto; padding-bottom: 4px; max-width: 100%; -webkit-overflow-scrolling: touch;">
+                    <button class="category-pill-btn ${selectedCategory === 'all' ? 'active' : ''}" data-category="all" style="padding: 8px 16px; border: 1.5px solid ${selectedCategory === 'all' ? 'var(--accent-color, #d17d39)' : 'var(--border-solid)'}; background: ${selectedCategory === 'all' ? 'rgba(209, 125, 57, 0.1)' : 'transparent'}; border-radius: 20px; color: ${selectedCategory === 'all' ? 'var(--accent-color, #d17d39)' : 'var(--text-muted)'}; font-size: 13px; font-weight: 600; cursor:pointer; transition: all 0.2s; white-space: nowrap;">
+                        Alle
+                    </button>
+                    ${categories.map(cat => `
+                    <button class="category-pill-btn ${selectedCategory === cat.name ? 'active' : ''}" data-category="${cat.name}" style="padding: 8px 16px; border: 1.5px solid ${selectedCategory === cat.name ? 'var(--accent-color, #d17d39)' : 'var(--border-solid)'}; background: ${selectedCategory === cat.name ? 'rgba(209, 125, 57, 0.1)' : 'transparent'}; border-radius: 20px; color: ${selectedCategory === cat.name ? 'var(--accent-color, #d17d39)' : 'var(--text-muted)'}; font-size: 13px; font-weight: 600; cursor:pointer; transition: all 0.2s; white-space: nowrap;">
+                        ${cat.name}
+                    </button>
+                    `).join('')}
+                </div>
+                
+                <button class="btn btn-ghost btn-sm" id="btn-add-category" style="padding: 6px 12px; border-radius: 10px; font-size:12.5px; height: auto; display: flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">add_box</span>
+                    Ny kategori
+                </button>
+            </div>
+
             <!-- New note form (hidden by default) -->
             <div class="new-note-form is-hidden" id="new-note-form">
                 <div class="form-group">
                     <label>${t('notes.title')}</label>
                     <input id="note-title-input" placeholder="${t('notes.titlePlaceholder')}" autocomplete="off">
                 </div>
-                <div class="form-group ms-form-group-gap-10">
+                <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
+                    <label>Kategori</label>
+                    <select id="note-category-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-solid); background: var(--main-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;">
+                        <option value="">Ingen kategori</option>
+                        ${categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group ms-form-group-gap-10" style="margin-top: 12px;">
                     <label>${t('notes.content')}</label>
                     <div class="rte-wrapper">
                         <div class="rte-toolbar" id="rte-toolbar-new">
@@ -8308,12 +8352,12 @@ class MinSideManager {
 
             <!-- Personal notes list -->
             <div id="personal-notes-list" class="${currentView === 'list' ? 'personal-notes-list' : 'personal-notes-grid'}">
-                ${personalNotes.length === 0
+                ${filteredPersonalNotes.length === 0
                 ? `<div class="note-empty-personal">
                         <span class="material-symbols-outlined">edit_note</span>
                         <p>${t('notes.emptyPersonalNotes')}</p>
                        </div>`
-                : personalNotes.map(currentView === 'list' ? makePNoteRow : makePNote).join('')}
+                : filteredPersonalNotes.map(currentView === 'list' ? makePNoteRow : makePNote).join('')}
             </div>
 
             <!-- HKM Notes (read-only) -->
@@ -8347,12 +8391,46 @@ class MinSideManager {
         // View toggles
         document.getElementById('view-grid-btn')?.addEventListener('click', () => {
             localStorage.setItem('hkm_notes_view', 'grid');
-            this._renderNotesUI(container, personalNotes, hkmNotes);
+            this._renderNotesUI(container, personalNotes, hkmNotes, categories);
         });
 
         document.getElementById('view-list-btn')?.addEventListener('click', () => {
             localStorage.setItem('hkm_notes_view', 'list');
-            this._renderNotesUI(container, personalNotes, hkmNotes);
+            this._renderNotesUI(container, personalNotes, hkmNotes, categories);
+        });
+
+        // Category pills click events
+        container.querySelectorAll('.category-pill-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.dataset.category;
+                localStorage.setItem('hkm_notes_selected_category', cat);
+                this._renderNotesUI(container, personalNotes, hkmNotes, categories);
+            });
+        });
+
+        // Create new category click event
+        document.getElementById('btn-add-category')?.addEventListener('click', async () => {
+            const name = prompt("Skriv inn navn på den nye kategorien:");
+            if (!name || !name.trim()) return;
+            const cleanName = name.trim();
+
+            if (categories.some(c => c.name.toLowerCase() === cleanName.toLowerCase())) {
+                alert("Denne kategorien finnes allerede!");
+                return;
+            }
+
+            try {
+                const ref = await firebase.firestore().collection('personal_note_categories').add({
+                    userId: uid,
+                    name: cleanName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                categories.push({ id: ref.id, name: cleanName });
+                categories.sort((a, b) => a.name.localeCompare(b.name));
+                this._renderNotesUI(container, personalNotes, hkmNotes, categories);
+            } catch (e) {
+                alert("Kunne ikke opprette kategori: " + e.message);
+            }
         });
 
         // Wire RTE toolbar
@@ -8376,6 +8454,7 @@ class MinSideManager {
         // Save new note
         document.getElementById('save-note-btn')?.addEventListener('click', async () => {
             const title = document.getElementById('note-title-input').value.trim();
+            const category = document.getElementById('note-category-select').value;
             const editor = document.getElementById('note-body-editor');
             const text = editor?.innerHTML?.trim() || '';
             const plain = editor?.innerText?.trim() || '';
@@ -8389,12 +8468,20 @@ class MinSideManager {
                     userId: uid,
                     title: title || t('notes.untitled'),
                     text,
+                    category: category || '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 });
-                // Prepend new note immediately
-                personalNotes.unshift({ id: ref.id, title: title || t('notes.untitled'), text, createdAt: null });
-                this._renderNotesUI(container, personalNotes, hkmNotes);
+                // Add to state and re-render
+                personalNotes.unshift(this._normalizeNoteDoc({
+                    id: ref.id,
+                    title: title || t('notes.untitled'),
+                    text,
+                    category: category || '',
+                    userId: uid,
+                    createdAt: { toDate: () => new Date() }
+                }, 'personal'));
+                this._renderNotesUI(container, personalNotes, hkmNotes, categories);
             } catch (e) {
                 console.error('Save note error:', e);
                 alert(t('notes.saveError') + ': ' + e.message);
@@ -8424,6 +8511,13 @@ class MinSideManager {
                         <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
                             <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.title')}</label>
                             <input id="edit-note-title-${note.id}" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border-solid); background: var(--main-bg); color: var(--text-main);">
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">Kategori</label>
+                            <select id="edit-note-category-${note.id}" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-solid); background: var(--main-bg); color: var(--text-main); font-size: 14px; outline: none; font-weight: 500;">
+                                <option value="">Ingen kategori</option>
+                                ${categories.map(cat => `<option value="${cat.name}" ${note.category === cat.name ? 'selected' : ''}>${cat.name}</option>`).join('')}
+                            </select>
                         </div>
                         <div class="form-group ms-form-group-gap-12" style="margin: 0; flex-grow: 1; display: flex; flex-direction: column;">
                             <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.content')}</label>
@@ -8463,7 +8557,7 @@ class MinSideManager {
                 container.querySelector(`#edit-note-title-${note.id}`)?.focus();
 
                 const closeEditor = () => {
-                    this._renderNotesUI(container, personalNotes, hkmNotes);
+                    this._renderNotesUI(container, personalNotes, hkmNotes, categories);
                 };
 
                 // Close and Cancel buttons listener
@@ -8473,6 +8567,7 @@ class MinSideManager {
                 // Save button listener
                 container.querySelector(`#save-edit-btn-${note.id}`)?.addEventListener('click', async () => {
                     const newTitle = container.querySelector(`#edit-note-title-${note.id}`).value.trim() || t('notes.untitled');
+                    const newCategory = container.querySelector(`#edit-note-category-${note.id}`).value;
                     const newText = editor?.innerHTML?.trim() || '';
                     const plain = editor?.innerText?.trim() || '';
                     if (!plain) { editor?.focus(); return; }
@@ -8485,10 +8580,12 @@ class MinSideManager {
                         await firebase.firestore().collection('personal_notes').doc(id).update({
                             title: newTitle,
                             text: newText,
+                            category: newCategory || '',
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         });
                         note.title = newTitle;
                         note.text = newText;
+                        note.category = newCategory || '';
                         closeEditor();
                     } catch (e) {
                         alert(t('notes.updateError') + ': ' + e.message);
