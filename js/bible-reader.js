@@ -649,17 +649,13 @@ class BibleReader {
             if (settingsBtn) {
                 settingsBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    document.getElementById('floating-chapter-popover')?.classList.remove('active');
                     popover.classList.toggle('active');
                 });
                 
                 // Prevent closing when clicking inside popover
                 popover.addEventListener('click', (e) => {
                     e.stopPropagation();
-                });
-                
-                // Close popover when clicking anywhere else
-                document.addEventListener('click', () => {
-                    popover.classList.remove('active');
                 });
             }
             
@@ -668,21 +664,26 @@ class BibleReader {
             if (pill) {
                 pill.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (window.innerWidth <= 991) {
-                        // On mobile, toggle the book navigation sidebar
-                        const sidebar = document.getElementById('bible-sidebar');
-                        if (sidebar) {
-                            sidebar.classList.toggle('active');
-                        }
-                    } else {
-                        // On desktop, toggle the quick chapter select overlay
-                        const overlay = document.getElementById('chapter-selector-overlay');
-                        if (overlay) {
-                            overlay.classList.toggle('active');
-                        }
+                    document.getElementById('floating-settings-popover')?.classList.remove('active');
+                    const chapPopover = document.getElementById('floating-chapter-popover');
+                    if (chapPopover) {
+                        chapPopover.classList.toggle('active');
                     }
                 });
+                
+                const chapPopover = document.getElementById('floating-chapter-popover');
+                if (chapPopover) {
+                    chapPopover.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                }
             }
+
+            // Close all floating popovers when clicking anywhere else
+            document.addEventListener('click', () => {
+                popover?.classList.remove('active');
+                document.getElementById('floating-chapter-popover')?.classList.remove('active');
+            });
         }
     }
 
@@ -1778,31 +1779,50 @@ class BibleReader {
     }
 
     renderChapters() {
-        if (!this.dom.chapterGrid) return;
-
-        this.dom.chapterGrid.innerHTML = this.chapters.map(c => {
+        const gridHtml = this.chapters.map(c => {
             const isActive = c.id === this.selectedChapterId ? 'active' : '';
             return `<div class="chapter-item ${isActive}" data-id="${c.id}">${c.number}</div>`;
         }).join('');
 
-        this.dom.chapterGrid.querySelectorAll('.chapter-item').forEach(item => {
-            item.addEventListener('click', async () => {
-                this.dom.chapterGrid.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
-                item.classList.add('active');
-                await this.selectChapter(item.dataset.id);
-                
-                // Hide chapter selector overlay
-                const overlay = document.getElementById('chapter-selector-overlay');
-                if (overlay) {
-                    overlay.classList.remove('active');
-                }
-                
-                // Hide mobile/reading-mode sidebar if active
-                if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
-                    this.dom.sidebar.classList.remove('active');
-                }
+        const onChapterClick = async (item) => {
+            document.querySelectorAll('.chapter-grid .chapter-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('#floating-chapter-grid .chapter-item').forEach(el => el.classList.remove('active'));
+            
+            // Highlight this chapter in all grids
+            const targetChapterId = item.dataset.id;
+            document.querySelectorAll(`.chapter-item[data-id="${targetChapterId}"]`).forEach(el => el.classList.add('active'));
+
+            await this.selectChapter(targetChapterId);
+            
+            // Hide chapter selector overlay
+            const overlay = document.getElementById('chapter-selector-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            
+            // Hide floating chapter popover
+            document.getElementById('floating-chapter-popover')?.classList.remove('active');
+            
+            // Hide mobile/reading-mode sidebar if active
+            if (this.dom.sidebar && this.dom.sidebar.classList.contains('active')) {
+                this.dom.sidebar.classList.remove('active');
+            }
+        };
+
+        if (this.dom.chapterGrid) {
+            this.dom.chapterGrid.innerHTML = gridHtml;
+            this.dom.chapterGrid.querySelectorAll('.chapter-item').forEach(item => {
+                item.addEventListener('click', () => onChapterClick(item));
             });
-        });
+        }
+
+        const floatGrid = document.getElementById('floating-chapter-grid');
+        if (floatGrid) {
+            floatGrid.innerHTML = gridHtml;
+            floatGrid.querySelectorAll('.chapter-item').forEach(item => {
+                item.addEventListener('click', () => onChapterClick(item));
+            });
+        }
     }
 
     async selectChapter(chapterId) {
@@ -1994,8 +2014,7 @@ class BibleReader {
         const floatChapSpan = document.getElementById('floating-nav-chapter');
         const currentBook = this.books.find(b => b.id === this.selectedBookId);
         if (floatBookSpan && currentBook) {
-            const isMobile = window.innerWidth <= 768;
-            floatBookSpan.innerText = isMobile ? this.getBookAbbreviation(currentBook.name) : currentBook.name;
+            floatBookSpan.innerText = currentBook.name;
         }
         if (floatChapSpan) floatChapSpan.innerText = chapterNum;
     }
