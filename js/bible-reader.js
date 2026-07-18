@@ -1198,30 +1198,62 @@ class BibleReader {
                 e.stopPropagation();
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     const ref = this.getCurrentReferenceText();
-                    const unbookmarked = this.selectedVerses.filter(v => {
-                        const fullRef = `${ref}:${v.verseNum}`;
-                        return !this.bookmarks.some(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+                    
+                    // Parse all currently bookmarked verse numbers for the current chapter and translation
+                    const activeBookmarks = this.bookmarks.filter(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
+                    const currentBookmarked = new Set();
+                    activeBookmarks.forEach(b => {
+                        const verses = this.parseVersesFromRef(b.ref);
+                        verses.forEach(v => currentBookmarked.add(v));
                     });
 
-                    if (unbookmarked.length > 0) {
-                        // Bookmark all selected verses
-                        unbookmarked.forEach(v => {
-                            const fullRef = `${ref}:${v.verseNum}`;
-                            this.bookmarks.push({
-                                id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
-                                ref: fullRef,
-                                bookId: this.selectedBookId,
-                                chapterId: this.selectedChapterId,
-                                verse: v.verseNum,
-                                bibleId: this.selectedBibleId,
-                                createdAt: new Date().toISOString()
-                            });
-                        });
-                    } else {
-                        // Unbookmark all selected verses
-                        this.selectedVerses.forEach(v => {
-                            const fullRef = `${ref}:${v.verseNum}`;
-                            this.bookmarks = this.bookmarks.filter(b => !(b.ref === fullRef && b.bibleId === this.selectedBibleId));
+                    // Check if there are any selected verses that are NOT currently bookmarked
+                    const hasUnbookmarked = this.selectedVerses.some(v => !currentBookmarked.has(parseInt(v.verseNum, 10)));
+                    const selectedNumbers = this.selectedVerses.map(v => parseInt(v.verseNum, 10));
+
+                    // Remove any existing overlapping bookmarks in the current chapter/translation
+                    this.bookmarks = this.bookmarks.filter(b => {
+                        if (b.chapterId !== this.selectedChapterId || b.bibleId !== this.selectedBibleId) {
+                            return true;
+                        }
+                        const verses = this.parseVersesFromRef(b.ref);
+                        const overlaps = verses.some(v => selectedNumbers.includes(v));
+                        return !overlaps;
+                    });
+
+                    if (hasUnbookmarked) {
+                        // Create a single combined bookmark representing all selected verses
+                        const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+                        const numbers = sorted.map(v => parseInt(v.verseNum, 10));
+                        const ranges = [];
+                        let start = numbers[0];
+                        let prev = numbers[0];
+                        
+                        for (let i = 1; i <= numbers.length; i++) {
+                            const current = numbers[i];
+                            if (current === prev + 1) {
+                                prev = current;
+                            } else {
+                                if (start === prev) {
+                                    ranges.push(String(start));
+                                } else {
+                                    ranges.push(`${start}-${prev}`);
+                                }
+                                start = current;
+                                prev = current;
+                            }
+                        }
+                        const verseRange = ranges.join(', ');
+                        const combinedRef = `${ref}:${verseRange}`;
+
+                        this.bookmarks.push({
+                            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                            ref: combinedRef,
+                            bookId: this.selectedBookId,
+                            chapterId: this.selectedChapterId,
+                            verse: verseRange,
+                            bibleId: this.selectedBibleId,
+                            createdAt: new Date().toISOString()
                         });
                     }
 
@@ -2520,11 +2552,21 @@ class BibleReader {
             this.highlightedVerseElement.classList.remove('verse-temp-highlight');
             this.highlightedVerseElement = null;
         }
+        
+        // Extract the first verse from range/list formats (e.g. "1-7" or "3, 5" -> "1" or "3")
+        let targetVerse = String(verseNum).trim();
+        if (targetVerse.includes('-')) {
+            targetVerse = targetVerse.split('-')[0].trim();
+        }
+        if (targetVerse.includes(',')) {
+            targetVerse = targetVerse.split(',')[0].trim();
+        }
+
         setTimeout(() => {
             const paragraphs = this.dom.readingPane.querySelectorAll('p');
             for (const p of paragraphs) {
                 const sup = p.querySelector('sup.v');
-                if (sup && sup.innerText.trim() === String(verseNum)) {
+                if (sup && sup.innerText.trim() === targetVerse) {
                     this.isProgrammaticScrolling = true;
                     
                     // Scroll container programmatically to avoid scrolling the main window/viewport
@@ -2887,12 +2929,16 @@ class BibleReader {
         const ref = this.getCurrentReferenceText();
         const fullRef = `${ref}:${verseNumber}`;
         
-        const existingIdx = this.bookmarks.findIndex(b => b.ref === fullRef && b.bibleId === this.selectedBibleId);
+        // Find if this verse is part of any existing bookmarks in this chapter
+        const activeBookmarks = this.bookmarks.filter(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
+        const overlappingBookmark = activeBookmarks.find(b => {
+            const verses = this.parseVersesFromRef(b.ref);
+            return verses.includes(parseInt(verseNumber, 10));
+        });
 
-        if (existingIdx >= 0) {
-            // Remove highlight
-            this.bookmarks.splice(existingIdx, 1);
-            paragraphElement.classList.remove('highlighted');
+        if (overlappingBookmark) {
+            // Remove highlight by deleting the overlapping bookmark
+            this.bookmarks = this.bookmarks.filter(b => b.id !== overlappingBookmark.id);
         } else {
             // Add highlight
             this.bookmarks.push({
@@ -2900,28 +2946,34 @@ class BibleReader {
                 ref: fullRef,
                 bookId: this.selectedBookId,
                 chapterId: this.selectedChapterId,
-                verse: verseNumber,
+                verse: String(verseNumber),
                 bibleId: this.selectedBibleId,
                 createdAt: new Date().toISOString()
             });
-            paragraphElement.classList.add('highlighted');
         }
 
         this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
         this.renderBookmarksList();
+        this.restoreHighlights();
     }
 
     restoreHighlights() {
         const ref = this.getCurrentReferenceText();
         const activeBookmarks = this.bookmarks.filter(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
         
+        // Build a Set of all bookmarked verse numbers in this chapter
+        const bookmarkedVerses = new Set();
+        activeBookmarks.forEach(b => {
+            const verses = this.parseVersesFromRef(b.ref);
+            verses.forEach(v => bookmarkedVerses.add(v));
+        });
+        
         const paragraphs = this.dom.readingPane.querySelectorAll('p');
         paragraphs.forEach(p => {
             const sup = p.querySelector('sup.v');
             if (sup) {
-                const verseNum = sup.innerText.trim();
-                const isBookmarked = activeBookmarks.some(b => String(b.verse) === verseNum);
-                if (isBookmarked) {
+                const verseNum = parseInt(sup.innerText.trim(), 10);
+                if (bookmarkedVerses.has(verseNum)) {
                     p.classList.add('highlighted');
                 } else {
                     p.classList.remove('highlighted');
