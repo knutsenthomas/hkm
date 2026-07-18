@@ -21,6 +21,7 @@ const minsideTranslations = {
         'common.save': 'Lagre',
         'common.cancel': 'Avbryt',
         'common.edit': 'Rediger',
+        'common.back': 'Tilbake',
         'common.saving': 'Lagrer...',
         'common.saved': 'Lagret ✓',
         'common.saveError': 'Feil ved lagring',
@@ -323,6 +324,7 @@ const minsideTranslations = {
         'common.save': 'Save',
         'common.cancel': 'Cancel',
         'common.edit': 'Edit',
+        'common.back': 'Back',
         'common.saving': 'Saving...',
         'common.saved': 'Saved ✓',
         'common.saveError': 'Error saving',
@@ -625,6 +627,7 @@ const minsideTranslations = {
         'common.save': 'Guardar',
         'common.cancel': 'Cancelar',
         'common.edit': 'Editar',
+        'common.back': 'Volver',
         'common.saving': 'Guardando...',
         'common.saved': 'Guardado ✓',
         'common.saveError': 'Error al guardar',
@@ -8363,23 +8366,23 @@ class MinSideManager {
 
                 // Replace container innerHTML with a full screen note editor workspace
                 container.innerHTML = `
-                <div class="full-screen-note-editor" style="max-width: 800px; margin: 0 auto; padding: 24px 0;">
+                <div class="full-screen-note-editor" style="width: 100%; display: flex; flex-direction: column; min-height: calc(100vh - 200px); box-sizing: border-box;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
                         <h2 style="font-size: 24px; font-weight: 700; color: var(--accent-color, #d17d39); margin:0;">${t('notes.editNote') || 'Rediger notat'}</h2>
                         <button type="button" class="btn btn-ghost close-editor-btn" style="padding: 8px 16px;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back') || 'Tilbake'}
+                            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span> ${t('common.back')}
                         </button>
                     </div>
                     
-                    <div class="new-note-form" id="edit-note-form-${note.id}" style="display: block; box-shadow: none; border: 1px solid var(--border-solid); padding: 32px; border-radius: 20px; background: var(--card-bg);">
-                        <div class="form-group">
+                    <div class="new-note-form" id="edit-note-form-${note.id}" style="display: flex; flex-direction: column; flex-grow: 1; box-shadow: none; border: none; padding: 0; background: transparent; gap: 20px;">
+                        <div class="form-group" style="display: flex; flex-direction: column; margin: 0;">
                             <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.title')}</label>
                             <input id="edit-note-title-${note.id}" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border-solid); background: var(--main-bg); color: var(--text-main);">
                         </div>
-                        <div class="form-group ms-form-group-gap-12" style="margin-top: 20px;">
+                        <div class="form-group ms-form-group-gap-12" style="margin: 0; flex-grow: 1; display: flex; flex-direction: column;">
                             <label style="font-size: 12px; font-weight: 700; color: var(--text-muted, #475569); display: block; margin-bottom: 8px; text-transform: uppercase;">${t('notes.content')}</label>
-                            <div class="rte-wrapper" style="border: 1px solid var(--border-solid); border-radius: 12px; overflow: hidden; background: var(--main-bg);">
-                                <div class="rte-toolbar" id="rte-toolbar-edit-${note.id}" style="border-bottom: 1px solid var(--border-solid); background: var(--card-bg); padding: 8px 12px;">
+                            <div class="rte-wrapper" style="border: 1px solid var(--border-solid); border-radius: 12px; overflow: hidden; background: var(--main-bg); flex-grow: 1; display: flex; flex-direction: column;">
+                                <div class="rte-toolbar" id="rte-toolbar-edit-${note.id}" style="border-bottom: 1px solid var(--border-solid); background: var(--card-bg); padding: 8px 12px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
                                     <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
                                     <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
                                     <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
@@ -8392,10 +8395,10 @@ class MinSideManager {
                                     <div class="rte-divider"></div>
                                     <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
                                 </div>
-                                <div class="rte-editor" id="edit-note-body-${note.id}" contenteditable="true" style="min-height: 300px; padding: 20px; outline: none; color: var(--text-main); font-size: 15px; line-height: 1.6;"></div>
+                                <div class="rte-editor" id="edit-note-body-${note.id}" contenteditable="true" style="flex-grow: 1; min-height: 400px; padding: 20px; outline: none; color: var(--text-main); font-size: 15px; line-height: 1.6; overflow-y: auto;"></div>
                             </div>
                         </div>
-                        <div class="ms-actions-row-end" style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                        <div class="ms-actions-row-end" style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0;">
                             <button class="btn btn-ghost" id="cancel-edit-btn-${note.id}" style="padding: 10px 24px; font-weight: 600;">${t('common.cancel')}</button>
                             <button class="btn btn-primary" id="save-edit-btn-${note.id}" style="padding: 10px 28px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; font-weight: 600;">
                                 <span class="material-symbols-outlined">save</span>
