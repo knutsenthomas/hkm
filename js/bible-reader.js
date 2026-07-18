@@ -2498,6 +2498,8 @@ class BibleReader {
 
     async lookupWord(word, contextText, refText) {
         this.dom.dictDrawer.classList.add('active');
+        const dictBody = this.dom.dictDrawer ? this.dom.dictDrawer.querySelector('.dict-body') : null;
+        if (dictBody) dictBody.scrollTop = 0;
         if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'none';
         this.dom.dictSpinner.style.display = 'flex';
         this.dom.dictContentWrap.style.display = 'none';
@@ -3791,8 +3793,8 @@ class BibleReader {
                 .hkm-devotional-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; background: #ffffff !important; z-index: 9999999 !important; display: flex !important; align-items: center !important; justify-content: center !important; transform: translateZ(0) !important; backface-visibility: hidden !important; }
                 .hkm-devotional-content { background: #ffffff !important; width: 100% !important; max-width: 100% !important; height: 100% !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; position: relative !important; transform: translateZ(0) !important; backface-visibility: hidden !important; overflow: hidden !important; }
                 .hkm-devotional-step-title { font-size: 22px !important; font-weight: 700 !important; color: #1B4965 !important; margin-bottom: 16px !important; line-height: 1.3 !important; }
-                .hkm-devotional-text-serif { font-family: 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
-                .hkm-devotional-text-serif p { display: block !important; position: relative !important; margin-bottom: 16px !important; font-size: 18px !important; line-height: 1.8 !important; font-family: 'Georgia', serif !important; }
+                .hkm-devotional-text-serif { font-family: 'Merriweather', 'Georgia', serif !important; font-size: 18px !important; line-height: 1.8 !important; color: #1e293b !important; margin-bottom: 24px !important; text-align: left !important; }
+                .hkm-devotional-text-serif p { display: block !important; position: relative !important; margin-bottom: 16px !important; font-size: 18px !important; line-height: 1.8 !important; font-family: 'Merriweather', 'Georgia', serif !important; }
                 .hkm-devotional-text-serif sup.v { font-size: 0.65em !important; font-weight: 700 !important; color: #d17d39 !important; margin-right: 6px !important; vertical-align: baseline !important; position: relative !important; top: -0.3em !important; line-height: 0 !important; user-select: none !important; }
                 .hkm-devotional-prayer-box { background: #f8fafc !important; border-left: 4px solid #d17d39 !important; padding: 20px !important; border-radius: 0 12px 12px 0 !important; font-style: italic !important; font-size: 16px !important; line-height: 1.6 !important; color: #334155 !important; margin-bottom: 24px !important; }
                 .hkm-devotional-reflection-textarea { display: block !important; width: 100% !important; min-height: 150px !important; padding: 16px !important; border-radius: 12px !important; border: 1px solid #cbd5e1 !important; outline: none !important; font-size: 15px !important; line-height: 1.5 !important; margin-bottom: 24px !important; resize: vertical !important; }
@@ -6839,7 +6841,7 @@ class BibleReader {
                             <span class="material-symbols-outlined" style="font-size: 16px;">auto_awesome</span>
                             <span>${matchPrefix}</span>
                         </div>
-                        <div style="font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #334155;">
+                        <div style="font-family: 'Merriweather', 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #334155;">
                             ${formatted}
                         </div>
                     </div>
@@ -6854,7 +6856,7 @@ class BibleReader {
                 formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
                 formatted = formatted.replace(/\n/g, '<br>');
                 return `
-                    <blockquote style="margin: 16px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
+                    <blockquote style="margin: 16px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Merriweather', 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
                         ${formatted}
                     </blockquote>
                 `;
@@ -6868,7 +6870,7 @@ class BibleReader {
             // Replace single newlines within the paragraph with `<br>` to preserve line breaks
             formatted = formatted.replace(/\n/g, '<br>');
             
-            return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Georgia', serif; font-size: 17px; color: #334155;">${formatted}</p>`;
+            return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Merriweather', 'Georgia', serif; font-size: 17px; color: #334155;">${formatted}</p>`;
         }).join('');
     }
 
@@ -6893,7 +6895,7 @@ class BibleReader {
                 if (node.nodeType === 3) { // Node.TEXT_NODE
                     const trimmed = node.textContent.trim();
                     if (!trimmed) return '';
-                    return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Georgia', serif; font-size: 17px; color: #334155;">${trimmed}</p>`;
+                    return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Merriweather', 'Georgia', serif; font-size: 17px; color: #334155;">${trimmed}</p>`;
                 }
                 
                 if (node.nodeType === 1) { // Node.ELEMENT_NODE
@@ -6952,7 +6954,7 @@ class BibleReader {
                                     <span class="material-symbols-outlined" style="font-size: 16px;">auto_awesome</span>
                                     <span>${matchedPrefix.label}</span>
                                 </div>
-                                <div style="font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #334155;">
+                                <div style="font-family: 'Merriweather', 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #334155;">
                                     ${prayerContent}
                                 </div>
                             </div>
@@ -6962,14 +6964,14 @@ class BibleReader {
                     // 3. Blockquotes
                     if (tagName === 'blockquote') {
                         return `
-                            <blockquote style="margin: 16px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
+                            <blockquote style="margin: 16px 0; padding: 16px 24px; border-left: 4px solid var(--bible-primary, #1B4965); background: rgba(27, 73, 101, 0.03); font-family: 'Merriweather', 'Georgia', serif; font-style: italic; font-size: 17px; line-height: 1.7; color: #475569; border-radius: 0 8px 8px 0; border-top: none; border-right: none; border-bottom: none;">
                                 ${innerHtml}
                             </blockquote>
                         `;
                     }
                     
                     // 4. Default paragraph or element, preserve original style
-                    return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Georgia', serif; font-size: 17px; color: #334155;">${innerHtml}</p>`;
+                    return `<p style="margin-bottom: 16px; line-height: 1.8; font-family: 'Merriweather', 'Georgia', serif; font-size: 17px; color: #334155;">${innerHtml}</p>`;
                 }
                 
                 return '';
