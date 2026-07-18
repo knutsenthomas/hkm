@@ -3159,6 +3159,11 @@ html[data-theme="dark"] .user-profile-link:hover {
 
 html[data-theme="dark"] [id="ph-avatar"],
 html[data-theme="dark"] .user-avatar {
+  border-color: #1e293b !important;
+}
+
+html[data-theme="dark"] .user-profile-link:hover [id="ph-avatar"],
+html[data-theme="dark"] .user-profile-link:hover .user-avatar {
   border-color: #334155 !important;
 }
 
