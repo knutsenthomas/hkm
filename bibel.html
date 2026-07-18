@@ -938,8 +938,10 @@
 
         .floating-nav-info {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
+            justify-content: center;
+            gap: 8px;
             min-width: 105px;
             user-select: none;
             cursor: pointer;
@@ -958,20 +960,20 @@
         }
 
         #floating-nav-book {
-            font-size: 10px;
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            color: var(--text-base);
             line-height: 1.1;
             white-space: nowrap !important;
         }
 
         #floating-nav-chapter {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 800;
             color: var(--bible-primary);
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .nav-btn {
@@ -1840,9 +1842,13 @@
             .floating-nav-info {
                 min-width: 90px !important;
                 padding: 4px 10px !important;
+                gap: 4px !important;
+            }
+            #floating-nav-book {
+                font-size: 12px !important;
             }
             #floating-nav-chapter {
-                font-size: 16px !important;
+                font-size: 13px !important;
             }
         }
 
