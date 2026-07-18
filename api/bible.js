@@ -571,9 +571,9 @@ export default async function handler(req, res) {
 
       let responseData = null;
 
-      // Bypass slow Gemini definition lookup if it is a scripture reference
+      // Bypass slow Gemini definition lookup if it is a scripture reference (unless requesting extended analysis)
       const isScripture = !!parseReference(word);
-      if (isScripture) {
+      if (isScripture && !extended) {
         const labelDef = lang === 'en' ? `Scripture reference and commentaries for ${word}.` : (lang === 'es' ? `Referencia bíblica y comentarios para ${word}.` : `Bibelreferanse og kommentarer for ${word}.`);
         const labelCat = lang === 'en' ? "Scripture Reference" : (lang === 'es' ? "Referencia Bíblica" : "Bibelreferanse");
         

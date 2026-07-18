@@ -1145,6 +1145,12 @@ class BibleReader {
                     }
                     const data = await res.json();
                     
+                    // Cache the extended data client-side for instant re-loads
+                    const cacheKey = `${word.toLowerCase()}_${document.documentElement.lang || 'no'}`;
+                    if (this.dictCache) {
+                        this.dictCache[cacheKey] = { dictRes: data, resources: this.dictCache[cacheKey]?.resources || [] };
+                    }
+                    
                     if (this.dom.dictExtendedText) {
                         this.dom.dictExtendedText.innerHTML = this.parseMarkdown(data.extendedAnalysis);
                     }
@@ -2600,7 +2606,15 @@ class BibleReader {
                                dictRes.category === 'No relacionado con la Biblia';
             
             if (this.dom.dictExtendedTriggerWrap) {
-                if (!isRejected && dictRes.definition && !dictRes.definition.includes('Ingen forhåndsdefinert forklaring')) {
+                if (dictRes.extendedAnalysis) {
+                    this.dom.dictExtendedTriggerWrap.style.display = 'none';
+                    if (this.dom.dictExtendedText) {
+                        this.dom.dictExtendedText.innerHTML = this.parseMarkdown(dictRes.extendedAnalysis);
+                    }
+                    if (this.dom.dictExtendedSection) {
+                        this.dom.dictExtendedSection.style.display = 'block';
+                    }
+                } else if (!isRejected && dictRes.definition && !dictRes.definition.includes('Ingen forhåndsdefinert forklaring')) {
                     this.dom.dictExtendedTriggerWrap.style.display = 'block';
                 } else {
                     this.dom.dictExtendedTriggerWrap.style.display = 'none';
