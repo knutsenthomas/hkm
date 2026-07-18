@@ -5131,3 +5131,13 @@ html[data-theme="dark"] .btn-ghost:hover {
     flex-shrink: 0;
 }
 
+/* Hide scrollbar for category pills container while retaining scroll ability */
+.category-pills::-webkit-scrollbar {
+    display: none !important;
+}
+
+.category-pills {
+    -ms-overflow-style: none !important;  /* IE/Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
+
