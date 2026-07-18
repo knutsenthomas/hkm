@@ -485,11 +485,19 @@ class BibleReader {
             if (refParam) {
                 await this.parseAndNavigateToReference(refParam);
             } else {
-                // Load default (John 1 or first book)
-                const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
-                if (defaultBook) {
-                    await this.selectBook(defaultBook.id);
-                    await this.selectChapter(`${defaultBook.id}_1`);
+                // Restore last read book and chapter from localStorage if available
+                const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
+                const lastChapter = this.safeGetLocalStorage('hkm_bible_last_chapter');
+                if (lastBook && lastChapter) {
+                    await this.selectBook(lastBook);
+                    await this.selectChapter(lastChapter);
+                } else {
+                    // Load default (John 1 or first book)
+                    const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
+                    if (defaultBook) {
+                        await this.selectBook(defaultBook.id);
+                        await this.selectChapter(`${defaultBook.id}_1`);
+                    }
                 }
             }
         }
@@ -2015,6 +2023,25 @@ class BibleReader {
 
         this.clearSelection();
         this.selectedChapterId = chapterId;
+
+        // Save last read position to localStorage
+        this.safeSetLocalStorage('hkm_bible_last_chapter', chapterId);
+        if (this.selectedBookId) {
+            this.safeSetLocalStorage('hkm_bible_last_book', this.selectedBookId);
+        }
+
+        // Update URL search parameters without reloading
+        try {
+            const url = new URL(window.location.href);
+            const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+            const chapterNum = chapterId.split('_')[1];
+            if (currentBook && chapterNum && !url.searchParams.get('plan')) {
+                url.searchParams.set('ref', `${currentBook.name} ${chapterNum}`);
+                window.history.replaceState({}, '', url.toString());
+            }
+        } catch (urlErr) {
+            console.warn("[BibleReader] Failed to update URL parameters:", urlErr);
+        }
         
         // Highlight in grid
         document.querySelectorAll('.chapter-grid .chapter-item, #floating-chapter-grid .chapter-item').forEach(el => {
