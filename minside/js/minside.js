@@ -8200,6 +8200,14 @@ class MinSideManager {
     }
 
     _renderNotesUI(container, personalNotes, hkmNotes) {
+        const currentView = localStorage.getItem('hkm_notes_view') || 'grid';
+
+        const stripHtml = (html) => {
+            const tmp = document.createElement('DIV');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        };
+
         const makePNote = (n) => `
         <div class="personal-note-card" data-id="${n.id}">
             <div class="personal-note-card-top">
@@ -8219,6 +8227,23 @@ class MinSideManager {
             </div>
         </div>`;
 
+        const makePNoteRow = (n) => `
+        <div class="personal-note-row" data-id="${n.id}">
+            <div class="personal-note-row-left">
+                <div class="personal-note-row-title">${n.title || t('notes.untitled')}</div>
+                <div class="personal-note-row-body">${stripHtml(n.text || '')}</div>
+                <div class="personal-note-row-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
+            </div>
+            <div class="personal-note-row-actions">
+                <button class="note-btn-edit actions-btn" data-id="${n.id}" title="${t('common.edit')}" style="padding: 6px; border-radius: 8px; background: transparent; border: 1.5px solid var(--border-solid); color: var(--text-muted); display: flex; cursor: pointer; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="note-btn-delete actions-btn" data-id="${n.id}" title="${t('profile.remove')}" style="padding: 6px; border-radius: 8px; background: transparent; border: 1.5px solid var(--border-solid); color: var(--text-muted); display: flex; cursor: pointer; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        </div>`;
+
         container.innerHTML = `
         <div class="notes-container">
 
@@ -8230,10 +8255,20 @@ class MinSideManager {
                         ${t('notes.personalNotesSub')}
                     </p>
                 </div>
-                <button class="btn btn-primary" id="new-note-btn">
-                    <span class="material-symbols-outlined">add</span>
-                    ${t('notes.newNote')}
-                </button>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="view-toggle-buttons" style="display:inline-flex; border: 1.5px solid var(--border-solid); border-radius: 12px; overflow:hidden; padding: 2px; background: var(--card-bg);">
+                        <button class="view-btn" id="view-grid-btn" style="padding: 6px 10px; border:none; background: ${currentView === 'grid' ? 'var(--main-bg)' : 'transparent'}; border-radius: 8px; color: ${currentView === 'grid' ? 'var(--accent-color)' : 'var(--text-muted)'}; display:flex; align-items:center; cursor:pointer; transition: all 0.2s;" title="Rutenett">
+                            <span class="material-symbols-outlined" style="font-size:20px;">grid_view</span>
+                        </button>
+                        <button class="view-btn" id="view-list-btn" style="padding: 6px 10px; border:none; background: ${currentView === 'list' ? 'var(--main-bg)' : 'transparent'}; border-radius: 8px; color: ${currentView === 'list' ? 'var(--accent-color)' : 'var(--text-muted)'}; display:flex; align-items:center; cursor:pointer; transition: all 0.2s;" title="Liste">
+                            <span class="material-symbols-outlined" style="font-size:20px;">format_list_bulleted</span>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" id="new-note-btn">
+                        <span class="material-symbols-outlined">add</span>
+                        ${t('notes.newNote')}
+                    </button>
+                </div>
             </div>
 
             <!-- New note form (hidden by default) -->
@@ -8272,13 +8307,13 @@ class MinSideManager {
             </div>
 
             <!-- Personal notes list -->
-            <div id="personal-notes-list" class="personal-notes-grid">
+            <div id="personal-notes-list" class="${currentView === 'list' ? 'personal-notes-list' : 'personal-notes-grid'}">
                 ${personalNotes.length === 0
                 ? `<div class="note-empty-personal">
                         <span class="material-symbols-outlined">edit_note</span>
                         <p>${t('notes.emptyPersonalNotes')}</p>
                        </div>`
-                : personalNotes.map(makePNote).join('')}
+                : personalNotes.map(currentView === 'list' ? makePNoteRow : makePNote).join('')}
             </div>
 
             <!-- HKM Notes (read-only) -->
@@ -8308,6 +8343,17 @@ class MinSideManager {
 
         // ── Wire up events ──
         const uid = this.currentUser?.uid;
+
+        // View toggles
+        document.getElementById('view-grid-btn')?.addEventListener('click', () => {
+            localStorage.setItem('hkm_notes_view', 'grid');
+            this._renderNotesUI(container, personalNotes, hkmNotes);
+        });
+
+        document.getElementById('view-list-btn')?.addEventListener('click', () => {
+            localStorage.setItem('hkm_notes_view', 'list');
+            this._renderNotesUI(container, personalNotes, hkmNotes);
+        });
 
         // Wire RTE toolbar
         this._wireRteToolbar('rte-toolbar-new', 'note-body-editor');

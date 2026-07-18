@@ -5049,3 +5049,69 @@ html[data-theme="dark"] .btn-ghost:hover {
   border-color: var(--accent-color, #d17d39) !important;
 }
 
+/* Personal Notes List View Styling */
+.personal-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.personal-note-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg, #ffffff) !important;
+    border: 1px solid var(--border-solid, #e2e8f0) !important;
+    border-radius: 16px !important;
+    padding: 16px 24px !important;
+    gap: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.personal-note-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent-color, #d17d39) !important;
+}
+
+.personal-note-row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.personal-note-row-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.personal-note-row-body {
+    font-size: 13.5px;
+    color: var(--text-muted, #64748b);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.personal-note-row-meta {
+    font-size: 11px;
+    color: var(--text-muted, #64748b);
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.personal-note-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
