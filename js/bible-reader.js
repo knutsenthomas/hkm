@@ -667,6 +667,18 @@ class BibleReader {
                     document.getElementById('floating-settings-popover')?.classList.remove('active');
                     const chapPopover = document.getElementById('floating-chapter-popover');
                     if (chapPopover) {
+                        // Reset view to chapters on open
+                        if (!chapPopover.classList.contains('active')) {
+                            const headerChapters = document.getElementById('floating-popover-header-chapters');
+                            const headerBooks = document.getElementById('floating-popover-header-books');
+                            const chapGrid = document.getElementById('floating-chapter-grid');
+                            const booksCont = document.getElementById('floating-books-container');
+
+                            if (headerChapters) headerChapters.style.display = 'flex';
+                            if (headerBooks) headerBooks.style.display = 'none';
+                            if (chapGrid) chapGrid.style.display = 'grid';
+                            if (booksCont) booksCont.style.display = 'none';
+                        }
                         chapPopover.classList.toggle('active');
                     }
                 });
@@ -677,6 +689,43 @@ class BibleReader {
                         e.stopPropagation();
                     });
                 }
+            }
+
+            // Set up show books view trigger inside popover
+            const btnShowBooks = document.getElementById('btn-show-books-view');
+            if (btnShowBooks) {
+                btnShowBooks.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const headerChapters = document.getElementById('floating-popover-header-chapters');
+                    const headerBooks = document.getElementById('floating-popover-header-books');
+                    const chapGrid = document.getElementById('floating-chapter-grid');
+                    const booksCont = document.getElementById('floating-books-container');
+
+                    if (headerChapters) headerChapters.style.display = 'none';
+                    if (headerBooks) headerBooks.style.display = 'flex';
+                    if (chapGrid) chapGrid.style.display = 'none';
+                    if (booksCont) {
+                        booksCont.style.display = 'flex';
+                        this.renderFloatingBooks();
+                    }
+                });
+            }
+
+            // Set up back to chapters view trigger inside popover
+            const btnShowChapters = document.getElementById('btn-show-chapters-view');
+            if (btnShowChapters) {
+                btnShowChapters.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const headerChapters = document.getElementById('floating-popover-header-chapters');
+                    const headerBooks = document.getElementById('floating-popover-header-books');
+                    const chapGrid = document.getElementById('floating-chapter-grid');
+                    const booksCont = document.getElementById('floating-books-container');
+
+                    if (headerChapters) headerChapters.style.display = 'flex';
+                    if (headerBooks) headerBooks.style.display = 'none';
+                    if (chapGrid) chapGrid.style.display = 'grid';
+                    if (booksCont) booksCont.style.display = 'none';
+                });
             }
 
             // Close all floating popovers when clicking anywhere else
@@ -1823,6 +1872,45 @@ class BibleReader {
                 item.addEventListener('click', () => onChapterClick(item));
             });
         }
+    }
+
+    renderFloatingBooks() {
+        const container = document.getElementById('floating-books-container');
+        if (!container) return;
+
+        container.innerHTML = this.books.map(b => {
+            const isActive = b.id === this.selectedBookId ? 'active' : '';
+            return `
+                <div class="floating-book-item ${isActive}" data-id="${b.id}">
+                    <span>${b.name}</span>
+                    <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.6;">chevron_right</span>
+                </div>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.floating-book-item').forEach(item => {
+            item.addEventListener('click', async () => {
+                const bookId = item.dataset.id;
+                
+                // Highlight the selected book
+                container.querySelectorAll('.floating-book-item').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+
+                // Load book chapters (which calls renderChapters dynamically)
+                await this.selectBook(bookId);
+
+                // Switch view back to chapters
+                const headerChapters = document.getElementById('floating-popover-header-chapters');
+                const headerBooks = document.getElementById('floating-popover-header-books');
+                const chapGrid = document.getElementById('floating-chapter-grid');
+                const booksCont = document.getElementById('floating-books-container');
+
+                if (headerChapters) headerChapters.style.display = 'flex';
+                if (headerBooks) headerBooks.style.display = 'none';
+                if (chapGrid) chapGrid.style.display = 'grid';
+                if (booksCont) booksCont.style.display = 'none';
+            });
+        });
     }
 
     async selectChapter(chapterId) {

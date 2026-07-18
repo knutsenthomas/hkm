@@ -823,6 +823,45 @@
             background: rgba(0, 0, 0, 0.05) !important;
         }
 
+        /* Floating Book Item */
+        .floating-book-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px !important;
+            border-radius: 12px;
+            font-size: 13px !important;
+            font-weight: 600;
+            color: var(--text-base) !important;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            margin-bottom: 6px;
+            box-sizing: border-box !important;
+        }
+
+        .floating-book-item:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: var(--bible-primary) !important;
+            padding-left: 18px !important;
+        }
+
+        .floating-book-item.active {
+            background: var(--bible-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary) !important;
+        }
+
+        html[data-theme="light"] .floating-book-item {
+            background: rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        }
+        
+        html[data-theme="light"] .floating-book-item:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+        }
+
         @media (max-width: 768px) {
             .floating-chapter-popover {
                 width: 290px !important;
@@ -2937,14 +2976,31 @@
 
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+                    <!-- Header for Chapters (default view) -->
+                    <div id="floating-popover-header-chapters" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
                         <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Velg kapittel</span>
-                        <button style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const sidebar = document.getElementById('bible-sidebar'); if (sidebar) sidebar.classList.add('active');">
+                        <button id="btn-show-books-view" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
                             <span>Velg bok</span>
                         </button>
                     </div>
+                    
+                    <!-- Header for Books (books view) -->
+                    <div id="floating-popover-header-books" style="display: none; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Velg bok</span>
+                        <button id="btn-show-chapters-view" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                            <span>Tilbake</span>
+                        </button>
+                    </div>
+
+                    <!-- Chapters Container -->
                     <div class="chapter-grid" id="floating-chapter-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 250px; overflow-y: auto;">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Books Container -->
+                    <div id="floating-books-container" style="display: none; flex-direction: column; gap: 4px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
                         <!-- Loaded dynamically -->
                     </div>
                 </div>
@@ -3195,7 +3251,7 @@
     <!-- JavaScript -->
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.07.18.2"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.07.18.3"></script>
     <script type="module" src="js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
