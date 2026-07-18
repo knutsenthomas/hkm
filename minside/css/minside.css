@@ -4997,3 +4997,19 @@ html[data-theme="dark"] .ms-rp-checklist-card {
   border-color: var(--border-solid, #334155) !important;
 }
 
+/* Prayer Focus Card and inner elements styling */
+.ms-rp-prayer-focus-box {
+  border-left: 4px solid #d17d39 !important;
+}
+
+html[data-theme="dark"] .ms-rp-prayer-focus-box {
+  background: #0f172a !important;
+  border-left: 4px solid #d17d39 !important;
+}
+
+html[data-theme="dark"] .ms-rp-prayer-focus-box,
+html[data-theme="dark"] .ms-rp-prayer-focus-box * {
+  color: #e2e8f0 !important;
+  border-left-color: #d17d39 !important;
+}
+

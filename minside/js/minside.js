@@ -7089,7 +7089,7 @@ class MinSideManager {
                         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--border-solid, #e2e8f0); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                             <h3 style="font-size: 15px; font-weight: 700; color: #d17d39; margin: 0 0 16px 0;">Bønnefokus & Fordypning</h3>
                             
-                            <div style="background: var(--main-bg, #f8fafc); border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--text-muted, #475569);">
+                            <div class="ms-rp-prayer-focus-box" style="background: var(--main-bg, #f8fafc); border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--text-muted, #475569);">
                                 "${currentDayConfig?.prayerFocus || 'Be over ordene du har lest i dag.'}"
                             </div>
                             
