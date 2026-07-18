@@ -1239,6 +1239,72 @@
                             <canvas id="gsc-line-chart"></canvas>
                         </div>
                     </div>
+
+                    <!-- Google Search Console Page Indexing Card -->
+                    <div class="chart-card-premium" id="gsc-indexing-card" style="display: none;">
+                        <div class="chart-card-header">
+                            <div class="chart-card-title-group" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div>
+                                    <h3 class="chart-card-title">
+                                        <span class="material-symbols-outlined" style="font-size: 20px; color: #1b4965;">fact_check</span>
+                                        Sideindeksering (Search Console)
+                                    </h3>
+                                    <p class="chart-card-subtitle">Sider lagt til eller ekskludert i Googles søkeindeks</p>
+                                </div>
+                                <span class="badge" id="gsc-indexing-date" style="font-size: 11px; background: rgba(27, 73, 101, 0.08); color: #1b4965; font-weight: 600; padding: 4px 8px; border-radius: 6px;">Siste: --</span>
+                            </div>
+                        </div>
+
+                        <!-- Indexing Metrics Row -->
+                        <div class="gsc-metric-container" id="gsc-indexing-metrics-row">
+                            <div class="gsc-metric-box">
+                                <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Indeksert</div>
+                                <div id="gsc-indexed-val" style="font-size: 16px; font-weight: 700; color: #16a34a; font-family: 'Fira Code', monospace;">--</div>
+                            </div>
+                            <div class="gsc-metric-box">
+                                <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Ikke indeksert</div>
+                                <div id="gsc-nonindexed-val" style="font-size: 16px; font-weight: 700; color: #dc2626; font-family: 'Fira Code', monospace;">--</div>
+                            </div>
+                            <div class="gsc-metric-box">
+                                <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Totalt oppdaget</div>
+                                <div id="gsc-total-pages-val" style="font-size: 16px; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">--</div>
+                            </div>
+                            <div class="gsc-metric-box">
+                                <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Dekningsgrad</div>
+                                <div id="gsc-index-rate-val" style="font-size: 16px; font-weight: 700; color: #1b4965; font-family: 'Fira Code', monospace;">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Indexing Line Chart -->
+                        <div class="chart-container-inner" id="gsc-indexing-chart-container" style="height: 180px; position: relative; margin-top: 16px;">
+                            <canvas id="gsc-indexing-chart"></canvas>
+                        </div>
+
+                        <!-- Indexing Reasons Table -->
+                        <div style="margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: #334155; margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #dc2626;">warning</span>
+                                Årsaker til at sider ikke er indeksert
+                            </h4>
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                            <th style="padding: 8px 4px;">Grunn</th>
+                                            <th style="padding: 8px 4px;">Kilde</th>
+                                            <th style="padding: 8px 4px; text-align: right;">Sider</th>
+                                            <th style="padding: 8px 4px; text-align: right; width: 35%;">Andel</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gsc-indexing-reasons-body">
+                                        <tr>
+                                            <td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Laster årsaker...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Column 2: Top Pages & Traffic Sources -->
@@ -1583,6 +1649,7 @@
             let trafficChart = null;
             let sourcesChart = null;
             let gscChart = null;
+            let gscIndexingChart = null;
             let activeDays = 7;
             let lastLoadedCities = null;
             let chartsLoaded = false;
@@ -1729,6 +1796,31 @@
                     const aiAlertText = aiAlertBox.querySelector('p');
                     if (aiAlertTitle) aiAlertTitle.textContent = 'AI-trafikkandel: --';
                     if (aiAlertText) aiAlertText.textContent = 'Venter på data...';
+                }
+
+                // Clear GSC Indexation
+                const indexingCard = document.getElementById('gsc-indexing-card');
+                if (indexingCard) indexingCard.style.display = 'none';
+                
+                const indexedVal = document.getElementById('gsc-indexed-val');
+                const nonIndexedVal = document.getElementById('gsc-nonindexed-val');
+                const totalVal = document.getElementById('gsc-total-pages-val');
+                const rateVal = document.getElementById('gsc-index-rate-val');
+                const dateBadge = document.getElementById('gsc-indexing-date');
+                const reasonsBody = document.getElementById('gsc-indexing-reasons-body');
+
+                if (indexedVal) indexedVal.textContent = '--';
+                if (nonIndexedVal) nonIndexedVal.textContent = '--';
+                if (totalVal) totalVal.textContent = '--';
+                if (rateVal) rateVal.textContent = '--';
+                if (dateBadge) dateBadge.textContent = 'Siste: --';
+                if (reasonsBody) reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Laster årsaker...</td></tr>';
+
+                if (gscIndexingChart) {
+                    gscIndexingChart.data.labels = [];
+                    gscIndexingChart.data.datasets[0].data = [];
+                    gscIndexingChart.data.datasets[1].data = [];
+                    gscIndexingChart.update();
                 }
             }
 
@@ -1935,6 +2027,61 @@
                 }
             });
 
+            // 2d. GSC Indexing Chart initialization
+            const ctxIndexing = document.getElementById('gsc-indexing-chart').getContext('2d');
+            gscIndexingChart = new Chart(ctxIndexing, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Indeksert',
+                            data: [],
+                            borderColor: '#16a34a', // Green
+                            backgroundColor: 'rgba(22, 163, 74, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Ikke indeksert',
+                            data: [],
+                            borderColor: '#dc2626', // Red
+                            backgroundColor: 'rgba(220, 38, 38, 0.03)',
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            fill: true,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                font: { family: 'Inter', size: 10 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { family: 'Inter', size: 10 }, color: '#64748b' }
+                        }
+                    }
+                }
+            });
+
             // No initial static/fictional data is populated on load.
             clearAnalyticsToEmpty();
 
@@ -1960,6 +2107,15 @@
                     }
                     gscChart.update();
                 }
+                if (gscIndexingChart) {
+                    gscIndexingChart.options.scales.x.ticks.color = tickColor;
+                    gscIndexingChart.options.scales.y.ticks.color = tickColor;
+                    gscIndexingChart.options.scales.y.grid.color = gridColor;
+                    if (gscIndexingChart.options.plugins.legend.labels) {
+                        gscIndexingChart.options.plugins.legend.labels.color = tickColor;
+                    }
+                    gscIndexingChart.update();
+                }
             }
 
             // Sync charts with current theme on load
@@ -1980,11 +2136,136 @@
 
             // 3. Reell GA4 Datainnhenting og API-integrasjon
 
+            async function loadGscIndexation(days) {
+                try {
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        const db = firebase.firestore();
+                        const idxSnap = await db.collection('content').doc('gsc_indexation_status').get();
+                        if (idxSnap.exists) {
+                            const idxData = idxSnap.data();
+                            const summary = idxData.summary || {};
+                            const history = idxData.history || [];
+
+                            // Vis kortet
+                            const card = document.getElementById('gsc-indexing-card');
+                            if (card) card.style.display = 'block';
+
+                            // Sett tallverdier
+                            const indexedValEl = document.getElementById('gsc-indexed-val');
+                            const nonIndexedValEl = document.getElementById('gsc-nonindexed-val');
+                            const totalValEl = document.getElementById('gsc-total-pages-val');
+                            const rateValEl = document.getElementById('gsc-index-rate-val');
+                            const dateBadgeEl = document.getElementById('gsc-indexing-date');
+
+                            if (indexedValEl) indexedValEl.textContent = (summary.indexed || 0).toLocaleString('no-NO');
+                            if (nonIndexedValEl) nonIndexedValEl.textContent = (summary.nonIndexed || 0).toLocaleString('no-NO');
+                            if (totalValEl) totalValEl.textContent = (summary.total || 0).toLocaleString('no-NO');
+                            if (rateValEl) rateValEl.textContent = `${summary.indexingRate || 0}%`;
+
+                            const latestDate = summary.latestDate || "";
+                            if (latestDate && dateBadgeEl) {
+                                const parts = latestDate.split('-');
+                                if (parts.length === 3) {
+                                    const day = parseInt(parts[2], 10);
+                                    const monthNum = parseInt(parts[1], 10);
+                                    const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                                    dateBadgeEl.textContent = `Siste: ${day}. ${months[monthNum - 1]}`;
+                                } else {
+                                    dateBadgeEl.textContent = `Siste: ${latestDate}`;
+                                }
+                            }
+
+                            // Oppdater grafen
+                            if (history.length > 0 && gscIndexingChart) {
+                                // Filtrer historikk basert på valgte dager
+                                const cutDate = new Date();
+                                cutDate.setDate(cutDate.getDate() - days);
+                                const filteredHistory = history.filter(h => {
+                                    const hDate = new Date(h.date);
+                                    return hDate >= cutDate;
+                                });
+
+                                // Sikkerhetsnett: vis de siste 30 målingene dersom filteret gir for få punkter
+                                const chartData = (filteredHistory.length >= 3) ? filteredHistory : history.slice(-Math.min(30, history.length));
+
+                                const labels = chartData.map(h => {
+                                    const parts = h.date.split('-');
+                                    if (parts.length === 3) {
+                                        const day = parseInt(parts[2], 10);
+                                        const monthNum = parseInt(parts[1], 10);
+                                        const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                                        return `${day}. ${months[monthNum - 1] || ''}`;
+                                    }
+                                    return h.date;
+                                });
+
+                                const indexedSeries = chartData.map(h => h.indexed);
+                                const nonIndexedSeries = chartData.map(h => h.nonIndexed);
+
+                                gscIndexingChart.data.labels = labels;
+                                gscIndexingChart.data.datasets[0].data = indexedSeries;
+                                gscIndexingChart.data.datasets[1].data = nonIndexedSeries;
+                                gscIndexingChart.update();
+                            }
+
+                            // Populer årsaker (reasons) tabell
+                            const reasonsBody = document.getElementById('gsc-indexing-reasons-body');
+                            if (reasonsBody) {
+                                const reasonsList = idxData.reasons || [];
+                                reasonsBody.innerHTML = '';
+                                
+                                if (reasonsList.length === 0) {
+                                    reasonsBody.innerHTML = '<tr><td colspan="4" style="padding: 12px 4px; color: #64748b; text-align: center;">Ingen registrerte feil eller årsaker</td></tr>';
+                                } else {
+                                    const totalNonIndexed = summary.nonIndexed || 1;
+                                    reasonsList.forEach(r => {
+                                        const tr = document.createElement('tr');
+                                        tr.style.borderBottom = '1px solid #f1f5f9';
+                                        
+                                        const pct = totalNonIndexed > 0 ? ((r.count / totalNonIndexed) * 100).toFixed(1) : 0;
+                                        
+                                        const isGoogle = r.source === 'Google-systemer';
+                                        const sourceBadge = `<span class="badge" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; background: ${isGoogle ? 'rgba(27, 73, 101, 0.05)' : 'rgba(209, 125, 57, 0.05)'}; color: ${isGoogle ? '#1b4965' : '#d17d39'};">${r.source}</span>`;
+                                        
+                                        // Highlight 404 with red and others with regular color
+                                        const barColor = r.reason.toLowerCase().includes('404') ? '#dc2626' : '#1b4965';
+                                        
+                                        tr.innerHTML = `
+                                            <td style="padding: 10px 4px; font-weight: 600; color: #334155; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.reason}">${r.reason}</td>
+                                            <td style="padding: 10px 4px;">${sourceBadge}</td>
+                                            <td style="padding: 10px 4px; text-align: right; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">${r.count.toLocaleString('no-NO')}</td>
+                                            <td style="padding: 10px 4px; text-align: right;">
+                                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                                    <span style="font-size: 11px; font-weight: 600; color: #64748b; font-family: 'Fira Code', monospace; min-width: 36px; text-align: right;">${pct}%</span>
+                                                    <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle;">
+                                                        <div style="width: ${pct}%; height: 100%; background: ${barColor}; border-radius: 3px;"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        `;
+                                        reasonsBody.appendChild(tr);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn("[Analytics] Feil ved lasting av indekseringsstatus fra Firestore:", err);
+                }
+            }
+
             async function loadRealAnalytics(days) {
                 activeDays = days;
                 const pageviewsValEl = document.getElementById('pageviews-value');
                 const engagementValEl = document.getElementById('engagement-value');
                 const pageviewsMetaEl = document.getElementById('pageviews-meta');
+ 
+                // Hent GSC-indeksering uavhengig av GA4 API-tilkobling
+                try {
+                    await loadGscIndexation(days);
+                } catch (gscErr) {
+                    console.warn("[Analytics] Feil ved lasting av GSC-indeksering:", gscErr.message);
+                }
 
                 pageviewsValEl.textContent = 'Laster...';
                 engagementValEl.textContent = 'Laster...';
