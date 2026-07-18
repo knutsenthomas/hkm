@@ -7329,6 +7329,8 @@ html[data-theme="dark"] body.minside-body .nav-category-header {
 }
 
 /* Prevent dark mode input styles from adding dark boxes/borders to borderless search inputs */
+html[data-theme="dark"] .family-search-box input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] #global-search-input:not([type="checkbox"]):not([type="radio"]),
 html[data-theme="dark"] .family-search-box input,
 html[data-theme="dark"] #global-search-input {
   background-color: transparent !important;
