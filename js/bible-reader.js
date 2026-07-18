@@ -1021,6 +1021,38 @@ class BibleReader {
             floatNextBtn.addEventListener('click', () => this.navigateChapter(1));
         }
 
+        // Touch Swipe Gestures to navigate chapters on mobile/tablet
+        let touchstartX = 0;
+        let touchstartY = 0;
+        let touchendX = 0;
+        let touchendY = 0;
+
+        const pane = this.dom.readingPane ? this.dom.readingPane.closest('.bible-content-pane') : null;
+        if (pane) {
+            pane.addEventListener('touchstart', (e) => {
+                touchstartX = e.changedTouches[0].screenX;
+                touchstartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            pane.addEventListener('touchend', (e) => {
+                touchendX = e.changedTouches[0].screenX;
+                touchendY = e.changedTouches[0].screenY;
+                
+                const diffX = touchendX - touchstartX;
+                const diffY = touchendY - touchstartY;
+
+                // Trigger swipe navigation if horizontal swipe is significant
+                // and vertical movement is minor (ensuring it was not a vertical scroll)
+                if (Math.abs(diffX) > 80 && Math.abs(diffY) < 60) {
+                    if (diffX < 0) {
+                        this.navigateChapter(1); // Swipe left -> Next chapter
+                    } else {
+                        this.navigateChapter(-1); // Swipe right -> Prev chapter
+                    }
+                }
+            }, { passive: true });
+        }
+
         // Quick Search Form
         if (this.dom.quickSearchForm) {
             this.dom.quickSearchForm.addEventListener('submit', (e) => {
