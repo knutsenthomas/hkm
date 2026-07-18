@@ -4038,28 +4038,28 @@ class BibleReader {
                 .bible-theme-dark .hkm-yv-footer-pill { background: #1e293b !important; border-color: #334155 !important; color: #94a3b8 !important; }
                 
                 /* Cream Mode theme for Devotional Wizard */
-                .bible-theme-cream .hkm-devotional-overlay { background: #fbf6eb !important; }
-                .bible-theme-cream .hkm-devotional-content { background: #fbf6eb !important; }
+                .bible-theme-cream .hkm-devotional-overlay { background: #ffffff !important; }
+                .bible-theme-cream .hkm-devotional-content { background: #ffffff !important; }
                 .bible-theme-cream .hkm-devotional-step-title { color: #1B4965 !important; }
                 .bible-theme-cream .hkm-devotional-text-serif { color: #2d3748 !important; }
                 .bible-theme-cream .hkm-devotional-text-serif p { color: #2d3748 !important; }
-                .bible-theme-cream .hkm-devotional-prayer-box { background: #f4ebd8 !important; color: #4a5568 !important; border-left-color: #d17d39 !important; }
-                .bible-theme-cream .hkm-devotional-reflection-textarea { background: #fbf6eb !important; border-color: #d2c4a9 !important; color: #2d3748 !important; }
+                .bible-theme-cream .hkm-devotional-prayer-box { background: #faf7f0 !important; color: #4a5568 !important; border-left-color: #d17d39 !important; }
+                .bible-theme-cream .hkm-devotional-reflection-textarea { background: #ffffff !important; border-color: #cbd5e1 !important; color: #2d3748 !important; }
                 .bible-theme-cream .hkm-celebration-title { color: #1B4965 !important; }
                 .bible-theme-cream .hkm-celebration-desc { color: #4a5568 !important; }
-                .bible-theme-cream .hkm-yv-wrapper { background: #fbf6eb !important; }
-                .bible-theme-cream .hkm-yv-header { background: #ffffff !important; border-bottom-color: #ecdcb9 !important; }
+                .bible-theme-cream .hkm-yv-wrapper { background: #ffffff !important; }
+                .bible-theme-cream .hkm-yv-header { background: #ffffff !important; border-bottom-color: #e2e8f0 !important; }
                 .bible-theme-cream .hkm-yv-header-btn-close { color: #4a5568 !important; }
-                .bible-theme-cream .hkm-yv-header-btn-close:hover { background: #f4ebd8 !important; }
+                .bible-theme-cream .hkm-yv-header-btn-close:hover { background: #f1f5f9 !important; }
                 .bible-theme-cream .hkm-yv-header-text { color: #1B4965 !important; }
                 .bible-theme-cream .hkm-yv-action-btn { color: #4a5568 !important; }
-                .bible-theme-cream .hkm-yv-action-btn:hover { background: #f4ebd8 !important; color: #1B4965 !important; }
+                .bible-theme-cream .hkm-yv-action-btn:hover { background: #f1f5f9 !important; color: #1B4965 !important; }
                 .bible-theme-cream .hkm-yv-action-btn.speaking { color: #d17d39 !important; background: rgba(209, 125, 57, 0.1) !important; }
-                .bible-theme-cream .hkm-yv-body { background: #fbf6eb !important; }
-                .bible-theme-cream .hkm-yv-footer { background: #fbf6eb !important; border-top-color: #ecdcb9 !important; }
-                .bible-theme-cream .hkm-yv-nav-circle-btn:not(.active) { background: #f4ebd8 !important; color: #4a5568 !important; }
-                .bible-theme-cream .hkm-yv-nav-circle-btn:hover { background: #ecdcb9 !important; color: #1B4965 !important; }
-                .bible-theme-cream .hkm-yv-footer-pill { background: #f4ebd8 !important; border-color: #ecdcb9 !important; color: #718096 !important; }
+                .bible-theme-cream .hkm-yv-body { background: #ffffff !important; }
+                .bible-theme-cream .hkm-yv-footer { background: #ffffff !important; border-top-color: #e2e8f0 !important; }
+                .bible-theme-cream .hkm-yv-nav-circle-btn:not(.active) { background: #f1f5f9 !important; color: #4a5568 !important; }
+                .bible-theme-cream .hkm-yv-nav-circle-btn:hover { background: #e2e8f0 !important; color: #1B4965 !important; }
+                .bible-theme-cream .hkm-yv-footer-pill { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #718096 !important; }
                 /* Dark Mode theme for Reading Plan Dashboard */
                 .bible-theme-dark .hkm-rp-title { color: #f8fafc !important; }
                 .bible-theme-dark .hkm-rp-subtitle { color: #94a3b8 !important; }
