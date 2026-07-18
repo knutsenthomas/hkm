@@ -4048,7 +4048,7 @@ class BibleReader {
                 .bible-theme-cream .hkm-celebration-title { color: #1B4965 !important; }
                 .bible-theme-cream .hkm-celebration-desc { color: #4a5568 !important; }
                 .bible-theme-cream .hkm-yv-wrapper { background: #fbf6eb !important; }
-                .bible-theme-cream .hkm-yv-header { background: #fbf6eb !important; border-bottom-color: #ecdcb9 !important; }
+                .bible-theme-cream .hkm-yv-header { background: #ffffff !important; border-bottom-color: #ecdcb9 !important; }
                 .bible-theme-cream .hkm-yv-header-btn-close { color: #4a5568 !important; }
                 .bible-theme-cream .hkm-yv-header-btn-close:hover { background: #f4ebd8 !important; }
                 .bible-theme-cream .hkm-yv-header-text { color: #1B4965 !important; }
