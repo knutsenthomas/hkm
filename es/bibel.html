@@ -1791,49 +1791,193 @@
             background: rgba(27, 73, 101, 0.12) !important;
             border-radius: 4px !important;
         }
-                /* Premium Floating Verse Toolbar */
-        /* Premium Floating Verse Toolbar (Popover Card Style) */
+        /* Premium Floating Verse Toolbar (Responsive Layout) */
         #verse-context-toolbar {
-            position: fixed !important;
-            bottom: 80px !important;
-            top: auto !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 320px !important;
-            max-width: calc(100vw - 32px) !important;
-            background: rgba(30, 41, 59, 0.8) !important;
-            backdrop-filter: blur(16px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 20px !important;
-            padding: 16px !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
-            z-index: 10002 !important; /* Stand above bottom nav and everything else */
+            position: absolute !important;
+            background: var(--bg-card) !important;
+            backdrop-filter: blur(12px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.1) !important;
+            padding: 6px 10px !important;
             display: none;
-            flex-direction: column;
+            align-items: center;
+            gap: 6px !important;
+            z-index: 1000 !important;
+            transform: translate(-50%, -125%) !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            flex-direction: row !important;
+            width: auto !important;
+            max-width: none !important;
+            bottom: auto !important;
+            left: 50% !important;
             box-sizing: border-box !important;
-            animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
         }
 
-        html[data-theme="light"] #verse-context-toolbar {
-            background: rgba(255, 255, 255, 0.85) !important;
-            border: 1px solid rgba(0, 0, 0, 0.08) !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+        #verse-context-toolbar .toolbar-mobile-header {
+            display: none !important;
         }
 
         #verse-context-toolbar .floating-book-item {
-            text-transform: none !important;
-            font-family: inherit !important;
-            background: rgba(255, 255, 255, 0.02) !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            width: 100% !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            color: var(--text-base) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            transition: all 0.2s ease !important;
+            position: relative !important;
+            padding: 0 !important;
+            margin: 0 !important;
             box-shadow: none !important;
-            margin-bottom: 6px !important;
+            text-transform: none !important;
         }
 
-        html[data-theme="light"] #verse-context-toolbar .floating-book-item {
-            background: rgba(0, 0, 0, 0.02) !important;
-            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        #verse-context-toolbar .floating-book-item:hover {
+            background: var(--active-bg) !important;
+            color: var(--bible-primary) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        #verse-context-toolbar .floating-book-item:active {
+            transform: scale(0.92) !important;
+        }
+
+        #verse-context-toolbar .toolbar-btn-text {
+            display: none !important;
+        }
+
+        /* Tooltip behavior on Desktop */
+        #verse-context-toolbar .floating-book-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px) scale(0.9);
+            background: rgba(15, 23, 42, 0.95);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1001;
+        }
+
+        #verse-context-toolbar .floating-book-item:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px) scale(1);
+        }
+
+        #verse-context-toolbar #toolbar-btn-lookup {
+            color: var(--bible-primary) !important;
+        }
+        #verse-context-toolbar #toolbar-btn-clear {
+            color: #bd4f2a !important;
+        }
+
+        #verse-context-toolbar .toolbar-divider {
+            width: 1px !important;
+            height: 20px !important;
+            background: var(--border-color) !important;
+            margin: 0 4px !important;
+            display: block !important;
+        }
+
+        @keyframes popoverFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Mobile Adaptation (<= 768px) */
+        @media (max-width: 768px) {
+            #verse-context-toolbar {
+                position: fixed !important;
+                bottom: 80px !important;
+                top: auto !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 300px !important;
+                max-width: calc(100vw - 32px) !important;
+                background: rgba(30, 41, 59, 0.8) !important;
+                backdrop-filter: blur(16px) saturate(180%) !important;
+                -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 20px !important;
+                padding: 16px !important;
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+                z-index: 10002 !important;
+                flex-direction: column !important;
+                animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+                gap: 0px !important;
+            }
+
+            html[data-theme="light"] #verse-context-toolbar {
+                background: rgba(255, 255, 255, 0.85) !important;
+                border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            #verse-context-toolbar .toolbar-mobile-header {
+                display: flex !important;
+            }
+
+            #verse-context-toolbar .floating-book-item {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                border-radius: 10px !important;
+                width: 100% !important;
+                height: auto !important;
+                padding: 8px 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                gap: 10px !important;
+                margin-bottom: 6px !important;
+                transform: none !important;
+            }
+
+            html[data-theme="light"] #verse-context-toolbar .floating-book-item {
+                background: rgba(0, 0, 0, 0.02) !important;
+                border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            }
+
+            #verse-context-toolbar .floating-book-item:hover {
+                transform: scale(1.02) !important;
+                background: var(--active-bg) !important;
+            }
+
+            #verse-context-toolbar .floating-book-item:active {
+                transform: scale(0.98) !important;
+            }
+
+            #verse-context-toolbar .toolbar-btn-text {
+                display: inline !important;
+            }
+
+            #verse-context-toolbar .toolbar-divider {
+                display: none !important;
+            }
+
+            #verse-context-toolbar .floating-book-item::after {
+                display: none !important;
+            }
         }
 
         @keyframes popoverFadeIn {
@@ -2743,45 +2887,54 @@
                 </div>
 
                 <!-- Verse Context Actions Toolbar -->
-                <div class="floating-chapter-popover" id="verse-context-toolbar" style="display: none; bottom: 80px !important; top: auto !important; left: 50% !important; transform: translateX(-50%) !important; width: 300px !important; max-height: 400px; overflow-y: auto;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+                <div id="verse-context-toolbar">
+                    <div class="toolbar-mobile-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; width: 100%;">
                         <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Opciones de versículo</span>
-                        <button id="toolbar-btn-clear" style="display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; color: #bd4f2a; cursor: pointer; padding: 4px;">
+                        <button onclick="document.getElementById('toolbar-btn-clear').click()" style="display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; color: #bd4f2a; cursor: pointer; padding: 4px;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                         </button>
                     </div>
                     
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <button id="toolbar-btn-bookmark" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">bookmark</span>
-                            <span id="toolbar-bookmark-text">Favorito</span>
-                        </button>
+                    <button id="toolbar-btn-bookmark" class="floating-book-item" data-tooltip="Favorito">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">bookmark</span>
+                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Favorito</span>
+                    </button>
 
-                        <button id="toolbar-btn-range" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">select_all</span>
-                            <span>Seleccionar rango</span>
-                        </button>
+                    <button id="toolbar-btn-range" class="floating-book-item" data-tooltip="Seleccionar rango">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">select_all</span>
+                        <span class="toolbar-btn-text">Seleccionar rango</span>
+                    </button>
 
-                        <button id="toolbar-btn-lookup" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">menu_book</span>
-                            <span>Explicar en el Lexicón</span>
-                        </button>
+                    <div class="toolbar-divider"></div>
 
-                        <button id="toolbar-btn-share" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">share</span>
-                            <span>Compartir</span>
-                        </button>
+                    <button id="toolbar-btn-lookup" class="floating-book-item" data-tooltip="Explicar en el Lexicón">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+                        <span class="toolbar-btn-text">Explicar en el Lexicón</span>
+                    </button>
 
-                        <button id="toolbar-btn-download" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">download</span>
-                            <span>Copiar / Descargar</span>
-                        </button>
+                    <div class="toolbar-divider"></div>
 
-                        <button id="toolbar-btn-save-user" class="floating-book-item" style="margin-bottom: 4px; text-align: left; justify-content: flex-start; gap: 10px; border-radius: 10px; padding: 8px 12px !important; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--bible-primary);">edit_note</span>
-                            <span>Guardar en Mi Página</span>
-                        </button>
-                    </div>
+                    <button id="toolbar-btn-share" class="floating-book-item" data-tooltip="Compartir">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
+                        <span class="toolbar-btn-text">Compartir</span>
+                    </button>
+
+                    <button id="toolbar-btn-download" class="floating-book-item" data-tooltip="Copiar / Descargar">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                        <span class="toolbar-btn-text">Copiar / Descargar</span>
+                    </button>
+
+                    <button id="toolbar-btn-save-user" class="floating-book-item" data-tooltip="Guardar en Mi Página">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
+                        <span class="toolbar-btn-text">Guardar en Mi Página</span>
+                    </button>
+
+                    <div class="toolbar-divider"></div>
+
+                    <button id="toolbar-btn-clear" class="floating-book-item" data-tooltip="Borrar selección">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                        <span class="toolbar-btn-text">Borrar selección</span>
+                    </button>
                 </div>
             </div>
 
