@@ -1034,6 +1034,7 @@ class MinSideManager {
 
         // Run initial translation on static elements (sidebar, headers)
         translateStaticHTML();
+        this.setupThemeToggle();
         this.init();
     }
 
@@ -1221,6 +1222,30 @@ class MinSideManager {
     toggleSidebar(show) {
         document.getElementById('sidebar')?.classList.toggle('active', show);
         document.getElementById('sidebar-overlay')?.classList.toggle('active', show);
+    }
+
+    setupThemeToggle() {
+        const toggleBtn = document.getElementById('theme-toggle-btn');
+        if (!toggleBtn) return;
+
+        // Set initial icon based on active theme
+        const updateIcon = () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const iconEl = toggleBtn.querySelector('.material-symbols-outlined');
+            if (iconEl) {
+                iconEl.textContent = currentTheme === 'dark' ? 'light_mode' : 'dark_mode';
+            }
+        };
+
+        updateIcon();
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('hkm_theme', newTheme);
+            updateIcon();
+        });
     }
 
     // Dynamic Language Switching Routine

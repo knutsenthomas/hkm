@@ -4961,3 +4961,34 @@ html[data-theme="dark"] #view-container [style*="border-bottom:1px solid #e2e8f0
   border-bottom-color: var(--border-solid, #334155) !important;
 }
 
+/* Theme Toggle Button Style */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1.5px solid var(--border-solid, #e2e8f0);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #0f172a);
+  cursor: pointer;
+  transition: var(--transition, all 0.2s ease);
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--accent-color, #d17d39);
+  box-shadow: 0 0 0 3px var(--accent-glow, rgba(209, 125, 57, 0.15));
+  color: var(--accent-color, #d17d39);
+}
+
+html[data-theme="dark"] .theme-toggle-btn {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
