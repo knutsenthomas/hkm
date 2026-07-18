@@ -7064,13 +7064,13 @@ class MinSideManager {
                 <div class="ms-rp-grid">
                     <!-- Left Column: Dagens Andakt / Active Day details -->
                     <div style="display: flex; flex-direction: column; gap: 24px;">
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
+                        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--border-solid, #e2e8f0); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
                                 <span class="material-symbols-outlined" style="color: #bd4f2a; font-size: 20px;">event</span>
                                 <span style="font-size: 12px; font-weight: 700; color: #bd4f2a; text-transform: uppercase; letter-spacing: 0.05em;">Dagens Andakt</span>
                             </div>
                             
-                            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0;">Dag ${currentDayNum}: ${currentDayConfig?.verses}</h3>
+                            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-main, #0f172a); margin: 0 0 12px 0;">Dag ${currentDayNum}: ${currentDayConfig?.verses}</h3>
                             
                             <!-- Action Row -->
                             <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
