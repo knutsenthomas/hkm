@@ -4992,3 +4992,8 @@ html[data-theme="dark"] .theme-toggle-btn {
   color: #f8fafc !important;
 }
 
+html[data-theme="dark"] .ms-rp-checklist-card {
+  background: var(--card-bg, #1e293b) !important;
+  border-color: var(--border-solid, #334155) !important;
+}
+

@@ -7086,28 +7086,28 @@ class MinSideManager {
                         </div>
 
                         <!-- Prayer & Resources Preview -->
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
+                        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--border-solid, #e2e8f0); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);">
                             <h3 style="font-size: 15px; font-weight: 700; color: #d17d39; margin: 0 0 16px 0;">Bønnefokus & Fordypning</h3>
                             
-                            <div style="background: #f8fafc; border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: #475569;">
+                            <div style="background: var(--main-bg, #f8fafc); border-left: 4px solid #d17d39; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; font-size: 14px; line-height: 1.6; color: var(--text-muted, #475569);">
                                 "${currentDayConfig?.prayerFocus || 'Be over ordene du har lest i dag.'}"
                             </div>
                             
-                            <h4 style="font-size: 13px; font-weight: 700; color: #475569; margin: 0 0 12px 0;">Ressurser for dagen:</h4>
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-muted, #475569); margin: 0 0 12px 0;">Ressurser for dagen:</h4>
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 ${currentDayConfig?.resources && currentDayConfig.resources.length > 0 ? 
                                     currentDayConfig.resources.map(res => `
-                                    <a href="${res.url || '#'}" target="_blank" style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #f1f5f9; border-radius: 10px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'" onmouseout="this.style.borderColor='#f1f5f9'">
-                                        <span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 20px;">
+                                    <a href="${res.url || '#'}" target="_blank" style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border-solid, #f1f5f9); border-radius: 10px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--border-color, #cbd5e1)'" onmouseout="this.style.borderColor='var(--border-solid, #f1f5f9)'">
+                                        <span class="material-symbols-outlined" style="color: var(--text-muted, #cbd5e1); font-size: 20px;">
                                             ${res.type === 'video' ? 'play_circle' : res.type === 'podcast' ? 'podcasts' : 'article'}
                                         </span>
                                         <div>
-                                            <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${res.title}</div>
-                                            <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-top: 1px;">${res.type}</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: var(--text-main, #0f172a);">${res.title}</div>
+                                            <div style="font-size: 10px; color: var(--text-muted, #94a3b8); text-transform: uppercase; font-weight: 700; margin-top: 1px;">${res.type}</div>
                                         </div>
                                     </a>
                                     `).join('') : `
-                                    <p style="font-size: 13px; color: #94a3b8; font-style: italic; margin: 0;">Ingen tilknyttede ressurser.</p>
+                                    <p style="font-size: 13px; color: var(--text-muted, #94a3b8); font-style: italic; margin: 0;">Ingen tilknyttede ressurser.</p>
                                     `
                                 }
                             </div>
@@ -7123,16 +7123,16 @@ class MinSideManager {
                                 const isCompleted = completedDays.includes(d.dayNumber);
                                 const isActive = d.dayNumber === currentDayNum;
                                 return `
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#d17d39' : '#f1f5f9'}; background: ${isActive ? 'rgba(209, 125, 57, 0.02)' : '#ffffff'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid ${isActive ? '#d17d39' : 'var(--border-solid, #f1f5f9)'}; background: ${isActive ? 'rgba(209, 125, 57, 0.05)' : 'var(--card-bg, #ffffff)'}; cursor: pointer; transition: all 0.2s;" class="ms-rp-day-row" onclick="window.minSideManager.selectDayPreview('${globalPlan.id}', ${d.dayNumber})">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#d17d39' : '#cbd5e1'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex !important; align-items: center !important; justify-content: center !important; color: ${isCompleted ? '#ffffff' : '#cbd5e1'}; flex-shrink: 0; box-sizing: border-box !important;">
-                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">check</span>' : `<span style="font-size: 11px; font-weight: 700; color: ${isActive ? '#d17d39' : '#475569'}; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">${d.dayNumber}</span>`}
+                                        <div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${isCompleted ? '#10b981' : isActive ? '#d17d39' : 'var(--border-solid, #cbd5e1)'}; background: ${isCompleted ? '#10b981' : 'transparent'}; display: flex !important; align-items: center !important; justify-content: center !important; color: ${isCompleted ? '#ffffff' : 'var(--text-muted, #cbd5e1)'}; flex-shrink: 0; box-sizing: border-box !important;">
+                                            ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">check</span>' : `<span style="font-size: 11px; font-weight: 700; color: ${isActive ? '#d17d39' : 'var(--text-main, #475569)'}; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;">${d.dayNumber}</span>`}
                                         </div>
                                         <div>
-                                            <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${d.verses}</div>
+                                            <div style="font-size: 13px; font-weight: 600; color: var(--text-main, #0f172a);">${d.verses}</div>
                                         </div>
                                     </div>
-                                    <span class="material-symbols-outlined" style="color: #94a3b8; font-size: 18px;">chevron_right</span>
+                                    <span class="material-symbols-outlined" style="color: var(--text-muted, #94a3b8); font-size: 18px;">chevron_right</span>
                                 </div>
                                 `;
                             }).join('')}
