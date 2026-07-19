@@ -6166,7 +6166,7 @@ class BibleReader {
         
         // Task 1: Devotional (Andakt)
         checklistItemsHtml += `
-            <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+            <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     ${checkCircleHtml}
                     <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${lang === 'en' ? 'Devotional' : (lang === 'es' ? 'Devocional' : 'Andakt')}</span>
@@ -6178,7 +6178,7 @@ class BibleReader {
         // Task 2+: Scripture chapters (one row per passage)
         passages.forEach((passage) => {
             checklistItemsHtml += `
-                <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
+                <div class="hkm-rp-checklist-item" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 2)" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--bg-sidebar)'" onmouseout="this.style.backgroundColor='var(--bg-card)'">
                     <div style="display: flex; align-items: center; gap: 16px;">
                         ${checkCircleHtml}
                         <span style="font-size: 15px; font-weight: 600; color: var(--text-base);">${passage}</span>
@@ -7311,9 +7311,9 @@ class BibleReader {
             fullTitleText = fullTitleText.substring(0, 37) + '...';
         }
         // Step Label mapping
-        let stepLabel = 'BIBEL';
-        if (step === 1) stepLabel = lang === 'en' ? 'BIBLE' : (lang === 'es' ? 'BIBLIA' : 'BIBEL');
-        else if (step === 2) stepLabel = isPrayerApp ? (lang === 'en' ? 'PRAYER' : (lang === 'es' ? 'ORACIÓN' : 'BØNN')) : (lang === 'en' ? 'DEVOTION' : (lang === 'es' ? 'DEVOCIONAL' : 'ANDAKT'));
+        let stepLabel = 'ANDAKT';
+        if (step === 1) stepLabel = isPrayerApp ? (lang === 'en' ? 'PRAYER' : (lang === 'es' ? 'ORACIÓN' : 'BØNN')) : (lang === 'en' ? 'DEVOTION' : (lang === 'es' ? 'DEVOCIONAL' : 'ANDAKT'));
+        else if (step === 2) stepLabel = lang === 'en' ? 'BIBLE' : (lang === 'es' ? 'BIBLIA' : 'BIBEL');
         else if (step === 3) stepLabel = lang === 'en' ? 'RESOURCES' : (lang === 'es' ? 'RECURSOS' : 'RESSURSER');
         else if (step === 4) stepLabel = lang === 'en' ? 'NOTES' : (lang === 'es' ? 'NOTAS' : 'NOTAT');
         else if (step === 5) stepLabel = lang === 'en' ? 'COMPLETED' : (lang === 'es' ? 'COMPLETADO' : 'FULLFØRT');
@@ -7321,12 +7321,6 @@ class BibleReader {
         // Generate dynamic content HTML
         let stepContentHtml = '';
         if (step === 1) {
-            const heading = dayConfig.verses || 'BIBEL';
-            stepContentHtml = `
-                <h3 class="hkm-devotional-step-title">${heading}</h3>
-                <div class="hkm-devotional-text-serif">${scriptureHtml}</div>
-            `;
-        } else if (step === 2) {
             const heading = isPrayerApp 
                 ? (lang === 'en' ? 'Prayer Focus' : (lang === 'es' ? 'Enfoque de oración' : 'Bønnefokus'))
                 : (lang === 'en' ? 'Daily Devotional' : (lang === 'es' ? 'Devocional' : 'Dagens Andakt'));
@@ -7360,6 +7354,12 @@ class BibleReader {
                     `;
                 }
             }
+        } else if (step === 2) {
+            const heading = dayConfig.verses || 'BIBEL';
+            stepContentHtml = `
+                <h3 class="hkm-devotional-step-title">${heading}</h3>
+                <div class="hkm-devotional-text-serif">${scriptureHtml}</div>
+            `;
         } else if (step === 3) {
             const heading = lang === 'en' ? 'Resources' : (lang === 'es' ? 'Recursos' : 'Dypere Dykk');
             let resourcesListHtml = '';
