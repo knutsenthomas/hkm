@@ -35,7 +35,28 @@ class FirebaseService {
         }
         const isAdminRoute = typeof window !== 'undefined' && (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/minside'));
         
-        if (hasPublicCache || hasAdminCache || isAdminRoute) {
+        const pathname = typeof window !== 'undefined' ? window.location.pathname.toLowerCase() : '';
+        const search = typeof window !== 'undefined' ? window.location.search.toLowerCase() : '';
+        const isInteractivePage = 
+            pathname.includes('/bibel') || 
+            pathname.includes('/leseplan') || 
+            pathname.includes('/blogg') || 
+            pathname.includes('/blog-post') || 
+            pathname.includes('/arrangement') || 
+            pathname.includes('/event') || 
+            pathname.includes('/detalles-evento') || 
+            pathname.includes('/kurs') || 
+            pathname.includes('/cursos') || 
+            pathname.includes('/courses') ||
+            search.includes('plan=') ||
+            search.includes('day=') ||
+            search.includes('id=') ||
+            search.includes('courseid=') ||
+            search.includes('lex=') ||
+            search.includes('dict=') ||
+            search.includes('ref=');
+
+        if (hasPublicCache || hasAdminCache || isAdminRoute || isInteractivePage) {
             this.isLazy = false;
         }
         

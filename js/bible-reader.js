@@ -450,6 +450,12 @@ class BibleReader {
                 window.firebaseService.waitForInitialization(30000).then(initialized => {
                     if (initialized) {
                         setupAuthObserver();
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const planParam = urlParams.get('plan');
+                        const dayParam = urlParams.get('day');
+                        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
+                            this.initReadingPlanMode(planParam, dayParam);
+                        }
                     }
                 });
             }
