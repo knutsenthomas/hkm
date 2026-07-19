@@ -515,10 +515,14 @@ class BibleReader {
         }
         
         // Remove loading state once reader initialization (including deep-link / reading plan setup) is complete
-        if (typeof window.revealPublicUI === 'function') {
-            window.revealPublicUI('bible-reader-ready');
+        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
+            console.log("[BibleReader] Delaying UI reveal because reading plan data is still loading...");
         } else {
-            document.body.classList.remove('cms-loading');
+            if (typeof window.revealPublicUI === 'function') {
+                window.revealPublicUI('bible-reader-ready');
+            } else {
+                document.body.classList.remove('cms-loading');
+            }
         }
     }
 
@@ -4899,6 +4903,13 @@ class BibleReader {
             }
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
+        } finally {
+            // Reveal UI now that the reading plan loading attempt is complete
+            if (typeof window.revealPublicUI === 'function') {
+                window.revealPublicUI('bible-reader-ready');
+            } else {
+                document.body.classList.remove('cms-loading');
+            }
         }
     }
 
