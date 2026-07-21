@@ -1353,7 +1353,7 @@ class NewsletterBuilder {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   .canvas-header {
-    padding: 48px 32px;
+    padding: 24px 32px;
     text-align: center;
     border-bottom: 1px solid #f1f5f9;
   }
@@ -1371,7 +1371,7 @@ class NewsletterBuilder {
     font-family: sans-serif;
   }
   .blocks-container {
-    padding: 32px 40px;
+    padding: 20px 40px;
     color: #1e293b;
     line-height: 1.6;
   }
