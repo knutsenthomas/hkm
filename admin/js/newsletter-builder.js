@@ -1695,13 +1695,18 @@ class NewsletterBuilder {
             case 'image':
                 previewHtml = `
                     <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Bilde</div>
-                    <div style="width:100%; height:80px; background:#f1f5f9; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#94a3b8; font-family:material-symbols-outlined;">image</div>
+                    <div style="width:100%; height:80px; background:#f1f5f9; border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:32px; color:#94a3b8;">image</span>
+                    </div>
                 `;
                 break;
             case 'logo':
                 previewHtml = `
                     <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Logo</div>
-                    <div style="width:100%; height:40px; background:#f1f5f9; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#94a3b8; font-family:material-symbols-outlined;">featured_seasonal_and_gifts</div>
+                    <div style="width:100%; height:50px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <span class="material-symbols-outlined" style="font-size:20px; color:#d17d39;">featured_seasonal_and_gifts</span>
+                        <span style="font-size:12px; font-weight:700; color:#1B4965; font-family:'Inter', sans-serif;">HKM Logo</span>
+                    </div>
                 `;
                 break;
             case 'social':
