@@ -438,6 +438,11 @@ class NewsletterBuilder {
         if (imageInput) {
             imageInput.addEventListener('change', (e) => this.handleImageFileSelect(e));
         }
+
+        // Floating Bubble Menu (Notion-style Selection Menu)
+        document.addEventListener('selectionchange', () => {
+            this.handleTextSelection();
+        });
     }
 
     saveSelection() {
@@ -464,6 +469,196 @@ class NewsletterBuilder {
                 sel.selectAllChildren(container);
                 sel.collapseToEnd();
             }
+        }
+    }
+
+    handleTextSelection() {
+        const selection = window.getSelection();
+        const container = document.getElementById('blocks-container');
+        if (!container) return;
+
+        if (selection.isCollapsed || selection.rangeCount === 0) {
+            this.hideSelectionBubble();
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+        if (container.contains(range.commonAncestorContainer)) {
+            const text = selection.toString().trim();
+            if (text.length > 0) {
+                this.savedRange = range.cloneRange();
+                this.showSelectionBubble(range);
+                return;
+            }
+        }
+        this.hideSelectionBubble();
+    }
+
+    showSelectionBubble(range) {
+        let bubble = document.getElementById('hkm-selection-bubble');
+        if (!bubble) {
+            bubble = document.createElement('div');
+            bubble.id = 'hkm-selection-bubble';
+            bubble.style.cssText = `
+                position: absolute;
+                background: #0f172a;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+                z-index: 10000;
+                pointer-events: auto;
+                font-family: system-ui, -apple-system, sans-serif;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+                opacity: 0;
+                transform: translateY(6px) scale(0.95);
+            `;
+
+            const createBtn = (icon, title, toolName) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = title;
+                btn.style.cssText = `
+                    background: none;
+                    border: none;
+                    color: #94a3b8;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 4px;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                `;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">${icon}</span>`;
+                btn.onmouseenter = () => { btn.style.color = '#fff'; btn.style.background = 'rgba(255,255,255,0.08)'; };
+                btn.onmouseleave = () => { btn.style.color = '#94a3b8'; btn.style.background = 'none'; };
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.exec(toolName);
+                };
+                return btn;
+            };
+
+            const boldBtn = createBtn('format_bold', 'Fet', 'bold');
+            const italicBtn = createBtn('format_italic', 'Kursiv', 'italic');
+            const underlineBtn = createBtn('format_underlined', 'Understreket', 'underline');
+            
+            const linkBtn = createBtn('link', 'Lenke', 'link');
+            linkBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = prompt("Skriv inn nettadresse:", "https://");
+                if (url) {
+                    this.exec('createLink', url);
+                }
+            };
+
+            const colorBtn = document.createElement('button');
+            colorBtn.type = 'button';
+            colorBtn.title = 'Tekstfarge';
+            colorBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 4px;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+            `;
+            colorBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">palette</span>`;
+            colorBtn.onmouseenter = () => { colorBtn.style.color = '#fff'; colorBtn.style.background = 'rgba(255,255,255,0.08)'; };
+            colorBtn.onmouseleave = () => { colorBtn.style.color = '#94a3b8'; colorBtn.style.background = 'none'; };
+            colorBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const colorGrid = bubble.querySelector('.hkm-bubble-color-grid');
+                if (colorGrid) {
+                    colorGrid.style.display = colorGrid.style.display === 'none' ? 'flex' : 'none';
+                }
+            };
+
+            const colorGrid = document.createElement('div');
+            colorGrid.className = 'hkm-bubble-color-grid';
+            colorGrid.style.cssText = `
+                position: absolute;
+                top: 42px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #0f172a;
+                border-radius: 8px;
+                padding: 6px;
+                display: none;
+                gap: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10001;
+            `;
+            const colors = ['#ffffff', '#000000', '#d17d39', '#1B4965', '#22c55e', '#ef4444', '#e2e8f0'];
+            colors.forEach(col => {
+                const swatch = document.createElement('div');
+                swatch.style.cssText = `
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 4px;
+                    background: ${col};
+                    cursor: pointer;
+                    border: 1px solid rgba(255,255,255,0.2);
+                `;
+                swatch.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.exec('foreColor', col);
+                    colorGrid.style.display = 'none';
+                };
+                colorGrid.appendChild(swatch);
+            });
+
+            bubble.appendChild(boldBtn);
+            bubble.appendChild(italicBtn);
+            bubble.appendChild(underlineBtn);
+            bubble.appendChild(linkBtn);
+            bubble.appendChild(colorBtn);
+            bubble.appendChild(colorGrid);
+            document.body.appendChild(bubble);
+        }
+
+        const rect = range.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+
+        const bubbleWidth = bubble.offsetWidth || 180;
+        const top = rect.top + scrollY - 48;
+        const left = rect.left + scrollX + (rect.width / 2) - (bubbleWidth / 2);
+
+        bubble.style.top = top + 'px';
+        bubble.style.left = left + 'px';
+        bubble.style.display = 'flex';
+        
+        setTimeout(() => {
+            bubble.style.opacity = '1';
+            bubble.style.transform = 'translateY(0) scale(1)';
+        }, 10);
+    }
+
+    hideSelectionBubble() {
+        const bubble = document.getElementById('hkm-selection-bubble');
+        if (bubble) {
+            bubble.style.opacity = '0';
+            bubble.style.transform = 'translateY(6px) scale(0.95)';
+            setTimeout(() => {
+                if (bubble.style.opacity === '0') {
+                    bubble.style.display = 'none';
+                    const colorGrid = bubble.querySelector('.hkm-bubble-color-grid');
+                    if (colorGrid) colorGrid.style.display = 'none';
+                }
+            }, 200);
         }
     }
 
