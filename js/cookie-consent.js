@@ -74,6 +74,9 @@ function showCookieBanner() {
     }
 
     const t = getCookieTranslations();
+    const saved = getSavedConsent();
+    const isAnalyticsChecked = saved ? saved.analytics === true : false;
+    const isMarketingChecked = saved ? saved.marketing === true : false;
 
     // Inject HTML
     const bannerHTML = `
@@ -92,11 +95,11 @@ function showCookieBanner() {
                     <label for="cookie-necessary">${t.necessary}</label>
                 </div>
                 <div class="cookie-option">
-                    <input type="checkbox" id="cookie-analytics" class="cookie-toggle">
+                    <input type="checkbox" id="cookie-analytics" class="cookie-toggle" ${isAnalyticsChecked ? 'checked' : ''}>
                     <label for="cookie-analytics">${t.analytics}</label>
                 </div>
                 <div class="cookie-option">
-                    <input type="checkbox" id="cookie-marketing" class="cookie-toggle">
+                    <input type="checkbox" id="cookie-marketing" class="cookie-toggle" ${isMarketingChecked ? 'checked' : ''}>
                     <label for="cookie-marketing">${t.marketing}</label>
                 </div>
             </div>
