@@ -3209,4 +3209,94 @@ body:not(.builder-active) #newsletter-builder-layout {
     display: none !important;
 }
 
+/* --- PREMIUM EDITOR AESTHETICS OVERLAYS --- */
+
+/* Modern designer grid background for workspace */
+body.builder-active .canvas-container {
+    background-color: #f8fafc !important;
+    background-image: 
+        radial-gradient(#cbd5e1 1.2px, transparent 1.2px) !important;
+    background-size: 24px 24px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 32px 40px 64px 40px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Floating Rich Text Toolbar */
+body.builder-active .builder-workspace > .docs-toolbar {
+    width: min(calc(100% - 80px), var(--admin-page-max, 1280px)) !important;
+    margin: 16px auto 0 !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.04), 0 4px 6px -4px rgba(15, 23, 42, 0.02) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    padding: 8px 16px !important;
+    gap: 8px !important;
+}
+
+/* Rounded and premium styling for email canvas sheet */
+.newsletter-canvas {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 
+        0 20px 25px -5px rgba(15, 23, 42, 0.05), 
+        0 10px 10px -5px rgba(15, 23, 42, 0.03),
+        0 0 1px rgba(15, 23, 42, 0.1) !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Element Sidebar cards styling */
+.builder-elements-sidebar-v2 {
+    background: #ffffff !important;
+    border-right: 1px solid #f1f5f9 !important;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.015) !important;
+    padding: 24px !important;
+}
+
+.element-card-row {
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.element-card-row:hover {
+    background: #fff7ed !important;
+    border-color: rgba(209, 125, 57, 0.35) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 16px -4px rgba(209, 125, 57, 0.08), 0 4px 6px -2px rgba(209, 125, 57, 0.03) !important;
+}
+
+.element-card-row:hover .element-icon {
+    color: #d17d39 !important;
+}
+
+.element-card-row:hover .element-label {
+    color: #1e293b !important;
+}
+
+.element-card-row:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+/* Header & control buttons hover states */
+.builder-unified-header .header-action-btn {
+    border-radius: 10px !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.builder-unified-header .header-action-btn:hover {
+    transform: translateY(-1.5px) !important;
+}
+
+.builder-unified-header .header-action-btn:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
 
