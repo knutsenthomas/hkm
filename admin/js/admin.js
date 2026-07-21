@@ -6739,7 +6739,7 @@ class AdminManager {
                 <div style="padding: 16px 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #0f172a;">
                     <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">link</span>
-                        <span>Sett inn lenke / produkt</span>
+                        <span>Sett inn lenke</span>
                     </h3>
                     <button id="hkm-link-close" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 6px; transition: all 0.2s;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
@@ -6755,9 +6755,21 @@ class AdminManager {
                         </div>
                     </div>
                     
+                    <!-- Tabs switcher -->
+                    <div style="display: flex; gap: 8px; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-top: 8px;">
+                        <button type="button" id="hkm-tab-products" style="flex: 1; padding: 8px 12px; background: #1B4965; border: none; border-radius: 6px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">shopping_bag</span>
+                            <span>Produkter</span>
+                        </button>
+                        <button type="button" id="hkm-tab-events" style="flex: 1; padding: 8px 12px; background: transparent; border: 1px solid #334155; border-radius: 6px; color: #94a3b8; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">event</span>
+                            <span>Arrangementer</span>
+                        </button>
+                    </div>
+
                     <!-- Search input -->
-                    <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #334155; padding-top: 16px;">
-                        <label style="font-size: 12px; font-weight: 600; color: #94a3b8;">Søk etter produkt i His Kingdom Designs</label>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label id="hkm-search-label" style="font-size: 12px; font-weight: 600; color: #94a3b8;">Søk etter produkt i His Kingdom Designs</label>
                         <div style="position: relative; display: flex; align-items: center;">
                             <span class="material-symbols-outlined" style="position: absolute; left: 10px; color: #94a3b8; font-size: 18px;">search</span>
                             <input type="text" id="hkm-link-search-input" style="width: 100%; padding: 10px 12px 10px 34px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Søk på kopper, gensere, plakater...">
@@ -6783,7 +6795,7 @@ class AdminManager {
             const style = document.createElement('style');
             style.id = 'hkm-link-modal-styles';
             style.textContent = `
-                .hkm-link-product-item:hover { background: #334155 !important; border-color: #475569 !important; }
+                .hkm-link-product-item:hover, .hkm-link-event-item:hover { background: #334155 !important; border-color: #475569 !important; }
                 #hkm-link-close:hover { background: #334155 !important; color: white !important; }
                 #hkm-link-url-input:focus, #hkm-link-search-input:focus { border-color: #d17d39 !important; }
             `;
@@ -6795,7 +6807,12 @@ class AdminManager {
         const searchInput = modal.querySelector('#hkm-link-search-input');
         const resultsContainer = modal.querySelector('#hkm-link-results');
         const urlInput = modal.querySelector('#hkm-link-url-input');
+        const searchLabel = modal.querySelector('#hkm-search-label');
 
+        const tabProducts = modal.querySelector('#hkm-tab-products');
+        const tabEvents = modal.querySelector('#hkm-tab-events');
+
+        let activeTab = 'products';
         let productsList = [];
         const loadProducts = async () => {
             if (window.hkmWixProductsCache) {
@@ -6814,6 +6831,21 @@ class AdminManager {
             }
         };
 
+        let eventsList = [];
+        const loadEvents = async () => {
+            if (window.hkmEventsCache) {
+                eventsList = window.hkmEventsCache;
+                return;
+            }
+            try {
+                const raw = await firebaseService.getPageContent('collection_events');
+                eventsList = this._getCollectionItems(raw).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                window.hkmEventsCache = eventsList;
+            } catch (err) {
+                console.error("Failed to fetch local events for link selector:", err);
+            }
+        };
+
         const escapeHtml = (str) => {
             return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         };
@@ -6821,67 +6853,154 @@ class AdminManager {
         const updateResults = () => {
             const query = searchInput.value.toLowerCase().trim();
             if (!query) {
-                resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Skriv i søkefeltet over for å søke etter produkter.</div>';
+                if (activeTab === 'products') {
+                    resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Skriv i søkefeltet over for å søke etter produkter.</div>';
+                } else {
+                    resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Skriv i søkefeltet over for å søke etter arrangementer.</div>';
+                }
                 return;
             }
 
-            let searchTerms = [query];
-            if (query.includes('kopp') || query.includes('krus') || query.includes('mug') || query.includes('cup')) {
-                searchTerms = ['kopp', 'krus', 'mug', 'cup', 'enamel', 'ceramic'];
-            } else if (query.includes('genser') || query.includes('hoodie') || query.includes('hettejakke') || query.includes('hettegenser') || query.includes('zip')) {
-                searchTerms = ['genser', 'hoodie', 'sweater', 'hettejakke', 'zip', 'hettegenser'];
-            } else if (query.includes('t-skjorte') || query.includes('tskjorte') || query.includes('t-shirt') || query.includes('tee') || (query.includes('skjorte') && !query.includes('hette'))) {
-                searchTerms = ['t-skjorte', 't-shirt', 'tee', 'skjorte'];
-            } else if (query.includes('plakat') || query.includes('poster') || query.includes('trykk')) {
-                searchTerms = ['plakat', 'poster', 'trykk', 'print'];
-            } else if (query.includes('klistremerke') || query.includes('sticker')) {
-                searchTerms = ['klistremerke', 'sticker'];
-            } else if (query.includes('bag') || query.includes('veske') || query.includes('tote')) {
-                searchTerms = ['bag', 'veske', 'tote', 'handlenett'];
-            } else if (query.includes('bok') || query.includes('book') || query.includes('fargelegg')) {
-                searchTerms = ['bok', 'book', 'fargelegg', 'coloring'];
-            }
+            if (activeTab === 'products') {
+                let searchTerms = [query];
+                if (query.includes('kopp') || query.includes('krus') || query.includes('mug') || query.includes('cup')) {
+                    searchTerms = ['kopp', 'krus', 'mug', 'cup', 'enamel', 'ceramic'];
+                } else if (query.includes('genser') || query.includes('hoodie') || query.includes('hettejakke') || query.includes('hettegenser') || query.includes('zip')) {
+                    searchTerms = ['genser', 'hoodie', 'sweater', 'hettejakke', 'zip', 'hettegenser'];
+                } else if (query.includes('t-skjorte') || query.includes('tskjorte') || query.includes('t-shirt') || query.includes('tee') || (query.includes('skjorte') && !query.includes('hette'))) {
+                    searchTerms = ['t-skjorte', 't-shirt', 'tee', 'skjorte'];
+                } else if (query.includes('plakat') || query.includes('poster') || query.includes('trykk')) {
+                    searchTerms = ['plakat', 'poster', 'trykk', 'print'];
+                } else if (query.includes('klistremerke') || query.includes('sticker')) {
+                    searchTerms = ['klistremerke', 'sticker'];
+                } else if (query.includes('bag') || query.includes('veske') || query.includes('tote')) {
+                    searchTerms = ['bag', 'veske', 'tote', 'handlenett'];
+                } else if (query.includes('bok') || query.includes('book') || query.includes('fargelegg')) {
+                    searchTerms = ['bok', 'book', 'fargelegg', 'coloring'];
+                }
 
-            const filtered = productsList.filter(p => {
-                const nameLower = (p.name || '').toLowerCase();
-                const descLower = (p.description || '').toLowerCase();
-                return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term)) || nameLower.includes(query);
-            });
+                const filtered = productsList.filter(p => {
+                    const nameLower = (p.name || '').toLowerCase();
+                    const descLower = (p.description || '').toLowerCase();
+                    return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term)) || nameLower.includes(query);
+                });
 
-            if (filtered.length === 0) {
-                resultsContainer.innerHTML = `<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Ingen produkter funnet for "${escapeHtml(query)}"</div>`;
-                return;
-            }
+                if (filtered.length === 0) {
+                    resultsContainer.innerHTML = `<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Ingen produkter funnet for "${escapeHtml(query)}"</div>`;
+                    return;
+                }
 
-            resultsContainer.innerHTML = filtered.map(p => {
-                const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                const url = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
-                const img = p.imageUrl 
-                    ? `<img src="${p.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
-                    : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">🛍️</div>`;
-                return `
-                    <div class="hkm-link-product-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                        ${img}
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
-                            <span style="font-size: 13px; font-weight: 600; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</span>
-                            <span style="font-size: 11px; color: #d17d39; font-weight: 700;">kr ${p.price},-</span>
+                resultsContainer.innerHTML = filtered.map(p => {
+                    const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    const url = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+                    const img = p.imageUrl 
+                        ? `<img src="${p.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
+                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">🛍️</div>`;
+                    return `
+                        <div class="hkm-link-product-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                            ${img}
+                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-size: 13px; font-weight: 600; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</span>
+                                <span style="font-size: 11px; color: #d17d39; font-weight: 700;">kr ${p.price},-</span>
+                            </div>
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
                         </div>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
-            resultsContainer.querySelectorAll('.hkm-link-product-item').forEach(item => {
-                item.onclick = () => {
-                    const productUrl = item.dataset.url;
-                    urlInput.value = productUrl;
-                    urlInput.style.borderColor = '#d17d39';
-                    setTimeout(() => {
-                        urlInput.style.borderColor = '#334155';
-                    }, 300);
-                };
-            });
+                resultsContainer.querySelectorAll('.hkm-link-product-item').forEach(item => {
+                    item.onclick = () => {
+                        const productUrl = item.dataset.url;
+                        urlInput.value = productUrl;
+                        urlInput.style.borderColor = '#d17d39';
+                        setTimeout(() => {
+                            urlInput.style.borderColor = '#334155';
+                        }, 300);
+                    };
+                });
+            } else {
+                const filtered = eventsList.filter(e => {
+                    const titleLower = (e.title || '').toLowerCase();
+                    const descLower = (e.description || e.shortDescription || '').toLowerCase();
+                    const locLower = (e.location || '').toLowerCase();
+                    return titleLower.includes(query) || descLower.includes(query) || locLower.includes(query);
+                });
+
+                if (filtered.length === 0) {
+                    resultsContainer.innerHTML = `<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Ingen arrangementer funnet for "${escapeHtml(query)}"</div>`;
+                    return;
+                }
+
+                resultsContainer.innerHTML = filtered.map(e => {
+                    const dateStr = e.date ? String(e.date).split('T')[0] : 'Uten dato';
+                    const locStr = e.location ? escapeHtml(e.location) : 'Sted ikke oppgitt';
+                    const url = `/arrangement-detaljer.html?id=${e.id || e.key}`;
+                    const img = e.imageUrl 
+                        ? `<img src="${e.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
+                        : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">📅</div>`;
+                    return `
+                        <div class="hkm-link-event-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                            ${img}
+                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-size: 13px; font-weight: 600; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(e.title)}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: 500;">${dateStr} · ${locStr}</span>
+                            </div>
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                        </div>
+                    `;
+                }).join('');
+
+                resultsContainer.querySelectorAll('.hkm-link-event-item').forEach(item => {
+                    item.onclick = () => {
+                        const eventUrl = item.dataset.url;
+                        urlInput.value = eventUrl;
+                        urlInput.style.borderColor = '#d17d39';
+                        setTimeout(() => {
+                            urlInput.style.borderColor = '#334155';
+                        }, 300);
+                    };
+                });
+            }
         };
+
+        const switchTab = (tab) => {
+            activeTab = tab;
+            searchInput.value = '';
+            if (tab === 'products') {
+                tabProducts.style.background = '#1B4965';
+                tabProducts.style.borderColor = 'transparent';
+                tabProducts.style.color = 'white';
+                
+                tabEvents.style.background = 'transparent';
+                tabEvents.style.borderColor = '#334155';
+                tabEvents.style.color = '#94a3b8';
+
+                searchLabel.innerText = 'Søk etter produkt i His Kingdom Designs';
+                searchInput.placeholder = 'Søk på kopper, gensere, plakater...';
+                
+                loadProducts().then(() => {
+                    updateResults();
+                });
+            } else {
+                tabEvents.style.background = '#1B4965';
+                tabEvents.style.borderColor = 'transparent';
+                tabEvents.style.color = 'white';
+                
+                tabProducts.style.background = 'transparent';
+                tabProducts.style.borderColor = '#334155';
+                tabProducts.style.color = '#94a3b8';
+
+                searchLabel.innerText = 'Søk etter arrangement i His Kingdom Ministry';
+                searchInput.placeholder = 'Søk på navn, sted, beskrivelse...';
+                
+                loadEvents().then(() => {
+                    updateResults();
+                });
+            }
+        };
+
+        tabProducts.onclick = () => switchTab('products');
+        tabEvents.onclick = () => switchTab('events');
 
         loadProducts().then(() => {
             if (searchInput.value) updateResults();
