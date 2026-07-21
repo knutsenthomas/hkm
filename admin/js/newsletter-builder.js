@@ -268,12 +268,13 @@ class NewsletterBuilder {
             });
         });
 
-        // Block Tool Clicks & Drag and Drop Setup
+        // Block Tool Clicks, Drag and Drop, & Hover Previews Setup
         document.querySelectorAll('.element-card').forEach(btn => {
             btn.setAttribute('draggable', 'true');
             btn.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('hkm-block-type', btn.dataset.type);
                 btn.style.opacity = '0.5';
+                this.hideElementHoverPreview();
             });
             btn.addEventListener('dragend', () => {
                 btn.style.opacity = '';
@@ -293,6 +294,12 @@ class NewsletterBuilder {
                 if (this.isMobileViewport()) {
                     this.closeToolsUi();
                 }
+            });
+            btn.addEventListener('mouseenter', () => {
+                this.showElementHoverPreview(btn);
+            });
+            btn.addEventListener('mouseleave', () => {
+                this.hideElementHoverPreview();
             });
         });
 
@@ -410,6 +417,22 @@ class NewsletterBuilder {
 
         // Actions
         document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
+
+        // Dark Mode Simulator Toggle
+        const darkModeBtn = document.getElementById('email-dark-mode-btn');
+        if (darkModeBtn) {
+            darkModeBtn.addEventListener('click', () => {
+                const canvas = document.getElementById('newsletter-canvas');
+                if (canvas) {
+                    canvas.classList.toggle('simulated-dark-mode');
+                    darkModeBtn.classList.toggle('active');
+                    
+                    const isDark = canvas.classList.contains('simulated-dark-mode');
+                    darkModeBtn.querySelector('span').textContent = isDark ? 'light_mode' : 'dark_mode';
+                    darkModeBtn.title = isDark ? 'Lyst tema-simulator' : 'Mørkt tema-simulator';
+                }
+            });
+        }
         
         const saveDraftBtn = document.getElementById('save-draft-btn');
         if (saveDraftBtn) {
@@ -1598,6 +1621,128 @@ class NewsletterBuilder {
         frame.appendChild(canvas);
         frame.className = `preview-frame ${this.currentView}`;
         modal.style.display = 'flex';
+    }
+
+    showElementHoverPreview(btn) {
+        const type = btn.dataset.type;
+        if (!type || type.startsWith('ai_')) return;
+
+        let preview = document.getElementById('hkm-element-hover-preview');
+        if (!preview) {
+            preview = document.createElement('div');
+            preview.id = 'hkm-element-hover-preview';
+            preview.style.cssText = `
+                position: absolute;
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+                z-index: 10000;
+                pointer-events: none;
+                padding: 16px;
+                width: 280px;
+                opacity: 0;
+                transform: translateX(10px);
+                transition: opacity 0.2s ease, transform 0.2s ease;
+                font-family: 'Inter', sans-serif;
+            `;
+            document.body.appendChild(preview);
+        }
+
+        let previewHtml = '';
+        switch (type) {
+            case 'header':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Overskrift</div>
+                    <h2 style="font-family:'Inter', sans-serif; margin:0; font-size:20px; font-weight:800; color:#1e293b;">Overskrift her</h2>
+                `;
+                break;
+            case 'text':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Tekstfelt</div>
+                    <p style="font-family:'Inter', sans-serif; margin:0; font-size:13px; color:#475569; line-height:1.5;">Skriv din nyhet, beskrivelse eller en lengre tekstblokk her...</p>
+                `;
+                break;
+            case 'divider':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Skillelinje</div>
+                    <hr style="border:none; border-top:2px solid #e2e8f0; margin:12px 0;">
+                `;
+                break;
+            case 'spacer':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Avstand</div>
+                    <div style="height:32px; border:1px dashed #cbd5e1; border-radius:6px; background:#f8fafc; display:flex; align-items:center; justify-content:center; font-size:11px; color:#94a3b8;">Tomrom (32px)</div>
+                `;
+                break;
+            case 'button':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Knapp</div>
+                    <div style="text-align:center;">
+                        <span style="display:inline-block; background:#d17d39; color:white; padding:8px 20px; border-radius:999px; font-weight:700; font-size:12px; font-family:'Inter', sans-serif;">Les mer</span>
+                    </div>
+                `;
+                break;
+            case 'columns':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Kolonner</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; height:32px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#94a3b8;">Kolonne 1</div>
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; height:32px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#94a3b8;">Kolonne 2</div>
+                    </div>
+                `;
+                break;
+            case 'image':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Bilde</div>
+                    <div style="width:100%; height:80px; background:#f1f5f9; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#94a3b8; font-family:material-symbols-outlined;">image</div>
+                `;
+                break;
+            case 'logo':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Logo</div>
+                    <div style="width:100%; height:40px; background:#f1f5f9; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#94a3b8; font-family:material-symbols-outlined;">featured_seasonal_and_gifts</div>
+                `;
+                break;
+            case 'social':
+                previewHtml = `
+                    <div style="font-size:11px; font-weight:700; color:#94a3b8; margin-bottom:8px; text-transform:uppercase;">Forhåndsvisning: Sosiale lenker</div>
+                    <div style="display:flex; justify-content:center; gap:8px; font-size:11px; font-weight:600; color:#1B4965;">
+                        <span>Facebook</span> • <span>Instagram</span> • <span>YouTube</span>
+                    </div>
+                `;
+                break;
+            default:
+                return;
+        }
+
+        preview.innerHTML = previewHtml;
+
+        const rect = btn.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+
+        preview.style.top = (rect.top + scrollY + (rect.height / 2) - 60) + 'px';
+        preview.style.left = (rect.right + scrollX + 16) + 'px';
+        preview.style.display = 'block';
+
+        setTimeout(() => {
+            preview.style.opacity = '1';
+            preview.style.transform = 'translateX(0)';
+        }, 10);
+    }
+
+    hideElementHoverPreview() {
+        const preview = document.getElementById('hkm-element-hover-preview');
+        if (preview) {
+            preview.style.opacity = '0';
+            preview.style.transform = 'translateX(10px)';
+            setTimeout(() => {
+                if (preview.style.opacity === '0') {
+                    preview.style.display = 'none';
+                }
+            }, 200);
+        }
     }
 
     async saveTemplate() {

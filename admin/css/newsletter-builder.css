@@ -3299,4 +3299,110 @@ body.builder-active .builder-workspace > .docs-toolbar {
     transform: translateY(0) scale(0.97) !important;
 }
 
+/* --- DEVICE MOCKUPS FOR PREVIEW MODAL --- */
+
+.preview-frame-wrap {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 32px !important;
+    box-sizing: border-box !important;
+}
+
+.preview-frame {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15) !important;
+}
+
+/* MacBook / Desktop Browser Mockup Frame */
+.preview-frame.desktop {
+    width: 100% !important;
+    max-width: 960px !important;
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding-top: 40px !important; /* Space for mockup header */
+}
+
+.preview-frame.desktop::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 40px !important;
+    background: #f1f5f9 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-top-left-radius: 11px !important;
+    border-top-right-radius: 11px !important;
+    display: block !important;
+}
+
+/* Traffic light circles on mockup */
+.preview-frame.desktop::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 15px !important;
+    left: 16px !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    background: #ef4444 !important;
+    box-shadow: 16px 0 0 #f59e0b, 32px 0 0 #10b981 !important;
+    display: block !important;
+}
+
+/* Mobile iPhone Mockup Frame */
+.preview-frame.mobile {
+    width: 375px !important;
+    height: 812px !important;
+    border-radius: 40px !important;
+    border: 12px solid #0f172a !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+}
+
+/* Dynamic island notch for iPhone */
+.preview-frame.mobile::before {
+    content: '' !important;
+    position: sticky !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 110px !important;
+    height: 28px !important;
+    background: #000000 !important;
+    border-radius: 20px !important;
+    z-index: 1000 !important;
+    display: block !important;
+    margin-bottom: -28px !important;
+}
+
+/* Dark Mode Simulator styles for e-mail canvas */
+.newsletter-canvas.simulated-dark-mode {
+    background: #0f172a !important; /* Dark Slate background */
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+.newsletter-canvas.simulated-dark-mode p,
+.newsletter-canvas.simulated-dark-mode h1,
+.newsletter-canvas.simulated-dark-mode h2,
+.newsletter-canvas.simulated-dark-mode h3 {
+    color: #f8fafc !important;
+}
+
+.newsletter-canvas.simulated-dark-mode .block-text {
+    color: #cbd5e1 !important;
+}
+
+.newsletter-canvas.simulated-dark-mode a:not(.block-btn) {
+    color: #fb923c !important; /* Amber links in dark mode */
+}
+
 
