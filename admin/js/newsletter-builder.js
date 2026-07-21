@@ -3070,7 +3070,8 @@ class NewsletterBuilder {
             const targetImg = document.getElementById('hkm-crop-target');
             let cropper = null;
 
-            targetImg.onload = () => {
+            const initCropper = () => {
+                if (cropper) return;
                 cropper = new window.Cropper(targetImg, {
                     viewMode: 1,
                     dragMode: 'move',
@@ -3080,7 +3081,14 @@ class NewsletterBuilder {
                 });
             };
 
+            if (targetImg.complete) {
+                initCropper();
+            } else {
+                targetImg.onload = initCropper;
+            }
+
             targetImg.onerror = () => {
+                if (cropper) return;
                 targetImg.removeAttribute('crossOrigin');
                 cropper = new window.Cropper(targetImg, {
                     viewMode: 1,
