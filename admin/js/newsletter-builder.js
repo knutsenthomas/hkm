@@ -361,6 +361,16 @@ class NewsletterBuilder {
                 const indicator = container.querySelector('.hkm-drop-indicator');
                 if (indicator) indicator.remove();
                 
+                // Handle actual local file drop (e.g. image dragged from desktop)
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('image/')) {
+                        const afterElement = this.getDragAfterElement(container, e.clientY);
+                        this.uploadAndInsertImageFileAt(file, afterElement);
+                    }
+                    return;
+                }
+                
                 const type = e.dataTransfer.getData('hkm-block-type');
                 if (!type) return;
                 
@@ -988,6 +998,40 @@ class NewsletterBuilder {
 
         if (html) {
             this.exec('insertHTML', html);
+        }
+    }
+
+    async uploadAndInsertImageFileAt(file, afterElement) {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) {
+            showToast("Firebase er ikke initialisert.", "error");
+            return;
+        }
+        try {
+            showToast("Laster opp bilde...", "info");
+            const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+            const url = await window.firebaseService.uploadImage(file, uploadPath);
+            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+            
+            const temp = document.createElement('div');
+            temp.innerHTML = imgHtml;
+            const container = document.getElementById('blocks-container');
+            if (container) {
+                if (afterElement) {
+                    while (temp.firstChild) {
+                        container.insertBefore(temp.firstChild, afterElement);
+                    }
+                } else {
+                    while (temp.firstChild) {
+                        container.appendChild(temp.firstChild);
+                    }
+                }
+                this.syncUnifiedBlocks();
+                this.triggerAutosave();
+            }
+            showToast("Bilde lastet opp!", "success");
+        } catch (err) {
+            console.error("Upload failed:", err);
+            showToast("Opplasting feilet.", "error");
         }
     }
 
