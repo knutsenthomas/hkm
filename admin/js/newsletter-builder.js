@@ -3096,13 +3096,16 @@ class NewsletterBuilder {
 
             const initCropper = () => {
                 if (cropper) return;
-                cropper = new window.Cropper(targetImg, {
-                    viewMode: 1,
-                    dragMode: 'move',
-                    background: false,
-                    responsive: true,
-                    checkOrientation: false
-                });
+                setTimeout(() => {
+                    if (cropper) return;
+                    cropper = new window.Cropper(targetImg, {
+                        viewMode: 1,
+                        dragMode: 'move',
+                        background: false,
+                        responsive: true,
+                        checkOrientation: false
+                    });
+                }, 150);
             };
 
             if (targetImg.complete) {
@@ -3114,12 +3117,15 @@ class NewsletterBuilder {
             targetImg.onerror = () => {
                 if (cropper) return;
                 targetImg.removeAttribute('crossOrigin');
-                cropper = new window.Cropper(targetImg, {
-                    viewMode: 1,
-                    dragMode: 'move',
-                    background: false,
-                    responsive: true
-                });
+                setTimeout(() => {
+                    if (cropper) return;
+                    cropper = new window.Cropper(targetImg, {
+                        viewMode: 1,
+                        dragMode: 'move',
+                        background: false,
+                        responsive: true
+                    });
+                }, 150);
             };
 
             cropModal.querySelectorAll('.crop-ratio-btn').forEach(btn => {
