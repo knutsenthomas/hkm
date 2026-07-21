@@ -299,6 +299,14 @@ class NewsletterBuilder {
                     e.preventDefault();
                     e.stopPropagation();
                     this.activateImageResizer(img);
+                    return;
+                }
+                const btn = e.target.closest('.block-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.activateButtonManager(btn);
+                    return;
                 }
             });
         }
@@ -417,6 +425,15 @@ class NewsletterBuilder {
     syncUnifiedBlocks() {
         const container = document.getElementById('blocks-container');
         if (!container) return;
+
+        // Clean up empty button/block wrappers
+        container.querySelectorAll('div').forEach(div => {
+            const isBtnWrap = div.style.textAlign === 'center' || div.classList.contains('block-btn-wrap');
+            if (isBtnWrap && !div.querySelector('.block-btn')) {
+                div.remove();
+            }
+        });
+
         this.blocks = [{
             id: 'unified_content',
             type: 'text',
@@ -580,7 +597,7 @@ class NewsletterBuilder {
                 if (!url) return;
                 html = `
                     <div style="text-align: center; margin: 24px 0;">
-                        <a href="${url}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
+                        <a href="${url}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
                     </div><p><br></p>`;
                 break;
             case 'columns':
@@ -746,7 +763,7 @@ class NewsletterBuilder {
                                 case 'button':
                                     return `
                                         <div style="text-align: center; margin: 24px 0;">
-                                            <a href="${block.content.url || '#'}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text || 'Les mer'}</a>
+                                            <a href="${block.content.url || '#'}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text || 'Les mer'}</a>
                                         </div><p><br></p>`;
                                 case 'divider':
                                     return `<hr style="border: none; border-top: ${block.content.thickness || 2}px solid ${block.content.color || '#e2e8f0'}; margin: 24px 0;">`;
@@ -1188,7 +1205,7 @@ class NewsletterBuilder {
                     case 'button':
                         return `
                             <div style="text-align: center; margin: 24px 0;">
-                                <a href="${block.content.url}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text}</a>
+                                <a href="${block.content.url}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text}</a>
                             </div><p><br></p>`;
                     case 'divider':
                         return `<hr style="border: none; border-top: ${block.content.thickness || 2}px solid ${block.content.color || '#e2e8f0'}; margin: 24px 0;">`;
@@ -1538,6 +1555,130 @@ class NewsletterBuilder {
             finalBtn.disabled = false;
             finalBtn.innerHTML = 'Gå til utsendelse';
         }
+    }
+
+    activateButtonManager(btn) {
+        const existing = document.getElementById('hkm-btn-manager');
+        if (existing) existing.remove();
+
+        if (!btn || !btn.parentElement) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'hkm-btn-manager';
+        overlay.style.cssText = `
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px dashed #d17d39;
+            border-radius: ${getComputedStyle(btn).borderRadius || '999px'};
+            z-index: 10000;
+            pointer-events: none;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 4px 15px rgba(209, 125, 57, 0.3);
+        `;
+
+        const updateOverlayPos = () => {
+            if (!btn || !btn.parentElement || !document.body.contains(btn)) {
+                overlay.remove();
+                return;
+            }
+            const rect = btn.getBoundingClientRect();
+            const scrollX = window.scrollX || window.pageXOffset;
+            const scrollY = window.scrollY || window.pageYOffset;
+
+            overlay.style.top = (rect.top + scrollY) + 'px';
+            overlay.style.left = (rect.left + scrollX) + 'px';
+            overlay.style.width = rect.width + 'px';
+            overlay.style.height = rect.height + 'px';
+        };
+
+        const toolbar = document.createElement('div');
+        toolbar.style.cssText = `
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            pointer-events: auto;
+            z-index: 10001;
+            font-family: system-ui, -apple-system, sans-serif;
+        `;
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.style.cssText = 'background:none; border:none; color:#fb923c; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
+        editBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">edit</span> Rediger';
+        editBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            overlay.remove();
+            
+            const oldText = btn.textContent || '';
+            const oldUrl = btn.getAttribute('href') || '';
+            
+            const newText = prompt("Ny knapptekst:", oldText);
+            if (newText === null) return;
+            
+            const newUrl = prompt("Ny knapp-URL (f.eks. nettside eller e-post):", oldUrl);
+            if (newUrl === null) return;
+
+            btn.textContent = newText.trim() || 'Les mer';
+            btn.setAttribute('href', newUrl.trim() || 'https://');
+            this.syncUnifiedBlocks();
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.style.cssText = 'background:none; border:none; color:#f87171; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
+        deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">delete</span> Slett';
+        deleteBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            overlay.remove();
+            
+            if (confirm("Vil du slette denne knappen?")) {
+                const parent = btn.closest('div');
+                if (parent && (parent.style.textAlign === 'center' || parent.classList.contains('block-btn-wrap'))) {
+                    parent.remove();
+                } else {
+                    btn.remove();
+                }
+                this.syncUnifiedBlocks();
+            }
+        };
+
+        toolbar.appendChild(editBtn);
+        toolbar.appendChild(document.createTextNode(' • '));
+        toolbar.appendChild(deleteBtn);
+        overlay.appendChild(toolbar);
+
+        document.body.appendChild(overlay);
+        updateOverlayPos();
+
+        const resizeObserver = new ResizeObserver(() => updateOverlayPos());
+        resizeObserver.observe(btn);
+
+        const removeOverlay = (e) => {
+            if (e.target !== btn && !overlay.contains(e.target)) {
+                overlay.remove();
+                resizeObserver.disconnect();
+                document.removeEventListener('click', removeOverlay);
+                window.removeEventListener('scroll', removeOverlay);
+            }
+        };
+
+        setTimeout(() => {
+            document.addEventListener('click', removeOverlay);
+            window.addEventListener('scroll', removeOverlay);
+        }, 50);
     }
 
     activateImageResizer(img, onComplete, onOpenSettings, onDelete) {
