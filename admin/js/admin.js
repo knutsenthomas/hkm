@@ -6184,6 +6184,10 @@ class AdminManager {
                             <span>Unsplash</span>
                         </button>
                     </div>
+                    <button id="g-img-opt-crop" class="prompt-btn primary" style="background: #0284c7 !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">crop</span>
+                        <span>Beskjær bilde</span>
+                    </button>
                     <button id="g-img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-weight: 600; font-size: 13px;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
                         <span>Slett bilde</span>
@@ -6464,6 +6468,53 @@ class AdminManager {
             }
         };
 
+        // Crop
+        document.getElementById('g-img-opt-crop').onclick = () => {
+            closeOverlay();
+            this.openImageCropper(imgElement.src, (newUrl) => {
+                imgElement.src = newUrl;
+                imgElement.setAttribute('src', newUrl);
+
+                const currentStyles = {
+                    width: imgElement.style.width,
+                    height: imgElement.style.height,
+                    objectFit: imgElement.style.objectFit,
+                    objectPosition: imgElement.style.objectPosition,
+                    borderRadius: imgElement.style.borderRadius,
+                    margin: imgElement.style.margin,
+                    display: imgElement.style.display
+                };
+
+                if (blockId && editor?.blocks) {
+                    try {
+                        editor.save().then(async (savedOutput) => {
+                            const allBlockEls = container.querySelectorAll('.ce-block');
+                            const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
+                            if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
+                                await editor.blocks.update(blockId, {
+                                    ...savedOutput.blocks[blockIndex].data,
+                                    ...currentStyles,
+                                    file: { url: newUrl }
+                                });
+                                setTimeout(() => {
+                                    const newBlock = container.querySelector(`.ce-block[data-id="${blockId}"]`);
+                                    if (newBlock) {
+                                        const newImg = newBlock.querySelector('img') || newBlock.querySelector('.image-tool__image-picture');
+                                        if (newImg) {
+                                            newImg.src = newUrl;
+                                            newImg.setAttribute('src', newUrl);
+                                            Object.assign(newImg.style, currentStyles);
+                                        }
+                                    }
+                                }, 50);
+                            }
+                        });
+                    } catch (e) {}
+                }
+                this.showToast('Bilde beskjært!', 'success');
+            }, collectionId || 'pages');
+        };
+
         // Delete image
         document.getElementById('g-img-opt-delete').onclick = () => {
             closeOverlay();
@@ -6477,6 +6528,194 @@ class AdminManager {
                 } catch (err) {}
             }
         };
+    }
+
+    openImageCropper(imageSrc, onCropped, folderPath = 'cropped') {
+        const loadCropper = (cb) => {
+            if (window.Cropper) {
+                cb();
+                return;
+            }
+            if (!document.querySelector('link[href*="cropper.min.css"]')) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css';
+                document.head.appendChild(link);
+            }
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js';
+            script.onload = cb;
+            document.body.appendChild(script);
+        };
+
+        loadCropper(() => {
+            let cropModal = document.getElementById('hkm-crop-modal');
+            if (cropModal) cropModal.remove();
+
+            cropModal = document.createElement('div');
+            cropModal.id = 'hkm-crop-modal';
+            cropModal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.95);
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                backdrop-filter: blur(10px);
+            `;
+
+            cropModal.innerHTML = `
+                <div style="background: #1e293b; border-radius: 20px; width: 100%; max-width: 800px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; max-height: 90vh;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #334155; background: #0f172a;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: #d17d39;">crop</span>
+                            <span>Beskjær / Roter bilde</span>
+                        </h3>
+                        <button id="hkm-crop-close" style="background: #334155; border: none; color: #94a3b8; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                        </button>
+                    </div>
+
+                    <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f172a; min-height: 350px; position: relative;">
+                        <div style="max-height: 50vh; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 8px;">
+                            <img id="hkm-crop-target" src="${imageSrc}" style="max-width: 100%; max-height: 45vh; display: block;" crossOrigin="anonymous">
+                        </div>
+                    </div>
+
+                    <div style="padding: 16px 24px; background: #0f172a; border-top: 1px solid #334155; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;" class="hkm-crop-ratios">
+                            <button data-ratio="NaN" class="crop-ratio-btn active" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">Fri</button>
+                            <button data-ratio="1" class="crop-ratio-btn" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">1:1</button>
+                            <button data-ratio="1.7777777777777777" class="crop-ratio-btn" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">16:9</button>
+                            <button data-ratio="1.3333333333333333" class="crop-ratio-btn" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">4:3</button>
+                            <button data-ratio="1.5" class="crop-ratio-btn" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">3:2</button>
+                            <button data-ratio="0.6666666666666666" class="crop-ratio-btn" style="padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer;">2:3</button>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button id="hkm-crop-rotate-l" style="padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer; display: flex; align-items: center;" title="Roter venstre">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">rotate_left</span>
+                            </button>
+                            <button id="hkm-crop-rotate-r" style="padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer; display: flex; align-items: center;" title="Roter høyre">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">rotate_right</span>
+                            </button>
+                            <button id="hkm-crop-zoom-in" style="padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer; display: flex; align-items: center;" title="Zoom inn">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">zoom_in</span>
+                            </button>
+                            <button id="hkm-crop-zoom-out" style="padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; cursor: pointer; display: flex; align-items: center;" title="Zoom ut">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">zoom_out</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="padding: 16px 24px; border-top: 1px solid #334155; display: flex; justify-content: flex-end; gap: 12px; background: #0f172a;">
+                        <button id="hkm-crop-cancel" style="padding: 10px 18px; border-radius: 10px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 14px;">Avbryt</button>
+                        <button id="hkm-crop-save" style="padding: 10px 18px; border-radius: 10px; border: none; background: #1B4965; color: white; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                            <span>Lagre beskjæring</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (!document.getElementById('hkm-crop-styles')) {
+                const style = document.createElement('style');
+                style.id = 'hkm-crop-styles';
+                style.textContent = `
+                    .crop-ratio-btn { transition: all 0.2s ease; }
+                    .crop-ratio-btn:hover { background: #334155 !important; }
+                    .crop-ratio-btn.active { background: #d17d39 !important; border-color: #d17d39 !important; }
+                    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(cropModal);
+
+            const targetImg = document.getElementById('hkm-crop-target');
+            let cropper = null;
+
+            targetImg.onload = () => {
+                cropper = new window.Cropper(targetImg, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    background: false,
+                    responsive: true,
+                    checkOrientation: false
+                });
+            };
+
+            targetImg.onerror = () => {
+                targetImg.removeAttribute('crossOrigin');
+                cropper = new window.Cropper(targetImg, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    background: false,
+                    responsive: true
+                });
+            };
+
+            cropModal.querySelectorAll('.crop-ratio-btn').forEach(btn => {
+                btn.onclick = () => {
+                    cropModal.querySelectorAll('.crop-ratio-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const ratio = parseFloat(btn.dataset.ratio);
+                    if (cropper) {
+                        cropper.setAspectRatio(isNaN(ratio) ? NaN : ratio);
+                    }
+                };
+            });
+
+            document.getElementById('hkm-crop-rotate-l').onclick = () => cropper && cropper.rotate(-90);
+            document.getElementById('hkm-crop-rotate-r').onclick = () => cropper && cropper.rotate(90);
+            document.getElementById('hkm-crop-zoom-in').onclick = () => cropper && cropper.zoom(0.1);
+            document.getElementById('hkm-crop-zoom-out').onclick = () => cropper && cropper.zoom(-0.1);
+
+            const closeCrop = () => cropModal.remove();
+            document.getElementById('hkm-crop-close').onclick = closeCrop;
+            document.getElementById('hkm-crop-cancel').onclick = closeCrop;
+
+            document.getElementById('hkm-crop-save').onclick = async () => {
+                if (!cropper) return;
+                const saveBtn = document.getElementById('hkm-crop-save');
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 18px; animation: spin 1s linear infinite;">sync</span><span>Lagrer...</span>';
+
+                try {
+                    const canvas = cropper.getCroppedCanvas({
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high'
+                    });
+
+                    canvas.toBlob(async (blob) => {
+                        if (!blob) {
+                            alert("Kunne ikke generere beskåret bilde.");
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
+                            return;
+                        }
+
+                        const filename = `cropped_${Date.now()}.jpg`;
+                        const file = new File([blob], filename, { type: 'image/jpeg' });
+                        const path = `${folderPath}/${Date.now()}_${filename}`;
+                        
+                        const service = typeof firebaseService !== 'undefined' ? firebaseService : window.firebaseService;
+                        const url = await service.uploadImage(file, path);
+
+                        onCropped(url);
+                        closeCrop();
+                    }, 'image/jpeg', 0.92);
+                } catch (err) {
+                    console.error("Cropping failed:", err);
+                    alert("En feil oppstod under beskjæring: " + err.message);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
+                }
+            };
+        });
     }
 
     _hasMeaningfulEditorContent(editorData) {
