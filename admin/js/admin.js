@@ -5832,7 +5832,219 @@ class AdminManager {
             const ceBlock = imageWrapper.closest('.ce-block');
             const blockId = ceBlock?.dataset?.id;
 
-            // Create a temporary file input
+            this.showGlobalImageOptions(imageWrapper, container, editor, blockId, ceBlock, collectionId);
+        });
+    }
+
+    showGlobalImageOptions(imageWrapper, container, editor, blockId, ceBlock, collectionId) {
+        let overlay = document.getElementById('global-image-options-modal');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'global-image-options-modal';
+            overlay.className = 'profile-modal';
+            overlay.style.cssText = `
+                display: none;
+                z-index: 12000;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.6);
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(8px);
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        const imgElement = imageWrapper.querySelector('img') || imageWrapper.querySelector('.image-tool__image-picture') || imageWrapper;
+
+        // Parse current styles
+        const curWidth = imgElement.style.width || '100%';
+        const curHeight = imgElement.style.height || 'auto';
+        const curRadius = imgElement.style.borderRadius || '8px';
+        const curMargin = imgElement.style.margin || '';
+        
+        let curAlign = 'center';
+        if (curMargin.includes('auto 16px 0') || curMargin.includes('auto 0') || curMargin.endsWith(' 0')) {
+            curAlign = 'left';
+        } else if (curMargin.includes('0 16px auto') || curMargin.includes('0 auto')) {
+            curAlign = 'right';
+        }
+
+        overlay.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 480px; width: 92%; border-radius: 20px; background: white; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">photo_size_select_large</span>
+                        <span>Bildeinnstillinger & Størrelse</span>
+                    </h3>
+                    <button id="g-img-opt-close" style="background: #f1f5f9; border: none; color: #64748b; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                    </button>
+                </div>
+
+                <!-- STØRRELSE & FORM -->
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <!-- Bredde (Width) -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Bredde (Størrelse)</label>
+                            <span id="g-img-val-width" style="font-size: 12px; font-weight: 600; color: #d17d39;">${curWidth}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                            <button class="g-img-preset-btn" data-type="width" data-val="25%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">25%</button>
+                            <button class="g-img-preset-btn" data-type="width" data-val="50%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">50%</button>
+                            <button class="g-img-preset-btn" data-type="width" data-val="75%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">75%</button>
+                            <button class="g-img-preset-btn" data-type="width" data-val="100%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">100%</button>
+                        </div>
+                        <input type="range" id="g-img-slider-width" min="10" max="100" value="${parseInt(curWidth) || 100}" style="width: 100%; accent-color: #d17d39; cursor: pointer;">
+                    </div>
+
+                    <!-- Høyde (Height) -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Høyde</label>
+                            <span id="g-img-val-height" style="font-size: 12px; font-weight: 600; color: #d17d39;">${curHeight}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                            <button class="g-img-preset-btn" data-type="height" data-val="auto" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Auto</button>
+                            <button class="g-img-preset-btn" data-type="height" data-val="150px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">150px</button>
+                            <button class="g-img-preset-btn" data-type="height" data-val="250px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">250px</button>
+                            <button class="g-img-preset-btn" data-type="height" data-val="400px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">400px</button>
+                        </div>
+                    </div>
+
+                    <!-- Justering (Alignment) & Hjørner -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Plassering</label>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="g-img-preset-btn ${curAlign === 'left' ? 'active' : ''}" data-type="align" data-val="left" title="Venstre" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_left</span>
+                                </button>
+                                <button class="g-img-preset-btn ${curAlign === 'center' ? 'active' : ''}" data-type="align" data-val="center" title="Senter" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_center</span>
+                                </button>
+                                <button class="g-img-preset-btn ${curAlign === 'right' ? 'active' : ''}" data-type="align" data-val="right" title="Høyre" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_right</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Hjørner</label>
+                            <select id="g-img-select-radius" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: white;">
+                                <option value="0px" ${curRadius === '0px' ? 'selected' : ''}>Skarpe (0px)</option>
+                                <option value="8px" ${curRadius === '8px' || curRadius === '' ? 'selected' : ''}>Runde (8px)</option>
+                                <option value="16px" ${curRadius === '16px' ? 'selected' : ''}>Myke (16px)</option>
+                                <option value="24px" ${curRadius === '24px' ? 'selected' : ''}>Ekstra myke (24px)</option>
+                                <option value="50%" ${curRadius === '50%' ? 'selected' : ''}>Sirkel (50%)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BILDEKILDE ACTIONS -->
+                <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Bytt kilde eller slett</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button id="g-img-opt-upload" class="prompt-btn primary" style="background: #1B4965 !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">upload_file</span>
+                            <span>Last opp</span>
+                        </button>
+                        <button id="g-img-opt-unsplash" class="prompt-btn primary" style="background: #d17d39 !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span>
+                            <span>Unsplash</span>
+                        </button>
+                    </div>
+                    <button id="g-img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                        <span>Slett bilde</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        overlay.style.display = 'flex';
+
+        const closeOverlay = () => {
+            overlay.style.display = 'none';
+        };
+
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeOverlay();
+        };
+
+        const closeBtn = document.getElementById('g-img-opt-close');
+        if (closeBtn) closeBtn.onclick = closeOverlay;
+
+        // Helper to update styles
+        const updateStyle = (prop, val) => {
+            if (prop === 'width') {
+                imgElement.style.width = val;
+                imageWrapper.style.width = val;
+                document.getElementById('g-img-val-width').textContent = val;
+            } else if (prop === 'height') {
+                imgElement.style.height = val;
+                if (val !== 'auto') {
+                    imgElement.style.objectFit = 'cover';
+                } else {
+                    imgElement.style.objectFit = '';
+                }
+                document.getElementById('g-img-val-height').textContent = val;
+            } else if (prop === 'align') {
+                imgElement.style.display = 'block';
+                imageWrapper.style.display = 'block';
+                if (val === 'left') {
+                    imgElement.style.margin = '16px auto 16px 0';
+                    imageWrapper.style.margin = '16px auto 16px 0';
+                } else if (val === 'right') {
+                    imgElement.style.margin = '16px 0 16px auto';
+                    imageWrapper.style.margin = '16px 0 16px auto';
+                } else {
+                    imgElement.style.margin = '16px auto';
+                    imageWrapper.style.margin = '16px auto';
+                }
+            } else if (prop === 'radius') {
+                imgElement.style.borderRadius = val;
+            }
+        };
+
+        // Event listeners for width slider
+        const widthSlider = document.getElementById('g-img-slider-width');
+        if (widthSlider) {
+            widthSlider.oninput = (e) => {
+                updateStyle('width', `${e.target.value}%`);
+            };
+        }
+
+        // Event listeners for presets
+        overlay.querySelectorAll('.g-img-preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                const type = btn.dataset.type;
+                const val = btn.dataset.val;
+                if (type === 'width') {
+                    if (widthSlider) widthSlider.value = parseInt(val) || 100;
+                    updateStyle('width', val);
+                } else if (type === 'height') {
+                    updateStyle('height', val);
+                } else if (type === 'align') {
+                    overlay.querySelectorAll('.g-img-preset-btn[data-type="align"]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateStyle('align', val);
+                }
+            };
+        });
+
+        // Border radius select
+        const radiusSelect = document.getElementById('g-img-select-radius');
+        if (radiusSelect) {
+            radiusSelect.onchange = (e) => {
+                updateStyle('radius', e.target.value);
+            };
+        }
+
+        // Upload from device
+        document.getElementById('g-img-opt-upload').onclick = () => {
+            closeOverlay();
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = 'image/*';
@@ -5844,7 +6056,6 @@ class AdminManager {
                 fileInput.remove();
                 if (!file) return;
 
-                // Show loading state on the image
                 const picture = imageWrapper.querySelector('.image-tool__image-picture');
                 const preloader = imageWrapper.querySelector('.image-tool__image-preloader');
                 if (picture) { picture.style.opacity = '0.35'; picture.style.transition = 'opacity 0.2s'; }
@@ -5854,14 +6065,10 @@ class AdminManager {
                     const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
                     const url = await firebaseService.uploadImage(file, path);
 
-                    // Update the visible <img> immediately so user sees the change
-                    if (picture) {
-                        picture.src = url;
-                        picture.style.opacity = '1';
-                    }
+                    imgElement.src = url;
+                    if (picture) picture.style.opacity = '1';
                     if (preloader) preloader.style.display = 'none';
 
-                    // Update the internal Editor.js block data so the new URL is saved
                     if (blockId && editor?.blocks) {
                         try {
                             const savedOutput = await editor.save();
@@ -5875,10 +6082,8 @@ class AdminManager {
                                 };
                                 editor.blocks.update(blockId, updatedData);
                             }
-                        } catch (updateErr) {
-                            // Block update API may not be available in all EditorJS versions –
-                            // the visual update already happened, and save() will pick up the src.
-                            console.warn('[ImageReplace] Could not call blocks.update():', updateErr);
+                        } catch (err) {
+                            console.warn('[ImageReplace] Could not call blocks.update():', err);
                         }
                     }
 
@@ -5892,7 +6097,50 @@ class AdminManager {
             };
 
             fileInput.click();
-        });
+        };
+
+        // Unsplash
+        document.getElementById('g-img-opt-unsplash').onclick = () => {
+            closeOverlay();
+            if (window.unsplashManager) {
+                window.unsplashManager.open((selection) => {
+                    if (selection && selection.url) {
+                        imgElement.src = selection.url;
+                        if (blockId && editor?.blocks) {
+                            try {
+                                editor.save().then(savedOutput => {
+                                    const allBlockEls = container.querySelectorAll('.ce-block');
+                                    const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
+                                    if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
+                                        editor.blocks.update(blockId, {
+                                            ...savedOutput.blocks[blockIndex].data,
+                                            file: { url: selection.url }
+                                        });
+                                    }
+                                });
+                            } catch (e) {}
+                        }
+                        this.showToast('Bilde erstattet fra Unsplash!', 'success');
+                    }
+                });
+            } else {
+                this.showToast('Unsplash er ikke tilgjengelig.', 'warning');
+            }
+        };
+
+        // Delete image
+        document.getElementById('g-img-opt-delete').onclick = () => {
+            closeOverlay();
+            if (!confirm('Vil du fjerne dette bildet fra innholdet?')) return;
+            if (blockId && editor?.blocks && typeof editor.blocks.delete === 'function') {
+                try {
+                    const index = editor.blocks.getIndex(blockId);
+                    editor.blocks.delete(index);
+                    this.showToast('Bilde fjernet', 'success');
+                    return;
+                } catch (err) {}
+            }
+        };
     }
 
     _hasMeaningfulEditorContent(editorData) {
