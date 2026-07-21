@@ -3405,4 +3405,14 @@ body.builder-active .builder-workspace > .docs-toolbar {
     color: #fb923c !important; /* Amber links in dark mode */
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 

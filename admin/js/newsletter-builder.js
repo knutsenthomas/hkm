@@ -903,49 +903,154 @@ class NewsletterBuilder {
 
     openImageInsertionFlowAt(afterElement) {
         this.saveSelection();
-        let fileInput = document.getElementById('block-image-upload');
-        if (!fileInput) {
-            fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.id = 'block-image-upload';
-            fileInput.accept = 'image/*';
-            fileInput.style.display = 'none';
-            document.body.appendChild(fileInput);
-        }
-        const newFileInput = fileInput.cloneNode(true);
-        fileInput.parentNode.replaceChild(newFileInput, fileInput);
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('hkm-image-source-modal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'hkm-image-source-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            animation: fadeIn 0.2s ease-out;
+            font-family: 'Inter', sans-serif;
+        `;
+        
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 440px;
+            padding: 24px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        `;
+        
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0; font-size:18px; font-weight:800; color:#1e293b;">Sett inn bilde</h3>
+                <button type="button" id="hkm-close-img-modal" class="material-symbols-outlined" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; padding:4px; border-radius:50%; transition:background 0.2s;">close</button>
+            </div>
             
-        newFileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            try {
-                showToast("Laster opp bilde...", "info");
-                const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
-                const url = await window.firebaseService.uploadImage(file, uploadPath);
-                const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                <button type="button" id="hkm-img-source-upload" style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; padding:20px 12px; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <span class="material-symbols-outlined" style="font-size:32px; color:#d17d39;">upload_file</span>
+                    <span style="font-size:13px; font-weight:700; color:#1B4965;">Last opp fra enhet</span>
+                </button>
                 
-                const temp = document.createElement('div');
-                temp.innerHTML = imgHtml;
-                const container = document.getElementById('blocks-container');
-                if (container) {
-                    if (afterElement) {
-                        while (temp.firstChild) {
-                            container.insertBefore(temp.firstChild, afterElement);
-                        }
-                    } else {
-                        while (temp.firstChild) {
-                            container.appendChild(temp.firstChild);
-                        }
-                    }
-                    this.syncUnifiedBlocks();
-                }
-                showToast("Bilde lastet opp!", "success");
-            } catch (err) {
-                console.error("Upload failed:", err);
-                showToast("Opplasting feilet.", "error");
+                <button type="button" id="hkm-img-source-url" style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; padding:20px 12px; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <span class="material-symbols-outlined" style="font-size:32px; color:#1B4965;">link</span>
+                    <span style="font-size:13px; font-weight:700; color:#1B4965;">Sett inn med lenke</span>
+                </button>
+            </div>
+            
+            <div id="hkm-url-input-container" style="display:none; flex-direction:column; gap:12px; border-top:1px solid #e2e8f0; padding-top:16px; animation: slideDown 0.2s ease;">
+                <label style="font-size:12px; font-weight:700; color:#64748b;">BILDE-URL (Lenke til bilde på nett)</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="url" id="hkm-img-url-field" placeholder="https://eksempel.no/bilde.jpg" style="flex:1; padding:10px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; outline:none;" />
+                    <button type="button" id="hkm-submit-img-url" style="background:#1B4965; color:white; border:none; border-radius:8px; padding:10px 16px; font-weight:700; font-size:14px; cursor:pointer; transition:background 0.2s;">Sett inn</button>
+                </div>
+            </div>
+        `;
+        
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+        
+        // Trigger scale animation
+        setTimeout(() => { card.style.transform = 'scale(1)'; }, 10);
+        
+        // Close modal helper
+        const closeModal = () => {
+            card.style.transform = 'scale(0.95)';
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 200);
+        };
+        
+        // Event Listeners
+        modal.querySelector('#hkm-close-img-modal').addEventListener('click', closeModal);
+        
+        const uploadBtn = modal.querySelector('#hkm-img-source-upload');
+        const urlBtn = modal.querySelector('#hkm-img-source-url');
+        
+        uploadBtn.onmouseenter = () => { uploadBtn.style.borderColor = '#d17d39'; uploadBtn.style.background = '#fffbeb'; };
+        uploadBtn.onmouseleave = () => { uploadBtn.style.borderColor = '#cbd5e1'; uploadBtn.style.background = '#f8fafc'; };
+        
+        urlBtn.onmouseenter = () => { urlBtn.style.borderColor = '#1B4965'; urlBtn.style.background = '#f0f9ff'; };
+        urlBtn.onmouseleave = () => { urlBtn.style.borderColor = '#cbd5e1'; urlBtn.style.background = '#f8fafc'; };
+        
+        // Handle device upload click
+        uploadBtn.addEventListener('click', () => {
+            closeModal();
+            let fileInput = document.getElementById('block-image-upload');
+            if (!fileInput) {
+                fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.id = 'block-image-upload';
+                fileInput.accept = 'image/*';
+                fileInput.style.display = 'none';
+                document.body.appendChild(fileInput);
             }
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+            
+            newFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.uploadAndInsertImageFileAt(file, afterElement);
+                }
+            });
+            newFileInput.click();
         });
-        newFileInput.click();
+        
+        // Handle URL insertion option click
+        urlBtn.addEventListener('click', () => {
+            const urlContainer = modal.querySelector('#hkm-url-input-container');
+            urlContainer.style.display = 'flex';
+            modal.querySelector('#hkm-img-url-field').focus();
+        });
+        
+        // Handle Submit Image URL click
+        modal.querySelector('#hkm-submit-img-url').addEventListener('click', () => {
+            const url = modal.querySelector('#hkm-img-url-field').value.trim();
+            if (!url) {
+                showToast("Vennligst oppgi en gyldig nettadresse.", "error");
+                return;
+            }
+            
+            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+            const temp = document.createElement('div');
+            temp.innerHTML = imgHtml;
+            const container = document.getElementById('blocks-container');
+            if (container) {
+                if (afterElement) {
+                    while (temp.firstChild) {
+                        container.insertBefore(temp.firstChild, afterElement);
+                    }
+                } else {
+                    while (temp.firstChild) {
+                        container.appendChild(temp.firstChild);
+                    }
+                }
+                this.syncUnifiedBlocks();
+                this.triggerAutosave();
+            }
+            closeModal();
+            showToast("Bilde satt inn!", "success");
+        });
     }
 
     addBlock(type) {
