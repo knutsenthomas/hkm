@@ -2080,7 +2080,7 @@ class NewsletterBuilder {
                 imgElement.setAttribute('src', newUrl);
                 this.syncUnifiedBlocks();
                 showToast("Bilde beskjært!", "success");
-            }, 'newsletter');
+            }, 'newsletter/images');
         };
 
         // Option 4: Delete image

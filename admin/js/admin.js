@@ -6512,7 +6512,7 @@ class AdminManager {
                     } catch (e) {}
                 }
                 this.showToast('Bilde beskjært!', 'success');
-            }, collectionId || 'pages');
+            }, 'editor/' + (collectionId || 'pages'));
         };
 
         // Delete image
