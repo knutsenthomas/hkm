@@ -2011,6 +2011,7 @@ class NewsletterBuilder {
                     const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
                     const url = await window.firebaseService.uploadImage(file, uploadPath);
                     imgElement.src = url;
+                    imgElement.setAttribute('src', url);
                     this.syncUnifiedBlocks();
                     showToast("Bilde erstattet!", "success");
                 } catch (err) {
@@ -2028,6 +2029,7 @@ class NewsletterBuilder {
                 window.unsplashManager.open((selection) => {
                     if (selection && selection.url) {
                         imgElement.src = selection.url;
+                        imgElement.setAttribute('src', selection.url);
                         this.syncUnifiedBlocks();
                         showToast("Bilde erstattet fra Unsplash!", "success");
                     }
@@ -2054,6 +2056,7 @@ class NewsletterBuilder {
 
                         if (result.data && result.data.imageUrl) {
                             imgElement.src = result.data.imageUrl;
+                            imgElement.setAttribute('src', result.data.imageUrl);
                             this.syncUnifiedBlocks();
                             showToast("Bilde erstattet med AI-generert bilde!", "success");
                         }

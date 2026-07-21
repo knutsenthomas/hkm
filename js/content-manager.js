@@ -5376,7 +5376,16 @@ class ContentManager {
                             const imageUrl = data?.file?.url || data?.url || '';
                             if (!imageUrl) return '';
                             const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
-                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}" loading="lazy">${caption}</figure>`;
+                            let imgStyle = '';
+                            if (data.width) imgStyle += `width:${data.width};`;
+                            if (data.height) imgStyle += `height:${data.height};`;
+                            if (data.objectFit) imgStyle += `object-fit:${data.objectFit};`;
+                            if (data.objectPosition) imgStyle += `object-position:${data.objectPosition};`;
+                            if (data.borderRadius) imgStyle += `border-radius:${data.borderRadius};`;
+                            if (data.margin) imgStyle += `margin:${data.margin};`;
+                            if (data.customStyle) imgStyle += data.customStyle;
+                            const styleAttr = imgStyle ? ` style="${imgStyle}"` : '';
+                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}"${styleAttr} loading="lazy">${caption}</figure>`;
                         }
                         case 'quote':
                             return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>${data.caption}</cite>` : ''}</blockquote>`;

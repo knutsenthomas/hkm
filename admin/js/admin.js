@@ -5833,7 +5833,25 @@ class AdminManager {
             const blockId = ceBlock?.dataset?.id;
 
             const img = imageWrapper.querySelector('img') || imageWrapper.querySelector('.image-tool__image-picture') || imageWrapper;
-            this.activateImageResizer(img, () => {}, () => {
+            this.activateImageResizer(img, () => {
+                if (blockId && editor?.blocks && typeof editor.save === 'function') {
+                    editor.save().then(savedOutput => {
+                        const allBlockEls = container.querySelectorAll('.ce-block');
+                        const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
+                        if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
+                            editor.blocks.update(blockId, {
+                                ...savedOutput.blocks[blockIndex].data,
+                                width: img.style.width,
+                                height: img.style.height,
+                                objectFit: img.style.objectFit,
+                                objectPosition: img.style.objectPosition,
+                                borderRadius: img.style.borderRadius,
+                                margin: img.style.margin
+                            });
+                        }
+                    }).catch(() => {});
+                }
+            }, () => {
                 this.showGlobalImageOptions(imageWrapper, container, editor, blockId, ceBlock, collectionId);
             });
         });
@@ -6225,12 +6243,40 @@ class AdminManager {
                 const focusValEl = document.getElementById('g-img-val-focus');
                 if (focusValEl) focusValEl.textContent = `${val}%`;
             }
+
+            // Save styles to EditorJS block data!
+            if (blockId && editor?.blocks && typeof editor.save === 'function') {
+                try {
+                    editor.save().then(savedOutput => {
+                        const allBlockEls = container.querySelectorAll('.ce-block');
+                        const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
+                        if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
+                            const updatedData = {
+                                ...savedOutput.blocks[blockIndex].data,
+                                width: imgElement.style.width,
+                                height: imgElement.style.height,
+                                objectFit: imgElement.style.objectFit,
+                                objectPosition: imgElement.style.objectPosition,
+                                borderRadius: imgElement.style.borderRadius,
+                                margin: imgElement.style.margin
+                            };
+                            editor.blocks.update(blockId, updatedData);
+                        }
+                    });
+                } catch (e) {}
+            }
         };
 
         // Event listeners for width slider
         const widthSlider = document.getElementById('g-img-slider-width');
         if (widthSlider) {
             widthSlider.oninput = (e) => {
+                imgElement.style.width = `${e.target.value}%`;
+                imageWrapper.style.width = `${e.target.value}%`;
+                const valEl = document.getElementById('g-img-val-width');
+                if (valEl) valEl.textContent = `${e.target.value}%`;
+            };
+            widthSlider.onchange = (e) => {
                 updateStyle('width', `${e.target.value}%`);
             };
         }
@@ -6239,6 +6285,12 @@ class AdminManager {
         const focusSlider = document.getElementById('g-img-slider-focus');
         if (focusSlider) {
             focusSlider.oninput = (e) => {
+                imgElement.style.objectPosition = `50% ${e.target.value}%`;
+                imgElement.style.objectFit = 'cover';
+                const focusValEl = document.getElementById('g-img-val-focus');
+                if (focusValEl) focusValEl.textContent = `${e.target.value}%`;
+            };
+            focusSlider.onchange = (e) => {
                 updateStyle('focus', e.target.value);
             };
         }
@@ -6302,8 +6354,19 @@ class AdminManager {
                     const url = await firebaseService.uploadImage(file, path);
 
                     imgElement.src = url;
+                    imgElement.setAttribute('src', url);
                     if (picture) picture.style.opacity = '1';
                     if (preloader) preloader.style.display = 'none';
+
+                    const currentStyles = {
+                        width: imgElement.style.width,
+                        height: imgElement.style.height,
+                        objectFit: imgElement.style.objectFit,
+                        objectPosition: imgElement.style.objectPosition,
+                        borderRadius: imgElement.style.borderRadius,
+                        margin: imgElement.style.margin,
+                        display: imgElement.style.display
+                    };
 
                     if (blockId && editor?.blocks) {
                         try {
@@ -6314,9 +6377,21 @@ class AdminManager {
                             if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
                                 const updatedData = {
                                     ...savedOutput.blocks[blockIndex].data,
+                                    ...currentStyles,
                                     file: { url }
                                 };
-                                editor.blocks.update(blockId, updatedData);
+                                await editor.blocks.update(blockId, updatedData);
+                                setTimeout(() => {
+                                    const newBlock = container.querySelector(`.ce-block[data-id="${blockId}"]`);
+                                    if (newBlock) {
+                                        const newImg = newBlock.querySelector('img') || newBlock.querySelector('.image-tool__image-picture');
+                                        if (newImg) {
+                                            newImg.src = url;
+                                            newImg.setAttribute('src', url);
+                                            Object.assign(newImg.style, currentStyles);
+                                        }
+                                    }
+                                }, 50);
                             }
                         } catch (err) {
                             console.warn('[ImageReplace] Could not call blocks.update():', err);
@@ -6341,17 +6416,42 @@ class AdminManager {
             if (window.unsplashManager) {
                 window.unsplashManager.open((selection) => {
                     if (selection && selection.url) {
-                        imgElement.src = selection.url;
+                        const url = selection.url;
+                        imgElement.src = url;
+                        imgElement.setAttribute('src', url);
+
+                        const currentStyles = {
+                            width: imgElement.style.width,
+                            height: imgElement.style.height,
+                            objectFit: imgElement.style.objectFit,
+                            objectPosition: imgElement.style.objectPosition,
+                            borderRadius: imgElement.style.borderRadius,
+                            margin: imgElement.style.margin,
+                            display: imgElement.style.display
+                        };
+
                         if (blockId && editor?.blocks) {
                             try {
-                                editor.save().then(savedOutput => {
+                                editor.save().then(async (savedOutput) => {
                                     const allBlockEls = container.querySelectorAll('.ce-block');
                                     const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
                                     if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
-                                        editor.blocks.update(blockId, {
+                                        await editor.blocks.update(blockId, {
                                             ...savedOutput.blocks[blockIndex].data,
-                                            file: { url: selection.url }
+                                            ...currentStyles,
+                                            file: { url }
                                         });
+                                        setTimeout(() => {
+                                            const newBlock = container.querySelector(`.ce-block[data-id="${blockId}"]`);
+                                            if (newBlock) {
+                                                const newImg = newBlock.querySelector('img') || newBlock.querySelector('.image-tool__image-picture');
+                                                if (newImg) {
+                                                    newImg.src = url;
+                                                    newImg.setAttribute('src', url);
+                                                    Object.assign(newImg.style, currentStyles);
+                                                }
+                                            }
+                                        }, 50);
                                     }
                                 });
                             } catch (e) {}
