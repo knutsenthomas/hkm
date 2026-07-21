@@ -6718,6 +6718,206 @@ class AdminManager {
         });
     }
 
+    openProductLinkModal(onLinkSelected) {
+        // Save selection range
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0);
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'hkm-product-link-modal';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 999999; backdrop-filter: blur(8px); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #f1f5f9;
+        `;
+        modal.innerHTML = `
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 16px; width: 90%; max-width: 500px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 85vh;">
+                <div style="padding: 16px 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #0f172a;">
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">link</span>
+                        <span>Sett inn lenke / produkt</span>
+                    </h3>
+                    <button id="hkm-link-close" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 6px; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
+                
+                <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; flex: 1;" class="hkm-modal-body">
+                    <!-- URL input -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #94a3b8;">Nettadresse (URL)</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="text" id="hkm-link-url-input" style="width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="https://..." value="https://">
+                        </div>
+                    </div>
+                    
+                    <!-- Search input -->
+                    <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #334155; padding-top: 16px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #94a3b8;">Søk etter produkt i His Kingdom Designs</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <span class="material-symbols-outlined" style="position: absolute; left: 10px; color: #94a3b8; font-size: 18px;">search</span>
+                            <input type="text" id="hkm-link-search-input" style="width: 100%; padding: 10px 12px 10px 34px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 14px; outline: none; transition: border-color 0.2s;" placeholder="Søk på kopper, gensere, plakater...">
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="hkm-link-results" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px;">
+                        <div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Skriv i søkefeltet over for å søke etter produkter.</div>
+                    </div>
+                </div>
+
+                <div style="padding: 16px 20px; border-top: 1px solid #334155; display: flex; justify-content: flex-end; gap: 12px; background: #0f172a;">
+                    <button id="hkm-link-cancel" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">Avbryt</button>
+                    <button id="hkm-link-submit" style="padding: 8px 16px; border-radius: 8px; border: none; background: #1B4965; color: white; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <span>Sett inn lenke</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (!document.getElementById('hkm-link-modal-styles')) {
+            const style = document.createElement('style');
+            style.id = 'hkm-link-modal-styles';
+            style.textContent = `
+                .hkm-link-product-item:hover { background: #334155 !important; border-color: #475569 !important; }
+                #hkm-link-close:hover { background: #334155 !important; color: white !important; }
+                #hkm-link-url-input:focus, #hkm-link-search-input:focus { border-color: #d17d39 !important; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        document.body.appendChild(modal);
+
+        const searchInput = modal.querySelector('#hkm-link-search-input');
+        const resultsContainer = modal.querySelector('#hkm-link-results');
+        const urlInput = modal.querySelector('#hkm-link-url-input');
+
+        let productsList = [];
+        const loadProducts = async () => {
+            if (window.hkmWixProductsCache) {
+                productsList = window.hkmWixProductsCache;
+                return;
+            }
+            try {
+                const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products');
+                const data = await res.json();
+                if (data.success && Array.isArray(data.products)) {
+                    window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
+                    productsList = window.hkmWixProductsCache;
+                }
+            } catch (err) {
+                console.error("Failed to fetch wix products for link selector:", err);
+            }
+        };
+
+        const escapeHtml = (str) => {
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
+        const updateResults = () => {
+            const query = searchInput.value.toLowerCase().trim();
+            if (!query) {
+                resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Skriv i søkefeltet over for å søke etter produkter.</div>';
+                return;
+            }
+
+            let searchTerms = [query];
+            if (query.includes('kopp') || query.includes('krus') || query.includes('mug') || query.includes('cup')) {
+                searchTerms = ['kopp', 'krus', 'mug', 'cup', 'enamel', 'ceramic'];
+            } else if (query.includes('genser') || query.includes('hoodie') || query.includes('hettejakke') || query.includes('hettegenser') || query.includes('zip')) {
+                searchTerms = ['genser', 'hoodie', 'sweater', 'hettejakke', 'zip', 'hettegenser'];
+            } else if (query.includes('t-skjorte') || query.includes('tskjorte') || query.includes('t-shirt') || query.includes('tee') || (query.includes('skjorte') && !query.includes('hette'))) {
+                searchTerms = ['t-skjorte', 't-shirt', 'tee', 'skjorte'];
+            } else if (query.includes('plakat') || query.includes('poster') || query.includes('trykk')) {
+                searchTerms = ['plakat', 'poster', 'trykk', 'print'];
+            } else if (query.includes('klistremerke') || query.includes('sticker')) {
+                searchTerms = ['klistremerke', 'sticker'];
+            } else if (query.includes('bag') || query.includes('veske') || query.includes('tote')) {
+                searchTerms = ['bag', 'veske', 'tote', 'handlenett'];
+            } else if (query.includes('bok') || query.includes('book') || query.includes('fargelegg')) {
+                searchTerms = ['bok', 'book', 'fargelegg', 'coloring'];
+            }
+
+            const filtered = productsList.filter(p => {
+                const nameLower = (p.name || '').toLowerCase();
+                const descLower = (p.description || '').toLowerCase();
+                return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term)) || nameLower.includes(query);
+            });
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `<div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">Ingen produkter funnet for "${escapeHtml(query)}"</div>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = filtered.map(p => {
+                const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const url = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
+                const img = p.imageUrl 
+                    ? `<img src="${p.imageUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #334155;" />`
+                    : `<div style="width: 40px; height: 40px; border-radius: 6px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 16px;">🛍️</div>`;
+                return `
+                    <div class="hkm-link-product-item" data-url="${url}" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                        ${img}
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</span>
+                            <span style="font-size: 11px; color: #d17d39; font-weight: 700;">kr ${p.price},-</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    </div>
+                `;
+            }).join('');
+
+            resultsContainer.querySelectorAll('.hkm-link-product-item').forEach(item => {
+                item.onclick = () => {
+                    const productUrl = item.dataset.url;
+                    urlInput.value = productUrl;
+                    urlInput.style.borderColor = '#d17d39';
+                    setTimeout(() => {
+                        urlInput.style.borderColor = '#334155';
+                    }, 300);
+                };
+            });
+        };
+
+        loadProducts().then(() => {
+            if (searchInput.value) updateResults();
+        });
+
+        const submit = () => {
+            const finalUrl = urlInput.value.trim();
+            if (!finalUrl || finalUrl === 'https://') {
+                alert('Vennligst oppgi en gyldig nettadresse.');
+                return;
+            }
+            if (savedRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(savedRange);
+            }
+            modal.remove();
+            onLinkSelected(finalUrl);
+        };
+
+        modal.querySelector('#hkm-link-submit').onclick = submit;
+        urlInput.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
+
+        let debounceTimer;
+        searchInput.oninput = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updateResults, 200);
+        };
+
+        const close = () => modal.remove();
+        modal.querySelector('#hkm-link-close').onclick = close;
+        modal.querySelector('#hkm-link-cancel').onclick = close;
+
+        setTimeout(() => searchInput.focus(), 50);
+    }
+
     _hasMeaningfulEditorContent(editorData) {
         const blocks = Array.isArray(editorData?.blocks) ? editorData.blocks : [];
         if (!blocks.length) return false;
@@ -11391,8 +11591,9 @@ class AdminManager {
                             window.alert('Marker tekst før du legger til lenke.');
                             return;
                         }
-                        const url = window.prompt('Skriv inn URL:', 'https://');
-                        if (url) exec('createLink', url);
+                        this.openProductLinkModal((url) => {
+                            exec('createLink', url);
+                        });
                     }
                 };
 
