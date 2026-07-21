@@ -1556,51 +1556,195 @@ class NewsletterBuilder {
                 justify-content: center;
                 backdrop-filter: blur(8px);
             `;
-            
-            overlay.innerHTML = `
-                <div class="profile-modal-content card modern" style="max-width: 400px; width: 90%; border-radius: 20px; background: white; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                    <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 20px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">image</span>
-                        <span>Håndter bilde</span>
-                    </h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button id="img-opt-upload" class="prompt-btn primary" style="background: #1B4965 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">upload_file</span>
-                            <span>Last opp fra enhet</span>
-                        </button>
-                        <button id="img-opt-unsplash" class="prompt-btn primary" style="background: #d17d39 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">image_search</span>
-                            <span>Finn på Unsplash</span>
-                        </button>
-                        <button id="img-opt-ai" class="prompt-btn primary" style="background: linear-gradient(135deg, #bd4f2a, #d17d39) !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">auto_awesome</span>
-                            <span>Generer med AI</span>
-                        </button>
-                        <button id="img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">delete</span>
-                            <span>Slett bilde</span>
-                        </button>
-                        <button id="img-opt-cancel" class="prompt-btn secondary" style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; font-size: 14px; background: white;">
-                            <span>Avbryt</span>
-                        </button>
-                    </div>
-                </div>
-            `;
             document.body.appendChild(overlay);
         }
+
+        // Parse current image styles
+        const curWidth = imgElement.style.width || '100%';
+        const curHeight = imgElement.style.height || 'auto';
+        const curObjectFit = imgElement.style.objectFit || 'cover';
+        const curRadius = imgElement.style.borderRadius || '8px';
+        const curMargin = imgElement.style.margin || '';
         
+        let curAlign = 'center';
+        if (curMargin.includes('auto 16px 0') || curMargin.includes('auto 0') || curMargin.endsWith(' 0')) {
+            curAlign = 'left';
+        } else if (curMargin.includes('0 16px auto') || curMargin.includes('0 auto')) {
+            curAlign = 'right';
+        }
+
+        overlay.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 480px; width: 92%; border-radius: 20px; background: white; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">photo_size_select_large</span>
+                        <span>Bildeinnstillinger & Størrelse</span>
+                    </h3>
+                    <button id="img-opt-close" style="background: #f1f5f9; border: none; color: #64748b; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                    </button>
+                </div>
+
+                <!-- STØRRELSE & FORM -->
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <!-- Bredde (Width) -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Bredde (Størrelse)</label>
+                            <span id="img-val-width" style="font-size: 12px; font-weight: 600; color: #d17d39;">${curWidth}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                            <button class="img-preset-btn" data-type="width" data-val="25%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">25%</button>
+                            <button class="img-preset-btn" data-type="width" data-val="50%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">50%</button>
+                            <button class="img-preset-btn" data-type="width" data-val="75%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">75%</button>
+                            <button class="img-preset-btn" data-type="width" data-val="100%" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">100%</button>
+                        </div>
+                        <input type="range" id="img-slider-width" min="10" max="100" value="${parseInt(curWidth) || 100}" style="width: 100%; accent-color: #d17d39; cursor: pointer;">
+                    </div>
+
+                    <!-- Høyde (Height) -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Høyde</label>
+                            <span id="img-val-height" style="font-size: 12px; font-weight: 600; color: #d17d39;">${curHeight}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                            <button class="img-preset-btn" data-type="height" data-val="auto" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Auto</button>
+                            <button class="img-preset-btn" data-type="height" data-val="150px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">150px</button>
+                            <button class="img-preset-btn" data-type="height" data-val="250px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">250px</button>
+                            <button class="img-preset-btn" data-type="height" data-val="400px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">400px</button>
+                        </div>
+                    </div>
+
+                    <!-- Justering (Alignment) & Hjørner -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Plassering</label>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="img-preset-btn ${curAlign === 'left' ? 'active' : ''}" data-type="align" data-val="left" title="Venstre" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_left</span>
+                                </button>
+                                <button class="img-preset-btn ${curAlign === 'center' ? 'active' : ''}" data-type="align" data-val="center" title="Senter" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_center</span>
+                                </button>
+                                <button class="img-preset-btn ${curAlign === 'right' ? 'active' : ''}" data-type="align" data-val="right" title="Høyre" style="flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">format_align_right</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Hjørner</label>
+                            <select id="img-select-radius" style="width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; background: white;">
+                                <option value="0px" ${curRadius === '0px' ? 'selected' : ''}>Skarpe (0px)</option>
+                                <option value="8px" ${curRadius === '8px' || curRadius === '' ? 'selected' : ''}>Runde (8px)</option>
+                                <option value="16px" ${curRadius === '16px' ? 'selected' : ''}>Myke (16px)</option>
+                                <option value="24px" ${curRadius === '24px' ? 'selected' : ''}>Ekstra myke (24px)</option>
+                                <option value="50%" ${curRadius === '50%' ? 'selected' : ''}>Sirkel (50%)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BILDEKILDE ACTIONS -->
+                <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Bytt kilde eller slett</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button id="img-opt-upload" class="prompt-btn primary" style="background: #1B4965 !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">upload_file</span>
+                            <span>Last opp</span>
+                        </button>
+                        <button id="img-opt-unsplash" class="prompt-btn primary" style="background: #d17d39 !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span>
+                            <span>Unsplash</span>
+                        </button>
+                    </div>
+                    <button id="img-opt-ai" class="prompt-btn primary" style="background: linear-gradient(135deg, #bd4f2a, #d17d39) !important; border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: white; font-weight: 600; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+                        <span>Generer med AI</span>
+                    </button>
+                    <button id="img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-weight: 600; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                        <span>Slett bilde</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
         overlay.style.display = 'flex';
-        
+
         const closeOverlay = () => {
             overlay.style.display = 'none';
         };
-        
+
         overlay.onclick = (e) => {
             if (e.target === overlay) closeOverlay();
         };
-        
-        document.getElementById('img-opt-cancel').onclick = closeOverlay;
-        
+
+        const closeBtn = document.getElementById('img-opt-close');
+        if (closeBtn) closeBtn.onclick = closeOverlay;
+
+        // Helper to update image styles and sync
+        const updateImgStyle = (prop, val) => {
+            if (prop === 'width') {
+                imgElement.style.width = val;
+                document.getElementById('img-val-width').textContent = val;
+            } else if (prop === 'height') {
+                imgElement.style.height = val;
+                if (val !== 'auto') {
+                    imgElement.style.objectFit = 'cover';
+                } else {
+                    imgElement.style.objectFit = '';
+                }
+                document.getElementById('img-val-height').textContent = val;
+            } else if (prop === 'align') {
+                imgElement.style.display = 'block';
+                if (val === 'left') {
+                    imgElement.style.margin = '16px auto 16px 0';
+                } else if (val === 'right') {
+                    imgElement.style.margin = '16px 0 16px auto';
+                } else {
+                    imgElement.style.margin = '16px auto';
+                }
+            } else if (prop === 'radius') {
+                imgElement.style.borderRadius = val;
+            }
+            this.syncUnifiedBlocks();
+        };
+
+        // Event listeners for width slider
+        const widthSlider = document.getElementById('img-slider-width');
+        if (widthSlider) {
+            widthSlider.oninput = (e) => {
+                updateImgStyle('width', `${e.target.value}%`);
+            };
+        }
+
+        // Event listeners for presets
+        overlay.querySelectorAll('.img-preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                const type = btn.dataset.type;
+                const val = btn.dataset.val;
+                if (type === 'width') {
+                    if (widthSlider) widthSlider.value = parseInt(val) || 100;
+                    updateImgStyle('width', val);
+                } else if (type === 'height') {
+                    updateImgStyle('height', val);
+                } else if (type === 'align') {
+                    overlay.querySelectorAll('.img-preset-btn[data-type="align"]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateImgStyle('align', val);
+                }
+            };
+        });
+
+        // Border radius select
+        const radiusSelect = document.getElementById('img-select-radius');
+        if (radiusSelect) {
+            radiusSelect.onchange = (e) => {
+                updateImgStyle('radius', e.target.value);
+            };
+        }
+
         // Option 1: Upload from device
         document.getElementById('img-opt-upload').onclick = () => {
             closeOverlay();
@@ -1634,7 +1778,7 @@ class NewsletterBuilder {
             });
             newFileInput.click();
         };
-        
+
         // Option 2: Search Unsplash
         document.getElementById('img-opt-unsplash').onclick = () => {
             closeOverlay();
@@ -1650,7 +1794,7 @@ class NewsletterBuilder {
                 showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
             }
         };
-        
+
         // Option 3: Generate with AI
         document.getElementById('img-opt-ai').onclick = () => {
             closeOverlay();
@@ -1678,7 +1822,7 @@ class NewsletterBuilder {
                 }
             );
         };
-        
+
         // Option 4: Delete image
         document.getElementById('img-opt-delete').onclick = async () => {
             closeOverlay();
