@@ -268,8 +268,16 @@ class NewsletterBuilder {
             });
         });
 
-        // Block Tool Clicks
+        // Block Tool Clicks & Drag and Drop Setup
         document.querySelectorAll('.element-card').forEach(btn => {
+            btn.setAttribute('draggable', 'true');
+            btn.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('hkm-block-type', btn.dataset.type);
+                btn.style.opacity = '0.5';
+            });
+            btn.addEventListener('dragend', () => {
+                btn.style.opacity = '';
+            });
             btn.addEventListener('mousedown', () => {
                 this.saveSelection();
             });
@@ -288,7 +296,7 @@ class NewsletterBuilder {
             });
         });
 
-        // Unified Editor Reactivity
+        // Unified Editor Reactivity & Drop Zone
         const container = document.getElementById('blocks-container');
         if (container) {
             container.addEventListener('input', () => this.syncUnifiedBlocks());
@@ -308,6 +316,49 @@ class NewsletterBuilder {
                     this.activateButtonManager(btn);
                     return;
                 }
+            });
+
+            // Drag and drop events
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = this.getDragAfterElement(container, e.clientY);
+                
+                let indicator = container.querySelector('.hkm-drop-indicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.className = 'hkm-drop-indicator';
+                    indicator.style.cssText = `
+                        height: 4px;
+                        background: #d17d39;
+                        border-radius: 2px;
+                        margin: 12px 0;
+                        transition: all 0.15s ease;
+                        pointer-events: none;
+                    `;
+                }
+                
+                if (afterElement) {
+                    container.insertBefore(indicator, afterElement);
+                } else {
+                    container.appendChild(indicator);
+                }
+            });
+            
+            container.addEventListener('dragleave', () => {
+                const indicator = container.querySelector('.hkm-drop-indicator');
+                if (indicator) indicator.remove();
+            });
+            
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const indicator = container.querySelector('.hkm-drop-indicator');
+                if (indicator) indicator.remove();
+                
+                const type = e.dataTransfer.getData('hkm-block-type');
+                if (!type) return;
+                
+                const afterElement = this.getDragAfterElement(container, e.clientY);
+                this.insertBlockAt(type, afterElement);
             });
         }
 
@@ -544,6 +595,10 @@ class NewsletterBuilder {
     }
 
     openImageInsertionFlow() {
+        this.openImageInsertionFlowAt(null);
+    }
+
+    openImageInsertionFlowAt(afterElement) {
         this.saveSelection();
         let fileInput = document.getElementById('block-image-upload');
         if (!fileInput) {
@@ -557,22 +612,37 @@ class NewsletterBuilder {
         const newFileInput = fileInput.cloneNode(true);
         fileInput.parentNode.replaceChild(newFileInput, fileInput);
             
-            newFileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                try {
-                    showToast("Laster opp bilde...", "info");
-                    const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
-                    const url = await window.firebaseService.uploadImage(file, uploadPath);
-                    const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
-                    this.exec('insertHTML', imgHtml);
-                    showToast("Bilde lastet opp!", "success");
-                } catch (err) {
-                    console.error("Upload failed:", err);
-                    showToast("Opplasting feilet.", "error");
+        newFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                showToast("Laster opp bilde...", "info");
+                const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                const url = await window.firebaseService.uploadImage(file, uploadPath);
+                const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                
+                const temp = document.createElement('div');
+                temp.innerHTML = imgHtml;
+                const container = document.getElementById('blocks-container');
+                if (container) {
+                    if (afterElement) {
+                        while (temp.firstChild) {
+                            container.insertBefore(temp.firstChild, afterElement);
+                        }
+                    } else {
+                        while (temp.firstChild) {
+                            container.appendChild(temp.firstChild);
+                        }
+                    }
+                    this.syncUnifiedBlocks();
                 }
-            });
-            newFileInput.click();
+                showToast("Bilde lastet opp!", "success");
+            } catch (err) {
+                console.error("Upload failed:", err);
+                showToast("Opplasting feilet.", "error");
+            }
+        });
+        newFileInput.click();
     }
 
     addBlock(type) {
@@ -626,6 +696,89 @@ class NewsletterBuilder {
         if (html) {
             this.exec('insertHTML', html);
         }
+    }
+
+    insertBlockAt(type, afterElement) {
+        let html = '';
+        switch (type) {
+            case 'header':
+                html = `<h1>Overskrift her</h1>`;
+                break;
+            case 'text':
+                html = `<p>Skriv din tekst her...</p>`;
+                break;
+            case 'divider':
+                html = `<hr style="border: none; border-top: 2px solid #e2e8f0; margin: 24px 0;">`;
+                break;
+            case 'spacer':
+                html = `<div style="height: 24px;"></div>`;
+                break;
+            case 'button':
+                const label = prompt("Knapptekst:", "Les mer");
+                if (!label) return;
+                const url = prompt("Knapp-URL (f.eks. nettside eller e-post):", "https://");
+                if (!url) return;
+                html = `
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="${url}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
+                    </div><p><br></p>`;
+                break;
+            case 'columns':
+                html = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
+                        <div style="min-height: 50px;">Venstre kolonne...</div>
+                        <div style="min-height: 50px;">Høyre kolonne...</div>
+                    </div><p><br></p>`;
+                break;
+            case 'image':
+                this.openImageInsertionFlowAt(afterElement);
+                return;
+            case 'logo':
+                this.openImageInsertionFlowAt(afterElement);
+                return;
+            case 'social':
+                html = `
+                    <div style="text-align: center; margin: 24px 0; display: flex; justify-content: center; gap: 16px;">
+                        <a href="https://facebook.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Facebook</a>
+                        <a href="https://instagram.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Instagram</a>
+                        <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
+                    </div><p><br></p>`;
+                break;
+            default:
+                return;
+        }
+
+        if (html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const container = document.getElementById('blocks-container');
+            if (container) {
+                if (afterElement) {
+                    while (temp.firstChild) {
+                        container.insertBefore(temp.firstChild, afterElement);
+                    }
+                } else {
+                    while (temp.firstChild) {
+                        container.appendChild(temp.firstChild);
+                    }
+                }
+                this.syncUnifiedBlocks();
+            }
+        }
+    }
+
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll(':scope > *:not(.hkm-drop-indicator)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
     showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
