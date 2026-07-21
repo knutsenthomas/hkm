@@ -26351,9 +26351,7 @@ class AdminManager {
                                     <h4 style="font-family: 'Merriweather', Georgia, serif; font-size: 18px; line-height: 26px; font-weight: 600; color: #121c2c; margin: 0 0 12px 0;">
                                         Dagens andakt og bønn
                                     </h4>
-                                    <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">
-                                        \${prayerFocus}
-                                    </div>
+                                    <div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; color: rgba(18, 28, 44, 0.9); text-align: left; white-space: pre-line;">\${prayerFocus}</div>
                                 </section>
 
                                 <!-- CTA Button (Asymmetrical, Orange Gradient) -->
