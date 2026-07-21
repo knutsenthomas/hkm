@@ -2405,7 +2405,10 @@ class NewsletterBuilder {
 
     activateImageResizer(img, onComplete, onOpenSettings, onDelete) {
         const existing = document.getElementById('hkm-img-resizer');
-        if (existing) existing.remove();
+        if (existing) {
+            if (existing.cleanup) existing.cleanup();
+            existing.remove();
+        }
 
         if (!img || !img.parentElement) return;
 
@@ -2460,6 +2463,13 @@ class NewsletterBuilder {
         const curH = img.style.height || 'auto';
         sizeText.textContent = `${curW} × ${curH} (${img.clientWidth}x${img.clientHeight}px)`;
 
+        const cleanupResizer = () => {
+            window.removeEventListener('resize', scrollResizeHandler);
+            window.removeEventListener('scroll', scrollResizeHandler, true);
+            document.removeEventListener('mousedown', outsideClickListener);
+        };
+        overlay.cleanup = cleanupResizer;
+
         const settingsBtn = document.createElement('button');
         settingsBtn.type = 'button';
         settingsBtn.style.cssText = 'background:none; border:none; color:#fb923c; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
@@ -2467,6 +2477,7 @@ class NewsletterBuilder {
         settingsBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
+            cleanupResizer();
             overlay.remove();
             if (onOpenSettings) onOpenSettings(img);
             else if (typeof this.showImageOptions === 'function') this.showImageOptions(img);
@@ -2480,6 +2491,7 @@ class NewsletterBuilder {
         deleteBtn.onclick = async (e) => {
             e.preventDefault();
             e.stopPropagation();
+            cleanupResizer();
             overlay.remove();
             if (onDelete) {
                 onDelete(img);
@@ -2586,33 +2598,31 @@ class NewsletterBuilder {
 
         const outsideClickListener = (evt) => {
             if (!overlay.contains(evt.target) && evt.target !== img) {
+                cleanupResizer();
                 overlay.remove();
-                window.removeEventListener('resize', scrollResizeHandler);
-                window.removeEventListener('scroll', scrollResizeHandler, true);
-                document.removeEventListener('mousedown', outsideClickListener);
             }
         };
         setTimeout(() => document.addEventListener('mousedown', outsideClickListener), 50);
     }
 
     showImageOptions(imgElement) {
-        let overlay = document.getElementById('image-options-modal');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'image-options-modal';
-            overlay.className = 'profile-modal';
-            overlay.style.cssText = `
-                display: none;
-                z-index: 12000;
-                position: fixed;
-                inset: 0;
-                background: rgba(15, 23, 42, 0.6);
-                align-items: center;
-                justify-content: center;
-                backdrop-filter: blur(8px);
-            `;
-            document.body.appendChild(overlay);
-        }
+        const existing = document.getElementById('image-options-modal');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'image-options-modal';
+        overlay.className = 'profile-modal';
+        overlay.style.cssText = `
+            display: none;
+            z-index: 12000;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        `;
+        document.body.appendChild(overlay);
 
         // Parse current image styles
         const curWidth = imgElement.style.width || '100%';
@@ -2757,7 +2767,7 @@ class NewsletterBuilder {
         overlay.style.display = 'flex';
 
         const closeOverlay = () => {
-            overlay.style.display = 'none';
+            overlay.remove();
         };
 
         overlay.onclick = (e) => {
