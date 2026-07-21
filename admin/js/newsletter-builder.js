@@ -946,15 +946,35 @@ class NewsletterBuilder {
                 <button type="button" id="hkm-close-img-modal" class="material-symbols-outlined" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; padding:4px; border-radius:50%; transition:background 0.2s;">close</button>
             </div>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
-                <button type="button" id="hkm-img-source-upload" style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; padding:20px 12px; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:8px;">
-                    <span class="material-symbols-outlined" style="font-size:32px; color:#d17d39;">upload_file</span>
-                    <span style="font-size:13px; font-weight:700; color:#1B4965;">Last opp fra enhet</span>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+                <button type="button" id="hkm-img-source-upload" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:14px 18px; cursor:pointer; text-align:left; transition:all 0.2s; display:flex; align-items:center; gap:14px; width:100%; box-sizing:border-box;">
+                    <div style="background:#fff7ed; padding:10px; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:24px; color:#d17d39;">upload_file</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:14px; font-weight:700; color:#1B4965;">Last opp fra enhet</span>
+                        <span style="font-size:11px; color:#64748b;">Velg et lokalt bilde fra din PC/mobil</span>
+                    </div>
                 </button>
                 
-                <button type="button" id="hkm-img-source-url" style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; padding:20px 12px; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:8px;">
-                    <span class="material-symbols-outlined" style="font-size:32px; color:#1B4965;">link</span>
-                    <span style="font-size:13px; font-weight:700; color:#1B4965;">Sett inn med lenke</span>
+                <button type="button" id="hkm-img-source-unsplash" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:14px 18px; cursor:pointer; text-align:left; transition:all 0.2s; display:flex; align-items:center; gap:14px; width:100%; box-sizing:border-box;">
+                    <div style="background:#f0fdf4; padding:10px; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:24px; color:#16a34a;">image_search</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:14px; font-weight:700; color:#1B4965;">Søk på Unsplash</span>
+                        <span style="font-size:11px; color:#64748b;">Finn gratis arkivbilder fra Unsplash</span>
+                    </div>
+                </button>
+                
+                <button type="button" id="hkm-img-source-url" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:14px 18px; cursor:pointer; text-align:left; transition:all 0.2s; display:flex; align-items:center; gap:14px; width:100%; box-sizing:border-box;">
+                    <div style="background:#f0f9ff; padding:10px; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:24px; color:#0284c7;">link</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:14px; font-weight:700; color:#1B4965;">Sett inn med lenke</span>
+                        <span style="font-size:11px; color:#64748b;">Lim inn en nettadresse til et bilde</span>
+                    </div>
                 </button>
             </div>
             
@@ -984,12 +1004,16 @@ class NewsletterBuilder {
         modal.querySelector('#hkm-close-img-modal').addEventListener('click', closeModal);
         
         const uploadBtn = modal.querySelector('#hkm-img-source-upload');
+        const unsplashBtn = modal.querySelector('#hkm-img-source-unsplash');
         const urlBtn = modal.querySelector('#hkm-img-source-url');
         
         uploadBtn.onmouseenter = () => { uploadBtn.style.borderColor = '#d17d39'; uploadBtn.style.background = '#fffbeb'; };
         uploadBtn.onmouseleave = () => { uploadBtn.style.borderColor = '#cbd5e1'; uploadBtn.style.background = '#f8fafc'; };
         
-        urlBtn.onmouseenter = () => { urlBtn.style.borderColor = '#1B4965'; urlBtn.style.background = '#f0f9ff'; };
+        unsplashBtn.onmouseenter = () => { unsplashBtn.style.borderColor = '#16a34a'; unsplashBtn.style.background = '#f0fdf4'; };
+        unsplashBtn.onmouseleave = () => { unsplashBtn.style.borderColor = '#cbd5e1'; unsplashBtn.style.background = '#f8fafc'; };
+        
+        urlBtn.onmouseenter = () => { urlBtn.style.borderColor = '#0284c7'; urlBtn.style.background = '#f0f9ff'; };
         urlBtn.onmouseleave = () => { urlBtn.style.borderColor = '#cbd5e1'; urlBtn.style.background = '#f8fafc'; };
         
         // Handle device upload click
@@ -1014,6 +1038,37 @@ class NewsletterBuilder {
                 }
             });
             newFileInput.click();
+        });
+        
+        // Handle Unsplash search option click
+        unsplashBtn.addEventListener('click', () => {
+            closeModal();
+            if (window.unsplashManager) {
+                window.unsplashManager.open((selection) => {
+                    if (selection && selection.url) {
+                        const imgHtml = `<p><img src="${selection.url}" alt="${selection.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                        const temp = document.createElement('div');
+                        temp.innerHTML = imgHtml;
+                        const container = document.getElementById('blocks-container');
+                        if (container) {
+                            if (afterElement) {
+                                while (temp.firstChild) {
+                                    container.insertBefore(temp.firstChild, afterElement);
+                                }
+                            } else {
+                                while (temp.firstChild) {
+                                    container.appendChild(temp.firstChild);
+                                }
+                            }
+                            this.syncUnifiedBlocks();
+                            this.triggerAutosave();
+                            showToast("Bilde satt inn fra Unsplash!", "success");
+                        }
+                    }
+                });
+            } else {
+                showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
+            }
         });
         
         // Handle URL insertion option click
