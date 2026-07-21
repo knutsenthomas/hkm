@@ -2980,9 +2980,23 @@ class NewsletterBuilder {
             document.body.appendChild(script);
         };
 
-        loadCropper(() => {
+        loadCropper(async () => {
             let cropModal = document.getElementById('hkm-crop-modal');
             if (cropModal) cropModal.remove();
+
+            // Prevent CORS caching/tainting by creating a Blob URL
+            let targetUrl = imageSrc;
+            if (imageSrc.startsWith('http') || imageSrc.startsWith('//')) {
+                try {
+                    const resp = await fetch(imageSrc, { mode: 'cors' });
+                    if (resp.ok) {
+                        const blob = await resp.blob();
+                        targetUrl = URL.createObjectURL(blob);
+                    }
+                } catch (e) {
+                    console.warn("Could not convert image to blob URL for cropping, using fallback URL:", e);
+                }
+            }
 
             cropModal = document.createElement('div');
             cropModal.id = 'hkm-crop-modal';
@@ -3013,7 +3027,7 @@ class NewsletterBuilder {
 
                     <div style="flex: 1; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f172a; min-height: 350px; position: relative;">
                         <div style="max-height: 50vh; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 8px;">
-                            <img id="hkm-crop-target" src="${imageSrc}" style="max-width: 100%; max-height: 45vh; display: block;" crossOrigin="anonymous">
+                            <img id="hkm-crop-target" src="${targetUrl}" style="max-width: 100%; max-height: 45vh; display: block;" ${targetUrl.startsWith('blob:') ? '' : 'crossOrigin="anonymous"'}>
                         </div>
                     </div>
 
@@ -3114,7 +3128,16 @@ class NewsletterBuilder {
             document.getElementById('hkm-crop-zoom-in').onclick = () => cropper && cropper.zoom(0.1);
             document.getElementById('hkm-crop-zoom-out').onclick = () => cropper && cropper.zoom(-0.1);
 
-            const closeCrop = () => cropModal.remove();
+            const closeCrop = () => {
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                if (targetUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(targetUrl);
+                }
+                cropModal.remove();
+            };
             document.getElementById('hkm-crop-close').onclick = closeCrop;
             document.getElementById('hkm-crop-cancel').onclick = closeCrop;
 
