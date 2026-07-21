@@ -560,7 +560,7 @@
                                         data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
                                 </li>
                                 <li><a href="javascript:void(0)"
-                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
+                                        onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;"
                                         data-content-doc="settings_global"
                                         data-content-key="footer.links.involvement.cookies">Cookies</a>
                                 </li>
