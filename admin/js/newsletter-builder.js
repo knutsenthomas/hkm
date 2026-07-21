@@ -298,7 +298,7 @@ class NewsletterBuilder {
                 if (img) {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.showImageOptions(img);
+                    this.activateImageResizer(img);
                 }
             });
         }
@@ -1538,6 +1538,198 @@ class NewsletterBuilder {
             finalBtn.disabled = false;
             finalBtn.innerHTML = 'Gå til utsendelse';
         }
+    }
+
+    activateImageResizer(img, onComplete, onOpenSettings, onDelete) {
+        const existing = document.getElementById('hkm-img-resizer');
+        if (existing) existing.remove();
+
+        if (!img || !img.parentElement) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'hkm-img-resizer';
+        overlay.style.cssText = `
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px solid #d17d39;
+            border-radius: ${getComputedStyle(img).borderRadius || '8px'};
+            z-index: 10000;
+            pointer-events: none;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 4px 15px rgba(209, 125, 57, 0.3);
+        `;
+
+        const updateOverlayPos = () => {
+            const rect = img.getBoundingClientRect();
+            const scrollX = window.scrollX || window.pageXOffset;
+            const scrollY = window.scrollY || window.pageYOffset;
+
+            overlay.style.top = (rect.top + scrollY) + 'px';
+            overlay.style.left = (rect.left + scrollX) + 'px';
+            overlay.style.width = rect.width + 'px';
+            overlay.style.height = rect.height + 'px';
+        };
+
+        const toolbar = document.createElement('div');
+        toolbar.style.cssText = `
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            pointer-events: auto;
+            z-index: 10001;
+            font-family: system-ui, -apple-system, sans-serif;
+        `;
+
+        const sizeText = document.createElement('span');
+        sizeText.id = 'hkm-resizer-size-badge';
+        const curW = img.style.width || `${img.clientWidth}px`;
+        const curH = img.style.height || 'auto';
+        sizeText.textContent = `${curW} × ${curH} (${img.clientWidth}x${img.clientHeight}px)`;
+
+        const settingsBtn = document.createElement('button');
+        settingsBtn.type = 'button';
+        settingsBtn.style.cssText = 'background:none; border:none; color:#fb923c; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
+        settingsBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">tune</span> Innstillinger';
+        settingsBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            overlay.remove();
+            if (onOpenSettings) onOpenSettings(img);
+            else if (typeof this.showImageOptions === 'function') this.showImageOptions(img);
+            else if (typeof this.showGlobalImageOptions === 'function') this.showGlobalImageOptions(img, img.parentElement);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.style.cssText = 'background:none; border:none; color:#f87171; cursor:pointer; font-size:11px; font-weight:700; display:flex; align-items:center; gap:3px; padding:0; font-family:inherit;';
+        deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">delete</span> Slett';
+        deleteBtn.onclick = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            overlay.remove();
+            if (onDelete) {
+                onDelete(img);
+            } else if (typeof this.showConfirm === 'function') {
+                const confirmed = await this.showConfirm('Slett bilde', 'Er du sikker på at du vil slette dette bildet?', 'Slett');
+                if (confirmed) {
+                    const p = img.parentNode;
+                    img.remove();
+                    if (p && p.tagName === 'P' && p.innerHTML.trim() === '') p.remove();
+                    if (typeof this.syncUnifiedBlocks === 'function') this.syncUnifiedBlocks();
+                }
+            } else {
+                if (confirm('Slette dette bildet?')) img.remove();
+            }
+        };
+
+        toolbar.appendChild(sizeText);
+        toolbar.appendChild(document.createTextNode(' • '));
+        toolbar.appendChild(settingsBtn);
+        toolbar.appendChild(document.createTextNode(' • '));
+        toolbar.appendChild(deleteBtn);
+        overlay.appendChild(toolbar);
+
+        const handles = [
+            { name: 'se', cursor: 'nwse-resize', style: 'bottom: -7px; right: -7px;' },
+            { name: 'sw', cursor: 'nesw-resize', style: 'bottom: -7px; left: -7px;' },
+            { name: 'ne', cursor: 'nesw-resize', style: 'top: -7px; right: -7px;' },
+            { name: 'nw', cursor: 'nwse-resize', style: 'top: -7px; left: -7px;' },
+            { name: 'e', cursor: 'ew-resize', style: 'top: 50%; right: -7px; transform: translateY(-50%);' },
+            { name: 's', cursor: 'ns-resize', style: 'bottom: -7px; left: 50%; transform: translateX(-50%);' }
+        ];
+
+        handles.forEach(h => {
+            const handleEl = document.createElement('div');
+            handleEl.style.cssText = `
+                position: absolute;
+                width: 13px;
+                height: 13px;
+                background: white;
+                border: 2px solid #d17d39;
+                border-radius: 50%;
+                cursor: ${h.cursor};
+                pointer-events: auto;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                z-index: 10002;
+                ${h.style}
+            `;
+
+            handleEl.addEventListener('mousedown', (evt) => {
+                evt.preventDefault();
+                evt.stopPropagation();
+
+                const startX = evt.clientX;
+                const startY = evt.clientY;
+                const startW = img.clientWidth;
+                const startH = img.clientHeight;
+                const parentW = img.parentElement.clientWidth || document.body.clientWidth;
+
+                const onMouseMove = (moveEvt) => {
+                    const deltaX = moveEvt.clientX - startX;
+                    const deltaY = moveEvt.clientY - startY;
+
+                    let newW = startW;
+                    let newH = startH;
+
+                    if (h.name.includes('e')) newW = startW + deltaX;
+                    if (h.name.includes('w')) newW = startW - deltaX;
+                    if (h.name.includes('s')) newH = startH + deltaY;
+                    if (h.name.includes('n')) newH = startH - deltaY;
+
+                    newW = Math.max(30, newW);
+                    newH = Math.max(30, newH);
+
+                    const widthPercent = Math.min(100, Math.max(5, Math.round((newW / parentW) * 100)));
+                    img.style.width = widthPercent + '%';
+                    img.style.height = Math.round(newH) + 'px';
+                    img.style.objectFit = 'cover';
+                    img.style.display = 'block';
+
+                    sizeText.textContent = `${widthPercent}% (${Math.round(newW)}px × ${Math.round(newH)}px)`;
+                    updateOverlayPos();
+                };
+
+                const onMouseUp = () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                    if (onComplete) onComplete(img);
+                    else if (typeof this.syncUnifiedBlocks === 'function') this.syncUnifiedBlocks();
+                };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+
+            overlay.appendChild(handleEl);
+        });
+
+        document.body.appendChild(overlay);
+        updateOverlayPos();
+
+        const scrollResizeHandler = () => updateOverlayPos();
+        window.addEventListener('resize', scrollResizeHandler);
+        window.addEventListener('scroll', scrollResizeHandler, true);
+
+        const outsideClickListener = (evt) => {
+            if (!overlay.contains(evt.target) && evt.target !== img) {
+                overlay.remove();
+                window.removeEventListener('resize', scrollResizeHandler);
+                window.removeEventListener('scroll', scrollResizeHandler, true);
+                document.removeEventListener('mousedown', outsideClickListener);
+            }
+        };
+        setTimeout(() => document.addEventListener('mousedown', outsideClickListener), 50);
     }
 
     showImageOptions(imgElement) {
