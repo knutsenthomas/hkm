@@ -1758,6 +1758,17 @@ class NewsletterBuilder {
         const curRadius = imgElement.style.borderRadius || '8px';
         const curMargin = imgElement.style.margin || '';
         
+        const curPosition = imgElement.style.objectPosition || '50% 50%';
+        let curPosY = 50;
+        const posParts = curPosition.split(' ');
+        if (posParts.length > 1) {
+            curPosY = parseInt(posParts[1]);
+            if (isNaN(curPosY)) curPosY = 50;
+        } else if (posParts.length === 1 && posParts[0].endsWith('%')) {
+            curPosY = parseInt(posParts[0]);
+            if (isNaN(curPosY)) curPosY = 50;
+        }
+        
         let curAlign = 'center';
         if (curMargin.includes('auto 16px 0') || curMargin.includes('auto 0') || curMargin.endsWith(' 0')) {
             curAlign = 'left';
@@ -1806,6 +1817,20 @@ class NewsletterBuilder {
                             <button class="img-preset-btn" data-type="height" data-val="250px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">250px</button>
                             <button class="img-preset-btn" data-type="height" data-val="400px" style="flex: 1; padding: 6px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">400px</button>
                         </div>
+                    </div>
+
+                    <!-- Bilde-fokus / Manuell beskjæring (Object-Position) -->
+                    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 13px; font-weight: 700; color: #334155;">Bilde-fokus (Vertikal beskjæring)</label>
+                            <span id="img-val-focus" style="font-size: 12px; font-weight: 600; color: #d17d39;">${curPosY}%</span>
+                        </div>
+                        <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                            <button type="button" class="img-focus-btn" data-val="0%" style="flex: 1; padding: 6px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Topp (0%)</button>
+                            <button type="button" class="img-focus-btn" data-val="50%" style="flex: 1; padding: 6px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Senter (50%)</button>
+                            <button type="button" class="img-focus-btn" data-val="100%" style="flex: 1; padding: 6px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">Bunn (100%)</button>
+                        </div>
+                        <input type="range" id="img-slider-focus" min="0" max="100" value="${curPosY}" style="width: 100%; accent-color: #d17d39; cursor: pointer;">
                     </div>
 
                     <!-- Justering (Alignment) & Hjørner -->
@@ -1884,6 +1909,9 @@ class NewsletterBuilder {
                 imgElement.style.height = val;
                 if (val !== 'auto') {
                     imgElement.style.objectFit = 'cover';
+                    if (!imgElement.style.objectPosition) {
+                        imgElement.style.objectPosition = '50% 50%';
+                    }
                 } else {
                     imgElement.style.objectFit = '';
                 }
@@ -1899,6 +1927,11 @@ class NewsletterBuilder {
                 }
             } else if (prop === 'radius') {
                 imgElement.style.borderRadius = val;
+            } else if (prop === 'focus') {
+                imgElement.style.objectPosition = `50% ${val}%`;
+                imgElement.style.objectFit = 'cover';
+                const focusValEl = document.getElementById('img-val-focus');
+                if (focusValEl) focusValEl.textContent = `${val}%`;
             }
             this.syncUnifiedBlocks();
         };
@@ -1910,6 +1943,23 @@ class NewsletterBuilder {
                 updateImgStyle('width', `${e.target.value}%`);
             };
         }
+
+        // Event listeners for focus slider
+        const focusSlider = document.getElementById('img-slider-focus');
+        if (focusSlider) {
+            focusSlider.oninput = (e) => {
+                updateImgStyle('focus', e.target.value);
+            };
+        }
+
+        overlay.querySelectorAll('.img-focus-btn').forEach(btn => {
+            btn.onclick = () => {
+                const val = btn.dataset.val;
+                const numeric = parseInt(val) || 0;
+                if (focusSlider) focusSlider.value = numeric;
+                updateImgStyle('focus', numeric);
+            };
+        });
 
         // Event listeners for presets
         overlay.querySelectorAll('.img-preset-btn').forEach(btn => {
