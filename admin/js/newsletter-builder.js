@@ -495,6 +495,62 @@ class NewsletterBuilder {
         }
     }
 
+    setLineHeight(value) {
+        this.restoreSelection();
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const container = document.getElementById('blocks-container');
+            let node = range.commonAncestorContainer;
+            if (node.nodeType === Node.TEXT_NODE) {
+                node = node.parentNode;
+            }
+            
+            while (node && node !== container && node.parentNode && node.parentNode !== container) {
+                node = node.parentNode;
+            }
+            
+            if (node && node !== container) {
+                node.style.lineHeight = value;
+                this.syncUnifiedBlocks();
+            } else {
+                const fragment = range.cloneContents();
+                const blocks = fragment.querySelectorAll('p, h1, h2, h3, li, div');
+                if (blocks.length > 0) {
+                    const container = document.getElementById('blocks-container');
+                    const allBlocks = container.querySelectorAll('p, h1, h2, h3, li, div');
+                    allBlocks.forEach(block => {
+                        if (selection.containsNode(block, true)) {
+                            block.style.lineHeight = value;
+                        }
+                    });
+                    this.syncUnifiedBlocks();
+                } else {
+                    const parent = range.startContainer.parentElement;
+                    if (parent && parent !== container) {
+                        parent.style.lineHeight = value;
+                        this.syncUnifiedBlocks();
+                    }
+                }
+            }
+        }
+    }
+
+    getCurrentLineHeight() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            let node = selection.getRangeAt(0).startContainer;
+            if (node.nodeType === Node.TEXT_NODE) {
+                node = node.parentNode;
+            }
+            const val = node.style.lineHeight || window.getComputedStyle(node).lineHeight;
+            if (val && !val.includes('px')) {
+                return val;
+            }
+        }
+        return '1.5';
+    }
+
     handleTextSelection() {
         const selection = window.getSelection();
         const container = document.getElementById('blocks-container');
@@ -581,6 +637,17 @@ class NewsletterBuilder {
                 }
             };
 
+            const spacingBtn = createBtn('format_line_spacing', 'Linjeavstand', 'lineHeight');
+            spacingBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const current = this.getCurrentLineHeight() || '1.5';
+                const val = prompt("Angi linjeavstand (f.eks. 1.0, 1.2, 1.5, 1.8):", current);
+                if (val) {
+                    this.setLineHeight(val);
+                }
+            };
+
             const colorBtn = document.createElement('button');
             colorBtn.type = 'button';
             colorBtn.title = 'Tekstfarge';
@@ -647,6 +714,7 @@ class NewsletterBuilder {
             bubble.appendChild(italicBtn);
             bubble.appendChild(underlineBtn);
             bubble.appendChild(linkBtn);
+            bubble.appendChild(spacingBtn);
             bubble.appendChild(colorBtn);
             bubble.appendChild(colorGrid);
             document.body.appendChild(bubble);
@@ -783,6 +851,13 @@ class NewsletterBuilder {
                 case 'highlightColor':
                     const hlInput = toolbar.querySelector('[data-color-input="highlight"]');
                     if (hlInput) hlInput.click();
+                    break;
+                case 'lineHeight':
+                    const currentLineHeight = this.getCurrentLineHeight() || '1.5';
+                    const newHeight = prompt("Angi linjeavstand (f.eks. 1.0, 1.2, 1.5, 1.8, 2.0):", currentLineHeight);
+                    if (newHeight) {
+                        this.setLineHeight(newHeight);
+                    }
                     break;
             }
         });
