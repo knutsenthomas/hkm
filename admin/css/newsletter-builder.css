@@ -3433,3 +3433,99 @@ body.builder-active .builder-workspace > .docs-toolbar {
 .card-delete-btn:active {
     transform: scale(0.92) !important;
 }
+
+/* Modern Elements Grid */
+.elements-grid-modern {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important; /* 8px Grid Rule */
+    padding: 8px 0 !important;
+}
+
+.element-card-square {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 24px 16px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+/* Hover and active states */
+.element-card-square:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.02) !important;
+}
+
+.element-card-square:active {
+    transform: translateY(0) scale(0.96) !important;
+}
+
+/* Icon style */
+.element-card-square .element-square-icon {
+    font-size: 28px !important;
+    color: #1e293b !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 36px !important;
+}
+
+/* Text representations for Aa and </> */
+.element-card-square .element-text-icon {
+    font-family: 'Outfit', 'Inter', sans-serif !important;
+    font-size: 26px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.05em !important;
+    color: #1e293b !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 36px !important;
+}
+
+/* Label style */
+.element-card-square .element-square-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Product block highlights (blue border and top right info icon) */
+.element-card-square.highlight-blue {
+    border-color: #3b82f6 !important;
+    background: #f0f7ff !important;
+}
+
+.element-card-square.highlight-blue:hover {
+    background: #e0f2fe !important;
+    border-color: #2563eb !important;
+}
+
+.element-card-square .info-badge {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    font-size: 14px !important;
+    color: #3b82f6 !important;
+    cursor: help !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
