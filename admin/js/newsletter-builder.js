@@ -658,6 +658,13 @@ class NewsletterBuilder {
                 }
             };
 
+            const quoteBtn = createBtn('format_quote', 'Sitat', 'quote');
+            quoteBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleQuote();
+            };
+
             const colorBtn = document.createElement('button');
             colorBtn.type = 'button';
             colorBtn.title = 'Tekstfarge';
@@ -725,6 +732,7 @@ class NewsletterBuilder {
             bubble.appendChild(underlineBtn);
             bubble.appendChild(linkBtn);
             bubble.appendChild(spacingBtn);
+            bubble.appendChild(quoteBtn);
             bubble.appendChild(colorBtn);
             bubble.appendChild(colorGrid);
             document.body.appendChild(bubble);
@@ -868,6 +876,9 @@ class NewsletterBuilder {
                     if (newHeight) {
                         this.setLineHeight(newHeight);
                     }
+                    break;
+                case 'quote':
+                    this.toggleQuote();
                     break;
             }
         });
@@ -1276,6 +1287,30 @@ class NewsletterBuilder {
                 return closest;
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    toggleQuote() {
+        this.restoreSelection();
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        let container = range.commonAncestorContainer;
+        if (container.nodeType === 3) {
+            container = container.parentNode;
+        }
+
+        const blockquote = container.closest('blockquote');
+        if (blockquote) {
+            // Already a quote, unwrap it (change blockquote to p)
+            const p = document.createElement('p');
+            p.innerHTML = blockquote.innerHTML;
+            blockquote.parentNode.replaceChild(p, blockquote);
+        } else {
+            // Convert current paragraph/block to a blockquote
+            document.execCommand('formatBlock', false, 'blockquote');
+        }
+        this.syncUnifiedBlocks();
     }
 
     showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
