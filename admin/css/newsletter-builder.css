@@ -1552,8 +1552,8 @@ input:checked+.slider:before {
         transform: translateX(-50%) translateY(0);
     }
 
-    .canvas-container {
-        padding: 16px 12px 28px;
+    body.builder-active .builder-workspace > .canvas-container {
+        padding: 80px 12px 28px !important;
         overflow-y: auto !important;
     }
 
@@ -1802,8 +1802,8 @@ input:checked+.slider:before {
         gap: 6px;
     }
 
-    .canvas-container {
-        padding: 12px 8px 20px;
+    body.builder-active .builder-workspace > .canvas-container {
+        padding: 80px 8px 20px !important;
     }
 }
 
