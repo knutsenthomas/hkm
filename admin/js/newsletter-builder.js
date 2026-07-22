@@ -804,6 +804,11 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
+        // Clean up nested footers if any got accidentally pasted or merged inside the editor content
+        container.querySelectorAll('.canvas-footer').forEach(footer => {
+            footer.remove();
+        });
+
         // Clean up empty button/block wrappers
         container.querySelectorAll('div').forEach(div => {
             const isBtnWrap = div.style.textAlign === 'center' || div.classList.contains('block-btn-wrap');
@@ -2256,6 +2261,13 @@ class NewsletterBuilder {
         }
 
         container.innerHTML = unifiedHtml;
+
+        // Clean up nested footers if any got accidentally loaded from the database content
+        const nestedFooters = container.querySelectorAll('.canvas-footer');
+        if (nestedFooters.length > 0) {
+            nestedFooters.forEach(footer => footer.remove());
+            this.syncUnifiedBlocks();
+        }
     }
 
     showPreview() {

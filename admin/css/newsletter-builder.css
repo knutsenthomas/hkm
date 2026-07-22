@@ -747,6 +747,7 @@ body.builder-active .builder-workspace > .canvas-container {
     border-top: 1px solid #f8fafc;
     font-size: 12px;
     color: var(--text-muted);
+    margin-top: auto !important;
 }
 
 .canvas-footer a {
