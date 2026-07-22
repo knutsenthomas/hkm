@@ -2896,7 +2896,7 @@ class NewsletterBuilder {
 
         const modal = document.createElement('div');
         modal.id = 'hkm-dynamic-value-modal';
-        modal.className = 'profile-modal';
+        modal.className = 'hkm-dyn-modal';
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -2914,7 +2914,7 @@ class NewsletterBuilder {
         `;
 
         modal.innerHTML = `
-            <div class="profile-modal-content card modern" style="
+            <div class="hkm-dyn-modal-content card modern" style="
                 max-width: 480px; 
                 width: 90%; 
                 background: white; 
@@ -2927,6 +2927,9 @@ class NewsletterBuilder {
                 padding: 24px;
                 box-sizing: border-box;
                 font-family: 'Inter', sans-serif;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: 90vh !important;
             ">
                 <!-- Close Button -->
                 <button type="button" id="hkm-dyn-close" class="material-symbols-outlined" style="
