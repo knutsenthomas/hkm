@@ -377,6 +377,11 @@ class NewsletterBuilder {
         if (container) {
             container.addEventListener('input', () => this.syncUnifiedBlocks());
             container.addEventListener('blur', () => this.syncUnifiedBlocks());
+            container.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    this.syncUnifiedBlocks();
+                }
+            });
             container.addEventListener('click', (e) => {
                 const img = e.target.closest('img');
                 if (img) {
@@ -990,7 +995,7 @@ class NewsletterBuilder {
         if (canvas) {
             canvas.style.setProperty('display', 'flex', 'important');
             canvas.style.setProperty('flex-direction', 'column', 'important');
-            canvas.style.setProperty('min-height', '1000px', 'important');
+            canvas.style.setProperty('min-height', '400px', 'important');
             canvas.style.setProperty('height', 'auto', 'important');
             canvas.style.setProperty('position', 'relative', 'important');
             canvas.style.setProperty('padding-bottom', '0', 'important');
@@ -999,8 +1004,8 @@ class NewsletterBuilder {
             container.style.setProperty('display', 'block', 'important');
             container.style.setProperty('flex', '1 0 auto', 'important');
             container.style.setProperty('height', 'auto', 'important');
-            container.style.setProperty('min-height', '750px', 'important');
-            container.style.setProperty('padding', '32px 40px 60px 40px', 'important');
+            container.style.setProperty('min-height', '250px', 'important');
+            container.style.setProperty('padding', '32px 40px 32px 40px', 'important');
             container.style.setProperty('box-sizing', 'border-box', 'important');
         }
         if (footer) {
@@ -1024,6 +1029,12 @@ class NewsletterBuilder {
         if (!container) return;
 
         this.enforceLayout();
+
+        // Force browser layout reflow to ensure the flex footer position recalculates dynamically
+        const canvas = document.getElementById('newsletter-canvas');
+        if (canvas) {
+            const reflow = canvas.offsetHeight;
+        }
 
         // Clean up nested footers if any got accidentally pasted or merged inside the editor content
         container.querySelectorAll('.canvas-footer').forEach(footer => {
