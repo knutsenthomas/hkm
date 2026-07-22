@@ -784,8 +784,11 @@ class NewsletterBuilder {
         // Clean up empty button/block wrappers
         container.querySelectorAll('div').forEach(div => {
             const isBtnWrap = div.style.textAlign === 'center' || div.classList.contains('block-btn-wrap');
-            if (isBtnWrap && !div.querySelector('.block-btn')) {
-                div.remove();
+            if (isBtnWrap) {
+                const hasContent = div.textContent.trim() !== '' || div.querySelector('.block-btn, img, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, hr, table, ul, ol');
+                if (!hasContent) {
+                    div.remove();
+                }
             }
         });
 
