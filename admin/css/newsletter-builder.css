@@ -115,6 +115,22 @@ body.builder-active #newsletter-builder-layout {
     font-size: 24px;
 }
 
+.rail-item-circle {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 .rail-bottom {
     margin-top: auto;
 }
