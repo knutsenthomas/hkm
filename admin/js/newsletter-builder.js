@@ -2877,6 +2877,18 @@ class NewsletterBuilder {
         return newElement;
     }
 
+    getAlignSVG(align) {
+        if (align === 'center') {
+            return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="6" y1="12" x2="18" y2="12"></line><line x1="5" y1="18" x2="19" y2="18"></line></svg>`;
+        } else if (align === 'right') {
+            return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="9" y1="12" x2="21" y2="12"></line><line x1="6" y1="18" x2="21" y2="18"></line></svg>`;
+        } else if (align === 'justify') {
+            return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+        } else {
+            return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg>`;
+        }
+    }
+
     showTextInspector(node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
@@ -2977,7 +2989,7 @@ class NewsletterBuilder {
                             <span style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #ffff00; border-radius: 1px;"></span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-align-cycle" title="Justering">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">format_align_${currentAlign === 'justify' ? 'justify' : currentAlign}</span>
+                            ${this.getAlignSVG(currentAlign)}
                         </button>
                     </div>
                     
@@ -3141,10 +3153,7 @@ class NewsletterBuilder {
                 const nextAlign = aligns[nextIdx];
                 currentNode.style.textAlign = nextAlign;
                 
-                const iconEl = btnAlignCycle.querySelector('.material-symbols-outlined');
-                if (iconEl) {
-                    iconEl.innerText = `format_align_${nextAlign === 'justify' ? 'justify' : nextAlign}`;
-                }
+                btnAlignCycle.innerHTML = this.getAlignSVG(nextAlign);
                 this.syncUnifiedBlocks();
             });
         }
