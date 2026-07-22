@@ -109,22 +109,38 @@ class NewsletterBuilder {
             const isTarget = btn.id === `rail-btn-${tab}`;
             btn.classList.toggle('active', isTarget);
             
-            // Highlight text color
-            btn.style.color = isTarget ? '#005bff' : '#475569';
-            if (isTarget) {
-                btn.style.fontWeight = '600';
-            } else {
-                btn.style.fontWeight = '500';
-            }
+            const isAddBtn = btn.id === 'rail-btn-add';
             
-            // Circle container styles
-            const circle = btn.querySelector('.rail-item-circle');
-            if (circle) {
-                circle.style.background = isTarget ? '#e0f2fe' : 'transparent';
-                circle.style.border = isTarget ? '2px solid #005bff' : 'none';
-                const icon = circle.querySelector('.material-symbols-outlined');
-                if (icon) {
-                    icon.style.color = isTarget ? '#005bff' : 'inherit';
+            if (isAddBtn) {
+                // Legg til button is ALWAYS round, orange with a white plus sign
+                btn.style.color = isTarget ? '#d17d39' : '#475569';
+                btn.style.fontWeight = isTarget ? '600' : '500';
+                
+                const circle = btn.querySelector('.rail-item-circle');
+                if (circle) {
+                    circle.style.background = 'linear-gradient(135deg, #d17d39, #bd4f2a)';
+                    circle.style.border = isTarget ? '2px solid #bd4f2a' : 'none';
+                    circle.style.boxShadow = isTarget ? '0 0 0 3px rgba(209, 125, 57, 0.3)' : 'none';
+                    const icon = circle.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = '#ffffff';
+                    }
+                }
+            } else {
+                // Highlight text color
+                btn.style.color = isTarget ? '#1b4965' : '#475569'; // HKM Brand Blue #1B4965
+                btn.style.fontWeight = isTarget ? '600' : '500';
+                
+                // Circle container styles
+                const circle = btn.querySelector('.rail-item-circle');
+                if (circle) {
+                    circle.style.background = isTarget ? '#e0f2fe' : 'transparent';
+                    circle.style.border = isTarget ? '2px solid #1b4965' : 'none';
+                    circle.style.boxShadow = 'none';
+                    const icon = circle.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = isTarget ? '#1b4965' : 'inherit';
+                    }
                 }
             }
         });
