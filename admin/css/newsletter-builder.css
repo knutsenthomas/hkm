@@ -3311,7 +3311,8 @@ body.builder-active .builder-workspace > .docs-toolbar {
 .preview-frame-wrap {
     display: flex !important;
     justify-content: center !important;
-    align-items: center !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
     width: 100% !important;
     height: 100% !important;
     padding: 32px !important;
