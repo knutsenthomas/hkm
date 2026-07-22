@@ -3153,11 +3153,19 @@ body.builder-active.sidebar-collapsed .sidebar {
 
 /* --- High-Fidelity Tablet & Mobile Sticky Header & Toolbar Fixes --- */
 @media (max-width: 1024px) {
+    html {
+        scroll-padding-top: 64px !important; /* Space for the sticky toolbar (~48px) + safety margin */
+    }
     body.builder-active .builder-workspace > .docs-toolbar {
         display: flex !important;
         position: sticky !important;
-        top: 72px !important; /* Stacked right below the 72px header */
+        top: 0 !important; /* Sticky at the very top of the viewport when header scrolls out */
         z-index: 999 !important;
+        width: 100% !important; /* Full width on mobile/tablet */
+        margin: 0 !important; /* Remove floating margin */
+        border-radius: 0 !important; /* Remove rounded corners */
+        border-left: none !important;
+        border-right: none !important;
         flex-wrap: nowrap !important; /* Garanterer én enkelt linje uten linjebrudd */
         overflow-x: auto !important; /* Tillater rulling sidelengs */
         overflow-y: hidden !important;
@@ -3174,8 +3182,7 @@ body.builder-active.sidebar-collapsed .sidebar {
 
 @media (max-width: 991px) {
     .builder-unified-header {
-        position: sticky !important;
-        top: 0 !important;
+        position: relative !important; /* Keep relative (not sticky) so it scrolls out of view on mobile and frees up screen space */
         z-index: 1000 !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
         background: #ffffff !important;
