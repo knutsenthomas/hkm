@@ -980,9 +980,47 @@ class NewsletterBuilder {
         this.syncUnifiedBlocks();
     }
 
+    enforceLayout() {
+        const canvas = document.getElementById('newsletter-canvas');
+        const container = document.getElementById('blocks-container');
+        const footer = canvas ? canvas.querySelector('.canvas-footer') : null;
+
+        if (canvas) {
+            canvas.style.setProperty('display', 'flex', 'important');
+            canvas.style.setProperty('flex-direction', 'column', 'important');
+            canvas.style.setProperty('min-height', '1000px', 'important');
+            canvas.style.setProperty('height', 'auto', 'important');
+            canvas.style.setProperty('position', 'relative', 'important');
+            canvas.style.setProperty('padding-bottom', '0', 'important');
+        }
+        if (container) {
+            container.style.setProperty('display', 'block', 'important');
+            container.style.setProperty('flex', '1 0 auto', 'important');
+            container.style.setProperty('height', 'auto', 'important');
+            container.style.setProperty('min-height', '750px', 'important');
+            container.style.setProperty('padding', '32px 40px 60px 40px', 'important');
+            container.style.setProperty('box-sizing', 'border-box', 'important');
+        }
+        if (footer) {
+            footer.style.setProperty('position', 'static', 'important');
+            footer.style.setProperty('margin-top', 'auto', 'important');
+            footer.style.setProperty('display', 'flex', 'important');
+            footer.style.setProperty('flex-direction', 'column', 'important');
+            footer.style.setProperty('justify-content', 'center', 'important');
+            footer.style.setProperty('align-items', 'center', 'important');
+            footer.style.setProperty('height', 'auto', 'important');
+            footer.style.setProperty('padding', '40px', 'important');
+            footer.style.setProperty('box-sizing', 'border-box', 'important');
+            footer.style.setProperty('background', '#fcfcfc', 'important');
+            footer.style.setProperty('border-top', '1px solid #f8fafc', 'important');
+        }
+    }
+
     syncUnifiedBlocks() {
         const container = document.getElementById('blocks-container');
         if (!container) return;
+
+        this.enforceLayout();
 
         // Clean up nested footers if any got accidentally pasted or merged inside the editor content
         container.querySelectorAll('.canvas-footer').forEach(footer => {
