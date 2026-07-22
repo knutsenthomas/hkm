@@ -106,7 +106,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/dashboard.css?v=20260713_V1">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260722_V5">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260722_V6">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260716_V2">
 
     <!-- Firebase SDK (Compat) -->
@@ -1024,8 +1024,8 @@
                 <!-- Saved Blocks Section -->
                 <div class="sidebar-section-container" style="margin-top: 24px;">
                     <div class="sidebar-section-label">Lagrede Blokker</div>
-                    <div class="saved-blocks-empty">
-                        <span class="material-symbols-outlined empty-icon">bookmark_border</span>
+                    <div class="sidebar-empty-state">
+                        <span class="material-symbols-outlined empty-icon">bookmark</span>
                         <span>Ingen lagrede blokker ennå...</span>
                     </div>
                 </div>
@@ -1037,7 +1037,10 @@
                         <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">edit_note</span>
                     </div>
                     <div id="drafts-list" class="templates-list-container">
-                        <p class="empty-state-text">Ingen kladder lagret ennå</p>
+                        <div class="sidebar-empty-state">
+                            <span class="material-symbols-outlined empty-icon">edit_document</span>
+                            <span>Ingen kladder lagret ennå</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1045,7 +1048,10 @@
                 <div class="sidebar-section-container" style="margin-top: 24px;">
                     <div class="sidebar-section-label">Mine maler</div>
                     <div id="templates-list" class="templates-list-container">
-                        <p class="empty-state-text">Ingen maler lagret ennå</p>
+                        <div class="sidebar-empty-state">
+                            <span class="material-symbols-outlined empty-icon">article</span>
+                            <span>Ingen maler lagret ennå</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1496,7 +1502,7 @@
     <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260722_V18"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260722_V19"></script>
 </body>
 
 </html>

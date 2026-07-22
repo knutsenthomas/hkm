@@ -346,12 +346,6 @@ class NewsletterBuilder {
                     this.closeToolsUi();
                 }
             });
-            btn.addEventListener('mouseenter', () => {
-                this.showElementHoverPreview(btn);
-            });
-            btn.addEventListener('mouseleave', () => {
-                this.hideElementHoverPreview();
-            });
         });
 
         // Global listeners to clean up sticky hover previews in all edge cases
@@ -368,7 +362,15 @@ class NewsletterBuilder {
             if (!e.target.closest('.element-card')) {
                 this.hideElementHoverPreview();
             }
-        });
+        });        const addBtn = document.querySelector('.add-element-dotted-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                const sidebar = document.querySelector('.builder-sidebar.left');
+                if (sidebar) {
+                    sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
 
         // Unified Editor Reactivity & Drop Zone
         const container = document.getElementById('blocks-container');
@@ -3167,6 +3169,7 @@ class NewsletterBuilder {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         try {
             const container = document.getElementById('templates-list');
+            if (!container) return;
             const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
             
             let count = 0;
@@ -3177,25 +3180,42 @@ class NewsletterBuilder {
                 count++;
                 
                 const div = document.createElement('div');
-                div.className = 'template-item card';
-                div.style.padding = '12px'; div.style.marginBottom = '8px'; div.style.cursor = 'pointer';
-                div.innerHTML = `<div style="font-weight:600; font-size:14px;">${data.name}</div>
-                                 <div style="font-size:11px; color:#64748b;">${new Date(data.createdAt).toLocaleDateString()}</div>`;
+                div.className = 'sidebar-item-card';
+                div.innerHTML = `
+                    <div class="card-icon-container">
+                        <span class="material-symbols-outlined">article</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${data.name}</div>
+                        <div class="card-subtitle">${new Date(data.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="card-action">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </div>
+                `;
                 div.onclick = async () => {
-                    const confirmed = await this.showConfirm('Last inn mal', `Last inn "${data.name}"?`, 'Last inn');
+                    const confirmed = await this.showConfirm('Last inn mal', `Last inn malen "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
                         this.blocks = data.blocks;
                         document.getElementById('newsletter-subject').value = data.subject || '';
                         this.renderCanvas();
+                        showToast(`Malen "${data.name}" er lastet inn.`, "info");
                     }
                 };
                 container.appendChild(div);
             });
             
             if (count === 0) {
-                container.innerHTML = '<p class="empty-msg">Ingen maler lagret ennå</p>';
+                container.innerHTML = `
+                    <div class="sidebar-empty-state">
+                        <span class="material-symbols-outlined empty-icon">article</span>
+                        <span>Ingen maler lagret ennå</span>
+                    </div>
+                `;
             }
-        } catch (e) { }
+        } catch (e) {
+            console.error("Load templates failed:", e);
+        }
     }
 
 
@@ -4440,17 +4460,21 @@ class NewsletterBuilder {
                 count++;
                 
                 const div = document.createElement('div');
-                div.className = 'template-item card';
-                div.style.padding = '12px'; div.style.marginBottom = '8px'; div.style.cursor = 'pointer';
-                div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
-                                     <div>
-                                         <div style="font-weight:600; font-size:14px; color:#1e293b;">${data.name}</div>
-                                         <div style="font-size:11px; color:#64748b;">${new Date(data.createdAt).toLocaleDateString()}</div>
-                                     </div>
-                                     <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">edit</span>
-                                 </div>`;
+                div.className = 'sidebar-item-card';
+                div.innerHTML = `
+                    <div class="card-icon-container">
+                        <span class="material-symbols-outlined">edit_document</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${data.name}</div>
+                        <div class="card-subtitle">${new Date(data.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="card-action">
+                        <span class="material-symbols-outlined">edit</span>
+                    </div>
+                `;
                 div.onclick = async () => {
-                    const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${data.name}"? Dette vil overskrive gjeldende innhold.`, 'Last inn');
+                    const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
                         this.blocks = data.blocks;
                         document.getElementById('newsletter-subject').value = data.subject || '';
@@ -4461,6 +4485,14 @@ class NewsletterBuilder {
                 container.appendChild(div);
             });
             
+            if (count === 0) {
+                container.innerHTML = `
+                    <div class="sidebar-empty-state">
+                        <span class="material-symbols-outlined empty-icon">edit_document</span>
+                        <span>Ingen kladder lagret ennå</span>
+                    </div>
+                `;
+            }
         } catch (e) {
             console.error("Load drafts failed:", e);
         }
