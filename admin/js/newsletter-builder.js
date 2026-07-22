@@ -3234,19 +3234,22 @@ class NewsletterBuilder {
                 console.warn("Cropper target image failed to load with CORS. Retrying without CORS...");
                 targetImg.removeAttribute('crossOrigin');
                 
+                targetImg.onload = () => {
+                    if (cropper) return;
+                    setTimeout(() => {
+                        if (cropper) return;
+                        cropper = new window.Cropper(targetImg, {
+                            viewMode: 1,
+                            dragMode: 'move',
+                            background: false,
+                            responsive: true
+                        });
+                    }, 150);
+                };
+
                 // Force browser to reload without CORS
                 const retryUrl = imageSrc + (imageSrc.includes('?') ? '&' : '?') + 'retrynocors=' + Date.now();
                 targetImg.src = retryUrl;
-
-                setTimeout(() => {
-                    if (cropper) return;
-                    cropper = new window.Cropper(targetImg, {
-                        viewMode: 1,
-                        dragMode: 'move',
-                        background: false,
-                        responsive: true
-                    });
-                }, 150);
             };
 
             cropModal.querySelectorAll('.crop-ratio-btn').forEach(btn => {
