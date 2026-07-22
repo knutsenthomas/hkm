@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-app-v38';
+const CACHE_NAME = 'hkm-admin-app-v39';
 const SHELL_ASSETS = [
     '/admin/index.html',
     '/admin/login.html',
@@ -63,11 +63,28 @@ self.addEventListener('fetch', (event) => {
     if (!isSameOrigin(url)) return;
 
     if (isHtmlRequest(request)) {
+        const isMainShell = url.pathname === '/admin/' || url.pathname === '/admin/index.html' || url.pathname === '/admin/login.html' || url.pathname === '/admin/login' || url.pathname === '/admin';
+        if (!isMainShell) {
+            // Bypass service worker and let the browser fetch directly from the network
+            return;
+        }
+
         event.respondWith((async () => {
             try {
                 return await fetch(request, { cache: 'no-store' });
             } catch (error) {
-                return await caches.match(request, { ignoreSearch: true }) || await caches.match('/admin/index.html') || Response.error();
+                let match = await caches.match(request, { ignoreSearch: true });
+                if (!match) {
+                    const cleanUrl = new URL(request.url);
+                    if (cleanUrl.pathname.endsWith('.html')) {
+                        const noHtmlPath = cleanUrl.pathname.slice(0, -5);
+                        match = await caches.match(noHtmlPath, { ignoreSearch: true });
+                    } else {
+                        const withHtmlPath = cleanUrl.pathname + '.html';
+                        match = await caches.match(withHtmlPath, { ignoreSearch: true });
+                    }
+                }
+                return match || await caches.match('/admin/index.html') || Response.error();
             }
         })());
         return;

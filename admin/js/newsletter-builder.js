@@ -6744,6 +6744,12 @@ class NewsletterBuilder {
         if (type === 'newsletter') {
             this.blocks = [];
             document.getElementById('newsletter-subject').value = '';
+            
+            // Set URL parameter immediately so reload stays in builder
+            const url = new URL(window.location.href);
+            url.searchParams.set('draftId', 'new');
+            window.history.pushState({}, '', url.toString());
+            
             this.toggleMode('builder');
             this.renderCanvas();
         } else if (type === 'blog' || type === 'teaching') {
@@ -6765,6 +6771,12 @@ class NewsletterBuilder {
             this.currentDraftName = draft.name;
             this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
             document.getElementById('newsletter-subject').value = draft.subject || '';
+            
+            // Set URL parameter immediately so reload stays in builder
+            const url = new URL(window.location.href);
+            url.searchParams.set('draftId', id);
+            window.history.pushState({}, '', url.toString());
+            
             this.toggleMode('builder');
             this.renderCanvas();
             showToast(`Kladden "${draft.name}" er lastet inn.`, "info");
@@ -6925,6 +6937,12 @@ class NewsletterBuilder {
                 this.currentDraftName = name;
                 this.blocks = JSON.parse(blocksStr);
                 document.getElementById('newsletter-subject').value = subject || '';
+                
+                // Update URL parameter immediately so reload stays in builder
+                const url = new URL(window.location.href);
+                url.searchParams.set('draftId', id);
+                window.history.pushState({}, '', url.toString());
+                
                 this.toggleMode('builder');
                 this.renderCanvas();
                 showToast(`Kladden "${name}" er lastet inn.`, "info");
@@ -6959,6 +6977,12 @@ class NewsletterBuilder {
             try {
                 this.blocks = JSON.parse(blocksStr);
                 document.getElementById('newsletter-subject').value = subject || '';
+                
+                // Update URL parameter immediately (new unsaved builder state)
+                const url = new URL(window.location.href);
+                url.searchParams.set('draftId', 'new');
+                window.history.pushState({}, '', url.toString());
+                
                 this.toggleMode('builder');
                 this.renderCanvas();
                 showToast(`Malen "${name}" er lastet inn.`, "info");
