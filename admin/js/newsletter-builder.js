@@ -2914,6 +2914,9 @@ class NewsletterBuilder {
         const textDec = computed.textDecoration || '';
         const isUnderline = textDec.includes('underline');
 
+        const isDesktopOnly = node.classList.contains('hkm-desktop-only');
+        const isMobileOnly = node.classList.contains('hkm-mobile-only');
+
         inspectorView.innerHTML = `
             <div class="inspector-header" style="border-bottom: none; padding-bottom: 8px;">
                 <h2 style="font-size: 20px; font-weight: 700;">Tilpass tekst</h2>
@@ -3054,8 +3057,37 @@ class NewsletterBuilder {
                         <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Synlighet</span>
                         <span class="material-symbols-outlined" id="visibility-accordion-arrow" style="font-size: 18px; color: #1e293b;">arrow_right</span>
                     </div>
-                    <div id="text-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
-                        Synlig for alle mottakere.
+                    <div id="text-inspector-visibility-content" style="display: none; padding-top: 12px; font-size: 14px; color: #475569;">
+                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #64748b;">Velg hvor dette elementet skal vises.</p>
+                        
+                        <!-- Visibility options stack -->
+                        <div class="visibility-options-stack" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Option 1: Alle enheter -->
+                            <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 2: Kun PC -->
+                            <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 3: Kun mobil -->
+                            <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Info box -->
+                        <div style="margin-top: 16px; padding: 12px 16px; background: #f1f5f9; border-radius: 8px; font-size: 13px; color: #475569; line-height: 1.5;">
+                            Bruk Forhåndsvisning og test for å se hvordan e-posten din vises på hver enhet.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3278,6 +3310,31 @@ class NewsletterBuilder {
                 }
             });
         }
+
+        document.querySelectorAll('#text-inspector-visibility-content .visibility-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('#text-inspector-visibility-content .visibility-card').forEach(c => {
+                    c.classList.remove('active');
+                    c.querySelector('.visibility-check').style.display = 'none';
+                });
+                
+                card.classList.add('active');
+                card.querySelector('.visibility-check').style.display = 'flex';
+                
+                const val = card.dataset.value;
+                if (val === 'desktop') {
+                    currentNode.classList.add('hkm-desktop-only');
+                    currentNode.classList.remove('hkm-mobile-only');
+                } else if (val === 'mobile') {
+                    currentNode.classList.add('hkm-mobile-only');
+                    currentNode.classList.remove('hkm-desktop-only');
+                } else {
+                    currentNode.classList.remove('hkm-desktop-only');
+                    currentNode.classList.remove('hkm-mobile-only');
+                }
+                this.syncUnifiedBlocks();
+            });
+        });
     }
 
     showImageInspector(img, node) {
@@ -3296,6 +3353,9 @@ class NewsletterBuilder {
         if (parentLink) {
             linkHref = parentLink.getAttribute('href') || '';
         }
+
+        const isDesktopOnly = node.classList.contains('hkm-desktop-only');
+        const isMobileOnly = node.classList.contains('hkm-mobile-only');
 
         inspectorView.innerHTML = `
             <div class="inspector-header">
@@ -3333,12 +3393,41 @@ class NewsletterBuilder {
                 </div>
 
                 <div class="inspector-group" style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="img-inspector-visibility-toggle">
-                        <span class="inspector-group-label" style="margin: 0;">Synlighet</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 8px 0;" id="img-inspector-visibility-toggle">
+                        <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Synlighet</span>
+                        <span class="material-symbols-outlined" id="img-visibility-accordion-arrow" style="font-size: 18px; color: #1e293b;">arrow_right</span>
                     </div>
-                    <div id="img-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
-                        Synlig for alle mottakere.
+                    <div id="img-inspector-visibility-content" style="display: none; padding-top: 12px; font-size: 14px; color: #475569;">
+                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #64748b;">Velg hvor dette elementet skal vises.</p>
+                        
+                        <!-- Visibility options stack -->
+                        <div class="visibility-options-stack" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Option 1: Alle enheter -->
+                            <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 2: Kun PC -->
+                            <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 3: Kun mobil -->
+                            <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Info box -->
+                        <div style="margin-top: 16px; padding: 12px 16px; background: #f1f5f9; border-radius: 8px; font-size: 13px; color: #475569; line-height: 1.5;">
+                            Bruk Forhåndsvisning og test for å se hvordan e-posten din vises på hver enhet.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3514,6 +3603,45 @@ class NewsletterBuilder {
             }
         });
 
+        const imgVisToggle = document.getElementById('img-inspector-visibility-toggle');
+        if (imgVisToggle) {
+            imgVisToggle.addEventListener('click', () => {
+                const content = document.getElementById('img-inspector-visibility-content');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                
+                const arrowEl = document.getElementById('img-visibility-accordion-arrow');
+                if (arrowEl) {
+                    arrowEl.innerText = isHidden ? 'arrow_drop_down' : 'arrow_right';
+                }
+            });
+        }
+
+        document.querySelectorAll('#img-inspector-visibility-content .visibility-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('#img-inspector-visibility-content .visibility-card').forEach(c => {
+                    c.classList.remove('active');
+                    c.querySelector('.visibility-check').style.display = 'none';
+                });
+                
+                card.classList.add('active');
+                card.querySelector('.visibility-check').style.display = 'flex';
+                
+                const val = card.dataset.value;
+                if (val === 'desktop') {
+                    node.classList.add('hkm-desktop-only');
+                    node.classList.remove('hkm-mobile-only');
+                } else if (val === 'mobile') {
+                    node.classList.add('hkm-mobile-only');
+                    node.classList.remove('hkm-desktop-only');
+                } else {
+                    node.classList.remove('hkm-desktop-only');
+                    node.classList.remove('hkm-mobile-only');
+                }
+                this.syncUnifiedBlocks();
+            });
+        });
+
         document.getElementById('img-inspector-cancel').addEventListener('click', () => this.deselectBlock());
         document.getElementById('img-inspector-apply').addEventListener('click', () => this.deselectBlock());
     }
@@ -3531,6 +3659,9 @@ class NewsletterBuilder {
         
         const computed = window.getComputedStyle(btn);
         const currentRadius = computed.borderRadius;
+
+        const isDesktopOnly = node.classList.contains('hkm-desktop-only');
+        const isMobileOnly = node.classList.contains('hkm-mobile-only');
 
         inspectorView.innerHTML = `
             <div class="inspector-header">
@@ -3554,12 +3685,41 @@ class NewsletterBuilder {
                 </div>
 
                 <div class="inspector-group" style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="btn-inspector-visibility-toggle">
-                        <span class="inspector-group-label" style="margin: 0;">Synlighet</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 8px 0;" id="btn-inspector-visibility-toggle">
+                        <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Synlighet</span>
+                        <span class="material-symbols-outlined" id="btn-visibility-accordion-arrow" style="font-size: 18px; color: #1e293b;">arrow_right</span>
                     </div>
-                    <div id="btn-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
-                        Synlig for alle mottakere.
+                    <div id="btn-inspector-visibility-content" style="display: none; padding-top: 12px; font-size: 14px; color: #475569;">
+                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #64748b;">Velg hvor dette elementet skal vises.</p>
+                        
+                        <!-- Visibility options stack -->
+                        <div class="visibility-options-stack" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Option 1: Alle enheter -->
+                            <div class="visibility-card ${!isDesktopOnly && !isMobileOnly ? 'active' : ''}" data-value="all" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">devices</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Alle enheter</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${!isDesktopOnly && !isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 2: Kun PC -->
+                            <div class="visibility-card ${isDesktopOnly ? 'active' : ''}" data-value="desktop" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">computer</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun PC</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isDesktopOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                            
+                            <!-- Option 3: Kun mobil -->
+                            <div class="visibility-card ${isMobileOnly ? 'active' : ''}" data-value="mobile" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 20px; color: #475569;">smartphone</span>
+                                <span style="font-weight: 600; color: #1e293b; font-size: 14px;">Kun mobil</span>
+                                <div class="visibility-check" style="position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #005bff; color: white; border-radius: 50%; display: ${isMobileOnly ? 'flex' : 'none'}; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Info box -->
+                        <div style="margin-top: 16px; padding: 12px 16px; background: #f1f5f9; border-radius: 8px; font-size: 13px; color: #475569; line-height: 1.5;">
+                            Bruk Forhåndsvisning og test for å se hvordan e-posten din vises på hver enhet.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3632,6 +3792,45 @@ class NewsletterBuilder {
                 this.syncUnifiedBlocks();
             });
         }
+
+        const btnVisToggle = document.getElementById('btn-inspector-visibility-toggle');
+        if (btnVisToggle) {
+            btnVisToggle.addEventListener('click', () => {
+                const content = document.getElementById('btn-inspector-visibility-content');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                
+                const arrowEl = document.getElementById('btn-visibility-accordion-arrow');
+                if (arrowEl) {
+                    arrowEl.innerText = isHidden ? 'arrow_drop_down' : 'arrow_right';
+                }
+            });
+        }
+
+        document.querySelectorAll('#btn-inspector-visibility-content .visibility-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('#btn-inspector-visibility-content .visibility-card').forEach(c => {
+                    c.classList.remove('active');
+                    c.querySelector('.visibility-check').style.display = 'none';
+                });
+                
+                card.classList.add('active');
+                card.querySelector('.visibility-check').style.display = 'flex';
+                
+                const val = card.dataset.value;
+                if (val === 'desktop') {
+                    node.classList.add('hkm-desktop-only');
+                    node.classList.remove('hkm-mobile-only');
+                } else if (val === 'mobile') {
+                    node.classList.add('hkm-mobile-only');
+                    node.classList.remove('hkm-desktop-only');
+                } else {
+                    node.classList.remove('hkm-desktop-only');
+                    node.classList.remove('hkm-mobile-only');
+                }
+                this.syncUnifiedBlocks();
+            });
+        });
 
         document.getElementById('btn-inspector-cancel').addEventListener('click', () => this.deselectBlock());
         document.getElementById('btn-inspector-apply').addEventListener('click', () => this.deselectBlock());
