@@ -268,22 +268,29 @@ class NewsletterBuilder {
             });
         });
 
+        this.isDragging = false;
+        this.hoverPreviewTimeout = null;
+
         // Block Tool Clicks, Drag and Drop, & Hover Previews Setup
         document.querySelectorAll('.element-card').forEach(btn => {
             btn.setAttribute('draggable', 'true');
             btn.addEventListener('dragstart', (e) => {
+                this.isDragging = true;
                 e.dataTransfer.setData('hkm-block-type', btn.dataset.type);
                 btn.style.opacity = '0.5';
                 this.hideElementHoverPreview();
             });
             btn.addEventListener('dragend', () => {
+                this.isDragging = false;
                 btn.style.opacity = '';
+                this.hideElementHoverPreview();
             });
             btn.addEventListener('mousedown', () => {
                 this.saveSelection();
             });
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
+                this.hideElementHoverPreview();
                 if (type === 'ai_text') {
                     this.showAiTextPrompt();
                 } else if (type === 'ai_image') {
@@ -301,6 +308,22 @@ class NewsletterBuilder {
             btn.addEventListener('mouseleave', () => {
                 this.hideElementHoverPreview();
             });
+        });
+
+        // Global listeners to clean up sticky hover previews in all edge cases
+        window.addEventListener('scroll', () => this.hideElementHoverPreview(), { passive: true });
+        document.addEventListener('dragstart', () => {
+            this.isDragging = true;
+            this.hideElementHoverPreview();
+        });
+        document.addEventListener('dragend', () => {
+            this.isDragging = false;
+            this.hideElementHoverPreview();
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.element-card')) {
+                this.hideElementHoverPreview();
+            }
         });
 
         // Unified Editor Reactivity & Drop Zone
@@ -2250,10 +2273,14 @@ class NewsletterBuilder {
     }
 
     showElementHoverPreview(btn) {
+        if (this.isDragging) return;
         const type = btn.dataset.type;
         if (!type || type.startsWith('ai_')) return;
 
         let preview = document.getElementById('hkm-element-hover-preview');
+        if (this.hoverPreviewTimeout) {
+            clearTimeout(this.hoverPreviewTimeout);
+        }
         if (!preview) {
             preview = document.createElement('div');
             preview.id = 'hkm-element-hover-preview';
@@ -2366,9 +2393,12 @@ class NewsletterBuilder {
     hideElementHoverPreview() {
         const preview = document.getElementById('hkm-element-hover-preview');
         if (preview) {
+            if (this.hoverPreviewTimeout) {
+                clearTimeout(this.hoverPreviewTimeout);
+            }
             preview.style.opacity = '0';
             preview.style.transform = 'translateX(10px)';
-            setTimeout(() => {
+            this.hoverPreviewTimeout = setTimeout(() => {
                 if (preview.style.opacity === '0') {
                     preview.style.display = 'none';
                 }
