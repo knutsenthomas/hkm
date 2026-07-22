@@ -3049,17 +3049,33 @@ class NewsletterBuilder {
             let cropModal = document.getElementById('hkm-crop-modal');
             if (cropModal) cropModal.remove();
 
-            // Prevent CORS caching/tainting by creating a Blob URL
+            // Prevent CORS caching/tainting by creating a Blob URL with cache-busting and proxy fallback
             let targetUrl = imageSrc;
             if (imageSrc.startsWith('http') || imageSrc.startsWith('//')) {
                 try {
-                    const resp = await fetch(imageSrc, { mode: 'cors' });
+                    const cacheBusterUrl = imageSrc + (imageSrc.includes('?') ? '&' : '?') + 'hkmcropnocache=' + Date.now();
+                    const resp = await fetch(cacheBusterUrl, { mode: 'cors', cache: 'no-store' });
                     if (resp.ok) {
                         const blob = await resp.blob();
                         targetUrl = URL.createObjectURL(blob);
+                    } else {
+                        throw new Error(`Direct fetch failed: ${resp.status}`);
                     }
-                } catch (e) {
-                    console.warn("Could not convert image to blob URL for cropping, using fallback URL:", e);
+                } catch (directErr) {
+                    console.warn("Direct CORS fetch failed, trying CORS proxy:", directErr);
+                    try {
+                        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(imageSrc);
+                        const resp = await fetch(proxyUrl);
+                        if (resp.ok) {
+                            const blob = await resp.blob();
+                            targetUrl = URL.createObjectURL(blob);
+                            console.log("Successfully fetched image through CORS proxy!");
+                        } else {
+                            throw new Error(`Proxy fetch failed: ${resp.status}`);
+                        }
+                    } catch (proxyErr) {
+                        console.warn("CORS proxy fetch also failed, using fallback URL:", proxyErr);
+                    }
                 }
             }
 
@@ -3171,7 +3187,13 @@ class NewsletterBuilder {
 
             targetImg.onerror = () => {
                 if (cropper) return;
+                console.warn("Cropper target image failed to load with CORS. Retrying without CORS...");
                 targetImg.removeAttribute('crossOrigin');
+                
+                // Force browser to reload without CORS
+                const retryUrl = imageSrc + (imageSrc.includes('?') ? '&' : '?') + 'retrynocors=' + Date.now();
+                targetImg.src = retryUrl;
+
                 setTimeout(() => {
                     if (cropper) return;
                     cropper = new window.Cropper(targetImg, {
@@ -3219,10 +3241,26 @@ class NewsletterBuilder {
                 saveBtn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size: 18px; animation: spin 1s linear infinite;">sync</span><span>Lagrer...</span>';
 
                 try {
-                    const canvas = cropper.getCroppedCanvas({
-                        imageSmoothingEnabled: true,
-                        imageSmoothingQuality: 'high'
-                    });
+                    let canvas;
+                    try {
+                        canvas = cropper.getCroppedCanvas({
+                            imageSmoothingEnabled: true,
+                            imageSmoothingQuality: 'high'
+                        });
+                    } catch (canvasErr) {
+                        console.error("Canvas export failed:", canvasErr);
+                        alert("Dette bildet kan ikke beskjæres av sikkerhetsårsaker fordi det er lagret på en ekstern nettside som blokkerer tilgang. Vennligst last opp bildet på nytt fra enheten din.");
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
+                        return;
+                    }
+
+                    if (!canvas) {
+                        alert("Kunne ikke generere beskåret bilde.");
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">check</span><span>Lagre beskjæring</span>';
+                        return;
+                    }
 
                     canvas.toBlob(async (blob) => {
                         if (!blob) {
