@@ -1,0 +1,3383 @@
+{
+  "OAK": {
+    "name": "Oak",
+    "slug": "oak",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Det finnes seks hebraiske ord som oversettes med «eik». (1.) «El» forekommer bare i ordet El-Paran (1 Mos 14:6). LXX oversetter det med «terebinttre». I flertallsform forekommer dette ordet i Jes 1:29; 57:5 (A.V. marg. og R.V., «blant eikene»); 61:3 («trær»). Ordet betyr egentlig sterkt, mektig, og dermed et sterkt tre. (2.) «Elah», 1 Mos 35:4, «under den eiken som stod ved Sikem» (R.V. marg., «terebinttre»). Jes 6:13, A.V., «lindetre;» R.V., «terebinttre». Jes 1:30, R.V. marg., «terebinttre». Absalom ble i flukten fanget i grenene på en «stor eik» (2 Sam 18:9; R.V. marg., «terebinttre»). (3.) «Elon», Dom 4:11; 9:6 (R.V., «eik;» A.V., etter Targum, «slette») egentlig den løvfellende eikearten som mister løvet om høsten. (4.) «Elan», bare i Dan 4:11, 14, 20, gjengitt som «tre» i Nebukadnesars drøm. Trolig er en eikeart ment. (5.) «Allah», Jos 24:26. Stedet det refereres til her, kalles Allon-Moreh («Morehs eik», som i R.V.) i 1 Mos 12:6 og 35:4. (6.) «Allon», alltid gjengitt som «eik». Trolig er den eviggrønne eiken (også kalt steineik) ment. Eikeskogene i Basan er ofte omtalt (Jes 2:13; Esek 27:6). Tre eikearter finnes i Palestina, hvorav den «piggete eviggrønne eiken» (Quercus coccifera) er den mest utbredte. «Den dekker Palestinas steinete åser med tett kratt av trær fra 2,4 til 3,6 meter høye, som forgrener seg fra basis, tett dekket med små, eviggrønne, stive blader, og bærer rikelig med eikenøtter.» Den såkalte Abrahams eik i Hebron er av denne arten. Tristram sier at denne eiken nær Hebron «i flere århundrer har overtatt plassen til det en gang så berømte terebinttreet som markerte Mamres sted på den andre siden av byen. Terebinttreet eksisterte i Mamre på Vespasianus’ tid, og under det ble de fangede jødene solgt som slaver. Det forsvant omkring år 330 e.Kr., og intet tre markerer nå Mamres lund. Den nåværende eiken er det edleste treet i Sør-Palestina, med en omkrets på 7 meter, og kronens diameter, som er usymmetrisk, er omtrent 27 meter.» (Se HEBRON; LINDETRE.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(Hebr. sterk). Det er betydelig vanskelig å bestemme de nøyaktige betydningene av de ulike variantene av begrepet nevnt ovenfor. Noen ganger er det åpenbart terebinttreet eller almen som menes, og andre ganger eiken. Det finnes en rekke eikevarianter i Palestina. (Dr. Robinson hevder at det generelt er eiken som menes, og at det er et svært vanlig tre i Østen. Eiker vokser til en stor størrelse, oppnår en høy alder og er på alle måter verdige de ærverdige assosiasjonene knyttet til treet.—RED.) To eikearter, Quercus pseudo-coccifera og Q. aegilops, er vel verdig navnet mektige trær; selv om det like sant er at over store deler av landet er eikene i Palestina for tiden bare busker."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:6",
+        "original": "Gen. 14:6"
+      },
+      {
+        "reference": "Isaiah 1:29",
+        "original": "Isa. 1:29"
+      },
+      {
+        "reference": "Isaiah 57:5",
+        "original": "Isa 57:5"
+      },
+      {
+        "reference": "Genesis 35:4",
+        "original": "Gen. 35:4"
+      },
+      {
+        "reference": "Isaiah 6:13",
+        "original": "Isa. 6:13"
+      },
+      {
+        "reference": "Isaiah 1:30",
+        "original": "Isa. 1:30"
+      },
+      {
+        "reference": "2 Samuel 18:9",
+        "original": "2 Sam. 18:9"
+      },
+      {
+        "reference": "Judges 4:11",
+        "original": "Judg. 4:11"
+      },
+      {
+        "reference": "Judges 9:6",
+        "original": "Judg 9:6"
+      },
+      {
+        "reference": "Daniel 4:11",
+        "original": "Dan. 4:11"
+      },
+      {
+        "reference": "Daniel 4:14",
+        "original": "Dan. 4:14"
+      },
+      {
+        "reference": "Daniel 4:20",
+        "original": "Dan. 4:20"
+      },
+      {
+        "reference": "Joshua 24:26",
+        "original": "Josh. 24:26"
+      },
+      {
+        "reference": "Genesis 12:6",
+        "original": "Gen. 12:6"
+      },
+      {
+        "reference": "Isaiah 2:13",
+        "original": "Isa. 2:13"
+      },
+      {
+        "reference": "Ezekiel 27:6",
+        "original": "Ezek. 27:6"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OATH": {
+    "name": "Oath",
+    "slug": "oath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En høytidelig appell til Gud, tillatt ved passende anledninger (5 Mos 6:13; Jer 4:2), i ulike former (1 Mos 16:5; 2 Sam 12:5; Rut 1:17; Hos 4:15; Rom 1:9), og avlagt på forskjellige måter (1 Mos 14:22; 24:2; 2 Krøn 6:22). Gud er fremstilt som avleggende en ed (Hebr 6:16-18), slik også Kristus (Matt 26:64) og Paulus (Rom 9:1; Gal 1:20; Fil 1:8). Formaningen: «Sverg slett ikke!» sikter sannsynligvis til vanlig samtale mellom mennesker (Matt 5:34, 37). Men hvis ordene tolkes som refererende til eder, kan intensjonen ha vært å vise «at den rette tilstanden for kristne er at de ikke trenger eder; at når ondskap er utryddet blant dem, vil hvert ja og nei være like avgjørende som en ed, hvert løfte like bindende som et løfte.»"
+      },
+      {
+        "source": "SMI",
+        "text": "Prinsippet som gjør en ed bindende, er tilfeldigvis nedfelt i (Hebr 6:16), nemlig som en endelig appell til guddommelig autoritet for å bekrefte en påstand. Etter samme prinsipp har den eden alltid vært ansett som mest bindende som appellerte til den høyeste autoritet, både når det gjelder enkeltpersoner og samfunn. Som en konsekvens av dette prinsippet behandles appeller til Guds navn på den ene side, og til hedenske guder på den annen side, i Skriften som prøver på lojalitet. (2 Mos 23:13; 34:6; 29:12) osv. Likeså brukes herskerens navn noen ganger som en form for forpliktelse. (1 Mos 42:15; 2 Sam 11:11; 14:19) Andre former for eder, alvorlige eller useriøse, er nevnt, hvorav noen fordømmes av vår Herre. (Matt 6:33; 23:16-22) og se (Jak 5:12) (Det er imidlertid en verden av forskjell mellom en høytidelig appell til Gud og vanhellig banning.) Formene for besvergelse nevnt i Skriften er—"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 6:13",
+        "original": "Deut. 6:13"
+      },
+      {
+        "reference": "Jeremiah 4:2",
+        "original": "Jer. 4:2"
+      },
+      {
+        "reference": "Genesis 16:5",
+        "original": "Gen. 16:5"
+      },
+      {
+        "reference": "2 Samuel 12:5",
+        "original": "2 Sam. 12:5"
+      },
+      {
+        "reference": "Ruth 1:17",
+        "original": "Ruth 1:17"
+      },
+      {
+        "reference": "Hosea 4:15",
+        "original": "Hos. 4:15"
+      },
+      {
+        "reference": "Romans 1:9",
+        "original": "Rom. 1:9"
+      },
+      {
+        "reference": "Genesis 14:22",
+        "original": "Gen. 14:22"
+      },
+      {
+        "reference": "Genesis 24:2",
+        "original": "Gen 24:2"
+      },
+      {
+        "reference": "2 Chronicles 6:22",
+        "original": "2 Chr. 6:22"
+      },
+      {
+        "reference": "Hebrews 6:16-18",
+        "original": "Heb. 6:16-18"
+      },
+      {
+        "reference": "Matthew 26:64",
+        "original": "Matt. 26:64"
+      },
+      {
+        "reference": "Romans 9:1",
+        "original": "Rom. 9:1"
+      },
+      {
+        "reference": "Galatians 1:20",
+        "original": "Gal. 1:20"
+      },
+      {
+        "reference": "Philippians 1:8",
+        "original": "Phil. 1:8"
+      },
+      {
+        "reference": "Matthew 5:34",
+        "original": "Matt. 5:34"
+      },
+      {
+        "reference": "Matthew 5:37",
+        "original": "Matt. 5:37"
+      },
+      {
+        "reference": "Hebrews 6:16",
+        "original": "Hebrews 6:16"
+      },
+      {
+        "reference": "Exodus 23:13",
+        "original": "Exodus 23:13"
+      },
+      {
+        "reference": "Exodus 34:6",
+        "original": "Exodus 34:6"
+      },
+      {
+        "reference": "Exodus 29:12",
+        "original": "Exodus 29:12"
+      },
+      {
+        "reference": "Genesis 42:15",
+        "original": "Genesis 42:15"
+      },
+      {
+        "reference": "2 Samuel 11:11",
+        "original": "2 Samuel 11:11"
+      },
+      {
+        "reference": "2 Samuel 14:19",
+        "original": "2 Samuel 14:19"
+      },
+      {
+        "reference": "Matthew 6:33",
+        "original": "Matthew 6:33"
+      },
+      {
+        "reference": "Matthew 23:16-22",
+        "original": "Matthew 23:16-22"
+      },
+      {
+        "reference": "James 5:12",
+        "original": "James 5:12"
+      },
+      {
+        "reference": "Leviticus 24:14",
+        "original": "Leviticus 24:14"
+      },
+      {
+        "reference": "Leviticus 17:7",
+        "original": "Leviticus 17:7"
+      },
+      {
+        "reference": "Isaiah 3:7",
+        "original": "Isaiah 3:7"
+      },
+      {
+        "reference": "Genesis 47:29",
+        "original": "Genesis 47:29"
+      },
+      {
+        "reference": "1 Kings 8:31",
+        "original": "1 Kings 8:31"
+      },
+      {
+        "reference": "Genesis 15:10",
+        "original": "Genesis 15:10"
+      },
+      {
+        "reference": "Genesis 15:17",
+        "original": "Genesis 15:17"
+      },
+      {
+        "reference": "Jeremiah 34:18",
+        "original": "Jeremiah 34:18"
+      },
+      {
+        "reference": "Exodus 20:7",
+        "original": "Exodus 20:7"
+      },
+      {
+        "reference": "Leviticus 19:12",
+        "original": "Leviticus 19:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OBADIAH": {
+    "name": "Obadiah",
+    "slug": "obadiah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Herrens tjener». (1.) En israelitt som var overhode i kong Akabs hus (1 Kong 18:3). Midt i stort åndelig forfall opprettholdt han sin troskap mot Gud, og grep inn for å beskytte Herrens profeter, hundre av dem skjulte han med stor personlig risiko i en hule (v. 4, 13). Akab synes å ha holdt Obadja i stor ære, selv om han ikke hadde sympati for hans fromhet (v. 5, 6, 7). Den siste omtalen av ham er når han bringer nyheter tilbake til Akab om at Elia, som han så lenge hadde søkt etter, var nær (v. 9-16). «Gå,» sa Elia til ham, da han møtte ham på veien, «gå og fortell din herre: Se, Elia er her!» (2.) En høvding fra Issakar-stammen (1 Krøn 7:3). (3.) En etterkommer av Saul (1 Krøn 8:38). (4.) En levitt, etter fangenskapet (1 Krøn 9:16). (5.) En gaditt som sluttet seg til David i Siklag (1 Krøn 12:9). (6.) En fyrste fra Sebulon i Davids tid (1 Krøn 27:19). (7.) En av fyrstene som ble sendt av Josafat for å undervise folket i loven (2 Krøn 17:7). (8.) En levitt som overvåket reparasjonene av tempelet under Josia (2 Krøn 34:12). (9.) En som fulgte Esra tilbake fra Babylon (Esra 8:9). (10.) En profet, den fjerde av de mindre profetene i den hebraiske kanon, og den femte i LXX. Han var trolig samtidig med Jeremia og Esekiel. Om hans personlige historie er intet kjent."
+      },
+      {
+        "source": "SMI",
+        "text": "(Herrens tjener)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 18:3",
+        "original": "1 Kings 18:3"
+      },
+      {
+        "reference": "1 Chronicles 7:3",
+        "original": "1 Chr. 7:3"
+      },
+      {
+        "reference": "1 Chronicles 8:38",
+        "original": "1 Chr. 8:38"
+      },
+      {
+        "reference": "1 Chronicles 9:16",
+        "original": "1 Chr. 9:16"
+      },
+      {
+        "reference": "1 Chronicles 12:9",
+        "original": "1 Chr. 12:9"
+      },
+      {
+        "reference": "1 Chronicles 27:19",
+        "original": "1 Chr. 27:19"
+      },
+      {
+        "reference": "2 Chronicles 17:7",
+        "original": "2 Chr. 17:7"
+      },
+      {
+        "reference": "2 Chronicles 34:12",
+        "original": "2 Chr. 34:12"
+      },
+      {
+        "reference": "Ezra 8:9",
+        "original": "Ezra 8:9"
+      },
+      {
+        "reference": "1 Chronicles 3:21",
+        "original": "1 Chronicles 3:21"
+      },
+      {
+        "reference": "1 Chronicles 8:33",
+        "original": "1 Chronicles 8:33"
+      },
+      {
+        "reference": "1 Chronicles 9:44",
+        "original": "1 Chronicles 9:44"
+      },
+      {
+        "reference": "Nehemiah 12:25",
+        "original": "Nehemiah 12:25"
+      },
+      {
+        "reference": "Nehemiah 10:5",
+        "original": "Nehemiah 10:5"
+      },
+      {
+        "reference": "1 Kings 18:3-16",
+        "original": "1 Kings 18:3-16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OBADIAH, BOOK OF": {
+    "name": "Obadiah, Book of",
+    "slug": "obadiah-book-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Består av ett kapittel, «om Edom», dens forestående undergang (1:1-16), og Israels gjenopprettelse (1:17-21). Dette er den korteste bok i Det gamle testamente. Det er nedtegnet beretningen om fire erobringer av Jerusalem: (1) av Sjisjak i Rehabeams regjeringstid (1 Kong 14:25); (2) av filisterne og araberne i Joram’s regjeringstid (2 Krøn 21:16); (3) av Joasj, Israels konge, i Amasjas regjeringstid (2 Kong 14:13); og (4) av babylonerne, da Jerusalem ble inntatt og ødelagt av Nebukadnesar (586 f.Kr.). Obadja (1:11-14) omtaler denne erobringen som noe som har skjedd. Han ser ulykken som allerede kommet over Jerusalem, og edomittene som sluttet seg til kaldeernes styrker for å føre til Israels fornedrelse og ruin. Vi leser riktignok ikke at edomittene faktisk deltok sammen med kaldeerne, men sannsynligheten er at de gjorde det, og dette forklarer Obadjas ord når han forkynner Guds dommer over Edom. Datoen for hans profetier var dermed i eller omkring året Jerusalem ble ødelagt. Edom er et forbilde på Israels og Guds siste fiende (Jes 63:1-4). Disse vil til slutt alle bli overvunnet, og riket vil være Herrens (jf. Sal 22:28)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 14:25",
+        "original": "1 Kings 14:25"
+      },
+      {
+        "reference": "2 Chronicles 21:16",
+        "original": "2 Chr. 21:16"
+      },
+      {
+        "reference": "2 Kings 14:13",
+        "original": "2 Kings 14:13"
+      },
+      {
+        "reference": "Isaiah 63:1-4",
+        "original": "Isa. 63:1-4"
+      },
+      {
+        "reference": "Psalms 22:28",
+        "original": "Ps. 22:28"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OBAL": {
+    "name": "Obal",
+    "slug": "obal",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Avkledd», den åttende sønnen til Joktan (1 Mos 10:28); også kalt Ebal (1 Krøn 1:22)."
+      },
+      {
+        "source": "SMI",
+        "text": "(avkledd), sønn av Joktan, og, som resten av familien, tilsynelatende grunnleggeren av en arabisk stamme. (1 Mos 10:28) I (1 Krøn 1:22) er navnet skrevet Ebal."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:28",
+        "original": "Gen. 10:28"
+      },
+      {
+        "reference": "1 Chronicles 1:22",
+        "original": "1 Chr. 1:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OBED": {
+    "name": "Obed",
+    "slug": "obed",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Tjenende; tilbedende». (1.) En sønn av Boas og Rut (Rut 4:21, 22), og Davids bestefar (Matt 1:5). (2.) 1 Krøn 2:34-38. (3.) 1 Krøn 26:7. (4.) 2 Krøn 23:1."
+      },
+      {
+        "source": "SMI",
+        "text": "(tjenende)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ruth 4:21",
+        "original": "Ruth 4:21"
+      },
+      {
+        "reference": "Ruth 4:22",
+        "original": "Ruth 4:22"
+      },
+      {
+        "reference": "Matthew 1:5",
+        "original": "Matt. 1:5"
+      },
+      {
+        "reference": "1 Chronicles 2:34-38",
+        "original": "1 Chr. 2:34-38"
+      },
+      {
+        "reference": "1 Chronicles 26:7",
+        "original": "1 Chr. 26:7"
+      },
+      {
+        "reference": "2 Chronicles 23:1",
+        "original": "2 Chr. 23:1"
+      },
+      {
+        "reference": "Ruth 4:17",
+        "original": "Ruth 4:17"
+      },
+      {
+        "reference": "1 Chronicles 2:12",
+        "original": "1 Chronicles 2:12"
+      },
+      {
+        "reference": "Luke 3:32",
+        "original": "Luke 3:32"
+      },
+      {
+        "reference": "1 Chronicles 2:37",
+        "original": "1 Chronicles 2:37"
+      },
+      {
+        "reference": "1 Chronicles 2:38",
+        "original": "1 Chronicles 2:38"
+      },
+      {
+        "reference": "1 Chronicles 11:47",
+        "original": "1 Chronicles 11:47"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OBED-EDOM": {
+    "name": "Obed-Edom",
+    "slug": "obed-edom",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Edoms tjener». (1.) «Gatitten» (trolig kalt slik fordi han var fra Gat-Rimmon), en levitt fra Korittene (1 Krøn 26:1, 4-8), som særlig ble betrodd voktet av arken (1 Krøn 15:18). Da David hentet arken «fra Abinadabs hus, som var på Gibea» (trolig en høyde nær Kirjat-Jearim), og hadde nådd Nakons treskeplass, ble han redd på grunn av «bruddet over Ussa», og førte den til side inn i Obed-Edøms hus (2 Sam 6:1-12). Der ble den i seks måneder, og var til stor velsignelse for ham og hans hus. David flyttet den deretter med stor glede til Jerusalem, og satte den midt i det tabernaklet han hadde slått opp for den. (2.) En merarittisk levitt, en tempelvokter, som sammen med sine åtte sønner voktet den sørlige porten (1 Krøn 15:18, 21; 26:4, 8, 15). (3.) En som hadde ansvar for tempelskattene (2 Krøn 25:24)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 26:1",
+        "original": "1 Chr. 26:1"
+      },
+      {
+        "reference": "1 Chronicles 26:4",
+        "original": "1 Chr. 26:4"
+      },
+      {
+        "reference": "1 Chronicles 15:18",
+        "original": "1 Chr. 15:18"
+      },
+      {
+        "reference": "2 Samuel 6:1-12",
+        "original": "2 Sam. 6:1-12"
+      },
+      {
+        "reference": "1 Chronicles 15:21",
+        "original": "1 Chr. 15:21"
+      },
+      {
+        "reference": "2 Chronicles 25:24",
+        "original": "2 Chr. 25:24"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OBEDEDOM": {
+    "name": "Obededom",
+    "slug": "obededom",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Edoms tjener)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 6:10",
+        "original": "2 Samuel 6:10"
+      },
+      {
+        "reference": "2 Samuel 6:11",
+        "original": "2 Samuel 6:11"
+      },
+      {
+        "reference": "Joshua 21:25",
+        "original": "Joshua 21:25"
+      },
+      {
+        "reference": "2 Samuel 6:12",
+        "original": "2 Samuel 6:12"
+      },
+      {
+        "reference": "1 Chronicles 15:25",
+        "original": "1 Chronicles 15:25"
+      },
+      {
+        "reference": "1 Chronicles 16:38",
+        "original": "1 Chronicles 16:38"
+      },
+      {
+        "reference": "1 Chronicles 15:18",
+        "original": "1 Chronicles 15:18"
+      },
+      {
+        "reference": "1 Chronicles 15:24",
+        "original": "1 Chronicles 15:24"
+      },
+      {
+        "reference": "1 Chronicles 15:21",
+        "original": "1 Chronicles 15:21"
+      },
+      {
+        "reference": "1 Chronicles 16:5",
+        "original": "1 Chronicles 16:5"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OBEISANCE": {
+    "name": "Obeisance",
+    "slug": "obeisance",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hyllest eller ærbødighet overfor noen (1 Mos 37:7; 43:28)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 37:7",
+        "original": "Gen. 37:7"
+      },
+      {
+        "reference": "Genesis 43:28",
+        "original": "Gen 43:28"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OBIL": {
+    "name": "Obil",
+    "slug": "obil",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En kamelgjeter, en ismaelitt som var «over kamelene» i Davids tid (1 Krøn 27:30)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sjef for kamelene), en vokter av kamelflokkene i Davids regjeringstid. (1 Krøn 27:30) (ca. 1050 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 27:30",
+        "original": "1 Chr. 27:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OBLATION": {
+    "name": "Oblation",
+    "slug": "oblation",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Offer]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OBOTH": {
+    "name": "Oboth",
+    "slug": "oboth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Flasker», en leirplass for israelittene under ørkenvandringen (4 Mos 33:43), den første etter at kobberslangen ble satt opp."
+      },
+      {
+        "source": "SMI",
+        "text": "(flasker), en av israelittenes leirplasser, øst for Moab. (4 Mos 21:10; 33:43) Dens nøyaktige beliggenhet er ukjent, men den lå trolig sør for Dødehavet, på grensen mellom Moab og Edom.—RED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 33:43",
+        "original": "Num. 33:43"
+      },
+      {
+        "reference": "Numbers 21:10",
+        "original": "Numbers 21:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OCRAN": {
+    "name": "Ocran",
+    "slug": "ocran",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(plaget), en asjeritt, far til Pagiel. (4 Mos 1:13; 2:27; 7:72,77; 10:26) (f.Kr. før 1658.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 1:13",
+        "original": "Numbers 1:13"
+      },
+      {
+        "reference": "Numbers 2:27",
+        "original": "Numbers 2:27"
+      },
+      {
+        "reference": "Numbers 7:72",
+        "original": "Numbers 7:72"
+      },
+      {
+        "reference": "Numbers 7:77",
+        "original": "Numbers 7:77"
+      },
+      {
+        "reference": "Numbers 10:26",
+        "original": "Numbers 10:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ODED": {
+    "name": "Oded",
+    "slug": "oded",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "«Gjenreiser», eller «oppretter». (1.) Far til profeten Asarja (2 Krøn 15:1, 8). (2.) En profet i Akas’ og Pekahs tid (2 Krøn 28:9-15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(gjenreiser)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 15:1",
+        "original": "2 Chr. 15:1"
+      },
+      {
+        "reference": "2 Chronicles 15:8",
+        "original": "2 Chr. 15:8"
+      },
+      {
+        "reference": "2 Chronicles 28:9-15",
+        "original": "2 Chr. 28:9-15"
+      },
+      {
+        "reference": "2 Chronicles 28:9",
+        "original": "2 Chronicles 28:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ODOLLAM": {
+    "name": "Odollam",
+    "slug": "odollam",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Adullam]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OFFENCE": {
+    "name": "Offence",
+    "slug": "offence",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) En skade eller urett gjort mot noen (1 Sam 25:31; Rom 5:15). (2.) En anstøtsstein eller årsak til fristelse (Jes 8:14; Matt 16:23; 18:7). Gresk skandalon, egentlig det man snubler over eller tar anstøt av. \"Korsets anstøt\" (Gal 5:11) er det anstøt jødene tok over læren om at frelse var ved Den Korsfestede, og ved ham alene. Frelse ved korset var en snublestein for deres nasjonale stolthet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 25:31",
+        "original": "1 Sam. 25:31"
+      },
+      {
+        "reference": "Romans 5:15",
+        "original": "Rom. 5:15"
+      },
+      {
+        "reference": "Isaiah 8:14",
+        "original": "Isa. 8:14"
+      },
+      {
+        "reference": "Matthew 16:23",
+        "original": "Matt. 16:23"
+      },
+      {
+        "reference": "Matthew 18:7",
+        "original": "Matt 18:7"
+      },
+      {
+        "reference": "Galatians 5:11",
+        "original": "Gal. 5:11"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OFFERING": {
+    "name": "Offering",
+    "slug": "offering",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En offergave, innviet til Gud. Slik innviet Kain til Gud av jordens førstegrøde, og Abel av småfebuskapens førstefødte (1 Mos 4:3, 4). Under det levittiske systemet er ulike typer offergaver spesifisert, og lover er gitt for hvordan de skal fremføres. Disse beskrives under sine særskilte navn."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 4:3",
+        "original": "Gen. 4:3"
+      },
+      {
+        "reference": "Genesis 4:4",
+        "original": "Gen. 4:4"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OFFERINGS": {
+    "name": "Offerings",
+    "slug": "offerings",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Se Offergaver]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OFFICER": {
+    "name": "Officer",
+    "slug": "officer",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Det er åpenbart at de fleste, om ikke alle, de hebraiske ordene oversatt med \"offiser\" enten har en ubestemt karakter eller er synonyme betegnelser for funksjonærer kjent under andre og mer spesifikke navn, som \"skriver\", \"evnukk\" osv. De to ordene som er oversatt slik i Det nye testamente betegner—"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 5:25",
+        "original": "Matthew 5:25"
+      },
+      {
+        "reference": "Acts 5:22",
+        "original": "Acts 5:22"
+      },
+      {
+        "reference": "Luke 12:58",
+        "original": "Luke 12:58"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OG": {
+    "name": "Og",
+    "slug": "og",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gigantisk, kongen av Basan, som ble beseiret av Moses i et slag ved Edre'i, og ble drept sammen med sine sønner (5 Mos 1:4). Hans rike ble gitt til stammene Ruben og Gad og halve Manasse stamme (4 Mos 21:32-35; 5 Mos 3:1-13). Hans seng (eller rettere sagt sarkofag) var av jern (eller jernstein), 9 alen lang og 4 alen bred. Hans nederlag ble senere feiret i sang (Sal 135:11; 136:20). (Se SIHON)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Kjempe, bokstavelig talt \"langhalset\"), en amorittisk konge i Basan, hvis herredømme strakte seg over seksti byer (Jos 13:12). Han var en av de siste representantene for kjemperasen refaim, og ble, med sine barn og sitt folk, beseiret og utryddet av israelittene ved Edre'i umiddelbart etter erobringen av Sihon (4 Mos 32:33; 5 Mos 3:1-13). Også (5 Mos 1:4; 4:47; 31:4; Jos 2:10; 9:10; 13:12, 30). Troen på Ogs enorme størrelse bekreftes av en henvisning til hans jernseng som ble bevart i \"Rabbat Ammons barn\" (5 Mos 3:11). (F.Kr. 1461)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 1:4",
+        "original": "Deut. 1:4"
+      },
+      {
+        "reference": "Numbers 21:32-35",
+        "original": "Num. 21:32-35"
+      },
+      {
+        "reference": "Deuteronomy 3:1-13",
+        "original": "Deut. 3:1-13"
+      },
+      {
+        "reference": "Psalms 135:11",
+        "original": "Ps. 135:11"
+      },
+      {
+        "reference": "Psalms 136:20",
+        "original": "Ps 136:20"
+      },
+      {
+        "reference": "Joshua 13:12",
+        "original": "Joshua 13:12"
+      },
+      {
+        "reference": "Numbers 32:33",
+        "original": "Numbers 32:33"
+      },
+      {
+        "reference": "Numbers 3:1-13",
+        "original": "Numbers 3:1-13"
+      },
+      {
+        "reference": "Joshua 2:10",
+        "original": "Joshua 2:10"
+      },
+      {
+        "reference": "Joshua 9:10",
+        "original": "Joshua 9:10"
+      },
+      {
+        "reference": "Joshua 13:30",
+        "original": "Joshua 13:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OHAD": {
+    "name": "Ohad",
+    "slug": "ohad",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Forente, eller makt, Simeons tredje sønn (1 Mos 46:10)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:10",
+        "original": "Gen. 46:10"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OHEL": {
+    "name": "Ohel",
+    "slug": "ohel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Et hus; telt, Serubabels fjerde sønn (1 Krøn 3:20)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 3:20",
+        "original": "1 Chr. 3:20"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OIL": {
+    "name": "Oil",
+    "slug": "oil",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Bare olivenolje ser ut til å ha blitt brukt blant hebreerne. Den ble brukt til mange formål: til å salve kroppen eller håret (2 Mos 29:7; 2 Sam 14:2; Sal 23:5; 92:10; 104:15; Luk 7:46); i noen av offergavene (2 Mos 29:40; 3 Mos 7:12; 4 Mos 6:15; 15:4), men var utelukket fra syndofferet (3 Mos 5:11) og sjalusiofferet (4 Mos 5:15); til å brenne i lamper (2 Mos 25:6; 27:20; Matt 25:3); til medisinske formål (Jes 1:6; Luk 10:34; Jak 5:14); og til å salve de døde (Matt 26:12; Luk 23:56). Det var et av landets mest verdifulle produkter (5 Mos 32:13; Esek 16:13), og utgjorde en viktig handelsvare med Tyrus (Esek 27:17). Bruken av olje var et tegn på glede (Sal 92:10; Jes 61:3), og utelatelse et tegn på sorg (2 Sam 14:2; Matt 6:17). Den var svært rikelig i Galilea. (Se OLIVEN)."
+      },
+      {
+        "source": "SMI",
+        "text": "Blant de mange animalske og vegetabilske substansene som var kjent for oldtidens folk som kilder til olje, er olivenbæret det som oftest nevnes i Skriften."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 29:7",
+        "original": "Ex. 29:7"
+      },
+      {
+        "reference": "2 Samuel 14:2",
+        "original": "2 Sam. 14:2"
+      },
+      {
+        "reference": "Psalms 23:5",
+        "original": "Ps. 23:5"
+      },
+      {
+        "reference": "Psalms 92:10",
+        "original": "Ps 92:10"
+      },
+      {
+        "reference": "Psalms 104:15",
+        "original": "Ps 104:15"
+      },
+      {
+        "reference": "Luke 7:46",
+        "original": "Luke 7:46"
+      },
+      {
+        "reference": "Exodus 29:40",
+        "original": "Ex. 29:40"
+      },
+      {
+        "reference": "Leviticus 7:12",
+        "original": "Lev. 7:12"
+      },
+      {
+        "reference": "Numbers 6:15",
+        "original": "Num. 6:15"
+      },
+      {
+        "reference": "Numbers 15:4",
+        "original": "Num 15:4"
+      },
+      {
+        "reference": "Leviticus 5:11",
+        "original": "Lev. 5:11"
+      },
+      {
+        "reference": "Numbers 5:15",
+        "original": "Num. 5:15"
+      },
+      {
+        "reference": "Exodus 25:6",
+        "original": "Ex. 25:6"
+      },
+      {
+        "reference": "Exodus 27:20",
+        "original": "Ex 27:20"
+      },
+      {
+        "reference": "Matthew 25:3",
+        "original": "Matt. 25:3"
+      },
+      {
+        "reference": "Isaiah 1:6",
+        "original": "Isa. 1:6"
+      },
+      {
+        "reference": "Luke 10:34",
+        "original": "Luke 10:34"
+      },
+      {
+        "reference": "James 5:14",
+        "original": "James 5:14"
+      },
+      {
+        "reference": "Matthew 26:12",
+        "original": "Matt. 26:12"
+      },
+      {
+        "reference": "Luke 23:56",
+        "original": "Luke 23:56"
+      },
+      {
+        "reference": "Deuteronomy 32:13",
+        "original": "Deut. 32:13"
+      },
+      {
+        "reference": "Ezekiel 16:13",
+        "original": "Ezek. 16:13"
+      },
+      {
+        "reference": "Isaiah 61:3",
+        "original": "Isa. 61:3"
+      },
+      {
+        "reference": "Matthew 6:17",
+        "original": "Matt. 6:17"
+      },
+      {
+        "reference": "Leviticus 24:2",
+        "original": "Leviticus 24:2"
+      },
+      {
+        "reference": "Numbers 28:6",
+        "original": "Numbers 28:6"
+      },
+      {
+        "reference": "Exodus 29:2",
+        "original": "Exodus 29:2"
+      },
+      {
+        "reference": "Mark 6:13",
+        "original": "Mark 6:13"
+      },
+      {
+        "reference": "Leviticus 8:12",
+        "original": "Leviticus 8:12"
+      },
+      {
+        "reference": "Exodus 22:29",
+        "original": "Exodus 22:29"
+      },
+      {
+        "reference": "Exodus 23:16",
+        "original": "Exodus 23:16"
+      },
+      {
+        "reference": "Numbers 18:12",
+        "original": "Numbers 18:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OIL TREE": {
+    "name": "Oil Tree",
+    "slug": "oil-tree",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Hebr. ets shemen). De hebraiske ordene forekommer i (Neh 8:15) (Autorisert Oversettelse \"furugrener\"), (1 Kong 6:23) (\"oljetre\") og i (Jes 41:19) (\"oljetre\"). Fra passasjen i Nehemja, hvor ets shemen nevnes som atskilt fra oliventreet, kan det kanskje identifiseres med arabernes zackum-tre, Balanites aegyptiaca, en velkjent og rikelig busk eller et lite tre på Jordansletten. Zackum-oljen holdes høyt i ære av araberne for sine medisinske egenskaper. [Oliven]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 8:15",
+        "original": "Nehemiah 8:15"
+      },
+      {
+        "reference": "1 Kings 6:23",
+        "original": "1 Kings 6:23"
+      },
+      {
+        "reference": "Isaiah 41:19",
+        "original": "Isaiah 41:19"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OIL-TREE": {
+    "name": "Oil-tree",
+    "slug": "oil-tree",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Jes 41:19; R.V. marg., \"oleaster\"), hebr. ‘etz shemen, oversatt med \"oljetre\" i 1 Kong 6:23, 31, 32, 33 (R.V., \"oliventreved\") og \"furu-grener\" i Neh 8:15 (R.V., \"grener av vill oliven\"), var et tre som var forskjellig fra oliventreet. Det var sannsynligvis oleaster (Eleagnus angustifolius), som vokser rikelig i nesten alle deler av Palestina, spesielt rundt Hebron og Samaria. \"Det har et fint, hardt trevirke,\" sier Tristram, \"og gir en olje av lavere kvalitet, men det har ingen tilknytning til oliventreet, som det imidlertid ligner på i generelt utseende.\""
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Isaiah 41:19",
+        "original": "Isa. 41:19"
+      },
+      {
+        "reference": "1 Kings 6:23",
+        "original": "1 Kings 6:23"
+      },
+      {
+        "reference": "1 Kings 6:31",
+        "original": "1 Kings 6:31"
+      },
+      {
+        "reference": "1 Kings 6:32",
+        "original": "1 Kings 6:32"
+      },
+      {
+        "reference": "1 Kings 6:33",
+        "original": "1 Kings 6:33"
+      },
+      {
+        "reference": "Nehemiah 8:15",
+        "original": "Neh. 8:15"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OINTMENT": {
+    "name": "Ointment",
+    "slug": "ointment",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ulike velluktende preparater, også blandinger for medisinske formål, kalles så (2 Mos 30:25; Sal 133:2; Jes 1:6; Amos 6:6; Joh 12:3; Åp 18:13)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Et oljeaktig eller salvelignende stoff, vanligvis sammensatt av olje med ulike krydder og harpikser og aromatiske stoffer, og oppbevart i små alabastbokser eller krukker, hvor den herlige duften best ble bevart. Noen av salvene har vært kjent for å beholde sin duft i flere hundre år. De var en svært ettertraktet luksus, og ofte svært kostbare.—Red.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 30:25",
+        "original": "Ex. 30:25"
+      },
+      {
+        "reference": "Psalms 133:2",
+        "original": "Ps. 133:2"
+      },
+      {
+        "reference": "Isaiah 1:6",
+        "original": "Isa. 1:6"
+      },
+      {
+        "reference": "Amos 6:6",
+        "original": "Amos 6:6"
+      },
+      {
+        "reference": "John 12:3",
+        "original": "John 12:3"
+      },
+      {
+        "reference": "Revelation 18:13",
+        "original": "Rev. 18:13"
+      },
+      {
+        "reference": "Ruth 3:2",
+        "original": "Ruth 3:2"
+      },
+      {
+        "reference": "Matthew 26:12",
+        "original": "Matthew 26:12"
+      },
+      {
+        "reference": "Jeremiah 8:22",
+        "original": "Jeremiah 8:22"
+      },
+      {
+        "reference": "John 9:6",
+        "original": "John 9:6"
+      },
+      {
+        "reference": "Revelation 3:18",
+        "original": "Revelation 3:18"
+      },
+      {
+        "reference": "Exodus 30:23",
+        "original": "Exodus 30:23"
+      },
+      {
+        "reference": "Exodus 30:33",
+        "original": "Exodus 30:33"
+      },
+      {
+        "reference": "Exodus 29:7",
+        "original": "Exodus 29:7"
+      },
+      {
+        "reference": "Exodus 37:29",
+        "original": "Exodus 37:29"
+      },
+      {
+        "reference": "Exodus 40:9",
+        "original": "Exodus 40:9"
+      },
+      {
+        "reference": "Exodus 40:15",
+        "original": "Exodus 40:15"
+      },
+      {
+        "reference": "Nehemiah 3:8",
+        "original": "Nehemiah 3:8"
+      },
+      {
+        "reference": "1 Samuel 8:13",
+        "original": "1 Samuel 8:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OLD GATE": {
+    "name": "Old gate",
+    "slug": "old-gate",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En av portene i Jerusalems nordmur, såkalt fordi den ble bygget av jebusittene (Neh 3:6; 12:39)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 3:6",
+        "original": "Neh. 3:6"
+      },
+      {
+        "reference": "Nehemiah 12:39",
+        "original": "Neh 12:39"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OLD TESTAMENT": {
+    "name": "Old Testament",
+    "slug": "old-testament",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "I. TEKSTEN I DET GAMLE TESTAMENTET.—"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 40:7",
+        "original": "Psalms 40:7"
+      },
+      {
+        "reference": "Jeremiah 36:14",
+        "original": "Jeremiah 36:14"
+      },
+      {
+        "reference": "Ezekiel 2:9",
+        "original": "Ezekiel 2:9"
+      },
+      {
+        "reference": "Zechariah 5:1",
+        "original": "Zechariah 5:1"
+      },
+      {
+        "reference": "Acts 1:20",
+        "original": "Acts 1:20"
+      },
+      {
+        "reference": "1 Corinthians 1:31",
+        "original": "1 Corinthians 1:31"
+      },
+      {
+        "reference": "Luke 4:18",
+        "original": "Luke 4:18"
+      },
+      {
+        "reference": "Luke 4:19",
+        "original": "Luke 4:19"
+      },
+      {
+        "reference": "Isaiah 61:1",
+        "original": "Isaiah 61:1"
+      },
+      {
+        "reference": "Isaiah 58:6",
+        "original": "Isaiah 58:6"
+      },
+      {
+        "reference": "Romans 11:8",
+        "original": "Romans 11:8"
+      },
+      {
+        "reference": "Romans 29:4",
+        "original": "Romans 29:4"
+      },
+      {
+        "reference": "Isaiah 29:10",
+        "original": "Isaiah 29:10"
+      },
+      {
+        "reference": "Matthew 27:9",
+        "original": "Matthew 27:9"
+      },
+      {
+        "reference": "Jeremiah 18:1",
+        "original": "Jeremiah 18:1"
+      },
+      {
+        "reference": "Jeremiah 19:1",
+        "original": "Jeremiah 19:1"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OLIVE": {
+    "name": "Olive",
+    "slug": "olive",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Frukten fra oliventreet. Dette treet ga olje som var høyt verdsatt. Den beste oljen kom fra oliven som ble plukket før de var fullt modne, og deretter slått eller presset (5 Mos 24:20; Jes 17:6; 24:13). Den ble kalt \"slått\" eller \"fersk olje\" (2 Mos 27:20). Det fantes også oljepresser, hvor oljen ble tråkket ut med føttene (Mika 6:15). Jakob (3:12) kaller frukten \"olivenbær\". Uttrykket \"vingårder og oliven\" (Dom 15:5, A.V.) burde ganske enkelt være \"olivenhage\", som i den reviderte versjonen. (Se OLJE)."
+      },
+      {
+        "source": "SMI",
+        "text": "Oliven var blant Judeas mest utbredte og karakteristiske vegetasjon. Oliventreet vokser fritt nesten overalt ved Middelhavets kyster, men var spesielt rikelig i Palestina. Se (5 Mos 6:11; 8:8; 28:40). Olivenlunder er en selvfølge i beskrivelser av landet, i likhet med vingårder og kornåkre (Dom 15:5; 1 Sam 8:14). Kongene hadde svært omfattende lunder (1 Krøn 27:28). Selv nå er det svært rikelig i landet. Nesten hver landsby har sin olivenlund. Visse distrikter kan spesifiseres hvor dette treet til forskjellige tider har vært svært frodig. Dyrkingen av oliventreet hadde den nærmeste forbindelse med israelittenes hjemmeliv (2 Krøn 2:10), deres handel (Esek 27:17; Hos 12:1), og til og med deres offentlige seremonier og religiøse tilbedelse. I Salomos tempel var kjerubene \"av oljetre\" (1 Kong 6:23), det samme var dørene (1 Kong 6:31,32) og dørstolpene (1 Kong 6:33). For de forskjellige bruksområdene for olivenolje, se Olje. Vinden ble fryktet av olivedyrkeren, for den minste krusning av en bris er egnet til å få blomstene til å falle (Job 15:33). Det er unødvendig å legge til at gresshoppen var en formidabel fiende av oliven. Det hendte ikke sjelden at forhåpninger ble skuffet, og at \"olivens arbeid slo feil\" (Hab 3:17). Når det gjelder treets vekst, trives det best i varme og solrike omgivelser. Det har en moderat høyde, med en knudrete, forvridd stamme og glatt, askefarget bark. Det vokser sakte, men lever til en uhyre høy alder. Utseendet er bemerkelsesverdig tegn på seig livskraft, og dette er kraften i det som sies i Skriften om dets \"grønnhet\", som et symbol på styrke og velstand. Bladene er heller ikke løvfellende. De som ser oliven for første gang, blir av og til skuffet over den støvete fargen på løvverket; men de som er kjent med dem, finner en ubeskrivelig sjarm i de bølgende endringene i deres slanke grågrønne blader. (Se Ruskins \"Stones of Venice,\" iii. 175-177.) Oliven danner grunnlaget for en av Paulus' allegorier (Rom 11:16-25). Hedningene er den \"ville oljen\" som er podet inn på den \"edle oljen\", som jødene en gang tilhørte, og som de igjen kan inkorporeres med. (Oliventreet vokser fra 6 til 12 meter høyt. I generelt utseende ligner det epletreet; i blader og stengler, pilen. Blomstene er hvite og dukker opp i juni. Frukten er som en plomme i form og størrelse, og er først grønn, men blir gradvis lilla, og til og med svart, med en hard steinkjerne, og er bemerkelsesverdig ved at den ytre kjøttfulle delen er den som inneholder mye olje, og ikke, som vanlig, i frøets mandel. Frukten modnes fra august til september. Den spises noen ganger grønn, men dens hovedverdi ligger i oljen. Trevirket er hardt, fint, vakkert året, og brukes ofte til møbelsnekkerarbeid. Oliventrær var så rikelig i Galilea at under beleiringen av Jotapata av Vespasian ble den romerske hæren drevet tilbake fra oppstigningen av murene av varm olivenolje som ble hellet over dem og skoldet dem under rustningene deres.—Josefus, Jødekrigen, 3; 7:28.—Red.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 24:20",
+        "original": "Deut. 24:20"
+      },
+      {
+        "reference": "Isaiah 17:6",
+        "original": "Isa. 17:6"
+      },
+      {
+        "reference": "Isaiah 24:13",
+        "original": "Isa 24:13"
+      },
+      {
+        "reference": "Exodus 27:20",
+        "original": "Ex. 27:20"
+      },
+      {
+        "reference": "Micah 6:15",
+        "original": "Micah 6:15"
+      },
+      {
+        "reference": "Judges 15:5",
+        "original": "Judg. 15:5"
+      },
+      {
+        "reference": "1 Samuel 8:14",
+        "original": "1 Samuel 8:14"
+      },
+      {
+        "reference": "1 Chronicles 27:28",
+        "original": "1 Chronicles 27:28"
+      },
+      {
+        "reference": "2 Chronicles 2:10",
+        "original": "2 Chronicles 2:10"
+      },
+      {
+        "reference": "Ezekiel 27:17",
+        "original": "Ezekiel 27:17"
+      },
+      {
+        "reference": "Hosea 12:1",
+        "original": "Hosea 12:1"
+      },
+      {
+        "reference": "1 Kings 6:23",
+        "original": "1 Kings 6:23"
+      },
+      {
+        "reference": "1 Kings 6:31",
+        "original": "1 Kings 6:31"
+      },
+      {
+        "reference": "1 Kings 6:32",
+        "original": "1 Kings 6:32"
+      },
+      {
+        "reference": "1 Kings 6:33",
+        "original": "1 Kings 6:33"
+      },
+      {
+        "reference": "Job 15:33",
+        "original": "Job 15:33"
+      },
+      {
+        "reference": "Habakkuk 3:17",
+        "original": "Habakkuk 3:17"
+      },
+      {
+        "reference": "Romans 11:16-25",
+        "original": "Romans 11:16-25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OLIVE-TREE": {
+    "name": "Olive-tree",
+    "slug": "olive-tree",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nevnes ofte i Skriften. Duen fra arken brakte en olivenkvist til Noah (1 Mos 8:11). Det nevnes blant de mest bemerkelsesverdige trærne i Palestina, hvor det ble dyrket lenge før hebreernes tid (5 Mos 6:11; 8:8). Det nevnes i Det gamle testamentes første lignelse, Jotams lignelse (Dom 9:9), og er navngitt blant velsignelsene i det \"gode landet\", og er i dag Palestinas ene karakteristiske tre. De eldste oliventreeene i landet er de som er omsluttet av Getsemane hage. Det refereres til som et symbol på velstand og skjønnhet og religiøse privilegier (Sal 52:8; Jer 11:16; Hos 14:6). De to \"vitnene\" nevnt i Åp 11:4 omtales som \"to oljetrær som står foran jordens Gud\" (Jfr. Sak 4:3, 11-14). \"Oliventreet, vilt av natur\" (Rom 11:24), er skuddet eller stiklingen fra det gode oliventreet som, når det står upoddet, vokser opp til å bli en \"vill oliven\". I Rom 11:17 henviser Paulus til praksisen med å pode skudd fra vill oliven inn i en \"god\" oliven som har blitt ufruktbar. Ved en slik prosess gjør saften fra den gode oliven, ved å gjennomtrenge grenen som er \"podet inn\", den til en god gren som bærer gode oliven. Slik bærer hedningene, som er en \"vill oliven\", men nå \"podet inn\", frukt, men bare gjennom saften fra treet de er podet inn i. Dette er en prosess \"mot naturen\" (Rom 11:24)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 8:11",
+        "original": "Gen. 8:11"
+      },
+      {
+        "reference": "Deuteronomy 6:11",
+        "original": "Deut. 6:11"
+      },
+      {
+        "reference": "Deuteronomy 8:8",
+        "original": "Deut 8:8"
+      },
+      {
+        "reference": "Judges 9:9",
+        "original": "Judg. 9:9"
+      },
+      {
+        "reference": "Psalms 52:8",
+        "original": "Ps. 52:8"
+      },
+      {
+        "reference": "Jeremiah 11:16",
+        "original": "Jer. 11:16"
+      },
+      {
+        "reference": "Hosea 14:6",
+        "original": "Hos. 14:6"
+      },
+      {
+        "reference": "Revelation 11:4",
+        "original": "Rev. 11:4"
+      },
+      {
+        "reference": "Zechariah 4:3",
+        "original": "Zech. 4:3"
+      },
+      {
+        "reference": "Zechariah 4:11",
+        "original": "Zech. 4:11"
+      },
+      {
+        "reference": "Romans 11:24",
+        "original": "Rom. 11:24"
+      },
+      {
+        "reference": "Romans 11:17",
+        "original": "Rom. 11:17"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OLIVES, MOUNT OF": {
+    "name": "Olives, Mount Of",
+    "slug": "olives-mount-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "«Oljeberget» forekommer i Det gamle testamente bare i (Sakarja 14:4). I (2 Samuel 15:30) kalles det «Oljeberget»; andre steder ganske enkelt «fjellet» (Nehemja 8:15), «fjellet som ligger overfor Jerusalem» (1 Kongebok 11:7) eller «fjellet som er på byens østside» (Esekiel 11:23). I Det nye testamente er den vanlige formen «Oljeberget». Det kalles også «Oljeberget» (Apostlenes gjerninger 1:12). Dette fjellet er den velkjente høyden øst for Jerusalem, nært forbundet med noen av de alvorligste hendelsene i Det gamle og Det nye testamentes historie: scenen for Davids flukt og Davids Sønns triumftog, Salomos avgudsdyrkelse, og Kristi dødskamp og forræderi. Det er en åsrygg på litt over en mil i lengde, som løper i generell retning nord og sør, og dekker hele den østlige siden av byen. Ved den nordlige enden bøyer åsryggen seg rundt mot vest, slik at den også danner en innhegning for byen på den siden. I nord skiller et nesten en mil langt, ganske flatt område bymurene fra den stigende bakken; i øst ligger fjellet nær murene, bare skilt av den smale Kidron-dalen. Det er denne delen som er det virkelige Oljeberget i historien. I sin generelle høyde er det ikke mye høyere enn byen: 300 fot høyere enn tempelhøyden, knapt mer enn 100 fot over det såkalte Sion. Det er avrundet, svulmende og regelmessig i formen. Fra nord til sør finnes fire uavhengige topper, kalt – 1, «Viri Galilaei»; 2, «Himmelfartsberget»; 3, «Profetenes» – underordnet den siste og nesten en del av den; 4, «Forargelsens berg»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Zechariah 14:4",
+        "original": "Zechariah 14:4"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2 Samuel 15:30"
+      },
+      {
+        "reference": "Nehemiah 8:15",
+        "original": "Nehemiah 8:15"
+      },
+      {
+        "reference": "1 Kings 11:7",
+        "original": "1 Kings 11:7"
+      },
+      {
+        "reference": "Ezekiel 11:23",
+        "original": "Ezekiel 11:23"
+      },
+      {
+        "reference": "Acts 1:12",
+        "original": "Acts 1:12"
+      },
+      {
+        "reference": "Matthew 23:29",
+        "original": "Matthew 23:29"
+      },
+      {
+        "reference": "2 Kings 23:13",
+        "original": "2 Kings 23:13"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OLIVET": {
+    "name": "Olivet",
+    "slug": "olivet",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(sted for oliven). (2 Samuel 15:30; Apostlenes gjerninger 1:12) [OLJEBERGET]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2 Samuel 15:30"
+      },
+      {
+        "reference": "Acts 1:12",
+        "original": "Acts 1:12"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OLVES, MOUNT OF": {
+    "name": "Olves, Mount of",
+    "slug": "olves-mount-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Kalles slik på grunn av oliventrærne som kler sidene, er en fjellrygg øst for Jerusalem (1 Kongebok 11:7; Esekiel 11:23; Sakarja 14:4), som den er skilt fra av Kidron-dalen. Den er først nevnt i forbindelse med Davids flukt fra Jerusalem under Absaloms opprør (2 Samuel 15:30), og er bare én gang til nevnt i Det gamle testamente, i Sakarja 14:4. Den er imidlertid ofte hentydet til (1 Kongebok 11:7; 2 Kongebok 23:13; Nehemja 8:15; Esekiel 11:23). Den er hyppig nevnt i Det nye testamente (Matteus 21:1; 26:30, osv.). Den bærer nå navnet Jebel et-Tur, dvs. «Toppfjellet»; også noen ganger kalt Jebel ez-Zeitun, dvs. «Oljeberget». Den ligger omtrent 200 fot over byens nivå. Veien fra Jerusalem til Betania går som i gamle dager over dette fjellet. Det var på dette fjellet Jesus sto da han gråt over Jerusalem. «Intet navn i Skriften,» sier Dr. Porter, «fremkaller assosiasjoner som er så hellige og så behagelige på én gang som Oljeberget. ‘Fjellet’ er så nært forbundet med Frelserens private og andaktsfulle liv, at vi leser om det og ser på det med følelser av dypeste interesse og hengivenhet. Her satt han ofte med disiplene sine, og fortalte dem om underfulle hendelser som ennå skulle komme, om ødeleggelsen av Den hellige by; om lidelsene, forfølgelsen og den endelige triumfen til hans etterfølgere (Matteus 24). Her ga han dem de vakre lignelsene om de ti jomfruene og de fem talentene (25); her pleide han å trekke seg tilbake hver kveld for meditasjon, bønn og kroppslig hvile, når han var sliten og plaget av dagens strev og prøvelser (Lukas 21:37); og hit kom han den natten han ble forrådt for å uttale den vidunderlige bønnen: ‘Min Far, om det er mulig, la denne kalk gå meg forbi! Men ikke som jeg vil, men som du vil’ (Matteus 26:39). Og da Guds vredes kalk var tømt, og døden og graven var overvunnet, ledet han disiplene sine ut igjen over Oljeberget så langt som til Betania, og etter en avskjedsvelsignelse steg han opp til himmelen (Lukas 24:50, 51; Apostlenes gjerninger 1:12).» Dette fjellet, eller rettere sagt fjellkjeden, har fire topper: (1) «Galilea»-toppen, så kalt fra en tradisjon om at englene sto her da de talte til disiplene (Apostlenes gjerninger 1:11); (2) «Himmelfartsfjellet», det antatte stedet for den hendelsen, som imidlertid sannsynligvis var et sted nærmere Betania (Lukas 24:51, 52); (3) «Profetenes», fra katakombene på dens side, kalt «profetenes graver»; og (4) «Fordervelsens fjell», så kalt på grunn av «offerhaugene» Salomo reiste der for avgudsdyrkelsen av sine utenlandske hustruer (1 Kongebok 11:7; 2 Kongebok 23:13; Vulg., «Forargelsens berg»)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 11:7",
+        "original": "1 Kings 11:7"
+      },
+      {
+        "reference": "Ezekiel 11:23",
+        "original": "Ezek. 11:23"
+      },
+      {
+        "reference": "Zechariah 14:4",
+        "original": "Zech. 14:4"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2 Sam. 15:30"
+      },
+      {
+        "reference": "2 Kings 23:13",
+        "original": "2 Kings 23:13"
+      },
+      {
+        "reference": "Nehemiah 8:15",
+        "original": "Neh. 8:15"
+      },
+      {
+        "reference": "Matthew 21:1",
+        "original": "Matt. 21:1"
+      },
+      {
+        "reference": "Matthew 26:30",
+        "original": "Matt 26:30"
+      },
+      {
+        "reference": "Matthew 24",
+        "original": "Matt. 24"
+      },
+      {
+        "reference": "Luke 21:37",
+        "original": "Luke 21:37"
+      },
+      {
+        "reference": "Matthew 26:39",
+        "original": "Matt. 26:39"
+      },
+      {
+        "reference": "Luke 24:50",
+        "original": "Luke 24:50"
+      },
+      {
+        "reference": "Luke 24:51",
+        "original": "Luke 24:51"
+      },
+      {
+        "reference": "Acts 1:12",
+        "original": "Acts 1:12"
+      },
+      {
+        "reference": "Acts 1:11",
+        "original": "Acts 1:11"
+      },
+      {
+        "reference": "Luke 24:52",
+        "original": "Luke 24:52"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OLYMPAS": {
+    "name": "Olympas",
+    "slug": "olympas",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En romersk kristen som Paulus hilser (Romerbrevet 16:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(himmelsk), en kristen i Roma. (Romerbrevet 16:15) (A.D. 65)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Romans 16:15",
+        "original": "Rom. 16:15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OMAR": {
+    "name": "Omar",
+    "slug": "omar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Veltalende, sønn av Elifas, som var Esaus eldste sønn (1 Mosebok 36:11-15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(veltalende, snakkesalig), sønn av Elifas, Esaus førstefødte. (1 Mosebok 36:11,15; 1 Krønikebok 1:38) (ca. 1750 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:11-15",
+        "original": "Gen. 36:11-15"
+      },
+      {
+        "reference": "Genesis 36:11",
+        "original": "Genesis 36:11"
+      },
+      {
+        "reference": "Genesis 36:15",
+        "original": "Genesis 36:15"
+      },
+      {
+        "reference": "1 Chronicles 1:38",
+        "original": "1 Chronicles 1:38"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OMEGA": {
+    "name": "Omega",
+    "slug": "omega",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Åpenbaringen 1:8), den siste bokstaven i det greske alfabetet. (Se Alfa)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Revelation 1:8",
+        "original": "Rev. 1:8"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OMEGA, OR OMEGA": {
+    "name": "Omega, Or Omega",
+    "slug": "omega-or-omega",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Den siste bokstaven i det greske alfabetet. Den brukes metaforisk for å betegne slutten på noe (Åpenbaringen 1:8,11)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Revelation 1:8",
+        "original": "Revelation 1:8"
+      },
+      {
+        "reference": "Revelation 1:11",
+        "original": "Revelation 1:11"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OMER": {
+    "name": "Omer",
+    "slug": "omer",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En håndfull, en tidel av en efa = en halv gallon tørrmål (2 Mosebok 16:22, 32, 33, 36) = «en tiendedel mål»."
+      },
+      {
+        "source": "SMI",
+        "text": "[Vekter og mål]."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 16:22",
+        "original": "Ex. 16:22"
+      },
+      {
+        "reference": "Exodus 16:32",
+        "original": "Ex 16:32"
+      },
+      {
+        "reference": "Exodus 16:33",
+        "original": "Ex 16:33"
+      },
+      {
+        "reference": "Exodus 16:36",
+        "original": "Ex 16:36"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OMRI": {
+    "name": "Omri",
+    "slug": "omri",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jehovas tjener. Da Ela ble myrdet av Zimri i Tirza (1 Kongebok 16:15-27), ble Omri, hans hærfører, gjort til konge (ca. 931 f.Kr.). I fire år var det vedvarende motstand mot hans regjeringstid, der Tibni, en annen tronpretendent, ledet den motsatte parten; men ved slutten av denne perioden ble alle hans rivaler beseiret, og han ble konge i Israel: «Tibni døde og Omri regjerte» (ca. 927 f.Kr.). Med sin kraft og makt oppnådde han stor anseelse og konsoliderte kongeriket. Han etablerte sitt dynasti på tronen så fast at det fortsatte i fire etterfølgende regjeringstider. Tirza var sete for hans regjering i seks år. Han flyttet deretter hovedstaden til Samaria (se d.o.), hvor han døde, og ble etterfulgt av sin sønn Akab. «Han gjorde det som var ondt i Herrens øyne, og handlet verre enn alle dem som var før ham.» Bet-Omri, «Omris hus» eller «Omris by», er navnet som vanligvis finnes på assyriske inskripsjoner for Samaria. På Mesjas stele («Moabittsteinen»), som ble reist i Moab omtrent tjue eller tretti år etter Omris død, er det nedtegnet at Omri undertrykte Moab til Mesja befridde landet: «Omri, Israels konge, undertrykte Moab i mange dager, for Kemosj var vred på sitt land. Hans sønn etterfulgte ham, og han sa også: Jeg vil undertrykke Moab» (jf. 2 Kongebok 1:1; 3:4, 5). «Moabittsteinen» nedtegner også at «Omri tok landet Medeba, og besatte det i sin tid og i sin sønns dager i førti år»."
+      },
+      {
+        "source": "SMI",
+        "text": "(Jehovas elev)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 16:15-27",
+        "original": "1 Kings 16:15-27"
+      },
+      {
+        "reference": "2 Kings 1:1",
+        "original": "2 Kings 1:1"
+      },
+      {
+        "reference": "2 Kings 3:4",
+        "original": "2 Kings 3:4"
+      },
+      {
+        "reference": "2 Kings 3:5",
+        "original": "2 Kings 3:5"
+      },
+      {
+        "reference": "1 Kings 16:21",
+        "original": "1 Kings 16:21"
+      },
+      {
+        "reference": "1 Kings 16:15",
+        "original": "1 Kings 16:15"
+      },
+      {
+        "reference": "1 Kings 16:23",
+        "original": "1Kin 16:23"
+      },
+      {
+        "reference": "1 Chronicles 7:8",
+        "original": "1 Chronicles 7:8"
+      },
+      {
+        "reference": "1 Chronicles 9:4",
+        "original": "1 Chronicles 9:4"
+      },
+      {
+        "reference": "1 Chronicles 27:18",
+        "original": "1 Chronicles 27:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ON": {
+    "name": "On",
+    "slug": "on",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lys; solen, (1 Mosebok 41:45, 50), det store senteret for soltilbedelse, også kalt Bet-Sjemesj (Jeremia 43:13) og Aven (Esekiel 30:17), lå på Nilens østbredd, noen få mil nord for Memfis, og nær Kairo, i nordøst. Vulgata og LXX-versjonene har «Heliopolis» («solens by») i stedet for On i Første Mosebok og Aven i Esekiel. «Ødeleggelsens by» som Jesaja taler om (19:18, marg. «av Heres»; Hebr. ‘Ir-ha-heres, som noen MSS. leser Ir-ha-heres, dvs. «solens by») kan være navnet gitt til On, der profetien er at tiden vil komme når den byen som var kjent som «solgudens by», skal bli «solgudens ødeleggelsesby», dvs. når avgudsdyrkelsen skal opphøre, og tilbedelsen av den sanne Gud skal etableres. I oldtiden var denne byen full av obelisker viet til solen. Av disse står nå bare én. «Kleopatras nål» var en av dem som sto i denne byen foran Tums tempel, dvs. «solen». Den er nå reist på Thames Embankment i London. «Det var i On Josef fridde til og vant den mørkhudede Asenat, datteren til ypperstepresten i dens store tempel.» Dette var en kjent universitetsby, og her fikk Moses sin kunnskap om «all egypternes visdom»."
+      },
+      {
+        "source": "SMI",
+        "text": "(solens bosted eller by), en by i nedre Egypt, kalt BET-SJEMESJ i (Jeremia 43:13). On er bedre kjent under sitt greske navn Heliopolis. Den lå på østsiden av Nilens pelusiaske gren, like nedenfor Deltas punkt, og omtrent tjue mil nordøst for Memfis. Hovedformålet med tilbedelsen i Heliopolis var solen, hvis tempel, beskrevet av Strabon, nå bare er representert av den ene vakre obelisken, av rød granitt, 68 fot 2 tommer høy over sokkelen, som har stått i mer enn 4000 år, reist av Usirtesen, den andre kongen av det tolvte dynasti. Heliopolis var i oldtiden berømt for sin lærdom, og Eudoxos og Platon studerte under dens prester. Den første omtalen av dette stedet i Bibelen er i Josefs historie, der vi leser at Farao ga «Asenat, datter av Potifera, presten i On, til kone» (1 Mosebok 41:45) jf. vers 1 Mosebok 41:60 og 1 Mosebok 46:20 (On skal huskes ikke bare som Josefs hjem, men som det tradisjonelle stedet hans fjerne navnebror tok Maria og barnet Jesus til under flukten til Egypt. De to berømte obeliskene, lenge kalt «Kleopatras nåler», hvorav den ene nå står i London og den andre i Central Park i New York City, sto en gang foran denne byen, og ble sett av Israels barn før utvandringen, etter å ha blitt brutt i Syene ved Nilen, reist i On (Heliopolis) av Thutmose III, ca. 1500 f.Kr., og inskripsjoner lagt til av Ramses II (Sesostris) to hundre år senere. De ble tatt til Alexandria av Augustus Cæsar år 23 e.Kr., hvorfra de ble fjernet til sine nåværende steder.—RED.) sønn av Pelet og en av høvdingene i Rubens stamme, som deltok med Korah, Datan og Abiram i deres opprør mot Moses. (4 Mosebok 16:1) (ca. 1491 f.Kr.). Hans navn forekommer ikke igjen i beretningen om konspirasjonen, og han er heller ikke hentydet til når det refereres til den endelige katastrofen."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 41:45",
+        "original": "Gen. 41:45"
+      },
+      {
+        "reference": "Genesis 41:50",
+        "original": "Gen. 41:50"
+      },
+      {
+        "reference": "Jeremiah 43:13",
+        "original": "Jer. 43:13"
+      },
+      {
+        "reference": "Ezekiel 30:17",
+        "original": "Ezek. 30:17"
+      },
+      {
+        "reference": "Numbers 16:1",
+        "original": "Numbers 16:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONAM": {
+    "name": "Onam",
+    "slug": "onam",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(sterk)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:23",
+        "original": "Genesis 36:23"
+      },
+      {
+        "reference": "1 Chronicles 1:40",
+        "original": "1 Chronicles 1:40"
+      },
+      {
+        "reference": "1 Chronicles 2:26",
+        "original": "1 Chronicles 2:26"
+      },
+      {
+        "reference": "1 Chronicles 2:28",
+        "original": "1 Chronicles 2:28"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ONAN": {
+    "name": "Onan",
+    "slug": "onan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sterk, den andre sønnen til Juda (1 Mosebok 38:4-10; jf. 5 Mosebok 25:5; Matteus 22:24). Han døde før Jakob og hans familie dro ned til Egypt."
+      },
+      {
+        "source": "SMI",
+        "text": "(sterk), den andre sønnen til Juda med kanaaneerkvinnen, «Sjuas datter». (1 Mosebok 38:4; 1 Krønikebok 2:3) «Det han gjorde, var ondt i Herrens øyne, og Han drepte ham også, slik Han hadde drept hans eldre bror. (1 Mosebok 38:9) Hans død fant sted før Jakobs familie dro ned til Egypt. (1 Mosebok 46:12; 4 Mosebok 26:19) (ca. 1706 f.Kr.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 38:4-10",
+        "original": "Gen. 38:4-10"
+      },
+      {
+        "reference": "Deuteronomy 25:5",
+        "original": "Deut. 25:5"
+      },
+      {
+        "reference": "Matthew 22:24",
+        "original": "Matt. 22:24"
+      },
+      {
+        "reference": "Genesis 38:4",
+        "original": "Genesis 38:4"
+      },
+      {
+        "reference": "1 Chronicles 2:3",
+        "original": "1 Chronicles 2:3"
+      },
+      {
+        "reference": "Genesis 38:9",
+        "original": "Genesis 38:9"
+      },
+      {
+        "reference": "Genesis 46:12",
+        "original": "Genesis 46:12"
+      },
+      {
+        "reference": "Numbers 26:19",
+        "original": "Numbers 26:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONESIMUS": {
+    "name": "Onesimus",
+    "slug": "onesimus",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nyttig, en slave som etter å ha ranet sin herre Filemon (se d.o.) i Kolossai, flyktet til Roma, hvor han ble omvendt av apostelen Paulus, som sendte ham tilbake til sin herre med brevet som bærer hans navn. I det ber han Filemon om å ta imot slaven sin som en «trofast og elsket bror». Paulus tilbyr å betale Filemon for alt slaven hadde tatt, og å bære den urett han hadde gjort ham. Han ble ledsaget på sin retur av Tykikus, bæreren av brevet til Kolosserne (Filemon 1:16, 18). Historien om denne flyktende slavens fra Kolossai er et bemerkelsesverdig bevis på den frie adgangen til fangen som ble gitt til alle, og «en vakker illustrasjon både av St. Paulus' karakter og evangeliets forvandlende kraft og rettferdige prinsipper»."
+      },
+      {
+        "source": "SMI",
+        "text": "(nyttig, gagnlig), navnet på tjeneren eller slaven som Paulus skrev Filemon-brevet for. Han var født i, eller i hvert fall en innbygger av, Kolossai. (Kolosserbrevet 4:9) (A.D. 58). Han flyktet fra sin herre og unnslapp til Roma, hvor han ble ledet til å omfavne evangeliet gjennom Paulus’ virke. Etter hans omvendelse oppsto de lykkeligste og vennligste forholdene mellom læreren og disippelen. Hvorvidt Paulus ønsket hans nærvær som personlig tjener eller som evangeliets minister er ikke sikkert fra vers 13 i brevet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Philemon 1:1",
+        "original": "Philemon 1"
+      },
+      {
+        "reference": "Colossians 4:9",
+        "original": "Colossians 4:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONESIPHORUS": {
+    "name": "Onesiphorus",
+    "slug": "onesiphorus",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Som bringer nytte, en efesisk kristen som viste stor godhet mot Paulus i Roma. Han tjente ham på mange måter, og hadde ofte styrket ham. Paulus uttrykker en varm interesse for ham og hans husstand (2 Timoteus 1:16-18; 4:19)."
+      },
+      {
+        "source": "SMI",
+        "text": "(som bringer nytte) nevnes bare to ganger i Det nye testamente, nemlig (2 Timoteus 1:16-18) og 2 Timoteus 4:19. Paulus nevner ham med takknemlig kjærlighet for hans edle mot og generøsitet på hans vegne, midt under hans prøvelser som fange i Roma, da andre som han forventet bedre ting fra, hadde forlatt ham. (2 Timoteus 4:16) Trolig var også andre medlemmer av familien aktive kristne. (2 Timoteus 4:19) Det er tydelig fra (2 Timoteus 1:18) at Onesiforus hadde sitt hjem i Efesos. (A.D. 64)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Timothy 1:16-18",
+        "original": "2 Tim. 1:16-18"
+      },
+      {
+        "reference": "2 Timothy 4:19",
+        "original": "2 Tim. 4:19"
+      },
+      {
+        "reference": "2 Timothy 4:16",
+        "original": "2 Timothy 4:16"
+      },
+      {
+        "reference": "2 Timothy 1:18",
+        "original": "2 Timothy 1:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONIAS": {
+    "name": "Onias",
+    "slug": "onias",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "navnet på fem yppersteprester i perioden mellom Det gamle og Det nye testamente."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ONION": {
+    "name": "Onion",
+    "slug": "onion",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Israelittene i ørkenen lengtet etter «løken og hvitløken fra Egypt» (4 Mos 11:5). Dette var hebreernes betsel, botanikernes Allium cepe, og det sies at det nå vokser tretti til førti arter av den i Palestina. Løken er «den ‘udelade’ purren, unio_, _unus, én.»"
+      },
+      {
+        "source": "SMI",
+        "text": "Dette produktet er nevnt kun i (4 Mosebok 11:5) som en av Egypts gode ting som Israelittene angret tapet av. Løk har fra uminnelige tider vært en populær matvare blant egypterne. Egypts løk er mye mildere i smak og mindre skarp enn de som vokser her i landet."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 11:5",
+        "original": "Num. 11:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONO": {
+    "name": "Ono",
+    "slug": "ono",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En by i Benjamin, på «Onosletten» (1 Krøn 8:12; Esra 2:33); nå Kefr ‘Ana, 5 engelske mil nord for Lydda, og omtrent 30 engelske mil nordvest for Jerusalem. Da Sanballat og Tobia ikke lyktes i sine forsøk på å hindre Nehemja i å gjenoppbygge Jerusalems murer, tyr de til list, og later som de ønsket en samtale med ham, inviterte de ham til å møte dem i Ono. Fire ganger kom forespørselen, og hver gang nektet Nehemja å komme. Deres mål var å ta ham til fange."
+      },
+      {
+        "source": "SMI",
+        "text": "(sterk), en av Benjamins byer, nevnes først i (1 Krønikebok 8:12). Til byen hørte en slette kalt «Onosletten» (Nehemja 6:2), kanskje identisk med «håndverkernes dal» (Nehemja 11:35)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:12",
+        "original": "1 Chr. 8:12"
+      },
+      {
+        "reference": "Ezra 2:33",
+        "original": "Ezra 2:33"
+      },
+      {
+        "reference": "Nehemiah 6:2",
+        "original": "Nehemiah 6:2"
+      },
+      {
+        "reference": "Nehemiah 11:35",
+        "original": "Nehemiah 11:35"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONYCHA": {
+    "name": "Onycha",
+    "slug": "onycha",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En negl; klo; hov, (Hebr. sheheleth; 2 Mos 30:34), et latinsk ord som brukes om operculum, dvs. kloen eller neglen til strombus eller vingesnegl, en snegleslekning som er vanlig i Rødehavet. Operculene fra disse skalldyrene avgir, når de brennes, en sterk lukt «som bevergjel». Dette var en ingrediens i den hellige røkelsen."
+      },
+      {
+        "source": "SMI",
+        "text": "omtalt i (2 Mosebok 30:34) var en av ingrediensene i den hellige parfymen. Den består av skall fra flere typer muslinger, som når de brennes, avgir en sterk lukt."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 30:34",
+        "original": "Ex. 30:34"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ONYX": {
+    "name": "Onyx",
+    "slug": "onyx",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En hagl; klo; hov, (Hebr. shoham), en edelsten som prydet yppersteprestens brystplate og efodens skuldre (2 Mos 28:9-12, 20; 35:27; Job 28:16; Esek 28:13). Den ble funnet i Havilas land (1 Mos 2:12). Septuaginta (LXX) oversetter det hebraiske ordet med smaragdos, en smaragd. Noen mener at det er sardonyks som menes. Men onyks skiller seg fra sardonyks ved at mens sistnevnte har to lag (svart og hvitt), har førstnevnte tre (svart, hvitt og rødt)."
+      },
+      {
+        "source": "SMI",
+        "text": "(en negl) er oversettelsen av det hebraiske shoham; men det er en viss tvil om dets betydning. Noen forfattere mener at «beryll» er ment; men flertallet av autoriteter heller mot en variant av onyks. («Onyksen er ikke en gjennomsiktig stein, men slik kjøttets farge synes gjennom neglen (gresk onyks) på menneskekroppen, slik skinner den rødaktige massen nedenfor delikat gjennom den hvitaktige overflaten av onyksen. Det finnes flere varianter. Hvite og rødaktige striper som veksler, danner sardonyksen; hvite og rødaktige grå, kalsedonen. Når den er polert, har den en fin glans og er lett å forme til en edelsten av stor skjønnhet.» – Rosenmiller.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 28:9-12",
+        "original": "Ex. 28:9-12"
+      },
+      {
+        "reference": "Exodus 28:20",
+        "original": "Ex 28:20"
+      },
+      {
+        "reference": "Exodus 35:27",
+        "original": "Ex 35:27"
+      },
+      {
+        "reference": "Job 28:16",
+        "original": "Job 28:16"
+      },
+      {
+        "reference": "Ezekiel 28:13",
+        "original": "Ezek. 28:13"
+      },
+      {
+        "reference": "Genesis 2:12",
+        "original": "Gen. 2:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OPEN PLACE": {
+    "name": "Open place",
+    "slug": "open-place",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "1 Mos 38:14, 21, marg. Enaim; sannsynligvis det samme som Enam (Jos 15:34), en by på lavlandet eller Shefela."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 38:14",
+        "original": "Gen. 38:14"
+      },
+      {
+        "reference": "Genesis 38:21",
+        "original": "Gen. 38:21"
+      },
+      {
+        "reference": "Joshua 15:34",
+        "original": "Josh. 15:34"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OPHEL": {
+    "name": "Ophel",
+    "slug": "ophel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Høyde; haug, den lange, smale, avrundede odde på den sørlige skråningen av Tempelhøyden, mellom Tyropoeon og Kedrondalen (2 Krøn 27:3; 33:14; Neh 3:26, 27). Den var omgitt av en egen mur og ble bebodd av netinim etter fangenskapet. Denne muren er blitt oppdaget av ingeniørene fra Palestine Exploration Fund ved det sørøstlige hjørnet av tempelområdet. Den ligger 4 fot under nåværende overflate. I 2 Kong 5:24 er dette ordet oversatt med «tårn» (revidert versjon, «høyde»), og betegner trolig en forhøyning nær Elisjas hus."
+      },
+      {
+        "source": "SMI",
+        "text": "(høyde), en del av det gamle Jerusalem. Ofel var den svulmende hellingen der tempelhøyden skråner ned på sørsiden til Hinnoms dal – en lang, smal, avrundet utløper eller odde, som ligger mellom munningen av Jerusalems sentrale dal (Tyropoeon) og Kedron, eller Josjafats dal. Halvveis ned på dens østside er («Jomfruens kilde», som den kalles; og ved dens fot den nedre utløpet av samme kilde – Siloamdammen. I (2 Krønikebok 27:3) sies det at Jotam bygde mye «på Ofels mur». Manasse, blant hans andre forsvarsverk, «omgav Ofel». Ibid. (2 Krønikebok 33:14) Den synes å ha vært nær «vannporten», (Nehemja 3:26) og det «store tårnet som stikker ut». vers (Nehemja 3:27) Det var tydeligvis levittenes bosted. (Nehemja 11:21)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 27:3",
+        "original": "2 Chr. 27:3"
+      },
+      {
+        "reference": "2 Chronicles 33:14",
+        "original": "2 Chr. 33:14"
+      },
+      {
+        "reference": "Nehemiah 3:26",
+        "original": "Neh. 3:26"
+      },
+      {
+        "reference": "Nehemiah 3:27",
+        "original": "Neh. 3:27"
+      },
+      {
+        "reference": "2 Kings 5:24",
+        "original": "2 Kings 5:24"
+      },
+      {
+        "reference": "Nehemiah 11:21",
+        "original": "Nehemiah 11:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OPHIR": {
+    "name": "Ophir",
+    "slug": "ophir",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) En av Joktans sønner (1 Mos 10:29). (2.) En region berømt for sitt gull (1 Kong 9:28; 10:11; 22:48; Job 22:24; 28:16; Jes 13:12). I Septuaginta (LXX) er dette ordet gjengitt som «Sophir», og «Sofir» er det koptiske navnet for India, som er gjengivelsen i den arabiske versjonen, så vel som i Vulgata. Josefus har identifisert det med Den Gyldne Kersones, dvs. Malayahalvøya. Det identifiseres nå vanligvis med Abhira, ved munningen av Indus. Mye kan imidlertid sies til fordel for oppfatningen om at det lå et sted i Arabia."
+      },
+      {
+        "source": "SMI",
+        "text": "(overflod)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:29",
+        "original": "Gen. 10:29"
+      },
+      {
+        "reference": "1 Kings 9:28",
+        "original": "1 Kings 9:28"
+      },
+      {
+        "reference": "1 Kings 10:11",
+        "original": "1 Kings 10:11"
+      },
+      {
+        "reference": "1 Kings 22:48",
+        "original": "1 Kings 22:48"
+      },
+      {
+        "reference": "Job 22:24",
+        "original": "Job 22:24"
+      },
+      {
+        "reference": "Job 28:16",
+        "original": "Job 28:16"
+      },
+      {
+        "reference": "Isaiah 13:12",
+        "original": "Isa. 13:12"
+      },
+      {
+        "reference": "1 Chronicles 1:23",
+        "original": "1 Chronicles 1:23"
+      },
+      {
+        "reference": "1 Chronicles 29:4",
+        "original": "1 Chronicles 29:4"
+      },
+      {
+        "reference": "Psalms 45:9",
+        "original": "Psalms 45:9"
+      },
+      {
+        "reference": "1 Kings 22:18",
+        "original": "1 Kings 22:18"
+      },
+      {
+        "reference": "2 Chronicles 8:18",
+        "original": "2 Chronicles 8:18"
+      },
+      {
+        "reference": "2 Chronicles 9:10",
+        "original": "2 Chronicles 9:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OPHNI": {
+    "name": "Ophni",
+    "slug": "ophni",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Muggen, en by i Benjamin (Jos 18:24)."
+      },
+      {
+        "source": "SMI",
+        "text": "(muggen), en by i Benjamin, nevnt i (Josva 18:24), det samme som Josefus' Gophna, et sted som på tiden for Vespasian’s invasjon tilsynelatende var så viktig at det var nest etter Jerusalem. Den eksisterer fortsatt i det moderne Jifna eller Jufna, 23 engelske mil nordvest for Betel."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 18:24",
+        "original": "Josh. 18:24"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OPHRAH": {
+    "name": "Ophrah",
+    "slug": "ophrah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En dåhjort. 1 Krøn 4:14. (1.) En by i Benjamin (Jos 18:23); sannsynligvis identisk med Efron (2 Krøn 13:19) og Efraim (Joh 11:54). (2.) «Til Abi-esriterne.» En by i Manasse, 6 engelske mil sørvest for Sikem, Gideons bosted (Dom 6:11; 8:27, 32). Etter sin store seier over midjanittene drepte han de fangne kongene på dette stedet (8:18-21). Han antok deretter yppersteprestens funksjon og forsøkte å gjøre Ofra til det Sjilo burde ha vært. Denne handlingen «ble en snare» for Gideon og hans hus. Etter Gideons død bodde familien hans her til de ble drept av Abimelek (Dom 9:5). Den er identifisert med Ferata."
+      },
+      {
+        "source": "SMI",
+        "text": "(dåhjort)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:14",
+        "original": "1 Chr. 4:14"
+      },
+      {
+        "reference": "Joshua 18:23",
+        "original": "Josh. 18:23"
+      },
+      {
+        "reference": "2 Chronicles 13:19",
+        "original": "2 Chr. 13:19"
+      },
+      {
+        "reference": "John 11:54",
+        "original": "John 11:54"
+      },
+      {
+        "reference": "Judges 6:11",
+        "original": "Judg. 6:11"
+      },
+      {
+        "reference": "Judges 8:27",
+        "original": "Judg 8:27"
+      },
+      {
+        "reference": "Judges 8:32",
+        "original": "Judg 8:32"
+      },
+      {
+        "reference": "Judges 9:5",
+        "original": "Judg. 9:5"
+      },
+      {
+        "reference": "1 Samuel 13:17",
+        "original": "1 Samuel 13:17"
+      },
+      {
+        "reference": "Judges 6:24",
+        "original": "Judges 6:24"
+      },
+      {
+        "reference": "Judges 6:15",
+        "original": "Judges 6:15"
+      },
+      {
+        "reference": "Judges 9:1",
+        "original": "Judges 9:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORACLE": {
+    "name": "Oracle",
+    "slug": "oracle",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "I Det gamle testamente brukes ordet i alle tilfeller, unntatt 2 Sam 16:23, for å betegne det aller helligste i tempelet (1 Kong 6:5, 19-23; 8:6). I 2 Sam 16:23 betyr det Guds Ord. En mann spurte «Guds orakel» ved hjelp av Urim og Tummim i brystplaten på yppersteprestens efod. I Det nye testamente brukes det bare i flertall, og betegner alltid Guds Ord (Rom 3:2; Heb 5:12, osv.). Skriftene kalles «levende orakler» (jf. Heb 4:12) på grunn av deres livgivende kraft (Apg 7:38)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 16:23",
+        "original": "2 Sam. 16:23"
+      },
+      {
+        "reference": "1 Kings 6:5",
+        "original": "1 Kings 6:5"
+      },
+      {
+        "reference": "1 Kings 6:19",
+        "original": "1 Kings 6:19"
+      },
+      {
+        "reference": "Romans 3:2",
+        "original": "Rom. 3:2"
+      },
+      {
+        "reference": "Hebrews 5:12",
+        "original": "Heb. 5:12"
+      },
+      {
+        "reference": "Hebrews 4:12",
+        "original": "Heb. 4:12"
+      },
+      {
+        "reference": "Acts 7:38",
+        "original": "Acts 7:38"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ORATOR": {
+    "name": "Orator",
+    "slug": "orator",
+    "definitions": [],
+    "scripture_refs": [
+      {
+        "reference": "Isaiah 3:3",
+        "original": "Isaiah 3:3"
+      },
+      {
+        "reference": "Acts 24:1",
+        "original": "Acts 24:1"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ORCHARD": {
+    "name": "Orchard",
+    "slug": "orchard",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Hage]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OREB": {
+    "name": "Oreb",
+    "slug": "oreb",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ravn, en midjanittisk fyrste, som, etter å ha blitt beseiret av Gideon og satt i trengsel, ble drept sammen med Seeb (Dom 7:20-25). Mange av midjanittene omkom sammen med ham (Sal 83:9; Jes 10:26)."
+      },
+      {
+        "source": "SMI",
+        "text": "(ravn), en av høvdingene i midjanitthæren som invaderte Israel, og som ble beseiret og drevet tilbake av Gideon. (Dommerne 7:25) (ca. 1362 f.Kr.). Jesaja, (Jesaja 10:26) refererer til omfanget av denne katastrofen. Jf. (Salmenes 83:1) ..."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 7:20-25",
+        "original": "Judg. 7:20-25"
+      },
+      {
+        "reference": "Psalms 83:9",
+        "original": "Ps. 83:9"
+      },
+      {
+        "reference": "Isaiah 10:26",
+        "original": "Isa. 10:26"
+      },
+      {
+        "reference": "Judges 7:25",
+        "original": "Judges 7:25"
+      },
+      {
+        "reference": "Psalms 83:1",
+        "original": "Psalms 83:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OREB, THE ROCK": {
+    "name": "Oreb, The Rock",
+    "slug": "oreb-the-rock",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "«ravneklippen», stedet øst for Jordan, der midjanittfyrsten Oreb, sammen med tusenvis av sine landsmenn, falt for efraimittenes hånd, og som trolig fikk sitt navn derfra. Den er nevnt i (Dommerne 7:25; Jesaja 10:26). Kanskje stedet kalt ’Orbo, som i Bereshith Rabba sies å ha vært i nærheten av Bet-Sjean, kan ha en forbindelse med det."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 7:25",
+        "original": "Judges 7:25"
+      },
+      {
+        "reference": "Isaiah 10:26",
+        "original": "Isaiah 10:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OREB, THE ROCK OF": {
+    "name": "Oreb, The rock of",
+    "slug": "oreb-the-rock-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Stedet der Gideon drepte Oreb etter midjanittenes nederlag (Dom 7:25; Jes 10:26). Det var trolig stedet som nå kalles Orbo, øst for Jordan, nær Bet-Sjean."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 7:25",
+        "original": "Judg. 7:25"
+      },
+      {
+        "reference": "Isaiah 10:26",
+        "original": "Isa. 10:26"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OREN": {
+    "name": "Oren",
+    "slug": "oren",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ask eller furu, sønn av Jerahmeel (1 Krøn 2:25)."
+      },
+      {
+        "source": "SMI",
+        "text": "(furu), en av Jerahmeels sønner, Hesrons førstefødte. (1 Krøn 2:25)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:25",
+        "original": "1 Chr. 2:25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORGAN": {
+    "name": "Organ",
+    "slug": "organ",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Et slags blåseinstrument, sannsynligvis en type panfløyte (1 Mos 4:21; Job 21:12; Sal 150:4), som besto av sju eller åtte rør av ulik lengde."
+      },
+      {
+        "source": "SMI",
+        "text": "(1 Mos 4:21; Job 21:12; 30:31; Sal 150:4) Det hebraiske ordet som er gjengitt slik, betegner sannsynligvis en fløyte eller et perforert blåseinstrument. I (1 Mos 4:21) ser det ut til å være et generelt begrep for alle blåseinstrumenter. I (Job 21:12) er tre slags musikkinstrumenter nevnt, som er mulige under de generelle betegnelsene tromme, harpe og oryan (organ). Noen identifiserer det med panfløyten eller syrinxen, et instrument av ubestridelig eldgammel opprinnelse, og som var vanlig i Østen. [Se Musikk]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 4:21",
+        "original": "Gen. 4:21"
+      },
+      {
+        "reference": "Job 21:12",
+        "original": "Job 21:12"
+      },
+      {
+        "reference": "Psalms 150:4",
+        "original": "Ps. 150:4"
+      },
+      {
+        "reference": "Job 30:31",
+        "original": "Job 30:31"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORION": {
+    "name": "Orion",
+    "slug": "orion",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebr. Kesil; dvs. «dåren», navnet på en stjernekonstellasjon (Job 9:9; 38:31; Amos 5:8) bestående av rundt åtti stjerner. Vulgata gjengir det slik, men LXX gjengir det med Hesperus, dvs. «aftenstjernen», Venus. Orientalerne «ser ut til å ha forestilt seg denne konstellasjonen under figuren av en ugudelig kjempe bundet på himmelen.» Denne kjempen var, ifølge tradisjonen, Nimrod, typen på dårskapen som strider mot Gud. I Jes 13:10 er flertallsformen av det hebraiske ordet gjengitt som «stjernebilder»."
+      },
+      {
+        "source": "SMI",
+        "text": "(kjempen), et stort og lyssterkt stjernebilde med 80 stjerner, 17 store, krysset av ekvatorlinjen. Det er oppkalt etter en mytisk gresk skikkelse av gigantisk statur og «verdens vakreste mann». Araberne kalte det «kjempen», med henvisning til Nimrod, den mektige jegeren som det ble sagt var bundet til himmelen for sin ugudelighet. (Job 9:9) Også omtalt i (Job 38:31)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 9:9",
+        "original": "Job 9:9"
+      },
+      {
+        "reference": "Job 38:31",
+        "original": "Job 38:31"
+      },
+      {
+        "reference": "Amos 5:8",
+        "original": "Amos 5:8"
+      },
+      {
+        "reference": "Isaiah 13:10",
+        "original": "Isa. 13:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORNAMENTS, PERSONAL": {
+    "name": "Ornaments, Personal",
+    "slug": "ornaments-personal",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Antallet, variasjonen og vekten av smykkene som vanligvis ble båret på personen, utgjør et av de karakteristiske trekkene ved orientalsk klesdrakt, både i oldtiden og i moderne tid. Monumentene fra det gamle Egypt viser kvinner som var overlesset med ringer, øredobber av meget stor størrelse, ankelringer, armbånd, armringer i de mest varierte former, rikt utsmykkede halskjeder og kjeder av ulike slag. Det er tilstrekkelig bevis i Bibelen for at innbyggerne i Palestina var like glad i pynt. I Det gamle testamente gir Jesaja (Jes 3:18-23) oss en detaljert beskrivelse av de gjenstandene som de luksuriøse kvinnene i hans tid var utsmykket med. Elieser utsmykket Rebekka med «en gyllen nesering på en halv sekel (1/4 oz.) vekt, og to armbånd for hennes hender på ti sekel (4 1/2 oz.) gullvekt.» (1 Mos 23:22) Øredobber ble båret av Jakobs hustruer. (1 Mos 35:4) Antallet personlige smykker båret av egypterne, særlig av kvinnene, er tilfeldigvis nevnt i (2 Mos 3:22)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Isaiah 3:18-23",
+        "original": "Isaiah 3:18-23"
+      },
+      {
+        "reference": "Genesis 23:22",
+        "original": "Genesis 23:22"
+      },
+      {
+        "reference": "Genesis 35:4",
+        "original": "Genesis 35:4"
+      },
+      {
+        "reference": "Exodus 3:22",
+        "original": "Exodus 3:22"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ORNAN": {
+    "name": "Ornan",
+    "slug": "ornan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "1 Krøn 21:15. (Se ARAUNA.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(aktiv). (1 Krøn 21:15; 2 Krøn 3:1) [Arauna]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 21:15",
+        "original": "1 Chr. 21:15"
+      },
+      {
+        "reference": "2 Chronicles 3:1",
+        "original": "2 Chronicles 3:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORPAH": {
+    "name": "Orpah",
+    "slug": "orpah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pannehår eller dådyr, en moabittkvinne, Kileons hustru (Rut 1:4; 4:10). Etter ektemannens død fulgte hun sin svigermor Noomi et stykke på veien til Betlehem, men vendte så tilbake til Moab."
+      },
+      {
+        "source": "SMI",
+        "text": "(en gaselle), en moabittkvinne, hustru til Kileon, Noomis sønn, og dermed Rut sin svigerinne. (Rut 2:4,14) (ca. 1360 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ruth 1:4",
+        "original": "Ruth 1:4"
+      },
+      {
+        "reference": "Ruth 4:10",
+        "original": "Ruth 4:10"
+      },
+      {
+        "reference": "Ruth 2:4",
+        "original": "Ruth 2:4"
+      },
+      {
+        "reference": "Ruth 2:14",
+        "original": "Ruth 2:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ORPHANS": {
+    "name": "Orphans",
+    "slug": "orphans",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Klagesangene 5:3), dvs. forlatt og uten beskyttere. Ordet forekommer kun her. I Johannes 14:18 betyr ordet som der er gjengitt «trøstesløse» (revidert oversettelse, «forlatt»; margen, «foreldreløse») egentlig «foreldreløse». Det samme greske ordet er gjengitt «farLøse» i Jakob 1:27."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Lamentations 5:3",
+        "original": "Lam. 5:3"
+      },
+      {
+        "reference": "John 14:18",
+        "original": "John 14:18"
+      },
+      {
+        "reference": "James 1:27",
+        "original": "James 1:27"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OSHEA": {
+    "name": "Oshea",
+    "slug": "oshea",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(frelse). [Josva]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "OSPREY": {
+    "name": "Osprey",
+    "slug": "osprey",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebr. ‘ozniyyah, en uren fugl ifølge Moseloven (3 Mos 11:13; 5 Mos 14:12); fiskeørnen (Pandion haliaetus); en av de mindre ørnene. Men det hebraiske ordet kan også tolkes som korttået ørn (Circaetus gallicus fra Sør-Europa), en av de mest tallrike ørneartene som finnes i Palestina."
+      },
+      {
+        "source": "SMI",
+        "text": "Det hebraiske ordet forekommer i (3 Mos 11:13) og 5 Mos 14:12 som navn på en uren fugl. Det er sannsynligvis enten fiskeørnen (Pandion haliaetus) eller havørnen (Haliaetus albicilla)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 11:13",
+        "original": "Lev. 11:13"
+      },
+      {
+        "reference": "Deuteronomy 14:12",
+        "original": "Deut. 14:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OSSIFRAGE": {
+    "name": "Ossifrage",
+    "slug": "ossifrage",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebr. peres = å «bryte» eller «knuse», lammegribben, eller skjegggribben, den største av hele gribbefamilien. Det var en uren fugl (3 Mos 11:13; 5 Mos 14:12). Den er ikke en flokkfugl, og finnes sjelden i Palestina. «Når de andre gribbene har plukket kjøttet av et dyr, kommer den til slutt på festen og svelger knoklene, eller bryter dem og svelger stykkene hvis den ikke kan trekke ut margen på annen måte. Knoklene knekker den [derav navnet ossifrage, dvs. «ben-knekker»] ved å la dem falle på en stein fra stor høyde. Den begrenser seg imidlertid ikke til disse delikatessene, men vil når den får anledning, fortære lam, geitekillinger eller harer. Disse skaffer den seg vanligvis ved å dytte dem over klipper, når den har sett sin mulighet; og den har vært kjent for å angripe menn som klatrer i fjell, og slå dem mot bunnen. Men skilpadder og slanger er dens vanlige føde...Det var uten tvil en lammegribb som forvekslet dikteren Aiskhylos' skallete hode med en stein, og slapp skilpadden som drepte ham, på det» (Tristram’s Nat. Hist.)."
+      },
+      {
+        "source": "SMI",
+        "text": "(ben-knekkeren). Det hebraiske ordet forekommer, som navnet på en uren fugl, i (3 Mos 11:13) og 5 Mos 14:12. Det er sannsynligvis lammegribben, eller skjegggribben som den også kalles, en av de største rovfuglene. Den fortjener vel sitt navn ossifrage, ben-knekker, for «ikke bare dytter den geitekillinger og lam og til og med menn utfor klipper, men den tar knoklene fra dyr som andre rovfugler har renset for kjøtt, høyt opp i luften og lar dem falle på en stein for å knekke dem og gjøre dem mer fordøyelige selv for dens enorme svelgkraft. Margbein er de delikatessene den elsker. Dette er sannsynligvis fuglen som slapp en skilpadde på det skallete hodet til stakkars gamle Aiskhylos.»—N. H. Simpson."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 11:13",
+        "original": "Lev. 11:13"
+      },
+      {
+        "reference": "Deuteronomy 14:12",
+        "original": "Deut. 14:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OSTRICH": {
+    "name": "Ostrich",
+    "slug": "ostrich",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Klagesangene 4:3), gjengivelsen av hebraisk flertall enim; så kalt fra dens grådighet og fråtseri. Allusjonen her er til strutsens vane med hensyn til eggene sine, som beskrives slik: «Det ytre laget av egg er generelt så dårlig tildekket at de blir ødelagt i mengder av sjakaler, villkatter osv., og at de innfødte bærer dem bort, bare pass på å ikke etterlate fotsporene sine, for når strutsen kommer og finner at redet hennes er oppdaget, knuser hun hele kullet og bygger et rede et annet sted.» I Job 39:13 er dette ordet i King James-oversettelsen gjengivelsen av et hebraisk ord (notsah) som betyr «fjær», som i den reviderte oversettelsen. I det samme verset er ordet «påfugler» i King James-oversettelsen gjengivelsen av det hebraiske flertallsordet renanim, som egentlig betyr «strutser», som i den reviderte oversettelsen. (Se UGLE [1].)"
+      },
+      {
+        "source": "SMI",
+        "text": "En stor fugl, hjemmehørende i Afrika og Arabia, nesten tre meter høy, med lang hals og korte vinger. Den søker bortgjemte steder (Job 30:29; Klagesangene 4:13) og har et særegent sørgmodig rop som av araberne av og til forveksles med løvens brøl. (Mika 1:8) I (Job 39:13-18) finnes en beskrivelse av fuglens vaner. Strutser er polygame; hønene legger eggene sine hulter til bulter i ett rede, som bare er et hull skrapet i sanden; eggene dekkes deretter over til en dybde av omtrent 30 centimeter, og i tilfelle av fugler som finnes innenfor tropene, overlates de vanligvis det meste av dagen til solens varme, mens foreldrefuglene bytter på å ruge om natten. Strutsens vane med å overlate eggene sine til å modnes av solens varme brukes vanligvis for å bekrefte den bibelske beretningen, «hun overlater eggene sine til jorden»; men dette er sannsynligvis bare tilfelle med de tropiske fuglene. Vi tror at den sanne forklaringen på dette avsnittet er at noen av eggene blir liggende eksponert rundt redet for å gi næring til de unge fuglene. Det er en generell tro blant araberne at strutsen er en veldig dum fugl; de har til og med et ordtak: «dum som en struts.» Som kjent vil strutsen svelge nesten hva som helst, jern, steiner, og den har til og med vært kjent for å svelge «flere blykuler glødende varme fra formen.» Men på mange andre måter er strutsen ikke så dum som dette ville indikere, og er svært vanskelig å fange. Det er den største av alle kjente fugler, og kanskje den raskeste av alle løpende dyr. – De mye verdsatte fjærene er de lange hvite fjærene fra vingene. De beste kommer fra Barbary og vestkysten av Afrika."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Lamentations 4:3",
+        "original": "Lam. 4:3"
+      },
+      {
+        "reference": "Job 39:13",
+        "original": "Job 39:13"
+      },
+      {
+        "reference": "Job 30:29",
+        "original": "Job 30:29"
+      },
+      {
+        "reference": "Lamentations 4:13",
+        "original": "Lamentations 4:13"
+      },
+      {
+        "reference": "Micah 1:8",
+        "original": "Micah 1:8"
+      },
+      {
+        "reference": "Job 39:13-18",
+        "original": "Job 39:13-18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OTHNI": {
+    "name": "Othni",
+    "slug": "othni",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En Herrens løve, en sønn av Shemaja, og en av tempelportvaktene i Davids tid (1 Krøn 26:7). Han var en «mighty man of valour»."
+      },
+      {
+        "source": "SMI",
+        "text": "(Herrens løve), sønn av Shemaja, Obed-Edoms førstefødte. (1 Krøn 26:7) (ca. 1013 f.Kr.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 26:7",
+        "original": "1 Chr. 26:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OTHNIEL": {
+    "name": "Othniel",
+    "slug": "othniel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Guds løve, den første av dommerne. Hans hustru Aksa var datter av Kaleb (Jos 15:16, 17; Dom 1:13). Han vant hennes hånd som belønning for sin tapperhet i å lede en vellykket ekspedisjon mot Debir (se d.o.). Rundt tretti år etter Josvas død kom israelittene under undertrykkelse av Kusjan-Risjatajim (se d.o.), kongen av Mesopotamia. Han undertrykte dem i hele åtte år, da de «ropte» til Herren, og Otniel ble reist opp til å være deres befrier. Han var Kalebs yngre bror (Dom 3:8, 9-11). Han er den eneste dommeren som er nevnt i forbindelse med Juda stamme. Under ham hadde landet hvile i førti år."
+      },
+      {
+        "source": "SMI",
+        "text": "(Guds løve), sønn av Kenas og yngre bror av Kaleb. (Jos 15:17; Dom 1:13; 3:9; 1 Krøn 4:13) (ca. 1460 f.Kr.) Den første omtalen av Otniel er i forbindelse med erobringen av Kirjat-Sefer, eller Debir som den senere ble kalt. Kaleb lovet å gi sin datter Aksa til den som skulle angripe og ta byen. Otniel vant prisen. Neste omtale av ham er i (Dom 3:9) hvor han fremstår som Israels første dommer etter Josvas død, og som sitt folks befrier fra Kusjan-Risjatajims undertrykkelse (Dom 3:8-9)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:16",
+        "original": "Josh. 15:16"
+      },
+      {
+        "reference": "Joshua 15:17",
+        "original": "Josh. 15:17"
+      },
+      {
+        "reference": "Judges 1:13",
+        "original": "Judg. 1:13"
+      },
+      {
+        "reference": "Judges 3:8",
+        "original": "Judg. 3:8"
+      },
+      {
+        "reference": "Judges 3:9",
+        "original": "Judg. 3:9"
+      },
+      {
+        "reference": "1 Chronicles 4:13",
+        "original": "1 Chronicles 4:13"
+      },
+      {
+        "reference": "Judges 3:8-9",
+        "original": "Judges 3:8-9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OUCHES": {
+    "name": "Ouches",
+    "slug": "ouches",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Et gammelengelsk ord som betegner fordypninger eller fatninger der edelstener ble satt inn (2 Mos 28:11)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 28:11",
+        "original": "Ex. 28:11"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OVEN": {
+    "name": "Oven",
+    "slug": "oven",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebr. tannur (Hos 7:4). I byer ser det ut til å ha vært offentlige ovner. Det var en gate i Jerusalem (Jer 37:21) kalt «bakergaten» (det eneste tilfellet hvor navnet på en gate i Jerusalem er bevart). Ordene «ovnenes tårn» (Neh 3:11; 12:38) er mer korrekt «tårnet med ovnene» (hebr. tannurim). Disse lignet ovnene som brukes blant oss. Det fantes andre private ovner av ulike slag. Noen var som store krukker laget av leire eller kobber, som ble varmet opp innvendig med ved (1 Kong 17:12; Jes 44:15; Jer 7:18) eller gress (Matt 6:30), og når ilden hadde brent ut, ble små deigstykker plassert inni eller spredt i tynne lag utenpå, og ble slik bakt. (Se OVN/FYR.) Groper ble også dannet for samme formål, og foret med sement. Disse ble brukt på samme måte. Oppvarmede steiner, eller sand oppvarmet av en ild som var dynget over den, samt flate jernpanner, alt tjente som ovner for tilberedning av brød. (Se 1 Mos 18:6; 1 Kong 19:6.)"
+      },
+      {
+        "source": "SMI",
+        "text": "Den østlige ovnen er av to slag – fast og bærbar. Den førstnevnte finnes bare i byer, hvor det er ansatt faste bakere. (Hos 7:4) Den sistnevnte er tilpasset nomadelivet; den består av en stor leirkrukke, omtrent én meter høy og som utvider seg mot bunnen, med et hull for askefjerning. Hver husholdning eide en slik gjenstand (2 Mos 8:3), og det var bare i tider med ekstrem mangel at den samme ovnen var tilstrekkelig for flere familier. (3 Mos 26:26) Den ble varmet med tørre kvister og gress (Matt 6:30), og brødene ble plassert både inni og utenpå den."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Hosea 7:4",
+        "original": "Hos. 7:4"
+      },
+      {
+        "reference": "Jeremiah 37:21",
+        "original": "Jer. 37:21"
+      },
+      {
+        "reference": "Nehemiah 3:11",
+        "original": "Neh. 3:11"
+      },
+      {
+        "reference": "Nehemiah 12:38",
+        "original": "Neh 12:38"
+      },
+      {
+        "reference": "1 Kings 17:12",
+        "original": "1 Kings 17:12"
+      },
+      {
+        "reference": "Isaiah 44:15",
+        "original": "Isa. 44:15"
+      },
+      {
+        "reference": "Jeremiah 7:18",
+        "original": "Jer. 7:18"
+      },
+      {
+        "reference": "Matthew 6:30",
+        "original": "Matt. 6:30"
+      },
+      {
+        "reference": "Genesis 18:6",
+        "original": "Gen. 18:6"
+      },
+      {
+        "reference": "1 Kings 19:6",
+        "original": "1 Kings 19:6"
+      },
+      {
+        "reference": "Exodus 8:3",
+        "original": "Exodus 8:3"
+      },
+      {
+        "reference": "Leviticus 26:26",
+        "original": "Leviticus 26:26"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OWL": {
+    "name": "Owl",
+    "slug": "owl",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Hebraisk: bath-haya’anah, «grådighetens datter» eller «skrikets datter». Oppført blant de urene fuglene (3. Mos 11:16; 5. Mos 14:15); også nevnt i Job 30:29; Jes 13:21; 34:13; 43:20; Jer 50:39; Mika 1:8. I alle disse passasjene oversetter den Reviderte Versjon med «struts» (se dette), noe som er den korrekte gjengivelsen. (2.) Hebraisk: yanshuph, gjengitt som «stor ugle» i 3. Mos 11:17; 5. Mos 14:16, og «ugle» i Jes 34:11. Dette antas å være den egyptiske ørneuglen (Bubo ascalaphus), som erstatter ørneuglen (Bubo maximus) som finnes i Sør-Europa. Den holder ofte til blant ruinene i Egypt og Det hellige land. «Dens rop er et høyt, langtrukkent og svært kraftfullt tut. Jeg kjenner ikke noe som mer levende brakte frem følelsen av ødemark og ensomhet for meg enn det gjenlydende tutet fra to eller tre av disse store uglene da jeg sto ved midnatt blant de ødelagte templene i Baalbek» (Tristram). Septuaginta og Vulgata gjengir dette ordet med «ibis», dvs. den egyptiske hegren. (3.) Hebraisk: kos, gjengitt som «liten ugle» i 3. Mos 11:17; 5. Mos 14:16, og «ugle» i Sal 102:6. Araberne kaller denne fuglen «ruinenes mor». Den er den klart mest vanlige av alle uglene i Palestina. Det er Athene persica, Minervas fugl, symbolet for det gamle Athen. (4.) Hebraisk: kippoz, «stor ugle» (Jes 34:15); Revidert Versjon: «pilslange»; Septuaginta og Vulgata: «piggsvin», ved å lese kippod i teksten i stedet for kippoz. Det er ingen grunn til å tvile på korrektheten av gjengivelsen i King James Version. Tristram sier: «Ordet [dvs. kippoz] er svært mulig en etterligning av ropet fra dverghornuglen (Scops giu), som er svært vanlig blant ruiner, huler og gamle bymurer... Den er en trekkfugl som vender tilbake til Palestina om våren.» (5.) Hebraisk: lilith, «skrikugle» (Jes 34:14, marg. og R.V., «nattdemonen»). Det hebraiske ordet kommer fra en rot som betyr «natt». En eller annen ugleart er åpenbart ment med dette ordet. Det kan være kattuglen (Syrnium aluco), som er vanlig i Egypt og mange deler av Palestina. Dette verset i Jesaja er «beskrivende for fullstendig og evig ødemark, et land som skulle være fullt av ruiner, og bebodd av dyrene som vanligvis gjør slike ruiner til sitt hjem.»"
+      },
+      {
+        "source": "SMI",
+        "text": "En rekke uglearter er nevnt i Bibelen (3. Mos 11:17; 14:16; Jes 14:23; 34:15; Sef 2:14), og flere andre steder brukes det samme hebraiske ordet der det oversettes med struts (Job 30:29; Jer 50:39). Noen av disse artene var vanlige i Palestina, og, som det er velkjent, ble ofte funnet boende i ruiner (Jes 34:11,13-15)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 11:16",
+        "original": "Lev. 11:16"
+      },
+      {
+        "reference": "Deuteronomy 14:15",
+        "original": "Deut. 14:15"
+      },
+      {
+        "reference": "Job 30:29",
+        "original": "Job 30:29"
+      },
+      {
+        "reference": "Isaiah 13:21",
+        "original": "Isa. 13:21"
+      },
+      {
+        "reference": "Isaiah 34:13",
+        "original": "Isa 34:13"
+      },
+      {
+        "reference": "Isaiah 43:20",
+        "original": "Isa 43:20"
+      },
+      {
+        "reference": "Jeremiah 50:39",
+        "original": "Jer. 50:39"
+      },
+      {
+        "reference": "Micah 1:8",
+        "original": "Micah 1:8"
+      },
+      {
+        "reference": "Leviticus 11:17",
+        "original": "Lev. 11:17"
+      },
+      {
+        "reference": "Deuteronomy 14:16",
+        "original": "Deut. 14:16"
+      },
+      {
+        "reference": "Isaiah 34:11",
+        "original": "Isa. 34:11"
+      },
+      {
+        "reference": "Psalms 102:6",
+        "original": "Ps. 102:6"
+      },
+      {
+        "reference": "Isaiah 34:15",
+        "original": "Isa. 34:15"
+      },
+      {
+        "reference": "Isaiah 34:14",
+        "original": "Isa. 34:14"
+      },
+      {
+        "reference": "Leviticus 14:16",
+        "original": "Leviticus 14:16"
+      },
+      {
+        "reference": "Isaiah 14:23",
+        "original": "Isaiah 14:23"
+      },
+      {
+        "reference": "Zephaniah 2:14",
+        "original": "Zephaniah 2:14"
+      },
+      {
+        "reference": "Isaiah 34:13-15",
+        "original": "Isaiah 34:13-15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OX": {
+    "name": "Ox",
+    "slug": "ox",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hebraisk: bakar, «storfe»; «hornkveg» (1. Mos 12:16; 34:28; Job 1:3, 14; 42:12, osv.); skulle ikke munkebindes når det tråkket kornet (5. Mos 25:4). Vår Herre refererte til dette i sin irettesettelse av fariseerne (Luk 13:15; 14:5)."
+      },
+      {
+        "source": "SMI",
+        "text": "Det fantes ingen dyr i israelittenes jordbruk, eller for den saks skyld blant de gamle orientalere generelt, som ble holdt i høyere ære enn oksen, og med rette; for oksen var det dyret hvis tålmodige arbeid alle de vanlige jordbruksoperasjonene var avhengige av. Okser ble brukt til pløying (2. Mos 22:10; 1. Sam 14:14), osv.; til å treske korn (5. Mos 25:4; Hos 10:11), osv.; til trekkraft, der de vanligvis ble spent for i par (4. Mos 7:3; 1. Sam 6:7), osv.; som lastedyr (1. Krøn 12:40); kjøttet deres ble spist (5. Mos 14:4; 1. Kong 1:9), osv.; de ble brukt i ofringene; kuer ga melk, smør, osv. (5. Mos 32:14; 2. Sam 17:29; Jes 7:22). I tilknytning til oksenes viktighet i jødenes jordbruk er den strenge lovsamlingen som barmhjertig ble gitt av Gud for deres beskyttelse og bevaring. Oksen som tresket kornet skulle på ingen måte munkebindes; den skulle nyte hvile på sabbaten, så vel som sin herre (2. Mos 23:12; 5. Mos 5:14). Oksen ble sjelden slaktet (3. Mos 17:1-6). Det virker klart fra (Ordsp 15:17) og 1. Kong 4:23 at storfe noen ganger ble staldfôret, selv om det som hovedregel er sannsynlig at de beitet på slettene eller i åsene i Palestina. Storfeet som beitet fritt i det åpne landskapet ville utvilsomt ofte bli voldsomme og ville, for det må huskes at i primitive tider streifet løven og andre ville rovdyr omkring i Palestina. Derfor styrken i salmistens klage over sine fiender (Sal 22:13)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 12:16",
+        "original": "Gen. 12:16"
+      },
+      {
+        "reference": "Genesis 34:28",
+        "original": "Gen 34:28"
+      },
+      {
+        "reference": "Job 1:3",
+        "original": "Job 1:3"
+      },
+      {
+        "reference": "Job 1:14",
+        "original": "Job 1:14"
+      },
+      {
+        "reference": "Job 42:12",
+        "original": "Job 42:12"
+      },
+      {
+        "reference": "Deuteronomy 25:4",
+        "original": "Deut. 25:4"
+      },
+      {
+        "reference": "Luke 13:15",
+        "original": "Luke 13:15"
+      },
+      {
+        "reference": "Luke 14:5",
+        "original": "Luke 14:5"
+      },
+      {
+        "reference": "1 Samuel 14:14",
+        "original": "1 Samuel 14:14"
+      },
+      {
+        "reference": "Hosea 10:11",
+        "original": "Hosea 10:11"
+      },
+      {
+        "reference": "Numbers 7:3",
+        "original": "Numbers 7:3"
+      },
+      {
+        "reference": "1 Samuel 6:7",
+        "original": "1 Samuel 6:7"
+      },
+      {
+        "reference": "1 Chronicles 12:40",
+        "original": "1 Chronicles 12:40"
+      },
+      {
+        "reference": "1 Kings 1:9",
+        "original": "1 Kings 1:9"
+      },
+      {
+        "reference": "2 Samuel 17:29",
+        "original": "2 Samuel 17:29"
+      },
+      {
+        "reference": "Isaiah 7:22",
+        "original": "Isaiah 7:22"
+      },
+      {
+        "reference": "Exodus 23:12",
+        "original": "Exodus 23:12"
+      },
+      {
+        "reference": "Exodus 5:14",
+        "original": "Exodus 5:14"
+      },
+      {
+        "reference": "Leviticus 17:1-6",
+        "original": "Leviticus 17:1-6"
+      },
+      {
+        "reference": "Proverbs 15:17",
+        "original": "Proverbs 15:17"
+      },
+      {
+        "reference": "1 Kings 4:23",
+        "original": "1Kin 4:23"
+      },
+      {
+        "reference": "Psalms 22:13",
+        "original": "Psalms 22:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OX GOAD": {
+    "name": "Ox goad",
+    "slug": "ox-goad",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Nevnt kun i Dom 3:31, våpenet Shamgar (se dette) drepte seks hundre filistere med. «Plogmannen bærer fremdeles sin piggstav, et våpen tilsynelatende mer egnet for en soldats hånd enn for en fredelig bonde. Den jeg så var av ‘Basans eik’ og målte over ti fot i lengde. I den ene enden var et jernspyd, og i den andre et stykke av det samme metallet flatet ut. Man kan godt forstå hvordan en kriger kunne bruke et slikt våpen med effekt på slagmarken» (Porters Syria, osv.). (Se PIGGSTAV.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 3:31",
+        "original": "Judg. 3:31"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "OZEM": {
+    "name": "Ozem",
+    "slug": "ozem",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sterk. (1.) En av Davids brødre; Isais sjette sønn (1. Krøn 2:15). (2.) En sønn av Jerahme’el (1. Krøn 2:25)."
+      },
+      {
+        "source": "SMI",
+        "text": "(kraft)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:15",
+        "original": "1 Chr. 2:15"
+      },
+      {
+        "reference": "1 Chronicles 2:25",
+        "original": "1 Chr. 2:25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OZIAS": {
+    "name": "Ozias",
+    "slug": "ozias",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jorams sønn (Matt 1:8); også kalt Uzzia (2. Kong 15:32, 34)."
+      },
+      {
+        "source": "SMI",
+        "text": "(styrke fra Herren)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 1:8",
+        "original": "Matt. 1:8"
+      },
+      {
+        "reference": "2 Kings 15:32",
+        "original": "2 Kings 15:32"
+      },
+      {
+        "reference": "2 Kings 15:34",
+        "original": "2 Kings 15:34"
+      },
+      {
+        "reference": "Ezra 2",
+        "original": "Ezra. 2"
+      },
+      {
+        "reference": "Matthew 1:9",
+        "original": "Matthew 1:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "OZNI": {
+    "name": "Ozni",
+    "slug": "ozni",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hørelse. En av Gads sønner; også kalt Esbon (1. Mos 46:16; 4. Mos 26:16)."
+      },
+      {
+        "source": "SMI",
+        "text": "(hørelse), en av Gads sønner (4. Mos 26:16) og grunnlegger av Oznittenes familie (4. Mos 26:16)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:16",
+        "original": "Gen. 46:16"
+      },
+      {
+        "reference": "Numbers 26:16",
+        "original": "Num. 26:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  }
+}

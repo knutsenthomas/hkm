@@ -1,0 +1,5828 @@
+{
+  "ZAANAIM": {
+    "name": "Zaanaim",
+    "slug": "zaanaim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Vagabundeos; la descarga de tiendas, llamado así probablemente porque los nómadas con tiendas acampaban en medio de las ciudades y aldeas de esa región, un lugar al noroeste del lago Merom, cerca de Quedes, en Neftalí. Aquí Sísara fue muerto por Jael, “la esposa de Heber el ceneo”, quien había plantado su tienda en la “llanura [VR, 'hasta el encino'] de Zaanaim” (Jueces 4:11). Sin embargo, algunos han sugerido que, siguiendo la LXX y el Talmud, la letra 'b', que en hebreo significa “en”, debería tomarse como parte de la palabra siguiente, y la frase sería entonces “hasta el encino de Bitzanaim”, un lugar que ha sido identificado con las ruinas de Bessum, a medio camino entre Tiberíades y el monte Tabor."
+      },
+      {
+        "source": "SMI",
+        "text": "(mudanzas), La llanura de, o más precisamente, “el encino junto a Zaanaim”, un árbol —probablemente sagrado— mencionado como el lugar cercano donde Heber el ceneo acampaba cuando Sísara se refugió en su tienda. (Jueces 4:11) Su ubicación se define como “cerca de Quedes”, es decir, Quedes-Neftalí, cuyo nombre aún perdura en el terreno elevado al norte de Safed y a dos o tres millas al oeste del lago de el-Huleh (aguas de Merom). Toda esta región abunda en encinos."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 4:11",
+        "original": "Judg. 4:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAANAN": {
+    "name": "Zaanan",
+    "slug": "zaanan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lugar de rebaños, mencionado solo en Miqueas 1:11. Puede identificarse con Zenán, en la llanura de Judá (Josué 15:37)."
+      },
+      {
+        "source": "SMI",
+        "text": "[Zenán]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Micah 1:11",
+        "original": "Micah 1:11"
+      },
+      {
+        "reference": "Joshua 15:37",
+        "original": "Josh. 15:37"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAANANNIM": {
+    "name": "Zaanannim",
+    "slug": "zaanannim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "=Zaanaim, (Josué 19:33)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:33",
+        "original": "Josh. 19:33"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZAAVAN": {
+    "name": "Zaavan",
+    "slug": "zaavan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Terror, uno de los “duques de Edom” (Génesis 36:27); también llamado Zaván (1 Crónicas 1:42)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:27",
+        "original": "Gen. 36:27"
+      },
+      {
+        "reference": "1 Chronicles 1:42",
+        "original": "1 Chr. 1:42"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZAAVAN, OR ZAVAN": {
+    "name": "Zaavan, Or Zavan",
+    "slug": "zaavan-or-zavan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(migratorio), un jefe horeo, hijo de Ezer, hijo de Seir. (Génesis 36:27; 1 Crónicas 1:42)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:27",
+        "original": "Genesis 36:27"
+      },
+      {
+        "reference": "1 Chronicles 1:42",
+        "original": "1 Chronicles 1:42"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZABAD": {
+    "name": "Zabad",
+    "slug": "zabad",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don. (1.) Uno de los valientes de David (1 Crónicas 11:41), descendiente de Ahlai, de los “hijos de Sesán” (2:31). (2.) Un descendiente de Táhat (7:21). (3.) Hijo de Semat. Conspiró contra Joás, rey de Judá, y lo mató (2 Crónicas 24:25, 26). También se le llama Jozacar (2 Reyes 12:21). (4.) Esdras 10:27. (5.) Esdras 10:33. (6.) Esdras 10:43."
+      },
+      {
+        "source": "SMI",
+        "text": "(don)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 11:41",
+        "original": "1 Chr. 11:41"
+      },
+      {
+        "reference": "2 Chronicles 24:25",
+        "original": "2 Chr. 24:25"
+      },
+      {
+        "reference": "2 Chronicles 24:26",
+        "original": "2 Chr. 24:26"
+      },
+      {
+        "reference": "2 Kings 12:21",
+        "original": "2 Kings 12:21"
+      },
+      {
+        "reference": "Ezra 10:27",
+        "original": "Ezra 10:27"
+      },
+      {
+        "reference": "Ezra 10:33",
+        "original": "Ezra 10:33"
+      },
+      {
+        "reference": "Ezra 10:43",
+        "original": "Ezra 10:43"
+      },
+      {
+        "reference": "1 Chronicles 2:31-37",
+        "original": "1 Chronicles 2:31-37"
+      },
+      {
+        "reference": "1 Chronicles 7:21",
+        "original": "1 Chronicles 7:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABADEANS": {
+    "name": "Zabadeans",
+    "slug": "zabadeans",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Una tribu árabe que fue atacada y despojada por Jonatán, en su camino de regreso a Damasco después de su infructuosa persecución del ejército de Demetrio. 1 Macabeos 12:31. Su nombre probablemente sobrevive en la aldea de Zebdany, a unas 26 millas de Damasco."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1Macc 12:31",
+        "original": "1 Macc. 12:31"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZABBAI": {
+    "name": "Zabbai",
+    "slug": "zabbai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Vagabundo; puro. (1.) Esdras 10:28. (2.) Padre de Baruc, quien “reparó diligentemente” parte del muro de Jerusalén (Nehemías 3:20; nota al margen, “Zacai”)."
+      },
+      {
+        "source": "SMI",
+        "text": "(puro)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:28",
+        "original": "Ezra 10:28"
+      },
+      {
+        "reference": "Nehemiah 3:20",
+        "original": "Neh. 3:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABBUD": {
+    "name": "Zabbud",
+    "slug": "zabbud",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don, Esdras 8:14."
+      },
+      {
+        "source": "SMI",
+        "text": "(dado) uno de los hijos de Bigvai, que regresó en la segunda caravana con Esdras. (Esdras 8:14) (459 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 8:14",
+        "original": "Ezra 8:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABDI": {
+    "name": "Zabdi",
+    "slug": "zabdi",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don de Jehová. (1.) Ancestro de Acán (Josué 7:1, 17, 18). Probablemente es el “Zimri” de 1 Crónicas 2:6. (2.) Un benjamita (1 Crónicas 8:19). (3.) Llamado “el sifmita”, uno de los oficiales de David, que estaba a cargo de sus viñas (1 Crónicas 27:27). (4.) Un levita, uno de los hijos de Asaf (Nehemías 11:17); probablemente el mismo que Zicri (1 Crónicas 9:15) y Zacur (Nehemías 12:35)."
+      },
+      {
+        "source": "SMI",
+        "text": "(mi don)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 7:1",
+        "original": "Josh. 7:1"
+      },
+      {
+        "reference": "Joshua 7:17",
+        "original": "Josh. 7:17"
+      },
+      {
+        "reference": "Joshua 7:18",
+        "original": "Josh. 7:18"
+      },
+      {
+        "reference": "1 Chronicles 2:6",
+        "original": "1 Chr. 2:6"
+      },
+      {
+        "reference": "1 Chronicles 8:19",
+        "original": "1 Chr. 8:19"
+      },
+      {
+        "reference": "1 Chronicles 27:27",
+        "original": "1 Chr. 27:27"
+      },
+      {
+        "reference": "Nehemiah 11:17",
+        "original": "Neh. 11:17"
+      },
+      {
+        "reference": "1 Chronicles 9:15",
+        "original": "1 Chr. 9:15"
+      },
+      {
+        "reference": "Nehemiah 12:35",
+        "original": "Neh. 12:35"
+      },
+      {
+        "reference": "1 Chronicles 21:27",
+        "original": "1 Chronicles 21:27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABDIEL": {
+    "name": "Zabdiel",
+    "slug": "zabdiel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don de Dios. (1.) Padre de Jasobeam, quien fue uno de los oficiales de David (1 Crónicas 27:2). (2.) Un supervisor de los sacerdotes después del Cautiverio (Nehemías 11:14)."
+      },
+      {
+        "source": "SMI",
+        "text": "(don de Dios)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 27:2",
+        "original": "1 Chr. 27:2"
+      },
+      {
+        "reference": "Nehemiah 11:14",
+        "original": "Neh. 11:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABUD": {
+    "name": "Zabud",
+    "slug": "zabud",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don, el hijo de Natán, quien era “amigo del rey” en la corte de Salomón (1 Reyes 4:5)."
+      },
+      {
+        "source": "SMI",
+        "text": "(dado), hijo de Natán (1 Reyes 4:5), descrito como sacerdote (Versión Autorizada “oficial principal”), y como quien ocupaba en la corte de Salomón el cargo confidencial de “amigo del rey”, que había sido ocupado por Husai el arquita durante el reinado de David. (2 Samuel 15:37; 16:16; 1 Crónicas 27:33) (1012 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 4:5",
+        "original": "1 Kings 4:5"
+      },
+      {
+        "reference": "2 Samuel 15:37",
+        "original": "2 Samuel 15:37"
+      },
+      {
+        "reference": "2 Samuel 16:16",
+        "original": "2 Samuel 16:16"
+      },
+      {
+        "reference": "1 Chronicles 27:33",
+        "original": "1 Chronicles 27:33"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZABULON": {
+    "name": "Zabulon",
+    "slug": "zabulon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Mateo 4:13, 15; Apocalipsis 7:8). Ver ZEBULÚN."
+      },
+      {
+        "source": "SMI",
+        "text": "La forma griega del nombre Zabulón. (Mateo 4:13; 15; Apocalipsis 7:8)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 4:13",
+        "original": "Matt. 4:13"
+      },
+      {
+        "reference": "Matthew 4:15",
+        "original": "Matt. 4:15"
+      },
+      {
+        "reference": "Revelation 7:8",
+        "original": "Rev. 7:8"
+      },
+      {
+        "reference": "Matthew 15",
+        "original": "Matthew 15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACCAI": {
+    "name": "Zaccai",
+    "slug": "zaccai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Puro, uno cuyos “hijos” regresaron con Zorobabel a Jerusalén (Esdras 2:9; Nehemías 7:14). (Ver ZABAI)."
+      },
+      {
+        "source": "SMI",
+        "text": "(puro). Los hijos de Zacai, en número de 760, regresaron con Zorobabel. (Esdras 2:9; Nehemías 7:14) (Antes del 536 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:9",
+        "original": "Ezra 2:9"
+      },
+      {
+        "reference": "Nehemiah 7:14",
+        "original": "Neh. 7:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACCHAEUS": {
+    "name": "Zacchaeus",
+    "slug": "zacchaeus",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Puro, un superintendente de aduanas; un jefe de recaudadores de impuestos (publicano) en Jericó (Lucas 19:1-10). “La recaudación de aduanas en Jericó, que en esa época producía y exportaba una cantidad considerable de bálsamo, era sin duda un puesto importante, y explicaría por qué Zaqueo era un hombre rico.” Siendo de baja estatura, se adelantó a la multitud que rodeaba a Cristo mientras pasaba por Jericó camino a Jerusalén, y subió a un sicomoro para poder verlo. Cuando nuestro Señor llegó al lugar, miró al publicano entre las ramas y, dirigiéndose a él por su nombre, le dijo que se diera prisa y bajara, pues ese día tenía la intención de quedarse en su casa. Esto llevó a la notable entrevista registrada por el evangelista y a la impactante parábola de las diez minas (Lucas 19:12-27). En Er-riha (Jericó) hay una gran torre cuadrada de aspecto venerable, que recibe el nombre tradicional de la Casa de Zaqueo."
+      },
+      {
+        "source": "SMI",
+        "text": "(puro), un recaudador de impuestos cerca de Jericó, quien, siendo de baja estatura, subió a un sicomoro para poder ver a Jesús mientras pasaba por ese lugar. (Lucas 19:1-10) Zaqueo era judío, como puede inferirse de su nombre y del hecho de que el Salvador se refiere a él expresamente como “hijo de Abraham”. El término que designa su cargo —“el jefe entre los publicanos”— es inusual, pero lo describe, sin duda, como el superintendente de aduanas o tributos en el distrito de Jericó, donde vivía. El cargo debió ser lucrativo en una región así, y no es extraño que Zaqueo sea mencionado por los evangelistas como un hombre rico. El Salvador pasó la noche probablemente en la casa de Zaqueo, y al día siguiente continuó su viaje. Estaba en la caravana de Galilea que se dirigía a Jerusalén para celebrar la Pascua."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Luke 19:1-10",
+        "original": "Luke 19:1-10"
+      },
+      {
+        "reference": "Luke 19:12-27",
+        "original": "Luke 19:12-27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACCHUR": {
+    "name": "Zacchur",
+    "slug": "zacchur",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "un simeonita, de la familia de Misma. (1 Crónicas 4:26)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:26",
+        "original": "1 Chronicles 4:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZACCUR": {
+    "name": "Zaccur",
+    "slug": "zaccur",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Recordador/Atento. (1.) Padre de Samúa, uno de los espías enviados por Moisés (Núm. 13:4). (2.) Un levita merarita (1 Cr. 24:27). (3.) Hijo de Asaf y jefe de una de las clases de cantores organizadas por David (1 Cr. 25:2, 10). (4.) Hijo de Imrí (Neh. 3:2). (5.) Un levita (Neh. 10:12). (6.) Hijo de Matanías (Neh. 13:13)."
+      },
+      {
+        "source": "SMI",
+        "text": "(atento/recordador)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 13:4",
+        "original": "Num. 13:4"
+      },
+      {
+        "reference": "1 Chronicles 24:27",
+        "original": "1 Chr. 24:27"
+      },
+      {
+        "reference": "1 Chronicles 25:2",
+        "original": "1 Chr. 25:2"
+      },
+      {
+        "reference": "1 Chronicles 25:10",
+        "original": "1 Chr. 25:10"
+      },
+      {
+        "reference": "Nehemiah 3:2",
+        "original": "Neh. 3:2"
+      },
+      {
+        "reference": "Nehemiah 10:12",
+        "original": "Neh. 10:12"
+      },
+      {
+        "reference": "Nehemiah 13:13",
+        "original": "Neh. 13:13"
+      },
+      {
+        "reference": "Nehemiah 12:35",
+        "original": "Nehemiah 12:35"
+      },
+      {
+        "reference": "Nehemiah 10:18",
+        "original": "Nehemiah 10:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACHARIAH": {
+    "name": "Zachariah",
+    "slug": "zachariah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Recordado por el Señor. (1.) Hijo de Jeroboam II, rey de Israel. Tras la muerte de su padre, hubo un interregno de diez años, al cabo de los cuales sucedió en el trono, que ocupó solo seis meses, siendo asesinado por Salum, quien usurpó el trono. «Hizo lo malo ante los ojos del Señor, como habían hecho sus padres» (2 Reyes 14:29; 15:8-12). En él terminó la dinastía de Jehú. (2.) Padre de Abí, quien fue la madre de Ezequías (2 Reyes 18:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "(recordado por Jehová), o propiamente Zacarías."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 14:29",
+        "original": "2 Kings 14:29"
+      },
+      {
+        "reference": "2 Kings 15:8-12",
+        "original": "2 Kings 15:8-12"
+      },
+      {
+        "reference": "2 Kings 18:2",
+        "original": "2 Kings 18:2"
+      },
+      {
+        "reference": "2 Kings 10:30",
+        "original": "2 Kings 10:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACHARIAS": {
+    "name": "Zacharias",
+    "slug": "zacharias",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Un sacerdote de la clase de Abías, la octava de las veinticuatro clases en las que David había dividido originalmente a los sacerdotes (1 Cr. 23:1-19). Solo cuatro de estas clases o «familias» de sacerdotes regresaron del Exilio (Esdras 2:36-39); pero luego fueron redistribuidas bajo las antiguas designaciones. Los sacerdotes servían en el templo dos veces al año, y solo por una semana cada vez. Había llegado el turno de Zacarías para este servicio. Durante este período, su hogar sería una de las cámaras reservadas para los sacerdotes a los lados del terreno del templo. La ofrenda de incienso era una de las partes más solemnes del culto diario del templo, y cada día se echaban suertes para determinar quién tendría este gran honor, un honor que ningún sacerdote podía disfrutar más de una vez en su vida. Mientras Zacarías ministraba en el altar de oro del incienso en el lugar santo, el ángel Gabriel le anunció que su esposa Elisabet, también de familia sacerdotal y ya avanzada en años, daría a luz un hijo que sería llamado Juan, y que él sería el precursor del Mesías largamente esperado (Lucas 1:12-17). Como castigo por negarse a creer este mensaje, quedó mudo y «no pudo hablar hasta el día en que estas cosas se cumplieran» (20). Transcurrieron nueve meses, y nació el hijo de Elisabet, y cuando en respuesta a su pregunta Zacarías escribió en una «tablilla de escribir»: «Su nombre es Juan», su boca se abrió, y alabó a Dios (60-79). El niño (Juan el Bautista), así «nacido fuera de tiempo», «se fortalecía en espíritu» (1:80). (2.) El «hijo de Baraquías», mencionado como habiendo sido asesinado entre el templo y el altar (Mat. 23:35; Lucas 11:51). «Baraquías» aquí puede ser otro nombre para Joiada, como algunos piensan. (Ver ZACARÍAS)."
+      },
+      {
+        "source": "SMI",
+        "text": "(forma griega de Zacarías)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:1-19",
+        "original": "1 Chr. 23:1-19"
+      },
+      {
+        "reference": "Ezra 2:36-39",
+        "original": "Ezra 2:36-39"
+      },
+      {
+        "reference": "Luke 1:12-17",
+        "original": "Luke 1:12-17"
+      },
+      {
+        "reference": "Matthew 23:35",
+        "original": "Matt. 23:35"
+      },
+      {
+        "reference": "Luke 11:51",
+        "original": "Luke 11:51"
+      },
+      {
+        "reference": "Luke 1:5",
+        "original": "Luke 1:5"
+      },
+      {
+        "reference": "Luke 11:61",
+        "original": "Luke 11:61"
+      },
+      {
+        "reference": "2 Chronicles 24:20",
+        "original": "2 Chronicles 24:20"
+      },
+      {
+        "reference": "2 Chronicles 24:21",
+        "original": "2 Chronicles 24:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZACHER": {
+    "name": "Zacher",
+    "slug": "zacher",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Memorial, un hijo de Jehiel (1 Cr. 8:31; 9:35); llamado Zacarías (9:37)."
+      },
+      {
+        "source": "SMI",
+        "text": "(memorial), uno de los hijos de Jehiel, el padre o fundador de Gabaón, con su esposa Maaca. (1 Crónicas 8:31) (c. 1450 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:31",
+        "original": "1 Chr. 8:31"
+      },
+      {
+        "reference": "1 Chronicles 9:35",
+        "original": "1 Chr. 9:35"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZADOK": {
+    "name": "Zadok",
+    "slug": "zadok",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Justo. (1.) Hijo de Ahitob, de la línea de Eleazar (2 Sam. 8:17; 1 Cr. 24:3), sumo sacerdote en tiempos de David (2 Sam. 20:25) y Salomón (1 Reyes 4:4). Se le menciona por primera vez cuando acude a Hebrón para unirse a David (1 Cr. 12:27, 28). Probablemente por esta razón fue nombrado gobernante de los Aaronitas (27:17). Sadoc y Abiatar actuaron como sumos sacerdotes en varias ocasiones importantes (1 Cr. 15:11; 2 Sam. 15:24-29, 35, 36); pero cuando Adonías intentó asegurar el trono, Abiatar se unió a él, y por lo tanto Salomón lo «expulsó de ser sumo sacerdote», y Sadoc, permaneciendo fiel a David, se convirtió en sumo sacerdote único (1 Reyes 2:27, 35; 1 Cr. 29:22). En él la línea de Fineas reanudó la dignidad, y la mantuvo hasta la caída de Jerusalén. Fue sucedido en su cargo sagrado por su hijo Azarías (1 Reyes 4:2; comp. 1 Cr. 6:3-9). (2.) Padre de Jerusa, quien fue esposa del rey Uzías y madre del rey Jotam (2 Reyes 15:33; 2 Cr. 27:1). (3.) «El escriba» puesto a cargo de los tesoros del templo por Nehemías junto con un sacerdote y un levita (Neh. 13:13). (4.) Los hijos de Baana, uno de los que ayudaron a reconstruir el muro de Jerusalén (Neh. 3:4)."
+      },
+      {
+        "source": "SMI",
+        "text": "(justo)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 8:17",
+        "original": "2 Sam. 8:17"
+      },
+      {
+        "reference": "1 Chronicles 24:3",
+        "original": "1 Chr. 24:3"
+      },
+      {
+        "reference": "2 Samuel 20:25",
+        "original": "2 Sam. 20:25"
+      },
+      {
+        "reference": "1 Kings 4:4",
+        "original": "1 Kings 4:4"
+      },
+      {
+        "reference": "1 Chronicles 12:27",
+        "original": "1 Chr. 12:27"
+      },
+      {
+        "reference": "1 Chronicles 12:28",
+        "original": "1 Chr. 12:28"
+      },
+      {
+        "reference": "1 Chronicles 15:11",
+        "original": "1 Chr. 15:11"
+      },
+      {
+        "reference": "2 Samuel 15:24-29",
+        "original": "2 Sam. 15:24-29"
+      },
+      {
+        "reference": "2 Samuel 15:35",
+        "original": "2 Sam. 15:35"
+      },
+      {
+        "reference": "2 Samuel 15:36",
+        "original": "2 Sam. 15:36"
+      },
+      {
+        "reference": "1 Kings 2:27",
+        "original": "1 Kings 2:27"
+      },
+      {
+        "reference": "1 Kings 2:35",
+        "original": "1 Kings 2:35"
+      },
+      {
+        "reference": "1 Chronicles 29:22",
+        "original": "1 Chr. 29:22"
+      },
+      {
+        "reference": "1 Kings 4:2",
+        "original": "1 Kings 4:2"
+      },
+      {
+        "reference": "1 Chronicles 6:3-9",
+        "original": "1 Chr. 6:3-9"
+      },
+      {
+        "reference": "2 Kings 15:33",
+        "original": "2 Kings 15:33"
+      },
+      {
+        "reference": "2 Chronicles 27:1",
+        "original": "2 Chr. 27:1"
+      },
+      {
+        "reference": "Nehemiah 13:13",
+        "original": "Neh. 13:13"
+      },
+      {
+        "reference": "Nehemiah 3:4",
+        "original": "Neh. 3:4"
+      },
+      {
+        "reference": "2 Samuel 19:11",
+        "original": "2 Samuel 19:11"
+      },
+      {
+        "reference": "1 Kings 1:34",
+        "original": "1 Kings 1:34"
+      },
+      {
+        "reference": "1 Chronicles 16:39",
+        "original": "1 Chronicles 16:39"
+      },
+      {
+        "reference": "1 Chronicles 6:12",
+        "original": "1 Chronicles 6:12"
+      },
+      {
+        "reference": "Nehemiah 3:29",
+        "original": "Nehemiah 3:29"
+      },
+      {
+        "reference": "1 Chronicles 9:11",
+        "original": "1 Chronicles 9:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAHAM": {
+    "name": "Zaham",
+    "slug": "zaham",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(gordura/grasa), hijo de Roboam con Abihail, hija de Eliab. (2 Crónicas 11:19)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 11:19",
+        "original": "2 Chronicles 11:19"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAIR": {
+    "name": "Zair",
+    "slug": "zair",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pequeño, un lugar probablemente al este del Mar Muerto, donde Joram derrotó al ejército de Edom que se había sublevado contra él (2 Reyes 8:21)."
+      },
+      {
+        "source": "SMI",
+        "text": "(pequeño), un lugar nombrado solo en (2 Reyes 8:21), en el relato de la expedición de Joram contra los edomitas. Se ha conjeturado que Zair es idéntico a Zoar."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 8:21",
+        "original": "2 Kings 8:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZALAPH": {
+    "name": "Zalaph",
+    "slug": "zalaph",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(herida) padre de Hanún, quien ayudó en la reconstrucción del muro de la ciudad. (Nehemías 3:30)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 3:30",
+        "original": "Nehemiah 3:30"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZALMON": {
+    "name": "Zalmon",
+    "slug": "zalmon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sombrío. (1.) Uno de los guerreros de David, llamado ahohíta (2 Sam. 23:28); también llamado Ilai (1 Cr. 11:29). (2.) Un bosque cerca de Siquem, del cual Abimelec y su partido trajeron ramas y las «pusieron junto a la fortaleza» de Siquem, «y prendieron fuego a la fortaleza» (Jue. 9:48). Probablemente el pico sur del Gerizim, ahora llamado Jebel Sulmán. (Ver SALMÓN)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sombrío), un ahohíta de la guardia de David. (2 Samuel 23:28)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 23:28",
+        "original": "2 Sam. 23:28"
+      },
+      {
+        "reference": "1 Chronicles 11:29",
+        "original": "1 Chr. 11:29"
+      },
+      {
+        "reference": "Judges 9:48",
+        "original": "Judg. 9:48"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZALMON, MOUNT": {
+    "name": "Zalmon, Mount",
+    "slug": "zalmon-mount",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "una eminencia boscosa en las inmediaciones de Siquem. (Jueces 9:48) Se ha supuesto que el nombre de Dalmanuta es una corrupción del de Zalmon."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 9:48",
+        "original": "Judges 9:48"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZALMONAH": {
+    "name": "Zalmonah",
+    "slug": "zalmonah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sombrío, una de las estaciones de los israelitas en el desierto (Núm. 33:41, 42)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sombrío), una estación desértica de los israelitas (Números 33:41) que se encuentra en el lado este de Edom."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 33:41",
+        "original": "Num. 33:41"
+      },
+      {
+        "reference": "Numbers 33:42",
+        "original": "Num. 33:42"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZALMUNNA": {
+    "name": "Zalmunna",
+    "slug": "zalmunna",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Uno de los dos reyes de Madián a quienes el «Señor entregó» en manos de Gedeón. Fue asesinado más tarde junto con Zeba (Jue. 8:5-21). (Ver ZEBA)."
+      },
+      {
+        "source": "SMI",
+        "text": "[Zeba]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 8:5-21",
+        "original": "Judg. 8:5-21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAMZUMMIM": {
+    "name": "Zamzummim",
+    "slug": "zamzummim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Deuteronomio 2:20) solamente, el nombre amonita para el pueblo que por otros era llamado Refaítas. Se les describe como una nación de gigantes poderosa y numerosa en sus orígenes. Por una ligera similitud entre los dos nombres, y por la mención de los Emim en conexión con cada uno, se conjetura que los Zamzummim son idénticos a los Zuzim."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 2:20",
+        "original": "Deuteronomy 2:20"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAMZUMMIMS": {
+    "name": "Zamzummims",
+    "slug": "zamzummims",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una raza de gigantes; «un pueblo grande, numeroso y de alta estatura, como los anaquitas» (Deut. 2:20, 21). Fueron vencidos por los amonitas, «quienes los llamaban Zamzummim». Pertenecían a los Refaítas y habitaban el país posteriormente ocupado por los amonitas. Se ha conjeturado que podrían ser Ham-zuzim, es decir, Zuzim que moraban en Ham, un lugar aparentemente al sur de Astarot (Gén. 14:5), la antigua Rabá de los Amonitas."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Deuteronomy 2:20",
+        "original": "Deut. 2:20"
+      },
+      {
+        "reference": "Deuteronomy 2:21",
+        "original": "Deut. 2:21"
+      },
+      {
+        "reference": "Genesis 14:5",
+        "original": "Gen. 14:5"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZANOAH": {
+    "name": "Zanoah",
+    "slug": "zanoah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ciénaga. (1.) Un pueblo en la Sefelá o tierras bajas de Judá, cerca de Zora (Josué 15:34). Fue repoblado después del retorno del Cautiverio (Nehemías 11:30). Zanu’ah, en Wadi Ismail, a 10 millas al oeste de Jerusalén, probablemente ocupa el mismo sitio. (2.) Un pueblo en la región montañosa de Judá, unas 10 millas al suroeste de Hebrón (Josué 15:56)."
+      },
+      {
+        "source": "SMI",
+        "text": "(ciénaga)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:34",
+        "original": "Josh. 15:34"
+      },
+      {
+        "reference": "Nehemiah 11:30",
+        "original": "Neh. 11:30"
+      },
+      {
+        "reference": "Joshua 15:56",
+        "original": "Josh. 15:56"
+      },
+      {
+        "reference": "Nehemiah 3:13",
+        "original": "Nehemiah 3:13"
+      },
+      {
+        "reference": "Joshua 15:66",
+        "original": "Joshua 15:66"
+      },
+      {
+        "reference": "1 Chronicles 4:18",
+        "original": "1 Chronicles 4:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAPHNATH-PAANEAH": {
+    "name": "Zaphnath-paaneah",
+    "slug": "zaphnath-paaneah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El nombre que Faraón dio a José cuando lo elevó al rango de primer ministro o gran visir del reino (Génesis 41:45). Esta es una palabra puramente egipcia y ha sido explicada de diversas maneras. Algunos creen que significa “creador” o “preservador de vida”. Brugsch la interpreta como “gobernador del distrito del lugar de vida”, es decir, de Gosén, cuya ciudad principal era Pitón, “el lugar de vida”. Otros la explican como “un revelador de secretos” o “el hombre a quien se revelan los secretos”."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 41:45",
+        "original": "Gen. 41:45"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZAPHNATHPAANEAH": {
+    "name": "Zaphnathpaaneah",
+    "slug": "zaphnathpaaneah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "un nombre dado por Faraón a José. (Génesis 41:45) Los rabinos interpretaron Zafnat-paaneah como hebreo en el sentido de “revelador de un secreto”. Como el nombre debe haber sido egipcio, se ha explicado desde el copto como “el preservador de la era”."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 41:45",
+        "original": "Genesis 41:45"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAPHON": {
+    "name": "Zaphon",
+    "slug": "zaphon",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(norte), un lugar mencionado en la enumeración de la heredad de la tribu de Gad. (Josué 13:27)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:27",
+        "original": "Joshua 13:27"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARA, OR ZARAH": {
+    "name": "Zara, Or Zarah",
+    "slug": "zara-or-zarah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "el hijo de Judá. (Mateo 1:3)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 1:3",
+        "original": "Matthew 1:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARAH, OR ZERAH": {
+    "name": "Zarah, Or Zerah",
+    "slug": "zarah-or-zerah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "el hijo de Judá. (Génesis 38:30; 48:12)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 38:30",
+        "original": "Genesis 38:30"
+      },
+      {
+        "reference": "Genesis 48:12",
+        "original": "Genesis 48:12"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAREAH": {
+    "name": "Zareah",
+    "slug": "zareah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "lo mismo que Zora y Zorea. (Nehemías 11:29)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 11:29",
+        "original": "Nehemiah 11:29"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAREATHITES, THE": {
+    "name": "Zareathites, The",
+    "slug": "zareathites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "los habitantes de Zarea o Zora. (1 Crónicas 2:53)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:53",
+        "original": "1 Chronicles 2:53"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARED, THE VALLEY OF": {
+    "name": "Zared, The Valley Of",
+    "slug": "zared-the-valley-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Zered]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAREPHATH": {
+    "name": "Zarephath",
+    "slug": "zarephath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Taller de fundición, “un taller para el refinado y la fundición de metales”, una pequeña ciudad fenicia, ahora Surafend, a aproximadamente una milla de la costa, casi a mitad de camino entre Tiro y Sidón. Aquí Elías se hospedó con una viuda pobre durante la “gran hambruna”, cuando el “cielo estuvo cerrado tres años y seis meses” (Lucas 4:26; 1 Reyes 17:10). Se llama Sarepta en el Nuevo Testamento (Lucas 4:26)."
+      },
+      {
+        "source": "SMI",
+        "text": "(lugar de fundición), la residencia del profeta Elías durante la última parte de la sequía. (1 Reyes 17:9,10) Estaba cerca o dependía de Sidón. Está representada por la moderna aldea de Sura-fend. De la antigua ciudad quedan importantes indicios. Un grupo de cimientos se encuentra en un promontorio llamado Ain el-Kanatarah; pero los principales restos están al sur de este, y se extienden por una milla o más, con muchos fragmentos de columnas, losas y otras características arquitectónicas. En el Nuevo Testamento, Zarefat aparece bajo la forma griega de Sarepta. (Lucas 4:26)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Luke 4:26",
+        "original": "Luke 4:26"
+      },
+      {
+        "reference": "1 Kings 17:10",
+        "original": "1 Kings 17:10"
+      },
+      {
+        "reference": "1 Kings 17:9",
+        "original": "1 Kings 17:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZARETAN": {
+    "name": "Zaretan",
+    "slug": "zaretan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Cuando los hebreos cruzaron el Jordán, tan pronto como los pies de los sacerdotes se sumergieron en el agua, el flujo del río se detuvo. El punto de detención fue la “ciudad de Adán junto a Zaretán”, probablemente cerca de Sucot, en la desembocadura del Jaboc, unas 30 millas río arriba de donde el pueblo estaba acampado. Allí el agua “se detuvo y se amontonó”. Así, todo el espacio de 30 millas del lecho del río se secó, para que las tribus pudieran pasar (Josué 3:16, 17; comp. Salmos 104:3)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 3:16",
+        "original": "Josh. 3:16"
+      },
+      {
+        "reference": "Joshua 3:17",
+        "original": "Josh. 3:17"
+      },
+      {
+        "reference": "Psalms 104:3",
+        "original": "Ps. 104:3"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZARETAN, OR ZARTHAN": {
+    "name": "Zaretan, Or Zarthan",
+    "slug": "zaretan-or-zarthan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Josué 3:16)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 3:16",
+        "original": "Joshua 3:16"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARETH-SHAHAR": {
+    "name": "Zareth-shahar",
+    "slug": "zareth-shahar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El esplendor del amanecer, una ciudad “en el monte del valle” (Josué 13:19). Se identifica con las ruinas de Zara, cerca de la desembocadura del Wadi Zerka Maín, en la orilla oriental del Mar Muerto, unas 3 millas al sur de Callirrhoe. De esta ciudad queda poco. “Unas pocas columnas basálticas rotas y trozos de muro a unos 200 metros de la orilla, y un fuerte en ruinas algo más cerca del mar, aproximadamente en el centro de la línea costera de la llanura, es todo lo que queda” (La Tierra de Moab de Tristram)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:19",
+        "original": "Josh. 13:19"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZARETHSHAHAR": {
+    "name": "Zarethshahar",
+    "slug": "zarethshahar",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(esplendor del amanecer), un lugar mencionado solo en (Josué 13:19) en el catálogo de las ciudades asignadas a Rubén."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:19",
+        "original": "Joshua 13:19"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARHITES, THE": {
+    "name": "Zarhites, The",
+    "slug": "zarhites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "una rama de la tribu de Judá, descendiente de Zera, hijo de Judá. (Números 26:13,20; Josué 7:17; 1 Crónicas 27:11,15)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 26:13",
+        "original": "Numbers 26:13"
+      },
+      {
+        "reference": "Numbers 26:20",
+        "original": "Numbers 26:20"
+      },
+      {
+        "reference": "Joshua 7:17",
+        "original": "Joshua 7:17"
+      },
+      {
+        "reference": "1 Chronicles 27:11",
+        "original": "1 Chronicles 27:11"
+      },
+      {
+        "reference": "1 Chronicles 27:15",
+        "original": "1 Chronicles 27:15"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARTANAH": {
+    "name": "Zartanah",
+    "slug": "zartanah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(1 Reyes 4:12) [Zaretán, o Zartán, Zartán]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 4:12",
+        "original": "1 Kings 4:12"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZARTHAN": {
+    "name": "Zarthan",
+    "slug": "zarthan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un lugar cerca de Sucot, en la llanura del Jordán, “en la tierra arcillosa”, cerca del cual Hiram fundió los utensilios de bronce para el templo (1 Reyes 7:46); probablemente el mismo que Zartán. También se le llama Zeredatá (2 Crónicas 4:17). (Ver ZEREDA)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 7:46",
+        "original": "1 Kings 7:46"
+      },
+      {
+        "reference": "2 Chronicles 4:17",
+        "original": "2 Chr. 4:17"
+      },
+      {
+        "reference": "Joshua 3:18",
+        "original": "Joshua 3:18"
+      },
+      {
+        "reference": "1 Kings 4:12",
+        "original": "1 Kings 4:12"
+      },
+      {
+        "reference": "Judges 7:22",
+        "original": "Judges 7:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZATTHU": {
+    "name": "Zatthu",
+    "slug": "zatthu",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un brote, Neh. 10:14."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 10:14",
+        "original": "Neh. 10:14"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZATTU": {
+    "name": "Zattu",
+    "slug": "zattu",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ídem, uno de cuyos descendientes regresó del Cautiverio con Zorobabel (Esdras 2:8; Nehemías 7:13); probablemente el mismo que Zathu."
+      },
+      {
+        "source": "SMI",
+        "text": "Los hijos de Zattu eran una familia de laicos de Israel que regresaron con Zorobabel. (Esdras 2:8; Nehemías 7:13)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:8",
+        "original": "Ezra 2:8"
+      },
+      {
+        "reference": "Nehemiah 7:13",
+        "original": "Neh. 7:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZAVAN": {
+    "name": "Zavan",
+    "slug": "zavan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(1 Crónicas 1:42) [Zaaván, o Zaván]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:42",
+        "original": "1 Chronicles 1:42"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZAZA": {
+    "name": "Zaza",
+    "slug": "zaza",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Abundancia, un descendiente de Judá (1 Crónicas 2:33)."
+      },
+      {
+        "source": "SMI",
+        "text": "uno de los hijos de Jonatán, un descendiente de Jerameel. (1 Crónicas 2:33)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:33",
+        "original": "1 Chr. 2:33"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEAL": {
+    "name": "Zeal",
+    "slug": "zeal",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un temperamento ferviente; puede ser iluminado (Números 25:11-13; 2 Corintios 7:11; 9:2), o ignorante y mal dirigido (Romanos 10:2; Filipenses 3:6). Como gracia cristiana, debe fundamentarse en principios correctos y dirigirse a fines justos (Gálatas 4:18). A veces se atribuye a Dios (2 Reyes 19:31; Isaías 9:7; 37:32; Ezequiel 5:13)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 25:11-13",
+        "original": "Num. 25:11-13"
+      },
+      {
+        "reference": "2 Corinthians 7:11",
+        "original": "2 Cor. 7:11"
+      },
+      {
+        "reference": "2 Corinthians 9:2",
+        "original": "2 Cor. 9:2"
+      },
+      {
+        "reference": "Romans 10:2",
+        "original": "Rom. 10:2"
+      },
+      {
+        "reference": "Philippians 3:6",
+        "original": "Phil. 3:6"
+      },
+      {
+        "reference": "Galatians 4:18",
+        "original": "Gal. 4:18"
+      },
+      {
+        "reference": "2 Kings 19:31",
+        "original": "2 Kings 19:31"
+      },
+      {
+        "reference": "Isaiah 9:7",
+        "original": "Isa. 9:7"
+      },
+      {
+        "reference": "Isaiah 37:32",
+        "original": "Isa 37:32"
+      },
+      {
+        "reference": "Ezekiel 5:13",
+        "original": "Ezek. 5:13"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZEALOTS": {
+    "name": "Zealots",
+    "slug": "zealots",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una secta de judíos que se originó con Judas el galileo (Hechos 5:37). Se negaron a pagar tributo a los romanos, basándose en que esto violaba el principio de que Dios era el único rey de Israel. Se rebelaron contra los romanos, pero pronto fueron dispersados y se convirtieron en una banda anárquica de meros bandidos. Más tarde fueron llamados Sicarios, por su uso de la sica, es decir, la daga romana."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Acts 5:37",
+        "original": "Acts 5:37"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZEBADIAH": {
+    "name": "Zebadiah",
+    "slug": "zebadiah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Don de Jehová. (1.) Hijo de Asael, hermano de Joab (1 Crónicas 27:7). (2.) Un levita que participó como uno de los maestros en el sistema de educación nacional instituido por Josafat (2 Crónicas 17:7, 8). (3.) El hijo de Ismael, “el jefe de la casa de Judá en todos los asuntos del rey” (2 Crónicas 19:8-11). (4.) Hijo de Bería (1 Crónicas 8:15). (5.) Un portero coreíta de la casa del Señor (1 Crónicas 26:2). También se mencionan otros tres o cuatro con este nombre."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 27:7",
+        "original": "1 Chr. 27:7"
+      },
+      {
+        "reference": "2 Chronicles 17:7",
+        "original": "2 Chr. 17:7"
+      },
+      {
+        "reference": "2 Chronicles 17:8",
+        "original": "2 Chr. 17:8"
+      },
+      {
+        "reference": "2 Chronicles 19:8-11",
+        "original": "2 Chr. 19:8-11"
+      },
+      {
+        "reference": "1 Chronicles 8:15",
+        "original": "1 Chr. 8:15"
+      },
+      {
+        "reference": "1 Chronicles 26:2",
+        "original": "1 Chr. 26:2"
+      },
+      {
+        "reference": "1 Chronicles 8:17",
+        "original": "1 Chronicles 8:17"
+      },
+      {
+        "reference": "1 Chronicles 12:7",
+        "original": "1 Chronicles 12:7"
+      },
+      {
+        "reference": "Ezra 8:8",
+        "original": "Ezra 8:8"
+      },
+      {
+        "reference": "Ezra 10:20",
+        "original": "Ezra 10:20"
+      },
+      {
+        "reference": "1 Chronicles 26:3",
+        "original": "1 Chronicles 26:3"
+      },
+      {
+        "reference": "2 Chronicles 19:11",
+        "original": "2 Chronicles 19:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBAH": {
+    "name": "Zebah",
+    "slug": "zebah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Asesino de hombres, o sacrificio, uno de los dos reyes que lideraron la vasta hueste de los madianitas que invadieron la tierra de Israel, y sobre quienes Gedeón obtuvo una gran y decisiva victoria (Jueces 8). Zeba y Zalmuna habían logrado escapar a través del Jordán con un remanente del ejército madianita, pero fueron alcanzados en Karkor, probablemente en el Haurán, y derrotados por Gedeón. Los reyes fueron tomados vivos y llevados de vuelta a través del Jordán; y al confesar que habían participado personalmente en la matanza de los hermanos de Gedeón, fueron ejecutados (comp. 1 Samuel 12:11; Isaías 10:26; Salmo 83:11)."
+      },
+      {
+        "source": "SMI",
+        "text": "y Zalmuna (privados de protección), los dos “reyes” de Madián que comandaron la gran invasión de Palestina, y que finalmente cayeron por mano del propio Gedeón. (Jueces 8:5-21; Salmos 83:11) (1250 a.C.) Mientras Oreb y Zeeb, dos de los líderes inferiores de la incursión, habían sido muertos, junto con un vasto número de su pueblo, por los efraimitas, en los vados centrales del Jordán, los dos reyes habían logrado escapar por un paso más al norte (probablemente el vado cerca de Betsán), y de allí por el Wadi Yabis, a través de Galaad, hasta Kurkor, en lo alto del Haurán. Allí estaban reposando con 15.000 hombres, un mero remanente de su enorme horda, cuando Gedeón los alcanzó. La gente huyó despavorida, y Gedeón capturó a los dos reyes y los llevó a su pueblo natal, Ofra, donde los mató porque habían asesinado a sus hermanos."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 8",
+        "original": "Judg. 8"
+      },
+      {
+        "reference": "1 Samuel 12:11",
+        "original": "1 Sam. 12:11"
+      },
+      {
+        "reference": "Isaiah 10:26",
+        "original": "Isa. 10:26"
+      },
+      {
+        "reference": "Psalms 83:11",
+        "original": "Ps. 83:11"
+      },
+      {
+        "reference": "Judges 8:5-21",
+        "original": "Judges 8:5-21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBAIM": {
+    "name": "Zebaim",
+    "slug": "zebaim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Esdras 2:57; Nehemías 7:59). “Poqueret de Zebaim” debe leerse como en la Versión Revisada, “Poqueret-hazzebaim” (“el que apresa a los antílopes”), probablemente el nombre de algún cazador."
+      },
+      {
+        "source": "SMI",
+        "text": "(las gacelas), mencionado en el catálogo de las familias de los “siervos de Salomón” que regresaron del cautiverio con Zorobabel. (Esdras 2:57; Nehemías 7:59)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:57",
+        "original": "Ezra 2:57"
+      },
+      {
+        "reference": "Nehemiah 7:59",
+        "original": "Neh. 7:59"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBEDEE": {
+    "name": "Zebedee",
+    "slug": "zebedee",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un pescador galileo, esposo de Salomé (véase), y padre de Santiago y Juan, dos de los discípulos de nuestro Señor (Mateo 4:21; 27:56; Marcos 15:40). Parece haber sido un hombre de cierta posición en Capernaúm, pues tenía dos barcas (Lucas 5:4) y “jornaleros” (Marcos 1:20) propios. No se le menciona después del llamamiento de sus dos hijos por Jesús."
+      },
+      {
+        "source": "SMI",
+        "text": "(mi don) (forma griega de Zabdi) un pescador de Galilea, padre de los apóstoles Santiago el Mayor y Juan (Mateo 4:21) y esposo de Salomé. (Mateo 27:56; Marcos 15:40) Probablemente vivió en Betsaida o en sus inmediaciones. Se ha inferido de la mención de sus “jornaleros” (Marcos 1:20) y del conocimiento entre el apóstol Juan y Anás el sumo sacerdote (Juan 18:15) que la familia de Zebedeo gozaba de buenas circunstancias económicas (comp. Juan 19:27), aunque no estaban por encima del trabajo manual (Mateo 4:21). Aparece solo dos veces en la narrativa evangélica, a saber, en (Mateo 4:21,22; Marcos 1:19,20) donde se le ve en su barca con sus dos hijos remendando sus redes."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 4:21",
+        "original": "Matt. 4:21"
+      },
+      {
+        "reference": "Matthew 27:56",
+        "original": "Matt 27:56"
+      },
+      {
+        "reference": "Mark 15:40",
+        "original": "Mark 15:40"
+      },
+      {
+        "reference": "Luke 5:4",
+        "original": "Luke 5:4"
+      },
+      {
+        "reference": "Mark 1:20",
+        "original": "Mark 1:20"
+      },
+      {
+        "reference": "John 18:15",
+        "original": "John 18:15"
+      },
+      {
+        "reference": "John 19:27",
+        "original": "John 19:27"
+      },
+      {
+        "reference": "Matthew 4:22",
+        "original": "Matthew 4:22"
+      },
+      {
+        "reference": "Mark 1:19",
+        "original": "Mark 1:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBINA": {
+    "name": "Zebina",
+    "slug": "zebina",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(compra), uno de los hijos de Nebo que había tomado esposas extranjeras después del regreso de Babilonia (Esdras 10:43)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:43",
+        "original": "Ezra 10:43"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEBOIM": {
+    "name": "Zeboim",
+    "slug": "zeboim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gacelas o corzos. (1.) Una de las “cinco ciudades de la llanura” de Sodoma, generalmente mencionada junto con Adma (Génesis 10:19; 14:2; Deuteronomio 29:23; Oseas 11:8). Tenía su propio rey (Seméber), y por lo tanto era un lugar de cierta importancia. Fue destruida junto con las otras ciudades de la llanura. (2.) Un valle o barranco escarpado en algún lugar cerca de Gabaa en Benjamín (1 Samuel 13:18). Probablemente era el barranco que ahora lleva el nombre de Wadi Shakh-ed-Dub’a, o “barranco de la hiena”, al norte de Jericó. (3.) Un lugar mencionado solo en Nehemías 11:34, habitado por los benjamitas después del Cautiverio."
+      },
+      {
+        "source": "SMI",
+        "text": "(gacelas)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:19",
+        "original": "Gen. 10:19"
+      },
+      {
+        "reference": "Genesis 14:2",
+        "original": "Gen 14:2"
+      },
+      {
+        "reference": "Deuteronomy 29:23",
+        "original": "Deut. 29:23"
+      },
+      {
+        "reference": "Hosea 11:8",
+        "original": "Hos. 11:8"
+      },
+      {
+        "reference": "1 Samuel 13:18",
+        "original": "1 Sam. 13:18"
+      },
+      {
+        "reference": "Nehemiah 11:34",
+        "original": "Neh. 11:34"
+      },
+      {
+        "reference": "Genesis 14:8",
+        "original": "Genesis 14:8"
+      },
+      {
+        "reference": "Genesis 29:23",
+        "original": "Genesis 29:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBUDAH": {
+    "name": "Zebudah",
+    "slug": "zebudah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dada, la esposa de Josías y madre de Joacim (2 Reyes 23:36)."
+      },
+      {
+        "source": "SMI",
+        "text": "(otorgada), esposa de Josías y madre del rey Joacim. (2 Reyes 23:36) (653 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 23:36",
+        "original": "2 Kings 23:36"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBUL": {
+    "name": "Zebul",
+    "slug": "zebul",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Morada, el gobernador de Siquem bajo Abimelec (Jue. 9:28, 30, 36). Informó a su señor de la intención del pueblo de Siquem de transferir su lealtad a la tribu hevea de Hamor. Esto llevó a Abimelec a destruir la ciudad, pasando a espada a toda su población y sembrando sal en sus ruinas (Jue. 9:28-45)."
+      },
+      {
+        "source": "SMI",
+        "text": "(morada), hombre principal (versión autorizada \"gobernante\") de la ciudad de Siquem en el momento del conflicto entre Abimelec y los cananeos nativos. (Jueces 9:28,30,36,41) (c. 1209 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 9:28",
+        "original": "Judg. 9:28"
+      },
+      {
+        "reference": "Judges 9:30",
+        "original": "Judg 9:30"
+      },
+      {
+        "reference": "Judges 9:36",
+        "original": "Judg 9:36"
+      },
+      {
+        "reference": "Judges 9:28-45",
+        "original": "Judg. 9:28-45"
+      },
+      {
+        "reference": "Judges 9:41",
+        "original": "Judges 9:41"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBULONITE": {
+    "name": "Zebulonite",
+    "slug": "zebulonite",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La designación de Elón, el juez que pertenecía a la tribu de Zabulón (Jue. 12:11, 12)."
+      },
+      {
+        "source": "SMI",
+        "text": "Miembro de la tribu de Zabulón. (Jueces 12:11,12) Aplicado únicamente a Elón, el único juez que produjo la tribu. (Jueces 12:11,12)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 12:11",
+        "original": "Judg. 12:11"
+      },
+      {
+        "reference": "Judges 12:12",
+        "original": "Judg. 12:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBULUN": {
+    "name": "Zebulun",
+    "slug": "zebulun",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Morada, el sexto y más joven hijo de Jacob y Lea (Gén. 30:20). Poco se sabe de su historia personal. Tuvo tres hijos (46:14)."
+      },
+      {
+        "source": "SMI",
+        "text": "(una morada), el décimo de los hijos de Jacob, según el orden en que se enumeran sus nacimientos, el sexto y último de Lea. (Génesis 30:20; 35:23; 46:14; 1 Crónicas 2:1) Su nacimiento se menciona en (Génesis 30:19,20). De Zabulón como individuo no se registra nada. La lista de Génesis 46 le atribuye tres hijos, fundadores de las principales familias de la tribu (comp.) (Números 26:26) en el momento de la migración a Egipto. No se registra que la tribu haya participado, para bien o para mal, en ninguno de los eventos del Éxodo o la conquista. La afirmación de Josefo es probablemente correcta en lo principal: que se extendía por un lado hasta el lago de Genesaret y por el otro hasta el Carmelo y el Mediterráneo. Al sur limitaba con Isacar, que se encontraba en la gran llanura o valle del Cisón; al norte tenía a Neftalí y Aser. Así, lejos del centro de gobierno, Zabulón permanece a lo largo de la historia, con una excepción, en la oscuridad que envuelve a todas las tribus del norte. Esa excepción, sin embargo, es notable. La conducta de la tribu durante la lucha contra Sísara, cuando lucharon con valor desesperado codo a codo con sus hermanos de Neftalí, fue tal que atrajo el elogio especial de Débora, quien los distingue de todas las demás tribus. (Jueces 5:18)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 30:20",
+        "original": "Gen. 30:20"
+      },
+      {
+        "reference": "Genesis 35:23",
+        "original": "Genesis 35:23"
+      },
+      {
+        "reference": "Genesis 46:14",
+        "original": "Genesis 46:14"
+      },
+      {
+        "reference": "1 Chronicles 2:1",
+        "original": "1 Chronicles 2:1"
+      },
+      {
+        "reference": "Genesis 30:19",
+        "original": "Genesis 30:19"
+      },
+      {
+        "reference": "Numbers 26:26",
+        "original": "Numbers 26:26"
+      },
+      {
+        "reference": "Judges 5:18",
+        "original": "Judges 5:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEBULUN, LOT OF": {
+    "name": "Zebulun, Lot of",
+    "slug": "zebulun-lot-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En Galilea, al norte de Isacar y al sur de Aser y Neftalí (Jos. 19:10-16), y entre el Mar de Galilea y el Mediterráneo. Según una antigua profecía, esta parte de Galilea disfrutó de una gran parte del ministerio público de nuestro Señor (Isa. 9:1, 2; Mat. 4:12-16)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:10-16",
+        "original": "Josh. 19:10-16"
+      },
+      {
+        "reference": "Isaiah 9:1",
+        "original": "Isa. 9:1"
+      },
+      {
+        "reference": "Isaiah 9:2",
+        "original": "Isa 9:2"
+      },
+      {
+        "reference": "Matthew 4:12-16",
+        "original": "Matt. 4:12-16"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZEBULUN, TRIBE OF": {
+    "name": "Zebulun, Tribe of",
+    "slug": "zebulun-tribe-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Contada en Sinaí (Núm. 1:31) y antes de entrar en Canaán (26:27). Fue una de las tribus que no expulsó a los cananeos, sino que solo los hizo tributarios (Jue. 1:30). Mostró poco interés en los asuntos públicos. Sin embargo, respondió rápidamente al llamado de Gedeón (6:35), y más tarde ayudó a entronizar a David en Hebrón (1 Cr. 12:33, 40). Junto con las otras tribus del norte, Zabulón fue llevado a la tierra de Asiria por Tiglat-pileser (2 Re. 15:29). En el cántico de Débora, las palabras “De Zabulón los que empuñan la pluma del escritor” (Jue. 5:14) han sido traducidas en la R.V. como “Los que empuñan el bastón del mariscal”. Esta es una traducción cuestionable. “La palabra sopher ('escriba' o 'escritor') define la palabra shebhet ('vara' o 'pluma') con la que se une. La 'vara del escriba' en los monumentos asirios era el estilete de madera o metal, con la ayuda del cual se grababa la tablilla de arcilla o se inscribía el papiro con caracteres. El escriba que lo manejaba era el asociado y asistente de los 'legisladores'” (Sayce)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 1:31",
+        "original": "Num. 1:31"
+      },
+      {
+        "reference": "Judges 1:30",
+        "original": "Judg. 1:30"
+      },
+      {
+        "reference": "1 Chronicles 12:33",
+        "original": "1 Chr. 12:33"
+      },
+      {
+        "reference": "1 Chronicles 12:40",
+        "original": "1 Chr. 12:40"
+      },
+      {
+        "reference": "2 Kings 15:29",
+        "original": "2 Kings 15:29"
+      },
+      {
+        "reference": "Judges 5:14",
+        "original": "Judg. 5:14"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZEBULUNITES, THE": {
+    "name": "Zebulunites, The",
+    "slug": "zebulunites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Los miembros de la tribu de Zabulón. (Números 26:27) solamente."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 26:27",
+        "original": "Numbers 26:27"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZECHARIAH": {
+    "name": "Zechariah",
+    "slug": "zechariah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jehová es renombrado o recordado. (1.) Un profeta de Judá, el undécimo de los doce profetas menores. Al igual que Ezequiel, era de ascendencia sacerdotal. Se describe a sí mismo (1:1) como “hijo de Berequías”. En Esdras 5:1 y 6:14 se le llama “hijo de Iddo”, quien era propiamente su abuelo. Su carrera profética comenzó en el segundo año de Darío (520 a.C.), unos dieciséis años después del regreso de la primera compañía del exilio. Fue contemporáneo de Hageo (Esdras 5:1). Su libro consta de dos partes distintas: (1) capítulos 1 al 8, inclusive, y (2) 9 hasta el final. Comienza con un prefacio (1:1-6) que recuerda la historia pasada de la nación, con el propósito de presentar una solemne advertencia a la generación presente. Luego sigue una serie de ocho visiones (1:7-6:8), que se suceden una tras otra en una noche, y que pueden considerarse una historia simbólica de Israel, destinada a brindar consuelo a los exiliados que regresaron y a despertar la esperanza en sus mentes. La acción simbólica, la coronación de Josué (6:9-15), describe cómo los reinos del mundo se convierten en el reino del Cristo de Dios. Los capítulos 7 y 8, pronunciados dos años después, son una respuesta a la pregunta de si los días de luto por la destrucción de la ciudad deberían seguir observándose, y un discurso alentador al pueblo, asegurándoles la presencia y bendición de Dios. La segunda parte del libro (caps. 9-14) no tiene fecha. Es probable que un intervalo considerable la separe de la primera parte. Consta de dos cargas. La primera carga (caps. 9-11) esboza el curso de los tratos providenciales de Dios con su pueblo hasta el tiempo del Advenimiento. La segunda carga (caps. 12-14) señala las glorias que esperan a Israel en “el día postrero”, el conflicto final y el triunfo del reino de Dios. (2.) El hijo o nieto de Joiada, el sumo sacerdote en los tiempos de Ocozías y Joás. Después de la muerte de Joiada, condenó audazmente tanto al rey como al pueblo por su rebelión contra Dios (2 Cr. 24:20), lo que despertó tanto su resentimiento contra él que por orden del rey lo apedrearon, y murió “en el atrio de la casa de Jehová” (24:21). Cristo alude a este acto de asesinato en Mat. 23:35, Luc. 11:51. (Ver ZACARÍAS [2]). (3.) Un profeta que tenía “entendimiento en la visión de Dios” en tiempos de Uzías, quien le debía mucho por su sabio consejo (2 Cr. 26:5). Además de estos, hay un gran número de personas mencionadas en las Escrituras que llevan este nombre de quienes no se sabe nada. (4.) Uno de los jefes de la tribu de Rubén (1 Cr. 5:7). (5.) Uno de los porteros del tabernáculo (1 Cr. 9:21). (6.) 1 Cr. 9:37. (7.) Un levita que ayudó a subir el arca de la casa de Obed-edom (1 Cr. 15:20-24). (8.) Un levita coatita (1 Cr. 24:25). (9.) Un levita merarita (1 Cr. 27:21). (10.) El padre de Iddo (1 Cr. 27:21). (11.) Uno que ayudó a enseñar la ley al pueblo en tiempos de Josafat (2 Cr. 17:7). (12.) Un levita de los hijos de Asaf (2 Cr. 20:14). (13.) Uno de los hijos de Josafat (2 Cr. 21:2). (14.) El padre de Abías, quien fue la madre de Ezequías (2 Cr. 29:1). (15.) Uno de los hijos de Asaf (2 Cr. 29:13). (16.) Uno de los “gobernadores de la casa de Dios” (2 Cr. 35:8). (17.) Un jefe del pueblo en tiempos de Esdras, quien lo consultó sobre el regreso del cautiverio (Esdras 8:16); probablemente el mismo mencionado en Neh. 8:4. (18.) Neh. 11:12. (19.) Neh. 12:16. (20.) Neh. 12:35, 41. (21.) Isa. 8:2."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 5:1",
+        "original": "Ezra 5:1"
+      },
+      {
+        "reference": "2 Chronicles 24:20",
+        "original": "2 Chr. 24:20"
+      },
+      {
+        "reference": "Matthew 23:35",
+        "original": "Matt. 23:35"
+      },
+      {
+        "reference": "Luke 11:51",
+        "original": "Luke 11:51"
+      },
+      {
+        "reference": "2 Chronicles 26:5",
+        "original": "2 Chr. 26:5"
+      },
+      {
+        "reference": "1 Chronicles 5:7",
+        "original": "1 Chr. 5:7"
+      },
+      {
+        "reference": "1 Chronicles 9:21",
+        "original": "1 Chr. 9:21"
+      },
+      {
+        "reference": "1 Chronicles 9:37",
+        "original": "1 Chr. 9:37"
+      },
+      {
+        "reference": "1 Chronicles 15:20-24",
+        "original": "1 Chr. 15:20-24"
+      },
+      {
+        "reference": "1 Chronicles 24:25",
+        "original": "1 Chr. 24:25"
+      },
+      {
+        "reference": "1 Chronicles 27:21",
+        "original": "1 Chr. 27:21"
+      },
+      {
+        "reference": "2 Chronicles 17:7",
+        "original": "2 Chr. 17:7"
+      },
+      {
+        "reference": "2 Chronicles 20:14",
+        "original": "2 Chr. 20:14"
+      },
+      {
+        "reference": "2 Chronicles 21:2",
+        "original": "2 Chr. 21:2"
+      },
+      {
+        "reference": "2 Chronicles 29:1",
+        "original": "2 Chr. 29:1"
+      },
+      {
+        "reference": "2 Chronicles 29:13",
+        "original": "2 Chr. 29:13"
+      },
+      {
+        "reference": "2 Chronicles 35:8",
+        "original": "2 Chr. 35:8"
+      },
+      {
+        "reference": "Ezra 8:16",
+        "original": "Ezra 8:16"
+      },
+      {
+        "reference": "Nehemiah 8:4",
+        "original": "Neh. 8:4"
+      },
+      {
+        "reference": "Nehemiah 11:12",
+        "original": "Neh. 11:12"
+      },
+      {
+        "reference": "Nehemiah 12:16",
+        "original": "Neh. 12:16"
+      },
+      {
+        "reference": "Nehemiah 12:35",
+        "original": "Neh. 12:35"
+      },
+      {
+        "reference": "Nehemiah 12:41",
+        "original": "Neh. 12:41"
+      },
+      {
+        "reference": "Isaiah 8:2",
+        "original": "Isa. 8:2"
+      },
+      {
+        "reference": "Ezra 6:14",
+        "original": "Ezra 6:14"
+      },
+      {
+        "reference": "Zechariah 2:4",
+        "original": "Zechariah 2:4"
+      },
+      {
+        "reference": "1 Chronicles 15:18",
+        "original": "1 Chronicles 15:18"
+      },
+      {
+        "reference": "1 Chronicles 15:20",
+        "original": "1 Chronicles 15:20"
+      },
+      {
+        "reference": "2 Chronicles 34:12",
+        "original": "2 Chronicles 34:12"
+      },
+      {
+        "reference": "Ezra 8:3",
+        "original": "Ezra 8:3"
+      },
+      {
+        "reference": "Ezra 8:11",
+        "original": "Ezra 8:11"
+      },
+      {
+        "reference": "Ezra 10:26",
+        "original": "Ezra 10:26"
+      },
+      {
+        "reference": "Nehemiah 11:4",
+        "original": "Nehemiah 11:4"
+      },
+      {
+        "reference": "Nehemiah 11:5",
+        "original": "Nehemiah 11:5"
+      },
+      {
+        "reference": "Nehemiah 12:36",
+        "original": "Nehemiah 12:36"
+      },
+      {
+        "reference": "1 Chronicles 15:24",
+        "original": "1 Chronicles 15:24"
+      },
+      {
+        "reference": "1 Chronicles 26:11",
+        "original": "1 Chronicles 26:11"
+      },
+      {
+        "reference": "1 Chronicles 27:22",
+        "original": "1 Chronicles 27:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZECHARIAH, THE BOOK OF": {
+    "name": "Zechariah, The Book Of",
+    "slug": "zechariah-the-book-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "El libro de Zacarías, en su forma actual, consta de tres partes principales, a saber: caps. 1-8; caps. 9-11; caps. 12-14."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEDAD": {
+    "name": "Zedad",
+    "slug": "zedad",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lado; lugar inclinado, una ciudad en el norte de Palestina, cerca de Hamat (Núm. 34:8; Eze. 47:15). Ha sido identificada con las ruinas de Sudud, entre Emesa (Homs) y Baalbek, pero esto es incierto."
+      },
+      {
+        "source": "SMI",
+        "text": "(ladera de montaña), uno de los puntos de referencia en la frontera norte de la tierra de Israel, como prometido por Moisés (Números 34:8) y como restaurado por Ezequiel (Ezequiel 47:15). Existe un lugar llamado Sudud al este del extremo norte de la cadena del Antilíbano, a unas cincuenta millas al este-noreste de Baalbek. Esto podría ser idéntico a Zedad."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 34:8",
+        "original": "Num. 34:8"
+      },
+      {
+        "reference": "Ezekiel 47:15",
+        "original": "Ezek. 47:15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEDEKIAH": {
+    "name": "Zedekiah",
+    "slug": "zedekiah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Justicia de Jehová. (1.) El último rey de Judá. Era el tercer hijo de Josías, y el nombre de su madre era Hamutal, hija de Jeremías de Libna, por lo tanto, era hermano de Joacaz (2 Re. 23:31; 24:17, 18). Su nombre original era Matanías; pero cuando Nabucodonosor lo colocó en el trono como sucesor de Joaquín, le cambió el nombre a Sedequías. El profeta Jeremías fue su consejero, sin embargo, “hizo lo malo ante los ojos de Jehová” (2 Re. 24:19, 20; Jer. 52:2, 3). Ascendió al trono a la edad de veintiún años. El reino era entonces tributario de Nabucodonosor; pero, a pesar de las fuertes amonestaciones de Jeremías y otros, así como del ejemplo de Joaquín, se liberó del yugo de Babilonia y entró en una alianza con Hofra, rey de Egipto. Esto provocó que Nabucodonosor, “con todo su ejército” (2 Re. 25:1), fuera contra Jerusalén. Durante este asedio, que duró unos dieciocho meses, “todas las peores calamidades cayeron sobre la ciudad consagrada, que bebió hasta las heces la copa de la furia de Dios” (2 Re. 25:3; Lam. 4:4, 5, 10). La ciudad fue saqueada y reducida a ruinas. Sedequías y sus seguidores, intentando escapar, fueron capturados y llevados a Ribla. Allí, después de ver a sus propios hijos muertos, le sacaron los ojos, y, cargado de cadenas, fue llevado cautivo (588 a.C.) a Babilonia (2 Re. 25:1-7; 2 Cr. 36:12; Jer. 32:4, 5; 34:2, 3; 39:1-7; 52:4-11; Eze. 12:12), donde permaneció prisionero, por tiempo desconocido, hasta el día de su muerte. Después de la caída de Jerusalén, Nabuzaradán fue enviado para llevar a cabo su destrucción completa. La ciudad fue arrasada hasta los cimientos. Solo a un pequeño número de viñadores y labradores se les permitió permanecer en la tierra (Jer. 52:16). Guedalías, con una guardia caldea estacionada en Mizpa, gobernó sobre Judá (2 Re. 25:22, 24; Jer. 40:1, 2, 5, 6). (2.) El hijo de Quenaana, un falso profeta en los días de Acab (1 Re. 22:11, 24; 2 Cr. 18:10, 23). (3.) El hijo de Hananías, un príncipe de Judá en los días de Joacim (Jer. 36:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(justicia de Jehová)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 23:31",
+        "original": "2 Kings 23:31"
+      },
+      {
+        "reference": "2 Kings 24:17",
+        "original": "2 Kings 24:17"
+      },
+      {
+        "reference": "2 Kings 24:18",
+        "original": "2 Kings 24:18"
+      },
+      {
+        "reference": "2 Kings 24:19",
+        "original": "2 Kings 24:19"
+      },
+      {
+        "reference": "2 Kings 24:20",
+        "original": "2 Kings 24:20"
+      },
+      {
+        "reference": "Jeremiah 52:2",
+        "original": "Jer. 52:2"
+      },
+      {
+        "reference": "Jeremiah 52:3",
+        "original": "Jer. 52:3"
+      },
+      {
+        "reference": "2 Kings 25:1",
+        "original": "2 King 25:1"
+      },
+      {
+        "reference": "2 Kings 25:3",
+        "original": "2 Kings 25:3"
+      },
+      {
+        "reference": "Lamentations 4:4",
+        "original": "Lam. 4:4"
+      },
+      {
+        "reference": "Lamentations 4:5",
+        "original": "Lam 4:5"
+      },
+      {
+        "reference": "Lamentations 4:10",
+        "original": "Lam 4:10"
+      },
+      {
+        "reference": "2 Kings 25:1-7",
+        "original": "2 Kings 25:1-7"
+      },
+      {
+        "reference": "2 Chronicles 36:12",
+        "original": "2 Chr. 36:12"
+      },
+      {
+        "reference": "Jeremiah 32:4",
+        "original": "Jer. 32:4"
+      },
+      {
+        "reference": "Jeremiah 32:5",
+        "original": "Jer. 32:5"
+      },
+      {
+        "reference": "Ezekiel 12:12",
+        "original": "Ezek. 12:12"
+      },
+      {
+        "reference": "Jeremiah 52:16",
+        "original": "Jer. 52:16"
+      },
+      {
+        "reference": "2 Kings 25:22",
+        "original": "2 Kings 25:22"
+      },
+      {
+        "reference": "2 Kings 25:24",
+        "original": "2 Kings 25:24"
+      },
+      {
+        "reference": "1 Kings 22:11",
+        "original": "1 Kings 22:11"
+      },
+      {
+        "reference": "1 Kings 22:24",
+        "original": "1 Kings 22:24"
+      },
+      {
+        "reference": "2 Chronicles 18:10",
+        "original": "2 Chr. 18:10"
+      },
+      {
+        "reference": "2 Chronicles 18:23",
+        "original": "2 Chr. 18:23"
+      },
+      {
+        "reference": "Jeremiah 36:12",
+        "original": "Jer. 36:12"
+      },
+      {
+        "reference": "2 Kings 25:7",
+        "original": "2 Kings 25:7"
+      },
+      {
+        "reference": "Jeremiah 39:1-7",
+        "original": "Jeremiah 39:1-7"
+      },
+      {
+        "reference": "Jeremiah 62:1-11",
+        "original": "Jeremiah 62:1-11"
+      },
+      {
+        "reference": "1 Chronicles 38:10",
+        "original": "1 Chronicles 38:10"
+      },
+      {
+        "reference": "Jeremiah 21:0-0;",
+        "original": "Jere 21,24,27,28,29,32,34,37,38"
+      },
+      {
+        "reference": "Ezekiel 16:11-21",
+        "original": "Ezekiel 16:11-21"
+      },
+      {
+        "reference": "Jeremiah 27",
+        "original": "Jere 27"
+      },
+      {
+        "reference": "Jeremiah 37:5-11",
+        "original": "Jeremiah 37:5-11"
+      },
+      {
+        "reference": "Jeremiah 34:21",
+        "original": "Jeremiah 34:21"
+      },
+      {
+        "reference": "Ezekiel 17:15-20",
+        "original": "Ezek 17:15-20"
+      },
+      {
+        "reference": "Jeremiah 34:7",
+        "original": "Jeremiah 34:7"
+      },
+      {
+        "reference": "Jeremiah 52:4",
+        "original": "Jeremiah 52:4"
+      },
+      {
+        "reference": "Jeremiah 38:9",
+        "original": "Jeremiah 38:9"
+      },
+      {
+        "reference": "1 Kings 22",
+        "original": "1Kin 22"
+      },
+      {
+        "reference": "2 Chronicles 18",
+        "original": "2Chr 18"
+      },
+      {
+        "reference": "Jeremiah 29:21",
+        "original": "Jeremiah 29:21"
+      },
+      {
+        "reference": "Jeremiah 29:22",
+        "original": "Jeremiah 29:22"
+      },
+      {
+        "reference": "Jeremiah 38:12",
+        "original": "Jeremiah 38:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEEB": {
+    "name": "Zeeb",
+    "slug": "zeeb",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El lobo, uno de los dos líderes del gran ejército madianita que invadió Israel y fue completamente derrotado por Gedeón. La división de ese ejército, que intentó escapar a través del Jordán, bajo Oreb y Zeeb, fue alcanzada por los efraimitas, quienes, en una gran batalla, los vencieron por completo, siendo sus líderes capturados y muertos (Jue. 7:25; Sal. 83:11; Isa. 10:26)."
+      },
+      {
+        "source": "SMI",
+        "text": "(lobo), uno de los dos “príncipes” de Madián en la gran invasión de Israel. (c. 1250 a.C.). Siempre se le nombra junto con Oreb. (Jueces 7:25; 8:3; Salmos 83:11) Zeeb y Oreb no fueron muertos en la primera derrota de los árabes, sino en una etapa posterior de la lucha, probablemente al cruzar el Jordán por un vado más abajo del río. Zeeb, el lobo, fue acorralado en un lagar que en tiempos posteriores llevó su nombre: el “lagar de Zeeb”. [Oreb]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 7:25",
+        "original": "Judg. 7:25"
+      },
+      {
+        "reference": "Psalms 83:11",
+        "original": "Ps. 83:11"
+      },
+      {
+        "reference": "Isaiah 10:26",
+        "original": "Isa. 10:26"
+      },
+      {
+        "reference": "Judges 8:3",
+        "original": "Judges 8:3"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZELAH": {
+    "name": "Zelah",
+    "slug": "zelah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pendiente; lado, una ciudad en Benjamín, donde fueron sepultados Saúl y su hijo Jonatán (2 Sam. 21:14). Probablemente fue el lugar de nacimiento de Saúl."
+      },
+      {
+        "source": "SMI",
+        "text": "(una costilla), una ciudad en la porción de Benjamín (Josué 18:28) que contenía el sepulcro familiar de Cis, el padre de Saúl. (2 Samuel 21:14) [Quizás la misma que Zelzá]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 21:14",
+        "original": "2 Sam. 21:14"
+      },
+      {
+        "reference": "Joshua 18:28",
+        "original": "Joshua 18:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZELEK": {
+    "name": "Zelek",
+    "slug": "zelek",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hendido, un amonita; uno de los valientes de David (2 Sam. 23:37)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 23:37",
+        "original": "2 Sam. 23:37"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZELOK": {
+    "name": "Zelok",
+    "slug": "zelok",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(fisura), un amonita, uno de los guardias de David. (2 Samuel 23:37; 1 Crónicas 11:39)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 23:37",
+        "original": "2 Samuel 23:37"
+      },
+      {
+        "reference": "1 Chronicles 11:39",
+        "original": "1 Chronicles 11:39"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZELOPHEHAD": {
+    "name": "Zelophehad",
+    "slug": "zelophehad",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Primogénito, de la tribu de Manasés, y de la familia de Galaad; murió en el desierto. Al no haber dejado hijos, sus hijas, preocupadas de que el nombre de su padre “desapareciera de entre su familia”, apelaron a Moisés, quien, por dirección divina, estableció como “estatuto de juicio” en Israel que las hijas debían heredar la porción de su padre cuando no hubiera hijos varones (Núm. 27:1-11). Pero para que la posesión de Zelofehad no pasara en el año del jubileo de la tribu a la que pertenecía, Moisés ordenó que sus hijas no se casaran con nadie fuera de la tribu de su padre; y esto se convirtió más tarde en una ley general (Núm. 36)."
+      },
+      {
+        "source": "SMI",
+        "text": "(primogénito), hijo de Hefer, hijo de Galaad, hijo de Maquir, hijo de Manasés. (Josué 17:3) (antes de 1450 a.C.). Aparentemente fue el segundo hijo de Hefer. (1 Crónicas 7:15) Zelofehad salió de Egipto con Moisés, pero murió en el desierto, como toda esa generación. (Números 14:35; 27:3) A su muerte sin herederos varones, sus cinco hijas, justo después del segundo censo en el desierto, se presentaron ante Moisés y Eleazar para reclamar la herencia de su padre en la tribu de Manasés. La reclamación fue admitida por dirección divina. (Números 26:33; 27:1-11)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 27:1-11",
+        "original": "Num. 27:1-11"
+      },
+      {
+        "reference": "Numbers 36",
+        "original": "Num. 36"
+      },
+      {
+        "reference": "Joshua 17:3",
+        "original": "Joshua 17:3"
+      },
+      {
+        "reference": "1 Chronicles 7:15",
+        "original": "1 Chronicles 7:15"
+      },
+      {
+        "reference": "Numbers 14:35",
+        "original": "Numbers 14:35"
+      },
+      {
+        "reference": "Numbers 27:3",
+        "original": "Numbers 27:3"
+      },
+      {
+        "reference": "Numbers 26:33",
+        "original": "Numbers 26:33"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZELOTES": {
+    "name": "Zelotes",
+    "slug": "zelotes",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Lucas 6:15). Véase SIMÓN; ZELOTAS."
+      },
+      {
+        "source": "SMI",
+        "text": "el epíteto dado al apóstol Simón para distinguirlo de Simón Pedro. (Lucas 6:15) [Cananeo, El; Simón, 5]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Luke 6:15",
+        "original": "Luke 6:15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZELZAH": {
+    "name": "Zelzah",
+    "slug": "zelzah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(sombra), un lugar mencionado una sola vez, (1 Samuel 10:2) como en el límite de Benjamín, cerca del sepulcro de Raquel, a cinco millas al suroeste de Jerusalén."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 10:2",
+        "original": "1 Samuel 10:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEMARAIM": {
+    "name": "Zemaraim",
+    "slug": "zemaraim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Una ciudad de Benjamín (Josué 18:22); ahora la ruina, más bien dos ruinas, es-Sumrah, a 4 millas al norte de Jericó. (2.) Un monte en las tierras altas de Efraín, al norte de Jerusalén (2 Crónicas 13:4-20). Aquí los ejércitos de Abías y Jeroboam libraron una sangrienta batalla, que resultó en la derrota total del rey de Israel, quien nunca “recobró su fuerza de nuevo” y murió poco después."
+      },
+      {
+        "source": "SMI",
+        "text": "(doble vellón de lana), una ciudad en la porción de Benjamín, (Josué 18:22) quizás idéntica al monte Zemaraim, mencionado solo en (2 Crónicas 13:4), que estaba “en el monte de Efraín”, es decir, dentro del distrito general de las tierras altas de aquella gran tribu. (2 Crónicas 13:4)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 18:22",
+        "original": "Josh. 18:22"
+      },
+      {
+        "reference": "2 Chronicles 13:4-20",
+        "original": "2 Chr. 13:4-20"
+      },
+      {
+        "reference": "2 Chronicles 13:4",
+        "original": "2 Chronicles 13:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEMARITE": {
+    "name": "Zemarite",
+    "slug": "zemarite",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La designación de una de las tribus fenicias (Génesis 10:18) que habitaban la ciudad de Sumra, en la base occidental de la cordillera del Líbano. En las tablillas de Amarna (1400 a.C.) Zemar, o Zumur, era una de las ciudades fenicias más importantes, pero después casi desaparece de la historia."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:18",
+        "original": "Gen. 10:18"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZEMARITE, THE": {
+    "name": "Zemarite, The",
+    "slug": "zemarite-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "una de las tribus camitas que en la tabla genealógica de (Génesis 10:18) y 1 Crónicas 1:16 son representados como “hijos de Canaán”. Nada se sabe con certeza de esta antigua tribu. Los antiguos intérpretes los sitúan en Emesa, la moderna Homs."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:18",
+        "original": "Genesis 10:18"
+      },
+      {
+        "reference": "1 Chronicles 1:16",
+        "original": "1Chr 1:16"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEMIRA": {
+    "name": "Zemira",
+    "slug": "zemira",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Viñador, un benjamita; uno de los hijos de Béker (1 Crónicas 7:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(un cántico), uno de los hijos de Béker, hijo de Benjamín. (1 Crónicas 7:8) (antes de 1706 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:8",
+        "original": "1 Chr. 7:8"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZENAN": {
+    "name": "Zenan",
+    "slug": "zenan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(puntiagudo), una ciudad en la porción de Judá, situada en el distrito de la Sefelá. (Josué 15:37) Es probablemente idéntica a Zaanán. (Miqueas 1:11)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:37",
+        "original": "Joshua 15:37"
+      },
+      {
+        "reference": "Micah 1:11",
+        "original": "Micah 1:11"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZENAS": {
+    "name": "Zenas",
+    "slug": "zenas",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un discípulo llamado “el legista”, a quien Pablo deseaba que Tito trajera consigo (Tito 3:13). Nada más se sabe de él."
+      },
+      {
+        "source": "SMI",
+        "text": "un creyente y, como puede inferirse del contexto, un predicador del evangelio, mencionado en (Tito 3:13) en conexión con Apolos. Se le describe además como “el legista”. Es imposible determinar si Zenas era un jurisconsulto romano o un doctor judío."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Titus 3:13",
+        "original": "Titus 3:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEPHANIAH": {
+    "name": "Zephaniah",
+    "slug": "zephaniah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Jehová ha escondido, o Jehová de oscuridad. (1.) Hijo de Cusi, y bisnieto de Ezequías, y el noveno en el orden de los profetas menores. Profetizó en los días de Josías, rey de Judá (641-610 a.C.), y fue contemporáneo de Jeremías, con quien tenía mucho en común. El libro de sus profecías consta de: (a) Una introducción (1:1-6), anunciando el juicio del mundo y el juicio sobre Israel, a causa de sus transgresiones. (b) La descripción del juicio (1:7-18). (c) Una exhortación a buscar a Dios mientras aún hay tiempo (2:1-3). (d) El anuncio del juicio sobre los gentiles (2:4-15). (e) La miseria sin esperanza de Jerusalén (3:1-7). (f) La promesa de salvación (3:8-20). (2.) Hijo de Maasías, el “segundo sacerdote” en el reinado de Sedequías, a menudo mencionado en Jeremías como enviado por el rey para inquirir (Jeremías 21:1) sobre las calamidades venideras que él había denunciado, y para suplicar la intercesión del profeta a fin de que el juicio amenazado pudiera ser evitado (Jeremías 29:25, 26, 29; 37:3; 52:24). Él, junto con otros judíos cautivos, fue ejecutado por el rey de Babilonia “en Ribla, en la tierra de Hamat” (2 Reyes 25:21). (3.) Un antepasado coatita del profeta Samuel (1 Crónicas 6:36). (4.) El padre de Josías, el sacerdote que habitaba en Jerusalén cuando Darío emitió el decreto de que el templo debía ser reconstruido (Zacarías 6:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(escondido por Jehová)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 21:1",
+        "original": "Jer. 21:1"
+      },
+      {
+        "reference": "Jeremiah 29:25",
+        "original": "Jer. 29:25"
+      },
+      {
+        "reference": "Jeremiah 29:26",
+        "original": "Jer. 29:26"
+      },
+      {
+        "reference": "Jeremiah 29:29",
+        "original": "Jer. 29:29"
+      },
+      {
+        "reference": "2 Kings 25:21",
+        "original": "2 Kings 25:21"
+      },
+      {
+        "reference": "1 Chronicles 6:36",
+        "original": "1 Chr. 6:36"
+      },
+      {
+        "reference": "Zechariah 6:10",
+        "original": "Zech. 6:10"
+      },
+      {
+        "reference": "Zephaniah 1:1",
+        "original": "Zephaniah 1:1"
+      },
+      {
+        "reference": "Jeremiah 52:24",
+        "original": "Jeremiah 52:24"
+      },
+      {
+        "reference": "Jeremiah 52:27",
+        "original": "Jeremiah 52:27"
+      },
+      {
+        "reference": "2 Kings 25:18",
+        "original": "2 Kings 25:18"
+      },
+      {
+        "reference": "Zechariah 6:14",
+        "original": "Zechariah 6:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEPHATH": {
+    "name": "Zephath",
+    "slug": "zephath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Baliza; atalaya, una ciudad cananea; también llamada Horma (q.v.), Jueces 1:17. Se ha identificado con el paso de es-Sufah, pero con mayor probabilidad con S'beita."
+      },
+      {
+        "source": "SMI",
+        "text": "(atalaya), el nombre anterior, (Jueces 1:17) de una ciudad cananea que, después de su captura y destrucción, fue llamada por los israelitas Horma. [Horma]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 1:17",
+        "original": "Judg. 1:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEPHATHAH": {
+    "name": "Zephathah",
+    "slug": "zephathah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un valle en el oeste de Judá, cerca de Maresa; el escenario del conflicto de Asa con Zera el etíope (2 Crónicas 14:9-13). Identificado con el Wadi Safieh."
+      },
+      {
+        "source": "SMI",
+        "text": "(atalaya), El valle de, el lugar donde Asa se unió en batalla con Zera el etíope. (2 Crónicas 14:10) solamente."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 14:9-13",
+        "original": "2 Chr. 14:9-13"
+      },
+      {
+        "reference": "2 Chronicles 14:10",
+        "original": "2 Chronicles 14:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEPHI": {
+    "name": "Zephi",
+    "slug": "zephi",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(1 Crónicas 1:36) [Zefo]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:36",
+        "original": "1 Chronicles 1:36"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEPHO": {
+    "name": "Zepho",
+    "slug": "zepho",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(atalaya), hijo de Elifaz, hijo de Esaú, (Génesis 36:11) y uno de los “duques” o filarcas de los edomitas. vers. (Génesis 36:15) En (1 Crónicas 1:36) se le llama Zefí. (después de 1760 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:11",
+        "original": "Genesis 36:11"
+      },
+      {
+        "reference": "Genesis 36:15",
+        "original": "Genesis 36:15"
+      },
+      {
+        "reference": "1 Chronicles 1:36",
+        "original": "1 Chronicles 1:36"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEPHON": {
+    "name": "Zephon",
+    "slug": "zephon",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(vigilancia), el hijo de Gad, (Números 26:15) y antepasado de la familia de los zefonitas. Llamado Zifión en (Génesis 46:16) (1706 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 26:15",
+        "original": "Numbers 26:15"
+      },
+      {
+        "reference": "Genesis 46:16",
+        "original": "Genesis 46:16"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZER": {
+    "name": "Zer",
+    "slug": "zer",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(pedernal), una ciudad fortificada en la porción de Neftalí, (Josué 19:35) solamente, probablemente en las cercanías del lado suroeste del lago de Genesaret."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:35",
+        "original": "Joshua 19:35"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZERAH": {
+    "name": "Zerah",
+    "slug": "zerah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Amanecer. (1.) Un «etíope», probablemente Osorkon II, el sucesor de Sisac en el trono de Egipto. Con un ejército enorme, el más grande del que leemos en las Escrituras, invadió el reino de Judá en los días de Asa (2 Cr. 14:9-15). Llegó a Zefata y allí se enfrentó al ejército de Asa. Este es el único caso «en todos los anales de Judá de un encuentro victorioso en el campo con una potencia pagana de primera clase en toda su fuerza». El ejército egipcio fue completamente derrotado, y los hebreos recogieron «muchísimo botín». Transcurrieron trescientos años antes de que otro ejército egipcio, el de Necao (609 a.C.), subiera contra Jerusalén. (2.) Un hijo de Tamar (Gn. 38:30); también llamado Zara (Mt. 1:3). (3.) Un levita gersonita (1 Cr. 6:21, 41)."
+      },
+      {
+        "source": "SMI",
+        "text": "(el surgir (del sol))."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 14:9-15",
+        "original": "2 Chr. 14:9-15"
+      },
+      {
+        "reference": "Genesis 38:30",
+        "original": "Gen. 38:30"
+      },
+      {
+        "reference": "Matthew 1:3",
+        "original": "Matt. 1:3"
+      },
+      {
+        "reference": "1 Chronicles 6:21",
+        "original": "1 Chr. 6:21"
+      },
+      {
+        "reference": "1 Chronicles 6:41",
+        "original": "1 Chr. 6:41"
+      },
+      {
+        "reference": "Genesis 36:13",
+        "original": "Genesis 36:13"
+      },
+      {
+        "reference": "1 Chronicles 1:37",
+        "original": "1 Chronicles 1:37"
+      },
+      {
+        "reference": "Genesis 36:17",
+        "original": "Genesis 36:17"
+      },
+      {
+        "reference": "1 Chronicles 2:4",
+        "original": "1 Chronicles 2:4"
+      },
+      {
+        "reference": "Numbers 26:20",
+        "original": "Numbers 26:20"
+      },
+      {
+        "reference": "1 Kings 4:31",
+        "original": "1 Kings 4:31"
+      },
+      {
+        "reference": "1 Chronicles 27:8",
+        "original": "1 Chronicles 27:8"
+      },
+      {
+        "reference": "1 Chronicles 27:11",
+        "original": "1 Chronicles 27:11"
+      },
+      {
+        "reference": "1 Chronicles 4:24",
+        "original": "1 Chronicles 4:24"
+      },
+      {
+        "reference": "Genesis 46:10",
+        "original": "Genesis 46:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERAHIAH": {
+    "name": "Zerahiah",
+    "slug": "zerahiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Jehová ha surgido)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:6",
+        "original": "1 Chronicles 6:6"
+      },
+      {
+        "reference": "1 Chronicles 6:51",
+        "original": "1 Chronicles 6:51"
+      },
+      {
+        "reference": "Ezra 7:4",
+        "original": "Ezra 7:4"
+      },
+      {
+        "reference": "Ezra 8:4",
+        "original": "Ezra 8:4"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZERED": {
+    "name": "Zered",
+    "slug": "zered",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "=Zared, exuberancia; arbusto de sauce, un arroyo o valle que comunica con el Mar Muerto cerca de su extremo sur (Nm. 21:12; Dt. 2:14). Se le llama el «arroyo de los sauces» (Is. 15:7) y el «río del desierto» (Am. 6:14). Ha sido identificado con el Wady el-Aksy."
+      },
+      {
+        "source": "SMI",
+        "text": "(arroyo de sauces), (2:13,14) o Za’red, (Números 21:12) un arroyo o valle que desemboca en el Mar Muerto cerca de su esquina sureste, que el Dr. Robinson, con cierta probabilidad, sugiere como idéntico al Wady el-Ahsy. Se encontraba entre Moab y Edom y marca el límite del período adecuado de la peregrinación de los israelitas. (2:14)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 21:12",
+        "original": "Num. 21:12"
+      },
+      {
+        "reference": "Deuteronomy 2:14",
+        "original": "Deut. 2:14"
+      },
+      {
+        "reference": "Isaiah 15:7",
+        "original": "Isa. 15:7"
+      },
+      {
+        "reference": "Amos 6:14",
+        "original": "Amos 6:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEREDA": {
+    "name": "Zereda",
+    "slug": "zereda",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La fortaleza, una ciudad al norte del monte Efraín; lugar de nacimiento de Jeroboam (1 R. 11:26). Es probablemente la misma que Zaretán (Jos. 3:16), Zerera (Jue. 7:22), Zartaná (1 R. 4:12), o la siguiente."
+      },
+      {
+        "source": "SMI",
+        "text": "(la fortaleza) el lugar de origen de Jeroboam. (1 Reyes 11:26) Se ha supuesto que Zereda o Zeredah es idéntica a Zeredata y Zartán o Zartaná; pero las dos últimas estaban en el valle del Jordán, mientras que Zereda, según la repetida declaración de la LXX., estaba en el monte Efraín."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 11:26",
+        "original": "1 Kings 11:26"
+      },
+      {
+        "reference": "Joshua 3:16",
+        "original": "Josh. 3:16"
+      },
+      {
+        "reference": "Judges 7:22",
+        "original": "Judg. 7:22"
+      },
+      {
+        "reference": "1 Kings 4:12",
+        "original": "1 Kings 4:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZEREDATHAH": {
+    "name": "Zeredathah",
+    "slug": "zeredathah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un lugar en la llanura del Jordán; lo mismo que Zartán (2 Cr. 4:17; 1 R. 7:46). Aquí Salomón erigió las fundiciones en las que Hiram hizo las grandes piezas de bronce para el templo."
+      },
+      {
+        "source": "SMI",
+        "text": "[Zaretán, O Zartán, Zartán]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 4:17",
+        "original": "2 Chr. 4:17"
+      },
+      {
+        "reference": "1 Kings 7:46",
+        "original": "1 Kings 7:46"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERERATH": {
+    "name": "Zererath",
+    "slug": "zererath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Jue. 7:22), quizás idéntica a Zereda o Zeredata. Algunos la identifican con Zahra, un lugar a unas 3 millas al oeste de Bet-sán."
+      },
+      {
+        "source": "SMI",
+        "text": "[Zaretán, O Zartán, Zartán]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 7:22",
+        "original": "Judg. 7:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERESH": {
+    "name": "Zeresh",
+    "slug": "zeresh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Estrella de Venus, la esposa de Amán, a quien ella instigó a preparar una horca para Mardoqueo (Ester 5:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(oro), la esposa de Amán el agagueo. (Ester 5:10,14; 6:13) (475 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Esther 5:10",
+        "original": "Esther 5:10"
+      },
+      {
+        "reference": "Esther 5:14",
+        "original": "Esther 5:14"
+      },
+      {
+        "reference": "Esther 6:13",
+        "original": "Esther 6:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERETH": {
+    "name": "Zereth",
+    "slug": "zereth",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(esplendor), hijo de Ashur, el fundador de Tecoa, por su esposa Hela. (1 Crónicas 4:7) (1440 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:7",
+        "original": "1 Chronicles 4:7"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZERI": {
+    "name": "Zeri",
+    "slug": "zeri",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(edificado), uno de los hijos de Jedutún en el reinado de David. (1 Crónicas 25:3) (1043 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 25:3",
+        "original": "1 Chronicles 25:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZEROR": {
+    "name": "Zeror",
+    "slug": "zeror",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(un atado), un benjamita, ancestro de Cis, el padre de Saúl. (1 Samuel 9:1) (aprox. 1730 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 9:1",
+        "original": "1 Samuel 9:1"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZERUAH": {
+    "name": "Zeruah",
+    "slug": "zeruah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Afligida, madre de Jeroboam, el primer rey de las diez tribus (1 R. 11:26)."
+      },
+      {
+        "source": "SMI",
+        "text": "(de pechos llenos), la madre de Jeroboam hijo de Nabat. (1 Reyes 11:26) (973 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 11:26",
+        "original": "1 Kings 11:26"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERUBBABEL": {
+    "name": "Zerubbabel",
+    "slug": "zerubbabel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La semilla de Babilonia, el hijo de Salatiel o Sealtiel (Hag. 1:1; Zorobabel, Mt. 1:12); también llamado hijo de Pedaías (1 Cr. 3:17-19), es decir, según un uso frecuente de la palabra «hijo»; el nieto o el sobrino de Salatiel. También es conocido por el nombre persa de Sesbasar (Esd. 1:8, 11). En el primer año de Ciro, rey de Persia, dirigió la primera banda de judíos, que sumaban 42.360 (Esd. 2:64), excluyendo un gran número de siervos, que regresaron del cautiverio al final de los setenta años. En el segundo año después del Regreso, erigió un altar y puso los cimientos del templo sobre las ruinas del que había sido destruido por Nabucodonosor (3:8-13; caps. 4-6). A lo largo de toda la obra ocupó un lugar prominente, ya que era descendiente de la línea real de David."
+      },
+      {
+        "source": "SMI",
+        "text": "(nacido en Babel, es decir, Babilonia), la cabeza de la tribu de Judá en el momento del regreso del cautiverio babilónico en el primer año de Ciro. La historia de Zorobabel en las Escrituras es la siguiente: En el primer año de Ciro vivía en Babilonia y era el príncipe reconocido de Judá en el cautiverio —lo que en tiempos posteriores se llamó «el príncipe del cautiverio» o «el príncipe»—. Al emitirse el decreto de Ciro, inmediatamente se valió de él y se puso a la cabeza de aquellos de sus compatriotas «cuyo espíritu Dios había levantado para subir a edificar la casa del Señor que está en Jerusalén». Es probable que estuviera al servicio del rey de Babilonia, tanto por haber recibido, como Daniel y los tres jóvenes, un nombre caldeo, Sesbasar, como por el hecho de que fue nombrado por el rey persa para el cargo de gobernador de Judea. Al llegar a Jerusalén, la gran obra de Zorobabel, que emprendió de inmediato, fue la reconstrucción del templo. En el segundo mes del segundo año del regreso se pusieron los cimientos con toda la pompa que se pudo. Los esfuerzos de los samaritanos lograron detener la obra durante los siete años restantes del reinado de Ciro y durante los ocho años de Cambises y Esmerdis. Zorobabel tampoco parece completamente exento de culpa por esta larga demora. Las dificultades en la construcción del templo no eran tales como para haber detenido la obra, y durante esta larga suspensión de dieciséis años, Zorobabel y el resto del pueblo habían estado ocupados en construir casas costosas para sí mismos. Pero en el segundo año de Darío, la luz amaneció sobre la oscuridad de la colonia de Babilonia. En ese año —fue el evento más memorable en la vida de Zorobabel— el espíritu de profecía se encendió repentinamente con una luz brillante entre los cautivos que regresaron. Sus palabras cayeron como chispas sobre yesca. En un instante, Zorobabel se despertó de su apatía y puso toda su fuerza en la obra. Después de mucha oposición [véase Nehemías, El Libro de] y muchos obstáculos, impedimentos y demoras, el templo fue finalmente terminado en el sexto año de Darío, y fue dedicado con gran pompa y regocijo. [Templo] Las únicas otras obras de Zorobabel de las que aprendemos de las Escrituras son la restauración de los cursos de sacerdotes y levitas y la provisión para su mantenimiento, según la institución de David (Esd. 6:18; Neh. 12:47), el registro de los cautivos que regresaron según sus genealogías (Neh. 7:5), y la celebración de una Pascua en el séptimo año de Darío, con cuyo último evento termina todo lo que sabemos de la vida de Zorobabel. Su historia apócrifa se cuenta en 1 Esdras 3-7. La filiación exacta de Zorobabel es un poco oscura, ya que siempre se le llama hijo de Salatiel (Esd. 3:2,8; 5:2), etc.; (Hag. 1:1,12,14), etc., y aparece como tal en las genealogías de Cristo (Mt. 1:12; Lc. 3:27), mientras que en (1 Cr. 3:19) se le representa como hijo de Pedaías, hermano de Salatiel, y, por lo tanto, sobrino de Salatiel. Zorobabel fue el sucesor legal y heredero del patrimonio real de Jeconías, nieto de Neri y descendiente directo de Natán, hijo de David. En el Nuevo Testamento, el nombre aparece en la forma griega de Zorobabel."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Haggai 1:1",
+        "original": "Hag. 1:1"
+      },
+      {
+        "reference": "Matthew 1:12",
+        "original": "Matt. 1:12"
+      },
+      {
+        "reference": "1 Chronicles 3:17-19",
+        "original": "1 Chr. 3:17-19"
+      },
+      {
+        "reference": "Ezra 1:8",
+        "original": "Ezra 1:8"
+      },
+      {
+        "reference": "Ezra 1:11",
+        "original": "Ezra 1:11"
+      },
+      {
+        "reference": "Ezra 2:64",
+        "original": "Ezra 2:64"
+      },
+      {
+        "reference": "Ezra 6:18",
+        "original": "Ezra 6:18"
+      },
+      {
+        "reference": "Nehemiah 12:47",
+        "original": "Nehemiah 12:47"
+      },
+      {
+        "reference": "Nehemiah 7:5",
+        "original": "Nehemiah 7:5"
+      },
+      {
+        "reference": "1Esd 3",
+        "original": "1 Esdr. 3"
+      },
+      {
+        "reference": "Ezra 3:2",
+        "original": "Ezra 3:2"
+      },
+      {
+        "reference": "Ezra 3:8",
+        "original": "Ezra 3:8"
+      },
+      {
+        "reference": "Ezra 5:2",
+        "original": "Ezra 5:2"
+      },
+      {
+        "reference": "Haggai 1:12",
+        "original": "Haggai 1:12"
+      },
+      {
+        "reference": "Haggai 1:14",
+        "original": "Haggai 1:14"
+      },
+      {
+        "reference": "Luke 3:27",
+        "original": "Luke 3:27"
+      },
+      {
+        "reference": "1 Chronicles 3:19",
+        "original": "1 Chronicles 3:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZERUIAH": {
+    "name": "Zeruiah",
+    "slug": "zeruiah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Afligida del Señor, hermana de David, y madre de Abisai, Joab y Asahel (1 Cr. 2:16), quienes fueron los tres principales héroes del ejército de David, y siendo sus sobrinos, fueron admitidos a la más estrecha compañía con él."
+      },
+      {
+        "source": "SMI",
+        "text": "(bálsamo), la madre de los tres principales héroes del ejército de David —Abisai, Joab y Asahel— conocidos como los «hijos de Sarvia». Del esposo de Sarvia no hay mención en la Biblia. (Antes de 1046 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:16",
+        "original": "1 Chr. 2:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZETHAM": {
+    "name": "Zetham",
+    "slug": "zetham",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Plantador de olivos, un levita (1 Cr. 23:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(olivo), el hijo de Laadán, un levita gersonita. (1 Crónicas 23:8) (1043 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:8",
+        "original": "1 Chr. 23:8"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZETHAN": {
+    "name": "Zethan",
+    "slug": "zethan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un benjamita (1 Cr. 7:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(olivo), un benjamita de los hijos de Bilhán. (1 Crónicas 7:10) (probablemente 1014 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:10",
+        "original": "1 Chr. 7:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZETHAR": {
+    "name": "Zethar",
+    "slug": "zethar",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(estrella), uno de los siete eunucos de Asuero (Ester 1:10) (453 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Esther 1:10",
+        "original": "Esther 1:10"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIA": {
+    "name": "Zia",
+    "slug": "zia",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Temor, un gadita (1 Crónicas 5:13)."
+      },
+      {
+        "source": "SMI",
+        "text": "(movimiento), uno de los gaditas que habitaban en Basán (1 Crónicas 5:13) (1014 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 5:13",
+        "original": "1 Chr. 5:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIBA": {
+    "name": "Ziba",
+    "slug": "ziba",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Poste; estatua, un “siervo de la casa de Saúl” (2 Samuel 9:2), quien informó a David que Mefiboset, hijo de Jonatán, estaba vivo. Más tarde, actuó traidoramente contra Mefiboset, calumniándolo ante David."
+      },
+      {
+        "source": "SMI",
+        "text": "(estatua), un siervo de Saúl a quien David nombró mayordomo de Mefiboset, hijo de Saúl (2 Samuel 9:2-18; 16:1-4; 19:17,29) [Mefiboset] (1023 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 9:2",
+        "original": "2 Sam. 9:2"
+      },
+      {
+        "reference": "2 Samuel 9:2-18",
+        "original": "2 Samuel 9:2-18"
+      },
+      {
+        "reference": "2 Samuel 16:1-4",
+        "original": "2 Samuel 16:1-4"
+      },
+      {
+        "reference": "2 Samuel 19:17",
+        "original": "2 Samuel 19:17"
+      },
+      {
+        "reference": "2 Samuel 19:29",
+        "original": "2 Samuel 19:29"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIBEON": {
+    "name": "Zibeon",
+    "slug": "zibeon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ladrón; o teñido. (1.) Un heveo (Génesis 36:2). (2.) Un horeo, e hijo de Seir (Génesis 36:20)."
+      },
+      {
+        "source": "SMI",
+        "text": "(ladrón), padre de Aná, cuya hija Aholibama fue esposa de Esaú (Génesis 36:2) (1797 a.C.). Aunque llamado heveo, probablemente es el mismo que Zibeón, hijo de Seir el horeo (Génesis 36:20,24,29; 1 Crónicas 1:38,40)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:2",
+        "original": "Gen. 36:2"
+      },
+      {
+        "reference": "Genesis 36:20",
+        "original": "Gen. 36:20"
+      },
+      {
+        "reference": "Genesis 36:24",
+        "original": "Genesis 36:24"
+      },
+      {
+        "reference": "Genesis 36:29",
+        "original": "Genesis 36:29"
+      },
+      {
+        "reference": "1 Chronicles 1:38",
+        "original": "1 Chronicles 1:38"
+      },
+      {
+        "reference": "1 Chronicles 1:40",
+        "original": "1 Chronicles 1:40"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIBIA": {
+    "name": "Zibia",
+    "slug": "zibia",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gacela, un benjamita (1 Crónicas 8:9)."
+      },
+      {
+        "source": "SMI",
+        "text": "(corza), un benjamita, aparentemente hijo de Saharaim por su esposa Hodes (1 Crónicas 8:9) (1440 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:9",
+        "original": "1 Chr. 8:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIBIAH": {
+    "name": "Zibiah",
+    "slug": "zibiah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La madre del rey Joás (2 Reyes 12:1; 2 Crónicas 24:1)."
+      },
+      {
+        "source": "SMI",
+        "text": "(corza), una nativa de Beerseba y madre del rey Joás (2 Reyes 12:1; 2 Crónicas 24:1) (876 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 12:1",
+        "original": "2 Kings 12:1"
+      },
+      {
+        "reference": "2 Chronicles 24:1",
+        "original": "2 Chr. 24:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZICHRI": {
+    "name": "Zichri",
+    "slug": "zichri",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Recordado; ilustre. (1.) Un jefe benjamita (1 Crónicas 8:19). (2.) Otro de la misma tribu (1 Crónicas 8:23)."
+      },
+      {
+        "source": "SMI",
+        "text": "(memorable)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:19",
+        "original": "1 Chr. 8:19"
+      },
+      {
+        "reference": "1 Chronicles 8:23",
+        "original": "1 Chr. 8:23"
+      },
+      {
+        "reference": "Exodus 6:21",
+        "original": "Exodus 6:21"
+      },
+      {
+        "reference": "1 Chronicles 8:27",
+        "original": "1 Chronicles 8:27"
+      },
+      {
+        "reference": "1 Chronicles 9:15",
+        "original": "1 Chronicles 9:15"
+      },
+      {
+        "reference": "1 Chronicles 26:25",
+        "original": "1 Chronicles 26:25"
+      },
+      {
+        "reference": "1 Chronicles 27:16",
+        "original": "1 Chronicles 27:16"
+      },
+      {
+        "reference": "2 Chronicles 11:16",
+        "original": "2 Chronicles 11:16"
+      },
+      {
+        "reference": "2 Chronicles 23:1",
+        "original": "2 Chronicles 23:1"
+      },
+      {
+        "reference": "2 Chronicles 28:7",
+        "original": "2 Chronicles 28:7"
+      },
+      {
+        "reference": "Nehemiah 11:9",
+        "original": "Nehemiah 11:9"
+      },
+      {
+        "reference": "Nehemiah 12:17",
+        "original": "Nehemiah 12:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIDDIM": {
+    "name": "Ziddim",
+    "slug": "ziddim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lados, una ciudad de Neftalí (Josué 19:35), ha sido identificada con Kefr-Hattin, el “pueblo de los hititas”, a unas 5 millas al oeste de Tiberíades."
+      },
+      {
+        "source": "SMI",
+        "text": "(las laderas), una ciudad fortificada en la porción asignada a Neftalí (Josué 19:35)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:35",
+        "original": "Josh. 19:35"
+      },
+      {
+        "reference": "Joshua 10:35",
+        "original": "Joshua 10:35"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIDKIJAH": {
+    "name": "Zidkijah",
+    "slug": "zidkijah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El Señor es justo, uno que selló el pacto con Nehemías (Nehemías 10:1)."
+      },
+      {
+        "source": "SMI",
+        "text": "(justicia de Jehová) un sacerdote o familia de sacerdotes que firmaron el pacto con Nehemías (Nehemías 10:1) (410 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 10:1",
+        "original": "Neh. 10:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIDON": {
+    "name": "Zidon",
+    "slug": "zidon",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un lugar de pesca, una ciudad en la costa mediterránea, a unas 25 millas al norte de Tiro. Recibió su nombre del “primogénito” de Canaán, nieto de Noé (Génesis 10:15, 19). Fue el primer hogar de los fenicios en la costa de Palestina y, debido a sus extensas relaciones comerciales, se convirtió en una “gran” ciudad (Josué 11:8; 19:28). Fue la ciudad madre de Tiro. Se encontraba dentro de la porción de la tribu de Aser, pero nunca fue sometida (Jueces 1:31). Los sidonios oprimieron a Israel durante mucho tiempo (Jueces 10:12). Desde la época de David, su gloria comenzó a menguar, y Tiro, su “hija virgen” (Isaías 23:12), ascendió a su lugar de preeminencia. Salomón estableció una alianza matrimonial con los sidonios, y así su forma de adoración idolátrica encontró un lugar en la tierra de Israel (1 Reyes 11:1, 33). Esta ciudad fue famosa por sus manufacturas y artes, así como por su comercio (1 Reyes 5:6; 1 Crónicas 22:4; Ezequiel 27:8). Es frecuentemente mencionada por los profetas (Isaías 23:2, 4, 12; Jeremías 25:22; 27:3; 47:4; Ezequiel 27:8; 28:21, 22; 32:30; Joel 3:4). Nuestro Señor visitó las “regiones” de Tiro y Sidón (véase Sidón), Mateo 15:21; Marcos 7:24; Lucas 4:26; y de esta región muchos salieron a escucharlo predicar (Marcos 3:8; Lucas 6:17). Desde Sidón, donde el barco hizo escala después de salir de Cesarea, Pablo finalmente zarpó hacia Roma (Hechos 27:3, 4). Esta ciudad es ahora una población de 10,000 habitantes, con restos de muros construidos en el siglo XII d.C. En 1855, se descubrió el sarcófago de Eshmanezer. De una inscripción fenicia en su tapa, se desprende que fue un “rey de los sidonios”, probablemente en el siglo III a.C., y que su madre fue una sacerdotisa de Astoret, “la diosa de los sidonios”. En esta inscripción, Baal es mencionado como el dios principal de los sidonios."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:15",
+        "original": "Gen. 10:15"
+      },
+      {
+        "reference": "Genesis 10:19",
+        "original": "Gen. 10:19"
+      },
+      {
+        "reference": "Joshua 11:8",
+        "original": "Josh. 11:8"
+      },
+      {
+        "reference": "Joshua 19:28",
+        "original": "Josh 19:28"
+      },
+      {
+        "reference": "Judges 1:31",
+        "original": "Judg. 1:31"
+      },
+      {
+        "reference": "Judges 10:12",
+        "original": "Judg. 10:12"
+      },
+      {
+        "reference": "Isaiah 23:12",
+        "original": "Isa. 23:12"
+      },
+      {
+        "reference": "1 Kings 11:1",
+        "original": "1 Kings 11:1"
+      },
+      {
+        "reference": "1 Kings 11:33",
+        "original": "1 Kings 11:33"
+      },
+      {
+        "reference": "1 Kings 5:6",
+        "original": "1 Kings 5:6"
+      },
+      {
+        "reference": "1 Chronicles 22:4",
+        "original": "1 Chr. 22:4"
+      },
+      {
+        "reference": "Ezekiel 27:8",
+        "original": "Ezek. 27:8"
+      },
+      {
+        "reference": "Isaiah 23:2",
+        "original": "Isa. 23:2"
+      },
+      {
+        "reference": "Isaiah 23:4",
+        "original": "Isa. 23:4"
+      },
+      {
+        "reference": "Jeremiah 25:22",
+        "original": "Jer. 25:22"
+      },
+      {
+        "reference": "Jeremiah 27:3",
+        "original": "Jer 27:3"
+      },
+      {
+        "reference": "Jeremiah 47:4",
+        "original": "Jer 47:4"
+      },
+      {
+        "reference": "Ezekiel 28:21",
+        "original": "Ezek 28:21"
+      },
+      {
+        "reference": "Ezekiel 28:22",
+        "original": "Ezek 28:22"
+      },
+      {
+        "reference": "Ezekiel 32:30",
+        "original": "Ezek 32:30"
+      },
+      {
+        "reference": "Joel 3:4",
+        "original": "Joel 3:4"
+      },
+      {
+        "reference": "Matthew 15:21",
+        "original": "Matt. 15:21"
+      },
+      {
+        "reference": "Mark 7:24",
+        "original": "Mark 7:24"
+      },
+      {
+        "reference": "Luke 4:26",
+        "original": "Luke 4:26"
+      },
+      {
+        "reference": "Mark 3:8",
+        "original": "Mark 3:8"
+      },
+      {
+        "reference": "Luke 6:17",
+        "original": "Luke 6:17"
+      },
+      {
+        "reference": "Acts 27:3",
+        "original": "Acts 27:3"
+      },
+      {
+        "reference": "Acts 27:4",
+        "original": "Acts 27:4"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZIDON, OR SIDON": {
+    "name": "Zidon, Or Sidon",
+    "slug": "zidon-or-sidon",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Génesis 10:15,19; Josué 11:8; 19:28; Jueces 1:31; 18:28; Isaías 23:2,4,12; Jeremías 25:22; 27:3; Ezequiel 28:21,22; Joel 3:4) (Joel 4:4); Zacarías 9:2; Mateo 11:21,22; 15:21; Marcos 3:8; 1:24,31; Lucas 6:17; 10:13,14. Una ciudad antigua y próspera de Fenicia, en la costa oriental del Mar Mediterráneo, a menos de veinte millas inglesas al norte de Tiro. Su nombre hebreo, Tsidon, significa pesca o pesquería. Su nombre moderno es Saida. Está situada en la estrecha llanura entre el Líbano y el mar. Desde un punto de vista bíblico, esta ciudad tiene menos interés que su vecina Tiro; aunque en tiempos antiguos, Sidón era la más influyente de las dos ciudades. Esta visión se confirma por el uso de \"sidonios\" como nombre genérico para fenicios o cananeos (Josué 13:6; Jueces 18:7). Desde la época de Salomón hasta la invasión de Nabucodonosor, Sidón no se menciona a menudo directamente en la Biblia, y parece haber estado subordinada a Tiro. Cuando se menciona al pueblo llamado “sidonios”, a veces parece que se refiere a los fenicios de la llanura de Sidón (1 Reyes 5:6; 11:1,5,33; 16:31; 2 Reyes 23:13). Todo lo que se sabe sobre la ciudad es muy escaso, apenas más que una de sus fuentes de ingresos era el comercio de esclavos, en el que los habitantes no dudaban en vender a los habitantes de Palestina, y que estaba gobernada por reyes (Jeremías 25:22; 27:3). Durante la dominación persa, Sidón parece haber alcanzado su punto más alto de prosperidad; y se registra que, hacia el final de ese período, superó con creces a todas las demás ciudades fenicias en riqueza e importancia. Su prosperidad se vio truncada repentinamente por una revuelta fallida contra Persia, que terminó con la destrucción de la ciudad en el 351 a.C. Su rey, Tennes, había demostrado ser un traidor y entregó la ciudad a Ochus, rey de los persas; las tropas persas fueron admitidas dentro de las puertas y ocuparon los muros de la ciudad. Los sidonios, antes de la llegada de Ochus, habían quemado sus embarcaciones para evitar que alguien huyera de la ciudad; y cuando se vieron rodeados por las tropas persas, adoptaron la desesperada resolución de encerrarse con sus familias y prender fuego cada hombre a su propia casa. Se dice que cuarenta mil personas perecieron en las llamas. Sin embargo, Sidón se recuperó gradualmente del golpe y volvió a ser una ciudad floreciente. Está a unas cincuenta millas de Nazaret y es la ciudad más septentrional mencionada en relación con los viajes de Cristo. (La ciudad de Saida todavía muestra signos de su antigua riqueza, y sus casas están mejor construidas y son más sólidas que las de Tiro, muchas de ellas de piedra; pero es un lugar pobre y miserable, sin comercio ni manufacturas dignas de ese nombre. La ciudad que una vez compartió con Tiro el imperio de los mares ahora está casi sin una sola embarcación. La seda y la fruta son sus productos principales. Su población se estima en 10,000, de los cuales 7,000 son musulmanes y el resto católicos, maronitas y protestantes. —Cyclopaedia de McClintock y Strong. Aquí hay una próspera misión protestante. —ED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 10:15",
+        "original": "Genesis 10:15"
+      },
+      {
+        "reference": "Genesis 10:19",
+        "original": "Genesis 10:19"
+      },
+      {
+        "reference": "Joshua 11:8",
+        "original": "Joshua 11:8"
+      },
+      {
+        "reference": "Joshua 19:28",
+        "original": "Joshua 19:28"
+      },
+      {
+        "reference": "Judges 1:31",
+        "original": "Judges 1:31"
+      },
+      {
+        "reference": "Judges 18:28",
+        "original": "Judges 18:28"
+      },
+      {
+        "reference": "Isaiah 23:2",
+        "original": "Isaiah 23:2"
+      },
+      {
+        "reference": "Isaiah 23:4",
+        "original": "Isaiah 23:4"
+      },
+      {
+        "reference": "Isaiah 23:12",
+        "original": "Isaiah 23:12"
+      },
+      {
+        "reference": "Jeremiah 25:22",
+        "original": "Jeremiah 25:22"
+      },
+      {
+        "reference": "Jeremiah 27:3",
+        "original": "Jeremiah 27:3"
+      },
+      {
+        "reference": "Ezekiel 28:21",
+        "original": "Ezekiel 28:21"
+      },
+      {
+        "reference": "Ezekiel 28:22",
+        "original": "Ezekiel 28:22"
+      },
+      {
+        "reference": "Joel 3:4",
+        "original": "Joel 3:4"
+      },
+      {
+        "reference": "Joel 4:4",
+        "original": "Joel 4:4"
+      },
+      {
+        "reference": "Zechariah 9:2",
+        "original": "Zech 9:2"
+      },
+      {
+        "reference": "Matthew 11:21",
+        "original": "Matt 11:21"
+      },
+      {
+        "reference": "Matthew 11:22",
+        "original": "Matt 11:22"
+      },
+      {
+        "reference": "Matthew 15:21",
+        "original": "Matt 15:21"
+      },
+      {
+        "reference": "Mark 3:8",
+        "original": "Mark 3:8"
+      },
+      {
+        "reference": "Mark 1:24",
+        "original": "Mark 1:24"
+      },
+      {
+        "reference": "Mark 1:31",
+        "original": "Mark 1:31"
+      },
+      {
+        "reference": "Luke 6:17",
+        "original": "Luke 6:17"
+      },
+      {
+        "reference": "Luke 10:13",
+        "original": "Luke 10:13"
+      },
+      {
+        "reference": "Luke 10:14",
+        "original": "Luke 10:14"
+      },
+      {
+        "reference": "Joshua 13:6",
+        "original": "Joshua 13:6"
+      },
+      {
+        "reference": "Judges 18:7",
+        "original": "Judges 18:7"
+      },
+      {
+        "reference": "1 Kings 5:6",
+        "original": "1 Kings 5:6"
+      },
+      {
+        "reference": "1 Kings 11:1",
+        "original": "1 Kings 11:1"
+      },
+      {
+        "reference": "1 Kings 11:5",
+        "original": "1 Kings 11:5"
+      },
+      {
+        "reference": "1 Kings 11:33",
+        "original": "1 Kings 11:33"
+      },
+      {
+        "reference": "1 Kings 16:31",
+        "original": "1 Kings 16:31"
+      },
+      {
+        "reference": "2 Kings 23:13",
+        "original": "2 Kings 23:13"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIDONIANS": {
+    "name": "Zidonians",
+    "slug": "zidonians",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "los habitantes de Sidón. Estaban entre las naciones de Canaán; dejados para dar a los israelitas práctica en el arte de la guerra (Jueces 3:3), y colonias de ellos parecen haberse extendido por la región montañosa desde el Líbano hasta Misrefot-maim (Josué 13:4,6), de donde en tiempos posteriores cortaron cedros para David y Salomón (1 Crónicas 22:4). Oprimieron a los israelitas a su primera entrada en el país (Jueces 10:12), y parecen haber vivido una vida lujosa y despreocupada (Jueces 18:7). Eran hábiles en el corte de madera (1 Reyes 5:8), y fueron empleados para este propósito por Salomón. Eran idólatras, y adoraban a Astarot como su diosa tutelar (1 Reyes 11:5,33; 2 Reyes 23:13), así como al dios sol Baal, de quien su rey tomó el nombre (1 Reyes 16:31)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 3:3",
+        "original": "Judges 3:3"
+      },
+      {
+        "reference": "Joshua 13:4",
+        "original": "Joshua 13:4"
+      },
+      {
+        "reference": "Joshua 13:6",
+        "original": "Joshua 13:6"
+      },
+      {
+        "reference": "1 Chronicles 22:4",
+        "original": "1 Chronicles 22:4"
+      },
+      {
+        "reference": "Judges 10:12",
+        "original": "Judges 10:12"
+      },
+      {
+        "reference": "Judges 18:7",
+        "original": "Judges 18:7"
+      },
+      {
+        "reference": "1 Kings 5:8",
+        "original": "1 Kings 5:8"
+      },
+      {
+        "reference": "1 Kings 11:5",
+        "original": "1 Kings 11:5"
+      },
+      {
+        "reference": "1 Kings 11:33",
+        "original": "1 Kings 11:33"
+      },
+      {
+        "reference": "2 Kings 23:13",
+        "original": "2 Kings 23:13"
+      },
+      {
+        "reference": "1 Kings 16:31",
+        "original": "1 Kings 16:31"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIF": {
+    "name": "Zif",
+    "slug": "zif",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Brillo; esplendor; es decir, “el mes de las flores”, mencionado solo en 1 Reyes 6:1, 37 como el “segundo mes”. Los judíos posteriores lo llamaron Iyar. (Véase MES.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(1 Reyes 6:1) [Mes]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 6:1",
+        "original": "1 Kings 6:1"
+      },
+      {
+        "reference": "1 Kings 6:37",
+        "original": "1 Kings 6:37"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIHA": {
+    "name": "Ziha",
+    "slug": "ziha",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sequía. (1.) El nombre de una familia de los netineos (Esdras 2:43; Nehemías 7:46). (2.) Un gobernante entre los netineos (Nehemías 11:21)."
+      },
+      {
+        "source": "SMI",
+        "text": "(reseco)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:43",
+        "original": "Ezra 2:43"
+      },
+      {
+        "reference": "Nehemiah 7:46",
+        "original": "Neh. 7:46"
+      },
+      {
+        "reference": "Nehemiah 11:21",
+        "original": "Neh. 11:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIKLAG": {
+    "name": "Ziklag",
+    "slug": "ziklag",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una ciudad en el Neguev, o la región sur de Judá (Josué 15:31), en posesión de los filisteos cuando David huyó a Gat desde Zif con todos sus seguidores. Aquis, el rey, le asignó Siclag como lugar de residencia. Allí habitó por más de un año y cuatro meses. Desde entonces, perteneció a los reyes de Judá (1 Samuel 27:6). Durante su ausencia con su ejército para unirse a la expedición filistea contra los israelitas (29:11), fue destruida por los amalecitas (30:1, 2), a quienes David, sin embargo, persiguió y derrotó completamente, recuperando a todos los cautivos (1 Samuel 30:26-31). Dos días después de su regreso de esta expedición, David recibió noticias de la desastrosa batalla de Gilboa y de la muerte de Saúl (2 Samuel 1:1-16). Entonces dejó Siclag y regresó a Hebrón, junto con sus dos esposas, Ahinoam y Abigail, y su banda de 600 hombres. Ha sido identificada con ‘Asluj, un montón de ruinas al sur de Beerseba. Conder, sin embargo, la identifica con Khirbet Zuheilikah, ruinas encontradas en tres colinas separadas por media milla, a unas diecisiete millas al noroeste de Beerseba, en los confines de Filistea, Judá y Amalec."
+      },
+      {
+        "source": "SMI",
+        "text": "(sinuoso), un lugar que posee un interés especial por haber sido la residencia y propiedad privada de David. Se menciona por primera vez en el catálogo de las ciudades de Judá en (Josué 15:31) y aparece, en la misma conexión, entre los lugares que fueron asignados del territorio de Judá a Simeón (Josué 19:5). Luego la encontramos en posesión de los filisteos (1 Samuel 27:6) cuando, a petición de David, le fue concedida por Aquis, rey de Gat. Residió allí durante un año y cuatro meses (1 Samuel 27:6,7; 30:14,26; 1 Crónicas 12:1,20). Fue allí donde recibió la noticia de la muerte de Saúl (2 Samuel 1:1; 4:10). Luego la abandonó por Hebrón (2 Samuel 2:1). Siclag finalmente se menciona como rehabitada por la gente de Judá después de su regreso del cautiverio (Nehemías 11:28). La situación de la ciudad es difícil de determinar, y solo sabemos con certeza que estaba en la región del sur."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:31",
+        "original": "Josh. 15:31"
+      },
+      {
+        "reference": "1 Samuel 27:6",
+        "original": "1 Sam. 27:6"
+      },
+      {
+        "reference": "1 Samuel 30:26-31",
+        "original": "1 Sam. 30:26-31"
+      },
+      {
+        "reference": "2 Samuel 1:1-16",
+        "original": "2 Sam. 1:1-16"
+      },
+      {
+        "reference": "Joshua 19:5",
+        "original": "Joshua 19:5"
+      },
+      {
+        "reference": "1 Samuel 27:7",
+        "original": "1 Samuel 27:7"
+      },
+      {
+        "reference": "1 Samuel 30:14",
+        "original": "1 Samuel 30:14"
+      },
+      {
+        "reference": "1 Samuel 30:26",
+        "original": "1 Samuel 30:26"
+      },
+      {
+        "reference": "1 Chronicles 12:1",
+        "original": "1 Chronicles 12:1"
+      },
+      {
+        "reference": "1 Chronicles 12:20",
+        "original": "1 Chronicles 12:20"
+      },
+      {
+        "reference": "2 Samuel 1:1",
+        "original": "2 Samuel 1:1"
+      },
+      {
+        "reference": "2 Samuel 4:10",
+        "original": "2 Samuel 4:10"
+      },
+      {
+        "reference": "2 Samuel 2:1",
+        "original": "2 Samuel 2:1"
+      },
+      {
+        "reference": "Nehemiah 11:28",
+        "original": "Nehemiah 11:28"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZILLAH": {
+    "name": "Zillah",
+    "slug": "zillah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sombra, una de las esposas de Lamec, de la descendencia de Caín, y madre de Tubal-caín (Gn. 4:19, 22)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sombra). [Lamec]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 4:19",
+        "original": "Gen. 4:19"
+      },
+      {
+        "reference": "Genesis 4:22",
+        "original": "Gen. 4:22"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZILPAH": {
+    "name": "Zilpah",
+    "slug": "zilpah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Languideciente, la sierva de Lea, y madre de Gad y Aser (Gn. 30:9-13)."
+      },
+      {
+        "source": "SMI",
+        "text": "(un goteo), una siria que Labán dio a su hija Lea como asistente (Génesis 29:24) y que Lea dio a Jacob como concubina. Fue madre de Gad y Aser (Génesis 30:9-13; 35:26; 37:2; 46:18). (1753 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 30:9-13",
+        "original": "Gen. 30:9-13"
+      },
+      {
+        "reference": "Genesis 29:24",
+        "original": "Genesis 29:24"
+      },
+      {
+        "reference": "Genesis 35:26",
+        "original": "Genesis 35:26"
+      },
+      {
+        "reference": "Genesis 37:2",
+        "original": "Genesis 37:2"
+      },
+      {
+        "reference": "Genesis 46:18",
+        "original": "Genesis 46:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZILTHAI": {
+    "name": "Zilthai",
+    "slug": "zilthai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Sombra (es decir, protección) de Jehová. (1.) Un benjamita (1 Cr. 8:20). (2.) Uno de los capitanes de la tribu de Manasés que se unió a David en Siclag (1 Cr. 12:20)."
+      },
+      {
+        "source": "SMI",
+        "text": "(sombrío)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 8:20",
+        "original": "1 Chr. 8:20"
+      },
+      {
+        "reference": "1 Chronicles 12:20",
+        "original": "1 Chr. 12:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIMMAH": {
+    "name": "Zimmah",
+    "slug": "zimmah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Maldad. (1.) Un levita gersonita (1 Cr. 6:20). (2.) Otro levita gersonita (1 Cr. 6:42). (3.) El padre de Joa (2 Cr. 29:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(propósito)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 6:20",
+        "original": "1 Chr. 6:20"
+      },
+      {
+        "reference": "1 Chronicles 6:42",
+        "original": "1 Chr. 6:42"
+      },
+      {
+        "reference": "2 Chronicles 29:12",
+        "original": "2 Chr. 29:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIMRAN": {
+    "name": "Zimran",
+    "slug": "zimran",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Viñadores; celebrado, uno de los hijos de Abraham con Cetura (Gn. 25:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "(celebrado), el hijo mayor de Cetura (Génesis 25:2; 1 Crónicas 1:32). Sus descendientes no se mencionan, ni se da ninguna indicación de que fuera el fundador de una tribu. (1855 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:2",
+        "original": "Gen. 25:2"
+      },
+      {
+        "reference": "1 Chronicles 1:32",
+        "original": "1 Chronicles 1:32"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIMRI": {
+    "name": "Zimri",
+    "slug": "zimri",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Digno de alabanza. (1.) Hijo de Salú, asesinado por Finees, hijo de Eleazar, por su maldad al introducir una mujer madianita en su tienda (Núm. 25:6-15). (2.) Asesinó a Ela en Tirsa y le sucedió en el trono de Israel (1 Reyes 16:8-10). Reinó solo siete días, pues Omri, a quien el ejército eligió rey, sitió Tirsa, con lo que Zimri prendió fuego al palacio y pereció entre sus ruinas (11-20). Omri ascendió al trono solo después de cuatro años de feroz guerra con Tibni, otro pretendiente al trono."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 25:6-15",
+        "original": "Num. 25:6-15"
+      },
+      {
+        "reference": "1 Kings 16:8-10",
+        "original": "1 Kings 16:8-10"
+      },
+      {
+        "reference": "Numbers 25:14",
+        "original": "Numbers 25:14"
+      },
+      {
+        "reference": "1 Kings 16:9-20",
+        "original": "1 Kings 16:9-20"
+      },
+      {
+        "reference": "1 Chronicles 2:6",
+        "original": "1 Chronicles 2:6"
+      },
+      {
+        "reference": "1 Chronicles 8:36",
+        "original": "1 Chronicles 8:36"
+      },
+      {
+        "reference": "1 Chronicles 9:42",
+        "original": "1 Chronicles 9:42"
+      },
+      {
+        "reference": "Jeremiah 25:25",
+        "original": "Jeremiah 25:25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIN": {
+    "name": "Zin",
+    "slug": "zin",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una palmera baja, la esquina sureste del desierto de et-Tih, el desierto de Parán, entre el golfo de Akaba y la cabecera del Wadi Guraiyeh (Núm. 13:21). Debe distinguirse del desierto de Sin (véase)."
+      },
+      {
+        "source": "SMI",
+        "text": "(plano), nombre dado a una porción del tracto desértico entre el Mar Muerto, el Ghor y el Arabá al este, y la meseta general del Tih que se extiende hacia el oeste. La región en cuestión consiste en dos o tres terrazas montañosas sucesivas que convergen en un punto agudo en el extremo sur del Mar Muerto, hacia donde también se inclinan. Cades se encontraba allí, y aquí también Idumea era colindante con Judá; ya que Cades era una ciudad en la frontera de Edom. [Véase Cades, Cades-barnea]. (Números 13:21; 20:1; 27:14; 33:36; 34:3; Josué 15:1)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 13:21",
+        "original": "Num. 13:21"
+      },
+      {
+        "reference": "Numbers 20:1",
+        "original": "Numbers 20:1"
+      },
+      {
+        "reference": "Numbers 27:14",
+        "original": "Numbers 27:14"
+      },
+      {
+        "reference": "Numbers 33:36",
+        "original": "Numbers 33:36"
+      },
+      {
+        "reference": "Numbers 34:3",
+        "original": "Numbers 34:3"
+      },
+      {
+        "reference": "Joshua 15:1",
+        "original": "Joshua 15:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZINA": {
+    "name": "Zina",
+    "slug": "zina",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Adorno, uno de los hijos de Simei (1 Cr. 23:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(abundancia); Zizá, el segundo hijo de Simei el gersonita (1 Crónicas 23:10; cf. 1 Cr. 23:11)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:10",
+        "original": "1 Chr. 23:10"
+      },
+      {
+        "reference": "1 Chronicles 23:11",
+        "original": "1Chr 23:11"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZION": {
+    "name": "Zion",
+    "slug": "zion",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Soleado; altura, una de las eminencias sobre las que se construyó Jerusalén. Estaba rodeada por todos lados, excepto por el norte, por valles profundos, el del Tiropeón (véase) separándola del Moriah (véase), al que supera en altura por 105 pies. Era la colina sureste de Jerusalén. Cuando David la tomó de los jebuseos (Jos. 15:63; 2 Sam. 5:7), construyó en ella una ciudadela y un palacio, y se convirtió en «la ciudad de David» (1 Reyes 8:1; 2 Reyes 19:21, 31; 1 Cr. 11:5). En los libros posteriores del Antiguo Testamento, este nombre se usó a veces (Sal. 87:2; 149:2; Is. 33:14; Joel 2:1) para denotar Jerusalén en general, y a veces al Israel escogido de Dios (Sal. 51:18; 87:5). En el Nuevo Testamento (véase SIÓN) se usa a veces para denotar la Iglesia de Dios (Heb. 12:22) y a veces la ciudad celestial (Ap. 14:1)."
+      },
+      {
+        "source": "SMI",
+        "text": "[Jerusalén]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:63",
+        "original": "Josh. 15:63"
+      },
+      {
+        "reference": "2 Samuel 5:7",
+        "original": "2 Sam. 5:7"
+      },
+      {
+        "reference": "1 Kings 8:1",
+        "original": "1 Kings 8:1"
+      },
+      {
+        "reference": "2 Kings 19:21",
+        "original": "2 Kings 19:21"
+      },
+      {
+        "reference": "2 Kings 19:31",
+        "original": "2 Kings 19:31"
+      },
+      {
+        "reference": "1 Chronicles 11:5",
+        "original": "1 Chr. 11:5"
+      },
+      {
+        "reference": "Psalms 87:2",
+        "original": "Ps. 87:2"
+      },
+      {
+        "reference": "Psalms 149:2",
+        "original": "Ps 149:2"
+      },
+      {
+        "reference": "Isaiah 33:14",
+        "original": "Isa. 33:14"
+      },
+      {
+        "reference": "Joel 2:1",
+        "original": "Joel 2:1"
+      },
+      {
+        "reference": "Psalms 51:18",
+        "original": "Ps. 51:18"
+      },
+      {
+        "reference": "Psalms 87:5",
+        "original": "Ps 87:5"
+      },
+      {
+        "reference": "Hebrews 12:22",
+        "original": "Heb. 12:22"
+      },
+      {
+        "reference": "Revelation 14:1",
+        "original": "Rev. 14:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIOR": {
+    "name": "Zior",
+    "slug": "zior",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pequeñez, una ciudad en las montañas de Judá (Jos. 15:54); la moderna Si’air, a 4 1/2 millas al nornoreste de Hebrón."
+      },
+      {
+        "source": "SMI",
+        "text": "(pequeñez), una ciudad en la región montañosa de Judá (Josué 15:54). Pertenece al mismo grupo que Hebrón."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:54",
+        "original": "Josh. 15:54"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIPH": {
+    "name": "Ziph",
+    "slug": "ziph",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Que fluye. (1.) Un hijo de Jehaleel (1 Cr. 4:16). (2.) Una ciudad en el sur de Judá (Jos. 15:24), probablemente en el paso de Sufah. (3.) Una ciudad en las montañas de Judá (Jos. 15:55), identificada con las ruinas deshabitadas de Tell ez-Zif, a unas 5 millas al sureste de Hebrón. Aquí David se escondió durante sus andanzas (1 Sam. 23:19; Sal. 54, título)."
+      },
+      {
+        "source": "SMI",
+        "text": "(almena), el nombre de dos ciudades en Judá."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:16",
+        "original": "1 Chr. 4:16"
+      },
+      {
+        "reference": "Joshua 15:24",
+        "original": "Josh. 15:24"
+      },
+      {
+        "reference": "Joshua 15:55",
+        "original": "Josh. 15:55"
+      },
+      {
+        "reference": "1 Samuel 23:19",
+        "original": "1 Sam. 23:19"
+      },
+      {
+        "reference": "Psalms 54",
+        "original": "Ps. 54"
+      },
+      {
+        "reference": "1 Samuel 23:14",
+        "original": "1 Samuel 23:14"
+      },
+      {
+        "reference": "1 Samuel 23:15",
+        "original": "1 Samuel 23:15"
+      },
+      {
+        "reference": "1 Samuel 23:24",
+        "original": "1 Samuel 23:24"
+      },
+      {
+        "reference": "1 Samuel 26:2",
+        "original": "1 Samuel 26:2"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIPHAH": {
+    "name": "Ziphah",
+    "slug": "ziphah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un descendiente de Judá (1 Cr. 4:16)."
+      },
+      {
+        "source": "SMI",
+        "text": "(femenino de Zif), otro hijo de Jehaleel (1 Crónicas 4:16)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:16",
+        "original": "1 Chr. 4:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIPHIM, THE": {
+    "name": "Ziphim, The",
+    "slug": "ziphim-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "los habitantes de Zif, 2. En esta forma, el nombre se encuentra en la Versión Autorizada solo en el título de (Salmos 54:1). En la narrativa aparece en la forma más usual de ZIFITAS. (1 Samuel 23:19; 26:1)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 54:1",
+        "original": "Psalms 54:1"
+      },
+      {
+        "reference": "1 Samuel 23:19",
+        "original": "1 Samuel 23:19"
+      },
+      {
+        "reference": "1 Samuel 26:1",
+        "original": "1 Samuel 26:1"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIPHION": {
+    "name": "Ziphion",
+    "slug": "ziphion",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "hijo de Gad (Génesis 46:18) llamado en otra parte Zefón."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 46:18",
+        "original": "Genesis 46:18"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIPHRAN": {
+    "name": "Ziphran",
+    "slug": "ziphran",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(fragancia), un punto en el límite norte de la tierra prometida según lo especificado por Moisés (Números 34:9)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 34:9",
+        "original": "Numbers 34:9"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZIPHRON": {
+    "name": "Ziphron",
+    "slug": "ziphron",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dulce fragancia, una ciudad en la frontera norte de Palestina (Números 34:9), al sureste de Hamat."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 34:9",
+        "original": "Num. 34:9"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZIPPOR": {
+    "name": "Zippor",
+    "slug": "zippor",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pajarillo, el padre de Balac, rey de Moab (Números 22:2, 4)."
+      },
+      {
+        "source": "SMI",
+        "text": "(gorrión), padre de Balac, rey de Moab. (Números 22:2,4,10,16; 23:18; Josué 24:9; Jueces 11:25) No se nos dice si fue el 'rey anterior de Moab' aludido en (Números 21:26). (1451 a.C.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 22:2",
+        "original": "Num. 22:2"
+      },
+      {
+        "reference": "Numbers 22:4",
+        "original": "Num. 22:4"
+      },
+      {
+        "reference": "Numbers 22:10",
+        "original": "Numbers 22:10"
+      },
+      {
+        "reference": "Numbers 22:16",
+        "original": "Numbers 22:16"
+      },
+      {
+        "reference": "Numbers 23:18",
+        "original": "Numbers 23:18"
+      },
+      {
+        "reference": "Joshua 24:9",
+        "original": "Joshua 24:9"
+      },
+      {
+        "reference": "Judges 11:25",
+        "original": "Judges 11:25"
+      },
+      {
+        "reference": "Numbers 21:26",
+        "original": "Numbers 21:26"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIPPORAH": {
+    "name": "Zipporah",
+    "slug": "zipporah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ave hembra. Hija de Reuel, quien llegó a ser la esposa de Moisés (Éxodo 2:21). Como consecuencia del evento registrado en Éxodo 4:24-26, ella y sus dos hijos, Gersón y Eliezer, mientras iban de camino con Moisés hacia Egipto, fueron enviados de vuelta por él a sus parientes, los madianitas, con quienes permanecieron hasta que Moisés se les unió más tarde (18:2-6)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 2:21",
+        "original": "Ex. 2:21"
+      },
+      {
+        "reference": "Exodus 4:24-26",
+        "original": "Ex. 4:24-26"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZIPPORAH, OR ZIPPORAH": {
+    "name": "Zipporah, Or Zipporah",
+    "slug": "zipporah-or-zipporah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "hija de Reuel o Jetro, el sacerdote de Madián, esposa de Moisés y madre de sus dos hijos Gersón y Eliezer. (Éxodo 2:21; 4:25; 18:2) cf. Éxodo 18:6 (1530 a.C.) El único incidente registrado en su vida es el de la circuncisión de Gersón. (Éxodo 4:24-28)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 2:21",
+        "original": "Exodus 2:21"
+      },
+      {
+        "reference": "Exodus 4:25",
+        "original": "Exodus 4:25"
+      },
+      {
+        "reference": "Exodus 18:2",
+        "original": "Exodus 18:2"
+      },
+      {
+        "reference": "Exodus 18:6",
+        "original": "Exod 18:6"
+      },
+      {
+        "reference": "Exodus 4:24-28",
+        "original": "Exodus 4:24-28"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZITHRI": {
+    "name": "Zithri",
+    "slug": "zithri",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El Señor protege, un levita, hijo de Uziel (Éxodo 6:22)."
+      },
+      {
+        "source": "SMI",
+        "text": "(protección de Jehová), correctamente Sitri; uno de los hijos de Uziel, hijo de Coat. (Éxodo 6:22) En (Éxodo 6:21) Zithri debería ser Zicri, como en la Versión Autorizada de 1611."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 6:22",
+        "original": "Ex. 6:22"
+      },
+      {
+        "reference": "Exodus 6:21",
+        "original": "Exodus 6:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIZ": {
+    "name": "Ziz",
+    "slug": "ziz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Proyección; una flor, una hendidura o paso, probablemente el cercano a En-gadi, que asciende desde el Mar Muerto (2 Crónicas 20:16) en dirección a Tecoa; ahora Tell Hasasah."
+      },
+      {
+        "source": "SMI",
+        "text": "(la proyección), El acantilado de, el paso por donde la horda de moabitas, amonitas y meunim ascendió desde las orillas del Mar Muerto hasta el desierto de Judá, cerca de Tecoa. (2 Crónicas 20:16) solamente; cf. 2 Crónicas 20:20 Era el paso de Ain Guedí, la misma ruta que los árabes toman hoy en sus expediciones de saqueo."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 20:16",
+        "original": "2 Chr. 20:16"
+      },
+      {
+        "reference": "2 Chronicles 20:20",
+        "original": "2Chr 20:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIZA": {
+    "name": "Ziza",
+    "slug": "ziza",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Esplendor; abundancia. (1.) Un príncipe simeonita (1 Crónicas 4:37-43). (2.) Un hijo de Roboam (2 Crónicas 11:20)."
+      },
+      {
+        "source": "SMI",
+        "text": "(brillante)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:37-43",
+        "original": "1 Chr. 4:37-43"
+      },
+      {
+        "reference": "2 Chronicles 11:20",
+        "original": "2 Chr. 11:20"
+      },
+      {
+        "reference": "1 Chronicles 4:37",
+        "original": "1 Chronicles 4:37"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZIZAH": {
+    "name": "Zizah",
+    "slug": "zizah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un levita gersonita (1 Crónicas 23:11)."
+      },
+      {
+        "source": "SMI",
+        "text": "un levita gersonita, segundo hijo de Simei (1 Crónicas 23:11), llamado Zina en el v. (1 Crónicas 23:10)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 23:11",
+        "original": "1 Chr. 23:11"
+      },
+      {
+        "reference": "1 Chronicles 23:10",
+        "original": "1 Chronicles 23:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOAN": {
+    "name": "Zoan",
+    "slug": "zoan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Egipcio antiguo Sant= 'fortaleza', la moderna San). Una ciudad en la rama tanítica del Nilo, llamada por los griegos Tanis. Fue construida siete años después de Hebrón en Palestina (Números 13:22). Esta grande e importante ciudad fue la capital de los hicsos, o reyes pastores, que gobernaron Egipto por más de 500 años. Era la ciudad fronteriza de Gosén. Aquí Faraón tenía su corte en el momento de sus diversas entrevistas con Moisés y Aarón. 'No existe rastro de Zoán; Tanis fue construida sobre ella, y ciudad tras ciudad ha sido edificada sobre sus ruinas' (Harper, Bible and Modern Discovery). Extensos montículos de ruinas, los restos de la antigua ciudad, ahora marcan su sitio (Isaías 19:11, 13; 30:4; Ezequiel 30:14). 'El conjunto constituye una de las ruinas más grandiosas y antiguas del mundo.' Esta ciudad también fue llamada 'el Campo de Zoán' (Salmo 78:12, 43) y 'la Ciudad de Ramsés' (q.v.), porque el opresor la reconstruyó y embelleció, probablemente mediante el trabajo forzado de los hebreos, y la convirtió en su capital del norte."
+      },
+      {
+        "source": "SMI",
+        "text": "(lugar de partida), una antigua ciudad del Bajo Egipto, llamada Tanis por los griegos. Estaba situada en la orilla oriental de la rama tanítica del Nilo. Su nombre indica un lugar de partida de un país, y por lo tanto ha sido identificada con Avaris (Tanis, la moderna San), la capital de la dinastía de los Pastores en Egipto, construida siete años después de Hebrón y existente antes de la época de Abraham. Fue tomada por los reyes Pastores en su invasión de Egipto, y reconstruida y guarnecida por ellos, según Manetón, con 240.000 hombres. Esta ciudad es mencionada en relación con las plagas de tal manera que no deja duda de que es la ciudad de la que se habla en la narrativa de Éxodo como aquella donde habitó Faraón (Salmos 78:42,43) y donde Moisés obró sus maravillas en el campo de Zoán, una rica llanura que se extendía treinta millas hacia el este. Tanis dio su nombre a las dinastías vigésimo primera y vigésimo tercera y de ahí su mención en Isaías. (Isaías 19:13; 30:4) (El actual 'campo de Zoán' es un yermo estéril, muy escasamente habitado. 'Una de las principales capitales de Faraón es ahora la morada de pescadores, el refugio de bestias salvajes y está infestada de reptiles y fiebres malignas.' Aquí se han descubierto un gran número de monumentos que arrojan luz sobre la historia bíblica. Brugsch se refiere a dos estatuas de tamaño colosal de Mermesha de la decimotercera dinastía, maravillosamente perfectas en la ejecución de las partes individuales y dice que los monumentos de Ramsés el Grande yacen dispersos como los huesos carcomidos de generaciones masacradas hace mucho tiempo. El área del recinto sagrado del templo es de 1500 por 1250 pies. -ED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 13:22",
+        "original": "Num. 13:22"
+      },
+      {
+        "reference": "Isaiah 19:11",
+        "original": "Isa. 19:11"
+      },
+      {
+        "reference": "Isaiah 19:13",
+        "original": "Isa. 19:13"
+      },
+      {
+        "reference": "Ezekiel 30:14",
+        "original": "Ezek. 30:14"
+      },
+      {
+        "reference": "Psalms 78:12",
+        "original": "Ps. 78:12"
+      },
+      {
+        "reference": "Psalms 78:43",
+        "original": "Ps. 78:43"
+      },
+      {
+        "reference": "Psalms 78:42",
+        "original": "Psalms 78:42"
+      },
+      {
+        "reference": "Isaiah 30:4",
+        "original": "Isaiah 30:4"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOAR": {
+    "name": "Zoar",
+    "slug": "zoar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Pequeña, una ciudad al este o sureste del Mar Muerto, a la que Lot y sus hijas huyeron de Sodoma (Génesis 19:22, 23). Originalmente se llamaba Bela (14:2, 8). Es mencionada por los profetas Isaías (15:5) y Jeremías (48:34). Sus ruinas aún se ven en la desembocadura del barranco de Kerak, el Quir-Moab mencionado en 2 Reyes 3, el moderno Tell esh-Shaghur."
+      },
+      {
+        "source": "SMI",
+        "text": "(pequeñez), una de las ciudades más antiguas de la tierra de Canaán. Su nombre original era Bela. (Génesis 14:2,8) Estaba en íntima conexión con las ciudades de la 'llanura del Jordán' —Sodoma, Gomorra, Adma y Zeboim. Véase también (Génesis 13:10) pero no Génesis 10:19. En la destrucción general de las ciudades de la llanura, Zoar fue perdonada para dar refugio a Lot. (Génesis 19:22,23,30) Es mencionada en el relato de la muerte de Moisés como uno (de los hitos que limitaban su vista desde Pisga, (34:3) y parece haber sido conocida tanto en tiempos de Isaías (Isaías 15:5) como de Jeremías. (Jeremías 48:34) Estas son todas las menciones de Zoar contenidas en la Biblia. Estaba situada en el mismo distrito que las cuatro ciudades ya mencionadas, a saber, en la 'llanura' o 'círculo' del Jordán, y la narrativa de (Génesis 19:1)... implica evidentemente que estaba muy cerca de Sodoma. vv. (Génesis 19:15; 23:27) La posición definida de Sodoma es, y probablemente siempre será, un misterio; pero hay pocas dudas de que la llanura del Jordán estaba en el lado norte del Mar Muerto y que las ciudades de la llanura, por lo tanto, deben haber estado situadas allí en lugar de en el extremo sur del lago, como generalmente se da por sentado. [Sodoma] (Pero la gran mayoría de los eruditos, desde Josefo y Eusebio hasta la actualidad, la sitúan en el extremo sur del Mar Muerto.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 19:22",
+        "original": "Gen. 19:22"
+      },
+      {
+        "reference": "Genesis 19:23",
+        "original": "Gen. 19:23"
+      },
+      {
+        "reference": "2 Kings 3",
+        "original": "2 Kings 3"
+      },
+      {
+        "reference": "Genesis 14:2",
+        "original": "Genesis 14:2"
+      },
+      {
+        "reference": "Genesis 14:8",
+        "original": "Genesis 14:8"
+      },
+      {
+        "reference": "Genesis 13:10",
+        "original": "Genesis 13:10"
+      },
+      {
+        "reference": "Genesis 19:30",
+        "original": "Genesis 19:30"
+      },
+      {
+        "reference": "Isaiah 15:5",
+        "original": "Isaiah 15:5"
+      },
+      {
+        "reference": "Jeremiah 48:34",
+        "original": "Jeremiah 48:34"
+      },
+      {
+        "reference": "Genesis 19:1",
+        "original": "Genesis 19:1"
+      },
+      {
+        "reference": "Genesis 19:15",
+        "original": "Genesis 19:15"
+      },
+      {
+        "reference": "Genesis 23:27",
+        "original": "Genesis 23:27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOBA, OR ZOBAH": {
+    "name": "Zoba, Or Zobah",
+    "slug": "zoba-or-zobah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(estación), el nombre de una porción de Siria que formó un reino separado en tiempos de los monarcas judíos Saúl, David y Salomón. Probablemente se encontraba al este de Celesiria, y se extendía desde allí al noreste y este hacia, o incluso hasta, el Éufrates. Oímos hablar por primera vez de Zoba en tiempos de Saúl, cuando la encontramos mencionada como un país separado, gobernado aparentemente por varios reyes que no reconocían una cabeza o jefe común. (1 Samuel 14:47) Unos cuarenta años después, encontramos a Zoba bajo un único gobernante, Hadad-ezer, hijo de Rehob. Tuvo guerras con Toi, rey de Hamat (2 Samuel 8:10), y mantuvo a varios pequeños príncipes sirios como vasallos bajo su yugo. (2 Samuel 10:19) David (2 Samuel 8:3) atacó a Hadad-ezer al principio de su reinado, derrotó a su ejército y le quitó mil carros, setecientos (siete mil) (1 Crónicas 18:4) jinetes y 20.000 infantes. Los aliados de Hadad-ezer, los sirios de Damasco, fueron derrotados en una gran batalla. La riqueza de Zoba es muy evidente en la narrativa de esta campaña. Un hombre de Zoba, Rezón, hijo de Eliada, se hizo amo de Damasco, donde demostró ser un feroz adversario para Israel durante todo el reinado de Salomón. (1 Reyes 11:23-25) Salomón también, al parecer, estuvo involucrado en una guerra con Zoba misma. (2 Crónicas 8:3) Esto es lo último que oímos de Zoba en las Escrituras. Sin embargo, el nombre se encuentra en una fecha posterior en las inscripciones de Asiria, donde el reino de Zoba parece intervenir entre Hamat y Damasco."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 14:47",
+        "original": "1 Samuel 14:47"
+      },
+      {
+        "reference": "2 Samuel 8:10",
+        "original": "2 Samuel 8:10"
+      },
+      {
+        "reference": "2 Samuel 10:19",
+        "original": "2 Samuel 10:19"
+      },
+      {
+        "reference": "2 Samuel 8:3",
+        "original": "2 Samuel 8:3"
+      },
+      {
+        "reference": "1 Chronicles 18:4",
+        "original": "1 Chronicles 18:4"
+      },
+      {
+        "reference": "1 Kings 11:23-25",
+        "original": "1 Kings 11:23-25"
+      },
+      {
+        "reference": "2 Chronicles 8:3",
+        "original": "2 Chronicles 8:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOBAH": {
+    "name": "Zobah",
+    "slug": "zobah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "=Aram-Zoba, (Salmo 60, título), una provincia o reino sirio al sur de Celesiria, que se extendía desde las laderas orientales del Líbano hacia el norte y el este, en dirección al Éufrates. Saúl y David tuvieron guerra con los reyes de Zoba (1 Samuel 14:47; 2 Samuel 8:3; 10:6)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 60",
+        "original": "Ps. 60"
+      },
+      {
+        "reference": "1 Samuel 14:47",
+        "original": "1 Sam. 14:47"
+      },
+      {
+        "reference": "2 Samuel 8:3",
+        "original": "2 Sam. 8:3"
+      },
+      {
+        "reference": "2 Samuel 10:6",
+        "original": "2 Sam. 10:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZOBEBAH": {
+    "name": "Zobebah",
+    "slug": "zobebah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(la lenta), hijo de Coz, de la tribu de Judá. (1 Crónicas 4:8)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:8",
+        "original": "1 Chronicles 4:8"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOHAR": {
+    "name": "Zohar",
+    "slug": "zohar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Brillo. (1.) El padre de Efrón el hitita (Génesis 23:8). (2.) Uno de los hijos de Simeón (Génesis 46:10; Éxodo 6:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(luz)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 23:8",
+        "original": "Gen. 23:8"
+      },
+      {
+        "reference": "Genesis 46:10",
+        "original": "Gen. 46:10"
+      },
+      {
+        "reference": "Exodus 6:15",
+        "original": "Ex. 6:15"
+      },
+      {
+        "reference": "Genesis 25:9",
+        "original": "Genesis 25:9"
+      },
+      {
+        "reference": "1 Chronicles 4:24",
+        "original": "1 Chronicles 4:24"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOHELETH": {
+    "name": "Zoheleth",
+    "slug": "zoheleth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La piedra de la serpiente, una meseta rocosa cerca del centro del pueblo de Siloé, y cerca de la fuente de En-rogel, adonde las mujeres del pueblo acuden por agua (1 Reyes 1:5-9). Aquí Adonías (q.v.) festejó a todos los príncipes reales excepto a Salomón y a los hombres que tomaron parte con él en su intento de suceder al trono. Mientras estaban reunidos aquí, Salomón fue proclamado rey, mediante la intervención de Natán. Al oír esto, Adonías huyó y se refugió en el santuario (1 Reyes 1:49-53). Más tarde fue perdonado. Zohelet se proyecta o se inclina ligeramente sobre el valle de Cedrón. Ahora se llama ez-Zehwell o Zahweileh."
+      },
+      {
+        "source": "SMI",
+        "text": "(serpiente), La piedra, Esta estaba 'junto a En-rogel' (1 Reyes 1:9), y por lo tanto, si En-rogel es la moderna Um-ed-Deraj, esta piedra, 'donde Adonías mató ovejas y bueyes', estaba con toda probabilidad no lejos del pozo de la Virgen."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 1:5-9",
+        "original": "1 Kings 1:5-9"
+      },
+      {
+        "reference": "1 Kings 1:49-53",
+        "original": "1 Kings 1:49-53"
+      },
+      {
+        "reference": "1 Kings 1:9",
+        "original": "1 Kings 1:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOHETH": {
+    "name": "Zoheth",
+    "slug": "zoheth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "¿Arrebatando (?), uno de los hijos de Isi (1 Crónicas 4:20)."
+      },
+      {
+        "source": "SMI",
+        "text": "hijo de Isi de la tribu de Judá. (1 Crónicas 4:20)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:20",
+        "original": "1 Chr. 4:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOPHAH": {
+    "name": "Zophah",
+    "slug": "zophah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Extendiendo, un hijo de Helem (1 Crónicas 7:35), un jefe de Aser."
+      },
+      {
+        "source": "SMI",
+        "text": "(una vasija) hijo de Helem o Hotam, hijo de Heber, un aserita. (1 Crónicas 7:35,36)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 7:35",
+        "original": "1 Chr. 7:35"
+      },
+      {
+        "reference": "1 Chronicles 7:36",
+        "original": "1 Chronicles 7:36"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOPHAI": {
+    "name": "Zophai",
+    "slug": "zophai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(descendiente de Zuf), un levita coatita, hijo de Elcana y antepasado de Samuel. (2 Crónicas 6:26) (11). En el versículo 35 se le llama Zuf."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Chronicles 6:26",
+        "original": "2 Chronicles 6:26"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOPHAR": {
+    "name": "Zophar",
+    "slug": "zophar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Gorjeo (o piar), uno de los amigos de Job que vino a consolarlo en su angustia (Job 2:11. La LXX. traduce aquí 'rey de los mineos' = Ma’in, maonitas, Jueces 10:12, en Arabia del Sur). Se le llama naamita, o habitante de algún lugar desconocido llamado Naama."
+      },
+      {
+        "source": "SMI",
+        "text": "(gorrión), uno de los tres amigos de Job. (Job 2:11; 11:1; 20:1; 42:9)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 2:11",
+        "original": "Job 2:11"
+      },
+      {
+        "reference": "Judges 10:12",
+        "original": "Judg. 10:12"
+      },
+      {
+        "reference": "Job 11:1",
+        "original": "Job 11:1"
+      },
+      {
+        "reference": "Job 20:1",
+        "original": "Job 20:1"
+      },
+      {
+        "reference": "Job 42:9",
+        "original": "Job 42:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZOPHIM": {
+    "name": "Zophim",
+    "slug": "zophim",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(observadores), El campo de, un lugar en o cerca de la cima del Pisga, desde donde Balaam tuvo su segunda vista del campamento de Israel. (Números 23:14) La posición del campo de Zofim no está definida. Posiblemente es el mismo lugar que más tarde en la historia se menciona como Mizpa de Moab."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 23:14",
+        "original": "Numbers 23:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOPHIM, FIELD OF": {
+    "name": "Zophim, Field of",
+    "slug": "zophim-field-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Campo de los observadores, un lugar en Moab en la cordillera del Pisga (Números 23:14). A este lugar Balac trajo a Balaam para que desde allí maldijera a los hijos de Israel. Balaam solo pudo hablar la palabra del Señor, y esa fue de bendición. Es el moderno Tal’at-es-Safa. (Véase PISGAH)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 23:14",
+        "original": "Num. 23:14"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZORAH": {
+    "name": "Zorah",
+    "slug": "zorah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Lugar de avispas, una ciudad en la llanura de Judá, entregada después a Dan (Josué 19:41; Jueces 18:2), probablemente la misma que Zoreah (Josué 15:33). Este fue el lugar de nacimiento de Sansón (Jueces 13:2, 25), y cerca de allí encontró una tumba (16:31). Estaba situada en la cresta de una colina con vistas al valle de Sorec, y fue fortificada por Roboam (2 Crónicas 11:10). Ha sido identificada con Sur’ah, en el Wadi Surar, a 8 millas al oeste de Jerusalén. Se menciona en monumentos del siglo XV a.C. como atacada por los Abiri o hebreos."
+      },
+      {
+        "source": "SMI",
+        "text": "(avispa), una ciudad en el reparto de la tribu de Dan (Josué 19:41). Se menciona previamente en el capítulo (Josué 15:33) en el catálogo de Judá, entre los lugares del distrito de la Sefelá (Versión Autorizada 'Zoreah'). Fue la residencia de Manoa y el lugar de nacimiento de Sansón. Se menciona entre los lugares fortificados por Roboam (2 Crónicas 11:10). Quizás sea idéntica a la moderna aldea de Sur’ah."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:41",
+        "original": "Josh. 19:41"
+      },
+      {
+        "reference": "Judges 18:2",
+        "original": "Judg. 18:2"
+      },
+      {
+        "reference": "Joshua 15:33",
+        "original": "Josh. 15:33"
+      },
+      {
+        "reference": "Judges 13:2",
+        "original": "Judg. 13:2"
+      },
+      {
+        "reference": "Judges 13:25",
+        "original": "Judg 13:25"
+      },
+      {
+        "reference": "2 Chronicles 11:10",
+        "original": "2 Chr. 11:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZORATHITES, THE": {
+    "name": "Zorathites, The",
+    "slug": "zorathites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "es decir, la gente de Zora, mencionados en (1 Crónicas 4:2) como descendientes de Sobal."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:2",
+        "original": "1 Chronicles 4:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOREAH": {
+    "name": "Zoreah",
+    "slug": "zoreah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Zora]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZORITES, THE": {
+    "name": "Zorites, The",
+    "slug": "zorites-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "son nombrados en las genealogías de Judá (1 Crónicas 2:54), aparentemente entre los descendientes de Salma y parientes cercanos de Joab."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 2:54",
+        "original": "1 Chronicles 2:54"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZOROBABEL": {
+    "name": "Zorobabel",
+    "slug": "zorobabel",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Mateo 1:12,13; Lucas 3:27) [Zorobabel]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 1:12",
+        "original": "Matthew 1:12"
+      },
+      {
+        "reference": "Matthew 1:13",
+        "original": "Matthew 1:13"
+      },
+      {
+        "reference": "Luke 3:27",
+        "original": "Luke 3:27"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZUAR": {
+    "name": "Zuar",
+    "slug": "zuar",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(pequeñez), padre de Natanael, el jefe de la tribu de Isacar en el tiempo del Éxodo. (Números 1:8; 2:5; 7:18,23; 10:15) (c. 2491 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 1:8",
+        "original": "Numbers 1:8"
+      },
+      {
+        "reference": "Numbers 2:5",
+        "original": "Numbers 2:5"
+      },
+      {
+        "reference": "Numbers 7:18",
+        "original": "Numbers 7:18"
+      },
+      {
+        "reference": "Numbers 7:23",
+        "original": "Numbers 7:23"
+      },
+      {
+        "reference": "Numbers 10:15",
+        "original": "Numbers 10:15"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZUPH": {
+    "name": "Zuph",
+    "slug": "zuph",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Panal de miel, un levita coatita, antepasado de Elcana y Samuel (1 Samuel 1:1); llamado también Zofai (1 Crónicas 6:26)."
+      },
+      {
+        "source": "SMI",
+        "text": "un levita coatita, antepasado de Elcana y Samuel. (1 Samuel 1:1; 1 Crónicas 6:35) En (1 Crónicas 6:26) se le llama Zofai. (panal de miel), La tierra de, un distrito al que Saúl y su siervo llegaron después de pasar por las posesiones de Salisa, de Salim y de los benjamitas. (1 Samuel 9:5) solamente. Evidentemente contenía la ciudad en la que se encontraron con Samuel, versículo 6, y esa, a su vez, no estaba lejos del 'sepulcro de Raquel'. Quizás pueda identificarse con Soba, un lugar conocido a unas siete millas al oeste de Jerusalén."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 1:1",
+        "original": "1 Sam. 1:1"
+      },
+      {
+        "reference": "1 Chronicles 6:26",
+        "original": "1 Chr. 6:26"
+      },
+      {
+        "reference": "1 Chronicles 6:35",
+        "original": "1 Chronicles 6:35"
+      },
+      {
+        "reference": "1 Samuel 9:5",
+        "original": "1 Samuel 9:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZUPH, LAND OF": {
+    "name": "Zuph, Land of",
+    "slug": "zuph-land-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1 Samuel 9:5, 6), un distrito donde se encontraba la ciudad de Samuel, Ramá. Probablemente recibió ese nombre por Zuf, hijo de Elcana (1 Crónicas 6:26, margen)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Samuel 9:5",
+        "original": "1 Sam. 9:5"
+      },
+      {
+        "reference": "1 Samuel 9:6",
+        "original": "1 Sam. 9:6"
+      },
+      {
+        "reference": "1 Chronicles 6:26",
+        "original": "1 Chr. 6:26"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "ZUR": {
+    "name": "Zur",
+    "slug": "zur",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Roca. (1.) Uno de los cinco reyes madianitas a quienes los israelitas derrotaron y dieron muerte (Números 31:8). (2.) Un benjamita (1 Crónicas 8:30)."
+      },
+      {
+        "source": "SMI",
+        "text": "(una roca)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 31:8",
+        "original": "Num. 31:8"
+      },
+      {
+        "reference": "1 Chronicles 8:30",
+        "original": "1 Chr. 8:30"
+      },
+      {
+        "reference": "Numbers 25:15",
+        "original": "Numbers 25:15"
+      },
+      {
+        "reference": "1 Chronicles 9:36",
+        "original": "1 Chronicles 9:36"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZURIEL": {
+    "name": "Zuriel",
+    "slug": "zuriel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Roca de Dios, jefe de la familia de los meraritas (Nm 3:35) en la época del Éxodo."
+      },
+      {
+        "source": "SMI",
+        "text": "(mi roca es Dios) hijo de Abihail, y jefe de los levitas meraritas en la época del éxodo. (Números 3:35)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 3:35",
+        "original": "Num. 3:35"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZURISHADDAI": {
+    "name": "Zurishaddai",
+    "slug": "zurishaddai",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Roca del Todopoderoso, el padre de Selumiel, quien fue jefe de la tribu de Simeón cuando Israel estaba acampado en el Sinaí (Nm 1:6; 2:12)."
+      },
+      {
+        "source": "SMI",
+        "text": "(mi roca es el Todopoderoso), padre de Selumiel, jefe de la tribu de Simeón en la época del éxodo. (Números 1:6; 2:12; 7:36,41; 10:19)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 1:6",
+        "original": "Num. 1:6"
+      },
+      {
+        "reference": "Numbers 2:12",
+        "original": "Num 2:12"
+      },
+      {
+        "reference": "Numbers 7:36",
+        "original": "Numbers 7:36"
+      },
+      {
+        "reference": "Numbers 7:41",
+        "original": "Numbers 7:41"
+      },
+      {
+        "reference": "Numbers 10:19",
+        "original": "Numbers 10:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "ZUZIM, THE": {
+    "name": "Zuzim, The",
+    "slug": "zuzim-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "Un pueblo antiguo que, al encontrarse en el camino de Quedorlaomer y sus aliados, fue atacado y derrotado por ellos. (Génesis 14:5) Los zuzim quizás habitaron el país de los amonitas, quienes eran idénticos a los zamzumim, de quienes se sabe que fueron exterminados y sucedidos en su tierra por los amonitas [zamzumim]."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:5",
+        "original": "Genesis 14:5"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "ZUZIMS": {
+    "name": "Zuzims",
+    "slug": "zuzims",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Inquietos; brotando. Fueron heridos “en Ham” por Quedorlaomer y sus aliados (Gn 14:5). Algunos han identificado a esta tribu con los zamzumim (véase)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:5",
+        "original": "Gen. 14:5"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  }
+}

@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+            <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/en/courses">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses | His Kingdom Ministry</title>
+    <meta name="description" content="Explore courses from His Kingdom Ministry. Learn about Bible study, prayer, leadership and more.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+
+    <!-- Icons -->
+    <!-- Font Awesome (Deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../styles.css?v=2026.05.05.15">
+    <link rel="stylesheet" href="../css/subpage-hero.css">
+    <link rel="preload" href="../css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/cookie-consent.css"></noscript>
+    
+    <!-- Stripe.js (Required for payments) -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
+
+    <style>
+        :root {
+            --primary-orange: #d17d39;
+            --primary-red: #c0392b;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* Featured Teaching Section Styles */
+        .featured-teaching-section {
+            padding: 80px 24px;
+            background: #ffffff;
+        }
+        
+        .featured-teaching-section .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .featured-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Spotlight Card */
+        .spotlight-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        }
+
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(15, 23, 42, 0.1) 100%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .spotlight-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        }
+
+        .spotlight-card-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .spotlight-card:hover .spotlight-card-bg {
+            transform: scale(1.05);
+        }
+
+        .spotlight-content {
+            position: relative;
+            z-index: 2;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .spotlight-badge {
+            background: #d17d39;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .spotlight-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
+        }
+
+        .spotlight-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin: 0 0 24px 0;
+            line-height: 1.6;
+            max-width: 540px;
+        }
+
+        .spotlight-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .spotlight-card:hover .spotlight-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #ffffff;
+        }
+
+        /* Right List Column */
+        .featured-list-col {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .horizontal-course-card {
+            background: #ffffff;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            text-align: left;
+        }
+
+        .horizontal-course-card:hover {
+            transform: translateY(-4px);
+            border-color: #e2e8f0;
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+        }
+
+        .horizontal-course-thumb {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .horizontal-course-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .horizontal-course-title {
+            font-size: 1.2rem;
+            font-weight: 750;
+            color: #1e293b;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+        }
+
+        .horizontal-course-desc {
+            font-size: 0.92rem;
+            color: #475569;
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .horizontal-course-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .horizontal-course-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .horizontal-course-meta i {
+            color: #d17d39;
+        }
+
+        /* Floating Share Buttons for Featured Layout */
+        .spotlight-share-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+        }
+
+        .spotlight-share-btn:hover {
+            background: #d17d39;
+            border-color: #d17d39;
+            transform: scale(1.05);
+        }
+
+        .horizontal-share-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .horizontal-share-btn:hover {
+            background: #d17d39;
+            border-color: #d17d39;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Hero */
+        .kurs-hero {
+            background: #0f172a;
+            padding: 160px 24px 112px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kurs-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .kurs-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(27, 73, 101, 0.45) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(209, 125, 57, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.5) 0%, #0f172a 100%);
+            z-index: 0;
+        }
+
+        .kurs-hero>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .kurs-hero h1 {
+            font-size: clamp(2.25rem, 6vw, 3.75rem);
+            font-weight: 850;
+            color: white;
+            margin: 0 auto 24px;
+            max-width: 980px;
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .kurs-hero h1 span {
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+
+        .kurs-hero p {
+            font-size: 1.125rem;
+            color: #cbd5e1;
+            max-width: 720px;
+            margin: 0 auto 48px;
+            line-height: 1.62;
+            font-weight: 400;
+        }
+
+        /* Hero Badge */
+        .hero-badge {
+            display: inline-block;
+            background: rgba(209, 125, 57, 0.08);
+            border: 1.5px solid rgba(209, 125, 57, 0.25);
+            color: #d17d39;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            margin-bottom: 28px;
+        }
+
+        /* Hero Action Buttons */
+        .hero-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            background: #d17d39;
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-primary:hover {
+            transform: translateY(-2px);
+            background: #e0883f;
+            box-shadow: 0 8px 24px rgba(209, 125, 57, 0.5);
+        }
+
+        .hero-btn-primary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .hero-btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            background: rgba(255, 255, 255, 0.02);
+            color: white;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-btn-secondary:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Bento Stats Section */
+        .hero-stats-container {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 64px;
+            flex-wrap: wrap;
+            padding: 0 16px;
+        }
+
+        .hero-stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 32px 24px;
+            min-width: 210px;
+            flex: 1;
+            max-width: 250px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-stat-card:hover {
+            border-color: rgba(209, 125, 57, 0.35);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 20px rgba(209, 125, 57, 0.1);
+        }
+
+        .hero-stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            background: rgba(209, 125, 57, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d17d39;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            border: 1px solid rgba(209, 125, 57, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .hero-stat-card:hover .hero-stat-icon-wrapper {
+            background: rgba(209, 125, 57, 0.2);
+            color: #f69445;
+            transform: scale(1.05);
+        }
+
+        .hero-stat-number {
+            font-size: 1.75rem;
+            font-weight: 750;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            font-feature-settings: "tnum";
+        }
+
+        .hero-stat-label {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 2px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        /* Responsive Hero & Bento Stats Overrides for Mobile */
+        @media (max-width: 768px) {
+            .kurs-hero {
+                padding: 120px 16px 64px;
+            }
+
+            .kurs-hero::after {
+                opacity: 0.45;
+                width: 180px;
+            }
+
+            .kurs-hero p {
+                margin-bottom: 32px;
+                font-size: 0.98rem;
+                padding: 0 8px;
+            }
+
+            .hero-stats-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-top: 40px;
+                padding: 0;
+            }
+
+            .hero-stat-card {
+                padding: 20px 10px;
+                min-width: 0;
+                max-width: none;
+                border-radius: 12px;
+            }
+
+            .hero-stat-icon-wrapper {
+                width: 36px;
+                height: 36px;
+                margin-bottom: 10px;
+                font-size: 0.95rem;
+            }
+
+            .hero-stat-number {
+                font-size: 1.45rem;
+                margin-bottom: 2px;
+            }
+
+            .hero-stat-label {
+                font-size: 0.72rem;
+                line-height: 1.25;
+            }
+        }
+
+        .kurs-controls {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            position: sticky;
+            top: var(--hkm-header-height, 80px);
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .kurs-controls-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: var(--text-muted);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: white;
+        }
+
+        /* Course Grid */
+        .kurs-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .kurs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        @media (max-width: 900px) {
+            .kurs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kurs-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Course Card */
+        .course-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+        }
+
+        .course-thumb {
+            height: 200px;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .course-thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 3rem;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .price-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .price-badge.paid {
+            background: #d17d39;
+            color: white;
+        }
+
+        .price-badge.free {
+            background: #10b981;
+            color: white;
+        }
+
+        .course-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-body h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            color: var(--text-dark);
+        }
+
+        .course-body p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            flex: 1;
+            margin-bottom: 16px;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        .course-meta i {
+            color: var(--primary-orange);
+        }
+
+        .enroll-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .enroll-btn:hover {
+            opacity: 0.92;
+            transform: scale(1.01);
+        }
+
+        .enroll-btn.free {
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
+        }
+
+        /* Skeleton */
+        @keyframes skeletonPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .skeleton {
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-block {
+            background: #e2e8f0;
+            border-radius: 8px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #e2e8f0;
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+        }
+
+        /* Results count */
+        .results-meta {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .results-meta strong {
+            color: var(--text-dark);
+        }
+
+        /* Enroll Modal */
+        .lesson-select-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.88rem;
+            color: #334155;
+            cursor: pointer;
+            user-select: none;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .lesson-select-label:hover {
+            border-color: #d17d39;
+            background-color: #fffaf7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.05);
+        }
+        .lesson-select-label:active {
+            transform: scale(0.99);
+        }
+
+        .enroll-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 99999 !important;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .enroll-modal-overlay.open {
+            display: block;
+        }
+
+        .enroll-modal {
+            background: white;
+            width: 100%;
+            min-height: 100vh;
+            padding: 40px 24px 24px;
+            box-shadow: none;
+            animation: slideUp 0.3s ease;
+            margin: 0 auto;
+            border-radius: 0;
+        }
+
+        @media (min-width: 768px) {
+            .enroll-modal {
+                max-width: 800px;
+                padding: 60px 40px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .enroll-modal h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .enroll-modal .course-preview {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .enroll-modal .course-preview-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .form-field {
+            margin-bottom: 16px;
+        }
+
+        .form-field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 6px;
+        }
+
+        .form-field input,
+        .form-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        /* Responsive controls */
+        @media (max-width: 600px) {
+            .kurs-controls-inner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-scroll {
+                overflow-x: auto;
+                display: flex;
+                gap: 8px;
+                padding-bottom: 4px;
+                flex-wrap: nowrap;
+            }
+
+            .filter-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+        }
+
+        /* Course Share Button & Modal Styles */
+        .course-card-actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .btn-share-course {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-share-course:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: scale(1.05);
+        }
+
+        .btn-share-course:active {
+            transform: scale(0.95);
+        }
+
+        #share-modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        #share-modal-overlay.open {
+            display: flex;
+        }
+
+        #share-modal-overlay .enroll-modal {
+            min-height: auto;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 32px 24px;
+            max-width: 480px;
+            width: 100%;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .social-link {
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .social-link:hover {
+            transform: scale(1.1);
+            opacity: 0.95;
+        }
+
+        .social-link:active {
+            transform: scale(0.95);
+        }
+    </style>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+        
+    <link rel="preload" href="../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../css/search-v2.css?v=1.0.3"></noscript>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/kurs">
+    <meta property="og:title" content="Kurs | His Kingdom Ministry">
+    <meta property="og:description" content="Utforsk kurs fra His Kingdom Ministry. Lær om bibelstudium, bønn, lederskap og mer.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/kurs">
+    <meta property="twitter:title" content="Kurs | His Kingdom Ministry">
+    <meta property="twitter:description" content="Utforsk kurs fra His Kingdom Ministry. Lær om bibelstudium, bønn, lederskap og mer.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+</head>
+
+<body class="cms-loading">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search the site">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>EN</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profile Picture" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/en/donations"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donate</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-3">
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Toggle theme" title="Toggle theme">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Get Involved -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Get Involved</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/donations" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Support the Work</a>
+                                    <span class="mega-menu-desc">Support our ministry financially.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/regular-donors" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a>
+                                    <span class="mega-menu-desc">Partner with us on a monthly basis.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-churches" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For Churches</a>
+                                    <span class="mega-menu-desc">Resources and teaching for your church.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-businesses" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For Businesses</a>
+                                    <span class="mega-menu-desc">Partnership agreements for companies.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Networking for Christian business leaders.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Get to Know Us -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Get to Know Us</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/about" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">About Us</a>
+                                    <span class="mega-menu-desc">Learn about our vision, faith, and values.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/contact" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contact Us</a>
+                                    <span class="mega-menu-desc">Send us a message or reach out.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Resources -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Resources</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Read the Bible</a>
+                                    <span class="mega-menu-desc">Read the Word of God with our reader.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Store</a>
+                                    <span class="mega-menu-desc">Christian apparel, mugs, and more.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Watch messages and listen to podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/courses" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Courses</a>
+                                    <span class="mega-menu-desc">Teachings and courses for spiritual growth.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Current Activity -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Current Activity</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Reading Plans</a>
+                                    <span class="mega-menu-desc">Follow our structured reading plans.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/events" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Events</a>
+                                    <span class="mega-menu-desc">Join our seminars and gatherings.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">News & Blog</a>
+                                    <span class="mega-menu-desc">Latest updates and articles.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">My Page</a>
+                                    <span class="mega-menu-desc">Your profile and progress.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="kurs-hero">
+        <div class="hero-badge">EXPERT GUIDANCE</div>
+        <h1>Growth in <span>faith and knowledge</span></h1>
+        <p>Explore courses from His Kingdom Ministry and dive deep into God's word. Learn at your own pace with resources designed to strengthen your walk.</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
+            <a href="#kurs-grid-section" class="hero-btn-primary">
+                <i class="fas fa-graduation-cap"></i> Explore courses
+            </a>
+            <a href="/media" class="hero-btn-secondary">
+                <i class="fas fa-play-circle"></i> Free teachings
+            </a>
+        </div>
+
+        <!-- Bento Stats Section -->
+        <div class="hero-stats-container">
+            <div class="hero-stat-card">
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div id="stat-course-count" class="hero-stat-number">—</div>
+                <div class="hero-stat-label">Courses Available</div>
+            </div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div id="stat-lesson-count" class="hero-stat-number">—</div>
+                <div class="hero-stat-label">Total Lessons</div>
+            </div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-icon-wrapper">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <div class="hero-stat-number">∞</div>
+                <div class="hero-stat-label">Lifetime Access</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Teaching Section -->
+    <section class="featured-teaching-section" id="featured-teaching">
+        <div class="container">
+            <div class="featured-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+                <div style="text-align: left;">
+                    <h2 class="featured-title" style="font-size:2rem; font-weight:800; color:#1B4965; margin:0;">Featured Teachings</h2>
+                    <p class="featured-subtitle" style="color:#64748b; font-size:1rem; margin-top:8px; max-width:600px;">Dive into our most popular topics, carefully selected for your personal and spiritual growth.</p>
+                </div>
+                <a href="#kurs-grid-section" class="see-all-courses-link" style="color:#d17d39; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:8px; font-size:1rem; transition:color 0.2s;">
+                    See all courses <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="featured-grid" id="featured-courses-container">
+                <!-- Skeleton Loader for Featured Section -->
+                <div class="spotlight-card skeleton" style="cursor:default; min-height:480px; background:#f8fafc;"></div>
+                <div class="featured-list-col">
+                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
+                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search + Filters -->
+    <div class="kurs-controls">
+        <div class="kurs-controls-inner">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="course-search" placeholder="Search for courses...">
+            </div>
+            <div class="filter-scroll" id="filter-scroll" style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="filter-btn active" data-cat="all">Alle kurs</button>
+                <button class="filter-btn" data-cat="Bibelstudium">Bibelstudium</button>
+                <button class="filter-btn" data-cat="Bønn">Bønn</button>
+                <button class="filter-btn" data-cat="Lederskap">Lederskap</button>
+                <button class="filter-btn" data-cat="Helbredelse">Helbredelse</button>
+                <button class="filter-btn" data-cat="Identitet">Identitet</button>
+                <button class="filter-btn" data-cat="Evangelisering">Evangelisering</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <section class="kurs-main" id="kurs-grid-section">
+        <p class="results-meta" id="results-meta">Loading courses...</p>
+        <div class="kurs-grid" id="kurs-grid">
+            <!-- Skeleton -->
+            <!-- Skeleton -->
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
+                </div>
+            </div>
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
+                </div>
+            </div>
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enroll Modal -->
+    <div class="enroll-modal-overlay" id="enroll-modal-overlay">
+        <div class="enroll-modal">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+                <div>
+                    <h3 id="modal-course-title">Enroll</h3>
+                    <p style="color:var(--text-muted);font-size:0.9rem;margin-top:4px;" id="modal-course-price"></p>
+                </div>
+                <button id="close-enroll-modal"
+                    style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.4rem;padding:0;line-height:1;">✕</button>
+            </div>
+
+            <div class="course-preview">
+                <div class="course-preview-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <strong id="modal-course-name" style="font-size:0.95rem;"></strong>
+                    <p style="font-size:0.82rem;color:var(--text-muted);margin:3px 0 0;" id="modal-lesson-count"></p>
+                </div>
+            </div>
+
+            <form id="enroll-form">
+                <div class="form-field">
+                    <label>Your full name *</label>
+                    <input id="enroll-name" type="text" placeholder="John Doe" required>
+                </div>
+                <div class="form-field">
+                    <label>Email address *</label>
+                    <input id="enroll-email" type="email" placeholder="your@email.com" required>
+                </div>
+                <div class="form-field">
+                    <label>Mobile number (for Vipps) *</label>
+                    <input id="enroll-phone" type="tel" placeholder="Enter phone number" required>
+                </div>
+                <div class="form-field">
+                    <label>Message (optional)</label>
+                    <textarea id="enroll-message" rows="2" placeholder="Anything you want to tell us?"></textarea>
+                </div>
+                
+                <div id="enroll-lessons-selection" style="display: none; margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label style="font-weight: 700; color: #1e293b; font-size: 0.9rem; display: block; margin-bottom: 12px;">Select lessons you want to attend:</label>
+                    <div id="modal-lessons-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; color: #1e293b; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="select-all-lessons" checked style="width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #cbd5e1; accent-color: #d17d39;">
+                            Select all lessons
+                        </label>
+                        <span id="dynamic-total-price" style="font-weight: 750; color: #d17d39; font-size: 0.95rem;"></span>
+                    </div>
+                </div>
+                
+                <div id="payment-options-container" style="display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; margin-top:20px;">
+                    <button type="submit" class="enroll-btn" id="enroll-submit-btn" style="flex: 1 1 100%;">
+                        <i class="fas fa-paper-plane"></i> Send request
+                    </button>
+                    
+                    <button type="button" class="enroll-btn" id="vipps-payment-btn" style="background: #ff5b24; display: none; align-items: center; justify-content: center; gap: 8px; flex: 1 1 calc(50% - 6px); min-width: 140px;">
+                        <img src="../img/vipps-logo-white.svg" alt="Vipps" style="height: 22px; filter: brightness(0) invert(1);" loading="lazy"> 
+                        Pay with Vipps
+                    </button>
+
+                    <button type="button" class="enroll-btn" id="stripe-payment-btn" style="background: #1B4965; display: none; align-items: center; justify-content: center; gap: 8px; flex: 1 1 calc(50% - 6px); min-width: 140px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">credit_card</span> 
+                        Pay with card
+                    </button>
+                </div>
+
+                <div id="stripe-checkout-container" style="display: none; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <div id="payment-element" style="margin-bottom: 16px;"></div>
+                    <button type="button" class="enroll-btn" id="stripe-submit-btn" style="background: #1B4965; width: 100%; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">lock</span>
+                        Complete payment (<span id="stripe-amount-text">0</span> kr)
+                    </button>
+                    <div id="stripe-error-message" style="margin-top: 12px; font-size: 0.875rem; text-align: center; color: #df1b41; display: none;"></div>
+                </div>
+                <p id="enroll-status" style="margin-top:12px;font-size:0.875rem;text-align:center;"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="enroll-modal-overlay" id="share-modal-overlay">
+        <div class="enroll-modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <h3 style="margin:0;font-size:1.4rem;font-weight:800;color:#1B4965;">Share course</h3>
+                <button id="close-share-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.6rem;padding:0;line-height:1;transition:color 0.2s;">✕</button>
+            </div>
+            
+            <p id="share-modal-course-title" style="font-weight:700;font-size:1.1rem;color:#1e293b;margin-bottom:20px; line-height:1.4;"></p>
+            
+            <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 28px;">
+                <a href="javascript:void(0)" id="share-fb" class="social-link" style="background: #3b5998; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;"><i class="fab fa-facebook-f" style="font-size:1.2rem;"></i></a>
+                <a href="javascript:void(0)" id="share-tw" class="social-link" style="background: #000000; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512" fill="white">
+                        <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
+                    </svg>
+                </a>
+                <a href="javascript:void(0)" id="share-li" class="social-link" style="background: #0077b5; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;"><i class="fab fa-linkedin-in" style="font-size:1.2rem;"></i></a>
+                <a href="javascript:void(0)" id="share-copy" class="social-link" style="background: #f39c12; color: white; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s;" title="Kopier lenke"><i class="fas fa-link" style="font-size:1.2rem;"></i></a>
+            </div>
+
+            <div class="form-field" style="margin-bottom:0;">
+                <label style="font-weight:700;font-size:0.9rem;color:#475569;">Kopier lenke</label>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <input type="text" id="share-link-input" readonly style="flex:1;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;background:#f8fafc;" onclick="this.select();">
+                    <button id="copy-link-btn" class="enroll-btn" style="width:auto;padding:0 20px;font-size:0.95rem;white-space:nowrap;margin-top:0;">Kopier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="/en/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About us</h4>
+                            <ul>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+
+                                <li><a href="/en/courses">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
+                                <li><a href="javascript:void(0)" onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;">Cookies</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase -->
+    
+    <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
+    <script src="https://cdn.jsdelivr.net/npm/editorjs-html@3.4.2/build/edjsHTML.min.js"></script>
+
+    <script>
+            (function () {
+                let allCourses = [];
+                let activeFilter = 'all';
+                let searchQuery = '';
+                let currentUser = null;
+                let userEnrollments = [];
+                let currentUserRole = 'medlem';
+
+                const lang = (document.documentElement.lang || 'no').split('-')[0];
+                const STRINGS = {
+                    no: {
+                        allCourses: 'Alle kurs',
+                        noCoursesFound: 'Ingen kurs funnet',
+                        tryAnotherSearch: 'Prøv et annet søkeord eller kategori.',
+                        coursesFound: 'kurs funnet',
+                        unlocked: 'Låst opp',
+                        free: 'Gratis',
+                        untitled: 'Uten tittel',
+                        lesson: 'leksjon',
+                        lessons: 'leksjoner',
+                        hasAccess: 'Har tilgang',
+                        freeAccess: 'Gratis tilgang',
+                        paidCourse: 'Betalt kurs',
+                        goToCourse: 'Gå til kurset',
+                        startFree: 'Start gratis',
+                        enroll: 'Meld deg på',
+                        shareThisCourse: 'Del dette kurset',
+                        alertAuth: 'Du må opprette en bruker eller logge inn for å melde deg på og betale for kursene.',
+                        startFreeNow: 'Start kurset nå',
+                        enrollFree: 'Meld på gratis',
+                        total: 'Total',
+                        priceSuffix: ',-',
+                        lessonsIncluded: 'leksjoner inkludert',
+                        freeCourseDesc: 'Dette kurset er helt gratis.',
+                        paidCourseDesc: 'Etter betaling mottar du tilgangslenke på e-post.',
+                        sending: 'Sender...',
+                        sent: 'Sendt!',
+                        thankYouContact: '✅ Takk! Vi tar kontakt med deg på e-post snart.',
+                        somethingWentWrong: 'Noe gikk galt. Prøv igjen eller kontakt oss direkte.',
+                        fillFields: 'Vennligst fyll ut navn, e-post og telefonnummer først.',
+                        pleaseWait: 'Vennligst vent...',
+                        vippsNotReady: 'Vipps-modulen er ikke klar ennå. Vennligst prøv igjen om et sekund.',
+                        vippsError: 'Noe gikk galt under oppstart av Vipps: ',
+                        stripeError: 'Noe gikk galt under oppstart av kortbetaling: ',
+                        processing: 'Behandler...',
+                        stripeCompleted: 'Takk! Din betaling for kurset \'{courseName}\' er fullført. Du vil motta en tilgangslenke på e-post kort tid etter bekreftelse.',
+                        copyLabel: 'Kopier',
+                        copySuccess: 'Kopiert!',
+                        copyFailedAlert: 'Kunne ikke kopiere automatisk. Vennligst merk teksten og kopier manuelt.',
+                        shareText: 'Sjekk ut dette kurset fra His Kingdom Ministry: ',
+                        searchPlaceholder: 'Hva leter du etter? Skriv for forslag...',
+                        loadingCourses: 'Laster kurs...'
+                    },
+                    en: {
+                        allCourses: 'All courses',
+                        noCoursesFound: 'No courses found',
+                        tryAnotherSearch: 'Try another search term or category.',
+                        coursesFound: 'courses found',
+                        unlocked: 'Unlocked',
+                        free: 'Free',
+                        untitled: 'Untitled',
+                        lesson: 'lesson',
+                        lessons: 'lessons',
+                        hasAccess: 'Has access',
+                        freeAccess: 'Free access',
+                        paidCourse: 'Paid course',
+                        goToCourse: 'Go to course',
+                        startFree: 'Start free',
+                        enroll: 'Enroll',
+                        shareThisCourse: 'Share this course',
+                        alertAuth: 'You must create an account or log in to enroll and pay for courses.',
+                        startFreeNow: 'Start course now',
+                        enrollFree: 'Enroll for free',
+                        total: 'Total',
+                        priceSuffix: ',-',
+                        lessonsIncluded: 'lessons included',
+                        freeCourseDesc: 'This course is completely free.',
+                        paidCourseDesc: 'After payment, you will receive an access link by email.',
+                        sending: 'Sending...',
+                        sent: 'Sent!',
+                        thankYouContact: '✅ Thank you! We will contact you by email soon.',
+                        somethingWentWrong: 'Something went wrong. Please try again or contact us directly.',
+                        fillFields: 'Please fill in your name, email, and phone number first.',
+                        pleaseWait: 'Please wait...',
+                        vippsNotReady: 'Vipps module is not ready yet. Please try again in a second.',
+                        vippsError: 'Something went wrong starting Vipps: ',
+                        stripeError: 'Something went wrong starting card payment: ',
+                        processing: 'Processing...',
+                        stripeCompleted: 'Thank you! Your payment for the course \'{courseName}\' is complete. You will receive an access link by email shortly after confirmation.',
+                        copyLabel: 'Copy',
+                        copySuccess: 'Copied!',
+                        copyFailedAlert: 'Could not copy automatically. Please select the text and copy manually.',
+                        shareText: 'Check out this course from His Kingdom Ministry: ',
+                        searchPlaceholder: 'What are you looking for? Type for suggestions...',
+                        loadingCourses: 'Loading courses...'
+                    },
+                    es: {
+                        allCourses: 'Todos los cursos',
+                        noCoursesFound: 'No se encontraron cursos',
+                        tryAnotherSearch: 'Pruebe con otra palabra clave o categoría.',
+                        coursesFound: 'cursos encontrados',
+                        unlocked: 'Desbloqueado',
+                        free: 'Gratis',
+                        untitled: 'Sin título',
+                        lesson: 'lección',
+                        lessons: 'lecciones',
+                        hasAccess: 'Tiene acceso',
+                        freeAccess: 'Acceso gratuito',
+                        paidCourse: 'Curso de pago',
+                        goToCourse: 'Ir al curso',
+                        startFree: 'Empezar gratis',
+                        enroll: 'Inscribirse',
+                        shareThisCourse: 'Compartir este curso',
+                        alertAuth: 'Debe crear una cuenta o iniciar sesión para inscribirse y pagar los cursos.',
+                        startFreeNow: 'Empezar curso ahora',
+                        enrollFree: 'Inscribirse gratis',
+                        total: 'Total',
+                        priceSuffix: ',-',
+                        lessonsIncluded: 'lecciones incluidas',
+                        freeCourseDesc: 'Este curso es completamente gratis.',
+                        paidCourseDesc: 'Después del pago, recibirá un enlace de acceso por correo electrónico.',
+                        sending: 'Enviando...',
+                        sent: '¡Enviado!',
+                        thankYouContact: '✅ ¡Gracias! Nos pondremos en contacto con usted por correo electrónico pronto.',
+                        somethingWentWrong: 'Algo salió mal. Por favor, inténtelo de nuevo o contáctenos directamente.',
+                        fillFields: 'Por favor, complete primero su nombre, correo electrónico y número de teléfono.',
+                        pleaseWait: 'Por favor, espere...',
+                        vippsNotReady: 'El módulo Vipps aún no está listo. Por favor, inténtelo de nuevo en un segundo.',
+                        vippsError: 'Algo salió mal al iniciar Vipps: ',
+                        stripeError: 'Algo salió mal al iniciar el pago con tarjeta: ',
+                        processing: 'Procesando...',
+                        stripeCompleted: '¡Gracias! Su pago para el curso \'{courseName}\' se ha completado. Recibirá un enlace de acceso por correo electrónico poco después de la confirmación.',
+                        copyLabel: 'Copiar',
+                        copySuccess: '¡Copiado!',
+                        copyFailedAlert: 'No se pudo copiar automáticamente. Seleccione el texto y cópielo manualmente.',
+                        shareText: 'Echa un vistazo a este curso de His Kingdom Ministry: ',
+                        searchPlaceholder: '¿Qué estás buscando? Escribe para sugerencias...',
+                        loadingCourses: 'Cargando cursos...'
+                    }
+                };
+
+                function t(key, replacements = {}) {
+                    let str = (STRINGS[lang] && STRINGS[lang][key]) || STRINGS['no'][key] || '';
+                    Object.keys(replacements).forEach(k => {
+                        str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), replacements[k]);
+                    });
+                    return str;
+                }
+
+                // Initial UI translation setup
+                const loadingMeta = document.getElementById('results-meta');
+                if (loadingMeta) loadingMeta.textContent = t('loadingCourses');
+
+                async function listenToAuth() {
+                    await new Promise(resolve => {
+                        const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
+                        check();
+                    });
+
+                    firebase.auth().onAuthStateChanged(async (user) => {
+                        currentUser = user;
+                        if (user) {
+                            try {
+                                const [eSnap, uDoc] = await Promise.all([
+                                    firebase.firestore().collection('courseEnrollments')
+                                        .where('email', 'in', [user.email, user.email.toLowerCase()])
+                                        .get(),
+                                    firebase.firestore().collection('users').doc(user.uid).get()
+                                ]);
+                                userEnrollments = [];
+                                eSnap.forEach(doc => userEnrollments.push(doc.data()));
+                                const fallbackSuperadmins = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
+                                if (fallbackSuperadmins.includes((user.email || '').toLowerCase())) {
+                                    currentUserRole = 'superadmin';
+                                } else {
+                                    currentUserRole = (uDoc.exists ? uDoc.data()?.role : 'medlem') || 'medlem';
+                                }
+                            } catch (e) {
+                                console.error("Error fetching enrollments/role on auth change:", e);
+                            }
+                        } else {
+                            userEnrollments = [];
+                            currentUserRole = 'medlem';
+                        }
+                         renderGrid(getFiltered());
+                         renderFeaturedSection();
+                      });
+                  }
+                listenToAuth();
+
+                // ── Load courses from Firebase ──────────────────────────────────
+                async function loadCourses() {
+                    try {
+                        // Wait for firebase to be ready
+                        await new Promise(resolve => {
+                            const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
+                            check();
+                        });
+
+                        const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                        allCourses = (snap.exists ? snap.data()?.items : null) || [];
+
+                        // Localize courses and lessons dynamically
+                        allCourses = allCourses.map(course => {
+                            let localizedCourse = course;
+                            if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+                                localizedCourse = window.contentManager.getLocalizedContentItem(course, lang);
+                            }
+                            if (localizedCourse.lessons && Array.isArray(localizedCourse.lessons)) {
+                                localizedCourse.lessons = localizedCourse.lessons.map(lesson => {
+                                    if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+                                        return window.contentManager.getLocalizedContentItem(lesson, lang);
+                                    }
+                                    return lesson;
+                                });
+                            }
+                            return localizedCourse;
+                        });
+
+                        // Update hero stats
+                        const totalLessons = allCourses.reduce((sum, c) => sum + (c.lessons || []).length, 0);
+                        animateCount(document.getElementById('stat-course-count'), allCourses.length);
+                        animateCount(document.getElementById('stat-lesson-count'), totalLessons);
+
+                        // Populate categories dynamically
+                        const filterScroll = document.getElementById('filter-scroll');
+                        if (filterScroll) {
+                            const uniqueCategories = [...new Set(allCourses.map(c => c.category).filter(Boolean))];
+                            filterScroll.innerHTML = `
+                                <button class="filter-btn active" data-cat="all">${t('allCourses')}</button>
+                                ${uniqueCategories.map(cat => `
+                                    <button class="filter-btn" data-cat="${cat}">${cat}</button>
+                                `).join('')}
+                            `;
+                            
+                            filterScroll.querySelectorAll('.filter-btn').forEach(btn => {
+                                btn.addEventListener('click', () => {
+                                    filterScroll.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                                    btn.classList.add('active');
+                                    activeFilter = btn.dataset.cat;
+                                    renderGrid(getFiltered());
+                                });
+                            });
+                        }
+
+                        renderGrid(allCourses);
+                        renderFeaturedSection();
+
+                        // Check if a specific course should be opened on load
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const courseIdParam = urlParams.get('courseId') || urlParams.get('course');
+                        if (courseIdParam && allCourses && allCourses.length > 0) {
+                            const matchedCourse = allCourses.find(c => c.id === courseIdParam);
+                            if (matchedCourse) {
+                                openEnrollModal(matchedCourse);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Course load error:', err);
+                        document.getElementById('kurs-grid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="color:#e74c3c;"></i>
+                        <h3>Kunne ikke laste kurs</h3>
+                        <p>Prøv å oppdatere siden.</p>
+                    </div>`;
+                    }
+                }
+
+                function animateCount(el, target) {
+                    if (!el) return;
+                    const duration = 800;
+                    const start = performance.now();
+                    const step = (now) => {
+                        const t = Math.min((now - start) / duration, 1);
+                        const eased = 1 - Math.pow(1 - t, 3);
+                        el.textContent = Math.round(eased * target);
+                        if (t < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                }
+
+                // ── Featured Section Dynamic Handling ─────────────────────────────
+                window.handleCourseCardClick = function (courseId, isMock) {
+                    if (isMock) {
+                        if (window.showToast) {
+                            window.showToast('Dette kurset åpner snart! Følg med for lansering.', 'info');
+                        } else {
+                            alert('Dette kurset åpner snart! Følg med for lansering.');
+                        }
+                        return;
+                    }
+                    const course = allCourses.find(c => c.id === courseId);
+                    if (!course) return;
+                    
+                    const isFree = !course.price || course.price === 0;
+                    const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
+                    const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
+                    
+                    if (hasAccess) {
+                        window.location.href = '/minside/index.html#course-player?courseId=' + course.id;
+                    } else {
+                        openEnrollModal(course);
+                    }
+                };
+
+                function renderFeaturedSection() {
+                    const container = document.getElementById('featured-courses-container');
+                    if (!container) return;
+
+                    // If no courses are loaded, hide the featured section entirely
+                    if (!allCourses || allCourses.length === 0) {
+                        const featuredSection = document.getElementById('featured-teaching');
+                        if (featuredSection) featuredSection.style.display = 'none';
+                        return;
+                    }
+
+                    // Explicitly make sure the section is visible if we have courses
+                    const featuredSection = document.getElementById('featured-teaching');
+                    if (featuredSection) {
+                        const searchInput = document.getElementById('course-search');
+                        const hasSearch = searchInput && searchInput.value.trim().length > 0;
+                        const hasFilter = activeFilter && activeFilter !== 'all';
+                        if (!hasSearch && !hasFilter) {
+                            featuredSection.style.display = 'block';
+                        }
+                    }
+
+                    if (allCourses.length === 1) {
+                        const hasTranslation = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
+                        // Single course: render a full-width Spotlight Card
+                        const course = allCourses[0];
+                        const safeTitle = (course.title || '').replace(/'/g, "\\'");
+                        const isFree = !course.price || course.price === 0;
+                        const priceText = isFree ? 'Gratis' : 'kr ' + course.price + ',-';
+                        
+                        container.style.gridTemplateColumns = '1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course.id}', false)" style="min-height: 400px; position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <img class="spotlight-card-bg" src="${course.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course.title}" loading="lazy">
+                                <div class="spotlight-content" style="max-width: 800px;">
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Utvalgt Kurs</span>
+                                        <span class="spotlight-badge" style="background: ${isFree ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText}</span>
+                                        ${lang !== 'no' && !hasTranslation 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                            : ''
+                                        }
+                                    </div>
+                                    <h3 class="spotlight-title">${course.title}</h3>
+                                    <p class="spotlight-desc" style="max-width: 700px;">${course.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (allCourses.length === 2) {
+                        const hasTranslation1 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
+                        const hasTranslation2 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[1], lang);
+                        // Two courses: render spotlight card on the left, and one horizontal card on the right
+                        const course1 = allCourses[0];
+                        const course2 = allCourses[1];
+                        
+                        const safeTitle1 = (course1.title || '').replace(/'/g, "\\'");
+                        const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
+                        
+                        const isFree1 = !course1.price || course1.price === 0;
+                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        
+                        course2.durationText = (course2.lessons || []).length + ' leksjoner';
+                        const isFree2 = !course2.price || course2.price === 0;
+                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
+
+                        container.style.gridTemplateColumns = '1.2fr 1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
+                                <div class="spotlight-content">
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
+                                        <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                        ${lang !== 'no' && !hasTranslation1 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                            : ''
+                                        }
+                                    </div>
+                                    <h3 class="spotlight-title">${course1.title}</h3>
+                                    <p class="spotlight-desc">${course1.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="featured-list-col">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="height: 100%; display: flex; align-items: center; position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                    <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course2.title}</h4>
+                                        <p class="horizontal-course-desc">${course2.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course2.durationText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation2 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                                : ''
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // 3 or more courses: render standard layout with spotlight + 2 horizontal cards
+                        const hasTranslation1 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[0], lang);
+                        const hasTranslation2 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[1], lang);
+                        const hasTranslation3 = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(allCourses[2], lang);
+                        const course1 = allCourses[0];
+                        const course2 = allCourses[1];
+                        const course3 = allCourses[2];
+                        
+                        const safeTitle1 = (course1.title || '').replace(/'/g, "\\'");
+                        const safeTitle2 = (course2.title || '').replace(/'/g, "\\'");
+                        const safeTitle3 = (course3.title || '').replace(/'/g, "\\'");
+                        
+                        const isFree1 = !course1.price || course1.price === 0;
+                        const priceText1 = isFree1 ? 'Gratis' : 'kr ' + course1.price + ',-';
+                        
+                        course2.durationText = (course2.lessons || []).length + ' leksjoner';
+                        const isFree2 = !course2.price || course2.price === 0;
+                        course2.priceText = isFree2 ? 'Gratis' : 'kr ' + course2.price + ',-';
+
+                        course3.durationText = (course3.lessons || []).length + ' leksjoner';
+                        const isFree3 = !course3.price || course3.price === 0;
+                        course3.priceText = isFree3 ? 'Gratis' : 'kr ' + course3.price + ',-';
+
+                        container.style.gridTemplateColumns = '1.2fr 1fr';
+                        
+                        container.innerHTML = `
+                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                                <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <img class="spotlight-card-bg" src="${course1.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course1.title}" loading="lazy">
+                                <div class="spotlight-content">
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                                        <span class="spotlight-badge" style="margin-bottom: 0;">Populært</span>
+                                        <span class="spotlight-badge" style="background: ${isFree1 ? '#16a34a' : '#1b4965'}; margin-bottom: 0;">${priceText1}</span>
+                                        ${lang !== 'no' && !hasTranslation1 
+                                            ? `<span class="spotlight-badge" style="background: #d97706; margin-bottom: 0;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                            : ''
+                                        }
+                                    </div>
+                                    <h3 class="spotlight-title">${course1.title}</h3>
+                                    <p class="spotlight-desc">${course1.description || ''}</p>
+                                    <button class="spotlight-btn">
+                                        Start kurs <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="featured-list-col">
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                    <img class="horizontal-course-thumb" src="${course2.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course2.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course2.title}</h4>
+                                        <p class="horizontal-course-desc">${course2.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course2.durationText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course2.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation2 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                                : ''
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course3.id}', false)" style="position: relative;">
+                                    <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course3.id}', '${safeTitle3}')" title="Del kurs">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                    <img class="horizontal-course-thumb" src="${course3.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=800&q=80'}" alt="${course3.title}" loading="lazy">
+                                    <div class="horizontal-course-content">
+                                        <h4 class="horizontal-course-title">${course3.title}</h4>
+                                        <p class="horizontal-course-desc">${course3.description || ''}</p>
+                                        <div class="horizontal-course-meta">
+                                            <span><i class="far fa-clock"></i> ${course3.durationText}</span>
+                                            <span><i class="fas fa-tag"></i> ${course3.priceText}</span>
+                                            ${lang !== 'no' && !hasTranslation3 
+                                                ? `<span style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                                : ''
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                function updateFeaturedVisibility() {
+                    const featuredSection = document.getElementById('featured-teaching');
+                    if (!featuredSection) return;
+                    
+                    const searchInput = document.getElementById('course-search');
+                    const hasSearch = searchInput && searchInput.value.trim().length > 0;
+                    const hasFilter = activeFilter && activeFilter !== 'all';
+                    
+                    if (hasSearch || hasFilter) {
+                        featuredSection.style.display = 'none';
+                    } else {
+                        featuredSection.style.display = 'block';
+                    }
+                }
+
+                // ── Render grid ──────────────────────────────────────────────────
+                function renderGrid(courses) {
+                    updateFeaturedVisibility();
+                    const grid = document.getElementById('kurs-grid');
+                    const meta = document.getElementById('results-meta');
+
+                    if (!courses.length) {
+                        grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>${t('noCoursesFound')}</h3>
+                        <p>${t('tryAnotherSearch')}</p>
+                    </div>`;
+                        if (meta) meta.innerHTML = t('noCoursesFound') + '.';
+                        return;
+                    }
+
+                    if (meta) meta.innerHTML = `<strong>${courses.length}</strong> ${t('coursesFound')}`;
+
+                    grid.innerHTML = courses.map(course => {
+                        const isFree = !course.price || course.price === 0;
+                        const hasTranslation = !window.contentManager || typeof window.contentManager.hasUsableLocalizedTranslation !== 'function' || window.contentManager.hasUsableLocalizedTranslation(course, lang);
+                        const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
+                        const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
+                        const lessonCount = (course.lessons || []).length;
+                        const excerpt = (course.description || '').substring(0, 110) + ((course.description || '').length > 110 ? '...' : '');
+                        const safeTitle = (course.title || '').replace(/'/g, "\\'");
+
+                        const cardAction = hasAccess 
+                            ? `window.location.href='/minside/index.html#course-player?courseId=${course.id}'` 
+                            : `openEnrollModal(${JSON.stringify(course).replace(/"/g, '&quot;')})`;
+
+                        return `
+                <div class="course-card" onclick="${cardAction}">
+                    <div class="course-thumb">
+                        ${course.imageUrl
+                                ? `<img src="${course.imageUrl}" alt="${course.title}" loading="lazy">`
+                                : `<div class="course-thumb-placeholder"><i class="fas fa-graduation-cap"></i></div>`}
+                        ${course.category ? `<span class="category-badge">${course.category}</span>` : ''}
+                        ${hasAccess 
+                            ? `<span class="price-badge free" style="background:#16a34a; border-color:#16a34a;"><i class="fas fa-check-circle" style="font-size:11px; margin-right:3px;"></i> ${t('unlocked')}</span>`
+                            : `<span class="price-badge ${isFree ? 'free' : 'paid'}">${isFree ? t('free') : 'kr ' + course.price + t('priceSuffix') + (course.priceSuffix ? ' ' + course.priceSuffix : '')}</span>`
+                        }
+                    </div>
+                    <div class="course-body">
+                        <h3>${course.title || t('untitled')}</h3>
+                        <div class="course-meta">
+                            <span><i class="fas fa-play-circle"></i> ${lessonCount} ${lessonCount !== 1 ? t('lessons') : t('lesson')}</span>
+                            ${hasAccess 
+                                ? `<span><i class="fas fa-unlock" style="color:#16a34a;"></i> ${t('hasAccess')}</span>`
+                                : (isFree ? `<span><i class="fas fa-unlock"></i> ${t('freeAccess')}</span>` : `<span><i class="fas fa-lock"></i> ${t('paidCourse')}</span>`)
+                            }
+                            ${lang !== 'no' && !hasTranslation 
+                                ? `<span class="lang-indicator" style="color:#d97706; font-weight:600;"><i class="fas fa-globe"></i> ${lang === 'es' ? 'Curso en noruego' : 'Course held in Norwegian'}</span>` 
+                                : ''
+                            }
+                        </div>
+                        <p>${excerpt}</p>
+                        <div class="course-card-actions">
+                            ${hasAccess 
+                                ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white; flex:1;">
+                                     <i class="fas fa-play-circle"></i> ${t('goToCourse')}
+                                   </button>`
+                                : `<button class="enroll-btn ${isFree ? 'free' : ''}" style="flex:1;">
+                                     ${isFree ? '<i class="fas fa-graduation-cap"></i> ' + t('startFree') : '<i class="fas fa-shopping-cart"></i> ' + t('enroll')}
+                                   </button>`
+                            }
+                            <button class="btn-share-course" title="${t('shareThisCourse')}" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')">
+                                <i class="fas fa-share-nodes"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                    }).join('');
+                }
+
+                // ── Filter + Search ──────────────────────────────────────────────
+                function getFiltered() {
+                    let filtered = [...allCourses];
+                    if (activeFilter !== 'all') {
+                        filtered = filtered.filter(c => c.category === activeFilter);
+                    }
+                    if (searchQuery) {
+                        const q = searchQuery.toLowerCase();
+                        filtered = filtered.filter(c =>
+                            (c.title || '').toLowerCase().includes(q) ||
+                            (c.description || '').toLowerCase().includes(q) ||
+                            (c.category || '').toLowerCase().includes(q)
+                        );
+                    }
+                    return filtered;
+                }
+
+                let searchTimeout;
+                document.getElementById('course-search').addEventListener('input', e => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        searchQuery = e.target.value.trim();
+                        renderGrid(getFiltered());
+                    }, 250);
+                });
+
+                // ── Enroll Modal ─────────────────────────────────────────────────
+                let currentCourse = null;
+                let selectedLessons = [];
+                let currentPrice = 0;
+
+                window.openEnrollModal = function (course) {
+                    if (!currentUser) {
+                        alert(t('alertAuth'));
+                        window.location.href = `/minside/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+                        return;
+                    }
+                    currentCourse = course;
+                    const isFree = !course.price || course.price === 0;
+                    document.getElementById('modal-course-title').textContent = isFree ? t('startFree') : t('enroll');
+                    document.getElementById('modal-course-price').textContent = isFree ? t('freeCourseDesc') : t('paidCourseDesc');
+                    document.getElementById('modal-course-name').textContent = course.title || t('untitled');
+                    document.getElementById('modal-lesson-count').textContent = (course.lessons || []).length + ' ' + ((course.lessons || []).length !== 1 ? t('lessons') : t('lesson')) + ' ' + t('lessonsIncluded');
+                    document.getElementById('enroll-status').textContent = '';
+                    document.getElementById('enroll-form').reset();
+                    
+                    const submitBtn = document.getElementById('enroll-submit-btn');
+                    const vippsBtn = document.getElementById('vipps-payment-btn');
+                    const stripeBtn = document.getElementById('stripe-payment-btn');
+                    const stripeContainer = document.getElementById('stripe-checkout-container');
+                    const stripeError = document.getElementById('stripe-error-message');
+                    
+                    if (stripeError) stripeError.style.display = 'none';
+                    if (stripeContainer) stripeContainer.style.display = 'none';
+                    
+                    // Reset selections
+                    selectedLessons = [];
+                    currentPrice = isFree ? 0 : (course.price || 0);
+
+                    // Setup lessons checklist container
+                    const selectionContainer = document.getElementById('enroll-lessons-selection');
+                    const lessonsList = document.getElementById('modal-lessons-list');
+                    const selectAllCheckbox = document.getElementById('select-all-lessons');
+                    const totalPriceLabel = document.getElementById('dynamic-total-price');
+
+                    if (!isFree && course.lessons && course.lessons.length > 0) {
+                        selectionContainer.style.display = 'block';
+                        lessonsList.innerHTML = course.lessons.map((lesson, idx) => {
+                            const lessonPrice = lesson.price || 300;
+                            const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'nb-NO');
+                            const formattedDate = lesson.date ? new Date(lesson.date).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+                            const dateStr = formattedDate ? ` (${formattedDate})` : '';
+                            const rawTitle = lesson.title || t('untitled');
+                            const displayTitle = rawTitle.replace(/^(leksjon|lesson|lección)\s+\d+:\s*/i, '');
+                            const lessonPrefix = lang === 'en' ? 'Lesson' : (lang === 'es' ? 'Lección' : 'Leksjon');
+                            return `
+                                <label class="lesson-select-label">
+                                    <span style="display: flex; align-items: flex-start; gap: 10px;">
+                                        <input type="checkbox" class="lesson-select-cb" data-id="${lesson.id || 'lesson_' + idx}" data-price="${lessonPrice}" checked style="width: 16px; height: 16px; accent-color: #d17d39; margin-top: 2px; flex-shrink: 0;">
+                                        <span style="line-height: 1.4;">${lessonPrefix} ${idx + 1}: ${displayTitle}${dateStr}</span>
+                                    </span>
+                                    <strong style="color: #475569; flex-shrink: 0; text-align: right;">kr ${lessonPrice},-</strong>
+                                </label>
+                            `;
+                        }).join('');
+
+                        const updateSelection = () => {
+                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                            let total = 0;
+                            selectedLessons = [];
+                            checkboxes.forEach(cb => {
+                                if (cb.checked) {
+                                    total += parseFloat(cb.dataset.price) || 0;
+                                    selectedLessons.push(cb.dataset.id);
+                                }
+                            });
+                            
+                            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                            selectAllCheckbox.checked = checkedCount === checkboxes.length;
+                            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+
+                            currentPrice = total;
+                            totalPriceLabel.textContent = `${t('total')}: kr ${currentPrice},-`;
+                            
+                            if (currentPrice === 0) {
+                                vippsBtn.style.display = 'none';
+                                stripeBtn.style.display = 'none';
+                                submitBtn.style.display = 'flex';
+                                submitBtn.textContent = '🎓 ' + t('enrollFree');
+                            } else {
+                                vippsBtn.style.display = 'flex';
+                                stripeBtn.style.display = 'flex';
+                                submitBtn.style.display = 'none';
+                            }
+                            
+                            const stripeAmountEl = document.getElementById("stripe-amount-text");
+                            if (stripeAmountEl) stripeAmountEl.textContent = currentPrice;
+                        };
+
+                        document.querySelectorAll('.lesson-select-cb').forEach(cb => {
+                            cb.addEventListener('change', updateSelection);
+                        });
+
+                        selectAllCheckbox.onclick = () => {
+                            const checkboxes = document.querySelectorAll('.lesson-select-cb');
+                            checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+                            updateSelection();
+                        };
+
+                        updateSelection();
+                    } else {
+                        selectionContainer.style.display = 'none';
+                        lessonsList.innerHTML = '';
+                        selectedLessons = [];
+                        if (!isFree) {
+                            vippsBtn.style.display = 'flex';
+                            stripeBtn.style.display = 'flex';
+                            submitBtn.style.display = 'none';
+                        } else {
+                            vippsBtn.style.display = 'none';
+                            stripeBtn.style.display = 'none';
+                            submitBtn.style.display = 'flex';
+                            submitBtn.textContent = '🎓 ' + t('startFreeNow');
+                        }
+                    }
+                    
+                    document.getElementById('enroll-modal-overlay').classList.add('open');
+                };
+
+                document.getElementById('close-enroll-modal').addEventListener('click', () => {
+                    document.getElementById('enroll-modal-overlay').classList.remove('open');
+                });
+                document.getElementById('enroll-modal-overlay').addEventListener('click', e => {
+                    if (e.target === document.getElementById('enroll-modal-overlay')) {
+                        document.getElementById('enroll-modal-overlay').classList.remove('open');
+                    }
+                });
+
+                // ── Share Modal & Actions ─────────────────────────────────────────
+                window.openShareMenu = function (e, courseId, courseTitle) {
+                    if (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                    const shareUrl = window.location.origin + '/kurs.html?courseId=' + courseId;
+                    
+                    if (navigator.share) {
+                        navigator.share({
+                            title: courseTitle,
+                            text: 'Sjekk ut dette kurset fra His Kingdom Ministry: ' + courseTitle,
+                            url: shareUrl
+                        }).then(() => {
+                            if (window.gtag) {
+                                window.gtag('event', 'share', {
+                                    method: 'Native Share',
+                                    content_type: 'course',
+                                    item_id: courseId,
+                                    item_name: courseTitle
+                                });
+                            }
+                        }).catch(err => {
+                            console.error('Error sharing:', err);
+                            if (err.name !== 'AbortError') {
+                                openCustomShareModal(shareUrl, courseTitle, courseId);
+                            }
+                        });
+                    } else {
+                        openCustomShareModal(shareUrl, courseTitle, courseId);
+                    }
+                };
+
+                function openCustomShareModal(shareUrl, courseTitle, courseId) {
+                    const modal = document.getElementById('share-modal-overlay');
+                    const titleEl = document.getElementById('share-modal-course-title');
+                    const inputEl = document.getElementById('share-link-input');
+                    const copyBtn = document.getElementById('copy-link-btn');
+
+                    if (!modal) return;
+
+                    titleEl.textContent = courseTitle;
+                    inputEl.value = shareUrl;
+                    
+                    document.getElementById('share-fb').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Facebook',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
+                        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), 'facebook-share-dialog', 'width=800,height=600');
+                    };
+                    document.getElementById('share-tw').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Twitter',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
+                        window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(courseTitle), 'twitter-share-dialog', 'width=800,height=600');
+                    };
+                    document.getElementById('share-li').onclick = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'LinkedIn',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
+                        window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shareUrl), 'linkedin-share-dialog', 'width=800,height=600');
+                    };
+                    
+                    const copyAction = () => {
+                        if (window.gtag) {
+                            window.gtag('event', 'share', {
+                                method: 'Copy Link',
+                                content_type: 'course',
+                                item_id: courseId,
+                                item_name: courseTitle
+                            });
+                        }
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            copyBtn.textContent = t('copySuccess');
+                            copyBtn.style.background = '#16a34a';
+                            copyBtn.style.borderColor = '#16a34a';
+                            copyBtn.style.color = 'white';
+                            if (window.showToast) {
+                                const msg = lang === 'en' ? 'Link copied to clipboard!' : (lang === 'es' ? '¡Enlace copiado al portapapeles!' : 'Lenke kopiert til utklippstavlen!');
+                                window.showToast(msg, 'success');
+                            }
+                            setTimeout(() => {
+                                copyBtn.textContent = t('copyLabel');
+                                copyBtn.style.background = '';
+                                copyBtn.style.borderColor = '';
+                                copyBtn.style.color = '';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Copy failed:', err);
+                            alert(t('copyFailedAlert'));
+                        });
+                    };
+                    
+                    document.getElementById('share-copy').onclick = copyAction;
+                    copyBtn.onclick = copyAction;
+
+                    modal.classList.add('open');
+                }
+
+                document.getElementById('close-share-modal').addEventListener('click', () => {
+                    document.getElementById('share-modal-overlay').classList.remove('open');
+                });
+                document.getElementById('share-modal-overlay').addEventListener('click', e => {
+                    if (e.target === document.getElementById('share-modal-overlay')) {
+                        document.getElementById('share-modal-overlay').classList.remove('open');
+                    }
+                });
+
+                document.getElementById('enroll-form').addEventListener('submit', async e => {
+                    e.preventDefault();
+                    const name = document.getElementById('enroll-name').value.trim();
+                    const email = document.getElementById('enroll-email').value.trim();
+                    const message = document.getElementById('enroll-message').value.trim();
+                    const btn = document.getElementById('enroll-submit-btn');
+                    const status = document.getElementById('enroll-status');
+
+                    btn.disabled = true;
+                    btn.textContent = t('sending');
+
+                    try {
+                        await new Promise(resolve => {
+                            const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
+                            check();
+                        });
+                        const phone = document.getElementById('enroll-phone').value.trim();
+                        await firebase.firestore().collection('courseEnrollments').add({
+                            name, email, phone, message,
+                            courseId: currentCourse?.id || '',
+                            courseTitle: currentCourse?.title || '',
+                            amount: currentPrice,
+                            paidLessons: selectedLessons,
+                            enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: 'pending'
+                        });
+
+                        status.style.color = '#16a34a';
+                        status.textContent = t('thankYouContact');
+                        btn.textContent = '✅ ' + t('sent');
+                        setTimeout(() => {
+                            document.getElementById('enroll-modal-overlay').classList.remove('open');
+                            btn.disabled = false;
+                        }, 2500);
+                    } catch (err) {
+                        console.error(err);
+                        status.style.color = '#e74c3c';
+                        status.textContent = t('somethingWentWrong');
+                        btn.disabled = false;
+                        btn.textContent = t('enroll');
+                    }
+                });
+                
+                // ── Vipps Payment Handler ──────────────────────────────────────
+                const vBtn = document.getElementById('vipps-payment-btn');
+                if (vBtn) {
+                    vBtn.addEventListener('click', async () => {
+                        const name = document.getElementById('enroll-name').value.trim();
+                        const email = document.getElementById('enroll-email').value.trim();
+                        const phone = document.getElementById('enroll-phone').value.trim();
+                        
+                        if (!name || !email || !phone) {
+                            alert(t('fillFields'));
+                            return;
+                        }
+                        
+                        vBtn.disabled = true;
+                        const originalContent = vBtn.innerHTML;
+                        vBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('pleaseWait');
+                        
+                        try {
+                            const customerDetails = {
+                                name, email, phone,
+                                courseId: currentCourse?.id || '',
+                                courseTitle: currentCourse?.title || '',
+                                type: 'Course'
+                            };
+                            
+                            await firebase.firestore().collection('courseEnrollments').add({
+                                ...customerDetails,
+                                amount: currentPrice,
+                                paidLessons: selectedLessons,
+                                enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                status: 'pending_vipps',
+                                paymentMethod: 'Vipps'
+                            });
+                            
+                            if (typeof window.startVippsPayment === 'function') {
+                                await window.startVippsPayment(currentPrice, { ...customerDetails, amount: currentPrice, paidLessons: selectedLessons });
+                            } else {
+                                alert(t('vippsNotReady'));
+                                vBtn.disabled = false;
+                                vBtn.innerHTML = originalContent;
+                            }
+                        } catch (err) {
+                            console.error('Vipps error:', err);
+                            alert(t('vippsError') + err.message);
+                            vBtn.disabled = false;
+                            vBtn.innerHTML = originalContent;
+                        }
+                    });
+                }
+
+                // ── Card (Stripe) Payment Handler ──────────────────────────────
+                const sBtn = document.getElementById('stripe-payment-btn');
+                if (sBtn) {
+                    sBtn.addEventListener('click', async () => {
+                        const name = document.getElementById('enroll-name').value.trim();
+                        const email = document.getElementById('enroll-email').value.trim();
+                        const phone = document.getElementById('enroll-phone').value.trim();
+                        
+                        if (!name || !email || !phone) {
+                            alert(t('fillFields'));
+                            return;
+                        }
+                        
+                        sBtn.disabled = true;
+                        const originalContent = sBtn.innerHTML;
+                        sBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('pleaseWait');
+                        
+                        try {
+                            const response = await fetch("https://createpaymentintent-42bhgdjkcq-uc.a.run.app", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    amount: currentPrice,
+                                    currency: "nok",
+                                    customerDetails: {
+                                        name, email, phone,
+                                        courseId: currentCourse.id,
+                                        courseTitle: currentCourse.title,
+                                        paidLessons: selectedLessons,
+                                        type: 'Course'
+                                    }
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            if (!data.clientSecret) {
+                                throw new Error(data.error || "Mangler clientSecret");
+                            }
+                            
+                            const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
+                            const appearance = {
+                                theme: 'stripe',
+                                variables: {
+                                    colorPrimary: '#1B4965',
+                                    colorBackground: '#ffffff',
+                                    colorText: '#1e293b',
+                                    colorDanger: '#df1b41',
+                                    fontFamily: 'Inter, system-ui, sans-serif',
+                                    spacingUnit: '4px',
+                                    borderRadius: '8px',
+                                },
+                            };
+                            const elements = stripe.elements({ appearance, clientSecret: data.clientSecret });
+                            const paymentElement = elements.create("payment", { layout: "tabs" });
+                            paymentElement.mount("#payment-element");
+                            
+                            document.getElementById("stripe-amount-text").textContent = currentPrice;
+                            document.getElementById("stripe-checkout-container").style.display = "block";
+                            sBtn.style.display = "none";
+                            
+                            const submitBtn = document.getElementById('stripe-submit-btn');
+                            submitBtn.onclick = async () => {
+                                submitBtn.disabled = true;
+                                const origSubmitText = submitBtn.innerHTML;
+                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t('processing');
+                                
+                                await firebase.firestore().collection('courseEnrollments').add({
+                                    name, email, phone,
+                                    courseId: currentCourse.id,
+                                    courseTitle: currentCourse.title,
+                                    amount: currentPrice,
+                                    paidLessons: selectedLessons,
+                                    enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    status: 'pending_stripe',
+                                    paymentMethod: 'Card'
+                                });
+                                
+                                const { error } = await stripe.confirmPayment({
+                                    elements,
+                                    confirmParams: {
+                                        return_url: window.location.href.split('?')[0] + "?payment_status=success&course_name=" + encodeURIComponent(currentCourse.title),
+                                    }
+                                });
+                                
+                                if (error) {
+                                    const errorDiv = document.getElementById('stripe-error-message');
+                                    errorDiv.textContent = error.message;
+                                    errorDiv.style.display = 'block';
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = origSubmitText;
+                                }
+                            };
+                        } catch (err) {
+                            console.error('Stripe error:', err);
+                            alert(t('stripeError') + err.message);
+                            sBtn.disabled = false;
+                            sBtn.innerHTML = originalContent;
+                        }
+                    });
+                }
+
+                // Check Stripe redirect parameters on load
+                const query = new URLSearchParams(window.location.search);
+                const paymentStatus = query.get('payment_status');
+                const courseName = query.get('course_name');
+                if (paymentStatus === 'success' && courseName) {
+                    alert(t('stripeCompleted', { courseName: decodeURIComponent(courseName) }));
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // Copyright year
+                const yearEl = document.getElementById('copyright-year');
+                if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+                // Start loading
+                loadCourses();
+            })();
+    </script>
+    <script type="module" src="../js/stripe-checkout.js"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Search the site</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="What are you looking for? Type for suggestions..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Press 'Enter' for full search.</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

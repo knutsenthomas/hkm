@@ -100,9 +100,6 @@ function createTeachingCard(item, index) {
     card.innerHTML = `
         <div class="media-thumbnail">
             <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop'">
-            <div class="media-play-button">
-                <i class="fas fa-book-open"></i>
-            </div>
             ${item.date ? `<span class="media-duration">${escapeHtml(dateStr)}</span>` : ''}
         </div>
         <div class="media-content">

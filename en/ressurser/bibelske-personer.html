@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/en/ressurser/bibelske-personer">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/ressurser/bibelske-personer">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/ressurser/bibelske-personer">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/ressurser/bibelske-personer">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/ressurser/bibelske-personer">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblical Characters | His Kingdom Ministry</title>
+    <meta name="description" content="Explore the lives, history, and theological significance of key biblical figures, including Abraham, Moses, David, Jesus, Peter, and Paul.">
+    <meta name="keywords" content="biblical characters, bible study, Abraham, Moses, David, Jesus, Peter, Paul, Ruth, Mary, His Kingdom Ministry">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/en/ressurser/bibelske-personer">
+    <meta property="og:title" content="Biblical Characters | His Kingdom Ministry">
+    <meta property="og:description" content="Explore the lives, history, and theological significance of central figures in the Bible.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/person-jesus.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/en/ressurser/bibelske-personer">
+    <meta property="twitter:title" content="Biblical Characters | His Kingdom Ministry">
+    <meta property="twitter:description" content="Explore the lives, history, and theological significance of central figures in the Bible.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/person-jesus.png">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+
+    <!-- Font Awesome -->
+    <!-- Font Awesome (Deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <!-- Material Symbols Outlined -->
+    <!-- Material Symbols Outlined (Deferred) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../styles.css?v=2026.04.27.08.37">
+    <link rel="preload" href="../../css/cookie-consent.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../../css/cookie-consent.css"></noscript>
+    <link rel="stylesheet" href="../../css/subpage-hero.css">
+    <link rel="stylesheet" href="../../css/bibelske-personer.css?v=1.0.0">
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../../js/firebase-config.js"></script>
+    <script type="module" src="../../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../../js/content-manager.js?v=2026.05.10.8"></script>
+
+    <!-- Error Logger -->
+    <script type="module" src="../../js/error-logger.js"></script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="preload" href="../../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="../../css/search-v2.css?v=1.0.3"></noscript>
+</head>
+
+<body class="cms-loading header-dark-start bg-[#faf9f6] text-slate-800">
+
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions">
+                <!-- Utilities Dock (Search, Bible, Reading Plans, Language Selector) -->
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Search the site">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/en/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-bible-btn" aria-label="Read the Bible" title="Read the Bible">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/en/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all header-reading-plans-btn" aria-label="Reading Plans" title="Reading Plans">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1 dock-divider"></div>
+
+                        <!-- Language Switcher in same styling -->
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Velg språk">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>EN</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                                <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                                <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profile Picture" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
+
+                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <a href="/en/donations"
+                    class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
+                    <span>Donate</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+
+                <!-- Unified Toggle Button (Neutral circular button matching utilities) -->
+                <button
+                    class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10 hover:bg-white/25 active:scale-95 transition-all relative focus:outline-none focus:ring-0"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                    <span class="material-symbols-outlined text-2xl close-icon hidden">close</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Language Selector & Theme Toggle (Pill Style) -->
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex md:hidden items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/" class="text-sm font-bold text-primary-orange lang-switch-btn" data-lang="en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange lang-switch-btn" data-lang="es">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-3">
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
+                        <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Toggle theme" title="Toggle theme">
+                            <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Get Involved -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Get Involved</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/donations" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.supportWork">Support the Work</a>
+                                    <span class="mega-menu-desc">Support our ministry financially.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/regular-donors" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a>
+                                    <span class="mega-menu-desc">Partner with us on a monthly basis.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">church</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-churches" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.churches">For Churches</a>
+                                    <span class="mega-menu-desc">Resources and teaching for your church.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">corporate_fare</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/for-businesses" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.businesses">For Businesses</a>
+                                    <span class="mega-menu-desc">Partnership agreements for companies.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">business_center</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/bnn" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.engage.network">Business Network</a>
+                                    <span class="mega-menu-desc">Networking for Christian business leaders.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Get to Know Us -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Get to Know Us</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">info</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/about" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.about">About Us</a>
+                                    <span class="mega-menu-desc">Learn about our vision, faith, and values.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">mail</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/contact" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.about.contact">Contact Us</a>
+                                    <span class="mega-menu-desc">Send us a message or reach out.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Resources -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Resources</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <div class="flex flex-col">
+                                    <a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Read the Bible</a>
+                                    <span class="mega-menu-desc">Read the Word of God with our reader.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <div class="flex flex-col">
+                                    <a href="/butikk" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.store">Store</a>
+                                    <span class="mega-menu-desc">Christian apparel, mugs, and more.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">podcasts</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/media" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.media">Media & Podcast</a>
+                                    <span class="mega-menu-desc">Watch messages and listen to podcasts.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">school</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/courses" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Courses</a>
+                                    <span class="mega-menu-desc">Teachings and courses for spiritual growth.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Current Activity -->
+                    <div class="menu-col">
+                        <div class="menu-section-title" role="heading" aria-level="3" data-content-doc="settings_global"
+                            data-content-key="menu.sections.activity.title">Current Activity</div>
+                        <ul class="mega-nav-list">
+                            <li>
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Reading Plans</a>
+                                    <span class="mega-menu-desc">Follow our structured reading plans.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">event</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/events" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.events">Events</a>
+                                    <span class="mega-menu-desc">Join our seminars and gatherings.</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="material-symbols-outlined">feed</span>
+                                <div class="flex flex-col">
+                                    <a href="/en/blog" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.blog">News & Blog</a>
+                                    <span class="mega-menu-desc">Latest updates and articles.</span>
+                                </div>
+                            </li>
+                            <li class="min-side-pill">
+                                <span class="material-symbols-outlined">person</span>
+                                <div class="flex flex-col">
+                                    <a href="/minside/index" data-content-doc="settings_global"
+                                        data-content-key="menu.sections.resources.myPage">My Page</a>
+                                    <span class="mega-menu-desc">Your profile and progress.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subpage Hero -->
+    <section class="subpage-hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=60') !important;">
+        <div class="container mx-auto px-4 max-w-6xl text-center">
+            <h1 class="hero-title text-4xl md:text-5xl font-extrabold text-white mb-4">Biblical Characters</h1>
+            <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed text-center">
+                Explore the lives, history, and theological significance of central figures in the Bible.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content Section -->
+    <main class="py-16 bg-[#faf9f6]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="back-btn-container">
+                <a href="/en/media" class="back-link-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Media & Resources
+                </a>
+            </div>
+
+            <div id="characters-grid-container" class="characters-grid">
+                <!-- Dynamically populated by bibelske-personer.js -->
+                <div class="flex justify-center py-12 col-span-full">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-orange"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="/en/" class="logo">
+                            <div class="logo-icon">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" loading="lazy">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About us</h4>
+                            <ul>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who are we?</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
+                                <li><a href="/en/contact">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="/bibel">Bible</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+
+                                <li><a href="/en/courses">E-courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Page</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
+                                <li><a href="javascript:void(0)" onclick="if(window.showCookieBanner){window.showCookieBanner();}else{localStorage.removeItem('hkm_cookie_consent');location.reload();}return false;">Cookies</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+
+    <!-- App Scripts -->
+    <script type="module" src="../../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../../js/cookie-consent.js"></script>
+    <script type="module" src="../../js/i18n.js"></script>
+    <script type="module" src="../../js/bibelske-personer.js"></script>
+
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Close search">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Search the site</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="What are you looking for? Type for suggestions..." autocomplete="off">
+            </div>
+            
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Press 'Enter' for a full search.</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

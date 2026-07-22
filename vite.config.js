@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
+import react from '@vitejs/plugin-react';
 
 function getHtmlEntries(dir, entries = {}) {
     const files = fs.readdirSync(dir);
@@ -8,7 +9,7 @@ function getHtmlEntries(dir, entries = {}) {
         const filePath = resolve(dir, file);
         const stats = fs.statSync(filePath);
         if (stats.isDirectory()) {
-            if (!['node_modules', '.git', 'public', 'dist', 'functions', 'hkm-wordpress-theme', 'wishon', 'stitch'].includes(file)) {
+            if (!['node_modules', '.git', '.vercel', 'public', 'dist', 'functions', 'hkm-wordpress-theme', 'wishon', 'stitch'].includes(file)) {
                 getHtmlEntries(filePath, entries);
             }
         } else if (file.endsWith('.html')) {
@@ -21,9 +22,40 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
+    plugins: [react()],
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, 'admin/js')
+        }
+    },
+    server: {
+        proxy: {
+            '/api/facebook-feed': {
+                target: 'http://127.0.0.1:5001/his-kingdom-ministry/us-central1/facebookFeed',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/facebook-feed/, '')
+            }
+        }
+    },
     build: {
         rollupOptions: {
-            input: getHtmlEntries(__dirname)
+            input: getHtmlEntries(__dirname),
+            output: {
+                manualChunks(id) {
+                    if (id.includes('js/cookie-consent.js')) {
+                        return 'cookie-consent-only';
+                    }
+                    if (id.includes('node_modules')) {
+                        if (id.includes('firebase')) {
+                            return 'vendor-firebase';
+                        }
+                        if (id.includes('react') || id.includes('scheduler')) {
+                            return 'vendor-react';
+                        }
+                        return 'vendor-common';
+                    }
+                }
+            }
         }
     }
 });

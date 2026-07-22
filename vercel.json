@@ -1,0 +1,58 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/category/all-products", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/category/cups-bottles", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/category/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/product/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/products/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/produkt/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/produkter/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/shop/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/shop", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/cart", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/checkout", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/collections/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/collection/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/kontakt-oss", "destination": "/kontakt", "permanent": true },
+    { "source": "/hvem-vi-er", "destination": "/om-oss", "permanent": true },
+    { "source": "/butikk", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/butikk.html", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/api/bible/:path*", "destination": "/api/bible" },
+    { "source": "/kurs", "destination": "/api/share-preview?type=course&lang=no" },
+    { "source": "/kurs.html", "destination": "/api/share-preview?type=course&lang=no" },
+    { "source": "/en/courses", "destination": "/api/share-preview?type=course&lang=en" },
+    { "source": "/en/courses.html", "destination": "/api/share-preview?type=course&lang=en" },
+    { "source": "/es/cursos", "destination": "/api/share-preview?type=course&lang=es" },
+    { "source": "/es/cursos.html", "destination": "/api/share-preview?type=course&lang=es" },
+    { "source": "/leseplan-detaljer", "destination": "/api/share-preview?lang=no" },
+    { "source": "/leseplan-detaljer.html", "destination": "/api/share-preview?lang=no" },
+    { "source": "/en/reading-plan-details", "destination": "/api/share-preview?lang=en" },
+    { "source": "/en/reading-plan-details.html", "destination": "/api/share-preview?lang=en" },
+    { "source": "/es/detalles-plan-lectura", "destination": "/api/share-preview?lang=es" },
+    { "source": "/es/detalles-plan-lectura.html", "destination": "/api/share-preview?lang=es" },
+    { "source": "/blogg-post", "destination": "/api/share-preview?type=blog&lang=no" },
+    { "source": "/blogg-post.html", "destination": "/api/share-preview?type=blog&lang=no" },
+    { "source": "/en/blog-post", "destination": "/api/share-preview?type=blog&lang=en" },
+    { "source": "/en/blog-post.html", "destination": "/api/share-preview?type=blog&lang=en" },
+    { "source": "/es/blog-post", "destination": "/api/share-preview?type=blog&lang=es" },
+    { "source": "/es/blog-post.html", "destination": "/api/share-preview?type=blog&lang=es" },
+    { "source": "/arrangement-detaljer", "destination": "/api/share-preview?type=event&lang=no" },
+    { "source": "/arrangement-detaljer.html", "destination": "/api/share-preview?type=event&lang=no" },
+    { "source": "/en/event-details", "destination": "/api/share-preview?type=event&lang=en" },
+    { "source": "/en/event-details.html", "destination": "/api/share-preview?type=event&lang=en" },
+    { "source": "/es/detalles-evento", "destination": "/api/share-preview?type=event&lang=es" },
+    { "source": "/es/detalles-evento.html", "destination": "/api/share-preview?type=event&lang=es" },
+    { "source": "/en/blog", "destination": "/en/blog.html" },
+    { "source": "/es/blog", "destination": "/es/blog.html" }
+  ],
+  "functions": {
+    "api/share-preview.js": {
+      "includeFiles": "dist/**/*-template.html"
+    }
+  }
+}
+

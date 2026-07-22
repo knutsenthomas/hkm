@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>HKM Studio | Kurs-spiller</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#261813",
+                        "surface-tint": "#a73a00",
+                        "on-surface-variant": "#594138",
+                        "on-primary-fixed-variant": "#7f2b00",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#414754",
+                        "surface": "#fff8f6",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#fff1ec",
+                        "inverse-primary": "#ffb599",
+                        "secondary-container": "#dde2f3",
+                        "outline-variant": "#e1bfb3",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#001e2f",
+                        "tertiary-container": "#009bde",
+                        "secondary-fixed": "#dde2f3",
+                        "surface-dim": "#eed5cc",
+                        "surface-container-high": "#fde3da",
+                        "on-primary-fixed": "#370e00",
+                        "primary-fixed": "#ffdbce",
+                        "primary-container": "#f56523",
+                        "surface-variant": "#f7ddd4",
+                        "inverse-surface": "#3c2d27",
+                        "secondary-fixed-dim": "#c1c6d7",
+                        "primary-fixed-dim": "#ffb599",
+                        "on-primary-container": "#511800",
+                        "primary": "#a73a00",
+                        "error": "#ba1a1a",
+                        "outline": "#8d7166",
+                        "secondary": "#585e6c",
+                        "on-error-container": "#93000a",
+                        "on-background": "#261813",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#161c27",
+                        "inverse-on-surface": "#ffede7",
+                        "surface-bright": "#fff8f6",
+                        "surface-container": "#ffe9e2",
+                        "on-tertiary-container": "#002e46",
+                        "surface-container-highest": "#f7ddd4",
+                        "on-secondary-container": "#5e6473"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "8px",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "card-padding": "24px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "container-padding": "32px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Work Sans"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h1": ["Work Sans"],
+                        "h3": ["Work Sans"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["11px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+        }
+        .sidebar-active-gradient {
+            background: linear-gradient(90deg, rgba(245, 101, 35, 0.08) 0%, rgba(245, 101, 35, 0) 100%);
+        }
+        .lesson-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .lesson-card:hover {
+            transform: translateX(4px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-flex;
+            vertical-align: middle;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 8px spacing rule custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff8f6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e1bfb3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8d7166;
+        }
+
+        /* Mobile Landscape Guard (Design rules requirement) */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                font-size: 13px;
+            }
+            aside {
+                width: 200px !important;
+                padding: 16px !important;
+            }
+            main {
+                margin-left: 200px !important;
+            }
+            header {
+                left: 200px !important;
+                height: 48px !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+            .mt-16 {
+                margin-top: 48px !important;
+            }
+            h1 {
+                font-size: 24px !important;
+            }
+            h2 {
+                font-size: 18px !important;
+            }
+            .p-gutter {
+                padding: 16px !important;
+            }
+            .gap-gutter {
+                gap: 16px !important;
+            }
+        }
+
+        /* Dark mode overrides */
+        html[data-theme="dark"] body {
+            background-color: #0F172A !important;
+            color: #F8FAFC !important;
+        }
+        html[data-theme="dark"] .bg-surface {
+            background-color: #1E293B !important;
+        }
+        html[data-theme="dark"] .border-outline-variant {
+            border-color: #334155 !important;
+        }
+        html[data-theme="dark"] .text-primary {
+            color: #f97316 !important;
+        }
+        html[data-theme="dark"] .border-primary {
+            border-color: #f97316 !important;
+        }
+        html[data-theme="dark"] .bg-surface-container-low {
+            background-color: #0f172a !important;
+        }
+        html[data-theme="dark"] .text-on-surface-variant\/60 {
+            color: rgba(148, 163, 184, 0.6) !important;
+        }
+        html[data-theme="dark"] .text-on-surface {
+            color: #f8fafc !important;
+        }
+        html[data-theme="dark"] .lesson-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        html[data-theme="dark"] .lesson-card:hover {
+            background-color: #334155 !important;
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased overflow-x-hidden">
+    <!-- Sidebar Navigation Shell -->
+    <aside class="w-[260px] h-screen fixed left-0 top-0 bg-surface border-r border-outline-variant flex flex-col py-6 px-6 z-50 transition-all duration-300" id="SideNavBar">
+        <div class="mb-8">
+            <h1 class="font-h2 text-h2 font-black text-primary tracking-tight">HKM Studio</h1>
+            <p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">Admin Console</p>
+        </div>
+        
+        <nav class="flex-1 space-y-2 overflow-y-auto">
+            <!-- Nav Item: Dashboard -->
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out group" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+            <!-- Nav Item: Se Nettside -->
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">public</span>
+                <span class="font-body-md text-body-md">Se nettside</span>
+            </a>
+            <!-- Nav Item: Oversikt -->
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">view_quilt</span>
+                <span class="font-body-md text-body-md">Oversikt</span>
+            </a>
+            
+            <div class="pt-6 pb-2">
+                <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest opacity-40">Mitt Medlemskap</p>
+            </div>
+            
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-body-md text-body-md">Profil</span>
+            </a>
+            <!-- ACTIVE TAB: Kurs -->
+            <a class="flex items-center gap-3 p-3 rounded-xl text-primary font-bold sidebar-active-gradient border-r-4 border-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+                <span class="font-body-md text-body-md">Kurs</span>
+            </a>
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">calendar_today</span>
+                <span class="font-body-md text-body-md">Leseplaner</span>
+            </a>
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="font-body-md text-body-md">Gaver</span>
+            </a>
+            
+            <div class="pt-6 pb-2">
+                <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest opacity-40">Aktivitet</p>
+            </div>
+            
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="font-body-md text-body-md">Varslinger</span>
+            </a>
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high hover:text-primary active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">notes</span>
+                <span class="font-body-md text-body-md">Notater</span>
+            </a>
+        </nav>
+        
+        <div class="pt-6 space-y-2 border-t border-outline-variant/30 mt-auto">
+            <a class="flex items-center gap-3 p-3 rounded-xl text-secondary opacity-60 hover:opacity-100 hover:bg-surface-container-high active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-body-md text-body-md">Administrasjon</span>
+            </a>
+            <a class="flex items-center gap-3 p-3 rounded-xl text-error hover:bg-error-container/10 active:scale-[0.98] transition-all duration-300 ease-in-out" href="#">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-body-md text-body-md">Logg ut</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-[260px] min-h-screen transition-all duration-300">
+        <!-- TopAppBar Contextual Header -->
+        <header class="fixed top-0 right-0 left-[260px] h-16 bg-surface/80 backdrop-blur-md z-40 border-b border-outline-variant flex items-center justify-between px-8 transition-all duration-300" id="TopAppBar">
+            <div class="flex items-center gap-4">
+                <button onclick="window.history.back()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-90 transition-all duration-300 text-primary border-b-2 border-primary bg-surface-container-low" title="Gå tilbake">
+                    <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+                </button>
+                <div class="flex flex-col">
+                    <h2 class="font-h3 text-h3 text-on-surface leading-tight">Kurs-spiller</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant opacity-60 leading-none">Seerkurs med aktivering</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <!-- Search input with local feedback -->
+                <div class="relative flex items-center">
+                    <span class="material-symbols-outlined absolute left-3 text-on-surface-variant opacity-40">search</span>
+                    <input id="search-input" class="bg-surface-container border-none rounded-full pl-10 pr-4 py-2 w-64 text-body-sm focus:ring-2 focus:ring-primary outline-none transition-all duration-300" placeholder="Søk i leksjoner..." type="text"/>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Language selector -->
+                    <button id="lang-btn" class="flex items-center gap-2 font-body-sm font-bold text-on-surface px-4 py-2 rounded-full border border-outline-variant hover:bg-surface-container-high active:scale-95 transition-all duration-300 text-primary border-b-2 border-primary bg-surface-container-low">
+                        <span class="material-symbols-outlined text-[18px]">language</span>
+                        NO
+                    </button>
+                    
+                    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/50">
+                        <div class="text-right">
+                            <p class="font-body-sm font-bold leading-none">Thomas Knutsen</p>
+                            <p class="text-[10px] text-primary-container font-black uppercase tracking-tighter">Medlem</p>
+                        </div>
+                        <img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/10 hover:ring-primary transition-all duration-300" alt="Thomas Knutsen portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYWCOOzX9Sd7bTB8TUQx4LrPF2IgXqnaLiVWDnLIrb0LEoyX_dwaFhQDVNxWEL00A9_FTx_awYoE8WH8KNWONeZRo4VEpWgHZ_87_yXV_R4OdgNWYEZtM8722-DzthgnlbnMZ0QqBQg1F48ZE9V1MNlT9zsi_qat1P3CUMwts-1QL99NgYB8zpMOfeuNqP2rFlTuzIJT-fPX07sFwZmLKyOegexztbLN2utcnjhoR79ShAFkYccO56iz-o4Gnr0bjCT2C0D0ycShjR"/>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Canvas -->
+        <div class="mt-16 p-6 flex flex-col lg:flex-row gap-6 max-w-[1600px] mx-auto pt-8">
+            <!-- Left Side: Video Player and Lesson Info -->
+            <div class="flex-1 flex flex-col gap-6">
+                <!-- Video Player / Simulated Meeting Component -->
+                <div id="video-player-viewport" class="relative aspect-video rounded-xl overflow-hidden bg-black group shadow-lg ring-1 ring-on-surface/5 transition-all duration-300">
+                    <!-- Background image placeholder -->
+                    <div id="player-bg" class="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity duration-500" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59')"></div>
+                    
+                    <!-- Inner Active Simulated Player (Initially hidden) -->
+                    <div id="active-player" class="absolute inset-0 hidden bg-[#1a1a1a] flex-col items-center justify-center p-6 text-white">
+                        <div class="w-full h-full flex flex-col items-center justify-center gap-4 relative">
+                            <!-- Simulated active video stream -->
+                            <div class="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center ring-4 ring-primary animate-pulse">
+                                <span class="material-symbols-outlined text-[48px] text-primary">videocam</span>
+                            </div>
+                            <h3 id="active-player-title" class="font-h3 text-h3 text-white">Leksjon 1: Hvordan se i ånden</h3>
+                            <p class="text-body-sm text-zinc-400">Møtet pågår live • Tilkoblet Zoom Meeting SDK</p>
+                            
+                            <!-- Video status text overlays -->
+                            <div class="absolute top-4 left-4 bg-black/60 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                                <span class="font-bold text-red-500">LIVE</span>
+                            </div>
+                            <div id="mic-status-label" class="absolute top-4 right-4 bg-black/60 px-3 py-1.5 rounded-full text-xs text-zinc-300 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-red-500 text-sm">mic_off</span> Mikrofon dempet
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meeting Entrance Overlay -->
+                    <div id="entrance-overlay" class="absolute inset-0 flex flex-col items-center justify-center p-6 bg-on-surface/40 backdrop-blur-sm transition-all duration-300">
+                        <div class="bg-surface p-8 rounded-xl shadow-2xl w-full max-w-md text-center border border-outline-variant">
+                            <div class="w-24 h-24 bg-surface-container-high rounded-full mx-auto mb-6 flex items-center justify-center relative">
+                                <span class="material-symbols-outlined text-[48px] text-outline">person</span>
+                                <span class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-green-500 border-4 border-surface"></span>
+                            </div>
+                            <h3 class="font-h2 text-h2 mb-4 text-on-surface">Enter Meeting Info</h3>
+                            
+                            <div class="space-y-4 text-left">
+                                <div>
+                                    <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Your Name</label>
+                                    <input id="student-name-input" class="w-full border-outline-variant bg-surface-container rounded-xl focus:border-primary focus:ring-primary p-3 text-body-md" type="text" value="Thomas Knutsen"/>
+                                </div>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input class="rounded text-primary focus:ring-primary border-outline-variant cursor-pointer" type="checkbox" checked/>
+                                    <span class="font-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors select-none">Remember my name for future meetings</span>
+                                </label>
+                                <button id="join-btn" class="w-full bg-primary-container text-white font-bold py-4 rounded-xl hover:bg-primary transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.98]">
+                                    Join
+                                </button>
+                                <p class="text-[10px] text-center text-on-surface-variant/60 leading-normal">
+                                    By clicking "Join", you agree to our <a class="text-primary underline hover:text-primary-container" href="#">Terms of Service</a> and <a class="text-primary underline hover:text-primary-container" href="#">Privacy Statement</a>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connecting Spinner Overlay -->
+                    <div id="connecting-overlay" class="absolute inset-0 hidden flex-col items-center justify-center p-6 bg-on-surface/60 backdrop-blur-md text-white z-20">
+                        <div class="flex flex-col items-center gap-4 text-center">
+                            <span class="material-symbols-outlined text-[48px] text-primary-container animate-spin">sync</span>
+                            <div>
+                                <h3 class="font-h3 text-h3 text-white mb-2">Starter Zoom-spiller...</h3>
+                                <p class="text-body-sm text-zinc-400 max-w-sm">Laster inn integrert Zoom-klient med chat og video. Vennligst vent.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overlay Controls (Bottom bar) -->
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-30">
+                        <!-- Mic toggle -->
+                        <button id="mic-toggle-btn" class="bg-error/85 w-12 h-12 rounded-xl text-white hover:bg-error active:scale-90 transition-all duration-300 flex items-center justify-center shadow-lg" title="Mute/Unmute">
+                            <span class="material-symbols-outlined" id="mic-icon">mic_off</span>
+                        </button>
+                        <!-- Video camera toggle -->
+                        <button id="video-toggle-btn" class="bg-error/85 w-12 h-12 rounded-xl text-white hover:bg-error active:scale-90 transition-all duration-300 flex items-center justify-center shadow-lg" title="Start/Stop Video">
+                            <span class="material-symbols-outlined" id="video-icon">videocam_off</span>
+                        </button>
+                        <!-- Background selection -->
+                        <button id="background-select-btn" class="bg-on-surface-variant/75 hover:bg-on-surface-variant/90 backdrop-blur-md px-4 py-3 rounded-xl text-white font-body-sm flex items-center gap-2 active:scale-95 transition-all duration-300 shadow-lg">
+                            <span class="material-symbols-outlined">wallpaper</span> 
+                            <span>Backgrounds</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lesson Info Card -->
+                <div class="bg-surface rounded-xl border border-outline-variant p-6 shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+                        <div>
+                            <span id="lesson-info-badge" class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Leksjon #1</span>
+                            <h1 id="lesson-info-title" class="font-h1 text-h1 text-on-surface mt-1 leading-tight">Hvordan se i ånden</h1>
+                            <p id="lesson-info-desc" class="font-body-md text-on-surface-variant mt-2 max-w-2xl text-body-md">
+                                I denne første leksjonen går vi gjennom det fundamentale grunnlaget for åndelig klarsyn. Vi utforsker hvordan vi kan skille mellom egne tanker og Den Hellige Ånds ledelse.
+                            </p>
+                        </div>
+                        <div class="flex gap-3 self-stretch md:self-auto">
+                            <button id="fullscreen-btn" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-inverse-surface text-inverse-on-surface font-semibold text-body-sm rounded-xl hover:opacity-90 active:scale-95 transition-all duration-300 text-primary border-b-2 border-primary bg-surface-container-low">
+                                <span class="material-symbols-outlined">fullscreen</span> 
+                                <span>Fullskjerm</span>
+                            </button>
+                            <button id="zoom-app-btn" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-[#1DB954] text-white font-semibold text-body-sm rounded-xl hover:opacity-90 active:scale-95 transition-all duration-300">
+                                <span class="material-symbols-outlined">open_in_new</span> 
+                                <span>Åpne i Zoom-appen</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-outline-variant/30">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined">schedule</span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-on-surface-variant/40 leading-none">Varighet</p>
+                                <p id="duration-label" class="font-body-md font-semibold mt-1">45 minutter</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary">
+                                <span class="material-symbols-outlined">description</span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-on-surface-variant/40 leading-none">Ressurser</p>
+                                <p id="resource-label" class="font-body-md font-semibold mt-1">PDF Arbeidsbok</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#dde2f3] flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined">forum</span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-on-surface-variant/40 leading-none">Fellesskap</p>
+                                <p class="font-body-md font-semibold mt-1">124 Kommentarer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Course Navigation and Tabs -->
+            <div class="w-full lg:w-[380px] flex flex-col gap-6">
+                <div class="bg-surface rounded-xl border border-outline-variant overflow-hidden flex flex-col h-full shadow-sm">
+                    <!-- Tabs Header -->
+                    <div class="flex border-b border-outline-variant">
+                        <!-- Tab 1: Innhold -->
+                        <button id="tab-innhold-btn" class="flex-1 py-4 px-2 font-body-sm font-semibold text-primary border-b-2 border-primary bg-surface-container-low transition-all duration-300" onclick="switchTab('innhold')">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">list_alt</span>
+                                <span>Innhold</span>
+                            </div>
+                        </button>
+                        <!-- Tab 2: Notater -->
+                        <button id="tab-notater-btn" class="flex-1 py-4 px-2 font-body-sm font-semibold text-on-surface-variant/60 hover:text-on-surface border-b-2 border-transparent transition-all duration-300" onclick="switchTab('notater')">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                                <span>Notater</span>
+                            </div>
+                        </button>
+                        <!-- Tab 3: Bibel -->
+                        <button id="tab-bibel-btn" class="flex-1 py-4 px-2 font-body-sm font-semibold text-on-surface-variant/60 hover:text-on-surface border-b-2 border-transparent transition-all duration-300" onclick="switchTab('bibel')">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                                <span>Bibel</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Scrollable Content Containers -->
+                    <div class="flex-1 min-h-[380px] p-6">
+                        
+                        <!-- TAB VIEW 1: INNHOLD (LESSONS LIST) -->
+                        <div id="tab-innhold-view" class="space-y-4">
+                            <!-- Lesson Item: Active (1) -->
+                            <div id="lesson-item-1" class="lesson-card rounded-xl border-2 border-primary/20 bg-primary-fixed/20 cursor-pointer relative p-4 transition-all duration-300" onclick="selectLesson(1)">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-primary tracking-widest">Leksjon #1</span>
+                                        <h4 class="font-body-md font-bold text-on-surface">Hvordan se i ånden</h4>
+                                    </div>
+                                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+                                </div>
+                                <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary-container w-[65%]"></div>
+                                </div>
+                                <p class="mt-2 text-[10px] text-primary-container font-bold">PÅGÅENDE - 65% ferdig</p>
+                            </div>
+                            
+                            <!-- Lesson Item: Pending (2) -->
+                            <div id="lesson-item-2" class="lesson-card rounded-xl border border-outline-variant/30 hover:bg-surface-container shadow-sm cursor-pointer transition-all duration-300 group p-4" onclick="selectLesson(2)">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Leksjon #2</span>
+                                        <h4 class="font-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Hvordan tre foran nådens trone</h4>
+                                    </div>
+                                    <span class="material-symbols-outlined text-on-surface-variant opacity-25 group-hover:opacity-100 transition-opacity">videocam</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Lesson Item: Pending (3) -->
+                            <div id="lesson-item-3" class="lesson-card rounded-xl border border-outline-variant/30 hover:bg-surface-container shadow-sm cursor-pointer transition-all duration-300 group p-4" onclick="selectLesson(3)">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Leksjon #3</span>
+                                        <h4 class="font-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Møte med Jesus</h4>
+                                    </div>
+                                    <span class="material-symbols-outlined text-on-surface-variant opacity-25 group-hover:opacity-100 transition-opacity">videocam</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Lesson Item: Locked (4) -->
+                            <div id="lesson-item-4" class="lesson-card rounded-xl border border-outline-variant/10 bg-surface-dim/20 opacity-50 cursor-not-allowed p-4">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Leksjon #4</span>
+                                        <h4 class="font-body-md font-semibold text-on-surface">De syv ånder</h4>
+                                    </div>
+                                    <span class="material-symbols-outlined text-on-surface-variant/40">lock</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Lesson Item: Locked (5) -->
+                            <div id="lesson-item-5" class="lesson-card rounded-xl border border-outline-variant/10 bg-surface-dim/20 opacity-50 cursor-not-allowed p-4">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest">Leksjon #5</span>
+                                        <h4 class="font-body-md font-semibold text-on-surface">Profetisk handling</h4>
+                                    </div>
+                                    <span class="material-symbols-outlined text-on-surface-variant/40">lock</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB VIEW 2: NOTATER (INTERACTIVE NOTE SYSTEM) -->
+                        <div id="tab-notater-view" class="hidden flex flex-col h-full gap-4">
+                            <div>
+                                <h4 class="font-body-md font-bold text-on-surface mb-1">Mine Notater</h4>
+                                <p class="text-body-sm text-on-surface-variant opacity-60">Dine personlige notater lagres lokalt på maskinen din.</p>
+                            </div>
+                            
+                            <textarea id="note-textarea" class="w-full h-32 border-outline-variant bg-surface-container rounded-xl focus:border-primary focus:ring-primary p-3 text-body-md placeholder-on-surface-variant/40" placeholder="Skriv ned dine åpenbaringer, tanker eller refleksjoner her..."></textarea>
+                            
+                            <button id="save-note-btn" class="w-full bg-primary-container text-white font-bold py-3 rounded-xl hover:bg-primary active:scale-[0.98] transition-all duration-300 shadow-md">
+                                Lagre notat
+                            </button>
+                            
+                            <div class="border-t border-outline-variant/30 pt-4 mt-2">
+                                <h5 class="text-[10px] font-black uppercase text-on-surface-variant/40 tracking-widest mb-3">Tidligere lagrede notater</h5>
+                                <div id="saved-notes-list" class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                                    <!-- Dynamic notes will list here or empty state -->
+                                    <div id="notes-empty-state" class="text-center py-6 bg-surface-container-low rounded-xl border border-dashed border-outline-variant">
+                                        <span class="material-symbols-outlined text-[32px] text-outline mb-2">sticky_note_2</span>
+                                        <p class="text-body-sm text-on-surface-variant">Ingen lagrede notater for denne leksjonen ennå.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB VIEW 3: BIBEL (SEARCH & PREVIEW SYSTEM) -->
+                        <div id="tab-bibel-view" class="hidden space-y-4">
+                            <div>
+                                <h4 class="font-body-md font-bold text-on-surface mb-1">Slå opp i Bibelen</h4>
+                                <p class="text-body-sm text-on-surface-variant opacity-60">Søk etter nøkkelord eller spesifikke bibelvers.</p>
+                            </div>
+                            
+                            <div class="relative flex items-center">
+                                <span class="material-symbols-outlined absolute left-3 text-on-surface-variant opacity-40">menu_book</span>
+                                <input id="bible-search-input" class="w-full bg-surface-container border-none rounded-full pl-10 pr-10 py-3 text-body-sm focus:ring-2 focus:ring-primary outline-none transition-all duration-300" placeholder="F.eks. Johannes 3:16 eller Tro..." type="text"/>
+                                <button id="bible-search-clear-btn" class="absolute right-3 hidden text-on-surface-variant hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">close</span>
+                                </button>
+                            </div>
+                            
+                            <div id="bible-results-container" class="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+                                <!-- Default/Popular verses state -->
+                                <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative">
+                                    <span class="material-symbols-outlined text-primary-fixed text-sm absolute top-3 right-3">bookmark</span>
+                                    <p class="text-body-sm text-on-surface-variant italic mb-2 leading-relaxed">
+                                        "For så høyt har Gud elsket verden, at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv."
+                                    </p>
+                                    <p class="font-label-caps text-label-caps text-primary uppercase">Johannes 3:16</p>
+                                </div>
+                                <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative">
+                                    <span class="material-symbols-outlined text-primary-fixed text-sm absolute top-3 right-3">bookmark</span>
+                                    <p class="text-body-sm text-on-surface-variant italic mb-2 leading-relaxed">
+                                        "Troen er et pant på det vi håper, et bevis på det vi ikke ser."
+                                    </p>
+                                    <p class="font-label-caps text-label-caps text-primary uppercase">Hebreerne 11:1</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="p-6 border-t border-outline-variant bg-surface-container-low">
+                        <button class="w-full flex items-center justify-center gap-2 font-body-md font-bold text-on-surface hover:text-primary hover:scale-[1.02] active:scale-95 transition-all duration-300 group text-primary border-b-2 border-primary bg-surface-container-low">
+                            <span>Se alle 12 leksjoner</span>
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bible Verse of the Day Card -->
+                <div class="bg-inverse-surface text-inverse-on-surface p-6 rounded-xl relative overflow-hidden shadow-sm">
+                    <!-- Subtle background light pattern -->
+                    <div class="absolute -right-16 -top-16 w-36 h-36 bg-primary/10 rounded-full blur-2xl"></div>
+                    <div class="relative z-10">
+                        <span class="material-symbols-outlined text-primary-fixed mb-4">format_quote</span>
+                        <p id="verse-of-day-text" class="font-body-sm italic mb-4 leading-relaxed opacity-90">
+                            "Men den som drikker av det vannet jeg vil gi ham, skal aldri i evighet tørste. Det vannet jeg vil gi ham, skal bli en kilde i ham med vann som veller fram til evig liv."
+                        </p>
+                        <p id="verse-of-day-ref" class="font-label-caps text-label-caps uppercase text-primary-fixed">Johannes 4:14</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Core lesson mock data
+        const lessonsData = {
+            1: {
+                id: 1,
+                badge: "Leksjon #1",
+                title: "Hvordan se i ånden",
+                desc: "I denne første leksjonen går vi gjennom det fundamentale grunnlaget for åndelig klarsyn. Vi utforsker hvordan vi kan skille mellom egne tanker og Den Hellige Ånds ledelse.",
+                duration: "45 minutter",
+                resource: "PDF Arbeidsbok",
+                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                verse: "\"Men den som drikker av det vannet jeg vil gi ham, skal aldri i evighet tørste. Det vannet jeg vil gi ham, skal bli en kilde i ham med vann som veller fram til evig liv.\"",
+                verseRef: "Johannes 4:14"
+            },
+            2: {
+                id: 2,
+                badge: "Leksjon #2",
+                title: "Hvordan tre foran nådens trone",
+                desc: "Her lærer vi å tre frimodig inn i Guds nærhet. Vi ser på henvendelser i bønn og hvordan troen gir oss en direkte linje til himmelens tronsal.",
+                duration: "52 minutter",
+                resource: "Kompendium & Bønneguide",
+                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                verse: "\"La oss derfor tre fram for nådens trone med frimodighet, så vi kan få barmhjertighet og finne nåde som gir hjelp i rette tid.\"",
+                verseRef: "Hebreerne 4:16"
+            },
+            3: {
+                id: 3,
+                badge: "Leksjon #3",
+                title: "Møte med Jesus",
+                desc: "En dypdykk-leksjon fokusert på det personlige og intime forholdet til Jesus Kristus, og hvordan vi kan oppleve Hans nærvær i hverdagen.",
+                duration: "60 minutter",
+                resource: "Refleksjonshefte",
+                bgUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAKBzTxnpnsVp9DA8OzoYOBHUKZ7Eo4Yaniy1jXm87-3qYzjc5QZMaBThReDrLlUmPdj5e4EK3Ojq3Gow4zVe4WbzXhwJKqrDp5fwiaCg3R5Vzk16bx_PQf7hEFYI2MQ1QnFqoktutVv2jHa10dWMkOojdUdyLds5giToHcYqO-viwsrfh4DUXolKEj_f0DSBBuqOHuJZPQ4c8dErZoUhgLSMJAiYQwWH5HPiRG4x_gcHUUyQLuay_oXled8aukGPlchcNhUsENnT59",
+                verse: "\"Se, jeg står for døren og banker. Om noen hører min røst og åpner døren, vil jeg gå inn til ham og holde måltid med ham, og han med meg.\"",
+                verseRef: "Åpenbaringen 3:20"
+            }
+        };
+
+        // Bibel Verses database for simulated search
+        const bibleVerses = [
+            { text: "For så høyt har Gud elsket verden, at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv.", ref: "Johannes 3:16", keywords: ["elsket", "verden", "sønn", "tro", "evig liv"] },
+            { text: "Troen er et pant på det vi håper, et bevis på det vi ikke ser.", ref: "Hebreerne 11:1", keywords: ["troen", "tro", "håper", "håp", "bevis", "ser"] },
+            { text: "Herren er min hyrde, jeg mangler ikke noe. Han lar meg ligge i grønne enger, han leder meg til vann der jeg finner hvile.", ref: "Salmene 23:1-2", keywords: ["herren", "hyrde", "mangler", "hvile", "vann", "enger"] },
+            { text: "Vær ikke bekymret for noe! Men legg alt dere har på hjertet, fram for Gud i bønn og påkallelse med takk.", ref: "Filipperne 4:6", keywords: ["bekymret", "bønn", "takk", "gud", "hjertet"] },
+            { text: "For jeg vet hvilke tanker jeg har med dere, sier Herren, tanker til lykke og ikke til ulykke, for å gi dere fremtid og håp.", ref: "Jeremia 29:11", keywords: ["tanker", "herren", "lykke", "fremtid", "håp"] },
+            { text: "Dersom vi bekjenner våre synder, er han trofast og rettferdig, så han tilgir oss syndene og renser oss fra all urettferdighet.", ref: "1. Johannes 1:9", keywords: ["bekjenner", "synder", "trofast", "tilgir", "renser"] }
+        ];
+
+        // Active State tracking
+        let currentActiveLesson = 1;
+        let isMuted = true;
+        let isVideoOff = true;
+        let activeTab = 'innhold';
+
+        // Dom Elements
+        const entranceOverlay = document.getElementById('entrance-overlay');
+        const connectingOverlay = document.getElementById('connecting-overlay');
+        const activePlayer = document.getElementById('active-player');
+        const playerBg = document.getElementById('player-bg');
+        const joinBtn = document.getElementById('join-btn');
+        const studentNameInput = document.getElementById('student-name-input');
+        const activePlayerTitle = document.getElementById('active-player-title');
+        
+        // Controls Dom
+        const micToggleBtn = document.getElementById('mic-toggle-btn');
+        const micIcon = document.getElementById('mic-icon');
+        const micStatusLabel = document.getElementById('mic-status-label');
+        const videoToggleBtn = document.getElementById('video-toggle-btn');
+        const videoIcon = document.getElementById('video-icon');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const playerViewport = document.getElementById('video-player-viewport');
+        const backgroundSelectBtn = document.getElementById('background-select-btn');
+
+        // Notes Dom
+        const noteTextarea = document.getElementById('note-textarea');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const savedNotesList = document.getElementById('saved-notes-list');
+        const notesEmptyState = document.getElementById('notes-empty-state');
+
+        // Bibel Dom
+        const bibleSearchInput = document.getElementById('bible-search-input');
+        const bibleSearchClearBtn = document.getElementById('bible-search-clear-btn');
+        const bibleResultsContainer = document.getElementById('bible-results-container');
+
+        // Language Dom
+        const langBtn = document.getElementById('lang-btn');
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved notes from LocalStorage
+            renderSavedNotes();
+            
+            // Set up smooth transitions for elements on entry
+            const animTargets = document.querySelectorAll('.lesson-card, .rounded-xl, header, aside');
+            animTargets.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(12px)';
+                setTimeout(() => {
+                    element.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, 40 * index);
+            });
+        });
+
+        // Simulating the Zoom Meeting Entrance Flow
+        joinBtn.addEventListener('click', () => {
+            const name = studentNameInput.value.trim() || 'Thomas Knutsen';
+            
+            // Step 1: Show Connecting State
+            entranceOverlay.classList.add('opacity-0');
+            setTimeout(() => {
+                entranceOverlay.classList.add('hidden');
+                connectingOverlay.classList.remove('hidden');
+                connectingOverlay.classList.add('flex');
+            }, 300);
+
+            // Step 2: Transition into Active Live Stream Player
+            setTimeout(() => {
+                connectingOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    connectingOverlay.classList.add('hidden');
+                    activePlayer.classList.remove('hidden');
+                    activePlayer.classList.add('flex');
+                    playerBg.classList.add('opacity-10'); // dim back image
+                    
+                    // Update active title
+                    activePlayerTitle.innerText = `Leksjon ${currentActiveLesson}: ${lessonsData[currentActiveLesson].title}`;
+                }, 300);
+            }, 1800);
+        });
+
+        // Microphone toggle logic
+        micToggleBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                micToggleBtn.classList.remove('bg-primary');
+                micToggleBtn.classList.add('bg-error/85');
+                micIcon.innerText = 'mic_off';
+                micStatusLabel.innerHTML = `<span class="material-symbols-outlined text-red-500 text-sm">mic_off</span> Mikrofon dempet`;
+            } else {
+                micToggleBtn.classList.remove('bg-error/85');
+                micToggleBtn.classList.add('bg-primary');
+                micIcon.innerText = 'mic';
+                micStatusLabel.innerHTML = `<span class="material-symbols-outlined text-green-500 text-sm">mic</span> Mikrofon aktiv`;
+            }
+            // Simple scale feedback
+            micToggleBtn.classList.add('scale-95');
+            setTimeout(() => micToggleBtn.classList.remove('scale-95'), 100);
+        });
+
+        // Video toggle logic
+        videoToggleBtn.addEventListener('click', () => {
+            isVideoOff = !isVideoOff;
+            if (isVideoOff) {
+                videoToggleBtn.classList.remove('bg-primary');
+                videoToggleBtn.classList.add('bg-error/85');
+                videoIcon.innerText = 'videocam_off';
+            } else {
+                videoToggleBtn.classList.remove('bg-error/85');
+                videoToggleBtn.classList.add('bg-primary');
+                videoIcon.innerText = 'videocam';
+            }
+            videoToggleBtn.classList.add('scale-95');
+            setTimeout(() => videoToggleBtn.classList.remove('scale-95'), 100);
+        });
+
+        // Virtual background selection visual feedback
+        backgroundSelectBtn.addEventListener('click', () => {
+            alert('Virtuelle bakgrunner er kun tilgjengelig når du starter leksjonen i Zoom-appen.');
+        });
+
+        // Fullscreen API implementation
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (playerViewport.requestFullscreen) {
+                    playerViewport.requestFullscreen();
+                } else if (playerViewport.webkitRequestFullscreen) {
+                    playerViewport.webkitRequestFullscreen();
+                } else if (playerViewport.msRequestFullscreen) {
+                    playerViewport.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Sidebar View tab switcher logic
+        function switchTab(targetTab) {
+            activeTab = targetTab;
+            
+            // Hide all tab views
+            document.getElementById('tab-innhold-view').classList.add('hidden');
+            document.getElementById('tab-notater-view').classList.add('hidden');
+            document.getElementById('tab-bibel-view').classList.add('hidden');
+            
+            // Reset all tab header button styling
+            const tabs = ['innhold', 'notater', 'bibel'];
+            tabs.forEach(tab => {
+                const btn = document.getElementById(`tab-${tab}-btn`);
+                btn.className = "flex-1 py-4 px-2 font-body-sm font-semibold text-on-surface-variant/60 hover:text-on-surface border-b-2 border-transparent transition-all duration-300";
+            });
+
+            // Show target view & style active tab header button
+            document.getElementById(`tab-${targetTab}-view`).classList.remove('hidden');
+            if (targetTab === 'notater') {
+                document.getElementById(`tab-notater-view`).classList.remove('hidden');
+                document.getElementById(`tab-notater-view`).classList.add('flex');
+            }
+            
+            const activeBtn = document.getElementById(`tab-${targetTab}-btn`);
+            activeBtn.className = "flex-1 py-4 px-2 font-body-sm font-semibold text-primary border-b-2 border-primary bg-surface-container-low transition-all duration-300";
+        }
+
+        // Lesson navigation updates the main player and details cards
+        function selectLesson(lessonId) {
+            if (!lessonsData[lessonId]) return;
+            currentActiveLesson = lessonId;
+            const data = lessonsData[lessonId];
+
+            // 1. Update text metadata fields
+            document.getElementById('lesson-info-badge').innerText = data.badge;
+            document.getElementById('lesson-info-title').innerText = data.title;
+            document.getElementById('lesson-info-desc').innerText = data.desc;
+            document.getElementById('duration-label').innerText = data.duration;
+            document.getElementById('resource-label').innerText = data.resource;
+            
+            // 2. Update verse of day panel
+            document.getElementById('verse-of-day-text').innerText = data.verse;
+            document.getElementById('verse-of-day-ref').innerText = data.verseRef;
+
+            // 3. Reset Zoom player simulation state
+            activePlayer.classList.add('hidden');
+            connectingOverlay.classList.add('hidden');
+            entranceOverlay.classList.remove('hidden');
+            entranceOverlay.classList.remove('opacity-0');
+            playerBg.classList.remove('opacity-10');
+            playerBg.classList.add('opacity-60');
+            playerBg.style.backgroundImage = `url('${data.bgUrl}')`;
+
+            // 4. Update sidebar visual styles (Active highlight)
+            for (let i = 1; i <= 3; i++) {
+                const item = document.getElementById(`lesson-item-${i}`);
+                if (i === lessonId) {
+                    item.className = "lesson-card rounded-xl border-2 border-primary/20 bg-primary-fixed/20 cursor-pointer relative p-4 transition-all duration-300";
+                    // Add standard progress bar to active one
+                    if (!item.querySelector('.bg-primary-container')) {
+                        const progressHtml = `
+                            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-primary-container w-[10%]"></div>
+                            </div>
+                            <p class="mt-2 text-[10px] text-primary-container font-bold">PÅGÅENDE - 10% ferdig</p>
+                        `;
+                        item.insertAdjacentHTML('beforeend', progressHtml);
+                    }
+                } else {
+                    item.className = "lesson-card rounded-xl border border-outline-variant/30 hover:bg-surface-container shadow-sm cursor-pointer transition-all duration-300 group p-4";
+                    // Remove progress bars on inactive
+                    const progressBars = item.querySelectorAll('.mt-4, .mt-2');
+                    progressBars.forEach(bar => bar.remove());
+                }
+            }
+
+            // Refresh loaded notes list for this lesson
+            renderSavedNotes();
+        }
+
+        // --- Note System Implementation ---
+        saveNoteBtn.addEventListener('click', () => {
+            const noteText = noteTextarea.value.trim();
+            if (!noteText) return;
+
+            const notesKey = `hkm_notes_lesson_${currentActiveLesson}`;
+            let notes = JSON.parse(localStorage.getItem(notesKey)) || [];
+            
+            const newNote = {
+                id: Date.now(),
+                text: noteText,
+                timestamp: new Date().toLocaleDateString('nb-NO', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            notes.unshift(newNote); // newest first
+            localStorage.setItem(notesKey, JSON.stringify(notes));
+            noteTextarea.value = '';
+            
+            renderSavedNotes();
+        });
+
+        function renderSavedNotes() {
+            const notesKey = `hkm_notes_lesson_${currentActiveLesson}`;
+            const notes = JSON.parse(localStorage.getItem(notesKey)) || [];
+
+            if (notes.length === 0) {
+                notesEmptyState.style.display = 'block';
+                // remove existing note blocks
+                const dynamicNotes = savedNotesList.querySelectorAll('.dynamic-note-item');
+                dynamicNotes.forEach(note => note.remove());
+            } else {
+                notesEmptyState.style.display = 'none';
+                
+                // clear old list
+                const dynamicNotes = savedNotesList.querySelectorAll('.dynamic-note-item');
+                dynamicNotes.forEach(note => note.remove());
+
+                notes.forEach(note => {
+                    const noteHtml = `
+                        <div class="dynamic-note-item p-3 bg-surface-container rounded-xl border border-outline-variant/50 relative group transition-all duration-300">
+                            <button onclick="deleteNote(${note.id})" class="absolute top-2 right-2 text-on-surface-variant/40 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity" title="Slett notat">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                            </button>
+                            <p class="text-body-sm text-on-surface mb-1 pr-6 leading-relaxed">${note.text}</p>
+                            <span class="text-[9px] text-on-surface-variant/50 font-semibold">${note.timestamp}</span>
+                        </div>
+                    `;
+                    savedNotesList.insertAdjacentHTML('beforeend', noteHtml);
+                });
+            }
+        }
+
+        window.deleteNote = function(noteId) {
+            const notesKey = `hkm_notes_lesson_${currentActiveLesson}`;
+            let notes = JSON.parse(localStorage.getItem(notesKey)) || [];
+            notes = notes.filter(n => n.id !== noteId);
+            localStorage.setItem(notesKey, JSON.stringify(notes));
+            renderSavedNotes();
+        };
+
+        // --- Bibel Search Implementation ---
+        bibleSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                bibleSearchClearBtn.classList.remove('hidden');
+            } else {
+                bibleSearchClearBtn.classList.add('hidden');
+                resetBibleResults();
+                return;
+            }
+
+            // Simple search execution
+            const filtered = bibleVerses.filter(verse => {
+                return verse.ref.toLowerCase().includes(query) || 
+                       verse.text.toLowerCase().includes(query) ||
+                       verse.keywords.some(k => k.includes(query));
+            });
+
+            renderBibleResults(filtered);
+        });
+
+        bibleSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+        bibleSearchClearBtn.addEventListener('click', () => {
+            bibleSearchInput.value = '';
+            bibleSearchClearBtn.classList.add('hidden');
+            resetBibleResults();
+        });
+
+        function resetBibleResults() {
+            bibleResultsContainer.innerHTML = `
+                <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative">
+                    <span class="material-symbols-outlined text-primary-fixed text-sm absolute top-3 right-3">bookmark</span>
+                    <p class="text-body-sm text-on-surface-variant italic mb-2 leading-relaxed">
+                        "For så høyt har Gud elsket verden, at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv."
+                    </p>
+                    <p class="font-label-caps text-label-caps text-primary uppercase">Johannes 3:16</p>
+                </div>
+                <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative">
+                    <span class="material-symbols-outlined text-primary-fixed text-sm absolute top-3 right-3">bookmark</span>
+                    <p class="text-body-sm text-on-surface-variant italic mb-2 leading-relaxed">
+                        "Troen er et pant på det vi håper, et bevis på det vi ikke ser."
+                    </p>
+                    <p class="font-label-caps text-label-caps text-primary uppercase">Hebreerne 11:1</p>
+                </div>
+            `;
+        }
+
+        function renderBibleResults(results) {
+            if (results.length === 0) {
+                bibleResultsContainer.innerHTML = `
+                    <div class="text-center py-8 bg-surface-container-low rounded-xl border border-dashed border-outline-variant">
+                        <span class="material-symbols-outlined text-[32px] text-outline mb-2">find_in_page</span>
+                        <p class="text-body-sm text-on-surface-variant">Ingen treff. Prøv et annet kapittel eller søkeord.</p>
+                    </div>
+                `;
+            } else {
+                bibleResultsContainer.innerHTML = '';
+                results.forEach(verse => {
+                    const verseHtml = `
+                        <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant hover:border-primary/30 transition-all duration-300 relative">
+                            <span class="material-symbols-outlined text-primary-fixed text-sm absolute top-3 right-3 cursor-pointer hover:text-primary" title="Bokmerk vers">bookmark</span>
+                            <p class="text-body-sm text-on-surface-variant italic mb-2 leading-relaxed">${verse.text}</p>
+                            <p class="font-label-caps text-label-caps text-primary uppercase">${verse.ref}</p>
+                        </div>
+                    `;
+                    bibleResultsContainer.insertAdjacentHTML('beforeend', verseHtml);
+                });
+            }
+        }
+
+        // Language toggle simulated logic
+        langBtn.addEventListener('click', () => {
+            const currentLang = langBtn.innerText.trim();
+            if (currentLang.includes('NO')) {
+                langBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">language</span> EN`;
+                alert('Språk satt til engelsk. Dette er en demonstrasjon, tekster forblir på norsk.');
+            } else {
+                langBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">language</span> NO`;
+                alert('Språk satt til norsk.');
+            }
+        });
+    </script>
+</body>
+</html>

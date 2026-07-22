@@ -1,0 +1,2306 @@
+{
+  "KABZEEL": {
+    "name": "Kabzeel",
+    "slug": "kabzeel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Reunión de Dios, una ciudad en el extremo sur de Judá, cerca de Idumea (Jos. 15:21), lugar de nacimiento de Benaías, uno de los principales guerreros de David (2 Sam. 23:20; 1 Crón. 11:22). También fue llamada Jekabzeel (Neh. 11:25) después del Cautiverio."
+      },
+      {
+        "source": "SMI",
+        "text": "(Reunido por Dios), una de las 'ciudades' de la tribu de Judá (Josué 15:21), el lugar de origen del gran héroe Benaías ben-Joiada (2 Samuel 23:20; 1 Crónicas 11:22). Después del cautiverio fue repoblada por los judíos y aparece como Jekabzeel."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:21",
+        "original": "Josh. 15:21"
+      },
+      {
+        "reference": "2 Samuel 23:20",
+        "original": "2 Sam. 23:20"
+      },
+      {
+        "reference": "1 Chronicles 11:22",
+        "original": "1 Chr. 11:22"
+      },
+      {
+        "reference": "Nehemiah 11:25",
+        "original": "Neh. 11:25"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KADESH": {
+    "name": "Kadesh",
+    "slug": "kadesh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Santo, o Cades-Barnea, desierto sagrado de la peregrinación, un lugar en la frontera sureste de Palestina, a unas 165 millas del Horeb. Se encontraba en el «desierto» o «desierto de Zin» (Gén. 14:7; Núm. 13:3-26; 14:29-33; 20:1; 27:14), en la frontera de Edom (20:16). Desde este lugar, en cumplimiento del deseo del pueblo, Moisés envió a «doce espías» para reconocer la tierra. Después de examinarla en todos sus distritos, los espías trajeron un mal informe, solo Josué y Caleb dieron un buen informe de la tierra (13:18-31). Influenciado por el informe desalentador, el pueblo abandonó toda esperanza de entrar en la Tierra Prometida. Permanecieron un tiempo considerable en Cades. (Ver HORMA; CORÉ.) Debido a su incredulidad, fueron condenados por Dios a vagar durante treinta y ocho años en el desierto. Partieron de Cades hacia los desiertos de Parán, «camino del Mar Rojo» (Deut. 2:1). (Una teoría es que durante esos treinta y ocho años permanecieron en y alrededor de Cades.) Al final de estos años de peregrinaciones, las tribus se reunieron por segunda vez en Cades. Durante su estancia allí en este tiempo, Miriam murió y fue sepultada. Aquí el pueblo murmuró por falta de agua, como sus antepasados habían hecho antes en Refidim; y Moisés, irritado por sus reproches, «golpeó la roca dos veces con su vara», en lugar de «hablar a la roca delante de sus ojos», como el Señor le había mandado (comp. Núm. 27:14; Deut. 9:23; Sal. 106:32, 33). Debido a este acto suyo, en el que también Aarón estuvo involucrado, a ninguno de ellos se les permitiría poner un pie en la Tierra Prometida (Núm. 20:12, 24). El rey de Edom no les permitió pasar por su territorio, y por lo tanto comenzaron una marcha hacia el este y «llegaron al monte Hor» (20:22). Este lugar ha sido identificado con ‘Ain el-Kadeis, a unas 12 millas al este-sureste de Beerseba. (Ver ESPÍAS.)"
+      },
+      {
+        "source": "EAS",
+        "text": "La ciudad sagrada de los hititas, en la margen izquierda del Orontes, a unas 4 millas al sur del lago de Homs. Se identifica con el gran montículo Tell Neby Mendeh, de unos 50 a 100 pies de altura y 400 yardas de largo. En las ruinas del templo de Karnak, en Egipto, se ha encontrado una inscripción que registra la captura de esta ciudad por Ramsés II. (Ver FARAÓN.) Aquí el escultor «ha cincelado con profundo trabajo en la piedra, con una audaz ejecución de las diversas partes, la procesión de los guerreros, la batalla ante Cades, el asalto de la fortaleza, el derrocamiento del enemigo y la vida en el campamento de los egipcios». (Ver HITITAS.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:7",
+        "original": "Gen. 14:7"
+      },
+      {
+        "reference": "Numbers 13:3-26",
+        "original": "Num. 13:3-26"
+      },
+      {
+        "reference": "Numbers 14:29-33",
+        "original": "Num 14:29-33"
+      },
+      {
+        "reference": "Numbers 20:1",
+        "original": "Num 20:1"
+      },
+      {
+        "reference": "Numbers 27:14",
+        "original": "Num 27:14"
+      },
+      {
+        "reference": "Deuteronomy 2:1",
+        "original": "Deut. 2:1"
+      },
+      {
+        "reference": "Deuteronomy 9:23",
+        "original": "Deut. 9:23"
+      },
+      {
+        "reference": "Psalms 106:32",
+        "original": "Ps. 106:32"
+      },
+      {
+        "reference": "Psalms 106:33",
+        "original": "Ps. 106:33"
+      },
+      {
+        "reference": "Numbers 20:12",
+        "original": "Num. 20:12"
+      },
+      {
+        "reference": "Numbers 20:24",
+        "original": "Num. 20:24"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KADESH, KADESHBARNEA": {
+    "name": "Kadesh, Kadeshbarnea",
+    "slug": "kadesh-kadeshbarnea",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Cades significa santo; es la misma palabra que el nombre árabe de Jerusalén, el-Khuds. Barnea significa, desierto de la peregrinación.) Este lugar, escenario de la muerte de Miriam, fue el punto más lejano que los israelitas alcanzaron en su camino directo a Canaán; fue también desde donde se enviaron los espías, y donde, a su regreso, el pueblo estalló en murmuraciones, a raíz de lo cual comenzó su estricto período penal de peregrinación. (Números 13:3,26; 14:29-33; 20:1; 2:14) Es probable que el término «Cades», aunque aplicado para significar una «ciudad», también tuviera una aplicación más amplia a una región en la que Cades-Meriba ciertamente, y Cades-Barnea probablemente, indican un lugar preciso. En (Génesis 14:7) Cades se identifica con En-Mispát, la «fuente del juicio». Se ha supuesto, de (Números 13:21,26) y Números 20:1... que había dos lugares con el nombre de Cades, uno en el desierto de Parán y el otro en el de Zin; pero es más probable que se refiera a un solo lugar, y que Zin sea solo una parte del gran desierto de Parán. (Ha habido mucha duda sobre el sitio exacto de Cades; pero el Rev. H. Clay Trumbull de Filadelfia, al visitar el lugar en 1881, logró hacer casi seguro que el sitio de Cades es Ain Kadis (también escrito Gadis y Quadis); «el mismo nombre, letra por letra en árabe y hebreo, con la fuente bíblica de Cades —la 'fuente santa', como significa el nombre— que brotó cuando Moisés golpeó la roca». Se encuentra a 40 millas al sur de Beerseba y 165 al noreste de Horeb, inmediatamente debajo de la frontera sur de Palestina. Fue descubierto en 1842 por el Rev. J. Rowlands del Queen’s College, Cambridge, Inglaterra, cuyo descubrimiento fue respaldado por el gran geógrafo alemán Ritter, por E.S. Palmer en su «Desert of the Exodus», y por el «Imperial Bible Dictionary». El Dr. Trumbull lo describe así: «Es un extenso oasis, una serie de pozos, cuya agua fluye de debajo de un acantilado sobresaliente como se menciona en la historia bíblica; y se abre a una vasta llanura o uadi lo suficientemente grande como para haber servido de campamento para todo el ejército de Israel. Extensas ruinas primitivas se encuentran en las colinas cercanas. La llanura o uadi, también llamada Quadis, está rodeada por colinas, lo que la convierte en una posición muy deseable para un pueblo como los israelitas en las fronteras de territorio hostil —una posición que líderes como Moisés y Josué habrían sido propensos a seleccionar.» «Estaba cubierta de hierba y flores. Higuera cargada de frutos se apoyaba en sus laderas de piedra caliza. Abundaban arbustos en riqueza y variedad. Destacando de la cadena montañosa al norte del hermoso anfiteatro del oasis, se encontraba la 'gran masa única o pequeña colina de roca sólida' que Rowlands consideró como el acantilado (sela) golpeado por Moisés para hacer que 'diera sus aguas' cuando su flujo había cesado. De debajo de este acantilado brotaba el abundante arroyo. Un pozo, amurallado con bloques de piedra caliza desgastados por el tiempo, fue el primer receptáculo del agua. No lejos de este había un segundo pozo igualmente amurallado, abastecido de la misma fuente. Alrededor de ambos pozos había antiguos abrevaderos de piedra caliza. Varias piscinas, no amuralladas, también se abastecían del arroyo. El agua era clara, dulce y abundante. Dos de las piscinas eran amplias para bañarse.»—ED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 13:3",
+        "original": "Numbers 13:3"
+      },
+      {
+        "reference": "Numbers 13:26",
+        "original": "Numbers 13:26"
+      },
+      {
+        "reference": "Numbers 14:29-33",
+        "original": "Numbers 14:29-33"
+      },
+      {
+        "reference": "Numbers 20:1",
+        "original": "Numbers 20:1"
+      },
+      {
+        "reference": "Numbers 2:14",
+        "original": "Numbers 2:14"
+      },
+      {
+        "reference": "Genesis 14:7",
+        "original": "Genesis 14:7"
+      },
+      {
+        "reference": "Numbers 13:21",
+        "original": "Numbers 13:21"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KADMIEL": {
+    "name": "Kadmiel",
+    "slug": "kadmiel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ante Dios; es decir, su siervo, uno de los levitas que regresó con Zorobabel del Cautiverio (Neh. 9:4; 10:9; 12:8)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Ante Dios), uno de los levitas que con su familia regresó de Babilonia con Zorobabel (Esdras 2:40; Nehemías 7:43). Él y su casa son mencionados en la historia en tres ocasiones (Esdras 3:9; Nehemías 9:4,5; 10:9) (535-410 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 9:4",
+        "original": "Neh. 9:4"
+      },
+      {
+        "reference": "Nehemiah 10:9",
+        "original": "Neh 10:9"
+      },
+      {
+        "reference": "Nehemiah 12:8",
+        "original": "Neh 12:8"
+      },
+      {
+        "reference": "Ezra 2:40",
+        "original": "Ezra 2:40"
+      },
+      {
+        "reference": "Nehemiah 7:43",
+        "original": "Nehemiah 7:43"
+      },
+      {
+        "reference": "Ezra 3:9",
+        "original": "Ezra 3:9"
+      },
+      {
+        "reference": "Nehemiah 9:5",
+        "original": "Nehemiah 9:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KADMONITES": {
+    "name": "Kadmonites",
+    "slug": "kadmonites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Orientales, el nombre de una tribu cananea que habitó la parte nororiental de Palestina en tiempos de Abraham (Gén. 15:19). Probablemente eran idénticos a los «hijos del oriente», que habitaban el país entre Palestina y el Éufrates."
+      },
+      {
+        "source": "SMI",
+        "text": "(Orientales), Los, un pueblo mencionado solo en (Génesis 15:19); una de las naciones que en ese tiempo ocupaban la tierra (Canaán) prometida a los descendientes de Abram. El nombre es probablemente un sinónimo de los Bene-Kedem —los «hijos del Oriente»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Gen. 15:19"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KALLAI": {
+    "name": "Kallai",
+    "slug": "kallai",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Siervo veloz de Jehová), un sacerdote en los días de Joacim, hijo de Jesúa. Representaba a la familia de Salai (Nehemías 12:20) (después del 536 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 12:20",
+        "original": "Nehemiah 12:20"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KANAH": {
+    "name": "Kanah",
+    "slug": "kanah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Cañaveral; arroyo de cañas. (1.) Un arroyo que formaba el límite entre Efraín y Manasés, desde el Mediterráneo hacia el este hasta Tapúa (Jos. 16:8). Ha sido identificado con los arroyos pantanosos que constituyen el Wadi Talaik, que desemboca en el mar entre Jope y Cesarea. Otros lo identifican con el río Auja. (2.) Un pueblo en el norte de Aser (Jos. 19:28). Ha sido identificado con ‘Ain-Kana, una aldea en la ladera de un valle a unas 7 millas al sureste de Tiro. Aproximadamente a una milla al norte de este lugar hay muchas ruinas colosales esparcidas. Y en el lado de un barranco vecino hay figuras de hombres, mujeres y niños talladas en la roca. Se supone que estas son de origen fenicio."
+      },
+      {
+        "source": "SMI",
+        "text": "(Un lugar de cañas)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 16:8",
+        "original": "Josh. 16:8"
+      },
+      {
+        "reference": "Joshua 19:28",
+        "original": "Josh. 19:28"
+      },
+      {
+        "reference": "Joshua 17:9",
+        "original": "Joshua 17:9"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KAREAH": {
+    "name": "Kareah",
+    "slug": "kareah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Calvo, el padre de Johanán y Jonatán, quienes por un tiempo fueron leales a Guedalías, el gobernador babilónico de Jerusalén (Jer. 40:8, 13, 15, 16)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Calvo), el padre de Johanán y Jonatán, quienes apoyaron la autoridad de Guedalías y vengaron su asesinato (Jeremías 40:8,13,15,16; 41:11,13,14,16; 42:1,8; 43:2,4,5) (antes del 588 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Jeremiah 40:8",
+        "original": "Jer. 40:8"
+      },
+      {
+        "reference": "Jeremiah 40:13",
+        "original": "Jer 40:13"
+      },
+      {
+        "reference": "Jeremiah 40:15",
+        "original": "Jer 40:15"
+      },
+      {
+        "reference": "Jeremiah 40:16",
+        "original": "Jer 40:16"
+      },
+      {
+        "reference": "Jeremiah 41:11",
+        "original": "Jeremiah 41:11"
+      },
+      {
+        "reference": "Jeremiah 41:13",
+        "original": "Jeremiah 41:13"
+      },
+      {
+        "reference": "Jeremiah 41:14",
+        "original": "Jeremiah 41:14"
+      },
+      {
+        "reference": "Jeremiah 41:16",
+        "original": "Jeremiah 41:16"
+      },
+      {
+        "reference": "Jeremiah 42:1",
+        "original": "Jeremiah 42:1"
+      },
+      {
+        "reference": "Jeremiah 42:8",
+        "original": "Jeremiah 42:8"
+      },
+      {
+        "reference": "Jeremiah 43:2",
+        "original": "Jeremiah 43:2"
+      },
+      {
+        "reference": "Jeremiah 43:4",
+        "original": "Jeremiah 43:4"
+      },
+      {
+        "reference": "Jeremiah 43:5",
+        "original": "Jeremiah 43:5"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARKAA": {
+    "name": "Karkaa",
+    "slug": "karkaa",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Un piso; fondo, un lugar entre Adar y Azmón, aproximadamente a medio camino entre el Mediterráneo y el Mar Muerto (Jos. 15:3)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:3",
+        "original": "Josh. 15:3"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KARKAA, OR KARKAA": {
+    "name": "Karkaa, Or Karkaa",
+    "slug": "karkaa-or-karkaa",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(Fundamento), uno de los hitos en el límite sur de la tribu de Judá (Josué 15:3). Su sitio es desconocido."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:3",
+        "original": "Joshua 15:3"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KARKOR": {
+    "name": "Karkor",
+    "slug": "karkor",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Fundamento, un lugar en los desiertos abiertos al este del Jordán (Jue. 8:10), no lejos de Sucot y Penuel, hacia el sur. Aquí Gedeón alcanzó y derrotó a una banda fugitiva de madianitas bajo Zeba y Zalmuna, a quienes tomó cautivos."
+      },
+      {
+        "source": "SMI",
+        "text": "(Fundamento), el lugar donde Zeba y Zalmuna fueron nuevamente derrotados por Gedeón (Jueces 8:10) debió haber estado al este del Jordán."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 8:10",
+        "original": "Judg. 8:10"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARTAH": {
+    "name": "Kartah",
+    "slug": "kartah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ciudad, un pueblo en la tribu de Zabulón asignado a los levitas de la familia de Merari (Jos. 21:34). Es idéntica a Catat (19:15), y quizás también a Kitrón (Jue. 1:30)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Ciudad), un pueblo de Zabulón, asignado a los levitas meraritas (Josué 21:34)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21:34",
+        "original": "Josh. 21:34"
+      },
+      {
+        "reference": "Judges 1:30",
+        "original": "Judg. 1:30"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KARTAN": {
+    "name": "Kartan",
+    "slug": "kartan",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ciudad doble, un pueblo de Neftalí, asignado a los levitas gersonitas y una de las ciudades de refugio (Jos. 21:32). Probablemente estaba cerca de la orilla noroccidental del Mar de Tiberíades, idéntico al pueblo en ruinas el-Katanah."
+      },
+      {
+        "source": "SMI",
+        "text": "(Ciudad doble), una ciudad de Neftalí, asignada a los levitas gersonitas (Josué 21:32); en la lista paralela de (1 Crónicas 6:1) el nombre aparece, ver (1 Crónicas 6:76) en la forma más expandida de Quiriataim."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21:32",
+        "original": "Josh. 21:32"
+      },
+      {
+        "reference": "1 Chronicles 6:1",
+        "original": "1 Chronicles 6:1"
+      },
+      {
+        "reference": "1 Chronicles 6:76",
+        "original": "1 Chronicles 6:76"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KATTATH": {
+    "name": "Kattath",
+    "slug": "kattath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Jos. 19:15), un pueblo de Aser, ha sido identificado con Kana el Jelil. (Ver CANÁ.)"
+      },
+      {
+        "source": "SMI",
+        "text": "(Pequeño), una de las ciudades de la tribu de Zabulón (Josué 19:15)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 19:15",
+        "original": "Josh. 19:15"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDAR": {
+    "name": "Kedar",
+    "slug": "kedar",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "De piel oscura, el segundo hijo de Ismael (Gén. 25:13). Es el nombre de las tribus nómadas de árabes, los beduinos en general (Isa. 21:16; 42:11; 60:7; Jer. 2:10; Ezeq. 27:21), que habitaban en el noroeste de Arabia. Vivían en tiendas de pelo negro (Cant. 1:5). «Morar en las tiendas de Cedar» significaba estar separado de la adoración del Dios verdadero (Sal. 120:5). Los cedaritas sufrieron a manos de Nabucodonosor (Jer. 49:28, 29)."
+      },
+      {
+        "source": "SMI",
+        "text": "(De piel oscura), el segundo en orden de los hijos de Ismael (Génesis 25:13; 1 Crónicas 1:29) y el nombre de una gran tribu de árabes asentada en el noroeste de la península y en los confines de Palestina. La «gloria de Cedar» es registrada por el profeta Isaías (Isaías 21:13-17) en la carga sobre Arabia; y su importancia también puede inferirse de los «príncipes de Cedar» mencionados por Ezequiel (Ezequiel 27:21), así como por el carácter pastoral de la tribu. También parecen haber sido, como las tribus errantes de hoy en día, «arqueros» y «hombres valientes» (Isaías 21:17) comp. Salmo 120:5. Que también se asentaron en aldeas o pueblos lo encontramos en Isaías (Isaías 42:11). La tribu parece haber sido una de las más conspicuas de todas las tribus ismaelitas, y de ahí que los rabinos llamen universalmente a los árabes por este nombre."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:13",
+        "original": "Gen. 25:13"
+      },
+      {
+        "reference": "Isaiah 21:16",
+        "original": "Isa. 21:16"
+      },
+      {
+        "reference": "Isaiah 42:11",
+        "original": "Isa 42:11"
+      },
+      {
+        "reference": "Isaiah 60:7",
+        "original": "Isa 60:7"
+      },
+      {
+        "reference": "Jeremiah 2:10",
+        "original": "Jer. 2:10"
+      },
+      {
+        "reference": "Ezekiel 27:21",
+        "original": "Ezek. 27:21"
+      },
+      {
+        "reference": "Song of Solomon 1:5",
+        "original": "Cant. 1:5"
+      },
+      {
+        "reference": "Psalms 120:5",
+        "original": "Ps. 120:5"
+      },
+      {
+        "reference": "Jeremiah 49:28",
+        "original": "Jer. 49:28"
+      },
+      {
+        "reference": "Jeremiah 49:29",
+        "original": "Jer 49:29"
+      },
+      {
+        "reference": "1 Chronicles 1:29",
+        "original": "1 Chronicles 1:29"
+      },
+      {
+        "reference": "Isaiah 21:13-17",
+        "original": "Isaiah 21:13-17"
+      },
+      {
+        "reference": "Isaiah 21:17",
+        "original": "Isaiah 21:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDEMAH": {
+    "name": "Kedemah",
+    "slug": "kedemah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Hacia el este, el último de los hijos de Ismael (Gén. 25:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(hacia el este), el más joven de los hijos de Ismael. (Génesis 25:15; 1 Crónicas 1:31)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:15",
+        "original": "Gen. 25:15"
+      },
+      {
+        "reference": "1 Chronicles 1:31",
+        "original": "1 Chronicles 1:31"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDEMOTH": {
+    "name": "Kedemoth",
+    "slug": "kedemoth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Comienzos; más oriental, una ciudad de Rubén, asignada a los levitas de la familia de Merari (Josué 13:18). Se encontraba no muy al noreste de Dibón-gad, al este del Mar Muerto."
+      },
+      {
+        "source": "SMI",
+        "text": "(comienzos), una de las ciudades en el distrito al este del Mar Muerto, asignada a la tribu de Rubén (Josué 13:18), y entregada a los levitas meraritas (Josué 21:37; 1 Crónicas 6:79). Posiblemente dio su nombre al «desierto», o tierra de pastoreo sin cultivar, «de Kedemot» (Números 21:33; 2:26,27) etc."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 13:18",
+        "original": "Josh. 13:18"
+      },
+      {
+        "reference": "Joshua 21:37",
+        "original": "Joshua 21:37"
+      },
+      {
+        "reference": "1 Chronicles 6:79",
+        "original": "1 Chronicles 6:79"
+      },
+      {
+        "reference": "Numbers 21:33",
+        "original": "Numbers 21:33"
+      },
+      {
+        "reference": "Numbers 2:26",
+        "original": "Numbers 2:26"
+      },
+      {
+        "reference": "Numbers 2:27",
+        "original": "Numbers 2:27"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDESH": {
+    "name": "Kedesh",
+    "slug": "kedesh",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Santuario. (1.) Un lugar en el extremo sur de Judá (Josué 15:23). Probablemente el mismo que Cades-barnea (véase). (2.) Una ciudad de Isacar (1 Crón. 6:72). Posiblemente Tell Abu Kadeis, cerca de Lejjun. (3.) Una «ciudad fortificada» de Neftalí, una de las ciudades de refugio (Josué 19:37; Jueces 4:6). Fue asignada a los levitas gersonitas (Josué 21:32). Originalmente era una ciudad real cananea (Josué 12:22), y fue la residencia de Barac (Jueces 4:6); y allí él y Débora reunieron a las tribus de Zabulón y Neftalí antes del comienzo del conflicto con Sísara en la llanura de Esdraelón, «por Jehová entre los poderosos» (9, 10). En el reinado de Peka fue tomada por Tiglat-pileser (2 Reyes 15:29). Estaba situada cerca de la «llanura» (mejor «el roble») de Zaanaim, y ha sido identificada con la moderna Kedes, en las colinas, a cuatro millas al noroeste del lago El Huleh. Algunos han supuesto que el Cedes de la narración, donde Barac reunió a sus tropas, no era el lugar así llamado en la Alta Galilea, que estaba a 30 millas de la llanura de Esdraelón, sino Kedish, en la orilla del Mar de Galilea, a 12 millas del Tabor."
+      },
+      {
+        "source": "SMI",
+        "text": "(un santuario)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:23",
+        "original": "Josh. 15:23"
+      },
+      {
+        "reference": "1 Chronicles 6:72",
+        "original": "1 Chr. 6:72"
+      },
+      {
+        "reference": "Joshua 19:37",
+        "original": "Josh. 19:37"
+      },
+      {
+        "reference": "Judges 4:6",
+        "original": "Judg. 4:6"
+      },
+      {
+        "reference": "Joshua 21:32",
+        "original": "Josh. 21:32"
+      },
+      {
+        "reference": "Joshua 12:22",
+        "original": "Josh. 12:22"
+      },
+      {
+        "reference": "2 Kings 15:29",
+        "original": "2 Kings 15:29"
+      },
+      {
+        "reference": "Joshua 20:7",
+        "original": "Joshua 20:7"
+      },
+      {
+        "reference": "1 Chronicles 6:76",
+        "original": "1 Chronicles 6:76"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEDRON": {
+    "name": "Kedron",
+    "slug": "kedron",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "El valle, ahora bastante estrecho, entre el Monte de los Olivos y el Monte Moriah. Su parte superior se llama el Valle de Josafat. La LXX, en 1 Reyes 15:13, traduce «del cedro». La palabra significa «negro», y puede referirse al color del agua o a la oscuridad del barranco, o al verde oscuro de los cedros que crecían allí. Juan 18:1, «Cedrón», solo aquí en el Nuevo Testamento. (Véase KIDRÓN)."
+      },
+      {
+        "source": "SMI",
+        "text": "propiamente Kidrón. [Kidrón, o Cedrón]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 15:13",
+        "original": "1 Kings 15:13"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEFR KENNA": {
+    "name": "Kefr Kenna",
+    "slug": "kefr-kenna",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Véase Caná]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KEHELATHAH": {
+    "name": "Kehelathah",
+    "slug": "kehelathah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Asamblea, una de las estaciones de los israelitas en el desierto (Núm. 33:22, 23)."
+      },
+      {
+        "source": "SMI",
+        "text": "(asamblea), un campamento en el desierto de los israelitas (Números 33:22), del cual nada se sabe."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 33:22",
+        "original": "Num. 33:22"
+      },
+      {
+        "reference": "Numbers 33:23",
+        "original": "Num. 33:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEILAH": {
+    "name": "Keilah",
+    "slug": "keilah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ciudadela, una ciudad en las tierras bajas de Judá (Josué 15:44). David la rescató del ataque de los filisteos (1 Sam. 23:1-8); pero los habitantes, demostrando serle infieles al intentar entregarlo a Saúl (13), él y sus hombres «partieron de Queila, y se fueron por donde pudieron ir». Huyeron al monte Haret, a unas 3 millas al este, y desde allí a través de Hebrón a Zif (véase). «Y David estaba en el desierto de Zif, en un bosque» (1 Sam. 23:15). Aquí Jonatán lo buscó, «y fortaleció su mano en Dios». Esta fue la última entrevista entre David y Jonatán (23:16-18). Es la moderna Khurbet Kila. Otros la identifican con Khuweilfeh, entre Beit Yibrín (Eleuterópolis) y Beerseba, mencionada en las tablillas de Amarna."
+      },
+      {
+        "source": "SMI",
+        "text": "(fortaleza), una ciudad de la Sefelá, o distrito de tierras bajas de Judá (Josué 15:44). Su principal interés reside en su conexión con David (1 Samuel 23:7-13). Está representada por Kila, un sitio con ruinas, en el camino inferior de Beit Yibrín a Hebrón."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:44",
+        "original": "Josh. 15:44"
+      },
+      {
+        "reference": "1 Samuel 23:1-8",
+        "original": "1 Sam. 23:1-8"
+      },
+      {
+        "reference": "1 Samuel 23:15",
+        "original": "1 Sam. 23:15"
+      },
+      {
+        "reference": "1 Samuel 23:7-13",
+        "original": "1 Samuel 23:7-13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEILAH THE GARMITE": {
+    "name": "Keilah The Garmite",
+    "slug": "keilah-the-garmite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "aparentemente un descendiente del gran Caleb (1 Crónicas 4:19). No hay conexión aparente con la ciudad de Keila."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 4:19",
+        "original": "1 Chronicles 4:19"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KELAIAH": {
+    "name": "Kelaiah",
+    "slug": "kelaiah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(mensajero veloz de Jehová) = Quelita. (Esdras 10:23)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 10:23",
+        "original": "Ezra 10:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KELITA": {
+    "name": "Kelita",
+    "slug": "kelita",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Enano, un levita que ayudó a Esdras a exponer la ley al pueblo (Neh. 8:7; 10:10)."
+      },
+      {
+        "source": "SMI",
+        "text": "(asamblea), uno de los levitas que regresaron con Esdras (Esdras 10:23). Ayudó a exponer la ley (Nehemías 8:7) y firmó el pacto con Nehemías (Nehemías 10:10) (459-410 a.C.)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Nehemiah 8:7",
+        "original": "Neh. 8:7"
+      },
+      {
+        "reference": "Nehemiah 10:10",
+        "original": "Neh 10:10"
+      },
+      {
+        "reference": "Ezra 10:23",
+        "original": "Ezra 10:23"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEMUEL": {
+    "name": "Kemuel",
+    "slug": "kemuel",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ayudante de Dios, o asamblea de Dios. (1.) El tercer hijo de Nacor (Gén. 22:21). (2.) Hijo de Siftán, designado en nombre de la tribu de Efraín para repartir la tierra de Canaán (Núm. 34:24). (3.) Un levita (1 Crón. 27:17)."
+      },
+      {
+        "source": "SMI",
+        "text": "(congregación de Dios)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 22:21",
+        "original": "Gen. 22:21"
+      },
+      {
+        "reference": "Numbers 34:24",
+        "original": "Num. 34:24"
+      },
+      {
+        "reference": "1 Chronicles 27:17",
+        "original": "1 Chr. 27:17"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENAN": {
+    "name": "Kenan",
+    "slug": "kenan",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(posesión) = Cainán, el hijo de Enós (1 Crónicas 1:2)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 1:2",
+        "original": "1 Chronicles 1:2"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENATH": {
+    "name": "Kenath",
+    "slug": "kenath",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Posesión, una ciudad de Galaad. Fue capturada por Nobaj, quien le dio su propio nombre (Núm. 32:42). Ha sido identificada con Kunawat, en las laderas de Yabal Haurán (Monte Basán), 60 millas al este del extremo sur del Mar de Galilea."
+      },
+      {
+        "source": "SMI",
+        "text": "(posesión), una de las ciudades al este del Jordán, con sus «aldeas hijas» (versión autorizada «aldeas»), de la cual tomó posesión un tal Nobaj, quien luego la llamó con su propio nombre (Números 32:42)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 32:42",
+        "original": "Num. 32:42"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENAZ": {
+    "name": "Kenaz",
+    "slug": "kenaz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Cazador. (1.) Uno de los hijos de Elifaz, hijo de Esaú. Llegó a ser jefe de una tribu edomita (Gén. 36:11, 15, 42). (2.) Hermano menor de Caleb y padre de Otoniel (Josué 15:17), cuya familia fue importante en Israel hasta la época de David (1 Crón. 27:15). Algunos creen que Otoniel (Jueces 1:13), y no Cenaz, era el hermano de Caleb. (3.) Nieto de Caleb (1 Crón. 4:15)."
+      },
+      {
+        "source": "SMI",
+        "text": "(caza)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 36:11",
+        "original": "Gen. 36:11"
+      },
+      {
+        "reference": "Genesis 36:15",
+        "original": "Gen. 36:15"
+      },
+      {
+        "reference": "Genesis 36:42",
+        "original": "Gen. 36:42"
+      },
+      {
+        "reference": "Joshua 15:17",
+        "original": "Josh. 15:17"
+      },
+      {
+        "reference": "1 Chronicles 27:15",
+        "original": "1 Chr. 27:15"
+      },
+      {
+        "reference": "Judges 1:13",
+        "original": "Judg. 1:13"
+      },
+      {
+        "reference": "1 Chronicles 4:15",
+        "original": "1 Chr. 4:15"
+      },
+      {
+        "reference": "1 Chronicles 1:53",
+        "original": "1 Chronicles 1:53"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KENEZITE": {
+    "name": "Kenezite",
+    "slug": "kenezite",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "o Ceniceo (descendiente de Cenaz), (Génesis 15:19) una tribu edomita (Números 32:12; Josué 14:6,14)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Genesis 15:19"
+      },
+      {
+        "reference": "Numbers 32:12",
+        "original": "Numbers 32:12"
+      },
+      {
+        "reference": "Joshua 14:6",
+        "original": "Joshua 14:6"
+      },
+      {
+        "reference": "Joshua 14:14",
+        "original": "Joshua 14:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENITE, THE": {
+    "name": "Kenite, The",
+    "slug": "kenite-the",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "y los ceneos (herreros), habitaron la región rocosa y desértica entre el sur de Palestina y las montañas del Sinaí, al este del Golfo de Akaba. Eran una rama de la nación más grande de Madián, —por el hecho de que Jetro, quien en Éxodo (véase (Éxodo 2:15,16; 4:19) etc.) es representado como morador en la tierra de Madián, y como sacerdote o príncipe de esa nación, se dice distintamente en (Jueces 1:16; 4:11) que fue un ceneo. Los importantes servicios prestados por el jeque de los ceneos a Moisés durante un tiempo de gran presión y dificultad fueron recompensados por este último con la promesa de una firme amistad entre ambos pueblos. Parece que acompañaron a los hebreos durante sus peregrinaciones, (Números 24:21,22; Jueces 1:16) comp. 2Cr 28:15 Pero, una vez terminadas las peregrinaciones de Israel, abandonaron las cercanías de las ciudades y se retiraron a un aire más libre,—al «desierto de Judá, que está al sur de Arad». (Jueces 1:16) Sin embargo, uno de los jeques de la tribu, llamado Heber, había vagado hacia el norte en lugar de hacia el sur. (Jueces 4:11) El desarrollo más notable de este pueblo se encuentra en la secta o familia de los recabitas."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Exodus 2:15",
+        "original": "Exodus 2:15"
+      },
+      {
+        "reference": "Exodus 2:16",
+        "original": "Exodus 2:16"
+      },
+      {
+        "reference": "Exodus 4:19",
+        "original": "Exodus 4:19"
+      },
+      {
+        "reference": "Judges 1:16",
+        "original": "Judges 1:16"
+      },
+      {
+        "reference": "Judges 4:11",
+        "original": "Judges 4:11"
+      },
+      {
+        "reference": "Numbers 24:21",
+        "original": "Numbers 24:21"
+      },
+      {
+        "reference": "Numbers 24:22",
+        "original": "Numbers 24:22"
+      },
+      {
+        "reference": "2 Chronicles 28:15",
+        "original": "2Chr 28:15"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KENITES": {
+    "name": "Kenites",
+    "slug": "kenites",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Herreros, nombre de una tribu que habitaba el desierto situado entre el sur de Palestina y las montañas del Sinaí. Jetro era de esta tribu (Jue. 1:16). Se le llama «madianita» (Núm. 10:29), y de ahí se concluye que los madianitas y los ceneos eran la misma tribu. Eran herreros errantes, «los gitanos y caldereros ambulantes del antiguo mundo oriental. Formaron un gremio importante en una época en que el arte de la metalurgia estaba confinado a unos pocos» (Sayce’s Races, etc.). Mostraron bondad a Israel en su viaje por el desierto. Los acompañaron en su marcha hasta Jericó (Jue. 1:16), y luego regresaron a sus antiguos refugios entre los amalecitas, en el desierto al sur de Judá. Posteriormente mantuvieron relaciones amistosas con los israelitas cuando se establecieron en Canaán (Jue. 4:11, 17-21; 1 Sam. 27:10; 30:29). Los recabitas pertenecían a esta tribu (1 Cr. 2:55) y en los días de Jeremías (35:7-10) se hace referencia a ellos siguiendo sus costumbres nómadas. Saúl les ordenó que se apartaran de los amalecitas (1 Sam. 15:6) cuando, en obediencia a la comisión divina, estaba a punto de «herir a Amalec». Y su razón es: «porque vosotros mostrasteis bondad a todos los hijos de Israel cuando subieron de Egipto». Así, «Dios no es injusto para olvidar las bondades mostradas a su pueblo; sino que serán recordadas otro día, a más tardar en el gran día, y recompensadas en la resurrección de los justos» (M. Henry’s Commentary). Se les menciona por última vez en las Escrituras en 1 Sam. 27:10; comp. 30:20."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 1:16",
+        "original": "Judg. 1:16"
+      },
+      {
+        "reference": "Numbers 10:29",
+        "original": "Num. 10:29"
+      },
+      {
+        "reference": "Judges 4:11",
+        "original": "Judg. 4:11"
+      },
+      {
+        "reference": "Judges 4:17",
+        "original": "Judg. 4:17"
+      },
+      {
+        "reference": "1 Samuel 27:10",
+        "original": "1 Sam. 27:10"
+      },
+      {
+        "reference": "1 Samuel 30:29",
+        "original": "1 Sam. 30:29"
+      },
+      {
+        "reference": "1 Chronicles 2:55",
+        "original": "1 Chr. 2:55"
+      },
+      {
+        "reference": "1 Samuel 15:6",
+        "original": "1 Sam. 15:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KENIZZITE": {
+    "name": "Kenizzite",
+    "slug": "kenizzite",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Nombre de una tribu mencionada en el pacto que Dios hizo con Abraham (Gén. 15:19). No se les menciona entre los habitantes originales de Canaán (Éx. 3:8; Jos. 3:10), y probablemente habitaron alguna parte de Arabia, en los confines de Siria. (2.) Una designación dada a Caleb (R.V., Núm. 32:12; A.V., Kenezita)."
+      },
+      {
+        "source": "SMI",
+        "text": "(Génesis 15:19) [Kenezita]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 15:19",
+        "original": "Gen. 15:19"
+      },
+      {
+        "reference": "Exodus 3:8",
+        "original": "Ex. 3:8"
+      },
+      {
+        "reference": "Joshua 3:10",
+        "original": "Josh. 3:10"
+      },
+      {
+        "reference": "Numbers 32:12",
+        "original": "Num. 32:12"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KERCHIEF": {
+    "name": "Kerchief",
+    "slug": "kerchief",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Mencionado solo en Ez. 13:18, 21, como una prenda de vestir u ornamento aplicado a la cabeza de las mujeres idólatras de Israel. El significado preciso de la palabra es incierto. Parece haber sido un chal largo y suelto, como los que las mujeres orientales usan para envolverse (Rut 3:15; Is. 3:22). Algunos piensan que era un velo largo o un tocado, que denotaba por su forma la posición de quienes lo usaban."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezekiel 13:18",
+        "original": "Ezek. 13:18"
+      },
+      {
+        "reference": "Ezekiel 13:21",
+        "original": "Ezek. 13:21"
+      },
+      {
+        "reference": "Ruth 3:15",
+        "original": "Ruth 3:15"
+      },
+      {
+        "reference": "Isaiah 3:22",
+        "original": "Isa. 3:22"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KEREN-HAPPUCH": {
+    "name": "Keren-happuch",
+    "slug": "keren-happuch",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Cuerno del ungüento facial = caja de cosméticos, el nombre de la tercera hija de Job (Job 42:14), nacida después de que la prosperidad le hubiera regresado."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job. 42:14"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KERENHAPPUCH": {
+    "name": "Kerenhappuch",
+    "slug": "kerenhappuch",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(el cuerno de la belleza), la menor de las hijas de Job, nacida a él durante el período de su prosperidad restaurada. (Job 42:14)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job 42:14"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KERIOTH": {
+    "name": "Kerioth",
+    "slug": "kerioth",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Ciudades. (1.) Un pueblo en el sur de Judá (Jos. 15:25). Judas el traidor fue probablemente nativo de este lugar, y de ahí su nombre Iscariote. Se ha identificado con las ruinas de el-Kureitein, a unas 10 millas al sur de Hebrón. (Véase HAZOR [4]). (2.) Una ciudad de Moab (Jer. 48:24, 41), llamada Kiriot (Amós 2:2)."
+      },
+      {
+        "source": "SMI",
+        "text": "(ciudades)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:25",
+        "original": "Josh. 15:25"
+      },
+      {
+        "reference": "Jeremiah 48:24",
+        "original": "Jer. 48:24"
+      },
+      {
+        "reference": "Jeremiah 48:41",
+        "original": "Jer. 48:41"
+      },
+      {
+        "reference": "Amos 2:2",
+        "original": "Amos 2:2"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEROS": {
+    "name": "Keros",
+    "slug": "keros",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(curvado), uno de los netineos, cuyos descendientes regresaron con Zorobabel. (Esdras 2:44; Nehemías 7:47)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ezra 2:44",
+        "original": "Ezra 2:44"
+      },
+      {
+        "reference": "Nehemiah 7:47",
+        "original": "Nehemiah 7:47"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KESITAH": {
+    "name": "Kesitah",
+    "slug": "kesitah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Gén. 33:19, R.V., margen, una palabra hebrea, traducida, A.V., pl. «piezas de dinero», margen, «corderos»; Jos. 24:32, «piezas de plata»; Job 42:11, «pieza de dinero»). La kesita era probablemente una moneda de un peso particular, acuñada en forma de cordero. Los monumentos de Egipto muestran que se utilizaban tales pesos. (Véase PIEZAS.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 33:19",
+        "original": "Gen. 33:19"
+      },
+      {
+        "reference": "Joshua 24:32",
+        "original": "Josh. 24:32"
+      },
+      {
+        "reference": "Job 42:11",
+        "original": "Job 42:11"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KETTLE": {
+    "name": "Kettle",
+    "slug": "kettle",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una olla grande para cocinar. La misma palabra hebrea (dud, «hirviendo») se traduce también como «olla» (Sal. 81:6), «caldero» (2 Cr. 35:13), «cesto» (Jer. 24:2). Se usaba para preparar las ofrendas de paz (1 Sam. 2:13, 14)."
+      },
+      {
+        "source": "SMI",
+        "text": "un recipiente para fines culinarios o sacrificiales. (1 Samuel 2:14) La palabra hebrea también se traduce como «cesto» en (Jeremías 24:2), «caldero» en (2 Crónicas 35:13) y «olla» en (Job 41:20)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Psalms 81:6",
+        "original": "Ps. 81:6"
+      },
+      {
+        "reference": "2 Chronicles 35:13",
+        "original": "2 Chr. 35:13"
+      },
+      {
+        "reference": "Jeremiah 24:2",
+        "original": "Jer. 24:2"
+      },
+      {
+        "reference": "1 Samuel 2:13",
+        "original": "1 Sam. 2:13"
+      },
+      {
+        "reference": "1 Samuel 2:14",
+        "original": "1 Sam. 2:14"
+      },
+      {
+        "reference": "Job 41:20",
+        "original": "Job 41:20"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KETURAH": {
+    "name": "Keturah",
+    "slug": "keturah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Incienso, la esposa de Abraham, con quien se casó probablemente después de la muerte de Sara (Gén. 25:1-6), y con quien tuvo seis hijos, a quienes envió al país del este. Su nacionalidad es desconocida. Se la denomina «concubina de Abraham» (1 Cr. 1:32). A través de los descendientes de la línea de Cetura, Abraham se convirtió en el «padre de muchas naciones»."
+      },
+      {
+        "source": "SMI",
+        "text": "(incienso), la esposa de Abraham después de la muerte de Sara. (Génesis 25:1; 1 Crónicas 1:32) (A.C. 1860.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 25:1-6",
+        "original": "Gen. 25:1-6"
+      },
+      {
+        "reference": "1 Chronicles 1:32",
+        "original": "1 Chr. 1:32"
+      },
+      {
+        "reference": "Genesis 25:1",
+        "original": "Genesis 25:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEY": {
+    "name": "Key",
+    "slug": "key",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Mencionada con frecuencia en las Escrituras. En hebreo se llama *maphteah*, es decir, el abridor (Jue. 3:25); y en el Nuevo Testamento griego, *kleis*, por su uso para cerrar (Mat. 16:19; Luc. 11:52; Apoc. 1:18, etc.). Se encuentran con frecuencia figuras de llaves egipcias antiguas en los monumentos, también de cerraduras y llaves asirias de madera, y de gran tamaño (comp. Is. 22:22). La palabra se usa figurativamente para referirse al poder, la autoridad o el cargo (Is. 22:22; Apoc. 3:7; Apoc. 1:8; comp. 9:1; 20:1; comp. también Mat. 16:19; 18:18). La «llave del conocimiento» (Luc. 11:52; comp. Mat. 23:13) es el medio para alcanzar el conocimiento acerca del reino de Dios. El «poder de las llaves» es una frase de uso general para denotar la extensión de la autoridad eclesiástica."
+      },
+      {
+        "source": "SMI",
+        "text": "La llave de una cerradura oriental nativa es una pieza de madera, de siete pulgadas a dos pies de largo, provista de alambres o clavos cortos que, al insertarse lateralmente en el cerrojo hueco que sirve de cerradura, levanta otros pasadores dentro del pestillo para permitir que el cerrojo se retire. (Las llaves a veces eran de bronce o hierro, y tan grandes que una era tan pesada como un hombre podía cargar. Se usan en las Escrituras como símbolo de autoridad y poder. Dar llaves a una persona significa encomendarle un cargo importante. (Mateo 16:19) En Inglaterra, en los tiempos modernos, ciertos funcionarios del gobierno reciben, al asumir el cargo, una llave de oro.—ED.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Judges 3:25",
+        "original": "Judg. 3:25"
+      },
+      {
+        "reference": "Matthew 16:19",
+        "original": "Matt. 16:19"
+      },
+      {
+        "reference": "Luke 11:52",
+        "original": "Luke 11:52"
+      },
+      {
+        "reference": "Revelation 1:18",
+        "original": "Rev. 1:18"
+      },
+      {
+        "reference": "Isaiah 22:22",
+        "original": "Isa. 22:22"
+      },
+      {
+        "reference": "Revelation 3:7",
+        "original": "Rev. 3:7"
+      },
+      {
+        "reference": "Revelation 1:8",
+        "original": "Rev. 1:8"
+      },
+      {
+        "reference": "Matthew 18:18",
+        "original": "Matt 18:18"
+      },
+      {
+        "reference": "Matthew 23:13",
+        "original": "Matt. 23:13"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEZIA": {
+    "name": "Kezia",
+    "slug": "kezia",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Casia, el nombre de la segunda hija de Job (42:14), nacida después de que la prosperidad le hubiera regresado."
+      },
+      {
+        "source": "SMI",
+        "text": "(casia), la segunda de las hijas de Job nacida a él después de su recuperación. (Job 42:14) (A.C. 1950.)"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Job 42:14",
+        "original": "Job 42:14"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KEZIZ": {
+    "name": "Keziz",
+    "slug": "keziz",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Abrupto; cortado, una ciudad de la tribu de Benjamín (Jos. 18:21)."
+      },
+      {
+        "source": "SMI",
+        "text": "(cortado), El valle de, una de las «ciudades» de Benjamín, (Josué 18:21) y el límite oriental de la tribu."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 18:21",
+        "original": "Josh. 18:21"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIBROTH-HATTAAVAH": {
+    "name": "Kibroth-hattaavah",
+    "slug": "kibroth-hattaavah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Las tumbas del anhelo o de la codicia, una de las estaciones de los israelitas en el desierto. Probablemente estaba en el Wady Murrah y se ha identificado con Erweis el-Ebeirig, donde se han encontrado los restos de un antiguo campamento, a unas 30 millas al noreste del Sinaí, y exactamente a un día de viaje de ‘Ain Hudherah. «Aquí comenzaron los problemas del viaje. Primero, estallaron quejas entre el pueblo, probablemente por el calor, el esfuerzo y las privaciones de la marcha; y luego Dios los castigó de inmediato con un rayo, que cayó sobre la parte trasera del campamento y mató a muchas personas, pero cesó por la intercesión de Moisés (Núm. 11:1, 2). Luego, un disgusto invadió a la multitud al no tener nada más que maná para comer día tras día, sin cambios, sin carne, sin pescado, sin verduras de sabor intenso, sin frutas deliciosas... El pueblo aborrecía la ‘comida ligera’ y clamó a Moisés: ‘Danos carne, danos carne para que comamos’». En esta emergencia, Moisés, desesperado, clamó a Dios. Llegó una respuesta. Dios envió «un prodigioso vuelo de codornices, con las cuales el pueblo sació su apetito glotón durante un mes entero. Luego les sobrevino el castigo: aborrecieron la comida que habían deseado; les causó enfermedad; la ira divina agravó la enfermedad convirtiéndola en una plaga, y una alta mortalidad fue la consecuencia. Los muertos fueron enterrados fuera del campamento; y en memoria del pecado del hombre y de la ira divina, este nombre, Kibroth-hattaavah, las Tumbas de la Codicia, fue dado al lugar de su sepultura» (Núm. 11:34, 35; 33:16, 17; Deut. 9:22; comp. Sal. 78:30, 31)., Rawlinson’s Moses, p. 175. Desde este campamento viajaron en dirección noreste hacia Hazerot."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 11:1",
+        "original": "Num. 11:1"
+      },
+      {
+        "reference": "Numbers 11:2",
+        "original": "Num 11:2"
+      },
+      {
+        "reference": "Numbers 11:34",
+        "original": "Num. 11:34"
+      },
+      {
+        "reference": "Numbers 11:35",
+        "original": "Num. 11:35"
+      },
+      {
+        "reference": "Deuteronomy 9:22",
+        "original": "Deut. 9:22"
+      },
+      {
+        "reference": "Psalms 78:30",
+        "original": "Ps. 78:30"
+      },
+      {
+        "reference": "Psalms 78:31",
+        "original": "Ps. 78:31"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIBROTHHATTAAVAH": {
+    "name": "Kibrothhattaavah",
+    "slug": "kibrothhattaavah",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "es decir, como en el margen, las tumbas de la concupiscencia, una estación de los israelitas en el desierto, donde, cansados del maná y deseando carne, murmuraron, y Dios les envió codornices en gran abundancia, pero hirió a muchos de ellos con una plaga y murieron. Está a unas tres jornadas de camino desde el Sinaí, y cerca del Golfo de Áqaba y del Wady el Hudherah (Hazerot)."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KIBZAIM": {
+    "name": "Kibzaim",
+    "slug": "kibzaim",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Dos montones, una ciudad de Efraín, asignada a los levitas coatitas y designada como ciudad de refugio (Josué 21:22). También es llamada Jocmeam (1 Crónicas 6:68)."
+      },
+      {
+        "source": "SMI",
+        "text": "(dos montones), una ciudad del monte Efraín, entregada con sus “suburbios” a los levitas coatitas (Josué 21:22). En la lista paralela de (1 Crónicas 6:1), JOCBEAM se sustituye por Kibzaim. Ver. (1 Crónicas 6:68)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 21",
+        "original": "Josh. 21"
+      },
+      {
+        "reference": "1 Chronicles 6:68",
+        "original": "1 Chr. 6:68"
+      },
+      {
+        "reference": "Joshua 21:22",
+        "original": "Joshua 21:22"
+      },
+      {
+        "reference": "1 Chronicles 6:1",
+        "original": "1 Chronicles 6:1"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KIDRON": {
+    "name": "Kidron",
+    "slug": "kidron",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "= Cedrón = Cedrón, turbio, el torrente invernal que fluye a través del Valle de Josafat, en el lado oriental de Jerusalén, entre la ciudad y el Monte de los Olivos. Este valle es conocido en las Escrituras solo con el nombre de “el arroyo Cedrón”. David cruzó este arroyo descalzo y llorando, al huir de Absalón (2 Samuel 15:23, 30), y fue cruzado frecuentemente por nuestro Señor en sus idas y venidas (Juan 18:1). Aquí Asa quemó los ídolos obscenos de su madre (1 Reyes 15:13), y aquí Atalía fue ejecutada (2 Reyes 11:16). Posteriormente se convirtió en el receptáculo de todo tipo de impurezas (2 Crónicas 29:16; 30:14); y en tiempos de Josías, este valle era el cementerio común de la ciudad (2 Reyes 23:6; cf. Jeremías 26:23). Por esta quebrada montañosa no corre agua, excepto después de fuertes lluvias en las montañas alrededor de Jerusalén. Su longitud desde su cabecera hasta En-rogel es de 2 3/4 millas. Sus riberas escarpadas y rocosas están llenas de tumbas antiguas, especialmente la orilla izquierda frente al área del templo. El mayor deseo de los judíos es ser enterrados allí, por la idea de que el Cedrón es el “valle de Josafat” mencionado en Joel 3:2. Por debajo de En-rogel, el Cedrón no tiene interés histórico ni sagrado. Corre en un curso serpenteante a través del desierto de Judea hasta la orilla noroeste del Mar Muerto. Toda su longitud, en línea recta, es de solo unas 20 millas, pero en este espacio su descenso es de aproximadamente 3,912 pies. (Véase CEDRÓN.) Excavaciones recientes han revelado el hecho de que el antiguo lecho del Cedrón está unos 40 pies más abajo que su lecho actual, y unos 70 pies más cerca del muro del santuario."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 15:23",
+        "original": "2 Sam. 15:23"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2 Sam. 15:30"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      },
+      {
+        "reference": "1 Kings 15:13",
+        "original": "1 Kings 15:13"
+      },
+      {
+        "reference": "2 Kings 11:16",
+        "original": "2 Kings 11:16"
+      },
+      {
+        "reference": "2 Chronicles 29:16",
+        "original": "2 Chr. 29:16"
+      },
+      {
+        "reference": "2 Chronicles 30:14",
+        "original": "2 Chr. 30:14"
+      },
+      {
+        "reference": "2 Kings 23:6",
+        "original": "2 Kings 23:6"
+      },
+      {
+        "reference": "Jeremiah 26:23",
+        "original": "Jer. 26:23"
+      },
+      {
+        "reference": "Joel 3:2",
+        "original": "Joel 3:2"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KIDRON, OR KEDRON": {
+    "name": "Kidron, Or Kedron",
+    "slug": "kidron-or-kedron",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "(turbio), El arroyo, un torrente o valle, no un “arroyo” o, como en el margen de la Versión Revisada, “barranco”; griego: torrente invernal. Estaba cerca de Jerusalén, entre la ciudad y el Monte de los Olivos. Actualmente se conoce comúnmente como el “valle de Josafat”. El cauce del valle de Josafat no es más que el lecho seco de un torrente invernal, que muestra señales de ser ocasionalmente arrastrado por un gran volumen de agua. Fue cruzado por David en su huida (2 Samuel 15:23; cf. 2 Samuel 15:30) y por nuestro Señor de camino a Getsemaní (Juan 18:1; cf. Marcos 14:26; Lucas 22:39). La peculiaridad distintiva del valle del Cedrón —mencionado en el Antiguo Testamento— es la impureza que parece habérsele atribuido. En tiempos de Josías era el cementerio común de la ciudad (2 Reyes 23:6; cf. Jeremías 26:23)."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Samuel 15:23",
+        "original": "2 Samuel 15:23"
+      },
+      {
+        "reference": "2 Samuel 15:30",
+        "original": "2Sam 15:30"
+      },
+      {
+        "reference": "John 18:1",
+        "original": "John 18:1"
+      },
+      {
+        "reference": "Mark 14:26",
+        "original": "Mark 14:26"
+      },
+      {
+        "reference": "Luke 22:39",
+        "original": "Luke 22:39"
+      },
+      {
+        "reference": "2 Kings 23:6",
+        "original": "2 Kings 23:6"
+      },
+      {
+        "reference": "Jeremiah 26:23",
+        "original": "Jere 26:23"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINAH": {
+    "name": "Kinah",
+    "slug": "kinah",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una elegía, una ciudad en el extremo sur de Judá (Josué 15:22). Probablemente no estaba lejos del Mar Muerto, en el Wady Fikreh."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 15:22",
+        "original": "Josh. 15:22"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINE": {
+    "name": "Kine",
+    "slug": "kine",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Heb. sing. parah, es decir, “fructífera”), mencionada en el sueño del Faraón (Génesis 41:18). Aquí la palabra denota “búfalas”, que se alimentaban de los juncos y la maleza a orillas del río."
+      },
+      {
+        "source": "SMI",
+        "text": "el plural de vaca. [Véase Toro, Novillo]"
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 41",
+        "original": "Gen. 41"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KING": {
+    "name": "King",
+    "slug": "king",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "En las Escrituras se usa muy generalmente para denotar a alguien investido de autoridad, ya sea extensa o limitada. Hubo treinta y un reyes en Canaán (Josué 12:9, 24), a quienes Josué sometió. Adonibezec sometió a setenta reyes (Jueces 1:7). En el Nuevo Testamento, al emperador romano se le llama rey (1 Pedro 2:13, 17); y a Herodes Antipas, que era solo un tetrarca, también se le llama rey (Mateo 14:9; Marcos 6:22). Este título se aplica a Dios (1 Timoteo 1:17) y a Cristo, el Hijo de Dios (1 Timoteo 6:15, 16; Mateo 27:11). El pueblo de Dios también es llamado “reyes” (Daniel 7:22, 27; Mateo 19:28; Apocalipsis 1:6, etc.). La muerte es llamada el “rey de los terrores” (Job 18:14). Jehová fue el único Rey de la nación judía (1 Samuel 8:7; Isaías 33:22). Pero llegó un momento en la historia de ese pueblo en que se exigió un rey, para que pudieran ser como las otras naciones (1 Samuel 8:5). El profeta Samuel los reprendió, pero el pueblo clamó: “No, sino que tendremos un rey sobre nosotros”. La mala conducta de los hijos de Samuel fue la causa inmediata de esta demanda. Los reyes hebreos no gobernaban por derecho propio, ni en nombre del pueblo que los había elegido, sino en parte como siervos y en parte como representantes de Jehová, el verdadero Rey de Israel (1 Samuel 10:1). Los límites del poder del rey estaban prescritos (1 Samuel 10:25). Los oficiales de su corte eran: (1) el cronista o recordador (2 Samuel 8:16; 1 Reyes 4:3); (2) el escriba (2 Samuel 8:17; 20:25); (3) el mayordomo de la casa, el administrador principal (Isaías 22:15); (4) el “amigo del rey”, un compañero de confianza (1 Reyes 4:5); (5) el encargado del guardarropa (2 Reyes 22:14); (6) el capitán de la guardia (2 Samuel 20:23); (7) los oficiales sobre los tesoros del rey, etc. (1 Crónicas 27:25-31); (8) el comandante en jefe del ejército (1 Crónicas 27:34); (9) el consejero real (1 Crónicas 27:32; 2 Samuel 16:20-23). (Para un catálogo de reyes de Israel y Judá, véase la tabla cronológica en el Apéndice)."
+      },
+      {
+        "source": "SMI",
+        "text": "«Un gobernante principal, investido de autoridad suprema sobre una nación, tribu o país».—Webster. En la Biblia, la palabra no implica necesariamente gran poder o gran extensión de territorio. Muchas personas son llamadas reyes a quienes más bien deberíamos llamar jefes o líderes. La palabra se aplica en la Biblia a Dios como el soberano y gobernante del universo, y a Cristo el Hijo de Dios como la cabeza y gobernador de la Iglesia. Los hebreos fueron gobernados por un rey durante un período de aproximadamente 500 años antes de la destrucción de Jerusalén, en el 586 a.C. La ocasión inmediata de la sustitución de una forma de gobierno real por la de los jueces parece haber sido el asedio de Jabes de Galaad por Nahas, rey de los amonitas (1 Samuel 11:1; 12:12). La convicción parece haberse impuesto a los israelitas de que no podían resistir a su formidable vecino a menos que se sometieran al dominio de un rey, como las naciones circundantes. La idea original de un rey hebreo era doble: primero, que debía guiar al pueblo a la batalla en tiempo de guerra; y, segundo, que debía ejecutar juicio y justicia para ellos en la guerra y en la paz (1 Samuel 8:20). En ambos aspectos se logró el fin deseado. Además de ser comandante en jefe del ejército, juez supremo y, por así decirlo, amo absoluto de las vidas de sus súbditos, el rey ejercía el poder de imponerles impuestos y de exigirles servicio personal y trabajo. Además de estos poderes terrenales, el rey de Israel tenía un derecho más impresionante al respeto y la obediencia. Era el lugarteniente de Jehová (1 Samuel 10:1; 16:13) y, por así decirlo, su hijo, si era justo y santo (2 Samuel 7:14; Salmos 2:6,7; 89:26,27). Había sido apartado como un gobernante consagrado. Sobre su cabeza se había vertido el santo óleo de la unción, que hasta entonces había sido reservado exclusivamente para los sacerdotes de Jehová. Se había convertido, de hecho, enfáticamente en «el ungido del Señor». Tenía una corte de magnificencia oriental. El rey se vestía con ropas reales (1 Reyes 22:10; 2 Crónicas 18:9); sus insignias eran una corona o diadema de oro puro, o quizás radiante con gemas preciosas (2 Samuel 1:10; 12:30; 2 Reyes 11:12; Salmos 21:3), y un cetro real. Quienes se acercaban a él le hacían reverencia, inclinándose y tocando el suelo con la frente (1 Samuel 24:8; 2 Samuel 19:24), y esto lo hacía incluso la esposa de un rey, la madre de Salomón (1 Reyes 1:16). Sus oficiales y súbditos se llamaban a sí mismos sus siervos o esclavos. Tenía un gran harén, que era custodiado por eunucos. La ley de sucesión al trono es algo oscura, pero parece más probable que el rey, durante su vida, nombrara a su sucesor. Al mismo tiempo, si no intervenía ninguna parcialidad por una esposa o hijo favorito, siempre habría una inclinación natural de afecto a favor del hijo mayor."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 12:9",
+        "original": "Josh. 12:9"
+      },
+      {
+        "reference": "Joshua 12:24",
+        "original": "Josh. 12:24"
+      },
+      {
+        "reference": "Judges 1:7",
+        "original": "Judg. 1:7"
+      },
+      {
+        "reference": "1 Peter 2:13",
+        "original": "1 Pet. 2:13"
+      },
+      {
+        "reference": "1 Peter 2:17",
+        "original": "1 Pet. 2:17"
+      },
+      {
+        "reference": "Matthew 14:9",
+        "original": "Matt. 14:9"
+      },
+      {
+        "reference": "Mark 6:22",
+        "original": "Mark 6:22"
+      },
+      {
+        "reference": "1 Timothy 1:17",
+        "original": "1 Tim. 1:17"
+      },
+      {
+        "reference": "1 Timothy 6:15",
+        "original": "1 Tim. 6:15"
+      },
+      {
+        "reference": "1 Timothy 6:16",
+        "original": "1 Tim. 6:16"
+      },
+      {
+        "reference": "Matthew 27:11",
+        "original": "Matt. 27:11"
+      },
+      {
+        "reference": "Daniel 7:22",
+        "original": "Dan. 7:22"
+      },
+      {
+        "reference": "Daniel 7:27",
+        "original": "Dan. 7:27"
+      },
+      {
+        "reference": "Matthew 19:28",
+        "original": "Matt. 19:28"
+      },
+      {
+        "reference": "Revelation 1:6",
+        "original": "Rev. 1:6"
+      },
+      {
+        "reference": "Job 18:14",
+        "original": "Job 18:14"
+      },
+      {
+        "reference": "1 Samuel 8:7",
+        "original": "1 Sam. 8:7"
+      },
+      {
+        "reference": "Isaiah 33:22",
+        "original": "Isa. 33:22"
+      },
+      {
+        "reference": "1 Samuel 8:5",
+        "original": "1 Sam. 8:5"
+      },
+      {
+        "reference": "1 Samuel 10:1",
+        "original": "1 Sam. 10:1"
+      },
+      {
+        "reference": "1 Samuel 10:25",
+        "original": "1 Sam. 10:25"
+      },
+      {
+        "reference": "2 Samuel 8:16",
+        "original": "2 Sam. 8:16"
+      },
+      {
+        "reference": "1 Kings 4:3",
+        "original": "1 Kings 4:3"
+      },
+      {
+        "reference": "2 Samuel 8:17",
+        "original": "2 Sam. 8:17"
+      },
+      {
+        "reference": "2 Samuel 20:25",
+        "original": "2 Sam. 20:25"
+      },
+      {
+        "reference": "Isaiah 22:15",
+        "original": "Isa. 22:15"
+      },
+      {
+        "reference": "1 Kings 4:5",
+        "original": "1 Kings 4:5"
+      },
+      {
+        "reference": "2 Kings 22:14",
+        "original": "2 Kings 22:14"
+      },
+      {
+        "reference": "2 Samuel 20:23",
+        "original": "2 Sam. 20:23"
+      },
+      {
+        "reference": "1 Chronicles 27:25-31",
+        "original": "1 Chr. 27:25-31"
+      },
+      {
+        "reference": "1 Chronicles 27:34",
+        "original": "1 Chr. 27:34"
+      },
+      {
+        "reference": "1 Chronicles 27:32",
+        "original": "1 Chr. 27:32"
+      },
+      {
+        "reference": "2 Samuel 16:20-23",
+        "original": "2 Sam. 16:20-23"
+      },
+      {
+        "reference": "1 Samuel 11:1",
+        "original": "1 Samuel 11:1"
+      },
+      {
+        "reference": "1 Samuel 12:12",
+        "original": "1 Samuel 12:12"
+      },
+      {
+        "reference": "1 Samuel 8:20",
+        "original": "1 Samuel 8:20"
+      },
+      {
+        "reference": "1 Samuel 16:13",
+        "original": "1 Samuel 16:13"
+      },
+      {
+        "reference": "2 Samuel 7:14",
+        "original": "2 Samuel 7:14"
+      },
+      {
+        "reference": "Psalms 2:6",
+        "original": "Psalms 2:6"
+      },
+      {
+        "reference": "Psalms 2:7",
+        "original": "Psalms 2:7"
+      },
+      {
+        "reference": "Psalms 89:26",
+        "original": "Psalms 89:26"
+      },
+      {
+        "reference": "Psalms 89:27",
+        "original": "Psalms 89:27"
+      },
+      {
+        "reference": "1 Kings 22:10",
+        "original": "1 Kings 22:10"
+      },
+      {
+        "reference": "2 Chronicles 18:9",
+        "original": "2 Chronicles 18:9"
+      },
+      {
+        "reference": "2 Samuel 1:10",
+        "original": "2 Samuel 1:10"
+      },
+      {
+        "reference": "2 Samuel 12:30",
+        "original": "2 Samuel 12:30"
+      },
+      {
+        "reference": "2 Kings 11:12",
+        "original": "2 Kings 11:12"
+      },
+      {
+        "reference": "Psalms 21:3",
+        "original": "Psalms 21:3"
+      },
+      {
+        "reference": "1 Samuel 24:8",
+        "original": "1 Samuel 24:8"
+      },
+      {
+        "reference": "2 Samuel 19:24",
+        "original": "2 Samuel 19:24"
+      },
+      {
+        "reference": "1 Kings 1:16",
+        "original": "1 Kings 1:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "KINGDOM OF GOD": {
+    "name": "Kingdom of God",
+    "slug": "kingdom-of-god",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Mateo 6:33; Marcos 1:14, 15; Lucas 4:43) = «reino de Cristo» (Mateo 13:41; 20:21) = «reino de Cristo y de Dios» (Efesios 5:5) = «reino de David» (Marcos 11:10) = «el reino» (Mateo 8:12; 13:19) = «reino de los cielos» (Mateo 3:2; 4:17; 13:41), todos denotan la misma realidad bajo diferentes aspectos, a saber: (1) la autoridad mediadora de Cristo, o su gobierno en la tierra; (2) las bendiciones y ventajas de todo tipo que fluyen de este gobierno; (3) los súbditos de este reino tomados colectivamente, o la Iglesia."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Matthew 6:33",
+        "original": "Matt. 6:33"
+      },
+      {
+        "reference": "Mark 1:14",
+        "original": "Mark 1:14"
+      },
+      {
+        "reference": "Mark 1:15",
+        "original": "Mark 1:15"
+      },
+      {
+        "reference": "Luke 4:43",
+        "original": "Luke 4:43"
+      },
+      {
+        "reference": "Matthew 13:41",
+        "original": "Matt. 13:41"
+      },
+      {
+        "reference": "Matthew 20:21",
+        "original": "Matt 20:21"
+      },
+      {
+        "reference": "Ephesians 5:5",
+        "original": "Eph. 5:5"
+      },
+      {
+        "reference": "Mark 11:10",
+        "original": "Mark 11:10"
+      },
+      {
+        "reference": "Matthew 8:12",
+        "original": "Matt. 8:12"
+      },
+      {
+        "reference": "Matthew 13:19",
+        "original": "Matt 13:19"
+      },
+      {
+        "reference": "Matthew 3:2",
+        "original": "Matt. 3:2"
+      },
+      {
+        "reference": "Matthew 4:17",
+        "original": "Matt 4:17"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINGLY OFFICE OF CHRIST": {
+    "name": "Kingly office of Christ",
+    "slug": "kingly-office-of-christ",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Una de las tres relaciones especiales en las que Cristo se encuentra con su pueblo. El oficio de Cristo como mediador comprende tres funciones diferentes, a saber, las de profeta, sacerdote y rey. Estas no son tres oficios distintos, sino tres funciones del único oficio de mediador. Cristo es Rey y Cabeza soberana sobre su Iglesia y sobre todas las cosas para su Iglesia (Efesios 1:22; 4:15; Colosenses 1:18; 2:19). Él ejerce este reinado mediador en su Iglesia, y sobre su Iglesia, y sobre todas las cosas en beneficio de su Iglesia. Esta realeza difiere de la que esencialmente le pertenece como Dios, porque le es dada por el Padre como recompensa por su obediencia y sufrimientos (Filipenses 2:6-11), y tiene como su objeto especial la edificación y la gloria de su Iglesia redimida. Además, no se adhiere a su naturaleza divina como tal, sino a su persona como Dios-hombre. El reino mediador de Cristo puede ser considerado como comprendiendo: (1) su reino de poder, o su gobierno providencial del universo; (2) su reino de gracia, que es totalmente espiritual en sus súbditos y administración; y (3) su reino de gloria, que es la consumación de toda su administración providencial y de gracia. Cristo sostuvo y ejerció la función de Rey mediador, así como la de Profeta y Sacerdote, desde el tiempo de la caída del hombre, cuando entró en su obra mediadora; sin embargo, puede decirse que fue entronizado pública y formalmente cuando ascendió a lo alto y se sentó a la diestra del Padre (Salmos 2:6; Jeremías 23:5; Isaías 9:6), después de que su obra de humillación y sufrimiento en la tierra fue 'consumada'."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Ephesians 1:22",
+        "original": "Eph. 1:22"
+      },
+      {
+        "reference": "Ephesians 4:15",
+        "original": "Eph 4:15"
+      },
+      {
+        "reference": "Colossians 1:18",
+        "original": "Col. 1:18"
+      },
+      {
+        "reference": "Colossians 2:19",
+        "original": "Col 2:19"
+      },
+      {
+        "reference": "Philippians 2:6-11",
+        "original": "Phil. 2:6-11"
+      },
+      {
+        "reference": "Psalms 2:6",
+        "original": "Ps. 2:6"
+      },
+      {
+        "reference": "Jeremiah 23:5",
+        "original": "Jer. 23:5"
+      },
+      {
+        "reference": "Isaiah 9:6",
+        "original": "Isa. 9:6"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINGS": {
+    "name": "Kings",
+    "slug": "kings",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "de Judá e Israel. Para la lista, véase la tabla al final de este volumen."
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINGS, FIRST AND SECOND BOOKS OF": {
+    "name": "Kings, First And Second Books Of",
+    "slug": "kings-first-and-second-books-of",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "originalmente un solo libro en el canon hebreo; en la LXX. y la Vulgata, el tercero y cuarto libros de los Reyes (siendo los libros de Samuel el primero y el segundo). Debe recordarse que la división entre los libros de los Reyes y Samuel es igualmente artificial, y que, de hecho, los libros históricos que comienzan con Jueces y terminan con 2 Reyes presentan la apariencia de una sola obra, ofreciendo una historia continua de Israel desde el tiempo de Josué hasta la muerte de Joaquín. Los libros de los Reyes contienen la historia desde la muerte de David y la ascensión de Salomón hasta la destrucción del reino de Judá y la desolación de Jerusalén, con una nota suplementaria de un evento que ocurrió después de un intervalo de veintiséis años —a saber, la liberación de Joaquín de su prisión en Babilonia— y una extensión aún mayor hasta la muerte de Joaquín, cuyo momento no se conoce, pero que probablemente no fue mucho después de su liberación. La historia, por lo tanto, comprende todo el período de la monarquía israelita, excluyendo los reinados de Saúl y David. En cuanto a los asuntos de naciones extranjeras y la relación de Israel con ellas, las notas históricas en estos libros, aunque escasas en los tiempos más antiguos, son de gran valor y concuerdan notablemente con las últimas adiciones a nuestro conocimiento de la historia profana contemporánea. Una ayuda muy importante para una correcta comprensión de la historia en estos libros, y para completar su esquema, se encuentra en los profetas, y especialmente en Isaías y Jeremías. Tiempo de escritura.—Fueron sin duda escritos durante el período del cautiverio, probablemente después del vigésimo sexto año. Autoría.—En cuanto a la autoría de los libros, presenta poca dificultad. La tradición judía que los atribuye a Jeremías está respaldada por la evidencia interna más sólida, además de la del lenguaje. Fuentes de información.—Existía una serie regular de anales estatales tanto para el reino de Judá como para el de Israel, que abarcaba todo el tiempo comprendido en los libros de los Reyes, o al menos hasta el final del reinado de Joacim (2 Reyes 24:5). Estos anales son constantemente citados por su nombre como «el libro de los hechos de Salomón» (1 Reyes 11:41) y, después de Salomón, «el libro de las crónicas de los reyes de Judá» o «de Israel», por ejemplo (1 Reyes 14:29; 15:7; 16:5,14,20; 2 Reyes 10:34; 24:5), etc.; y es manifiesto que el autor de los Reyes los tuvo ambos ante sí mientras redactaba su historia, en la cual los reinados de los dos reinos están armonizados y a estos anales se apela constantemente. Pero, además de estos anales nacionales, también existían, en el momento en que se compilaron los libros de los Reyes, obras separadas de los diversos profetas que habían vivido en Judá e Israel. Autoridad.—Su autoridad canónica, al no haber sido nunca disputada, hace innecesario presentar los testimonios de su autenticidad que se pueden encontrar en Josefo, Eusebio, Jerónimo, Agustín, etc. Se cuentan entre los profetas, en la división triple de las Santas Escrituras; una posición acorde con la suposición de que fueron compilados por Jeremías y contienen las narraciones de los diferentes profetas en sucesión. Son frecuentemente citados por nuestro Señor y por los apóstoles."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "2 Kings 24:5",
+        "original": "2 Kings 24:5"
+      },
+      {
+        "reference": "1 Kings 11:41",
+        "original": "1 Kings 11:41"
+      },
+      {
+        "reference": "1 Kings 14:29",
+        "original": "1 Kings 14:29"
+      },
+      {
+        "reference": "1 Kings 15:7",
+        "original": "1 Kings 15:7"
+      },
+      {
+        "reference": "1 Kings 16:5",
+        "original": "1 Kings 16:5"
+      },
+      {
+        "reference": "1 Kings 16:14",
+        "original": "1 Kings 16:14"
+      },
+      {
+        "reference": "1 Kings 16:20",
+        "original": "1 Kings 16:20"
+      },
+      {
+        "reference": "2 Kings 10:34",
+        "original": "2 Kings 10:34"
+      }
+    ],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "KINGS, THE BOOKS OF": {
+    "name": "Kings, The Books of",
+    "slug": "kings-the-books-of",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Los dos libros de los Reyes formaron originalmente un solo libro en las Escrituras hebreas. La división actual en dos libros fue hecha por primera vez por la LXX., que ahora, junto con la Vulgata, los numera como el tercer y cuarto libro de los Reyes, siendo los dos libros de Samuel el primero y el segundo libro de los Reyes. Contienen los anales de la comunidad judía desde la ascensión de Salomón hasta la subyugación del reino por Nabucodonosor y los babilonios (aparentemente un período de unos cuatrocientos cincuenta y tres años). Los libros de Crónicas (q.v.) son más completos en su contenido que los de Reyes. Estos últimos se sincronizan con 1 Crónicas 28-2 Crónicas 36:21. Mientras que en Crónicas se da mayor prominencia al oficio sacerdotal o levítico, en Reyes se da mayor prominencia al oficio real. La autoría de estos libros es incierta. Hay algunas porciones de ellos y de Jeremías que son casi idénticas, por ejemplo, 2 Reyes 24:18-25 y Jeremías 52; 39:1-10; 40:7-41:10. También hay muchas coincidencias no intencionadas entre Jeremías y Reyes (2 Reyes 21-23 y Jeremías 7:15; 15:4; 19:3, etc.), y eventos registrados en Reyes de los cuales Jeremías tenía conocimiento personal. Estos hechos apoyan en cierto grado la tradición de que Jeremías fue el autor de los libros de los Reyes. Pero la suposición más probable es que Esdras, después del Cautiverio, los compiló a partir de documentos escritos quizás por David, Salomón, Natán, Gad e Iddo, y que los ordenó de la manera en que existen actualmente. En la triple división de las Escrituras por los judíos, estos libros se clasifican entre los «Profetas». Son citados o aludidos con frecuencia por nuestro Señor y sus apóstoles (Mateo 6:29; 12:42; Lucas 4:25, 26; 10:4; cf. 2 Reyes 4:29; Marcos 1:6; cf. 2 Reyes 1:8; Mateo 3:4, etc.). Las fuentes de la narración se remiten a (1) «el libro de los hechos de Salomón» (1 Reyes 11:41); (2) el «libro de las crónicas de los reyes de Judá» (14:29; 15:7, 23, etc.); (3) el «libro de las crónicas de los reyes de Israel» (14:19; 15:31; 16:14, 20, 27, etc.). La fecha de su composición fue en algún momento entre el 561 a.C., la fecha del último capítulo (2 Reyes 25), cuando Joaquín fue liberado del cautiverio por Evil-merodac, y el 538 a.C., la fecha del decreto de liberación por Ciro."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Chronicles 28",
+        "original": "1 Chr. 28"
+      },
+      {
+        "reference": "2 Chronicles 36:21",
+        "original": "2 Chr. 36:21"
+      },
+      {
+        "reference": "2 Kings 24:18-25",
+        "original": "2 Kings 24:18-25"
+      },
+      {
+        "reference": "Jeremiah 52",
+        "original": "Jer. 52"
+      },
+      {
+        "reference": "Jeremiah 39:1-10",
+        "original": "Jer 39:1-10"
+      },
+      {
+        "reference": "Jeremiah 40:7-41:10",
+        "original": "Jer 40:7-41:10"
+      },
+      {
+        "reference": "2 Kings 21",
+        "original": "2 Kings 21"
+      },
+      {
+        "reference": "Jeremiah 7:15",
+        "original": "Jer. 7:15"
+      },
+      {
+        "reference": "Jeremiah 15:4",
+        "original": "Jer 15:4"
+      },
+      {
+        "reference": "Jeremiah 19:3",
+        "original": "Jer 19:3"
+      },
+      {
+        "reference": "Matthew 6:29",
+        "original": "Matt. 6:29"
+      },
+      {
+        "reference": "Matthew 12:42",
+        "original": "Matt 12:42"
+      },
+      {
+        "reference": "Luke 4:25",
+        "original": "Luke 4:25"
+      },
+      {
+        "reference": "Luke 4:26",
+        "original": "Luke 4:26"
+      },
+      {
+        "reference": "2 Kings 4:29",
+        "original": "2 Kings 4:29"
+      },
+      {
+        "reference": "Mark 1:6",
+        "original": "Mark 1:6"
+      },
+      {
+        "reference": "2 Kings 1:8",
+        "original": "2 Kings 1:8"
+      },
+      {
+        "reference": "Matthew 3:4",
+        "original": "Matt. 3:4"
+      },
+      {
+        "reference": "1 Kings 11:41",
+        "original": "1 Kings 11:41"
+      },
+      {
+        "reference": "2 Kings 25",
+        "original": "2 Kings 25"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KING’S DALE": {
+    "name": "King’s dale",
+    "slug": "king-s-dale",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Mencionado solo en Génesis 14:17; 2 Samuel 18:18, el nombre dado al «valle de Save», donde el rey de Sodoma se encontró con Abram."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 14:17",
+        "original": "Gen. 14:17"
+      },
+      {
+        "reference": "2 Samuel 18:18",
+        "original": "2 Sam. 18:18"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "KINSMAN": {
+    "name": "Kinsman",
+    "slug": "kinsman",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Heb. goel, de una raíz que significa redimir. El goel entre los hebreos era el pariente masculino de sangre más cercano vivo. Ciertas obligaciones importantes recaían sobre él hacia su pariente más cercano. (1.) Si alguien por pobreza no podía redimir su herencia, era deber del pariente redimirla (Levítico 25:25, 28; Rut 3:9, 12). También se le exigía redimir a su pariente que se había vendido como esclavo (Levítico 25:48, 49). Dios es el Goel de su pueblo porque los redime (Éxodo 6:6; Isaías 43:1; 41:14; 44:6, 22; 48:20; Salmos 103:4; Job 19:25, etc.). (2.) El goel también era el vengador (q.v.) de sangre (Números 35:21) en caso de asesinato del pariente más cercano."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Leviticus 25:25",
+        "original": "Lev. 25:25"
+      },
+      {
+        "reference": "Leviticus 25:28",
+        "original": "Lev 25:28"
+      },
+      {
+        "reference": "Ruth 3:9",
+        "original": "Ruth 3:9"
+      },
+      {
+        "reference": "Ruth 3:12",
+        "original": "Ruth 3:12"
+      },
+      {
+        "reference": "Leviticus 25:48",
+        "original": "Lev. 25:48"
+      },
+      {
+        "reference": "Leviticus 25:49",
+        "original": "Lev. 25:49"
+      },
+      {
+        "reference": "Exodus 6:6",
+        "original": "Ex. 6:6"
+      },
+      {
+        "reference": "Isaiah 43:1",
+        "original": "Isa. 43:1"
+      },
+      {
+        "reference": "Isaiah 41:14",
+        "original": "Isa 41:14"
+      },
+      {
+        "reference": "Isaiah 44:6",
+        "original": "Isa 44:6"
+      },
+      {
+        "reference": "Isaiah 44:22",
+        "original": "Isa 44:22"
+      },
+      {
+        "reference": "Isaiah 48:20",
+        "original": "Isa 48:20"
+      },
+      {
+        "reference": "Psalms 103:4",
+        "original": "Ps. 103:4"
+      },
+      {
+        "reference": "Job 19:25",
+        "original": "Job 19:25"
+      },
+      {
+        "reference": "Numbers 35:21",
+        "original": "Num. 35:21"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  }
+}

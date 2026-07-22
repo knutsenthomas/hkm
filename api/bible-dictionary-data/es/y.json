@@ -1,0 +1,264 @@
+{
+  "YARN": {
+    "name": "Yarn",
+    "slug": "yarn",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Se encuentra solo en 1 Reyes 10:28, 2 Crónicas 1:16. La palabra hebrea mikveh, es decir, «un encadenamiento», así traducida, significa más bien una hueste, o compañía, o una hilera de caballos. La Versión Autorizada (Authorized Version) traduce: «Y Salomón tenía caballos traídos de Egipto, y lino hilado: los mercaderes del rey recibían el lino hilado a un precio»; pero la Versión Revisada (Revised Version) traduce correctamente: «Y los caballos que Salomón tenía eran traídos de Egipto; los mercaderes del rey los recibían en manadas, cada manada a un precio»."
+      },
+      {
+        "source": "SMI",
+        "text": "La mención de «hilo» se encuentra en un pasaje extremadamente oscuro en (1 Reyes 10:28; 2 Crónicas 1:16). El Texto Masorético (Received Text) hebreo es cuestionable. Gesenius da el sentido de «número» aplicándolo por igual a los mercaderes y a los caballos: «Una banda de los mercaderes del rey compró una manada (de caballos) a un precio»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "1 Kings 10:28",
+        "original": "1 Kings 10:28"
+      },
+      {
+        "reference": "1 Kings 10:2",
+        "original": "1 Kings 10:2"
+      },
+      {
+        "reference": "2 Chronicles 1:16",
+        "original": "2 Chronicles 1:16"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YEAR": {
+    "name": "Year",
+    "slug": "year",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "Heb. shanah, que significa «repetición» o «revolución» (Génesis 1:14; 5:3). Entre los antiguos egipcios, el año constaba de doce meses de treinta días cada uno, con cinco días añadidos para completar una revolución de la Tierra alrededor del sol. Los judíos contaban el año de dos maneras: (1) según un calendario sagrado, en el que el año comenzaba alrededor del tiempo del equinoccio vernal, con el mes de Abib; y (2) según un calendario civil, en el que el año comenzaba alrededor del tiempo del equinoccio otoñal, con el mes de Nisán. El mes de Tisri es ahora el comienzo del año judío."
+      },
+      {
+        "source": "SMI",
+        "text": "La división de tiempo ordinaria más alta. Los hebreos conocían y aparentemente usaban dos tipos de años."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Genesis 1:14",
+        "original": "Gen. 1:14"
+      },
+      {
+        "reference": "Genesis 5:3",
+        "original": "Gen 5:3"
+      },
+      {
+        "reference": "Psalms 74:17",
+        "original": "Psalms 74:17"
+      },
+      {
+        "reference": "Zechariah 14:18",
+        "original": "Zechariah 14:18"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YEAR OF JUBILEE": {
+    "name": "Year Of Jubilee",
+    "slug": "year-of-jubilee",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Jubileo, El Año del, AÑO DE]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "YEAR, SABBATICAL": {
+    "name": "Year, Sabbatical",
+    "slug": "year-sabbatical",
+    "definitions": [
+      {
+        "source": "SMI",
+        "text": "[Año Sabático AÑO]"
+      }
+    ],
+    "scripture_refs": [],
+    "sources": [
+      "SMI"
+    ]
+  },
+  "YESHEBI": {
+    "name": "Yeshebi",
+    "slug": "yeshebi",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "La palabra hebrea traducida como «habitantes» en Josué 17:7, pero probablemente sea más bien el nombre de la aldea Yeshepheh, posiblemente Yassuf, 8 millas al sur de Siquem."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Joshua 17:7",
+        "original": "Josh. 17:7"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  },
+  "YOKE": {
+    "name": "Yoke",
+    "slug": "yoke",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(1.) Objeto ajustado al cuello de los bueyes con el propósito de sujetarles los tirantes con los que arrastraban el arado, etc. (Números 19:2; Deuteronomio 21:3). Era una pieza de madera curvada llamada 'ol. (2.) En Jeremías 27:2; 28:10, 12, la palabra en la Versión Autorizada (Authorized Version) traducida como «yugo» es motah, que propiamente significa un «bastón», o como en la Versión Revisada (Revised Version), «barra». Ambas palabras en hebreo se usan figurativamente para referirse a servidumbre severa, aflicción o sujeción (Levítico 26:13; 1 Reyes 12:4; Isaías 47:6; Lamentaciones 1:14; 3:27). En el Nuevo Testamento, la palabra «yugo» también se usa para denotar servidumbre (Mateo 11:29, 30; Hechos 15:10; Gálatas 5:1). (3.) En 1 Samuel 11:7, 1 Reyes 19:21, Job 1:3, la palabra así traducida es tzemed, que significa un par, dos bueyes uncidos o acoplados, y de ahí que en 1 Samuel 14:14 represente tanta tierra como un par de bueyes podía arar en un día, como el latín jugum. En Isaías 5:10, esta palabra en plural se traduce como «acres»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Numbers 19:2",
+        "original": "Num. 19:2"
+      },
+      {
+        "reference": "Deuteronomy 21:3",
+        "original": "Deut. 21:3"
+      },
+      {
+        "reference": "Jeremiah 27:2",
+        "original": "Jer. 27:2"
+      },
+      {
+        "reference": "Jeremiah 28:10",
+        "original": "Jer 28:10"
+      },
+      {
+        "reference": "Jeremiah 28:12",
+        "original": "Jer 28:12"
+      },
+      {
+        "reference": "Leviticus 26:13",
+        "original": "Lev. 26:13"
+      },
+      {
+        "reference": "1 Kings 12:4",
+        "original": "1 Kings 12:4"
+      },
+      {
+        "reference": "Isaiah 47:6",
+        "original": "Isa. 47:6"
+      },
+      {
+        "reference": "Lamentations 1:14",
+        "original": "Lam. 1:14"
+      },
+      {
+        "reference": "Lamentations 3:27",
+        "original": "Lam 3:27"
+      },
+      {
+        "reference": "Matthew 11:29",
+        "original": "Matt. 11:29"
+      },
+      {
+        "reference": "Matthew 11:30",
+        "original": "Matt. 11:30"
+      },
+      {
+        "reference": "Acts 15:10",
+        "original": "Acts 15:10"
+      },
+      {
+        "reference": "Galatians 5:1",
+        "original": "Gal. 5:1"
+      },
+      {
+        "reference": "1 Samuel 11:7",
+        "original": "1 Sam. 11:7"
+      },
+      {
+        "reference": "1 Samuel 11:1",
+        "original": "1 Sam. 11:1"
+      },
+      {
+        "reference": "Job 1:3",
+        "original": "Job 1:3"
+      },
+      {
+        "reference": "1 Samuel 14:14",
+        "original": "1 Sam. 14:14"
+      },
+      {
+        "reference": "Isaiah 5:10",
+        "original": "Isa. 5:10"
+      },
+      {
+        "reference": "1 Kings 12:9-11",
+        "original": "1 Kings 12:9-11"
+      },
+      {
+        "reference": "Isaiah 9:4",
+        "original": "Isaiah 9:4"
+      },
+      {
+        "reference": "Jeremiah 5:5",
+        "original": "Jeremiah 5:5"
+      },
+      {
+        "reference": "Jeremiah 28:13",
+        "original": "Jeremiah 28:13"
+      },
+      {
+        "reference": "1 Kings 19:19",
+        "original": "1 Kings 19:19"
+      },
+      {
+        "reference": "1 Kings 19:21",
+        "original": "1 Kings 19:21"
+      },
+      {
+        "reference": "Judges 19:10",
+        "original": "Judges 19:10"
+      },
+      {
+        "reference": "2 Kings 5:17",
+        "original": "2 Kings 5:17"
+      },
+      {
+        "reference": "Isaiah 21:7",
+        "original": "Isaiah 21:7"
+      }
+    ],
+    "sources": [
+      "EAS",
+      "SMI"
+    ]
+  },
+  "YOKE-FELLOW": {
+    "name": "Yoke-fellow",
+    "slug": "yoke-fellow",
+    "definitions": [
+      {
+        "source": "EAS",
+        "text": "(Filipenses 4:3), uno de los colaboradores del apóstol. Algunos han conjeturado que se refiere a Epafrodito. Wycliffe traduce la frase como «el compañero germano» («the german felowe»), es decir, «tú, camarada [=genuino]»."
+      }
+    ],
+    "scripture_refs": [
+      {
+        "reference": "Philippians 4:3",
+        "original": "Phil. 4:3"
+      }
+    ],
+    "sources": [
+      "EAS"
+    ]
+  }
+}
