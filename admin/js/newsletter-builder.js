@@ -9,6 +9,7 @@ class NewsletterBuilder {
         this.currentView = 'desktop';
         this.activeTab = 'add';
         this.activeTheme = 'default';
+        this.pendingDeleteCard = null;
         this.themes = {
             default: {
                 name: 'Default',
@@ -345,6 +346,114 @@ class NewsletterBuilder {
                     e.stopPropagation();
                     this.activateButtonManager(btn);
                     return;
+                }
+            });
+
+            // Clear pending delete card outline on click/focus changes
+            container.addEventListener('mousedown', () => {
+                if (this.pendingDeleteCard) {
+                    this.pendingDeleteCard.style.outline = '';
+                    this.pendingDeleteCard.style.boxShadow = '';
+                    this.pendingDeleteCard = null;
+                }
+            });
+
+            // Prevent accidental deletion of product cards via backspace or delete key
+            container.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return;
+                    
+                    const range = selection.getRangeAt(0);
+                    
+                    // If cursor is at the start of a paragraph or node
+                    if (range.collapsed && range.startOffset === 0) {
+                        let parentBlock = selection.anchorNode;
+                        while (parentBlock && parentBlock.parentNode !== container) {
+                            parentBlock = parentBlock.parentNode;
+                        }
+                        
+                        if (parentBlock) {
+                            const prevSibling = parentBlock.previousSibling;
+                            
+                            // Check if the previous element is a product card
+                            if (prevSibling && prevSibling.classList && prevSibling.classList.contains('newsletter-product-card')) {
+                                if (this.pendingDeleteCard !== prevSibling) {
+                                    e.preventDefault();
+                                    
+                                    // Clear any previous selection outlines
+                                    if (this.pendingDeleteCard) {
+                                        this.pendingDeleteCard.style.outline = '';
+                                        this.pendingDeleteCard.style.boxShadow = '';
+                                    }
+                                    
+                                    this.pendingDeleteCard = prevSibling;
+                                    prevSibling.style.outline = '3px solid #ef4444';
+                                    prevSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+                                    showToast("Trykk Backspace én gang til for å slette produktet.", "warning");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Normal Backspace deletes the card if it's already pending deletion
+                    if (this.pendingDeleteCard) {
+                        this.pendingDeleteCard.style.outline = '';
+                        this.pendingDeleteCard.style.boxShadow = '';
+                        this.pendingDeleteCard = null;
+                    }
+                } else if (e.key === 'Delete') {
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return;
+                    
+                    const range = selection.getRangeAt(0);
+                    
+                    let parentBlock = selection.anchorNode;
+                    while (parentBlock && parentBlock.parentNode !== container) {
+                        parentBlock = parentBlock.parentNode;
+                    }
+                    
+                    if (parentBlock) {
+                        const nextSibling = parentBlock.nextSibling;
+                        
+                        if (nextSibling && nextSibling.classList && nextSibling.classList.contains('newsletter-product-card')) {
+                            // Check if cursor is at the end of the text
+                            const isAtEnd = range.collapsed && 
+                                (range.startContainer === parentBlock || 
+                                 (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length));
+                            
+                            if (isAtEnd) {
+                                if (this.pendingDeleteCard !== nextSibling) {
+                                    e.preventDefault();
+                                    
+                                    if (this.pendingDeleteCard) {
+                                        this.pendingDeleteCard.style.outline = '';
+                                        this.pendingDeleteCard.style.boxShadow = '';
+                                    }
+                                    
+                                    this.pendingDeleteCard = nextSibling;
+                                    nextSibling.style.outline = '3px solid #ef4444';
+                                    nextSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+                                    showToast("Trykk Delete én gang til for å slette produktet.", "warning");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (this.pendingDeleteCard) {
+                        this.pendingDeleteCard.style.outline = '';
+                        this.pendingDeleteCard.style.boxShadow = '';
+                        this.pendingDeleteCard = null;
+                    }
+                } else {
+                    // Any other key clears the deletion state
+                    if (this.pendingDeleteCard) {
+                        this.pendingDeleteCard.style.outline = '';
+                        this.pendingDeleteCard.style.boxShadow = '';
+                        this.pendingDeleteCard = null;
+                    }
                 }
             });
 
