@@ -1356,7 +1356,7 @@ class NewsletterBuilder {
 
         modal.innerHTML = `
             <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
-                <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: white;">shopping_bag</span>
@@ -1656,7 +1656,7 @@ class NewsletterBuilder {
 
         modal.innerHTML = `
             <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
-                <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: white;">calendar_today</span>
