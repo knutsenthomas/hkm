@@ -3226,7 +3226,7 @@ body:not(.builder-active) #newsletter-builder-layout {
 /* --- PREMIUM EDITOR AESTHETICS OVERLAYS --- */
 
 /* Modern designer grid background for workspace */
-body.builder-active .canvas-container {
+body.builder-active .builder-workspace > .canvas-container {
     background-color: #f8fafc !important;
     background-image: 
         radial-gradient(#cbd5e1 1.2px, transparent 1.2px) !important;
