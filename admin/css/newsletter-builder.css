@@ -668,7 +668,9 @@ body.builder-active .builder-workspace > .canvas-container {
     display: flex;
     justify-content: center;
     align-items: flex-start !important;
-    background: #f1f5f9;
+    background-color: #f1f5f9 !important;
+    background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px) !important;
+    background-size: 20px 20px !important;
 }
 
 .canvas-scaler {
@@ -3643,4 +3645,155 @@ body.builder-active .builder-workspace > .docs-toolbar {
 .sidebar-item-card .card-action span {
     font-size: 18px !important;
 }
+
+/* ==========================================================================
+   Premium Design Studio Enhancements
+   ========================================================================== */
+
+/* Notion-Style Selection Bubble Menu */
+.hkm-bubble-menu {
+    position: absolute;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(12px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(190%) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-radius: 12px !important;
+    box-shadow: 
+        0 10px 25px -5px rgba(27, 73, 101, 0.15), 
+        0 8px 16px -6px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8) !important;
+    padding: 6px !important;
+    gap: 4px !important;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    transition: opacity 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.hkm-bubble-menu.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.hkm-bubble-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease !important;
+}
+
+.hkm-bubble-btn:hover {
+    background: rgba(27, 73, 101, 0.08) !important;
+    color: #1B4965 !important;
+}
+
+.hkm-bubble-btn:active {
+    transform: scale(0.9) !important;
+}
+
+.hkm-bubble-btn span {
+    font-size: 18px !important;
+}
+
+.hkm-bubble-divider {
+    width: 1px;
+    height: 18px;
+    background: #e2e8f0;
+    margin: 0 4px;
+}
+
+/* Premium Entrance Animations for Inserted Blocks */
+.hkm-animated-entry {
+    animation: hkm-slide-down-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes hkm-slide-down-in {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulsing Drag & Drop Indicator Glow */
+.hkm-drop-indicator {
+    height: 4px !important;
+    background: linear-gradient(90deg, #d17d39, #bd4f2a) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 12px rgba(209, 125, 57, 0.6) !important;
+    animation: hkm-pulse-glow 1.5s infinite alternate ease-in-out !important;
+}
+
+@keyframes hkm-pulse-glow {
+    0% {
+        box-shadow: 0 0 4px rgba(209, 125, 57, 0.4);
+        opacity: 0.7;
+    }
+    100% {
+        box-shadow: 0 0 16px rgba(209, 125, 57, 0.9);
+        opacity: 1;
+    }
+}
+
+/* High-Fidelity Mobile Smartphone Device Frame Simulator */
+.canvas-scaler {
+    position: relative;
+    box-sizing: border-box;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.canvas-scaler.mobile {
+    max-width: 375px;
+    padding: 60px 16px 80px 16px !important;
+    background: #0f172a !important; /* Elegant dark chassis */
+    border-radius: 40px !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.35),
+        0 0 0 12px #334155, /* Metallic outer rim border */
+        0 0 0 13px #1e293b !important;
+    align-self: center !important;
+    margin: 20px auto !important;
+}
+
+/* Glossy screen reflection on phone simulator */
+.canvas-scaler.mobile::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 60px !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 80px !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 50.1%) !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+    border-radius: 0px !important;
+}
+
+/* Speaker notch pill */
+.canvas-scaler.mobile::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 25px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 60px !important;
+    height: 6px !important;
+    background: #334155 !important;
+    border-radius: 3px !important;
+    z-index: 11 !important;
+}
+
 

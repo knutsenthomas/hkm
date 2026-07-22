@@ -166,6 +166,7 @@ class NewsletterBuilder {
 
         this.setupEventListeners();
         this.setupRichTextToolbar();
+        this.setupBubbleMenu();
         this.applyBackgrounds();
         this.renderCanvas();
     }
@@ -289,6 +290,11 @@ class NewsletterBuilder {
 
     setupEventListeners() {
         this.setupToolsFab();
+
+        // Selection listener for Notion-style bubble
+        document.addEventListener('selectionchange', () => {
+            this.handleTextSelection();
+        });
 
         // Sidebar Tab Switching
         document.querySelectorAll('.nav-icon-btn').forEach(btn => {
@@ -1169,6 +1175,123 @@ class NewsletterBuilder {
                 this.exec('backColor', e.target.value);
             });
         }
+    }
+
+    setupBubbleMenu() {
+        const bubbleMenu = document.getElementById('hkm-bubble-menu');
+        if (!bubbleMenu) return;
+
+        // Prevent selection loss when clicking within the bubble menu
+        bubbleMenu.addEventListener('mousedown', (e) => {
+            this.saveSelection();
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        // Click actions handler for bubble formatting
+        bubbleMenu.addEventListener('click', (e) => {
+            const btn = e.target.closest('.hkm-bubble-btn');
+            if (!btn) return;
+
+            const tool = btn.getAttribute('data-tool');
+            if (!tool) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Scale feedback animation
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = '', 100);
+
+            // Restore highlight selection
+            this.restoreSelection();
+
+            switch (tool) {
+                case 'bold':
+                    this.exec('bold');
+                    break;
+                case 'italic':
+                    this.exec('italic');
+                    break;
+                case 'underline':
+                    this.exec('underline');
+                    break;
+                case 'strike':
+                    this.exec('strikeThrough');
+                    break;
+                case 'link':
+                    const url = prompt('Skriv inn URL:', 'https://');
+                    if (url) {
+                        this.exec('createLink', url);
+                    }
+                    break;
+                case 'textColor':
+                    const textInput = document.querySelector('#desktop-richtools [data-color-input="text"]');
+                    if (textInput) textInput.click();
+                    break;
+                case 'highlightColor':
+                    const hlInput = document.querySelector('#desktop-richtools [data-color-input="highlight"]');
+                    if (hlInput) hlInput.click();
+                    break;
+            }
+        });
+    }
+
+    handleTextSelection() {
+        const bubbleMenu = document.getElementById('hkm-bubble-menu');
+        if (!bubbleMenu) return;
+
+        const sel = window.getSelection();
+        if (sel.isCollapsed || sel.rangeCount === 0) {
+            bubbleMenu.classList.remove('visible');
+            setTimeout(() => {
+                if (!bubbleMenu.classList.contains('visible')) {
+                    bubbleMenu.style.display = 'none';
+                }
+            }, 150);
+            return;
+        }
+
+        const range = sel.getRangeAt(0);
+        const container = document.getElementById('blocks-container');
+        if (!container || !container.contains(range.commonAncestorContainer)) {
+            bubbleMenu.classList.remove('visible');
+            setTimeout(() => {
+                if (!bubbleMenu.classList.contains('visible')) {
+                    bubbleMenu.style.display = 'none';
+                }
+            }, 150);
+            return;
+        }
+
+        const rect = range.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+            bubbleMenu.classList.remove('visible');
+            setTimeout(() => {
+                if (!bubbleMenu.classList.contains('visible')) {
+                    bubbleMenu.style.display = 'none';
+                }
+            }, 150);
+            return;
+        }
+
+        // Save selection range
+        this.saveSelection();
+
+        bubbleMenu.style.display = 'flex';
+        const menuWidth = bubbleMenu.offsetWidth;
+        const menuHeight = bubbleMenu.offsetHeight;
+
+        // Position absolute to document body to overlay perfectly
+        const top = rect.top + window.scrollY - menuHeight - 12;
+        const left = rect.left + window.scrollX + (rect.width / 2) - (menuWidth / 2);
+
+        bubbleMenu.style.top = `${top}px`;
+        bubbleMenu.style.left = `${left}px`;
+
+        requestAnimationFrame(() => {
+            bubbleMenu.classList.add('visible');
+        });
     }
 
     openImageInsertionFlow() {
@@ -2275,6 +2398,15 @@ class NewsletterBuilder {
         if (html) {
             const temp = document.createElement('div');
             temp.innerHTML = html;
+            
+            // Apply entrance animations to top-level nodes of the block
+            Array.from(temp.children).forEach(child => {
+                child.classList.add('hkm-animated-entry');
+                setTimeout(() => {
+                    child.classList.remove('hkm-animated-entry');
+                }, 600);
+            });
+
             const container = document.getElementById('blocks-container');
             if (container) {
                 if (afterElement) {
