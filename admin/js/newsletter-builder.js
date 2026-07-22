@@ -2903,8 +2903,8 @@ class NewsletterBuilder {
         const isUnderline = textDec.includes('underline');
 
         inspectorView.innerHTML = `
-            <div class="inspector-header">
-                <h2>Tilpass tekst</h2>
+            <div class="inspector-header" style="border-bottom: none; padding-bottom: 8px;">
+                <h2 style="font-size: 20px; font-weight: 700;">Tilpass tekst</h2>
             </div>
             
             <div class="inspector-tabs">
@@ -2912,122 +2912,135 @@ class NewsletterBuilder {
                 <button class="inspector-tab" data-tab="design">Design</button>
             </div>
             
-            <div class="inspector-body" id="inspector-tab-content">
-                <!-- Format Dropdown -->
+            <div class="inspector-body" id="inspector-tab-content" style="padding-top: 16px;">
+                <!-- Format Dropdown inside Wix-style select wrapper -->
                 <div class="inspector-group">
-                    <label class="inspector-group-label">Format</label>
-                    <select class="inspector-select" id="text-inspector-format">
-                        <option value="p" ${formatVal === 'p' ? 'selected' : ''}>Avsnitt 1 (Brødtekst)</option>
-                        <option value="h1" ${formatVal === 'h1' ? 'selected' : ''}>Overskrift 1</option>
-                        <option value="h2" ${formatVal === 'h2' ? 'selected' : ''}>Overskrift 2</option>
-                        <option value="h3" ${formatVal === 'h3' ? 'selected' : ''}>Overskrift 3</option>
-                    </select>
+                    <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Format</label>
+                    <div class="inspector-select-wrapper">
+                        <select id="text-inspector-format">
+                            <option value="p" ${formatVal === 'p' ? 'selected' : ''}>Avsnitt 1</option>
+                            <option value="h1" ${formatVal === 'h1' ? 'selected' : ''}>Overskrift 1</option>
+                            <option value="h2" ${formatVal === 'h2' ? 'selected' : ''}>Overskrift 2</option>
+                            <option value="h3" ${formatVal === 'h3' ? 'selected' : ''}>Overskrift 3</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Font & Size side-by-side -->
-                <div class="inspector-group-row">
+                <!-- Font & Size side-by-side inside Wix-style select wrappers -->
+                <div class="inspector-group-row" style="margin-top: 16px;">
                     <div class="inspector-group" style="flex: 1; margin-bottom: 0;">
-                        <label class="inspector-group-label">Skrifttyper</label>
-                        <select class="inspector-select" id="text-inspector-font">
-                            <option value="Arial, sans-serif" ${cleanFont.includes('Arial') ? 'selected' : ''}>Arial</option>
-                            <option value="'Inter', sans-serif" ${cleanFont.includes('Inter') ? 'selected' : ''}>Inter</option>
-                            <option value="'Roboto', sans-serif" ${cleanFont.includes('Roboto') ? 'selected' : ''}>Roboto</option>
-                            <option value="'Playfair Display', serif" ${cleanFont.includes('Playfair') ? 'selected' : ''}>Playfair Display</option>
-                            <option value="Georgia, serif" ${cleanFont.includes('Georgia') ? 'selected' : ''}>Georgia</option>
-                            <option value="'Courier New', monospace" ${cleanFont.includes('Courier') ? 'selected' : ''}>Courier New</option>
-                        </select>
+                        <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Skrifttyper</label>
+                        <div class="inspector-select-wrapper">
+                            <select id="text-inspector-font">
+                                <option value="Arial, sans-serif" ${cleanFont.includes('Arial') ? 'selected' : ''}>Arial</option>
+                                <option value="'Inter', sans-serif" ${cleanFont.includes('Inter') ? 'selected' : ''}>Inter</option>
+                                <option value="'Roboto', sans-serif" ${cleanFont.includes('Roboto') ? 'selected' : ''}>Roboto</option>
+                                <option value="'Playfair Display', serif" ${cleanFont.includes('Playfair') ? 'selected' : ''}>Playfair Display</option>
+                                <option value="Georgia, serif" ${cleanFont.includes('Georgia') ? 'selected' : ''}>Georgia</option>
+                                <option value="'Courier New', monospace" ${cleanFont.includes('Courier') ? 'selected' : ''}>Courier New</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="inspector-group" style="width: 90px; margin-bottom: 0;">
-                        <label class="inspector-group-label">Størrelse</label>
-                        <select class="inspector-select" id="text-inspector-size">
-                            ${[12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48].map(size => `
-                                <option value="${size}" ${currentSize === size ? 'selected' : ''}>${size}</option>
-                            `).join('')}
-                        </select>
+                    <div class="inspector-group" style="width: 100px; margin-bottom: 0;">
+                        <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Størrelse</label>
+                        <div class="inspector-select-wrapper">
+                            <select id="text-inspector-size">
+                                ${[12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48].map(size => `
+                                    <option value="${size}" ${currentSize === size ? 'selected' : ''}>${size}</option>
+                                `).join('')}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 3-row premium Wix Studio formatting grid -->
-                <div class="inspector-group" style="margin-top: 16px;">
-                    <label class="inspector-group-label">Stiler</label>
+                <!-- 3-row flat Wix formatting grid -->
+                <div class="inspector-group" style="margin-top: 24px;">
+                    <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 8px;">Stiler</label>
                     
                     <!-- Row 1: B, I, U, Color, Highlight Color, Alignment -->
-                    <div class="inspector-style-grid" style="margin-bottom: 8px;">
-                        <button class="inspector-style-btn ${isBold ? 'active' : ''}" id="text-btn-bold" title="Fet">
-                            <span class="material-symbols-outlined" style="font-size: 18px; font-weight: 700;">format_bold</span>
+                    <div class="inspector-style-grid" style="margin-bottom: 12px; gap: 8px;">
+                        <button class="inspector-style-btn ${isBold ? 'active' : ''}" id="text-btn-bold" title="Fet" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 18px;">
+                            B
                         </button>
-                        <button class="inspector-style-btn ${isItalic ? 'active' : ''}" id="text-btn-italic" title="Kursiv">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_italic</span>
+                        <button class="inspector-style-btn ${isItalic ? 'active' : ''}" id="text-btn-italic" title="Kursiv" style="font-family: 'Inter', sans-serif; font-style: italic; font-weight: 700; font-size: 18px;">
+                            I
                         </button>
-                        <button class="inspector-style-btn ${isUnderline ? 'active' : ''}" id="text-btn-underline" title="Understreket">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_underlined</span>
+                        <button class="inspector-style-btn ${isUnderline ? 'active' : ''}" id="text-btn-underline" title="Understreket" style="font-family: 'Inter', sans-serif; text-decoration: underline; font-weight: 700; font-size: 18px;">
+                            U
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-color" title="Tekstfarge">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_color_text</span>
+                        <button class="inspector-style-btn" id="text-btn-color" title="Tekstfarge" style="position: relative;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_color_text</span>
+                            <span style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #3b82f6; border-radius: 1px;"></span>
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-bg" title="Tekstbakgrunn / Utheving">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">border_color</span>
+                        <button class="inspector-style-btn" id="text-btn-bg" title="Tekstbakgrunn / Utheving" style="position: relative;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">border_color</span>
+                            <span style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #ffff00; border-radius: 1px;"></span>
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-align-cycle" title="Justering (Trykk for å endre)">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_align_${currentAlign === 'justify' ? 'justify' : currentAlign}</span>
+                        <button class="inspector-style-btn" id="text-btn-align-cycle" title="Justering">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_align_${currentAlign === 'justify' ? 'justify' : currentAlign}</span>
                         </button>
                     </div>
                     
                     <!-- Row 2: Link, Unlink, Numbered list, Bulleted list, Outdent, Indent -->
-                    <div class="inspector-style-grid" style="margin-bottom: 8px;">
+                    <div class="inspector-style-grid" style="margin-bottom: 12px; gap: 8px;">
                         <button class="inspector-style-btn" id="text-btn-link" title="Sett inn lenke">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">link</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">link</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-unlink" title="Fjern lenke">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">link_off</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">link_off</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-list-number" title="Nummerert liste">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_list_numbered</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_list_numbered</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-list-bullet" title="Punktliste">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_list_bulleted</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_list_bulleted</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-outdent" title="Reduser innrykk">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_indent_decrease</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_indent_decrease</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-indent" title="Øk innrykk">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_indent_increase</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_indent_increase</span>
                         </button>
                     </div>
                     
                     <!-- Row 3: Line Height, Paragraph Spacing, Character Spacing, Clear formatting, Text Transform -->
-                    <div class="inspector-style-grid">
+                    <div class="inspector-style-grid" style="gap: 8px;">
                         <button class="inspector-style-btn" id="text-btn-lineheight" title="Linjeavstand">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_line_spacing</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">format_line_spacing</span>
                         </button>
                         <button class="inspector-style-btn" id="text-btn-spacing" title="Avstand etter avsnitt">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">space_bar</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px;">space_bar</span>
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-char-spacing" title="Tegnmellomrom">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">horizontal_distribute</span>
+                        <button class="inspector-style-btn" id="text-btn-char-spacing" title="Tegnmellomrom" style="display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
+                            <span style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1px; line-height: 1;">AV</span>
+                            <span style="position: absolute; bottom: 4px; left: 8px; right: 8px; border-bottom: 2px solid #1e293b;"></span>
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-clear" title="Nullstill formatering">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">format_clear</span>
+                        <button class="inspector-style-btn" id="text-btn-clear" title="Nullstill formatering" style="position: relative;">
+                            <span style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;">T</span>
+                            <span style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; position: absolute; top: 6px; right: 8px; color: #ef4444;">x</span>
                         </button>
-                        <button class="inspector-style-btn ${node.style.textTransform === 'uppercase' ? 'active' : ''}" id="text-btn-caps" title="Store/Små bokstaver (All caps)">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">text_fields</span>
+                        <button class="inspector-style-btn ${node.style.textTransform === 'uppercase' ? 'active' : ''}" id="text-btn-caps" title="Store/Små bokstaver" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 14px;">
+                            TT
                         </button>
                         <div style="flex: 1;"></div>
                     </div>
                 </div>
 
-                <div style="margin-top: 16px;">
-                    <a href="#" id="text-inspector-personalize" style="font-size: 14px; font-weight: 500; color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                <!-- Personalization -->
+                <div style="margin-top: 24px;">
+                    <a href="#" id="text-inspector-personalize" style="font-size: 14px; font-weight: 500; color: #005bff; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px; font-weight: bold;">add</span>
                         Legg til personlig tilpasset innhold
                     </a>
                 </div>
 
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
+
                 <!-- Synlighet accordion wrapper -->
-                <div class="inspector-group" style="margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="text-inspector-visibility-toggle">
-                        <span class="inspector-group-label" style="margin: 0; font-weight: 600;">Synlighet</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                <div class="inspector-group" style="margin-top: 0;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 8px 0;" id="text-inspector-visibility-toggle">
+                        <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Synlighet</span>
+                        <span class="material-symbols-outlined" id="visibility-accordion-arrow" style="font-size: 18px; color: #1e293b;">arrow_right</span>
                     </div>
                     <div id="text-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
                         Synlig for alle mottakere.
@@ -3035,19 +3048,21 @@ class NewsletterBuilder {
                 </div>
             </div>
 
-            <div class="inspector-body" id="inspector-tab-design" style="display: none;">
+            <div class="inspector-body" id="inspector-tab-design" style="display: none; padding-top: 16px;">
                 <div class="inspector-group">
-                    <label class="inspector-group-label">Bakgrunnsfarge</label>
-                    <input type="color" class="inspector-input" id="text-design-bg-color" value="#ffffff" style="height: 40px; padding: 4px; cursor: pointer;">
+                    <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Bakgrunnsfarge</label>
+                    <input type="color" class="inspector-input" id="text-design-bg-color" value="#ffffff" style="height: 40px; padding: 4px; cursor: pointer; border-radius: 8px;">
                 </div>
-                <div class="inspector-group">
-                    <label class="inspector-group-label">Marginer (Topp / Bunn)</label>
-                    <select class="inspector-select" id="text-design-margin">
-                        <option value="8px">8 px (Tett)</option>
-                        <option value="16px" selected>16 px (Normal)</option>
-                        <option value="24px">24 px (Romslig)</option>
-                        <option value="32px">32 px (Generøs)</option>
-                    </select>
+                <div class="inspector-group" style="margin-top: 16px;">
+                    <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Marginer (Topp / Bunn)</label>
+                    <div class="inspector-select-wrapper">
+                        <select id="text-design-margin">
+                            <option value="8px">8 px (Tett)</option>
+                            <option value="16px" selected>16 px (Normal)</option>
+                            <option value="24px">24 px (Romslig)</option>
+                            <option value="32px">32 px (Generøs)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
@@ -3247,7 +3262,11 @@ class NewsletterBuilder {
                 const content = document.getElementById('text-inspector-visibility-content');
                 const isHidden = content.style.display === 'none';
                 content.style.display = isHidden ? 'block' : 'none';
-                visToggle.querySelector('.material-symbols-outlined').innerText = isHidden ? 'expand_more' : 'chevron_right';
+                
+                const arrowEl = document.getElementById('visibility-accordion-arrow');
+                if (arrowEl) {
+                    arrowEl.innerText = isHidden ? 'arrow_drop_down' : 'arrow_right';
+                }
             });
         }
     }

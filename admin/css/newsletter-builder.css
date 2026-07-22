@@ -3882,8 +3882,7 @@ html[data-theme="dark"] .inspector-group-label {
     color: var(--admin-text-muted, #94a3b8);
 }
 
-.inspector-input,
-.inspector-select {
+.inspector-input {
     width: 100%;
     padding: 10px 12px;
     font-size: 14px;
@@ -3896,16 +3895,57 @@ html[data-theme="dark"] .inspector-group-label {
     transition: border-color 0.2s ease;
 }
 
-html[data-theme="dark"] .inspector-input,
-html[data-theme="dark"] .inspector-select {
+html[data-theme="dark"] .inspector-input {
     border-color: var(--admin-border, #334155);
     background: var(--admin-surface-muted, #0f172a);
     color: var(--admin-text, #f8fafc);
 }
 
-.inspector-input:focus,
-.inspector-select:focus {
-    border-color: #3b82f6;
+.inspector-input:focus {
+    border-color: #005bff;
+}
+
+/* Wix-style Dropdown Select Wrapper with custom blue chevron */
+.inspector-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+.inspector-select-wrapper select {
+    width: 100% !important;
+    height: 40px !important;
+    padding: 8px 32px 8px 12px !important;
+    font-size: 14px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.inspector-select-wrapper select:focus {
+    border-color: #005bff !important;
+}
+.inspector-select-wrapper::after {
+    content: "expand_more";
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #005bff;
+    pointer-events: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+html[data-theme="dark"] .inspector-select-wrapper select {
+    border-color: var(--admin-border, #334155) !important;
+    background: var(--admin-surface-muted, #0f172a) !important;
+    color: var(--admin-text, #f8fafc) !important;
 }
 
 /* Grid for style toggles */
@@ -3920,17 +3960,15 @@ html[data-theme="dark"] .inspector-select {
     align-items: center;
     justify-content: center;
     height: 38px;
-    border: 1px solid #cbd5e1;
+    border: none !important; /* Flat design like Wix! */
     border-radius: 8px;
-    background: #ffffff;
-    color: #475569;
+    background: transparent;
+    color: #1e293b;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 html[data-theme="dark"] .inspector-style-btn {
-    border-color: var(--admin-border, #334155);
-    background: var(--admin-surface-muted, #0f172a);
     color: var(--admin-text, #f8fafc);
 }
 
@@ -3943,15 +3981,13 @@ html[data-theme="dark"] .inspector-style-btn:hover {
 }
 
 .inspector-style-btn.active {
-    background: #eff6ff;
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background: #eff6ff !important;
+    color: #005bff !important;
 }
 
 html[data-theme="dark"] .inspector-style-btn.active {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: #3b82f6;
-    color: #3b82f6;
+    background: rgba(0, 91, 255, 0.15) !important;
+    color: #3b82f6 !important;
 }
 
 /* Image preview in sidebar */
@@ -4017,42 +4053,44 @@ html[data-theme="dark"] .inspector-image-preview-wrap {
     padding: 16px 24px;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    gap: 12px;
+    justify-content: flex-end; /* Align right like Wix */
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
 }
 
 html[data-theme="dark"] .inspector-footer {
     border-top-color: var(--admin-border, #334155);
+    background: var(--admin-surface, #1e293b);
 }
 
 .inspector-footer-btn {
-    flex: 1;
-    padding: 10px;
-    font-size: 14px;
+    padding: 8px 24px;
+    font-size: 15px;
     font-weight: 600;
-    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-align: center;
     border: none;
+    outline: none;
 }
 
 .inspector-footer-btn.cancel {
-    background: #f1f5f9;
-    color: #475569;
+    background: transparent !important;
+    color: #005bff !important;
 }
 
 html[data-theme="dark"] .inspector-footer-btn.cancel {
-    background: var(--admin-surface-muted, #0f172a);
-    color: var(--admin-text, #f8fafc);
+    color: #3b82f6 !important;
 }
 
 .inspector-footer-btn.apply {
-    background: #3b82f6;
-    color: #ffffff;
+    background: #005bff !important;
+    color: #ffffff !important;
+    border-radius: 999px !important; /* Wix rounded pill shape */
 }
 
 .inspector-footer-btn.apply:hover {
-    background: #2563eb;
+    background: #004ecc !important;
 }
 
 /* Block Selected outline styling */
