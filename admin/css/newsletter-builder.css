@@ -111,6 +111,12 @@ body.builder-active #newsletter-builder-layout {
     color: var(--accent-orange-bright);
 }
 
+#rail-btn-add.rail-item,
+#rail-btn-add.rail-item:hover,
+#rail-btn-add.rail-item.active {
+    background: transparent !important;
+}
+
 .rail-item span {
     font-size: 24px;
 }
