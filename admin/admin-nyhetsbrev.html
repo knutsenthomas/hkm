@@ -935,155 +935,440 @@
     <!-- Modus-svitsj: Builder -->
         <div id="newsletter-builder-layout" style="display: none; width: 100%;">
             <div class="builder-main-layout">
+            <!-- 1. Wix-style Navigation Rail (Extreme Left) -->
+            <aside class="builder-nav-rail" style="
+                width: 72px;
+                background: #ffffff;
+                border-right: 1px solid #cbd5e1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 24px 0;
+                box-sizing: border-box;
+                font-family: 'Inter', sans-serif;
+            ">
+                <!-- Top section -->
+                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; margin-bottom: 24px;">
+                    <a href="/admin/index.html" class="rail-logo-link" title="Tilbake til Dashboard" style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 48px;
+                        height: 48px;
+                        color: #475569;
+                        text-decoration: none;
+                        border-radius: 8px;
+                        transition: background 0.2s;
+                    ">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">arrow_back</span>
+                    </a>
+                    <div style="font-size: 11px; font-weight: 600; color: #475569; margin-top: -4px;">Lukk</div>
+                </div>
+
+                <!-- Middle items -->
+                <div class="rail-middle" style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    width: 100%;
+                    align-items: center;
+                ">
+                    <!-- Option 1: Legg til -->
+                    <div class="rail-item active" id="rail-btn-add" data-tab="add" title="Legg til elementer" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #005bff;
+                        text-decoration: none;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            background: #e0f2fe;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: 2px solid #005bff;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px; color: #005bff;">add</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 600; margin-top: 6px; color: #005bff; text-align: center;">Legg til</span>
+                    </div>
+
+                    <!-- Option 2: Temaer -->
+                    <div class="rail-item" id="rail-btn-themes" data-tab="themes" title="Temaer" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">brush</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Temaer</span>
+                    </div>
+
+                    <!-- Option 3: Bakgrunn -->
+                    <div class="rail-item" id="rail-btn-background" data-tab="background" title="Bakgrunn" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">texture</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Bakgrunn</span>
+                    </div>
+
+                    <!-- Option 4: AI-e-poster -->
+                    <div class="rail-item" id="rail-btn-ai" data-tab="ai" title="AI-e-poster" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">auto_awesome</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center; white-space: nowrap;">AI-e-poster</span>
+                    </div>
+                </div>
+
+                <!-- Bottom items -->
+                <div style="margin-top: auto; display: flex; flex-direction: column; gap: 24px; width: 100%; align-items: center;">
+                    <!-- Option 5: Høyre til venstre -->
+                    <div class="rail-item" id="rail-btn-rtl" data-tab="rtl" title="Høyre til venstre (RTL)" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">language</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center; line-height: 1.2;">Høyre til<br>venstre</span>
+                    </div>
+
+                    <!-- Option 6: Hjelp -->
+                    <div class="rail-item" id="rail-btn-help" data-tab="help" title="Hjelp" style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        cursor: pointer;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: color 0.2s;
+                    ">
+                        <div class="rail-item-circle" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s;
+                        ">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">help_outline</span>
+                        </div>
+                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Hjelp</span>
+                    </div>
+                </div>
+            </aside>
+
             <!-- 2. Sidebar: High-fidelity elements and templates column -->
-            <aside class="builder-elements-sidebar-v2" style="position: relative; display: flex; flex-direction: column;">
+            <aside class="builder-elements-sidebar-v2" style="position: relative; display: flex; flex-direction: column; border-left: none !important;">
                 <div id="sidebar-default-view" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
-                <!-- Header (like mock) -->
-                <div class="sidebar-header-modern">
-                    <h2>Nyhetsbrevbygger</h2>
-                </div>
+                    <!-- Wix-style Drawer Header -->
+                    <div class="sidebar-header-modern" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px; min-height: 52px; display: flex; align-items: center;">
+                        <h2 id="builder-sidebar-title" style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Legge til elementer</h2>
+                    </div>
 
-                <!-- Elements Section -->
-                <div class="sidebar-section-container">
-                    <div class="sidebar-section-label" style="font-size: 15px !important; font-weight: 600 !important; color: #1e293b !important; text-transform: none !important; letter-spacing: normal !important; margin-bottom: 12px !important; font-family: 'Inter', sans-serif !important;">Legge til elementer</div>
-                    <div class="elements-grid-modern">
-                        <button class="element-card-square element-card" data-type="text">
-                            <span class="element-text-icon">Aa|</span>
-                            <span class="element-square-label">Tekst</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="image">
-                            <span class="material-symbols-outlined element-square-icon">image</span>
-                            <span class="element-square-label">Bilde</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="button">
-                            <span class="material-symbols-outlined element-square-icon">crop_7_5</span>
-                            <span class="element-square-label">Knapp</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="divider">
-                            <span class="material-symbols-outlined element-square-icon">horizontal_rule</span>
-                            <span class="element-square-label">Skillelinje</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="html">
-                            <span class="element-text-icon">&lt;/&gt;</span>
-                            <span class="element-square-label">HTML</span>
-                        </button>
-                        <button class="element-card-square element-card highlight-blue" data-type="product">
-                            <span class="material-symbols-outlined info-badge" title="Dynamisk produktblokk fra nettbutikken">info</span>
-                            <span class="material-symbols-outlined element-square-icon" style="color: #3b82f6 !important;">shopping_bag</span>
-                            <span class="element-square-label" style="color: #3b82f6 !important;">Produkt</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="columns">
-                            <span class="material-symbols-outlined element-square-icon">view_column</span>
-                            <span class="element-square-label">Kolonner</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="logo">
-                            <span class="material-symbols-outlined element-square-icon">featured_seasonal_and_gifts</span>
-                            <span class="element-square-label">Logo</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="video">
-                            <span class="material-symbols-outlined element-square-icon">play_circle</span>
-                            <span class="element-square-label">Video</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="subscribe">
-                            <span class="material-symbols-outlined element-square-icon">mail</span>
-                            <span class="element-square-label">Abonner</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="link">
-                            <span class="material-symbols-outlined element-square-icon">link</span>
-                            <span class="element-square-label">Lenke</span>
-                        </button>
-                        <button class="element-card-square element-card" data-type="social">
-                            <span class="material-symbols-outlined element-square-icon">campaign</span>
-                            <span class="element-square-label">Sosiale medier</span>
-                        </button>
-                    </div>
-                </div>
+                    <!-- Panel body containing the scrollable tab contents -->
+                    <div style="flex: 1; overflow-y: auto; padding-right: 4px;" id="builder-sidebar-scroll-content">
+                        
+                        <!-- TAB 1: Legg til -->
+                        <div id="rail-tab-add" class="rail-tab-panel" style="display: block;">
+                            <!-- Elements Section -->
+                            <div class="sidebar-section-container" style="margin-bottom: 24px;">
+                                <div class="elements-grid-modern">
+                                    <button class="element-card-square element-card" data-type="text">
+                                        <span class="element-text-icon">Aa|</span>
+                                        <span class="element-square-label">Tekst</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="image">
+                                        <span class="material-symbols-outlined element-square-icon">image</span>
+                                        <span class="element-square-label">Bilde</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="button">
+                                        <span class="material-symbols-outlined info-badge" title="Knapp med lenke">info</span>
+                                        <span class="material-symbols-outlined element-square-icon">crop_7_5</span>
+                                        <span class="element-square-label">Knapp</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="divider">
+                                        <span class="material-symbols-outlined element-square-icon">horizontal_rule</span>
+                                        <span class="element-square-label">Skillelinje</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="html">
+                                        <span class="element-text-icon">&lt;/&gt;</span>
+                                        <span class="element-square-label">HTML</span>
+                                    </button>
+                                    <button class="element-card-square element-card highlight-blue" data-type="product">
+                                        <span class="material-symbols-outlined info-badge" title="Dynamisk produktblokk fra nettbutikken">info</span>
+                                        <span class="material-symbols-outlined element-square-icon" style="color: #3b82f6 !important;">shopping_bag</span>
+                                        <span class="element-square-label" style="color: #3b82f6 !important;">Produkt</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="columns">
+                                        <span class="material-symbols-outlined element-square-icon">view_column</span>
+                                        <span class="element-square-label">Kolonner</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="logo">
+                                        <span class="material-symbols-outlined element-square-icon">featured_seasonal_and_gifts</span>
+                                        <span class="element-square-label">Logo</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="video">
+                                        <span class="material-symbols-outlined element-square-icon">play_circle</span>
+                                        <span class="element-square-label">Video</span>
+                                    </button>
+                                    <button class="element-card-square element-card" data-type="subscribe">
+                                        <span class="material-symbols-outlined element-square-icon">mail</span>
+                                        <span class="element-square-label">Abonner</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                <!-- Magical AI Section (Premium layout addition) -->
-                <div class="sidebar-section-container" style="margin-top: 24px;">
-                    <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined purple-icon" style="font-size: 14px; color: #6366f1;">auto_awesome</span>
-                        <span>Magisk AI Verktøy</span>
-                    </div>
-                    <div class="elements-list-vertical">
-                        <button class="element-card-row element-card ai-tool-card purple-gradient" onclick="builder.buildWithAi()">
-                            <span class="material-symbols-outlined element-icon">magic_button</span>
-                            <span class="element-label">Magisk Oppsett (AI)</span>
-                        </button>
-                        <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_text">
-                            <span class="material-symbols-outlined element-icon">history_edu</span>
-                            <span class="element-label">Magisk Tekst (AI)</span>
-                        </button>
-                        <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_image">
-                            <span class="material-symbols-outlined element-icon">photo</span>
-                            <span class="element-label">AI Bildegenerator</span>
-                        </button>
-                    </div>
-                </div>
+                            <!-- Saved Blocks Section -->
+                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                                <div class="sidebar-section-label">Lagrede Blokker</div>
+                                <div class="sidebar-empty-state">
+                                    <span class="material-symbols-outlined empty-icon">bookmark</span>
+                                    <span>Ingen lagrede blokker ennå...</span>
+                                </div>
+                            </div>
 
-                <!-- Saved Blocks Section -->
-                <div class="sidebar-section-container" style="margin-top: 24px;">
-                    <div class="sidebar-section-label">Lagrede Blokker</div>
-                    <div class="sidebar-empty-state">
-                        <span class="material-symbols-outlined empty-icon">bookmark</span>
-                        <span>Ingen lagrede blokker ennå...</span>
-                    </div>
-                </div>
+                            <!-- Mine Kladder (Drafts) Section -->
+                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                                <div class="sidebar-section-label" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Mine kladder</span>
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">edit_note</span>
+                                </div>
+                                <div id="drafts-list" class="templates-list-container">
+                                    <div class="sidebar-empty-state">
+                                        <span class="material-symbols-outlined empty-icon">edit_document</span>
+                                        <span>Ingen kladder lagret ennå</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- Mine Kladder (Drafts) Section -->
-                <div class="sidebar-section-container" style="margin-top: 24px;">
-                    <div class="sidebar-section-label" style="display: flex; align-items: center; justify-content: space-between;">
-                        <span>Mine kladder</span>
-                        <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">edit_note</span>
-                    </div>
-                    <div id="drafts-list" class="templates-list-container">
-                        <div class="sidebar-empty-state">
-                            <span class="material-symbols-outlined empty-icon">edit_document</span>
-                            <span>Ingen kladder lagret ennå</span>
+                            <!-- Mine Maler Section (Fixed templates list) -->
+                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                                <div class="sidebar-section-label">Mine maler</div>
+                                <div id="templates-list" class="templates-list-container">
+                                    <div class="sidebar-empty-state">
+                                        <span class="material-symbols-outlined empty-icon">article</span>
+                                        <span>Ingen maler lagret ennå</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Mine Maler Section (Fixed templates list) -->
-                <div class="sidebar-section-container" style="margin-top: 24px;">
-                    <div class="sidebar-section-label">Mine maler</div>
-                    <div id="templates-list" class="templates-list-container">
-                        <div class="sidebar-empty-state">
-                            <span class="material-symbols-outlined empty-icon">article</span>
-                            <span>Ingen maler lagret ennå</span>
-                        </div>
-                    </div>
-                </div>
+                        <!-- TAB 2: Temaer -->
+                        <div id="rail-tab-themes" class="rail-tab-panel" style="display: none;">
+                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Tilpass globale farger og skrifttyper for hele kampanjen.</p>
+                            
+                            <div class="inspector-group" style="margin-bottom: 20px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Global Skrifttype</label>
+                                <div class="inspector-select-wrapper">
+                                    <select id="theme-global-font" style="width: 100%;">
+                                        <option value="'Inter', sans-serif">Inter (Modern)</option>
+                                        <option value="Arial, sans-serif">Arial (Standard)</option>
+                                        <option value="'Playfair Display', serif">Playfair Display (Klassisk)</option>
+                                        <option value="Georgia, serif">Georgia</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                <!-- Deliverability Sjekk widget -->
-                <div class="sidebar-section-container" style="margin-top: 24px;">
-                    <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--accent-orange, #d17d39);">verified_user</span>
-                        <span>Leveringssjekk</span>
-                    </div>
-                    <div class="deliverability-card-modern">
-                        <div class="chk-item-modern">
-                            <span class="material-symbols-outlined chk-success">check_circle</span>
-                            <span>E-postserver i Norge (GDPR)</span>
-                        </div>
-                        <div class="chk-item-modern">
-                            <span class="material-symbols-outlined chk-success">check_circle</span>
-                            <span>Avsenderdomene godkjent (DKIM)</span>
-                        </div>
-                        <div class="chk-item-modern" id="chk-test-email">
-                            <span class="material-symbols-outlined chk-warning" id="chk-test-icon">pending</span>
-                            <span id="chk-test-text">Test-epost ikke sendt</span>
-                        </div>
-                    </div>
-                </div>
+                            <div class="inspector-group" style="margin-bottom: 20px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Mørkeblå (Hovedfarge)</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="color" id="theme-color-primary" value="#1B4965" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
+                                    <input type="text" id="theme-color-primary-hex" value="#1B4965" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                </div>
+                            </div>
 
-                <!-- Bottom Add Button (like mock) -->
-                <div class="sidebar-bottom-actions" style="margin-top: auto; padding-top: 24px;">
-                    <button class="add-element-dotted-btn">
-                        <span class="material-symbols-outlined">add</span>
-                        <span>Legg til element</span>
-                    </button>
-                </div>
+                            <div class="inspector-group" style="margin-bottom: 20px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Oransje (Accentfarge)</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="color" id="theme-color-accent" value="#d17d39" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
+                                    <input type="text" id="theme-color-accent-hex" value="#d17d39" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                </div>
+                            </div>
+
+                            <div class="inspector-group" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; display: block;">Fargepalett Maler</label>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div class="theme-preset-card" data-primary="#1B4965" data-accent="#d17d39" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #005bff; border-radius: 8px; cursor: pointer; background: #f0f7ff;">
+                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Mandal Standard</span>
+                                        <div style="display: flex; gap: 4px;">
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #1B4965; display: block;"></span>
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #d17d39; display: block;"></span>
+                                        </div>
+                                    </div>
+                                    <div class="theme-preset-card" data-primary="#0f172a" data-accent="#06b6d4" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff;">
+                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Ocean Breeze</span>
+                                        <div style="display: flex; gap: 4px;">
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #0f172a; display: block;"></span>
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #06b6d4; display: block;"></span>
+                                        </div>
+                                    </div>
+                                    <div class="theme-preset-card" data-primary="#123c1d" data-accent="#eab308" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff;">
+                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Forest Gold</span>
+                                        <div style="display: flex; gap: 4px;">
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #123c1d; display: block;"></span>
+                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #eab308; display: block;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: Bakgrunn -->
+                        <div id="rail-tab-background" class="rail-tab-panel" style="display: none;">
+                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Tilpass bakgrunnsfargen for hele e-posten.</p>
+                            
+                            <div class="inspector-group" style="margin-bottom: 20px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Kanvas Bakgrunn (Ytre)</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="color" id="theme-bg-outer" value="#f8fafc" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
+                                    <input type="text" id="theme-bg-outer-hex" value="#f8fafc" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                </div>
+                            </div>
+
+                            <div class="inspector-group" style="margin-bottom: 20px;">
+                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Maler-bakgrunn (Indre)</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="color" id="theme-bg-inner" value="#ffffff" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
+                                    <input type="text" id="theme-bg-inner-hex" value="#ffffff" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: AI tools -->
+                        <div id="rail-tab-ai" class="rail-tab-panel" style="display: none;">
+                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Bruk kunstig intelligens for å generere tekster, bilder og oppsett automatisk.</p>
+                            
+                            <div class="elements-list-vertical" style="display: flex; flex-direction: column; gap: 12px;">
+                                <button class="element-card-row element-card ai-tool-card purple-gradient" onclick="builder.buildWithAi()" style="padding: 16px; border-radius: 12px;">
+                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">magic_button</span>
+                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">Magisk Oppsett (AI)</span>
+                                </button>
+                                <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_text" style="padding: 16px; border-radius: 12px;">
+                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">history_edu</span>
+                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">Magisk Tekst (AI)</span>
+                                </button>
+                                <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_image" style="padding: 16px; border-radius: 12px;">
+                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">photo</span>
+                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">AI Bildegenerator</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TAB 5: Hjelp -->
+                        <div id="rail-tab-help" class="rail-tab-panel" style="display: none;">
+                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Hjelp og snarveier for editoren.</p>
+                            
+                            <div class="sidebar-section-container" style="margin-bottom: 24px;">
+                                <div class="sidebar-section-label" style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Tastatursnarveier</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #475569;">
+                                    <div style="display: flex; justify-content: space-between;"><span>Angre:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Cmd/Ctrl + Z</kbd></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Gjenta:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Cmd/Ctrl + Y</kbd></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Slett blokk:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Backspace/Del</kbd></div>
+                                </div>
+                            </div>
+
+                            <!-- Deliverability Check Widget inside Help tab -->
+                            <div class="sidebar-section-container" style="border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                                <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px; color: var(--accent-orange, #d17d39);">verified_user</span>
+                                    <span>Leveringssjekk</span>
+                                </div>
+                                <div class="deliverability-card-modern">
+                                    <div class="chk-item-modern">
+                                        <span class="material-symbols-outlined chk-success">check_circle</span>
+                                        <span>E-postserver i Norge (GDPR)</span>
+                                    </div>
+                                    <div class="chk-item-modern">
+                                        <span class="material-symbols-outlined chk-success">check_circle</span>
+                                        <span>Avsenderdomene godkjent (DKIM)</span>
+                                    </div>
+                                    <div class="chk-item-modern" id="chk-test-email">
+                                        <span class="material-symbols-outlined chk-warning" id="chk-test-icon">pending</span>
+                                        <span id="chk-test-text">Test-epost ikke sendt</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- Close scroll content container -->
                 </div> <!-- Close sidebar-default-view -->
 
                 <!-- Inspector View: Customize Selected Element -->
@@ -1534,7 +1819,7 @@
     <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260722_V30"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260722_V31"></script>
 </body>
 
 </html>

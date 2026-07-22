@@ -89,13 +89,60 @@ class NewsletterBuilder {
     }
 
     switchTab(tab) {
+        if (tab === 'rtl') {
+            // Special Toggle: RTL direction
+            const canvas = document.getElementById('newsletter-canvas');
+            if (canvas) {
+                const isRtl = canvas.getAttribute('dir') === 'rtl';
+                canvas.setAttribute('dir', isRtl ? 'ltr' : 'rtl');
+                if (typeof showToast === 'function') {
+                    showToast(isRtl ? "Retning satt til Venstre-til-Høyre (LTR)" : "Retning satt til Høyre-til-Venstre (RTL)", "info");
+                }
+            }
+            return;
+        }
+
         this.activeTab = tab;
+        
+        // Update vertical rail items styles
         document.querySelectorAll('.rail-item').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === tab);
+            const isTarget = btn.id === `rail-btn-${tab}`;
+            btn.classList.toggle('active', isTarget);
+            
+            // Highlight text color
+            btn.style.color = isTarget ? '#005bff' : '#475569';
+            if (isTarget) {
+                btn.style.fontWeight = '600';
+            } else {
+                btn.style.fontWeight = '500';
+            }
+            
+            // Circle container styles
+            const circle = btn.querySelector('.rail-item-circle');
+            if (circle) {
+                circle.style.background = isTarget ? '#e0f2fe' : 'transparent';
+                circle.style.border = isTarget ? '2px solid #005bff' : 'none';
+                const icon = circle.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.color = isTarget ? '#005bff' : 'inherit';
+                }
+            }
         });
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.toggle('active', pane.id === `tab-${tab}`);
+
+        // Hide/Show tab panels
+        document.querySelectorAll('.rail-tab-panel').forEach(pane => {
+            pane.style.display = pane.id === `rail-tab-${tab}` ? 'block' : 'none';
         });
+
+        // Update Title Header
+        const titleEl = document.getElementById('builder-sidebar-title');
+        if (titleEl) {
+            if (tab === 'add') titleEl.innerText = 'Legge til elementer';
+            else if (tab === 'themes') titleEl.innerText = 'Temaer';
+            else if (tab === 'background') titleEl.innerText = 'Bakgrunn';
+            else if (tab === 'ai') titleEl.innerText = 'Magisk AI Verktøy';
+            else if (tab === 'help') titleEl.innerText = 'Hjelp og verktøy';
+        }
     }
 
     updateBackground(type, key, value) {
@@ -167,6 +214,7 @@ class NewsletterBuilder {
 
         this.setupEventListeners();
         this.setupRichTextToolbar();
+        this.setupThemePanelEvents();
         this.setupBubbleMenu();
         this.applyBackgrounds();
         this.renderCanvas();
@@ -298,7 +346,7 @@ class NewsletterBuilder {
         });
 
         // Sidebar Tab Switching
-        document.querySelectorAll('.nav-icon-btn').forEach(btn => {
+        document.querySelectorAll('.rail-item').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
                 this.switchTab(tab);
@@ -1100,6 +1148,111 @@ class NewsletterBuilder {
             content: { text: container.innerHTML }
         }];
         this.triggerAutosave();
+    }
+
+    setupThemePanelEvents() {
+        // Preset Themes click
+        document.querySelectorAll('.theme-preset-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.theme-preset-card').forEach(c => {
+                    c.style.borderColor = '#cbd5e1';
+                    c.style.background = '#ffffff';
+                });
+                card.style.borderColor = '#005bff';
+                card.style.background = '#f0f7ff';
+                
+                const primary = card.dataset.primary;
+                const accent = card.dataset.accent;
+                
+                const primInput = document.getElementById('theme-color-primary');
+                const primHex = document.getElementById('theme-color-primary-hex');
+                const accInput = document.getElementById('theme-color-accent');
+                const accHex = document.getElementById('theme-color-accent-hex');
+                
+                if (primInput) primInput.value = primary;
+                if (primHex) primHex.value = primary;
+                if (accInput) accInput.value = accent;
+                if (accHex) accHex.value = accent;
+                
+                // Set custom properties or styles on elements in the canvas
+                document.querySelectorAll('#newsletter-canvas button, #newsletter-canvas a').forEach(el => {
+                    if (!el.classList.contains('inspector-style-btn')) {
+                        el.style.backgroundColor = primary;
+                    }
+                });
+                
+                this.syncUnifiedBlocks();
+                if (typeof showToast === 'function') {
+                    showToast("Tema-palett brukt på malen!", "success");
+                }
+            });
+        });
+
+        // Global font change
+        const fontSelect = document.getElementById('theme-global-font');
+        if (fontSelect) {
+            fontSelect.addEventListener('change', (e) => {
+                const canvas = document.getElementById('newsletter-canvas');
+                if (canvas) {
+                    canvas.style.fontFamily = e.target.value;
+                    this.syncUnifiedBlocks();
+                }
+            });
+        }
+
+        // Primary color picker
+        const primInput = document.getElementById('theme-color-primary');
+        const primHex = document.getElementById('theme-color-primary-hex');
+        if (primInput) {
+            primInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (primHex) primHex.value = val;
+                
+                document.querySelectorAll('#newsletter-canvas button, #newsletter-canvas a').forEach(el => {
+                    if (!el.classList.contains('inspector-style-btn')) {
+                        el.style.backgroundColor = val;
+                    }
+                });
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        // Accent color picker
+        const accInput = document.getElementById('theme-color-accent');
+        const accHex = document.getElementById('theme-color-accent-hex');
+        if (accInput) {
+            accInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (accHex) accHex.value = val;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        // Ytre Bakgrunn
+        const bgOuter = document.getElementById('theme-bg-outer');
+        const bgOuterHex = document.getElementById('theme-bg-outer-hex');
+        if (bgOuter) {
+            bgOuter.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (bgOuterHex) bgOuterHex.value = val;
+                const canvasScaler = document.getElementById('canvas-scaler');
+                if (canvasScaler) canvasScaler.style.backgroundColor = val;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        // Indre Bakgrunn
+        const bgInner = document.getElementById('theme-bg-inner');
+        const bgInnerHex = document.getElementById('theme-bg-inner-hex');
+        if (bgInner) {
+            bgInner.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (bgInnerHex) bgInnerHex.value = val;
+                const canvas = document.getElementById('newsletter-canvas');
+                if (canvas) canvas.style.backgroundColor = val;
+                this.syncUnifiedBlocks();
+            });
+        }
     }
 
     setupRichTextToolbar() {
