@@ -1,7 +1,13 @@
-const CACHE_NAME = 'hkm-admin-app-v37';
+const CACHE_NAME = 'hkm-admin-app-v38';
 const SHELL_ASSETS = [
     '/admin/index.html',
     '/admin/login.html',
+    '/admin/admin-nyhetsbrev.html',
+    '/admin/admin-meldinger.html',
+    '/admin/admin-kommunikasjon.html',
+    '/admin/admin-segmenter.html',
+    '/admin/admin-analytics.html',
+    '/admin/admin-logger.html',
     '/admin/manifest.webmanifest',
     '/css/notifications.css',
     '/img/logo-hkm.png',
@@ -61,7 +67,7 @@ self.addEventListener('fetch', (event) => {
             try {
                 return await fetch(request, { cache: 'no-store' });
             } catch (error) {
-                return await caches.match(request) || await caches.match('/admin/index.html') || Response.error();
+                return await caches.match(request, { ignoreSearch: true }) || await caches.match('/admin/index.html') || Response.error();
             }
         })());
         return;
