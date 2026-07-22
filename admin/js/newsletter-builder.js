@@ -358,7 +358,7 @@ class NewsletterBuilder {
                 }
             });
 
-            // Prevent accidental deletion of product cards via backspace or delete key
+            // Prevent accidental deletion of product or event cards via backspace or delete key
             container.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace') {
                     const selection = window.getSelection();
@@ -376,8 +376,8 @@ class NewsletterBuilder {
                         if (parentBlock) {
                             const prevSibling = parentBlock.previousSibling;
                             
-                            // Check if the previous element is a product card
-                            if (prevSibling && prevSibling.classList && prevSibling.classList.contains('newsletter-product-card')) {
+                            // Check if the previous element is a product card or event card
+                            if (prevSibling && prevSibling.classList && (prevSibling.classList.contains('newsletter-product-card') || prevSibling.classList.contains('newsletter-event-card'))) {
                                 if (this.pendingDeleteCard !== prevSibling) {
                                     e.preventDefault();
                                     
@@ -390,7 +390,7 @@ class NewsletterBuilder {
                                     this.pendingDeleteCard = prevSibling;
                                     prevSibling.style.outline = '3px solid #ef4444';
                                     prevSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
-                                    showToast("Trykk Backspace én gang til for å slette produktet.", "warning");
+                                    showToast("Trykk Backspace én gang til for å slette elementet.", "warning");
                                     return;
                                 }
                             }
@@ -417,7 +417,7 @@ class NewsletterBuilder {
                     if (parentBlock) {
                         const nextSibling = parentBlock.nextSibling;
                         
-                        if (nextSibling && nextSibling.classList && nextSibling.classList.contains('newsletter-product-card')) {
+                        if (nextSibling && nextSibling.classList && (nextSibling.classList.contains('newsletter-product-card') || nextSibling.classList.contains('newsletter-event-card'))) {
                             // Check if cursor is at the end of the text
                             const isAtEnd = range.collapsed && 
                                 (range.startContainer === parentBlock || 
@@ -435,7 +435,7 @@ class NewsletterBuilder {
                                     this.pendingDeleteCard = nextSibling;
                                     nextSibling.style.outline = '3px solid #ef4444';
                                     nextSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
-                                    showToast("Trykk Delete én gang til for å slette produktet.", "warning");
+                                    showToast("Trykk Delete én gang til for å slette elementet.", "warning");
                                     return;
                                 }
                             }
@@ -1306,6 +1306,9 @@ class NewsletterBuilder {
             case 'product':
                 this.openProductInsertionFlow();
                 return;
+            case 'event':
+                this.openEventInsertionFlow();
+                return;
             default:
                 return;
         }
@@ -1614,6 +1617,317 @@ class NewsletterBuilder {
         loadProducts();
     }
 
+    openEventInsertionFlow() {
+        this.openEventInsertionFlowAt(null);
+    }
+
+    openEventInsertionFlowAt(afterElement) {
+        let modal = document.getElementById('hkm-event-selector-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-event-selector-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            display: flex;
+            z-index: 11000;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: white;">calendar_today</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">Sett inn arrangement</h3>
+                    </div>
+                    <button id="hkm-event-modal-close" style="background: none; border: none; color: white; opacity: 0.8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 50%; transition: all 0.2s;"><span class="material-symbols-outlined" style="font-size: 22px;">close</span></button>
+                </div>
+                <div style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 12px; align-items: center; background: #f8fafc;">
+                    <div style="position: relative; flex: 1;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
+                        <input type="text" id="hkm-event-search-input" placeholder="Søk etter arrangementer..." style="width: 100%; padding: 10px 12px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 500; outline: none; transition: border-color 0.2s, box-shadow: 0.2s; box-sizing: border-box; background: white;" />
+                    </div>
+                </div>
+                <div id="hkm-event-results" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 250px; max-height: 380px; background: white;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 12px;">
+                        <div style="width: 24px; height: 24px; border: 3px solid #e2e8f0; border-top-color: #d17d39; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <span style="font-size: 14px; font-weight: 500;">Henter arrangementer...</span>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <span id="hkm-event-selected-count" style="font-size: 13px; font-weight: 600; color: #64748b;">Ingen arrangementer valgt</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="hkm-event-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Avbryt</button>
+                        <button id="hkm-event-modal-insert" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; color: white; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.5; pointer-events: none; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(209, 125, 57, 0.25);">Sett inn valgte</button>
+                    </div>
+                </div>
+                <style>
+                    #hkm-event-results::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    #hkm-event-results::-webkit-scrollbar-thumb {
+                        background: #cbd5e1;
+                        border-radius: 3px;
+                    }
+                    .hkm-event-item {
+                        transition: all 0.2s ease;
+                    }
+                    .hkm-event-item:hover {
+                        background: #f8fafc !important;
+                        border-color: #cbd5e1 !important;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                    }
+                    .hkm-event-item:hover .material-symbols-outlined {
+                        color: #d17d39 !important;
+                    }
+                    #hkm-event-modal-cancel:hover {
+                        background: #f1f5f9 !important;
+                        border-color: #94a3b8 !important;
+                    }
+                    #hkm-event-modal-cancel:active {
+                        transform: scale(0.97) !important;
+                    }
+                    #hkm-event-modal-insert:hover {
+                        filter: brightness(1.05) !important;
+                    }
+                    #hkm-event-modal-insert:active {
+                        transform: scale(0.97) !important;
+                    }
+                </style>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeBtn = document.getElementById('hkm-event-modal-close');
+        const cancelBtn = document.getElementById('hkm-event-modal-cancel');
+        const insertBtn = document.getElementById('hkm-event-modal-insert');
+        const searchInput = document.getElementById('hkm-event-search-input');
+        const resultsContainer = document.getElementById('hkm-event-results');
+        const countText = document.getElementById('hkm-event-selected-count');
+
+        const closeModal = () => {
+            modal.remove();
+        };
+
+        closeBtn.onclick = closeModal;
+        cancelBtn.onclick = closeModal;
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+
+        const escapeHtml = (str) => {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
+        let eventsList = [];
+        const selectedEventsMap = new Map();
+
+        const updateSelectionUI = () => {
+            const count = selectedEventsMap.size;
+            if (countText) {
+                countText.textContent = count === 0 
+                    ? 'Ingen arrangementer valgt' 
+                    : `${count} ${count === 1 ? 'arrangement' : 'arrangementer'} valgt`;
+            }
+            
+            if (insertBtn) {
+                if (count > 0) {
+                    insertBtn.style.opacity = '1';
+                    insertBtn.style.pointerEvents = 'auto';
+                } else {
+                    insertBtn.style.opacity = '0.5';
+                    insertBtn.style.pointerEvents = 'none';
+                }
+            }
+        };
+
+        const renderEvents = (query = '') => {
+            const q = query.trim().toLowerCase();
+            let filtered = eventsList;
+
+            if (q) {
+                filtered = eventsList.filter(e => {
+                    const titleLower = (e.title || '').toLowerCase();
+                    const descLower = (e.description || e.content || e.excerpt || '').toLowerCase();
+                    return titleLower.includes(q) || descLower.includes(q);
+                });
+            }
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1;">search_off</span>
+                        <span style="font-size: 14px; font-weight: 500; text-align: center;">Ingen arrangementer funnet ${q ? `for "${escapeHtml(q)}"` : ''}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsContainer.innerHTML = filtered.map(e => {
+                const title = e.title || 'Uten tittel';
+                const key = e.id || `${title}|${e.start || e.date || ''}`;
+                const isSelected = selectedEventsMap.has(key);
+                
+                const startDate = (e.date || e.start) ? new Date(e.date || e.start) : null;
+                const formattedDate = startDate ? startDate.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' }) : 'Dato mangler';
+                const timeStr = e.time || (startDate && e.start && e.start.includes('T') ? startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }) : '');
+                
+                const imgUrl = e.imageUrl || e.image || e.dashboardImage || e.imageLink;
+                const img = imgUrl 
+                    ? `<img src="${imgUrl}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`
+                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;">📅</div>`;
+                
+                const itemStyles = isSelected 
+                    ? 'border-color: #1B4965 !important; background: #f0f6fa !important; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.05);' 
+                    : 'background: #ffffff;';
+                
+                const iconStyles = isSelected 
+                    ? 'color: #1B4965 !important;' 
+                    : 'color: #94a3b8;';
+                
+                const iconName = isSelected ? 'check_circle' : 'radio_button_unchecked';
+                
+                return `
+                    <div class="hkm-event-item" data-key="${escapeHtml(key)}" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; ${itemStyles}">
+                        ${img}
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                            <span style="font-size: 13.5px; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(title)}</span>
+                            <span style="font-size: 12px; color: #d17d39; font-weight: 700;">${formattedDate} ${timeStr ? `kl. ${timeStr}` : ''}</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 20px; transition: all 0.2s; ${iconStyles}">${iconName}</span>
+                    </div>
+                `;
+            }).join('');
+
+            resultsContainer.querySelectorAll('.hkm-event-item').forEach(item => {
+                const key = item.dataset.key;
+                const eventObj = filtered.find(e => {
+                    const k = e.id || `${e.title || 'event'}|${e.start || e.date || ''}`;
+                    return k === key;
+                });
+
+                item.onclick = () => {
+                    if (selectedEventsMap.has(key)) {
+                        selectedEventsMap.delete(key);
+                    } else {
+                        selectedEventsMap.set(key, eventObj);
+                    }
+                    updateSelectionUI();
+                    renderEvents(searchInput.value);
+                };
+            });
+        };
+
+        insertBtn.onclick = () => {
+            let combinedHtml = '';
+            selectedEventsMap.forEach((e) => {
+                const title = e.title || 'Uten tittel';
+                const key = e.id || `${title}|${e.start || e.date || ''}`;
+                const image = e.imageUrl || e.image || e.dashboardImage || e.imageLink || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+                
+                const startDate = (e.date || e.start) ? new Date(e.date || e.start) : null;
+                const day = startDate ? startDate.getDate() : '--';
+                const monthStr = startDate ? startDate.toLocaleString('nb-NO', { month: 'short' }).replace('.', '').toUpperCase() : '--';
+                const dateBadge = `${day}. ${monthStr}`;
+
+                const formattedDate = startDate ? startDate.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+                const timeStr = e.time || (startDate && e.start && e.start.includes('T') ? startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }) : '');
+                const timeLabel = formattedDate + (timeStr ? ` kl. ${timeStr}` : '');
+                
+                const location = e.location || '';
+                const detailsUrl = `https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(key)}`;
+
+                combinedHtml += `
+                    <div class="newsletter-event-card" contenteditable="false" style="display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 24px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
+                        <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9; position: relative;">
+                            <img src="${image}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(27, 73, 101, 0.95); color: white; text-align: center; padding: 4px 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                                ${dateBadge}
+                            </div>
+                        </div>
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                            <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(title)}</h4>
+                            <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">schedule</span>
+                                <span>${timeLabel}</span>
+                            </div>
+                            ${location ? `
+                            <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">location_on</span>
+                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(location)}</span>
+                            </div>
+                            ` : ''}
+                            <div style="margin-top: 6px;">
+                                <a href="${detailsUrl}" target="_blank" style="display: inline-block; background: #1B4965; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(27, 73, 101, 0.2);">Les mer & Påmelding</a>
+                            </div>
+                        </div>
+                    </div><p><br></p>
+                `;
+            });
+
+            this.insertHtmlAtCursorOrEndAt(combinedHtml, afterElement);
+            closeModal();
+            showToast(`${selectedEventsMap.size} ${selectedEventsMap.size === 1 ? 'arrangement' : 'arrangementer'} satt inn!`, "success");
+        };
+
+        const loadEvents = async () => {
+            try {
+                if (!window.firebaseService?.isInitialized) {
+                    throw new Error("Firebase Service not initialized");
+                }
+                const doc = await window.firebaseService.getPageContent('collection_events');
+                const firebaseItems = Array.isArray(doc) ? doc : (doc?.items || []);
+                
+                // Filter out past events
+                const now = new Date();
+                eventsList = firebaseItems.filter(e => {
+                    if (!e.date && !e.start) return true;
+                    const eventDate = new Date(e.date || e.start);
+                    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const checkDate = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                    return checkDate >= todayDate;
+                }).sort((a, b) => {
+                    const dateA = new Date(a.date || a.start || 0);
+                    const dateB = new Date(b.date || b.start || 0);
+                    return dateA - dateB;
+                });
+                
+                renderEvents();
+            } catch (err) {
+                console.error("Failed to load events:", err);
+                resultsContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #ef4444; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #f87171;">error</span>
+                        <span style="font-size: 14px; font-weight: 500; text-align: center;">Kunne ikke hente arrangementer.</span>
+                    </div>
+                `;
+            }
+        };
+
+        searchInput.oninput = (e) => {
+            renderEvents(e.target.value);
+        };
+
+        loadEvents();
+    }
+
     insertHtmlAtCursorOrEnd(html) {
         this.insertHtmlAtCursorOrEndAt(html, null);
     }
@@ -1640,7 +1954,7 @@ class NewsletterBuilder {
             const range = selection.getRangeAt(0);
             
             // Check if we are inserting block-level elements
-            const isBlockHtml = html.includes('newsletter-product-card') || html.includes('block-btn') || html.includes('display: grid');
+            const isBlockHtml = html.includes('newsletter-product-card') || html.includes('newsletter-event-card') || html.includes('block-btn') || html.includes('display: grid');
             
             if (isBlockHtml) {
                 // Find closest direct child of the blocks-container containing selection
@@ -1780,6 +2094,9 @@ class NewsletterBuilder {
                 break;
             case 'product':
                 this.openProductInsertionFlowAt(afterElement);
+                return;
+            case 'event':
+                this.openEventInsertionFlowAt(afterElement);
                 return;
             default:
                 return;
