@@ -2831,8 +2831,25 @@ class NewsletterBuilder {
         const nestedFooters = container.querySelectorAll('.canvas-footer');
         if (nestedFooters.length > 0) {
             nestedFooters.forEach(footer => footer.remove());
-            this.syncUnifiedBlocks();
         }
+
+        // Ensure all product and event cards in the container have a delete button
+        container.querySelectorAll('.newsletter-product-card, .newsletter-event-card').forEach(card => {
+            if (card.style.position !== 'relative') {
+                card.style.position = 'relative';
+            }
+            if (!card.querySelector('.card-delete-btn')) {
+                const isProduct = card.classList.contains('newsletter-product-card');
+                const btn = document.createElement('button');
+                btn.className = 'card-delete-btn';
+                btn.setAttribute('style', 'position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
+                btn.title = isProduct ? 'Slett produkt' : 'Slett arrangement';
+                btn.innerHTML = '×';
+                card.appendChild(btn);
+            }
+        });
+
+        this.syncUnifiedBlocks();
     }
 
     showPreview() {
