@@ -1,7 +1,7 @@
 (function () {
     const ADMIN_CACHE_PREFIX = 'hkm-admin-';
     const LOCAL_DEV_CLEANUP_KEY = 'hkm_admin_pwa_local_cleanup_done';
-    const PWA_VERSION = 'v49'; // Change this value to force-clear cache and reload production clients
+    const PWA_VERSION = 'v50'; // Change this value to force-clear cache and reload production clients
     const VERSION_KEY = 'hkm_admin_pwa_version';
 
     if (!('serviceWorker' in navigator)) return;
