@@ -1230,7 +1230,7 @@ class NewsletterBuilder {
         `;
 
         modal.innerHTML = `
-            <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 80vh; display: flex; flex-direction: column;">
+            <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 85vh; display: flex; flex-direction: column;">
                 <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
@@ -1246,10 +1246,17 @@ class NewsletterBuilder {
                         <input type="text" id="hkm-product-search-input" placeholder="Søk etter produkter..." style="width: 100%; padding: 10px 12px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 500; outline: none; transition: border-color 0.2s, box-shadow: 0.2s; box-sizing: border-box; background: white;" />
                     </div>
                 </div>
-                <div id="hkm-product-results" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 250px; max-height: 400px; background: white;">
+                <div id="hkm-product-results" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 250px; max-height: 380px; background: white;">
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 12px;">
                         <div style="width: 24px; height: 24px; border: 3px solid #e2e8f0; border-top-color: #d17d39; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                         <span style="font-size: 14px; font-weight: 500;">Henter produkter fra butikken...</span>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <span id="hkm-product-selected-count" style="font-size: 13px; font-weight: 600; color: #64748b;">Ingen produkter valgt</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="hkm-product-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Avbryt</button>
+                        <button id="hkm-product-modal-insert" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); border: none; color: white; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.5; pointer-events: none; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(209, 125, 57, 0.25);">Sett inn valgte</button>
                     </div>
                 </div>
                 <style>
@@ -1271,7 +1278,19 @@ class NewsletterBuilder {
                     }
                     .hkm-product-item:hover .material-symbols-outlined {
                         color: #d17d39 !important;
-                        transform: scale(1.1);
+                    }
+                    #hkm-product-modal-cancel:hover {
+                        background: #f1f5f9 !important;
+                        border-color: #94a3b8 !important;
+                    }
+                    #hkm-product-modal-cancel:active {
+                        transform: scale(0.97) !important;
+                    }
+                    #hkm-product-modal-insert:hover {
+                        filter: brightness(1.05) !important;
+                    }
+                    #hkm-product-modal-insert:active {
+                        transform: scale(0.97) !important;
                     }
                 </style>
             </div>
@@ -1280,14 +1299,18 @@ class NewsletterBuilder {
         document.body.appendChild(modal);
 
         const closeBtn = document.getElementById('hkm-product-modal-close');
+        const cancelBtn = document.getElementById('hkm-product-modal-cancel');
+        const insertBtn = document.getElementById('hkm-product-modal-insert');
         const searchInput = document.getElementById('hkm-product-search-input');
         const resultsContainer = document.getElementById('hkm-product-results');
+        const countText = document.getElementById('hkm-product-selected-count');
 
         const closeModal = () => {
             modal.remove();
         };
 
         closeBtn.onclick = closeModal;
+        cancelBtn.onclick = closeModal;
         modal.onclick = (e) => {
             if (e.target === modal) closeModal();
         };
@@ -1303,6 +1326,26 @@ class NewsletterBuilder {
         };
 
         let productsList = window.hkmWixProductsCache || [];
+        const selectedProductsMap = new Map();
+
+        const updateSelectionUI = () => {
+            const count = selectedProductsMap.size;
+            if (countText) {
+                countText.textContent = count === 0 
+                    ? 'Ingen produkter valgt' 
+                    : `${count} ${count === 1 ? 'produkt' : 'produkter'} valgt`;
+            }
+            
+            if (insertBtn) {
+                if (count > 0) {
+                    insertBtn.style.opacity = '1';
+                    insertBtn.style.pointerEvents = 'auto';
+                } else {
+                    insertBtn.style.opacity = '0.5';
+                    insertBtn.style.pointerEvents = 'none';
+                }
+            }
+        };
 
         const renderProducts = (query = '') => {
             const q = query.trim().toLowerCase();
@@ -1343,49 +1386,76 @@ class NewsletterBuilder {
 
             resultsContainer.innerHTML = filtered.map(p => {
                 const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const isSelected = selectedProductsMap.has(slug);
                 const img = p.imageUrl 
                     ? `<img src="${p.imageUrl}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`
                     : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;">🛍️</div>`;
                 
+                const itemStyles = isSelected 
+                    ? 'border-color: #d17d39 !important; background: #fffcf8 !important; box-shadow: 0 4px 6px -1px rgba(209, 125, 57, 0.05);' 
+                    : 'background: #ffffff;';
+                
+                const iconStyles = isSelected 
+                    ? 'color: #d17d39 !important;' 
+                    : 'color: #94a3b8;';
+                
+                const iconName = isSelected ? 'check_circle' : 'radio_button_unchecked';
+                
                 return `
-                    <div class="hkm-product-item" data-name="${escapeHtml(p.name)}" data-price="${p.price || ''}" data-slug="${slug}" data-image="${p.imageUrl || ''}" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #ffffff;">
+                    <div class="hkm-product-item" data-slug="${slug}" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; ${itemStyles}">
                         ${img}
                         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
                             <span style="font-size: 13.5px; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</span>
                             <span style="font-size: 12px; color: #d17d39; font-weight: 700;">kr ${p.price || 'N/A'},-</span>
                         </div>
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: #94a3b8; transition: all 0.2s;">add_circle</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px; transition: all 0.2s; ${iconStyles}">${iconName}</span>
                     </div>
                 `;
             }).join('');
 
             resultsContainer.querySelectorAll('.hkm-product-item').forEach(item => {
+                const slug = item.dataset.slug;
+                const product = filtered.find(p => {
+                    const s = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    return s === slug;
+                });
+
                 item.onclick = () => {
-                    const name = item.dataset.name;
-                    const price = item.dataset.price;
-                    const slug = item.dataset.slug;
-                    const image = item.dataset.image;
-
-                    const productHtml = `
-                        <div class="newsletter-product-card" contenteditable="false" style="display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 24px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
-                            <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9;">
-                                <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-                            </div>
-                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
-                                <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</h4>
-                                <span style="font-size: 15px; font-weight: 700; color: #d17d39;">kr ${price || 'N/A'},-</span>
-                                <div style="margin-top: 6px;">
-                                    <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2);">Se produkt</a>
-                                </div>
-                            </div>
-                        </div><p><br></p>
-                    `;
-
-                    this.insertHtmlAtCursorOrEndAt(productHtml, afterElement);
-                    closeModal();
-                    showToast("Produkt satt inn!", "success");
+                    if (selectedProductsMap.has(slug)) {
+                        selectedProductsMap.delete(slug);
+                    } else {
+                        selectedProductsMap.set(slug, product);
+                    }
+                    updateSelectionUI();
+                    renderProducts(searchInput.value);
                 };
             });
+        };
+
+        insertBtn.onclick = () => {
+            let combinedHtml = '';
+            selectedProductsMap.forEach((p) => {
+                const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const image = p.imageUrl || '';
+                combinedHtml += `
+                    <div class="newsletter-product-card" contenteditable="false" style="display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 24px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
+                        <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9;">
+                            <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                        </div>
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                            <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</h4>
+                            <span style="font-size: 15px; font-weight: 700; color: #d17d39;">kr ${p.price || 'N/A'},-</span>
+                            <div style="margin-top: 6px;">
+                                <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2);">Se produkt</a>
+                            </div>
+                        </div>
+                    </div><p><br></p>
+                `;
+            });
+
+            this.insertHtmlAtCursorOrEndAt(combinedHtml, afterElement);
+            closeModal();
+            showToast(`${selectedProductsMap.size} ${selectedProductsMap.size === 1 ? 'produkt' : 'produkter'} satt inn!`, "success");
         };
 
         const loadProducts = async () => {
