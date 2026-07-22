@@ -434,16 +434,11 @@ class NewsletterBuilder {
                             
                             // Check if the previous element is a product card or event card
                             if (prevSibling && prevSibling.classList && (prevSibling.classList.contains('newsletter-product-card') || prevSibling.classList.contains('newsletter-event-card'))) {
+                                // Block default browser action so it doesn't delete the card
+                                e.preventDefault();
+                                
                                 const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
                                 if (isCurrentBlockEmpty) {
-                                    e.preventDefault();
-                                    
-                                    if (this.pendingDeleteCard) {
-                                        this.pendingDeleteCard.style.outline = '';
-                                        this.pendingDeleteCard.style.boxShadow = '';
-                                        this.pendingDeleteCard = null;
-                                    }
-
                                     const prevPrevSibling = prevSibling.previousSibling;
                                     if (prevPrevSibling && prevPrevSibling.nodeType === Node.ELEMENT_NODE) {
                                         const range = document.createRange();
@@ -469,33 +464,10 @@ class NewsletterBuilder {
                                     parentBlock.remove();
                                     this.syncUnifiedBlocks();
                                     this.triggerAutosave();
-                                    return;
                                 }
-
-                                if (this.pendingDeleteCard !== prevSibling) {
-                                    e.preventDefault();
-                                    
-                                    // Clear any previous selection outlines
-                                    if (this.pendingDeleteCard) {
-                                        this.pendingDeleteCard.style.outline = '';
-                                        this.pendingDeleteCard.style.boxShadow = '';
-                                    }
-                                    
-                                    this.pendingDeleteCard = prevSibling;
-                                    prevSibling.style.outline = '3px solid #ef4444';
-                                    prevSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
-                                    showToast("Trykk Backspace én gang til for å slette elementet.", "warning");
-                                    return;
-                                }
+                                return;
                             }
                         }
-                    }
-                    
-                    // Normal Backspace deletes the card if it's already pending deletion
-                    if (this.pendingDeleteCard) {
-                        this.pendingDeleteCard.style.outline = '';
-                        this.pendingDeleteCard.style.boxShadow = '';
-                        this.pendingDeleteCard = null;
                     }
                 } else if (e.key === 'Delete') {
                     const selection = window.getSelection();
@@ -518,16 +490,11 @@ class NewsletterBuilder {
                                  (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length));
                             
                             if (isAtEnd) {
+                                // Block default browser action so it doesn't delete the card
+                                e.preventDefault();
+
                                 const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
                                 if (isCurrentBlockEmpty) {
-                                    e.preventDefault();
-                                    
-                                    if (this.pendingDeleteCard) {
-                                        this.pendingDeleteCard.style.outline = '';
-                                        this.pendingDeleteCard.style.boxShadow = '';
-                                        this.pendingDeleteCard = null;
-                                    }
-
                                     const nextNextSibling = nextSibling.nextSibling;
                                     if (nextNextSibling && nextNextSibling.nodeType === Node.ELEMENT_NODE) {
                                         const range = document.createRange();
@@ -553,38 +520,10 @@ class NewsletterBuilder {
                                     parentBlock.remove();
                                     this.syncUnifiedBlocks();
                                     this.triggerAutosave();
-                                    return;
                                 }
-
-                                if (this.pendingDeleteCard !== nextSibling) {
-                                    e.preventDefault();
-                                    
-                                    if (this.pendingDeleteCard) {
-                                        this.pendingDeleteCard.style.outline = '';
-                                        this.pendingDeleteCard.style.boxShadow = '';
-                                    }
-                                    
-                                    this.pendingDeleteCard = nextSibling;
-                                    nextSibling.style.outline = '3px solid #ef4444';
-                                    nextSibling.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
-                                    showToast("Trykk Delete én gang til for å slette elementet.", "warning");
-                                    return;
-                                }
+                                return;
                             }
                         }
-                    }
-                    
-                    if (this.pendingDeleteCard) {
-                        this.pendingDeleteCard.style.outline = '';
-                        this.pendingDeleteCard.style.boxShadow = '';
-                        this.pendingDeleteCard = null;
-                    }
-                } else {
-                    // Any other key clears the deletion state
-                    if (this.pendingDeleteCard) {
-                        this.pendingDeleteCard.style.outline = '';
-                        this.pendingDeleteCard.style.boxShadow = '';
-                        this.pendingDeleteCard = null;
                     }
                 }
             });
