@@ -391,6 +391,44 @@ class NewsletterBuilder {
                             
                             // Check if the previous element is a product card or event card
                             if (prevSibling && prevSibling.classList && (prevSibling.classList.contains('newsletter-product-card') || prevSibling.classList.contains('newsletter-event-card'))) {
+                                const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
+                                if (isCurrentBlockEmpty) {
+                                    e.preventDefault();
+                                    
+                                    if (this.pendingDeleteCard) {
+                                        this.pendingDeleteCard.style.outline = '';
+                                        this.pendingDeleteCard.style.boxShadow = '';
+                                        this.pendingDeleteCard = null;
+                                    }
+
+                                    const prevPrevSibling = prevSibling.previousSibling;
+                                    if (prevPrevSibling && prevPrevSibling.nodeType === Node.ELEMENT_NODE) {
+                                        const range = document.createRange();
+                                        const sel = window.getSelection();
+                                        range.selectNodeContents(prevPrevSibling);
+                                        range.collapse(false);
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                        if (prevPrevSibling.focus) prevPrevSibling.focus();
+                                    } else {
+                                        const newP = document.createElement('p');
+                                        newP.innerHTML = '<br>';
+                                        container.insertBefore(newP, prevSibling);
+                                        const range = document.createRange();
+                                        const sel = window.getSelection();
+                                        range.selectNodeContents(newP);
+                                        range.collapse(true);
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                        newP.focus();
+                                    }
+                                    
+                                    parentBlock.remove();
+                                    this.syncUnifiedBlocks();
+                                    this.triggerAutosave();
+                                    return;
+                                }
+
                                 if (this.pendingDeleteCard !== prevSibling) {
                                     e.preventDefault();
                                     
@@ -437,6 +475,44 @@ class NewsletterBuilder {
                                  (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === range.startContainer.length));
                             
                             if (isAtEnd) {
+                                const isCurrentBlockEmpty = parentBlock.textContent.trim() === '' && !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card');
+                                if (isCurrentBlockEmpty) {
+                                    e.preventDefault();
+                                    
+                                    if (this.pendingDeleteCard) {
+                                        this.pendingDeleteCard.style.outline = '';
+                                        this.pendingDeleteCard.style.boxShadow = '';
+                                        this.pendingDeleteCard = null;
+                                    }
+
+                                    const nextNextSibling = nextSibling.nextSibling;
+                                    if (nextNextSibling && nextNextSibling.nodeType === Node.ELEMENT_NODE) {
+                                        const range = document.createRange();
+                                        const sel = window.getSelection();
+                                        range.selectNodeContents(nextNextSibling);
+                                        range.collapse(true);
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                        if (nextNextSibling.focus) nextNextSibling.focus();
+                                    } else {
+                                        const newP = document.createElement('p');
+                                        newP.innerHTML = '<br>';
+                                        container.appendChild(newP);
+                                        const range = document.createRange();
+                                        const sel = window.getSelection();
+                                        range.selectNodeContents(newP);
+                                        range.collapse(true);
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                        newP.focus();
+                                    }
+                                    
+                                    parentBlock.remove();
+                                    this.syncUnifiedBlocks();
+                                    this.triggerAutosave();
+                                    return;
+                                }
+
                                 if (this.pendingDeleteCard !== nextSibling) {
                                     e.preventDefault();
                                     
