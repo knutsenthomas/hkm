@@ -231,17 +231,60 @@ class NewsletterBuilder {
     }
 
     startAuthListener() {
-        window.firebaseService.onAuthChange((user) => {
+        window.firebaseService.onAuthChange(async (user) => {
             if (!user) {
                 window.location.href = '/admin/login.html';
             } else {
                 console.log("[newsletter-builder] User is authenticated. Loading data...");
-                this.loadTemplates();
-                this.loadDrafts();
+                await this.loadTemplates();
+                await this.loadDrafts();
                 this.loadAiSuggestions();
                 this.loadDashboardData();
+
+                // Check URL for active draft
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlDraftId = urlParams.get('draftId');
+                if (urlDraftId) {
+                    await this.loadDraftFromUrl(urlDraftId);
+                }
             }
         });
+    }
+
+    async loadDraftFromUrl(draftId) {
+        if (draftId === 'new') {
+            this.blocks = [];
+            this.currentDraftId = null;
+            this.currentDraftName = null;
+            const subjectInput = document.getElementById('newsletter-subject');
+            if (subjectInput) subjectInput.value = '';
+            this.toggleMode('builder');
+            this.renderCanvas();
+            return;
+        }
+
+        try {
+            const doc = await window.firebaseService.db.collection('newsletter_templates').doc(draftId).get();
+            if (doc.exists) {
+                const data = doc.data();
+                this.currentDraftId = doc.id;
+                this.currentDraftName = data.name || 'Uten navn';
+                this.blocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
+                const subjectInput = document.getElementById('newsletter-subject');
+                if (subjectInput) subjectInput.value = data.subject || '';
+                
+                this.toggleMode('builder');
+                this.renderCanvas();
+                showToast(`Kladden "${this.currentDraftName}" ble gjenopprettet.`, "info");
+            } else {
+                showToast("Fant ikke den angitte kladden.", "error");
+                const url = new URL(window.location.href);
+                url.searchParams.delete('draftId');
+                window.history.replaceState({}, '', url.toString());
+            }
+        } catch (e) {
+            console.error("Gjenoppretting av kladd feilet:", e);
+        }
     }
 
     setupEventListeners() {
@@ -4411,6 +4454,15 @@ class NewsletterBuilder {
             if (builder) builder.style.display = 'block';
             if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
             document.body.className = 'builder-active';
+
+            // Maintain URL search parameters
+            const url = new URL(window.location.href);
+            if (this.currentDraftId) {
+                url.searchParams.set('draftId', this.currentDraftId);
+            } else {
+                url.searchParams.set('draftId', 'new');
+            }
+            window.history.replaceState({}, '', url.toString());
         } else {
             if (dashboard) dashboard.style.display = 'block';
             if (builder) builder.style.display = 'none';
@@ -4418,6 +4470,12 @@ class NewsletterBuilder {
                 mainHeader.style.removeProperty('display');
             }
             document.body.className = 'admin-body main-dashboard';
+
+            // Clear active draft from URL search parameter
+            const url = new URL(window.location.href);
+            url.searchParams.delete('draftId');
+            window.history.replaceState({}, '', url.toString());
+
             this.loadDashboardData();
         }
     }
@@ -5023,6 +5081,11 @@ class NewsletterBuilder {
                     const docRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
                     this.currentDraftId = docRef.id;
                     this.currentDraftName = data.name;
+                    
+                    // Update URL on first save
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('draftId', this.currentDraftId);
+                    window.history.replaceState({}, '', url.toString());
                 }
 
                 // Update UI status to Success
