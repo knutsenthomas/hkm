@@ -3153,6 +3153,30 @@ class NewsletterBuilder {
         canvas.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
         canvas.querySelectorAll('.image-overlay').forEach(o => o.remove());
 
+        // Override modal container width/height constraints from dashboard.css
+        const content = modal.querySelector('.preview-content');
+        if (content) {
+            content.style.maxWidth = '90vw';
+            content.style.maxHeight = '90vh';
+            content.style.width = '1000px';
+            content.style.height = '800px';
+        }
+
+        // Style the cloned canvas to match standard email client widths (600px)
+        if (this.currentView === 'desktop') {
+            canvas.style.maxWidth = '600px';
+            canvas.style.width = '100%';
+            canvas.style.margin = '0 auto';
+            canvas.style.boxShadow = 'none';
+            canvas.style.border = 'none';
+        } else {
+            canvas.style.width = '100%';
+            canvas.style.maxWidth = '100%';
+            canvas.style.margin = '0';
+            canvas.style.boxShadow = 'none';
+            canvas.style.border = 'none';
+        }
+
         frame.innerHTML = '';
         frame.appendChild(canvas);
         frame.className = `preview-frame ${this.currentView}`;
