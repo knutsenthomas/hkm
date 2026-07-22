@@ -3420,4 +3420,16 @@ body.builder-active .builder-workspace > .docs-toolbar {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.card-delete-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
+.card-delete-btn:hover {
+    background: #dc2626 !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+.card-delete-btn:active {
+    transform: scale(0.92) !important;
+}
