@@ -667,6 +667,7 @@ body.builder-active .builder-workspace > .canvas-container {
     padding: 64px 40px;
     display: flex;
     justify-content: center;
+    align-items: flex-start !important;
     background: #f1f5f9;
 }
 
@@ -674,10 +675,12 @@ body.builder-active .builder-workspace > .canvas-container {
     width: 100%;
     max-width: 680px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    align-self: flex-start !important;
 }
 
 .canvas-scaler.mobile {
     max-width: 375px;
+    align-self: flex-start !important;
 }
 
 /* The Newsletter "Paper" - Google Docs Style */
@@ -1549,7 +1552,7 @@ input:checked+.slider:before {
 
     .canvas-container {
         padding: 16px 12px 28px;
-        overflow: visible;
+        overflow-y: auto !important;
     }
 
     .canvas-scaler,
