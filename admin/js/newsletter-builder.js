@@ -1521,17 +1521,71 @@ class NewsletterBuilder {
                 container.insertBefore(temp.firstChild, afterElement);
             }
             this.syncUnifiedBlocks();
-        } else {
-            this.restoreSelection();
-            const selection = window.getSelection();
-            if (selection.rangeCount && container.contains(selection.anchorNode)) {
-                this.exec('insertHTML', html);
-            } else {
-                while (temp.firstChild) {
-                    container.appendChild(temp.firstChild);
+            return;
+        }
+
+        this.restoreSelection();
+        const selection = window.getSelection();
+        
+        if (selection.rangeCount && container.contains(selection.anchorNode)) {
+            const range = selection.getRangeAt(0);
+            
+            // Check if we are inserting block-level elements
+            const isBlockHtml = html.includes('newsletter-product-card') || html.includes('block-btn') || html.includes('display: grid');
+            
+            if (isBlockHtml) {
+                // Find closest direct child of the blocks-container containing selection
+                let parentBlock = selection.anchorNode;
+                while (parentBlock && parentBlock.parentNode !== container) {
+                    parentBlock = parentBlock.parentNode;
                 }
-                this.syncUnifiedBlocks();
+                
+                if (parentBlock) {
+                    const fragment = document.createDocumentFragment();
+                    while (temp.firstChild) {
+                        fragment.appendChild(temp.firstChild);
+                    }
+                    
+                    const lastInsertedNode = fragment.lastChild;
+                    
+                    if (parentBlock.nextSibling) {
+                        container.insertBefore(fragment, parentBlock.nextSibling);
+                    } else {
+                        container.appendChild(fragment);
+                    }
+                    
+                    // Focus cursor in the newly inserted paragraph below the block element
+                    if (lastInsertedNode && lastInsertedNode.tagName === 'P') {
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(lastInsertedNode);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                        lastInsertedNode.focus();
+                    }
+                    
+                    this.syncUnifiedBlocks();
+                    return;
+                }
             }
+            
+            this.exec('insertHTML', html);
+        } else {
+            const lastInsertedNode = temp.lastChild;
+            while (temp.firstChild) {
+                container.appendChild(temp.firstChild);
+            }
+            
+            if (lastInsertedNode && lastInsertedNode.tagName === 'P') {
+                const newRange = document.createRange();
+                newRange.selectNodeContents(lastInsertedNode);
+                newRange.collapse(true);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+                lastInsertedNode.focus();
+            }
+            this.syncUnifiedBlocks();
         }
     }
 
