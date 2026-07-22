@@ -2889,6 +2889,276 @@ class NewsletterBuilder {
         }
     }
 
+    openDynamicValueModal() {
+        // Remove existing modal if any
+        const existingModal = document.getElementById('hkm-dynamic-value-modal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'hkm-dynamic-value-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="
+                max-width: 480px; 
+                width: 90%; 
+                background: white; 
+                border-radius: 16px; 
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+                display: flex; 
+                flex-direction: column; 
+                overflow: visible;
+                position: relative;
+                padding: 24px;
+                box-sizing: border-box;
+                font-family: 'Inter', sans-serif;
+            ">
+                <!-- Close Button -->
+                <button type="button" id="hkm-dyn-close" class="material-symbols-outlined" style="
+                    position: absolute; 
+                    top: 20px; 
+                    right: 20px; 
+                    background: none; 
+                    border: none; 
+                    color: #1e293b; 
+                    cursor: pointer; 
+                    font-size: 22px; 
+                    padding: 4px; 
+                    border-radius: 50%; 
+                    transition: background 0.2s;
+                ">close</button>
+
+                <!-- Header -->
+                <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 700; color: #1e293b; line-height: 1.2;">Legg til en dynamisk verdi</h3>
+
+                <!-- Field 1: Value Selector -->
+                <div style="margin-bottom: 20px; position: relative;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 8px;">
+                        Hvilken verdi vil du legge til?
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #3b82f6; cursor: help;" title="Velg et felt som skal erstattes med mottakerens personlige informasjon">info</span>
+                    </label>
+                    
+                    <!-- Custom Select Dropdown -->
+                    <div id="hkm-dyn-select-trigger" style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 12px 16px;
+                        border: 1.5px solid #cbd5e1;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        background: #ffffff;
+                        transition: all 0.2s;
+                        font-size: 14px;
+                        color: #64748b;
+                        user-select: none;
+                    ">
+                        <span id="hkm-dyn-select-label">Begynn å skrive eller velg en verdi</span>
+                        <span class="material-symbols-outlined" style="color: #3b82f6; font-size: 20px; transition: transform 0.2s;">expand_more</span>
+                    </div>
+
+                    <!-- Dropdown Options List -->
+                    <div id="hkm-dyn-select-options" style="
+                        display: none;
+                        position: absolute;
+                        top: calc(100% + 6px);
+                        left: 0;
+                        right: 0;
+                        background: #ffffff;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                        z-index: 1000;
+                        max-height: 240px;
+                        overflow-y: auto;
+                        padding: 6px;
+                        box-sizing: border-box;
+                    ">
+                        <div class="hkm-dyn-opt" data-tag="contact.name.last" data-label="Kontaktens etternavn" style="padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;">
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Kontaktens etternavn</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">contact.name.last</div>
+                        </div>
+                        <div class="hkm-dyn-opt" data-tag="contact.name.first" data-label="Kontaktens fornavn" style="padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;">
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Kontaktens fornavn</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">contact.name.first</div>
+                        </div>
+                        <div class="hkm-dyn-opt" data-tag="contact.email" data-label="Kontakt-epost" style="padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;">
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Kontakt-epost</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">contact.email</div>
+                        </div>
+                        <div class="hkm-dyn-opt" data-tag="website.url" data-label="Nettadressens URL" style="padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s;">
+                            <div style="font-weight: 600; font-size: 14px; color: #1e293b;">Nettadressens URL</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">website.url</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field 2: Fallback Input -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 8px;">
+                        Hva er tilbakefallsteksten?
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #3b82f6; cursor: help;" title="Tekst som vises dersom mottakeren mangler verdi for det valgte feltet">info</span>
+                    </label>
+                    <input type="text" id="hkm-dyn-fallback-input" placeholder="f.eks. Hei sann! Kunde ..." style="
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 1.5px solid #cbd5e1;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        color: #1e293b;
+                        box-sizing: border-box;
+                        outline: none;
+                        transition: border-color 0.2s;
+                    ">
+                </div>
+
+                <!-- Footer Buttons -->
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;">
+                    <button type="button" id="hkm-dyn-cancel" style="
+                        background: #ffffff;
+                        border: 1.5px solid #cbd5e1;
+                        color: #005bff;
+                        padding: 10px 24px;
+                        border-radius: 9999px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    ">Avbryt</button>
+                    <button type="button" id="hkm-dyn-submit" disabled style="
+                        background: #cbd5e1;
+                        border: none;
+                        color: #ffffff;
+                        padding: 10px 24px;
+                        border-radius: 9999px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: not-allowed;
+                        transition: all 0.2s;
+                    ">Legg til</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        
+        // Trigger reflow for animation
+        modal.offsetHeight;
+        modal.style.opacity = '1';
+
+        // State variables
+        let selectedTag = '';
+        let selectedLabel = '';
+
+        // DOM elements
+        const trigger = modal.querySelector('#hkm-dyn-select-trigger');
+        const triggerLabel = modal.querySelector('#hkm-dyn-select-label');
+        const optionsList = modal.querySelector('#hkm-dyn-select-options');
+        const fallbackInput = modal.querySelector('#hkm-dyn-fallback-input');
+        const submitBtn = modal.querySelector('#hkm-dyn-submit');
+        const cancelBtn = modal.querySelector('#hkm-dyn-cancel');
+        const closeBtn = modal.querySelector('#hkm-dyn-close');
+
+        // Toggle dropdown open/close
+        const toggleDropdown = (e) => {
+            e.stopPropagation();
+            const isOpen = optionsList.style.display === 'block';
+            optionsList.style.display = isOpen ? 'none' : 'block';
+            trigger.style.borderColor = isOpen ? '#cbd5e1' : '#005bff';
+            const icon = trigger.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.transform = isOpen ? 'rotate(0)' : 'rotate(180deg)';
+        };
+        trigger.addEventListener('click', toggleDropdown);
+
+        // Close dropdown when clicking outside
+        const closeDropdownOutside = () => {
+            optionsList.style.display = 'none';
+            trigger.style.borderColor = '#cbd5e1';
+            const icon = trigger.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.transform = 'rotate(0)';
+        };
+        window.addEventListener('click', closeDropdownOutside);
+
+        // Option styles and hover effects
+        const optionEls = modal.querySelectorAll('.hkm-dyn-opt');
+        optionEls.forEach(opt => {
+            opt.addEventListener('mouseenter', () => {
+                opt.style.background = '#f0f7ff';
+            });
+            opt.addEventListener('mouseleave', () => {
+                opt.style.background = 'transparent';
+            });
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectedTag = opt.dataset.tag;
+                selectedLabel = opt.dataset.label;
+                
+                triggerLabel.innerText = selectedLabel;
+                triggerLabel.style.color = '#1e293b';
+                
+                optionsList.style.display = 'none';
+                trigger.style.borderColor = '#cbd5e1';
+                const icon = trigger.querySelector('.material-symbols-outlined');
+                if (icon) icon.style.transform = 'rotate(0)';
+                
+                // Enable submit button
+                submitBtn.disabled = false;
+                submitBtn.style.background = '#005bff';
+                submitBtn.style.cursor = 'pointer';
+            });
+        });
+
+        // Focus borders on inputs
+        fallbackInput.addEventListener('focus', () => {
+            fallbackInput.style.borderColor = '#005bff';
+        });
+        fallbackInput.addEventListener('blur', () => {
+            fallbackInput.style.borderColor = '#cbd5e1';
+        });
+
+        // Close modal helpers
+        const closeModal = () => {
+            window.removeEventListener('click', closeDropdownOutside);
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 250);
+        };
+
+        cancelBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        // Submit action
+        submitBtn.addEventListener('click', () => {
+            const fallbackVal = fallbackInput.value.trim();
+            let finalTag = '';
+            if (fallbackVal) {
+                finalTag = `{{${selectedTag} | fallback: "${fallbackVal}"}}`;
+            } else {
+                finalTag = `{{${selectedTag}}}`;
+            }
+
+            // Restore range and insert HTML tag
+            this.restoreSelection();
+            this.exec('insertHTML', finalTag);
+            this.syncUnifiedBlocks();
+            closeModal();
+        });
+    }
+
     showTextInspector(node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
@@ -3293,7 +3563,8 @@ class NewsletterBuilder {
         if (btnPers) {
             btnPers.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.exec('insertHTML', '{{fornavn}}');
+                this.saveSelection();
+                this.openDynamicValueModal();
             });
         }
 
