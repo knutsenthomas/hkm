@@ -716,8 +716,8 @@ body.builder-active .builder-workspace > .canvas-container {
 
 .blocks-container {
     padding: 16px 0;
-    min-height: 600px;
-    flex-grow: 1 !important;
+    min-height: 700px !important;
+    flex: 1 0 auto !important;
 }
 
 .empty-canvas-msg {
