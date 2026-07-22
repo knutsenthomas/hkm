@@ -1002,6 +1002,7 @@ class NewsletterBuilder {
             container.style.setProperty('box-sizing', 'border-box', 'important');
         }
         if (footer) {
+            footer.setAttribute('contenteditable', 'false');
             footer.style.setProperty('position', 'static', 'important');
             footer.style.setProperty('margin-top', 'auto', 'important');
             footer.style.setProperty('display', 'flex', 'important');
