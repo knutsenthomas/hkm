@@ -2941,7 +2941,7 @@ class NewsletterBuilder {
                             </select>
                         </div>
                     </div>
-                    <div class="inspector-group" style="width: 100px; margin-bottom: 0;">
+                    <div class="inspector-group" style="width: 80px; margin-bottom: 0;">
                         <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Størrelse</label>
                         <div class="inspector-select-wrapper">
                             <select id="text-inspector-size">

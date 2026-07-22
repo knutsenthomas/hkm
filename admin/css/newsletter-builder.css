@@ -3913,7 +3913,7 @@ html[data-theme="dark"] .inspector-input {
 .inspector-select-wrapper select {
     width: 100% !important;
     height: 40px !important;
-    padding: 8px 32px 8px 12px !important;
+    padding: 8px 24px 8px 12px !important; /* Optimized right padding for extra space */
     font-size: 14px !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
@@ -3931,14 +3931,14 @@ html[data-theme="dark"] .inspector-input {
 }
 .inspector-select-wrapper::after {
     content: "expand_more";
-    font-family: 'Material Symbols Outlined';
+    font-family: 'Material Symbols Outlined' !important;
     position: absolute;
-    right: 12px;
+    right: 8px; /* Slightly closer to edge to free space */
     top: 50%;
     transform: translateY(-50%);
     color: #005bff;
     pointer-events: none;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
 }
 
@@ -3966,6 +3966,14 @@ html[data-theme="dark"] .inspector-select-wrapper select {
     color: #1e293b;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: none !important; /* Prevent button text-transform */
+}
+
+/* Force Material Symbols ligature correctness against global button uppercase styles */
+.inspector-style-btn span {
+    font-family: 'Material Symbols Outlined' !important;
+    text-transform: none !important;
+    display: inline-block !important;
 }
 
 html[data-theme="dark"] .inspector-style-btn {
