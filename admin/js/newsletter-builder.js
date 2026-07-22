@@ -1280,16 +1280,49 @@ class NewsletterBuilder {
 
     showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
         return new Promise((resolve) => {
-            const modal = document.getElementById('hkm-confirm-modal');
+            let modal = document.getElementById('hkm-confirm-modal');
+            let isDynamicallyCreated = false;
+            
             if (!modal) {
-                resolve(confirm(message));
-                return;
+                isDynamicallyCreated = true;
+                modal = document.createElement('div');
+                modal.id = 'hkm-confirm-modal';
+                modal.className = 'profile-modal';
+                modal.style.cssText = `
+                    display: none;
+                    z-index: 21000;
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.6);
+                    align-items: center;
+                    justify-content: center;
+                    backdrop-filter: blur(8px);
+                    font-family: 'Inter', sans-serif;
+                `;
+                modal.innerHTML = `
+                    <div class="profile-modal-content card modern" style="max-width: 440px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; height: auto !important; min-height: auto !important; transform: translateZ(0); backface-visibility: hidden; display: flex; flex-direction: column;">
+                        <div class="modal-header" style="background: #1e293b; color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
+                            <div style="background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 24px; color: white;">warning</span>
+                            </div>
+                            <h3 id="confirm-modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.01em;">Bekreft handling</h3>
+                        </div>
+                        <div class="modal-body" style="padding: 32px; font-size: 16px; line-height: 1.6; color: #475569;">
+                            <p id="confirm-modal-message" style="margin: 0; font-weight: 500;">Er du sikker på at du vil utføre denne handlingen?</p>
+                        </div>
+                        <div class="modal-footer" style="padding: 24px 32px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 16px; border-top: 1px solid #f1f5f9;">
+                            <button id="confirm-modal-cancel" class="btn-secondary" style="padding: 12px 24px; border-radius: 12px; font-weight: 600; min-width: 100px; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: white; color: #64748b; font-size: 14px;">Avbryt</button>
+                            <button id="confirm-modal-confirm" class="btn-primary" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; min-width: 100px; cursor: pointer; transition: all 0.2s; background: #d17d39; color: white; border: none; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">Bekreft</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
             }
 
-            const titleEl = document.getElementById('confirm-modal-title');
-            const messageEl = document.getElementById('confirm-modal-message');
-            const confirmBtn = document.getElementById('confirm-modal-confirm');
-            const cancelBtn = document.getElementById('confirm-modal-cancel');
+            const titleEl = modal.querySelector('#confirm-modal-title') || document.getElementById('confirm-modal-title');
+            const messageEl = modal.querySelector('#confirm-modal-message') || document.getElementById('confirm-modal-message');
+            const confirmBtn = modal.querySelector('#confirm-modal-confirm') || document.getElementById('confirm-modal-confirm');
+            const cancelBtn = modal.querySelector('#confirm-modal-cancel') || document.getElementById('confirm-modal-cancel');
             const headerEl = modal.querySelector('.modal-header');
 
             if (titleEl) titleEl.textContent = title;
@@ -1312,7 +1345,11 @@ class NewsletterBuilder {
             }
 
             const cleanup = () => {
-                modal.style.display = 'none';
+                if (isDynamicallyCreated) {
+                    modal.remove();
+                } else {
+                    modal.style.display = 'none';
+                }
                 confirmBtn.onclick = null;
                 cancelBtn.onclick = null;
             };
@@ -1327,6 +1364,13 @@ class NewsletterBuilder {
                 e.preventDefault();
                 cleanup();
                 resolve(false);
+            };
+
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    cleanup();
+                    resolve(false);
+                }
             };
 
             modal.style.display = 'flex';
