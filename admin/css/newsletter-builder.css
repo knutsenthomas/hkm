@@ -3061,8 +3061,8 @@ body.builder-active.sidebar-collapsed .sidebar {
 }
 
 .builder-workspace > .docs-toolbar {
-    position: sticky !important;
-    top: 0 !important;
+    position: relative !important;
+    top: auto !important;
     z-index: 100 !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
@@ -3764,44 +3764,18 @@ body.builder-active .builder-workspace > .docs-toolbar {
 }
 
 .canvas-scaler.mobile {
-    max-width: 375px;
-    padding: 60px 16px 80px 16px !important;
-    background: #0f172a !important; /* Elegant dark chassis */
-    border-radius: 40px !important;
-    box-shadow: 
-        0 25px 50px -12px rgba(0, 0, 0, 0.35),
-        0 0 0 12px #334155, /* Metallic outer rim border */
-        0 0 0 13px #1e293b !important;
-    align-self: center !important;
+    max-width: 375px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    align-self: flex-start !important;
     margin: 20px auto !important;
 }
 
-/* Glossy screen reflection on phone simulator */
-.canvas-scaler.mobile::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 60px !important;
-    left: 16px !important;
-    right: 16px !important;
-    bottom: 80px !important;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 50.1%) !important;
-    z-index: 10 !important;
-    pointer-events: none !important;
-    border-radius: 0px !important;
-}
-
-/* Speaker notch pill */
+.canvas-scaler.mobile::before,
 .canvas-scaler.mobile::after {
-    content: "" !important;
-    position: absolute !important;
-    top: 25px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 60px !important;
-    height: 6px !important;
-    background: #334155 !important;
-    border-radius: 3px !important;
-    z-index: 11 !important;
+    display: none !important;
 }
 
 
