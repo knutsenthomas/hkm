@@ -55,6 +55,7 @@ class NewsletterBuilder {
         this.activeImageBlockId = null;
         this.activeColumnIndex = null;
         this.savedRange = null;
+        this.activeBlockNode = null;
 
         // Recipient Selection State
         this.selectedSegments = new Set();
@@ -389,6 +390,12 @@ class NewsletterBuilder {
                 }
             });
             container.addEventListener('click', (e) => {
+                // Determine active block clicked (Wix-style property panel selector)
+                const blockNode = this.getCurrentBlock(e.target);
+                if (blockNode) {
+                    this.selectBlock(blockNode);
+                }
+
                 const img = e.target.closest('img');
                 if (img) {
                     e.preventDefault();
@@ -415,6 +422,35 @@ class NewsletterBuilder {
                         showToast("Elementet ble slettet.", "success");
                     }
                     return;
+                }
+            });
+
+            // Wix-style deselect listener when clicking outside
+            document.addEventListener('click', (e) => {
+                const container = document.getElementById('blocks-container');
+                const sidebar = document.querySelector('.builder-elements-sidebar-v2');
+                const modal = document.querySelector('.hkm-modal, .hkm-prompt-overlay, .hkm-image-modal');
+                
+                if (container && !container.contains(e.target) && 
+                    sidebar && !sidebar.contains(e.target) && 
+                    (!modal || !modal.contains(e.target)) &&
+                    !e.target.closest('.cropper-container') &&
+                    !e.target.closest('.img-resizer-overlay')) {
+                    this.deselectBlock();
+                }
+            });
+
+            // Wix-style selection change listener to auto-detect text editing/caret placement
+            document.addEventListener('selectionchange', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                const anchorNode = selection.anchorNode;
+                const container = document.getElementById('blocks-container');
+                if (container && container.contains(anchorNode)) {
+                    const blockNode = this.getCurrentBlock(anchorNode);
+                    if (blockNode && blockNode !== this.activeBlockNode) {
+                        this.selectBlock(blockNode);
+                    }
                 }
             });
 
@@ -2755,6 +2791,822 @@ class NewsletterBuilder {
 
         const scaler = document.getElementById('canvas-scaler');
         scaler.classList.toggle('mobile', view === 'mobile');
+    }
+
+    getCurrentBlock(target) {
+        const container = document.getElementById('blocks-container');
+        if (!container) return null;
+        let node = target;
+        while (node && node !== container) {
+            if (node.parentNode === container) {
+                return node;
+            }
+            node = node.parentNode;
+        }
+        return null;
+    }
+
+    selectBlock(node) {
+        if (this.activeBlockNode === node) return;
+
+        console.log('[HKM Inspector] selectBlock triggered for element:', node);
+
+        // Clear previous active block highlight
+        this.deselectBlock();
+
+        this.activeBlockNode = node;
+        this.activeBlockNode.classList.add('selected-block-active');
+
+        // Hide floating top toolbar to make it look exactly like Wix
+        const topToolbar = document.getElementById('desktop-richtools');
+        if (topToolbar) {
+            topToolbar.style.setProperty('display', 'none', 'important');
+        }
+
+        // Determine block type
+        const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
+        const btn = node.querySelector('.block-btn') || (node.classList.contains('block-btn') ? node : null);
+        
+        if (img) {
+            console.log('[HKM Inspector] Loading IMAGE inspector');
+            this.showImageInspector(img, node);
+        } else if (btn) {
+            console.log('[HKM Inspector] Loading BUTTON inspector');
+            this.showButtonInspector(btn, node);
+        } else {
+            console.log('[HKM Inspector] Loading TEXT inspector');
+            this.showTextInspector(node);
+        }
+    }
+
+    deselectBlock() {
+        if (this.activeBlockNode) {
+            console.log('[HKM Inspector] deselectBlock triggered');
+            this.activeBlockNode.classList.remove('selected-block-active');
+            this.activeBlockNode = null;
+        }
+
+        // Show default elements view
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (defaultView && inspectorView) {
+            defaultView.style.display = 'flex';
+            inspectorView.style.display = 'none';
+        }
+
+        // Restore floating top toolbar
+        const topToolbar = document.getElementById('desktop-richtools');
+        if (topToolbar) {
+            topToolbar.style.display = '';
+        }
+    }
+
+    changeBlockTag(blockNode, newTag) {
+        const newElement = document.createElement(newTag);
+        // Copy attributes
+        Array.from(blockNode.attributes).forEach(attr => {
+            newElement.setAttribute(attr.name, attr.value);
+        });
+        // Copy inner HTML
+        newElement.innerHTML = blockNode.innerHTML;
+        // Replace in DOM
+        blockNode.parentNode.replaceChild(newElement, blockNode);
+        // Maintain selection class
+        newElement.classList.add('selected-block-active');
+        this.syncUnifiedBlocks();
+        return newElement;
+    }
+
+    showTextInspector(node) {
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!defaultView || !inspectorView) return;
+
+        defaultView.style.display = 'none';
+        inspectorView.style.display = 'flex';
+
+        const computed = window.getComputedStyle(node);
+        const fontName = node.style.fontFamily || computed.fontFamily;
+        let cleanFont = fontName.replace(/['"]/g, '').split(',')[0].trim();
+        const currentSize = parseInt(node.style.fontSize) || parseInt(computed.fontSize) || 16;
+        const currentAlign = node.style.textAlign || computed.textAlign || 'left';
+        
+        let formatVal = 'p';
+        if (node.tagName === 'H1') formatVal = 'h1';
+        else if (node.tagName === 'H2') formatVal = 'h2';
+        else if (node.tagName === 'H3') formatVal = 'h3';
+
+        const isBold = computed.fontWeight === 'bold' || parseInt(computed.fontWeight) >= 700;
+        const isItalic = computed.fontStyle === 'italic';
+        
+        const textDec = computed.textDecoration || '';
+        const isUnderline = textDec.includes('underline');
+
+        inspectorView.innerHTML = `
+            <div class="inspector-header">
+                <h2>Tilpass tekst</h2>
+            </div>
+            
+            <div class="inspector-tabs">
+                <button class="inspector-tab active" data-tab="content">Innhold</button>
+                <button class="inspector-tab" data-tab="design">Design</button>
+            </div>
+            
+            <div class="inspector-body" id="inspector-tab-content">
+                <!-- Format Dropdown -->
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Format</label>
+                    <select class="inspector-select" id="text-inspector-format">
+                        <option value="p" ${formatVal === 'p' ? 'selected' : ''}>Avsnitt 1 (Brødtekst)</option>
+                        <option value="h1" ${formatVal === 'h1' ? 'selected' : ''}>Overskrift 1</option>
+                        <option value="h2" ${formatVal === 'h2' ? 'selected' : ''}>Overskrift 2</option>
+                        <option value="h3" ${formatVal === 'h3' ? 'selected' : ''}>Overskrift 3</option>
+                    </select>
+                </div>
+
+                <!-- Font & Size side-by-side -->
+                <div class="inspector-group-row">
+                    <div class="inspector-group" style="flex: 1; margin-bottom: 0;">
+                        <label class="inspector-group-label">Skrifttyper</label>
+                        <select class="inspector-select" id="text-inspector-font">
+                            <option value="Arial, sans-serif" ${cleanFont.includes('Arial') ? 'selected' : ''}>Arial</option>
+                            <option value="'Inter', sans-serif" ${cleanFont.includes('Inter') ? 'selected' : ''}>Inter</option>
+                            <option value="'Roboto', sans-serif" ${cleanFont.includes('Roboto') ? 'selected' : ''}>Roboto</option>
+                            <option value="'Playfair Display', serif" ${cleanFont.includes('Playfair') ? 'selected' : ''}>Playfair Display</option>
+                            <option value="Georgia, serif" ${cleanFont.includes('Georgia') ? 'selected' : ''}>Georgia</option>
+                            <option value="'Courier New', monospace" ${cleanFont.includes('Courier') ? 'selected' : ''}>Courier New</option>
+                        </select>
+                    </div>
+                    <div class="inspector-group" style="width: 90px; margin-bottom: 0;">
+                        <label class="inspector-group-label">Størrelse</label>
+                        <select class="inspector-select" id="text-inspector-size">
+                            ${[12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48].map(size => `
+                                <option value="${size}" ${currentSize === size ? 'selected' : ''}>${size}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3-row premium Wix Studio formatting grid -->
+                <div class="inspector-group" style="margin-top: 16px;">
+                    <label class="inspector-group-label">Stiler</label>
+                    
+                    <!-- Row 1: B, I, U, Color, Highlight Color, Alignment -->
+                    <div class="inspector-style-grid" style="margin-bottom: 8px;">
+                        <button class="inspector-style-btn ${isBold ? 'active' : ''}" id="text-btn-bold" title="Fet">
+                            <span class="material-symbols-outlined" style="font-size: 18px; font-weight: 700;">format_bold</span>
+                        </button>
+                        <button class="inspector-style-btn ${isItalic ? 'active' : ''}" id="text-btn-italic" title="Kursiv">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_italic</span>
+                        </button>
+                        <button class="inspector-style-btn ${isUnderline ? 'active' : ''}" id="text-btn-underline" title="Understreket">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_underlined</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-color" title="Tekstfarge">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_color_text</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-bg" title="Tekstbakgrunn / Utheving">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">border_color</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-align-cycle" title="Justering (Trykk for å endre)">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_align_${currentAlign === 'justify' ? 'justify' : currentAlign}</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Row 2: Link, Unlink, Numbered list, Bulleted list, Outdent, Indent -->
+                    <div class="inspector-style-grid" style="margin-bottom: 8px;">
+                        <button class="inspector-style-btn" id="text-btn-link" title="Sett inn lenke">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">link</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-unlink" title="Fjern lenke">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">link_off</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-list-number" title="Nummerert liste">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_list_numbered</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-list-bullet" title="Punktliste">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_list_bulleted</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-outdent" title="Reduser innrykk">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_indent_decrease</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-indent" title="Øk innrykk">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_indent_increase</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Row 3: Line Height, Paragraph Spacing, Character Spacing, Clear formatting, Text Transform -->
+                    <div class="inspector-style-grid">
+                        <button class="inspector-style-btn" id="text-btn-lineheight" title="Linjeavstand">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_line_spacing</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-spacing" title="Avstand etter avsnitt">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">space_bar</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-char-spacing" title="Tegnmellomrom">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">horizontal_distribute</span>
+                        </button>
+                        <button class="inspector-style-btn" id="text-btn-clear" title="Nullstill formatering">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_clear</span>
+                        </button>
+                        <button class="inspector-style-btn ${node.style.textTransform === 'uppercase' ? 'active' : ''}" id="text-btn-caps" title="Store/Små bokstaver (All caps)">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">text_fields</span>
+                        </button>
+                        <div style="flex: 1;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <a href="#" id="text-inspector-personalize" style="font-size: 14px; font-weight: 500; color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                        Legg til personlig tilpasset innhold
+                    </a>
+                </div>
+
+                <!-- Synlighet accordion wrapper -->
+                <div class="inspector-group" style="margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="text-inspector-visibility-toggle">
+                        <span class="inspector-group-label" style="margin: 0; font-weight: 600;">Synlighet</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    </div>
+                    <div id="text-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
+                        Synlig for alle mottakere.
+                    </div>
+                </div>
+            </div>
+
+            <div class="inspector-body" id="inspector-tab-design" style="display: none;">
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Bakgrunnsfarge</label>
+                    <input type="color" class="inspector-input" id="text-design-bg-color" value="#ffffff" style="height: 40px; padding: 4px; cursor: pointer;">
+                </div>
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Marginer (Topp / Bunn)</label>
+                    <select class="inspector-select" id="text-design-margin">
+                        <option value="8px">8 px (Tett)</option>
+                        <option value="16px" selected>16 px (Normal)</option>
+                        <option value="24px">24 px (Romslig)</option>
+                        <option value="32px">32 px (Generøs)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="inspector-footer">
+                <button type="button" class="inspector-footer-btn cancel" id="text-inspector-cancel">Avbryt</button>
+                <button type="button" class="inspector-footer-btn apply" id="text-inspector-apply">Bruk</button>
+            </div>
+        `;
+
+        this.bindTextInspectorEvents(node);
+    }
+
+    bindTextInspectorEvents(node) {
+        let currentNode = node;
+        const selectFormat = document.getElementById('text-inspector-format');
+        const selectFont = document.getElementById('text-inspector-font');
+        const selectSize = document.getElementById('text-inspector-size');
+
+        document.querySelectorAll('.inspector-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.inspector-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const isDesign = tab.dataset.tab === 'design';
+                document.getElementById('inspector-tab-content').style.display = isDesign ? 'none' : 'flex';
+                document.getElementById('inspector-tab-design').style.display = isDesign ? 'flex' : 'none';
+            });
+        });
+
+        if (selectFormat) {
+            selectFormat.addEventListener('change', () => {
+                currentNode = this.changeBlockTag(currentNode, selectFormat.value);
+            });
+        }
+
+        if (selectFont) {
+            selectFont.addEventListener('change', () => {
+                currentNode.style.fontFamily = selectFont.value;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (selectSize) {
+            selectSize.addEventListener('change', () => {
+                currentNode.style.fontSize = selectSize.value + 'px';
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        const bindTool = (btnId, cmd, val = null) => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.exec(cmd, val);
+                    btn.classList.toggle('active', document.queryCommandState(cmd));
+                });
+            }
+        };
+
+        bindTool('text-btn-bold', 'bold');
+        bindTool('text-btn-italic', 'italic');
+        bindTool('text-btn-underline', 'underline');
+        bindTool('text-btn-list-bullet', 'insertUnorderedList');
+        bindTool('text-btn-list-number', 'insertOrderedList');
+        bindTool('text-btn-outdent', 'outdent');
+        bindTool('text-btn-indent', 'indent');
+
+        const btnAlignCycle = document.getElementById('text-btn-align-cycle');
+        if (btnAlignCycle) {
+            btnAlignCycle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const aligns = ['left', 'center', 'right', 'justify'];
+                const current = currentNode.style.textAlign || 'left';
+                const nextIdx = (aligns.indexOf(current) + 1) % aligns.length;
+                const nextAlign = aligns[nextIdx];
+                currentNode.style.textAlign = nextAlign;
+                
+                const iconEl = btnAlignCycle.querySelector('.material-symbols-outlined');
+                if (iconEl) {
+                    iconEl.innerText = `format_align_${nextAlign === 'justify' ? 'justify' : nextAlign}`;
+                }
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        const btnColor = document.getElementById('text-btn-color');
+        if (btnColor) {
+            btnColor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const color = prompt("Velg tekstfarge (HEX eller navn):", "#1B4965");
+                if (color) {
+                    this.exec('foreColor', color);
+                }
+            });
+        }
+
+        const btnBg = document.getElementById('text-btn-bg');
+        if (btnBg) {
+            btnBg.addEventListener('click', (e) => {
+                e.preventDefault();
+                const color = prompt("Velg bakgrunnsfarge for tekst (HEX):", "#ffff00");
+                if (color) {
+                    this.exec('backColor', color);
+                }
+            });
+        }
+
+        const btnLink = document.getElementById('text-btn-link');
+        if (btnLink) {
+            btnLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = prompt("Tast inn nettadresse (URL):", "https://");
+                if (url) {
+                    this.exec('createLink', url);
+                }
+            });
+        }
+
+        const btnUnlink = document.getElementById('text-btn-unlink');
+        if (btnUnlink) {
+            btnUnlink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.exec('unlink');
+            });
+        }
+
+        const btnClear = document.getElementById('text-btn-clear');
+        if (btnClear) {
+            btnClear.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.exec('removeFormat');
+            });
+        }
+
+        const btnLineHeight = document.getElementById('text-btn-lineheight');
+        if (btnLineHeight) {
+            btnLineHeight.addEventListener('click', (e) => {
+                e.preventDefault();
+                const val = prompt("Angi linjeavstand (f.eks. 1.2, 1.5, 1.8 eller normal):", currentNode.style.lineHeight || "1.5");
+                if (val) {
+                    currentNode.style.lineHeight = val;
+                    this.syncUnifiedBlocks();
+                }
+            });
+        }
+
+        const btnSpacing = document.getElementById('text-btn-spacing');
+        if (btnSpacing) {
+            btnSpacing.addEventListener('click', (e) => {
+                e.preventDefault();
+                const val = prompt("Angi avstand etter avsnitt (f.eks. 8px, 16px, 24px):", currentNode.style.marginBottom || "16px");
+                if (val) {
+                    currentNode.style.marginBottom = val;
+                    this.syncUnifiedBlocks();
+                }
+            });
+        }
+
+        const btnCharSpacing = document.getElementById('text-btn-char-spacing');
+        if (btnCharSpacing) {
+            btnCharSpacing.addEventListener('click', (e) => {
+                e.preventDefault();
+                const val = prompt("Angi tegnmellomrom (f.eks. 0.5px, 1px, 2px, normal):", currentNode.style.letterSpacing || "normal");
+                if (val) {
+                    currentNode.style.letterSpacing = val;
+                    this.syncUnifiedBlocks();
+                }
+            });
+        }
+
+        const btnCaps = document.getElementById('text-btn-caps');
+        if (btnCaps) {
+            btnCaps.addEventListener('click', (e) => {
+                e.preventDefault();
+                const current = currentNode.style.textTransform;
+                currentNode.style.textTransform = current === 'uppercase' ? 'none' : 'uppercase';
+                btnCaps.classList.toggle('active', currentNode.style.textTransform === 'uppercase');
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        document.getElementById('text-inspector-cancel').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('text-inspector-apply').addEventListener('click', () => this.deselectBlock());
+
+        const btnPers = document.getElementById('text-inspector-personalize');
+        if (btnPers) {
+            btnPers.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.exec('insertHTML', '{{fornavn}}');
+            });
+        }
+
+        const visToggle = document.getElementById('text-inspector-visibility-toggle');
+        if (visToggle) {
+            visToggle.addEventListener('click', () => {
+                const content = document.getElementById('text-inspector-visibility-content');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+                visToggle.querySelector('.material-symbols-outlined').innerText = isHidden ? 'expand_more' : 'chevron_right';
+            });
+        }
+    }
+
+    showImageInspector(img, node) {
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!defaultView || !inspectorView) return;
+
+        defaultView.style.display = 'none';
+        inspectorView.style.display = 'flex';
+
+        const currentSrc = img.src || '';
+        const currentAlt = img.alt || '';
+        
+        let linkHref = '';
+        let parentLink = img.closest('a');
+        if (parentLink) {
+            linkHref = parentLink.getAttribute('href') || '';
+        }
+
+        inspectorView.innerHTML = `
+            <div class="inspector-header">
+                <h2>Tilpass bilde</h2>
+            </div>
+            
+            <div class="inspector-tabs">
+                <button class="inspector-tab active" data-tab="content">Innhold</button>
+                <button class="inspector-tab" data-tab="design">Design</button>
+            </div>
+            
+            <div class="inspector-body" id="inspector-tab-content">
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Bilde</label>
+                    <div class="inspector-image-preview-wrap">
+                        <img class="inspector-image-preview" src="${currentSrc}" alt="Forhåndsvisning">
+                        <div class="inspector-image-overlay">
+                            <button type="button" class="inspector-btn-small" id="img-inspector-change">Endre bilde</button>
+                            <button type="button" class="inspector-btn-small" id="img-inspector-crop">Rediger</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Alt-tekst (for universell utforming)</label>
+                    <input type="text" class="inspector-input" id="img-inspector-alt" value="${currentAlt}" placeholder="Beskriv bildet...">
+                </div>
+
+                <div class="inspector-group">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label class="inspector-group-label" style="margin: 0;">Legg til en lenke</label>
+                        <input type="checkbox" id="img-inspector-has-link" ${linkHref ? 'checked' : ''} style="cursor: pointer;">
+                    </div>
+                    <input type="text" class="inspector-input" id="img-inspector-link-url" value="${linkHref}" placeholder="https://..." style="display: ${linkHref ? 'block' : 'none'}; margin-top: 8px;">
+                </div>
+
+                <div class="inspector-group" style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="img-inspector-visibility-toggle">
+                        <span class="inspector-group-label" style="margin: 0;">Synlighet</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    </div>
+                    <div id="img-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
+                        Synlig for alle mottakere.
+                    </div>
+                </div>
+            </div>
+
+            <div class="inspector-body" id="inspector-tab-design" style="display: none;">
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Justering</label>
+                    <div class="inspector-style-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <button class="inspector-style-btn" id="img-btn-align-left" title="Venstre">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">align_horizontal_left</span>
+                        </button>
+                        <button class="inspector-style-btn" id="img-btn-align-center" title="Senter">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">align_horizontal_center</span>
+                        </button>
+                        <button class="inspector-style-btn" id="img-btn-align-right" title="Høyre">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">align_horizontal_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inspector-footer">
+                <button type="button" class="inspector-footer-btn cancel" id="img-inspector-cancel">Avbryt</button>
+                <button type="button" class="inspector-footer-btn apply" id="img-inspector-apply">Bruk</button>
+            </div>
+        `;
+
+        this.bindImageInspectorEvents(img, node);
+    }
+
+    bindImageInspectorEvents(img, node) {
+        const inputAlt = document.getElementById('img-inspector-alt');
+        const checkLink = document.getElementById('img-inspector-has-link');
+        const inputLinkUrl = document.getElementById('img-inspector-link-url');
+        const btnChange = document.getElementById('img-inspector-change');
+        const btnCrop = document.getElementById('img-inspector-crop');
+
+        document.querySelectorAll('.inspector-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.inspector-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const isDesign = tab.dataset.tab === 'design';
+                document.getElementById('inspector-tab-content').style.display = isDesign ? 'none' : 'flex';
+                document.getElementById('inspector-tab-design').style.display = isDesign ? 'flex' : 'none';
+            });
+        });
+
+        if (btnChange) {
+            btnChange.addEventListener('click', () => {
+                const blockId = node.id || 'unified_content';
+                this.activeImageBlockId = blockId;
+                this.activeColumnIndex = null;
+                
+                const choice = confirm("Hvor vil du hente bildet fra? \\nTrykk 'OK' for å laste opp fra din enhet.\\nTrykk 'Avbryt' for å søke på Unsplash.");
+                if (choice) {
+                    let fileInput = document.getElementById('block-image-upload');
+                    if (!fileInput) {
+                        fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.id = 'block-image-upload';
+                        fileInput.accept = 'image/*';
+                        fileInput.style.display = 'none';
+                        document.body.appendChild(fileInput);
+                    }
+                    const newFileInput = fileInput.cloneNode(true);
+                    fileInput.parentNode.replaceChild(newFileInput, fileInput);
+                    newFileInput.addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        try {
+                            showToast("Laster opp...", "info");
+                            const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                            const url = await window.firebaseService.uploadImage(file, uploadPath);
+                            img.src = url;
+                            img.setAttribute('src', url);
+                            document.querySelector('.inspector-image-preview').src = url;
+                            this.syncUnifiedBlocks();
+                            showToast("Bilde erstattet!", "success");
+                        } catch (err) {
+                            showToast("Opplasting feilet.", "error");
+                        }
+                    });
+                    newFileInput.click();
+                } else {
+                    if (window.unsplashManager) {
+                        window.unsplashManager.open((selection) => {
+                            if (selection && selection.url) {
+                                img.src = selection.url;
+                                img.setAttribute('src', selection.url);
+                                document.querySelector('.inspector-image-preview').src = selection.url;
+                                this.syncUnifiedBlocks();
+                                showToast("Bilde erstattet fra Unsplash!", "success");
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        if (btnCrop) {
+            btnCrop.addEventListener('click', () => {
+                this.openImageCropper(img.src, (newUrl) => {
+                    img.src = newUrl;
+                    img.setAttribute('src', newUrl);
+                    document.querySelector('.inspector-image-preview').src = newUrl;
+                    this.syncUnifiedBlocks();
+                    showToast("Bilde beskjært!", "success");
+                }, 'newsletter/images');
+            });
+        }
+
+        if (inputAlt) {
+            inputAlt.addEventListener('input', () => {
+                img.alt = inputAlt.value;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (checkLink) {
+            checkLink.addEventListener('change', () => {
+                const hasLink = checkLink.checked;
+                inputLinkUrl.style.display = hasLink ? 'block' : 'none';
+                
+                if (hasLink) {
+                    let parentLink = img.closest('a');
+                    if (!parentLink) {
+                        const a = document.createElement('a');
+                        a.href = inputLinkUrl.value || '#';
+                        a.style.display = 'inline-block';
+                        img.parentNode.insertBefore(a, img);
+                        a.appendChild(img);
+                    }
+                } else {
+                    let parentLink = img.closest('a');
+                    if (parentLink) {
+                        parentLink.parentNode.insertBefore(img, parentLink);
+                        parentLink.remove();
+                    }
+                }
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (inputLinkUrl) {
+            inputLinkUrl.addEventListener('input', () => {
+                let parentLink = img.closest('a');
+                if (parentLink) {
+                    parentLink.href = inputLinkUrl.value;
+                }
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        const aligns = ['left', 'center', 'right'];
+        aligns.forEach(align => {
+            const btn = document.getElementById(`img-btn-align-${align}`);
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (align === 'center') {
+                        img.style.margin = '0 auto';
+                        img.style.display = 'block';
+                    } else if (align === 'right') {
+                        img.style.margin = '0 0 0 auto';
+                        img.style.display = 'block';
+                    } else {
+                        img.style.margin = '0 auto 0 0';
+                        img.style.display = 'block';
+                    }
+                    this.syncUnifiedBlocks();
+                });
+            }
+        });
+
+        document.getElementById('img-inspector-cancel').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('img-inspector-apply').addEventListener('click', () => this.deselectBlock());
+    }
+
+    showButtonInspector(btn, node) {
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!defaultView || !inspectorView) return;
+
+        defaultView.style.display = 'none';
+        inspectorView.style.display = 'flex';
+
+        const currentText = btn.innerText || 'Les mer';
+        const currentUrl = btn.getAttribute('href') || 'https://';
+        
+        const computed = window.getComputedStyle(btn);
+        const currentRadius = computed.borderRadius;
+
+        inspectorView.innerHTML = `
+            <div class="inspector-header">
+                <h2>Tilpass knapp</h2>
+            </div>
+            
+            <div class="inspector-tabs">
+                <button class="inspector-tab active" data-tab="content">Innhold</button>
+                <button class="inspector-tab" data-tab="design">Design</button>
+            </div>
+            
+            <div class="inspector-body" id="inspector-tab-content">
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Knappetekst</label>
+                    <input type="text" class="inspector-input" id="btn-inspector-text" value="${currentText}">
+                </div>
+
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Nettadresse (URL)</label>
+                    <input type="text" class="inspector-input" id="btn-inspector-url" value="${currentUrl}">
+                </div>
+
+                <div class="inspector-group" style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="btn-inspector-visibility-toggle">
+                        <span class="inspector-group-label" style="margin: 0;">Synlighet</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">chevron_right</span>
+                    </div>
+                    <div id="btn-inspector-visibility-content" style="display: none; padding-top: 8px; font-size: 13px; color: #64748b;">
+                        Synlig for alle mottakere.
+                    </div>
+                </div>
+            </div>
+
+            <div class="inspector-body" id="inspector-tab-design" style="display: none;">
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Knappefarge</label>
+                    <input type="color" class="inspector-input" id="btn-design-color" value="#d17d39" style="height: 40px; padding: 4px; cursor: pointer;">
+                </div>
+                <div class="inspector-group">
+                    <label class="inspector-group-label">Rundede kanter</label>
+                    <select class="inspector-select" id="btn-design-radius">
+                        <option value="0px" ${currentRadius === '0px' ? 'selected' : ''}>Skarpe (0px)</option>
+                        <option value="8px" ${currentRadius === '8px' ? 'selected' : ''}>Myke (8px)</option>
+                        <option value="999px" ${currentRadius === '999px' || currentRadius.includes('px') && parseInt(currentRadius) > 20 ? 'selected' : ''}>Runde (999px)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="inspector-footer">
+                <button type="button" class="inspector-footer-btn cancel" id="btn-inspector-cancel">Avbryt</button>
+                <button type="button" class="inspector-footer-btn apply" id="btn-inspector-apply">Bruk</button>
+            </div>
+        `;
+
+        this.bindButtonInspectorEvents(btn, node);
+    }
+
+    bindButtonInspectorEvents(btn, node) {
+        const inputText = document.getElementById('btn-inspector-text');
+        const inputUrl = document.getElementById('btn-inspector-url');
+        const designColor = document.getElementById('btn-design-color');
+        const designRadius = document.getElementById('btn-design-radius');
+
+        document.querySelectorAll('.inspector-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.inspector-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const isDesign = tab.dataset.tab === 'design';
+                document.getElementById('inspector-tab-content').style.display = isDesign ? 'none' : 'flex';
+                document.getElementById('inspector-tab-design').style.display = isDesign ? 'flex' : 'none';
+            });
+        });
+
+        if (inputText) {
+            inputText.addEventListener('input', () => {
+                btn.innerText = inputText.value;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (inputUrl) {
+            inputUrl.addEventListener('input', () => {
+                btn.setAttribute('href', inputUrl.value);
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (designColor) {
+            designColor.addEventListener('input', () => {
+                btn.style.backgroundColor = designColor.value;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        if (designRadius) {
+            designRadius.addEventListener('change', () => {
+                btn.style.borderRadius = designRadius.value;
+                this.syncUnifiedBlocks();
+            });
+        }
+
+        document.getElementById('btn-inspector-cancel').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('btn-inspector-apply').addEventListener('click', () => this.deselectBlock());
     }
 
     toggleRecipientsDrawer() {
