@@ -1163,12 +1163,274 @@ class NewsletterBuilder {
                         <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
                     </div><p><br></p>`;
                 break;
+            case 'product':
+                this.openProductInsertionFlow();
+                return;
             default:
                 return;
         }
 
         if (html) {
             this.exec('insertHTML', html);
+        }
+    }
+
+    openProductInsertionFlow() {
+        this.openProductInsertionFlowAt(null);
+    }
+
+    openProductInsertionFlowAt(afterElement) {
+        let modal = document.getElementById('hkm-product-selector-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-product-selector-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            display: flex;
+            z-index: 11000;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 80vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: white;">shopping_bag</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">Sett inn butikkprodukt</h3>
+                    </div>
+                    <button id="hkm-product-modal-close" style="background: none; border: none; color: white; opacity: 0.8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 50%; transition: all 0.2s;"><span class="material-symbols-outlined" style="font-size: 22px;">close</span></button>
+                </div>
+                <div style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 12px; align-items: center; background: #f8fafc;">
+                    <div style="position: relative; flex: 1;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
+                        <input type="text" id="hkm-product-search-input" placeholder="Søk etter produkter..." style="width: 100%; padding: 10px 12px 10px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-weight: 500; outline: none; transition: border-color 0.2s, box-shadow: 0.2s; box-sizing: border-box; background: white;" />
+                    </div>
+                </div>
+                <div id="hkm-product-results" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 250px; max-height: 400px; background: white;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 12px;">
+                        <div style="width: 24px; height: 24px; border: 3px solid #e2e8f0; border-top-color: #d17d39; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <span style="font-size: 14px; font-weight: 500;">Henter produkter fra butikken...</span>
+                    </div>
+                </div>
+                <style>
+                    #hkm-product-results::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    #hkm-product-results::-webkit-scrollbar-thumb {
+                        background: #cbd5e1;
+                        border-radius: 3px;
+                    }
+                    .hkm-product-item {
+                        transition: all 0.2s ease;
+                    }
+                    .hkm-product-item:hover {
+                        background: #f8fafc !important;
+                        border-color: #cbd5e1 !important;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                    }
+                    .hkm-product-item:hover .material-symbols-outlined {
+                        color: #d17d39 !important;
+                        transform: scale(1.1);
+                    }
+                </style>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeBtn = document.getElementById('hkm-product-modal-close');
+        const searchInput = document.getElementById('hkm-product-search-input');
+        const resultsContainer = document.getElementById('hkm-product-results');
+
+        const closeModal = () => {
+            modal.remove();
+        };
+
+        closeBtn.onclick = closeModal;
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+
+        const escapeHtml = (str) => {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
+        let productsList = window.hkmWixProductsCache || [];
+
+        const renderProducts = (query = '') => {
+            const q = query.trim().toLowerCase();
+            let filtered = productsList;
+
+            if (q) {
+                let searchTerms = [q];
+                if (q.includes('genser') || q.includes('hoodie') || q.includes('hette')) {
+                    searchTerms = ['genser', 'hoodie', 'hette', 'sweatshirt'];
+                } else if (q.includes('t-skjorte') || q.includes('tskjorte') || q.includes('t-shirt') || q.includes('tee') || (q.includes('skjorte') && !q.includes('hette'))) {
+                    searchTerms = ['t-skjorte', 't-shirt', 'tee', 'skjorte'];
+                } else if (q.includes('plakat') || q.includes('poster') || q.includes('trykk')) {
+                    searchTerms = ['plakat', 'poster', 'trykk', 'print'];
+                } else if (q.includes('klistremerke') || q.includes('sticker')) {
+                    searchTerms = ['klistremerke', 'sticker'];
+                } else if (q.includes('bag') || q.includes('veske') || q.includes('tote')) {
+                    searchTerms = ['bag', 'veske', 'tote', 'handlenett'];
+                } else if (q.includes('bok') || q.includes('book') || q.includes('fargelegg')) {
+                    searchTerms = ['bok', 'book', 'fargelegg', 'coloring'];
+                }
+
+                filtered = productsList.filter(p => {
+                    const nameLower = (p.name || '').toLowerCase();
+                    const descLower = (p.description || '').toLowerCase();
+                    return searchTerms.some(term => nameLower.includes(term) || descLower.includes(term)) || nameLower.includes(q);
+                });
+            }
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #94a3b8; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #cbd5e1;">search_off</span>
+                        <span style="font-size: 14px; font-weight: 500; text-align: center;">Ingen produkter funnet ${q ? `for "${escapeHtml(q)}"` : ''}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsContainer.innerHTML = filtered.map(p => {
+                const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const img = p.imageUrl 
+                    ? `<img src="${p.imageUrl}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;" />`
+                    : `<div style="width: 44px; height: 44px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px;">🛍️</div>`;
+                
+                return `
+                    <div class="hkm-product-item" data-name="${escapeHtml(p.name)}" data-price="${p.price || ''}" data-slug="${slug}" data-image="${p.imageUrl || ''}" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #ffffff;">
+                        ${img}
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                            <span style="font-size: 13.5px; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</span>
+                            <span style="font-size: 12px; color: #d17d39; font-weight: 700;">kr ${p.price || 'N/A'},-</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #94a3b8; transition: all 0.2s;">add_circle</span>
+                    </div>
+                `;
+            }).join('');
+
+            resultsContainer.querySelectorAll('.hkm-product-item').forEach(item => {
+                item.onclick = () => {
+                    const name = item.dataset.name;
+                    const price = item.dataset.price;
+                    const slug = item.dataset.slug;
+                    const image = item.dataset.image;
+
+                    const productHtml = `
+                        <div class="newsletter-product-card" contenteditable="false" style="display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 24px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
+                            <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9;">
+                                <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                            </div>
+                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</h4>
+                                <span style="font-size: 15px; font-weight: 700; color: #d17d39;">kr ${price || 'N/A'},-</span>
+                                <div style="margin-top: 6px;">
+                                    <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2);">Se produkt</a>
+                                </div>
+                            </div>
+                        </div><p><br></p>
+                    `;
+
+                    this.insertHtmlAtCursorOrEndAt(productHtml, afterElement);
+                    closeModal();
+                    showToast("Produkt satt inn!", "success");
+                };
+            });
+        };
+
+        const loadProducts = async () => {
+            if (productsList.length > 0) {
+                renderProducts();
+                return;
+            }
+
+            try {
+                const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products');
+                const data = await res.json();
+                if (data.success && Array.isArray(data.products)) {
+                    window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
+                    productsList = window.hkmWixProductsCache;
+                    renderProducts();
+                } else {
+                    throw new Error("Invalid API response format");
+                }
+            } catch (err) {
+                console.error("Failed to load live products, trying Firestore fallback:", err);
+                if (window.firebaseService?.isInitialized) {
+                    try {
+                        const doc = await window.firebaseService.getPageContent('wix_products');
+                        if (doc && Array.isArray(doc.items)) {
+                            window.hkmWixProductsCache = doc.items.filter(p => p.inStock !== false).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                            productsList = window.hkmWixProductsCache;
+                            renderProducts();
+                            return;
+                        }
+                    } catch (fsErr) {
+                        console.error("Firestore fallback failed:", fsErr);
+                    }
+                }
+                resultsContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; color: #ef4444; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: #f87171;">error</span>
+                        <span style="font-size: 14px; font-weight: 500; text-align: center;">Kunne ikke hente produkter fra butikken.</span>
+                    </div>
+                `;
+            }
+        };
+
+        searchInput.oninput = (e) => {
+            renderProducts(e.target.value);
+        };
+
+        loadProducts();
+    }
+
+    insertHtmlAtCursorOrEnd(html) {
+        this.insertHtmlAtCursorOrEndAt(html, null);
+    }
+
+    insertHtmlAtCursorOrEndAt(html, afterElement) {
+        const container = document.getElementById('blocks-container');
+        if (!container) return;
+
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        if (afterElement && container.contains(afterElement)) {
+            while (temp.firstChild) {
+                container.insertBefore(temp.firstChild, afterElement);
+            }
+            this.syncUnifiedBlocks();
+        } else {
+            this.restoreSelection();
+            const selection = window.getSelection();
+            if (selection.rangeCount && container.contains(selection.anchorNode)) {
+                this.exec('insertHTML', html);
+            } else {
+                while (temp.firstChild) {
+                    container.appendChild(temp.firstChild);
+                }
+                this.syncUnifiedBlocks();
+            }
         }
     }
 
@@ -1252,6 +1514,9 @@ class NewsletterBuilder {
                         <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
                     </div><p><br></p>`;
                 break;
+            case 'product':
+                this.openProductInsertionFlowAt(afterElement);
+                return;
             default:
                 return;
         }
