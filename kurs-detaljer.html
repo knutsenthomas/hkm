@@ -956,7 +956,12 @@
                 <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex - 1)">
                     <i class="fas fa-chevron-left"></i> Forrige leksjon
                 </button>
-                <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
+                    <a id="zoom-nav-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="display: none; padding: 6px 14px; font-size: 0.82rem; background: #0284c7; border: none; text-decoration: none; border-radius: 8px;">
+                        <i class="fas fa-video"></i> Åpne i Zoom-appen
+                    </a>
+                </div>
                 <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex + 1)">
                     Neste leksjon <i class="fas fa-chevron-right"></i>
                 </button>
@@ -975,6 +980,9 @@
                 <p class="overview-text" id="lesson-overview-text">
                     I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.
                 </p>
+
+                <!-- Dynamic Zoom Banner Container -->
+                <div id="zoom-banner-container" style="display: none;"></div>
 
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin-bottom: 12px;">Læreren din</h3>
                 <div class="instructor-card">
@@ -1371,6 +1379,42 @@
             const overviewText = document.getElementById('lesson-overview-text');
             if (overviewText) overviewText.textContent = lesson.description || 'Ingen leksjonsbeskrivelse spesifisert.';
 
+            // Render Zoom link button and banner if zoomUrl is present
+            const zoomUrl = lesson.zoomUrl || (currentCourse && currentCourse.zoomUrl);
+            const zoomNavLink = document.getElementById('zoom-nav-link');
+            const zoomBanner = document.getElementById('zoom-banner-container');
+
+            if (zoomUrl && String(zoomUrl).trim().length > 0) {
+                if (zoomNavLink) {
+                    zoomNavLink.href = zoomUrl;
+                    zoomNavLink.style.display = 'inline-flex';
+                }
+                if (zoomBanner) {
+                    zoomBanner.style.display = 'block';
+                    zoomBanner.innerHTML = `
+                        <div style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(209, 125, 57, 0.08) 100%); border: 1.5px solid #0284c7; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #0284c7; font-size: 1.05rem; margin-bottom: 4px;">
+                                    <i class="fas fa-video" style="font-size: 20px;"></i> Live Zoom-møte tilgjengelig
+                                </div>
+                                <p style="margin: 0; color: #475569; font-size: 0.9rem;">
+                                    Du kan følge denne live-økten direkte i spilleren ovenfor, eller åpne møtet i Zoom-appen.
+                                </p>
+                            </div>
+                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="background: #0284c7; border: none; text-decoration: none; white-space: nowrap; border-radius: 8px;">
+                                <i class="fas fa-external-link-alt"></i> Åpne i Zoom-appen
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                if (zoomNavLink) zoomNavLink.style.display = 'none';
+                if (zoomBanner) {
+                    zoomBanner.style.display = 'none';
+                    zoomBanner.innerHTML = '';
+                }
+            }
+
             // Progress bar is only visible if watching a recorded lesson (videoUrl present)
             const progressWrapper = document.querySelector('.progress-wrapper');
             const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
@@ -1538,6 +1582,7 @@
                                     <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTTER</label></div>
                                     <div class="countdown-box"><span id="cd-secs">00</span><label>SEKUNDER</label></div>
                                 </div>
+                                ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="background: #0284c7; border: none; text-decoration: none; padding: 10px 22px; font-size: 0.9rem; margin-top: 8px;"><i class="fas fa-video"></i> Åpne Zoom-lenke</a>` : ''}
                             </div>
                         `;
                         startCountdownTimer(targetDateVal);
@@ -1548,9 +1593,10 @@
                                     <i class="fas fa-graduation-cap" style="font-size:28px; color:#d17d39;"></i>
                                 </div>
                                 <h3 style="font-size:1.7rem; font-weight:800; margin-bottom:8px;">${lesson.title}</h3>
-                                <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6;">
+                                <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom: 12px;">
                                     ${lesson.description || 'Les teksten og oppgavene nedenfor for denne leksjonen.'}
                                 </p>
+                                ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="background: #0284c7; border: none; text-decoration: none; padding: 10px 22px; font-size: 0.9rem;"><i class="fas fa-video"></i> Åpne Zoom-møte</a>` : ''}
                             </div>
                         `;
                     }
