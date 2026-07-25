@@ -719,8 +719,8 @@
         }
 
         .course-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+            transform: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
         }
 
         .course-thumb {
@@ -831,12 +831,26 @@
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
-            transition: opacity 0.2s, transform 0.2s;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, opacity 0.2s ease;
         }
 
         .enroll-btn:hover {
-            opacity: 0.92;
-            transform: scale(1.01);
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px rgba(209, 125, 57, 0.45);
+            opacity: 0.98;
+        }
+
+        .enroll-btn:active {
+            transform: scale(0.97);
+        }
+
+        .enroll-btn i {
+            display: inline-block;
+            transition: transform 0.25s ease;
+        }
+
+        .enroll-btn:hover i {
+            transform: scale(1.15);
         }
 
         .enroll-btn.free {
