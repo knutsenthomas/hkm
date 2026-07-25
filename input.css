@@ -9453,3 +9453,19 @@ html[data-theme="dark"] .skeleton-text::after {
     height: 16px !important;
 }
 
+/* Remove browser default focus outline from search modal and inputs */
+.search-input-field:focus,
+.search-input-field:focus-visible,
+.search-input-field:active,
+.search-input-group:focus-within,
+#site-search-input-v2:focus,
+#site-search-input-v2:focus-visible,
+#floating-book-search-input:focus,
+#floating-book-search-input:focus-visible {
+    outline: none !important;
+    outline-style: none !important;
+    outline-width: 0 !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
