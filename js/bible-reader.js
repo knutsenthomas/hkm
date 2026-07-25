@@ -1641,8 +1641,8 @@ class BibleReader {
 
         // Color swatch listeners for bottom action sheet
         document.querySelectorAll('#verse-context-toolbar .color-swatch-circle').forEach(swatch => {
-            swatch.addEventListener('click', (e) => {
-                e.stopPropagation();
+            const applySwatchColor = (e) => {
+                if (e && e.stopPropagation) e.stopPropagation();
                 const color = swatch.getAttribute('data-color');
                 if (color === 'custom' || color === 'multi') {
                     openColorWheelModal();
@@ -1656,16 +1656,24 @@ class BibleReader {
                 }
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     this.selectedVerses.forEach(v => {
-                        v.paragraph.setAttribute('data-highlight-color', color);
+                        if (color === 'none') {
+                            v.paragraph.removeAttribute('data-highlight-color');
+                        } else {
+                            v.paragraph.setAttribute('data-highlight-color', color);
+                        }
                     });
                 }
-            });
+            };
+
+            swatch.addEventListener('click', applySwatchColor);
+            swatch.addEventListener('touchend', applySwatchColor);
         });
 
         // Prevent touch/pointer drag events inside bottom action sheet from closing it or triggering chapter swipe
         if (this.dom.verseToolbar) {
             ['touchstart', 'touchmove', 'touchend', 'pointerdown', 'pointermove', 'pointerup'].forEach(evtType => {
                 this.dom.verseToolbar.addEventListener(evtType, (e) => {
+                    if (e.target.closest('.color-swatch-circle, button, a')) return;
                     e.stopPropagation();
                 }, { passive: true });
             });

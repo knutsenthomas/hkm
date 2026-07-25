@@ -1821,18 +1821,32 @@
             text-decoration: underline dotted #475569 !important;
         }
 
-        .bible-reading-pane p.selected-verse[data-highlight-color="yellow"] {
+        /* Dotted Underline Verse Highlights */
+        .bible-reading-pane p[data-highlight-color="yellow"],
+        .bible-reading-pane span[data-highlight-color="yellow"] {
             text-decoration: underline dotted #eab308 !important;
+            text-underline-offset: 5px !important;
+            text-decoration-thickness: 2.5px !important;
         }
-        .bible-reading-pane p.selected-verse[data-highlight-color="green"] {
+        .bible-reading-pane p[data-highlight-color="green"],
+        .bible-reading-pane span[data-highlight-color="green"] {
             text-decoration: underline dotted #22c55e !important;
+            text-underline-offset: 5px !important;
+            text-decoration-thickness: 2.5px !important;
         }
-        .bible-reading-pane p.selected-verse[data-highlight-color="cyan"] {
+        .bible-reading-pane p[data-highlight-color="cyan"],
+        .bible-reading-pane span[data-highlight-color="cyan"] {
             text-decoration: underline dotted #06b6d4 !important;
+            text-underline-offset: 5px !important;
+            text-decoration-thickness: 2.5px !important;
         }
-        .bible-reading-pane p.selected-verse[data-highlight-color="multi"],
-        .bible-reading-pane p.selected-verse[data-highlight-color="custom"] {
-            text-decoration: underline dotted var(--custom-dotted-color, #a855f7) !important;
+        .bible-reading-pane p[data-highlight-color="multi"],
+        .bible-reading-pane p[data-highlight-color="custom"],
+        .bible-reading-pane span[data-highlight-color="multi"],
+        .bible-reading-pane span[data-highlight-color="custom"] {
+            text-decoration: underline dotted var(--custom-dotted-color, #d17d39) !important;
+            text-underline-offset: 5px !important;
+            text-decoration-thickness: 2.5px !important;
         }
 
         /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal) */
