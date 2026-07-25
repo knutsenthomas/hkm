@@ -1199,41 +1199,53 @@
             const container = document.getElementById('modules-accordion-container');
             if (!lessons || !lessons.length) return;
 
-            const mod1Lessons = lessons.slice(0, Math.ceil(lessons.length / 2));
-            const mod2Lessons = lessons.slice(Math.ceil(lessons.length / 2));
+            let html = '';
 
-            let html = `
-                <div class="module-group">
-                    <div class="module-header" onclick="window.toggleModule('mod-1')">
-                        <span>Modul 1: Introduksjon</span>
-                        <i class="fas fa-chevron-down" id="mod-1-icon"></i>
-                    </div>
-                    <ul class="lesson-list" id="mod-1-list">
-                        ${mod1Lessons.map((l, idx) => `
-                            <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}" style="cursor: pointer;">
-                                <span class="lesson-dot"></span>
-                                <span>Leksjon 1.${idx + 1}: ${l.title || 'Leksjon ' + (idx + 1)}</span>
-                            </a>
-                        `).join('')}
-                    </ul>
-                </div>
-            `;
-
-            if (mod2Lessons.length > 0) {
-                const offset = mod1Lessons.length;
-                html += `
-                    <div class="module-group">
-                        <div class="module-header" onclick="window.toggleModule('mod-2')">
-                            <span>Modul 2: Praktisk Aktivering</span>
-                            <i class="fas fa-chevron-down" id="mod-2-icon"></i>
+            if (currentCourse && Array.isArray(currentCourse.modules) && currentCourse.modules.length > 0) {
+                let lessonOffset = 0;
+                currentCourse.modules.forEach((mod, modIdx) => {
+                    const modLessons = mod.lessons || [];
+                    html += `
+                        <div class="module-group">
+                            <div class="module-header" onclick="window.toggleModule('mod-${modIdx}')">
+                                <span>${mod.title || `Modul ${modIdx + 1}`}</span>
+                                <i class="fas fa-chevron-down" id="mod-${modIdx}-icon"></i>
+                            </div>
+                            <ul class="lesson-list" id="mod-${modIdx}-list">
+                                ${modLessons.map((l, idx) => {
+                                    const overallIdx = lessonOffset + idx;
+                                    const rawTitle = l.title || `Leksjon ${overallIdx + 1}`;
+                                    const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Leksjon ${overallIdx + 1}: ${rawTitle}`;
+                                    return `
+                                    <a href="javascript:void(0)" class="lesson-item ${overallIdx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${overallIdx})" id="nav-lesson-${overallIdx}" style="cursor: pointer;">
+                                        <span class="lesson-dot"></span>
+                                        <span>${displayTitle}</span>
+                                    </a>
+                                    `;
+                                }).join('')}
+                            </ul>
                         </div>
-                        <ul class="lesson-list" id="mod-2-list">
-                            ${mod2Lessons.map((l, idx) => `
-                                <a href="javascript:void(0)" class="lesson-item ${offset + idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${offset + idx})" id="nav-lesson-${offset + idx}" style="cursor: pointer;">
+                    `;
+                    lessonOffset += modLessons.length;
+                });
+            } else {
+                html = `
+                    <div class="module-group">
+                        <div class="module-header" onclick="window.toggleModule('mod-1')">
+                            <span>Leksjoner og Live-økter</span>
+                            <i class="fas fa-chevron-down" id="mod-1-icon"></i>
+                        </div>
+                        <ul class="lesson-list" id="mod-1-list">
+                            ${lessons.map((l, idx) => {
+                                const rawTitle = l.title || `Leksjon ${idx + 1}`;
+                                const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Leksjon ${idx + 1}: ${rawTitle}`;
+                                return `
+                                <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}" style="cursor: pointer;">
                                     <span class="lesson-dot"></span>
-                                    <span>Leksjon 2.${idx + 1}: ${l.title || 'Leksjon ' + (offset + idx + 1)}</span>
+                                    <span>${displayTitle}</span>
                                 </a>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </ul>
                     </div>
                 `;
@@ -1265,9 +1277,8 @@
 
             const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
-                const modNum = index >= 2 ? '2' : '1';
-                const lesNum = index >= 2 ? (index - 1) : (index + 1);
-                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${modNum}.${lesNum}`;
+                const cleanDisplayTitle = (lesson.title || `Leksjon ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
+                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}: ${cleanDisplayTitle}`;
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
