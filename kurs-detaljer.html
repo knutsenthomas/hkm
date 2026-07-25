@@ -958,7 +958,7 @@
                 </button>
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
-                    <a id="zoom-nav-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="display: none; padding: 6px 14px; font-size: 0.82rem; background: #0284c7; border: none; text-decoration: none; border-radius: 8px;">
+                    <a id="zoom-nav-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="display: none; padding: 6px 14px; font-size: 0.82rem; background: var(--hkm-terracotta); border: none; text-decoration: none; border-radius: 8px;">
                         <i class="fas fa-video"></i> Åpne i Zoom-appen
                     </a>
                 </div>
@@ -1260,7 +1260,7 @@
                 return '<i class="fas fa-play-circle" style="color:var(--hkm-terracotta); font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
             }
             if (l.zoomUrl && String(l.zoomUrl).trim().length > 0) {
-                return '<i class="fas fa-video" style="color:#0284c7; font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
+                return '<i class="fas fa-video" style="color:var(--hkm-terracotta); font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
             }
             const lDate = l.date || l.releaseDate;
             if (lDate) {
@@ -1392,16 +1392,16 @@
                 if (zoomBanner) {
                     zoomBanner.style.display = 'block';
                     zoomBanner.innerHTML = `
-                        <div style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(209, 125, 57, 0.08) 100%); border: 1.5px solid #0284c7; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);">
+                        <div style="background: rgba(209, 125, 57, 0.08); border: 1.5px solid var(--hkm-terracotta); border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.08);">
                             <div>
-                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #0284c7; font-size: 1.05rem; margin-bottom: 4px;">
+                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--hkm-terracotta); font-size: 1.05rem; margin-bottom: 4px;">
                                     <i class="fas fa-video" style="font-size: 20px;"></i> Live Zoom-møte tilgjengelig
                                 </div>
                                 <p style="margin: 0; color: #475569; font-size: 0.9rem;">
-                                    Du kan følge denne live-økten direkte i spilleren ovenfor, eller åpne møtet i Zoom-appen.
+                                    Du kan følge denne live-økten direkte i Zoom-appen ved å klikke på knappen til høyre.
                                 </p>
                             </div>
-                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="background: #0284c7; border: none; text-decoration: none; white-space: nowrap; border-radius: 8px;">
+                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; white-space: nowrap; border-radius: 8px;">
                                 <i class="fas fa-external-link-alt"></i> Åpne i Zoom-appen
                             </a>
                         </div>
@@ -1539,14 +1539,14 @@
                     
                     videoContainer.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:32px 24px; position:relative; z-index:2;">
-                            <div style="background: rgba(2, 132, 199, 0.22); border: 1px solid #0284c7; color: #38bdf8; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);">
-                                <i class="fas fa-video" style="color: #38bdf8; font-size: 0.95rem;"></i> Live Zoom-økt
+                            <div style="background: rgba(209, 125, 57, 0.25); border: 1px solid var(--hkm-terracotta); color: #ffffff; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);">
+                                <i class="fas fa-video" style="color: #ffffff; font-size: 0.95rem;"></i> Live Zoom-økt
                             </div>
                             <h3 style="font-size:1.8rem; font-weight:800; margin-bottom:10px;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
                                 Denne leksjonen er en direkte Zoom-sending med Hilde Karin Knutsen. Klikk på knappen nedenfor for å bli med i Zoom-møtet.
                             </p>
-                            <a href="${lesson.zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="background: #0284c7; font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer;">
+                            <a href="${lesson.zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-video" style="font-size: 1.15rem;"></i> Bli med på Zoom-møtet nå
                             </a>
                         </div>
