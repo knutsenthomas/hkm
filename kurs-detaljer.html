@@ -482,6 +482,24 @@
             setTimeout(forceShow, 1000);
         })();
     </script>
+
+    <style id="kurs-detaljer-override-style">
+        html body.cms-loading > .platform-container,
+        html body.cms-loading > footer,
+        html body.cms-loading > .footer,
+        html body > .platform-container,
+        html body > footer,
+        html body > .footer {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        html body.cms-loading > footer,
+        html body.cms-loading > .footer {
+            display: block !important;
+        }
+    </style>
 </head>
 
 <body class="header-always-scrolled">
@@ -796,7 +814,16 @@
         let currentUser = null;
         let userHasAccess = false;
 
+        
         async function initPage() {
+            if (document.body) {
+                document.body.classList.remove('cms-loading');
+            }
+            if (typeof window.revealPublicUI === 'function') {
+                window.revealPublicUI('kurs-detaljer');
+            }
+            window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
+
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id') || urlParams.get('courseId');
 
@@ -821,142 +848,6 @@
         } else {
             initPage();
         }
-
-        async function loadCourseData(targetId) {
-            try {
-                let courses = [];
-                try {
-                    const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
-                    if (snap.exists && snap.data()?.items) {
-                        courses = snap.data().items;
-                    }
-                } catch (e) {
-                    console.warn('Firestore collection_courses error:', e);
-                }
-
-                if (!courses.length) {
-                    try {
-                        const snap = await firebase.firestore().collection('courses').get();
-                        courses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    } catch (e) {
-                        console.warn('Firestore courses fallback error:', e);
-                    }
-                }
-
-                if (targetId) {
-                    currentCourse = courses.find(c => String(c.id) === String(targetId));
-                }
-                if (!currentCourse && courses.length > 0) {
-                    currentCourse = courses[0];
-                }
-
-                if (!currentCourse) return;
-
-                document.getElementById('sidebar-course-title').textContent = currentCourse.title || 'Kurs';
-                document.getElementById('bc-course-title').textContent = currentCourse.title || 'Kurs';
-
-                const lessons = currentCourse.lessons || [];
-                renderSidebarModules(lessons);
-                await checkAccessAndUpdateUI();
-
-            } catch (err) {
-                console.error('Error loading course details:', err);
-            }
-        }
-
-        async function checkAccessAndUpdateUI() {
-            if (!currentCourse) return;
-            const isFree = !currentCourse.price || currentCourse.price === 0;
-            let isEnrolled = false;
-
-            if (currentUser) {
-                try {
-                    const enrollSnap = await firebase.firestore().collection('enrollments')
-                        .where('userId', '==', currentUser.uid)
-                        .where('courseId', '==', currentCourse.id)
-                        .get();
-                    isEnrolled = !enrollSnap.empty;
-                } catch (e) {
-                    console.warn('Enrollment check error:', e);
-                }
-            }
-
-            userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
-            selectLesson(currentLessonIndex);
-        }
-
-        function renderSidebarModules(lessons) {
-            const container = document.getElementById('modules-accordion-container');
-            if (!lessons || !lessons.length) return;
-
-            container.innerHTML = `
-                <div class="module-group">
-                    <div class="module-header">
-                        <span>Modul 1: Leksjoner</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <ul class="lesson-list">
-                        ${lessons.map((l, idx) => `
-                            <a class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}">
-                                <span class="lesson-dot"></span>
-                                <span>Leksjon ${idx + 1}: ${l.title || 'Leksjon ' + (idx + 1)}</span>
-                            </a>
-                        `).join('')}
-                    </ul>
-                </div>
-            `;
-        }
-
-        window.selectLesson = function(index) {
-            if (!currentCourse || !currentCourse.lessons) return;
-            currentLessonIndex = index;
-            const lesson = currentCourse.lessons[index];
-            if (!lesson) return;
-
-            document.querySelectorAll('.lesson-item').forEach((el, idx) => {
-                el.classList.toggle('active', idx === index);
-            });
-
-            document.getElementById('bc-lesson-title').textContent = `Leksjon ${index + 1}`;
-            document.getElementById('lesson-overview-title').textContent = `Oversikt over leksjonen: ${lesson.title}`;
-            document.getElementById('lesson-overview-text').textContent = lesson.description || 'Ingen leksjonsbeskrivelse spesifisert.';
-
-            const videoContainer = document.getElementById('video-card-container');
-            const lockedOverlay = document.getElementById('locked-overlay');
-
-            if (userHasAccess) {
-                if (lockedOverlay) lockedOverlay.style.display = 'none';
-                if (lesson.videoUrl && (lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('vimeo'))) {
-                    let embedUrl = lesson.videoUrl;
-                    if (lesson.videoUrl.includes('youtube.com/watch?v=')) {
-                        embedUrl = lesson.videoUrl.replace('watch?v=', 'embed/');
-                    }
-                    videoContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
-                } else if (lesson.videoUrl) {
-                    videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;"></video>`;
-                } else {
-                    videoContainer.innerHTML = `
-                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:white;text-align:center;padding:20px;">
-                            <i class="fas fa-graduation-cap" style="font-size:48px;color:#d17d39;margin-bottom:12px;"></i>
-                            <h3>${lesson.title}</h3>
-                            <p style="color:#cbd5e1;max-width:500px;">${lesson.description || 'Les teksten nedenfor for denne leksjonen.'}</p>
-                        </div>
-                    `;
-                }
-            } else {
-                if (lockedOverlay) lockedOverlay.style.display = 'flex';
-                const authBtn = document.getElementById('auth-btn');
-                if (authBtn) {
-                    if (!currentUser) {
-                        authBtn.href = '/minside/login.html';
-                        authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Logg inn for å se kurset';
-                    } else {
-                        authBtn.href = '/minside/index.html#course-player?courseId=' + currentCourse.id;
-                        authBtn.innerHTML = '<i class="fas fa-unlock"></i> Meld deg på for kr ' + (currentCourse.price || 0) + ',-';
-                    }
-                }
-            }
-        };
 
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
