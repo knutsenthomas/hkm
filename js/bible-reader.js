@@ -2500,7 +2500,24 @@ class BibleReader {
         }
     }
 
-    attachVerseCrossReferenceButtons() {
+    async loadChapterVerseCrossReferences() {
+        const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+        const bookName = currentBook ? currentBook.name : '';
+        const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
+        const fullRef = `${bookName} ${chapterNum}`;
+
+        try {
+            const res = await fetch(`/api/bible/chapter-crossrefs?chapterName=${encodeURIComponent(fullRef)}`);
+            if (!res.ok) throw new Error("Failed to load chapter crossrefs");
+            const map = await res.json();
+            this.attachVerseCrossReferenceButtons(map);
+        } catch (e) {
+            console.warn("Using default key verses for cross references:", e);
+            this.attachVerseCrossReferenceButtons({ "1": true, "4": true, "14": true });
+        }
+    }
+
+    attachVerseCrossReferenceButtons(crossrefMap = null) {
         if (!this.dom.readingPane) return;
         
         // Remove any previous icons
@@ -2521,6 +2538,11 @@ class BibleReader {
             const verseNum = sup.innerText.trim();
             if (!verseNum) return;
 
+            // Only render icon if this verse has cross references or user notes
+            const hasCrossref = crossrefMap && (crossrefMap[verseNum] || crossrefMap[String(verseNum)]);
+            const hasUserNote = this.userNotes && this.userNotes[verseNum];
+            if (!hasCrossref && !hasUserNote) return;
+
             const p = sup.closest('p') || sup.parentElement;
             const supRect = sup.getBoundingClientRect();
             const verseTop = (supRect.top - readingPaneRect.top) + scrollTop;
@@ -2528,7 +2550,7 @@ class BibleReader {
             const iconBtn = document.createElement('button');
             iconBtn.type = 'button';
             iconBtn.className = 'verse-crossref-icon-btn';
-            iconBtn.title = `Kryssreferanser og notat (Vers ${verseNum})`;
+            iconBtn.title = `Kryssreferanser (Vers ${verseNum})`;
             iconBtn.setAttribute('data-verse-num', verseNum);
             iconBtn.style.cssText = `position: absolute; right: 4px; top: ${Math.max(0, verseTop - 2)}px; background: var(--bg-surface, rgba(0,0,0,0.04)); border: 1px solid var(--border-subtle, rgba(0,0,0,0.08)); color: var(--text-muted, #64748b); opacity: 0.65; cursor: pointer; padding: 2px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; z-index: 5;`;
             iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">article</span>`;
@@ -2670,8 +2692,8 @@ class BibleReader {
         // Render verses HTML
         this.dom.readingPane.innerHTML = this.activeChapterData.content || '';
 
-        // Attach inline verse cross-reference buttons
-        this.attachVerseCrossReferenceButtons();
+        // Load chapter cross-references mapping & attach buttons only to verses with crossrefs or notes
+        this.loadChapterVerseCrossReferences();
 
         // Restore bookmarks highlight
         this.restoreHighlights();

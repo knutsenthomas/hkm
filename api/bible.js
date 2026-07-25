@@ -1049,6 +1049,63 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
       ]);
     }
 
+    // 2c. GET /api/bible/chapter-crossrefs
+    if (pathname === '/api/bible/chapter-crossrefs') {
+      const chapterName = urlObj.searchParams.get('chapterName');
+      if (!chapterName) {
+        return res.status(400).json({ error: "chapterName query parameter is required" });
+      }
+
+      const geminiApiKey = process.env.GEMINI_API_KEY;
+      if (geminiApiKey) {
+        try {
+          const ai = getGenAI();
+          const prompt = `Du er en teologisk ekspert på Bibelen.
+Finn 3 til 6 nøkkelvers i kapittelet "${chapterName}" som har viktigste teologiske kryssreferanser.
+For hvert av disse nøkkelversene (oppgitt med versnummer som streng-nøkkel, f.eks "1", "4", "14"), gi 1 til 3 kryssreferanser med referanse ('ref') og kort forklaring ('explanation') på norsk.
+
+Returner et JSON-objekt der nøklene er versnumrene som strenger (f.eks. "1", "4", "14"):
+{
+  "1": [
+    { "ref": "1. Mosebok 1:1", "explanation": "I begynnelsen skapte Gud..." },
+    { "ref": "Kolosserne 1:16", "explanation": "Alt er skapt ved ham..." }
+  ],
+  "4": [
+    { "ref": "Johannes 8:12", "explanation": "Jeg er verdens lys..." }
+  ]
+}`;
+
+          const response = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json"
+            }
+          });
+
+          if (response.text) {
+            return res.status(200).json(JSON.parse(response.text));
+          }
+        } catch (aiErr) {
+          console.error("Gemini chapter cross-references failed:", aiErr);
+        }
+      }
+
+      // Fallback: Default key verses for John 1 / general chapters
+      return res.status(200).json({
+        "1": [
+          { ref: "1. Mosebok 1:1", explanation: "Skapelsen fra begynnelsen." },
+          { ref: "Kolosserne 1:16", explanation: "Alt ble skapt ved ham og til ham." }
+        ],
+        "4": [
+          { ref: "Johannes 8:12", explanation: "Lyset skinner i mørket." }
+        ],
+        "14": [
+          { ref: "Filipperne 2:7", explanation: "Ordet ble kjøtt og bodde blant oss." }
+        ]
+      });
+    }
+
     // 3. GET /api/bible/bibles/:bibleId/books
     let match = pathname.match(/^\/api\/bible\/bibles\/([^\/]+)\/books$/);
     if (match) {
