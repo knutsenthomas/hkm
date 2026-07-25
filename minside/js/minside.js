@@ -1045,6 +1045,8 @@ class MinSideManager {
     // INIT
     // ──────────────────────────────────────────────────────────
     async init() {
+        window.minSideManager = this;
+        window.minSideApp = this;
         this.setupNavigation();
 
         if (typeof firebase === 'undefined') {
@@ -2608,82 +2610,2243 @@ class MinSideManager {
         }
     }
 
-    async renderOverview(container) {
-        const name = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser?.displayName || 'Medlem';
-        container.innerHTML = `
-            <div class="ms-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                <div class="hkm-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: 20px; padding: 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);">
-                    <span style="font-size: 12px; font-weight: 800; color: #fb923c; text-transform: uppercase; letter-spacing: 0.08em;">VELKOMMEN TILBAKE</span>
-                    <h2 style="font-size: 26px; font-weight: 800; color: white; margin: 8px 0 12px;">Velkommen, ${name}!</h2>
-                    <p style="color: #cbd5e1; margin-bottom: 20px; line-height: 1.6;">Velkommen til din personlige HKM-portal. Her har du tilgang til dine kurs, leseplaner, notater og bønnevegg.</p>
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="if (window.minSideApp) window.minSideApp.loadView('courses'); else if (window.minSideManager) window.minSideManager.loadView('courses');">
-                            <span class="material-symbols-outlined">school</span> Mine kurs
-                        </button>
-                        <button class="btn btn-secondary" style="background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer;" onclick="if (window.minSideApp) window.minSideApp.loadView('reading-plans'); else if (window.minSideManager) window.minSideManager.loadView('reading-plans');">
-                            <span class="material-symbols-outlined">auto_stories</span> Leseplaner
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
+    _getDailyVerse(lang) {
+        const verses = [
+            {
+                no: '"For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11',
+                en: '"For I know the plans I have for you," declares the Lord... — Jer 29:11',
+                es: '"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová... — Jer 29:11'
+            },
+            {
+                no: '"Alt makter jeg i ham som gjør meg sterk." — Fil 4:13',
+                en: '"I can do all things through him who strengthens me." — Phil 4:13',
+                es: '"Todo lo puedo en Cristo que me fortalece." — Fil 4:13'
+            },
+            {
+                no: '"Herren er min hyrde, jeg mangler ingenting." — Sal 23:1',
+                en: '"The Lord is my shepherd; I shall not want." — Ps 23:1',
+                es: '"Jehová es mi pastor; nada me faltará." — Sal 23:1'
+            },
+            {
+                no: '"Men de som venter på Herren, får ny kraft." — Jes 40:31',
+                en: '"But those who trust in the Lord will renew their strength." — Isa 40:31',
+                es: '"Pero los que esperan a Jehová tendrán nuevas fuerzas." — Is 40:31'
+            },
+            {
+                no: '"Vi vet at alt samvirker til det gode for dem som elsker Gud." — Rom 8:28',
+                en: '"And we know that in all things God works for the good of those who love him." — Rom 8:28',
+                es: '"Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien." — Rom 8:28'
+            },
+            {
+                no: '"Stol på Herren av hele ditt hjerte, og stol ikke på din egen forstand." — Ordsp 3:5',
+                en: '"Trust in the Lord with all your heart and lean not on your own understanding." — Prov 3:5',
+                es: '"Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia." — Prov 3:5'
+            },
+            {
+                no: '"Vær modig og sterk! Vær ikke redd, for Herren din Gud er med deg." — Jos 1:9',
+                en: '"Be strong and courageous. Do not be afraid; the Lord your God will be with you." — Josh 1:9',
+                es: '"Mira que te mando que te esfuerces y seas valiente; no temas, porque Jehová tu Dios estará contigo." — Jos 1:9'
+            }
+        ];
+
+        // Pick verse based on the day of the week (0 = Sunday, 1 = Monday, etc.)
+        const dayIndex = new Date().getDay();
+        const verse = verses[dayIndex] || verses[0];
+        return verse[lang] || verse['no'];
     }
 
-    async renderCourses(container) {
-        container.innerHTML = `<div class="loading-state" style="padding: 40px; text-align: center;"><div class="spinner"></div> Laster dine kurs...</div>`;
-        try {
-            const snap = await firebase.firestore().collection('courses').get();
-            let courses = [];
-            snap.forEach(d => courses.push({ id: d.id, ...d.data() }));
+    _timeAgo(dateVal) {
+        const date = (dateVal instanceof Date) ? dateVal : (dateVal?.toDate ? dateVal.toDate() : new Date(dateVal));
+        if (isNaN(date.getTime())) return '';
+        const s = Math.floor((Date.now() - date.getTime()) / 1000);
+        const lang = document.documentElement.lang || 'no';
+        const localeCode = lang === 'en' ? 'en-US' : lang === 'es' ? 'es-ES' : 'no-NO';
+        if (s < 0 || s < 60) return t('time.justNow');
+        if (s < 3600) return t('time.minutesAgo', { n: Math.floor(s / 60) });
+        if (s < 86400) return t('time.hoursAgo', { n: Math.floor(s / 3600) });
+        if (s < 604800) return t('time.daysAgo', { n: Math.floor(s / 86400) });
+        return date.toLocaleDateString(localeCode, { day: 'numeric', month: 'short', year: 'numeric' });
+    }
 
-            if (courses.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state" style="padding: 60px; text-align: center;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">school</span>
-                        <h3 style="margin-top: 12px; color: #1e293b;">Ingen kurs tilgjengelig</h3>
-                        <p style="color: #64748b;">Sjekk ut kursene våre på nettsiden.</p>
+    _normalizeNotificationDoc(docLike) {
+        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        return {
+            id: docLike?.id || raw.id || '',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert'),
+            body: typeof raw.body === 'string' ? raw.body : '',
+            type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
+            link: typeof raw.link === 'string' ? raw.link : '',
+            read: raw.read === true,
+            archived: raw.archived === true,
+            createdAt: raw.createdAt || null,
+        };
+    }
+
+    async _fetchCurrentUserDonations({ order = false }
+
+    async renderOverview(container) {
+        const p = this.profileData;
+        const user = this.currentUser;
+        const name = (p.displayName || user?.displayName || user?.email || t('role.fallbackUser')).split(' ')[0];
+        const year = new Date().getFullYear();
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? t('overview.goodMorning') : hour < 17 ? t('overview.hello') : t('overview.goodEvening');
+
+        container.innerHTML = `
+        <div class="ms-overview-wrap">
+
+            <!-- Welcome banner -->
+            <div class="ms-overview-banner">
+                <div>
+                    <h2 class="ms-overview-banner-title">
+                        ${greeting}, ${name}! 👋
+                    </h2>
+                    <p class="ms-overview-banner-quote">
+                        ${this._getDailyVerse(document.documentElement.lang || 'no')}
+                    </p>
+                </div>
+                <div class="ms-overview-banner-chip">
+                    <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
+                    <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div class="ms-overview-stats">
+                <!-- Uleste Varslinger -->
+                <div class="bento-stat-card bento-orange" onclick="window.minSideManager.loadView('notifications')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">notifications_active</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_flat</span>
                     </div>
-                `;
-                return;
+                    <div class="bento-card-label">${t('overview.unreadNotifications')}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-notif-count">—</span>
+                    </div>
+                    <div class="bento-card-desc">${t('overview.clickToViewAll')}</div>
+                </div>
+
+                <!-- Gitt totalt -->
+                <div class="bento-stat-card bento-blue" onclick="window.minSideManager.loadView('giving')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.totalGiven')} ${year}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-year-total">—</span>
+                    </div>
+                    <div class="bento-card-desc" id="ov-year-sub">${t('overview.seeGivingHistory')}</div>
+                </div>
+
+                <!-- Available courses -->
+                <div class="bento-stat-card bento-brand-blue" onclick="window.minSideManager.loadView('courses')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">auto_awesome</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.availableCourses')}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-courses-count">—</span>
+                    </div>
+                    <div class="bento-card-desc">${t('overview.teachingFromHkm')}</div>
+                </div>
+
+                <!-- Min fremdrift -->
+                <div class="bento-stat-card bento-teal" onclick="window.minSideManager.loadView('reading-plans')">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
+                    <div class="bento-card-label">${t('overview.myProgress')}</div>
+                    <div class="bento-value-row">
+                        <span class="bento-card-value" id="ov-progress-text">—</span>
+                        <div class="bento-progress-track">
+                            <div class="bento-progress-bar" id="ov-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="bento-card-desc" id="ov-progress-sub">...</div>
+                </div>
+            </div>
+
+            <!-- Bønneveggen preview -->
+            <div class="info-card ms-overview-card-gap" id="ov-prayer-preview-card" style="display: none;">
+                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>${t('overview.latestPrayer')}</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">${t('overview.latestPrayerSub')}</p>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('prayer-wall')" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important;"><span style="display: inline-block; line-height: 1;">${t('overview.goToPrayerWall')}</span><span class="material-symbols-outlined" style="font-size: 16px; position: relative; top: 3px !important; display: inline-block; line-height: 1;">arrow_forward</span></button>
+                </div>
+                <div id="ov-prayer-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </div>
+            
+            <!-- Calendar Events preview -->
+            <div class="info-card ms-overview-card-gap" id="ov-events-preview-card">
+                <div class="info-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3>${t('overview.upcomingEvents')}</h3>
+                        <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">${t('overview.upcomingEventsSub')}</p>
+                    </div>
+                    <a href="/arrangementer.html" class="btn btn-ghost btn-sm" style="font-size: 13px; display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 6px 12px !important; height: 32px !important; border: none !important; width: auto !important; text-decoration: none;"><span style="display: inline-block; line-height: 1;">${t('overview.seeAll')}</span><span class="material-symbols-outlined" style="font-size: 16px; display: inline-block; line-height: 1;">arrow_forward</span></a>
+                </div>
+                <div id="ov-events-feed-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 16px; box-sizing: border-box; width: 100%;">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+            <!-- Recent notifications -->
+            <div class="info-card no-border">
+                <div class="info-card-header">
+                    <h3>${t('overview.recentNotifications')}</h3>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('notifications')">
+                        ${t('overview.seeAll')}
+                    </button>
+                </div>
+                <div id="ov-recent-notifs">
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+        </div>`;
+
+        // Quick action clicks
+        container.querySelectorAll('.ov-action-btn').forEach(btn => {
+            btn?.addEventListener('click', () => this.loadView(btn.dataset.view));
+        });
+
+        // Stat: member since
+        if (p.createdAt?.toDate) {
+            document.getElementById('ov-member-since').textContent =
+                p.createdAt.toDate().getFullYear();
+        } else {
+            document.getElementById('ov-member-since').textContent = new Date().getFullYear();
+        }
+
+        // Parallel fetches
+        const uid = user?.uid;
+        try {
+            const promises = [
+                firebase.firestore().collection('user_notifications')
+                    .where('userId', '==', uid).where('read', '==', false).get(),
+                this._fetchCurrentUserDonations(),
+                firebase.firestore().collection('siteContent').doc('collection_courses').get(),
+                firebase.firestore().collection('user_notifications')
+                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get()
+            ];
+            if (this.prayerWallEnabled) {
+                promises.push(firebase.firestore().collection('prayers').get());
+            } else {
+                promises.push(Promise.resolve({ docs: [] }));
+            }
+            // Fetch reading plan progress (no orderBy/limit in query to avoid index requirement)
+            promises.push(
+                firebase.firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .collection('reading_plans')
+                    .where('completed', '==', false)
+                    .get()
+            );
+
+            const [notifSnap, donations, coursesSnap, recentSnap, prayersSnap, plansSnap] = await Promise.all(promises);
+
+            // Prayers preview rendering
+            const ovPrayerCard = document.getElementById('ov-prayer-preview-card');
+            const ovPrayerFeed = document.getElementById('ov-prayer-feed-preview');
+            if (ovPrayerCard && ovPrayerFeed) {
+                if (this.prayerWallEnabled) {
+                    ovPrayerCard.style.display = 'block';
+                
+                const prayers = prayersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                prayers.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+                    return bTime - aTime;
+                });
+                
+                const topPrayers = prayers.slice(0, 3);
+                if (topPrayers.length > 0) {
+                    ovPrayerFeed.innerHTML = topPrayers.map(p => {
+                        const name = p.isAnonymous ? t('prayer.anonymous') : (p.userName || t('prayer.member'));
+                        const count = p.prayedCount || (p.prayedUserIds || []).length || 0;
+                        const textSnippet = p.text.length > 80 ? p.text.substring(0, 80) + '...' : p.text;
+                        
+                        return `
+                            <div class="ov-prayer-item" style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; background: #f8fafc; display: flex; flex-direction: column; justify-content: space-between; min-height: 110px;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span style="font-size: 12px; font-weight: 700; color: #d17d39;">${name}</span>
+                                        <span style="font-size: 11px; color: #94a3b8;">${p.createdAt ? this.formatTimeAgo(p.createdAt) : ''}</span>
+                                    </div>
+                                    <p style="font-size: 13.5px; color: #334155; margin: 0 0 12px 0; line-height: 1.4; white-space: pre-wrap; font-family: inherit;">${textSnippet}</p>
+                                </div>
+                                <div style="display: flex !important; align-items: center !important; gap: 4px !important; font-size: 11px; font-weight: 700; color: #bd4f2a; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: auto; width: 100%;"><span class="material-symbols-outlined" style="font-size: 14px; position: relative; top: 3.5px !important; display: inline-block; line-height: 1;">volunteer_activism</span><span style="display: inline-block; line-height: 1;">${t('overview.prayedCountText', { n: count })}</span></div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    ovPrayerFeed.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
+                            ${t('overview.noPrayersYet')}
+                        </div>
+                    `;
+                }
+                } else {
+                    ovPrayerCard.style.display = 'none';
+                }
             }
 
-            container.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
-                    ${courses.map(c => `
-                        <div class="hkm-card" style="border-radius: 16px; overflow: hidden; padding: 0; cursor: pointer;" onclick="window.location.href='/kurs-detaljer?id=${c.id}'">
-                            <img src="${c.coverUrl || c.thumbnailUrl || '/img/bible-timeline-hero.webp'}" style="width: 100%; height: 160px; object-fit: cover;">
-                            <div style="padding: 20px;">
-                                <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${c.title || 'Uten tittel'}</h3>
-                                <p style="font-size: 14px; color: #64748b; margin-bottom: 16px; line-height: 1.5;">${c.excerpt || c.description || ''}</p>
-                                <a href="/kurs-detaljer?id=${c.id}" class="btn btn-primary btn-sm" style="width: 100%; text-align: center; justify-content: center;">Åpne kurs</a>
+            // Notif count
+            const notifEl = document.getElementById('ov-notif-count');
+            if (notifEl) notifEl.textContent = notifSnap.size || '0';
+
+            // Year total giving
+            let yearTotal = 0;
+            donations.forEach(donation => {
+                if (this._getDonationDate(donation)?.getFullYear?.() === new Date().getFullYear()) {
+                    yearTotal += this._normalizeDonationAmountNok(donation);
+                }
+            });
+            const yearEl = document.getElementById('ov-year-total');
+            if (yearEl) yearEl.textContent = yearTotal > 0
+                ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}`
+                : t('overview.givingNone');
+
+            // Courses count
+            const coursesEl = document.getElementById('ov-courses-count');
+            const coursesData = (coursesSnap.exists ? coursesSnap.data()?.items : null) || [];
+            if (coursesEl) coursesEl.textContent = coursesData.length || '0';
+
+            // Progress render
+            let progressPct = 0;
+            let progressTitle = 'Ingen aktiv plan';
+            if (plansSnap && !plansSnap.empty) {
+                // Sort active plans in memory by lastActiveAt desc
+                const activePlans = plansSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                activePlans.sort((a, b) => {
+                    const aTime = a.lastActiveAt?.toMillis ? a.lastActiveAt.toMillis() : (a.lastActiveAt?.seconds ? a.lastActiveAt.seconds * 1000 : 0);
+                    const bTime = b.lastActiveAt?.toMillis ? b.lastActiveAt.toMillis() : (b.lastActiveAt?.seconds ? b.lastActiveAt.seconds * 1000 : 0);
+                    return bTime - aTime;
+                });
+                const activeUserPlan = activePlans[0];
+                
+                const globalSnap = await firebase.firestore()
+                    .collection('reading_plans')
+                    .doc(activeUserPlan.planId)
+                    .get();
+                if (globalSnap.exists) {
+                    const activeGlobalPlan = globalSnap.data();
+                    const completedDays = activeUserPlan.completedDays || [];
+                    const totalDays = activeGlobalPlan.daysCount || (activeGlobalPlan.days ? Object.keys(activeGlobalPlan.days).length : 0) || 1;
+                    progressPct = Math.round((completedDays.length / totalDays) * 100);
+                    const planTitle = activeGlobalPlan.title || '';
+                    progressTitle = `${t('overview.continue')}: ${planTitle}`;
+                }
+            }
+            const progressTextEl = document.getElementById('ov-progress-text');
+            const progressBarEl = document.getElementById('ov-progress-bar');
+            const progressSubEl = document.getElementById('ov-progress-sub');
+            if (progressTextEl) progressTextEl.textContent = `${progressPct}%`;
+            if (progressBarEl) progressBarEl.style.width = `${progressPct}%`;
+            if (progressSubEl) progressSubEl.textContent = progressTitle;
+
+            // Recent notifications list
+            const recentEl = document.getElementById('ov-recent-notifs');
+            if (recentEl) {
+                if (recentSnap.empty) {
+                    recentEl.innerHTML = `<div class="ms-overview-notifs-empty">${t('overview.noNotificationsYet')}</div>`;
+                } else {
+                    recentEl.innerHTML = recentSnap.docs.map(doc => {
+                        const d = this._normalizeNotificationDoc(doc);
+                        const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
+                        return `<div class="ms-overview-notif-row">
+                            <div class="ms-overview-notif-dot ${d.read ? 'is-read' : ''}"></div>
+                            <div class="ms-overview-notif-main">
+                                <div class="ms-overview-notif-title">${d.title}</div>
+                                <div class="ms-overview-notif-body">${d.body || ''}</div>
                             </div>
+                            <div class="ms-overview-notif-time">${this._timeAgo(date)}</div>
+                        </div>`;
+                    }).join('') + `<div class="ms-overview-notifs-footer">
+                        <button class="btn btn-ghost btn-sm ms-btn-full"
+                            onclick="window.minSideManager.loadView('notifications')">
+                            ${t('overview.showAllNotifications')}
+                        </button></div>`;
+                }
+            }
+
+            // Fetch calendar events
+            (async () => {
+                const ovEventsCard = document.getElementById('ov-events-preview-card');
+                const ovEventsFeed = document.getElementById('ov-events-feed-preview');
+                if (!ovEventsCard || !ovEventsFeed) return;
+
+                // Image library helpers matching content-manager.js
+                const generateEventImage = (title) => {
+                    const imageLibrary = {
+                        'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
+                        'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
+                        'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
+                        'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
+                        'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
+                        'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
+                        'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
+                        'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
+                        'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
+                        'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
+                        'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
+                        'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
+                        'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
+                        'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
+                        'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
+                    };
+
+                    if (!title) return imageLibrary.default;
+
+                    const titleLower = title.toLowerCase();
+                    const keywordMap = {
+                        'bønn': 'prayer',
+                        'gudstjeneste': 'worship',
+                        'seminar': 'conference',
+                        'konferanse': 'conference',
+                        'undervisning': 'teaching',
+                        'skole': 'teaching',
+                        'kurs': 'teaching',
+                        'bibel': 'bible',
+                        'leseplan': 'bible',
+                        'ungdom': 'youth',
+                        'teens': 'youth',
+                        'barn': 'children',
+                        'søndagsskole': 'children',
+                        'familie': 'family',
+                        'påske': 'easter',
+                        'jul': 'christmas',
+                        'konsert': 'concert',
+                        'musikk': 'concert',
+                        'møte': 'meeting',
+                        'basar': 'family',
+                        'fellesskap': 'gathering'
+                    };
+
+                    for (const [key, category] of Object.entries(keywordMap)) {
+                        if (titleLower.includes(key)) {
+                            return imageLibrary[category];
+                        }
+                    }
+                    return imageLibrary.default;
+                };
+
+                const getEventImage = (event) => {
+                    if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
+                    return event.imageUrl || generateEventImage(event.title);
+                };
+
+                const normalizeGCalEvent = (item) => {
+                    const startVal = item.start.dateTime || item.start.date;
+                    const dateObj = new Date(startVal);
+                    return {
+                        id: item.id,
+                        title: item.summary || 'Uten tittel',
+                        description: item.description || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
+                        eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: 'Arrangement'
+                    };
+                };
+
+                const normalizeFirestoreEvent = (item) => {
+                    const dateObj = new Date(item.date);
+                    return {
+                        id: item.id,
+                        title: item.title || 'Uten tittel',
+                        description: item.description || item.seoDescription || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.imageUrl || item.image || '',
+                        eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: item.category || 'Arrangement'
+                    };
+                };
+
+                let allEvents = [];
+                let enrollments = [];
+                const email = firebase.auth().currentUser?.email;
+
+                // 1. Fetch user enrollments
+                if (email || uid) {
+                    try {
+                        const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
+                        if (targetEmails.length > 0) {
+                            const enrollSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('email', 'in', targetEmails)
+                                .get();
+                            enrollSnap.forEach(d => enrollments.push(d.data()));
+                        }
+                        if (uid) {
+                            const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('userId', '==', uid)
+                                .get();
+                            enrollUserSnap.forEach(d => enrollments.push(d.data()));
+                        }
+                    } catch (e) {
+                        console.error("Error fetching course enrollments for dashboard:", e);
+                    }
+                }
+                const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
+
+                const isUserEnrolledInCourse = (courseId) => {
+                    if (isAdmin) return true;
+                    return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
+                };
+
+                // 2. Fetch GCal events
+                let gcalEventsNormalized = [];
+                try {
+                    const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
+                    if (settingsSnap.exists) {
+                        const settings = settingsSnap.data();
+                        const gcal = settings.googleCalendar || {};
+                        if (gcal && gcal.apiKey && gcal.calendarId) {
+                            const nowIso = new Date().toISOString();
+                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
+                            const resp = await fetch(url);
+                            if (resp.ok) {
+                                const data = await resp.json();
+                                const gcalItems = data.items || [];
+                                gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch GCal events:", e);
+                }
+
+                // 3. Fetch Firestore events
+                let firestoreEventsNormalized = [];
+                try {
+                    const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
+                    if (fsEventsSnap.exists) {
+                        const fsData = fsEventsSnap.data();
+                        const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
+                        const now = new Date();
+                        
+                        firestoreEventsNormalized = fsItems
+                            .map(normalizeFirestoreEvent)
+                            .filter(ev => ev.date >= now); // only future events
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch Firestore events:", e);
+                }
+
+                // Deduplicate and Merge GCal and Firestore events
+                const isSameDay = (d1, d2) => {
+                    return d1.getFullYear() === d2.getFullYear() &&
+                           d1.getMonth() === d2.getMonth() &&
+                           d1.getDate() === d2.getDate();
+                };
+
+                const mergedGCal = [];
+                const matchedFirestoreIds = new Set();
+                
+                gcalEventsNormalized.forEach(gEvent => {
+                    const match = firestoreEventsNormalized.find(fEvent => {
+                        const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
+                        const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
+                        return sameId || sameDayMatch;
+                    });
+                    
+                    if (match) {
+                        matchedFirestoreIds.add(match.id);
+                        
+                        // Prioritize database override description, fallback to GCal description
+                        const gcalDesc = gEvent.description || '';
+                        const fsDesc = match.description || '';
+
+                        mergedGCal.push({
+                            ...gEvent,
+                            ...match,
+                            date: match.date || gEvent.date,
+                            description: fsDesc || gcalDesc
+                        });
+                    } else {
+                        mergedGCal.push(gEvent);
+                    }
+                });
+                
+                const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
+                
+                allEvents.push(...mergedGCal, ...uniqueFirestore);
+
+                // 4. Filter events based on course enrollment
+                const filteredEvents = allEvents.filter(ev => {
+                    const cat = String(ev.category || '').toLowerCase();
+                    if (cat === 'kurs' || cat === 'courses') {
+                        // Extract courseId from eventLink
+                        const match = ev.eventLink?.match(/courseId=([^&]+)/);
+                        const courseId = match ? match[1] : null;
+                        if (courseId) {
+                            return isUserEnrolledInCourse(courseId);
+                        }
+                        return false; // hide course events if we can't determine the course ID
+                    }
+                    return true; // show all other events
+                });
+
+                // 5. Sort by date ascending
+                filteredEvents.sort((a, b) => a.date - b.date);
+
+                // 6. Take top 3
+                const topEvents = filteredEvents.slice(0, 3);
+
+                if (topEvents.length > 0) {
+                    ovEventsFeed.innerHTML = topEvents.map(item => {
+                        const dateObj = item.date;
+                        const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
+                        
+                        const lang = document.documentElement.lang || 'no';
+                        const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+                        const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
+                        const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
+                        const day = dateObj.getDate();
+
+                        const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+                        let timeLabel = '';
+                        if (hasTime) {
+                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
+                            if (lang === 'en') {
+                                timeLabel = `, at ${startTime}`;
+                            } else if (lang === 'es') {
+                                timeLabel = `, a las ${startTime}`;
+                            } else {
+                                timeLabel = `, kl. ${startTime}`;
+                            }
+                        }
+                        
+                        const imageSrc = getEventImage(item);
+                        const imageAlt = item.title;
+                        
+                        const rawDesc = item.description || '';
+                        const cleanExcerpt = typeof rawDesc === 'string' 
+                            ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
+                            : '';
+                        const limitExcerpt = cleanExcerpt.length > 120 
+                            ? cleanExcerpt.slice(0, 117) + '...' 
+                            : cleanExcerpt;
+
+                        return `
+                            <a href="${item.eventLink}" class="ov-event-card">
+                                <div class="ov-event-image">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                    <div class="ov-event-date-badge">
+                                        <span class="month">${monthUpper}</span>
+                                        <span class="day">${day}</span>
+                                    </div>
+                                </div>
+                                <div class="ov-event-content">
+                                    <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
+                                    ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
+                                    <div class="ov-event-meta">
+                                        <span class="material-symbols-outlined">calendar_today</span>
+                                        <span>${dateLabel}${timeLabel}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+                } else {
+                    ovEventsFeed.innerHTML = `
+                        <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
+                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
                         </div>
-                    `).join('')}
-                </div>
-            `;
+                    `;
+                }
+            })();
         } catch (e) {
-            console.error("renderCourses error:", e);
-            container.innerHTML = `<div class="empty-state">Kunne ikke laste kurs.</div>`;
+            console.warn('Overview fetch error:', e);
         }
     }
 
-    async renderProfile(container) {
-        const user = this.currentUser || {};
-        container.innerHTML = `
-            <div class="hkm-card" style="max-width: 600px; border-radius: 20px; padding: 28px;">
-                <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">Min Profil</h3>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div>
-                        <label style="font-size: 13px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Navn</label>
-                        <input type="text" value="${user.displayName || (this.profileData && this.profileData.name) || ''}" disabled style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #334155;">
+    async renderCourses(container) {
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+        let courses = [];
+        try {
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            courses = (snap.exists ? snap.data()?.items : null) || [];
+        } catch (e) {
+            console.error("Error fetching courses:", e);
+        }
+
+        if (courses.length === 0) {
+            container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
+                <span class="material-symbols-outlined">school</span>
+                <h3>${t('courses.noCoursesYet')}</h3>
+                <p>${t('courses.noCoursesSub')}</p>
+            </div></div>`;
+            return;
+        }
+
+        // Fetch enrollments for current user to authorize lessons access
+        let enrollments = [];
+        if (this.currentUser?.email || this.currentUser?.uid) {
+            try {
+                const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
+                if (targetEmails.length > 0) {
+                    const eSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('email', 'in', targetEmails)
+                        .get();
+                    eSnap.forEach(d => enrollments.push(d.data()));
+                }
+                if (this.currentUser?.uid) {
+                    const eUserSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('userId', '==', this.currentUser.uid)
+                        .get();
+                    eUserSnap.forEach(d => enrollments.push(d.data()));
+                }
+            } catch (e) {
+                console.error("Error fetching course enrollments:", e);
+            }
+        }
+
+        const hasPaidForLesson = (course, lesson) => {
+            const isCourseFree = !course.price || course.price === 0;
+            if (isCourseFree) return true;
+
+            const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
+            if (isAdmin) return true;
+
+            const coursePaid = enrollments.find(e => 
+                e.courseId === course.id && 
+                (e.status === 'paid' || e.status === 'success')
+            );
+
+            if (!coursePaid) return false;
+
+            if (!coursePaid.paidLessons || coursePaid.paidLessons.length === 0) {
+                return true;
+            }
+
+            return coursePaid.paidLessons.includes(lesson.id);
+        };
+
+        container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
+            ${courses.map((c, cIdx) => {
+                const courseLessons = c.lessons || [];
+                
+                return `
+                <div class="course-card-premium">
+                    <div style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap;">
+                        <div class="course-thumbnail">
+                            ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <span class="course-category-tag">${c.category || 'Generelt'}</span>
+                            <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
+                            <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
+                        </div>
                     </div>
-                    <div>
-                        <label style="font-size: 13px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">E-post</label>
-                        <input type="email" value="${user.email || ''}" disabled style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #334155;">
+                    
+                    <div class="course-lessons-accordion">
+                        <div class="accordion-header" data-course-id="${c.id || cIdx}">
+                            <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin:0; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size: 20px !important;">format_list_bulleted</span> Leksjoner og Live-økter
+                            </h4>
+                            <span class="material-symbols-outlined expand-chevron">expand_more</span>
+                        </div>
+                        
+                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 24px 24px 24px; flex-direction:column; gap:12px;">
+                            ${courseLessons.length === 0 ? `
+                                <p style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
+                            ` : `
+                                <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
+                                    ${courseLessons.map((l, lIdx) => {
+                                        const paid = hasPaidForLesson(c, l);
+                                        let dateStr = '';
+                                        if (l.date) {
+                                            try {
+                                                const d = new Date(l.date);
+                                                const datePart = d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
+                                                const timePart = d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+                                                dateStr = `Klasse: ${datePart} • kl. ${timePart}`;
+                                            } catch (e) {
+                                                dateStr = `Klasse: ${l.date}`;
+                                            }
+                                        }
+                                        
+                                        const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
+                                        return `
+                                        <div class="course-lesson-row">
+                                            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                                                <div class="lesson-index-badge">
+                                                    ${lIdx + 1}
+                                                </div>
+                                                <div style="flex:1; min-width:0;">
+                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2; word-break:break-word;">
+                                                        ${cleanTitle}
+                                                    </div>
+                                                    ${dateStr ? `
+                                                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; display:flex; align-items:center; gap:4px; line-height: 1;">
+                                                            <span class="material-symbols-outlined" style="font-size: 14px !important;">calendar_today</span>
+                                                            <span style="display: inline-block; line-height: 1;">${dateStr}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                ${paid ? `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        ${l.videoUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">play_circle</span> Start leksjon
+                                                            </a>
+                                                        ` : (l.zoomUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">video_camera_front</span> Bli med på Zoom
+                                                            </a>
+                                                        ` : `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">school</span> Åpne leksjon
+                                                            </a>
+                                                        `)}
+                                                    </div>
+                                                ` : `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
+                                                            <span class="material-symbols-outlined" style="font-size:16px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">lock</span> Låst (kr ${l.price || 300},-)
+                                                        </span>
+                                                        <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            Lås opp
+                                                        </a>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+    }
+
+    async renderProfile(container) {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+
+        // Fresh fetch
+        let data = {};
+        try {
+            const doc = await firebase.firestore().collection('users').doc(uid).get();
+            if (doc.exists) data = doc.data() || {};
+        } catch (e) { }
+
+        const p = { ...this.profileData, ...data };
+        const esc = value => this._escapeHtml(value);
+        const val = v => v ? `<span class="info-row-value">${esc(v)}</span>` : `<span class="info-row-value empty">—</span>`;
+        const inputValue = v => esc(v || '');
+        const phoneCountryCode = p.phoneCountryCode || (String(p.phone || '').trim().startsWith('+') ? '' : '+47');
+        const phoneDisplay = [phoneCountryCode, p.phone].filter(Boolean).join(' ').trim();
+        const phoneCountryOptions = this._getPhoneCountries().map(([iso, dial, name]) => {
+            const selected = dial === phoneCountryCode ? 'selected' : '';
+            return `<option value="${esc(dial)}" data-country="${esc(iso)}" ${selected}>${esc(`${dial} ${name}`)}</option>`;
+        }).join('');
+
+        const joinYear = p.createdAt?.toDate
+            ? p.createdAt.toDate().getFullYear()
+            : new Date().getFullYear();
+
+        const genderKeys = {
+            'Mann': 'profile.genderMale',
+            'Male': 'profile.genderMale',
+            'Kvinne': 'profile.genderFemale',
+            'Female': 'profile.genderFemale',
+            'Annet': 'profile.genderOther',
+            'Other': 'profile.genderOther'
+        };
+        const maritalKeys = {
+            'Ugift': 'profile.maritalSingle',
+            'Single': 'profile.maritalSingle',
+            'Gift': 'profile.maritalMarried',
+            'Married': 'profile.maritalMarried',
+            'Samboer': 'profile.maritalPartner',
+            'Partner': 'profile.maritalPartner',
+            'Skilt': 'profile.maritalDivorced',
+            'Divorced': 'profile.maritalDivorced',
+            'Enke/Enkemann': 'profile.maritalWidowed',
+            'Widowed': 'profile.maritalWidowed'
+        };
+        const genderVal = p.gender ? (t(genderKeys[p.gender]) || p.gender) : '';
+        const maritalVal = p.maritalStatus ? (t(maritalKeys[p.maritalStatus]) || p.maritalStatus) : '';
+
+        // Fetch allowed items (admin default)
+        let allowedItems = ['overview', 'profile', 'courses', 'reading-plans', 'giving', 'notifications'];
+        try {
+            const designSettings = await window.firebaseService.getPageContent('settings_design');
+            if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
+                allowedItems = designSettings.minsideBottomNav;
+            }
+        } catch (e) {}
+
+        const userCustomNav = p.customBottomNav || allowedItems;
+
+        const navLabels = {
+            'overview': { label: t('sidebar.oversikt') || 'Oversikt', icon: 'home' },
+            'profile': { label: t('sidebar.profil') || 'Profil', icon: 'person' },
+            'courses': { label: t('overview.btnCoursesLabel') || 'Kurs', icon: 'school' },
+            'reading-plans': { label: t('overview.btnReadingPlansLabel') || 'Leseplaner', icon: 'auto_stories' },
+            'giving': { label: t('overview.btnGivingLabel') || 'Gaver', icon: 'volunteer_activism' },
+            'notifications': { label: t('sidebar.varslinger') || 'Varslinger', icon: 'notifications' }
+        };
+
+        const customNavHtml = allowedItems.map(id => {
+            const checked = userCustomNav.includes(id) ? 'checked' : '';
+            const item = navLabels[id] || { label: id, icon: 'link' };
+            return `
+                <label class="custom-nav-item">
+                    <div class="custom-nav-item-left">
+                        <span class="material-symbols-outlined">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </div>
+                    <label class="hkm-switch toggle-orange" style="margin: 0;">
+                        <input type="checkbox" class="custom-nav-cb" value="${id}" ${checked}>
+                        <span class="hkm-slider"></span>
+                    </label>
+                </label>
+            `;
+        }).join('');
+
+        const activeTab = this._activeProfileTab || 'my-profile';
+
+        container.innerHTML = `
+        <div class="profile-tabs-container">
+            <button class="profile-tab-btn ${activeTab === 'my-profile' ? 'active' : ''}" data-profile-tab="my-profile">Min profil</button>
+            <button class="profile-tab-btn ${activeTab === 'notifications' ? 'active' : ''}" data-profile-tab="notifications">Varsler</button>
+        </div>
+
+        <div id="profile-tab-content-my-profile" class="profile-tab-content" style="${activeTab === 'my-profile' ? '' : 'display: none;'}">
+            <div class="profile-grid">
+                <!-- ── LEFT COLUMN ── -->
+                <div class="profile-left">
+
+                <!-- Contact information -->
+                <div class="info-card profile-edit-card" id="contact-card">
+                    <div class="info-card-header">
+                        <h3>${t('profile.contactInfo')}</h3>
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit" title="${t('common.edit')}" type="button">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
+                    <div class="info-rows">
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">badge</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.fullName')}</div>
+                                <div class="info-row-display">${val(p.displayName || this.currentUser.displayName)}</div>
+                                <div class="info-row-edit">
+                                    <input name="displayName" value="${inputValue(p.displayName || this.currentUser.displayName)}" autocomplete="name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">mail</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.email')}</div>
+                                <div class="info-row-display">${val(this.currentUser.email)}</div>
+                            </div>
+                        </div>
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">phone</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.phone')}</div>
+                                <div class="info-row-display">${val(phoneDisplay)}</div>
+                                <div class="info-row-edit">
+                                    <div class="phone-inline-grid">
+                                        <select name="phoneCountryCode" autocomplete="tel-country-code">${phoneCountryOptions}</select>
+                                        <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel-national" placeholder="${t('profile.phonePlaceholder')}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">location_on</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.address')}</div>
+                                <div class="info-row-display">${p.address || p.zip || p.city || p.country
+                ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' '), esc(p.country)].filter(Boolean).join('<br>')}</span>`
+                : `<span class="info-row-value empty">—</span>`}</div>
+                                <div class="info-row-edit">
+                                    <input id="profile-address-input" name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="${t('profile.addressSearchPlaceholder')}">
+                                    <div id="address-search-status" class="address-search-status"></div>
+                                    <div id="address-search-results" class="address-search-results"></div>
+                                    <div class="profile-inline-grid">
+                                        <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="${t('profile.zipPlaceholder')}">
+                                        <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="${t('profile.cityPlaceholder')}">
+                                    </div>
+                                    <input name="country" value="${inputValue(p.country)}" autocomplete="country-name" placeholder="${t('profile.countryPlaceholder')}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-edit-actions">
+                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">${t('common.cancel')}</button>
+                        <button class="btn btn-primary btn-sm" id="save-contact-btn" type="button">
+                            <span class="material-symbols-outlined">save</span> ${t('common.save')}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Personal information -->
+                <div class="info-card profile-edit-card" id="personal-card">
+                    <div class="info-card-header">
+                        <h3>${t('profile.personalInfo')}</h3>
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-personal-edit" title="${t('common.edit')}" type="button">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
+                    <div class="info-rows">
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">person</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.gender')}</div>
+                                <div class="info-row-display">${val(genderVal)}</div>
+                                <div class="info-row-edit">
+                                    <select name="gender">
+                                        <option value="">${t('profile.select')}</option>
+                                        <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>${t('profile.genderMale')}</option>
+                                        <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>${t('profile.genderFemale')}</option>
+                                        <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>${t('profile.genderOther')}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">cake</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.birthday')}</div>
+                                <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
+                                <div class="info-row-edit">
+                                    <input type="date" name="birthday" value="${inputValue(p.birthday)}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">favorite</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.maritalStatus')}</div>
+                                <div class="info-row-display">${val(maritalVal)}</div>
+                                <div class="info-row-edit">
+                                    <select name="maritalStatus">
+                                        <option value="">${t('profile.select')}</option>
+                                        <option value="Ugift" ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>${t('profile.maritalSingle')}</option>
+                                        <option value="Gift" ${p.maritalStatus === 'Gift' ? 'selected' : ''}>${t('profile.maritalMarried')}</option>
+                                        <option value="Samboer" ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>${t('profile.maritalPartner')}</option>
+                                        <option value="Skilt" ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>${t('profile.maritalDivorced')}</option>
+                                        <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>${t('profile.maritalWidowed')}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">calendar_today</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">${t('profile.memberSince')}</div>
+                                <div class="info-row-display"><span class="info-row-value">${joinYear}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-edit-actions">
+                        <button class="btn btn-ghost btn-sm" id="cancel-personal-edit" type="button">${t('common.cancel')}</button>
+                        <button class="btn btn-primary btn-sm" id="save-personal-btn" type="button">
+                            <span class="material-symbols-outlined">save</span> ${t('common.save')}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>${t('profile.accountAdmin')}</h3>
+                    </div>
+                    <div class="ms-card-body-pad" style="padding: 16px 20px 18px 20px !important; display: block !important;">
+                        <p class="ms-danger-copy" style="margin-bottom: 12px !important;">
+                            ${t('profile.deleteAccountNotice')}
+                        </p>
+                        <button class="btn btn-danger" id="delete-account-btn" style="margin: 0 !important;">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                            ${t('profile.deleteAccountBtn')}
+                        </button>
                     </div>
                 </div>
             </div>
-        `;
+
+            <!-- ── RIGHT COLUMN ── -->
+            <div class="profile-right">
+
+                <!-- Household -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>${t('profile.family')}</h3>
+                    </div>
+                    <div class="family-search">
+                        <div class="family-search-box">
+                            <span class="material-symbols-outlined">search</span>
+                            <input id="family-search-input" type="search" placeholder="${t('profile.familySearchPlaceholder')}" autocomplete="off">
+                        </div>
+                        <div id="family-search-status" class="family-search-status"></div>
+                        <div id="family-search-results" class="family-search-results"></div>
+                    </div>
+                    <div id="household-content">
+                        ${p.familyMembers?.length ? `
+                            <p class="household-name">${esc(p.displayName?.split(' ').pop() || '')} ${t('profile.household')}</p>
+                            <div class="household-members">
+                                ${p.familyMembers.map(m => `
+                                    <div class="member-row">
+                                        <div class="member-avatar">${m.photoURL ? `<img src="${esc(m.photoURL)}" alt="">` : esc((m.name || '?').charAt(0).toUpperCase())}</div>
+                                        <div class="member-info">
+                                            <div class="member-info-name">${esc(m.name || 'Uten navn')}</div>
+                                            <div class="member-info-sub">${esc(m.role || m.email || '')}</div>
+                                        </div>
+                                        <button class="member-remove-btn" data-member-uid="${esc(m.uid || '')}" type="button" title="${t('common.cancel')}">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="empty-state ms-empty-state-compact">
+                                <span class="material-symbols-outlined ms-empty-state-icon-compact">group_off</span>
+                                <p class="ms-empty-state-copy-compact">${t('profile.noFamilyRegistered')}</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Menu Preferences -->
+                <div class="info-card">
+                    <div class="info-card-header" style="justify-content: flex-start !important; gap: 12px;">
+                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 22px;">phone_android</span>
+                        <h3 style="color: #d17d39;">Navigasjon på mobil</h3>
+                    </div>
+                    <div class="ms-card-body-pad" style="padding: 24px !important; display: block !important;">
+                        <p style="margin: 0 0 16px 0; color: var(--text-muted) !important; font-size: 13px; line-height: 1.5; font-weight: 500;">
+                            Velg hvilke snarveier og ikoner du ønsker å ha i menylinjen nederst på skjermen på mobil:
+                        </p>
+                        <div id="minside-custom-nav-list" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px;">
+                            ${customNavHtml}
+                        </div>
+                        <button class="btn btn-primary" id="save-custom-nav-btn" style="border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 13.5px; width: 100%; justify-content: center; margin: 0 !important;">
+                            <span class="material-symbols-outlined">save</span> Lagre menyvalg
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        </div>
+
+        <div id="profile-tab-content-notifications" class="profile-tab-content" style="${activeTab === 'notifications' ? '' : 'display: none;'}">
+            <div class="notif-settings-container">
+                
+                <!-- Main Header (Mockup Title and Description) -->
+                <div style="margin-bottom: 28px;">
+                    <h2 style="font-size: 30px; font-weight: 800; color: #d17d39; margin: 0 0 8px 0; letter-spacing: -0.02em;">Varslingsinnstillinger</h2>
+                    <p style="font-size: 13.5px; color: #64748b; margin: 0; line-height: 1.5; font-weight: 500;">
+                        Administrer hvordan du ønsker å motta oppdateringer og undervisning fra oss. Hold deg tilkoblet fellesskapet på dine egne premisser.
+                    </p>
+                </div>
+
+                <div class="notif-grid-layout">
+                    <!-- LEFT COLUMN: Push-varslinger -->
+                    <div class="notif-grid-left">
+                        <!-- CARD 1: Push-varslinger -->
+                        <div class="notif-settings-card push" style="margin-bottom: 0;">
+                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px;">
+                                <div class="notif-icon-circle push" style="margin-top: -11px !important;">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">notifications</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">Push-varslinger</h3>
+                                    <p class="notif-card-description">Motta varslinger direkte på din enhet når HKM sender meldinger.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notif-settings-list">
+                                <!-- Ny undervisning -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">school</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushTeachings')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushTeachingsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Ny podcast -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">podcasts</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushPodcasts')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushPodcastsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Nytt blogginnlegg -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">rate_review</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushBlogs')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushBlogsSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Bibel- og leseplaner -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">auto_stories</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.pushReadingPlans')}</div>
+                                            <div class="notif-setting-description">${t('profile.pushReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="push-reading-plans-toggle" ${p.pushReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: E-postvarslinger and Tidspunkt -->
+                    <div class="notif-grid-right">
+                        <!-- CARD 2: E-postvarslinger -->
+                        <div class="notif-settings-card email" style="margin-bottom: 0;">
+                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px;">
+                                <div class="notif-icon-circle email" style="margin-top: -11px !important;">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title">E-postvarslinger</h3>
+                                    <p class="notif-card-description">Velg hvilke oppdateringer vi sender til din innboks.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notif-settings-list">
+                                <!-- Nyhetsbrev -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">send</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">Nyhetsbrev</div>
+                                            <div class="notif-setting-description">Motta nyhetsbrev og oppdateringer om tjenesten.</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Daglige leseplanoppdateringer -->
+                                <div class="notif-setting-item">
+                                    <div class="notif-setting-left">
+                                        <span class="material-symbols-outlined notif-setting-sub-icon">calendar_today</span>
+                                        <div class="notif-setting-text">
+                                            <div class="notif-setting-label">${t('profile.emailReadingPlans')}</div>
+                                            <div class="notif-setting-description">${t('profile.emailReadingPlansSub')}</div>
+                                        </div>
+                                    </div>
+                                    <label class="hkm-switch toggle-orange">
+                                        <input type="checkbox" id="email-reading-plans-toggle" ${p.emailReadingPlans !== false ? 'checked' : ''}>
+                                        <span class="hkm-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARD 3: Tidspunkt for daglig oppdatering -->
+                        <div class="notif-settings-card time" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 20px !important; flex-wrap: wrap !important; margin-bottom: 0;">
+                            <div class="notif-card-header" style="display: flex; align-items: flex-start; gap: 18px; flex: 1; min-width: 200px;">
+                                <div class="notif-icon-circle time" style="margin-top: -11px !important;">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">schedule</span>
+                                </div>
+                                <div class="notif-card-title-container">
+                                    <h3 class="notif-card-title" style="margin: 0; line-height: 1.25;">Tidspunkt</h3>
+                                    <p class="notif-card-description" style="margin: 0;">Når vil du motta leseplan og push?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notif-time-select-wrapper" style="position: relative; flex-shrink: 0;">
+                                <select id="notification-time-select" class="notif-time-select">
+                                    ${[...Array(24).keys()].map(h => {
+                                        const padHour = String(h).padStart(2, '0');
+                                        const isSelected = (p.readingPlanNotificationHour !== undefined ? p.readingPlanNotificationHour : 7) === h;
+                                        return `<option value="${h}" ${isSelected ? 'selected' : ''}>${padHour}:00</option>`;
+                                    }).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FOOTER ACTIONS -->
+                <div class="notif-settings-footer">
+                    <p class="notif-footer-text">Dine endringer vil tre i kraft umiddelbart.</p>
+                    <button class="notif-save-btn" id="save-prefs-btn">
+                        <span class="material-symbols-outlined" style="font-size: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0 !important;">save</span> Lagre preferanser
+                    </button>
+                </div>
+
+            </div>
+        </div>`;
+
+        // Tab switching events
+        const tabBtns = container.querySelectorAll('.profile-tab-btn');
+        tabBtns.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                const target = btn.getAttribute('data-profile-tab');
+                this._activeProfileTab = target;
+
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                container.querySelectorAll('.profile-tab-content').forEach(c => {
+                    c.style.display = 'none';
+                });
+                const activeContent = container.querySelector(`#profile-tab-content-${target}`);
+                if (activeContent) {
+                    activeContent.style.display = target === 'notifications' ? 'block' : '';
+                }
+            });
+        });
+
+        // ── Wire up events ──
+        // Contact edit toggle
+        const toggleContact = document.getElementById('toggle-contact-edit');
+        const contactCard = document.getElementById('contact-card');
+        toggleContact?.addEventListener('click', () => {
+            contactCard?.classList.toggle('is-editing');
+            contactCard?.querySelector('[name="displayName"]')?.focus();
+        });
+        document.getElementById('cancel-contact-edit')?.addEventListener('click', () => {
+            contactCard?.classList.remove('is-editing');
+        });
+        document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
+            await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country']);
+            this.profileData = await this.getMergedProfile(this.currentUser);
+            this.updateHeader();
+            this.loadView('profile');
+        });
+
+        // Personal edit toggle
+        const togglePersonal = document.getElementById('toggle-personal-edit');
+        const personalCard = document.getElementById('personal-card');
+        togglePersonal?.addEventListener('click', () => {
+            personalCard?.classList.toggle('is-editing');
+            personalCard?.querySelector('[name="gender"]')?.focus();
+        });
+        document.getElementById('cancel-personal-edit')?.addEventListener('click', () => {
+            personalCard?.classList.remove('is-editing');
+        });
+        document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
+            await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
+            this.loadView('profile');
+        });
+
+        document.getElementById('save-custom-nav-btn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('save-custom-nav-btn');
+            if (btn) btn.disabled = true;
+            try {
+                const checkedBoxes = Array.from(document.querySelectorAll('.custom-nav-cb:checked'));
+                const customBottomNav = checkedBoxes.map(cb => cb.value);
+
+                // Update localStorage immediately to prevent FOUC flash on subsequent reloads
+                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(customBottomNav));
+
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
+                    { customBottomNav },
+                    { merge: true }
+                );
+
+                this.profileData.customBottomNav = customBottomNav;
+                this.applyBottomNavSettings(customBottomNav);
+
+                // Toast or animation feedback
+                if (btn) {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Meny lagret!';
+                    btn.style.background = '#10B981'; // Green
+                    btn.style.borderColor = '#10B981';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.style.background = '';
+                        btn.style.borderColor = '';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error("Save custom nav error:", err);
+                alert("Kunne ikke lagre menyvalg: " + err.message);
+                if (btn) btn.disabled = false;
+            }
+        });
+
+        this._wireFamilySearch();
+        this._wireAddressAutocomplete();
+
+        document.querySelectorAll('.member-remove-btn').forEach(button => {
+            button?.addEventListener('click', async () => {
+                await this.removeFamilyMember(button.dataset.memberUid);
+            });
+        });
+
+        document.getElementById('save-prefs-btn')?.addEventListener('click', async () => {
+            const pushTeachings = document.getElementById('push-teachings-toggle')?.checked ?? true;
+            const pushPodcasts = document.getElementById('push-podcasts-toggle')?.checked ?? true;
+            const pushBlogs = document.getElementById('push-blogs-toggle')?.checked ?? true;
+            const pushReadingPlans = document.getElementById('push-reading-plans-toggle')?.checked ?? true;
+            
+            // pushEnabled is true if any push sub-toggle is active
+            const pushEnabled = pushTeachings || pushPodcasts || pushBlogs || pushReadingPlans;
+            
+            const emailConsent = document.getElementById('email-toggle')?.checked;
+            const emailReadingPlans = document.getElementById('email-reading-plans-toggle')?.checked ?? true;
+            const readingPlanNotificationHour = parseInt(document.getElementById('notification-time-select')?.value ?? '7', 10);
+            const btn = document.getElementById('save-prefs-btn');
+            if (btn) { btn.disabled = true; }
+            try {
+                if (window.hkmLogger) window.hkmLogger.log("Preferanser: Lagrer innstillinger...");
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
+                    {
+                        pushEnabled,
+                        pushTeachings,
+                        pushPodcasts,
+                        pushBlogs,
+                        pushReadingPlans,
+                        emailConsent,
+                        emailReadingPlans,
+                        readingPlanNotificationHour,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    { merge: true }
+                );
+                
+                // Show immediate visual confirmation on button
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    btn.style.width = `${rect.width}px`;
+                    btn.style.height = `${rect.height}px`;
+                    btn.style.display = 'inline-flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px !important;">check_circle</span> ${t('common.saved')}`;
+                }
+                
+                const successMsg = "Preferansene dine ble lagret!";
+                if (typeof window.showToast === 'function') {
+                    window.showToast(successMsg, "success", 4000);
+                } else {
+                    alert(successMsg);
+                }
+
+                // Request push notifications in the background so it doesn't block the UI
+                if (pushEnabled) {
+                    const showRegToast = !p.pushEnabled;
+                    this._requestPushPermission(showRegToast).catch(pushErr => {
+                        console.warn('Background push registration failed:', pushErr);
+                        if (window.hkmLogger) {
+                            window.hkmLogger.warn("Background push registration failed: " + (pushErr.message || pushErr));
+                        }
+                    });
+                }
+
+                setTimeout(() => { 
+                    if (btn) { 
+                        btn.style.width = '';
+                        btn.style.height = '';
+                        btn.style.display = '';
+                        btn.style.alignItems = '';
+                        btn.style.justifyContent = '';
+                        btn.disabled = false; 
+                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}`; 
+                    } 
+                }, 2000);
+            } catch (e) {
+                console.warn('save prefs:', e);
+                if (window.hkmLogger) {
+                    window.hkmLogger.error(`Save preferences failed: ${e.message || e}. Stack: ${e.stack || ''}`);
+                }
+                const errorMsg = "Kunne ikke lagre preferanser: " + (e.message || e);
+                if (typeof window.showToast === 'function') {
+                    window.showToast(errorMsg, "error", 5000);
+                } else {
+                    alert(errorMsg);
+                }
+                if (btn) { 
+                    btn.disabled = false; 
+                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; margin-right: -2px !important;">save</span> ${t('profile.savePreferences')}`; 
+                }
+            }
+        });
+
+
+        // Delete account
+        document.getElementById('delete-account-btn')?.addEventListener('click', () => this.showDeleteConfirmModal());
+    }
+
+    async renderNotifications(container) {
+        const uid = this.currentUser?.uid;
+        const activeFilter = this._notifFilter || 'all';
+
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const filterArchivedLabel = isNo ? 'Arkivert' : (isEs ? 'Archivado' : 'Archived');
+
+        const iconMap = {
+            push:    { icon: 'campaign',      cls: 'activity-icon-tone-push' },
+            message: { icon: 'mail',          cls: 'activity-icon-tone-message' },
+            default: { icon: 'notifications', cls: 'activity-icon-tone-default' },
+        };
+
+        const filters = [
+            { id: 'all',     label: t('notifications.filterAll')     || 'Alle' },
+            { id: 'unread',  label: t('notifications.filterUnread')  || 'Ulest' },
+            { id: 'push',    label: t('notifications.filterPush')    || 'Push' },
+            { id: 'message', label: t('notifications.filterMessage') || 'Meldinger' },
+            { id: 'archived', label: filterArchivedLabel }
+        ];
+
+        container.innerHTML = `
+        <div class="ms-full-width ms-notifications-container">
+            <div class="ms-section-header-row">
+                <h2 class="ms-section-title">${t('notifications.title')}</h2>
+                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important;">
+                    <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
+                    <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
+                </button>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="notif-filter-tabs" id="notif-filter-tabs">
+                ${filters.map(f => `
+                    <button class="notif-filter-btn${f.id === activeFilter ? ' active' : ''}" data-filter="${f.id}">
+                        ${f.label}
+                        ${f.id === 'unread' ? `<span class="notif-filter-badge" id="unread-count-badge" style="display:none">0</span>` : ''}
+                    </button>
+                `).join('')}
+            </div>
+
+            <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
+        </div>`;
+
+        const inner = container.querySelector('#notifs-inner');
+
+        const renderList = (allItems) => {
+            let items = allItems;
+            
+            if (activeFilter === 'archived') {
+                items = allItems.filter(n => n.archived);
+            } else {
+                items = allItems.filter(n => !n.archived);
+                if (activeFilter === 'unread')  items = items.filter(n => !n.read);
+                if (activeFilter === 'push')    items = items.filter(n => n.type === 'push');
+                if (activeFilter === 'message') items = items.filter(n => n.type === 'message');
+            }
+
+            if (items.length === 0) {
+                inner.innerHTML = `<div class="empty-state">
+                    <span class="material-symbols-outlined">notifications_off</span>
+                    <h3>${t('notifications.noNotifications')}</h3>
+                    <p>${t('notifications.noNotificationsSub')}</p>
+                </div>`;
+                return;
+            }
+
+            inner.innerHTML = items.map(n => {
+                const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
+                const m = iconMap[n.type] || iconMap.default;
+                const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : m.cls;
+                
+                const archiveIcon = n.archived ? 'unarchive' : 'archive';
+                const archiveTitle = n.archived 
+                    ? (isNo ? 'Legg tilbake i innkurv' : (isEs ? 'Desarchivar' : 'Unarchive')) 
+                    : (isNo ? 'Arkiver varsel' : (isEs ? 'Archivar' : 'Archive'));
+                const deleteTitle = isNo ? 'Slett permanent' : (isEs ? 'Eliminar permanentemente' : 'Delete permanently');
+
+                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer; display:flex; align-items:center; width:100%; position:relative;">
+                    <div class="activity-icon ${iconCls}" style="flex-shrink:0;">
+                        <span class="material-symbols-outlined">${m.icon}</span>
+                    </div>
+                    <div class="activity-content" style="flex:1; min-width:0; margin-right:12px;">
+                        <div class="activity-title" style="font-weight:700; color:var(--text-main); font-size:14px;">${this._escapeHtml(n.title)}</div>
+                        ${n.body ? `<div class="activity-body" style="font-size:13px; color:var(--text-muted); margin-top:2px;">${this._escapeHtml(n.body)}</div>` : ''}
+                        <div class="activity-time" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${this._timeAgo(date)}</div>
+                    </div>
+                    
+                    <div class="activity-right-section" style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                        ${!n.read ? `<div class="ms-unread-dot" style="margin-right:4px;"></div>` : ''}
+                        
+                        <div class="notif-actions" style="display:flex; gap:4px; align-items:center;">
+                            <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; margin:0 !important;">${archiveIcon}</span>
+                            </button>
+                            <button type="button" class="btn-delete-notif" data-id="${n.id}" title="${deleteTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; color:#ef4444 !important; margin:0 !important;">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Bind click to open detail modal (but NOT when clicking action buttons)
+            inner.querySelectorAll('.activity-item').forEach(el => {
+                el?.addEventListener('click', (e) => {
+                    if (e.target.closest('.notif-actions')) return;
+                    
+                    const notif = items.find(n => n.id === el.dataset.id);
+                    if (notif) this.showNotificationModal(notif);
+                    if (notif && !notif.read) {
+                        notif.read = true;
+                        el.classList.remove('unread');
+                        el.querySelector('.ms-unread-dot')?.remove();
+                        const icon = el.querySelector('.activity-icon');
+                        if (icon) {
+                            icon.classList.remove('activity-icon-tone-notif-unread');
+                            const m2 = iconMap[notif.type] || iconMap.default;
+                            icon.classList.add(m2.cls);
+                        }
+                        firebase.firestore().collection('user_notifications').doc(notif.id)
+                            .update({ read: true }).catch(() => {});
+                    }
+                });
+            });
+
+            // Bind action buttons hover
+            inner.querySelectorAll('.btn-archive-notif, .btn-delete-notif').forEach(btn => {
+                btn?.addEventListener('mouseenter', () => {
+                    btn.style.backgroundColor = 'var(--border-solid)';
+                    if (!btn.classList.contains('btn-delete-notif')) {
+                        btn.style.color = 'var(--text-main)';
+                    }
+                });
+                btn?.addEventListener('mouseleave', () => {
+                    btn.style.backgroundColor = 'transparent';
+                    if (!btn.classList.contains('btn-delete-notif')) {
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                });
+            });
+
+            // Bind archive click
+            inner.querySelectorAll('.btn-archive-notif').forEach(btn => {
+                btn?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const notifId = btn.dataset.id;
+                    const notif = allItems.find(n => n.id === notifId);
+                    if (!notif) return;
+                    
+                    const newArchivedState = !notif.archived;
+                    try {
+                        await firebase.firestore().collection('user_notifications').doc(notifId)
+                            .update({ archived: newArchivedState });
+                        
+                        const msg = newArchivedState 
+                            ? (isNo ? 'Melding arkivert' : (isEs ? 'Mensaje archivado' : 'Message archived'))
+                            : (isNo ? 'Melding flyttet til innkurv' : (isEs ? 'Mensaje movido a la bandeja de entrada' : 'Message moved to inbox'));
+                        this._notify(msg, 'success');
+                        
+                        this.renderNotifications(container);
+                    } catch (err) {
+                        console.error('Error archiving notification:', err);
+                        this._notify(isNo ? 'Kunne ikke arkivere melding' : (isEs ? 'Error al archivar' : 'Failed to archive message'), 'warning');
+                    }
+                });
+            });
+
+            // Bind delete click
+            inner.querySelectorAll('.btn-delete-notif').forEach(btn => {
+                btn?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const notifId = btn.dataset.id;
+                    const confirmMsg = isNo 
+                        ? 'Vil du slette denne meldingen permanent?' 
+                        : (isEs ? '¿Eliminar este mensaje permanentemente?' : 'Delete this message permanently?');
+                    
+                    if (confirm(confirmMsg)) {
+                        try {
+                            await firebase.firestore().collection('user_notifications').doc(notifId).delete();
+                            this._notify(isNo ? 'Melding slettet' : (isEs ? 'Mensaje de alerta eliminado' : 'Message deleted'), 'success');
+                            this.renderNotifications(container);
+                        } catch (err) {
+                            console.error('Error deleting notification:', err);
+                            this._notify(isNo ? 'Kunne ikke slette melding' : (isEs ? 'Error al eliminar' : 'Failed to delete message'), 'warning');
+                        }
+                    }
+                });
+            });
+        };
+
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get();
+
+            const allItems = snap.docs.map(d => this._normalizeNotificationDoc(d));
+            const unreadItems = allItems.filter(n => !n.read && !n.archived);
+
+            // Show unread count badge on Ulest tab
+            const unreadBadge = container.querySelector('#unread-count-badge');
+            if (unreadBadge && unreadItems.length > 0) {
+                unreadBadge.textContent = unreadItems.length;
+                unreadBadge.style.display = '';
+            }
+
+            renderList(allItems);
+
+            // Auto mark all unread as read (only when on "Alle" or "Ulest" tab)
+            if ((activeFilter === 'all' || activeFilter === 'unread') && unreadItems.length > 0) {
+                try {
+                    const unreadSnap = await firebase.firestore()
+                        .collection('user_notifications')
+                        .where('userId', '==', uid)
+                        .where('read', '==', false)
+                        .get();
+                    
+                    if (!unreadSnap.empty) {
+                        const batch = firebase.firestore().batch();
+                        unreadSnap.docs.forEach(doc => {
+                            batch.update(doc.ref, { read: true });
+                        });
+                        await batch.commit();
+                    }
+                    this._setBadge(0);
+                } catch (err) {
+                    console.error('Error auto-marking all read:', err);
+                }
+            }
+
+            // Filter tab clicks
+            container.querySelectorAll('.notif-filter-btn').forEach(btn => {
+                btn?.addEventListener('click', () => {
+                    this._notifFilter = btn.dataset.filter;
+                    this.renderNotifications(container);
+                });
+            });
+
+            // Mark all read button
+            document.getElementById('mark-all-read-btn')?.addEventListener('click', async () => {
+                try {
+                    const unreadSnap = await firebase.firestore()
+                        .collection('user_notifications')
+                        .where('userId', '==', uid)
+                        .where('read', '==', false)
+                        .get();
+                    
+                    if (!unreadSnap.empty) {
+                        const b = firebase.firestore().batch();
+                        unreadSnap.docs.forEach(doc => {
+                            b.update(doc.ref, { read: true });
+                        });
+                        await b.commit();
+                    }
+                    this._setBadge(0);
+                    this._notifFilter = 'all';
+                    this.renderNotifications(container);
+                } catch (err) {
+                    console.error('Error marking all as read:', err);
+                }
+            });
+
+        } catch (err) {
+            console.error('renderNotifications error:', err);
+            this._notify(t('notifications.loadErrorNotice'), 'warning');
+            inner.innerHTML = `<div class="empty-state"><p>${t('notifications.loadErrorCopy')}</p></div>`;
+        }
+    }
+
+    async renderGiving(container) {
+        const uid = this.currentUser?.uid;
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+
+        let donations = [];
+        try {
+            donations = await this._fetchCurrentUserDonations({ order: true });
+        } catch (e) { }
+        this.currentGivingDonations = donations;
+
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const allTypesLabel = isNo ? 'Alle typer' : (isEs ? 'Todos los tipos' : 'All types');
+        const allYearsLabel = isNo ? 'Alle år' : (isEs ? 'Todos los años' : 'All years');
+        const printReportLabel = isNo ? 'Skriv ut rapport' : (isEs ? 'Imprimir informe' : 'Print report');
+        const typeGiftLabel = isNo ? 'Gave' : (isEs ? 'Ofrenda' : 'Gift');
+        const typeShopLabel = isNo ? 'Butikk' : (isEs ? 'Tienda' : 'Shop');
+
+        // Extract years dynamically from donations list
+        const years = new Set();
+        donations.forEach(d => {
+            const date = this._getDonationDate(d);
+            if (date && !isNaN(date.getFullYear())) {
+                years.add(date.getFullYear());
+            }
+        });
+        const yearsList = Array.from(years).sort((a, b) => b - a);
+
+        let selectedType = 'all';
+        let selectedYear = 'all';
+
+        const updateGivingCharts = () => {
+            if (typeof Chart === 'undefined') return;
+
+            // 1. Prepare Trends Chart Data
+            let trendsLabels = [];
+            let trendsData = [];
+
+            const chartFiltered = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                const year = date ? date.getFullYear() : null;
+                const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+                
+                const type = (d.type || 'Gave').toLowerCase();
+                const matchesType = (selectedType === 'all' || 
+                    (selectedType === 'gave' && type === 'gave') || 
+                    (selectedType === 'butikk' && type === 'butikk'));
+                
+                return matchesYear && matchesType;
+            });
+
+            if (selectedYear === 'all') {
+                // Group by year
+                const yearsMap = {};
+                chartFiltered.forEach(d => {
+                    const date = this._getDonationDate(d);
+                    if (date) {
+                        const year = date.getFullYear();
+                        if (year) {
+                            yearsMap[year] = (yearsMap[year] || 0) + this._normalizeDonationAmountNok(d);
+                        }
+                    }
+                });
+                trendsLabels = Object.keys(yearsMap).sort((a, b) => parseInt(a) - parseInt(b));
+                trendsData = trendsLabels.map(y => yearsMap[y]);
+            } else {
+                // Group by month for selected year
+                const monthsMap = Array(12).fill(0);
+                const yearInt = parseInt(selectedYear);
+                
+                const isNoLang = document.documentElement.lang === 'no' || !document.documentElement.lang;
+                const isEsLang = document.documentElement.lang === 'es';
+                const monthsLabelsNo = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
+                const monthsLabelsEs = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                const monthsLabelsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                trendsLabels = isNoLang ? monthsLabelsNo : (isEsLang ? monthsLabelsEs : monthsLabelsEn);
+
+                chartFiltered.forEach(d => {
+                    const date = this._getDonationDate(d);
+                    if (date && date.getFullYear() === yearInt) {
+                        const month = date.getMonth();
+                        monthsMap[month] += this._normalizeDonationAmountNok(d);
+                    }
+                });
+                trendsData = monthsMap;
+            }
+
+            // 2. Prepare Methods Chart Data
+            const methodsMap = {};
+            chartFiltered.forEach(d => {
+                const method = String(d.method || 'card').trim().toLowerCase();
+                const label = this._getDonationMethodLabel(method);
+                methodsMap[label] = (methodsMap[label] || 0) + this._normalizeDonationAmountNok(d);
+            });
+            const methodsLabels = Object.keys(methodsMap);
+            const methodsData = methodsLabels.map(l => methodsMap[l]);
+
+            // Clean up existing charts
+            if (this.givingTrendsChart) {
+                try { this.givingTrendsChart.destroy(); } catch (e) {}
+                this.givingTrendsChart = null;
+            }
+            if (this.givingMethodsChart) {
+                try { this.givingMethodsChart.destroy(); } catch (e) {}
+                this.givingMethodsChart = null;
+            }
+
+            // 3. Render Trends Chart (Line Chart)
+            const ctxTrends = container.querySelector('#giving-trends-chart');
+            if (ctxTrends) {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const gridColor = isDark ? '#334155' : '#e2e8f0';
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                this.givingTrendsChart = new Chart(ctxTrends, {
+                    type: 'line',
+                    data: {
+                        labels: trendsLabels,
+                        datasets: [{
+                            label: t('giving.chartNok'),
+                            data: trendsData,
+                            borderColor: '#d17d39',
+                            backgroundColor: 'rgba(209, 125, 57, 0.05)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#bd4f2a',
+                            pointBorderColor: '#ffffff',
+                            pointHoverRadius: 6,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'kr ' + context.raw.toLocaleString('no-NO', { minimumFractionDigits: 0 });
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '600'
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: gridColor
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '500'
+                                    },
+                                    callback: function(value) {
+                                        return 'kr ' + value.toLocaleString('no-NO');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 4. Render Methods Chart (Doughnut Chart)
+            const ctxMethods = container.querySelector('#giving-methods-chart');
+            if (ctxMethods && methodsLabels.length > 0) {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const legendColor = isDark ? '#f8fafc' : '#0f172a';
+
+                this.givingMethodsChart = new Chart(ctxMethods, {
+                    type: 'doughnut',
+                    data: {
+                        labels: methodsLabels,
+                        datasets: [{
+                            data: methodsData,
+                            backgroundColor: [
+                                '#d17d39',
+                                '#bd4f2a',
+                                '#d17d39',
+                                '#475569',
+                                '#94a3b8',
+                                '#cbd5e1'
+                            ],
+                            borderWidth: isDark ? 2 : 1,
+                            borderColor: isDark ? '#1e293b' : '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: legendColor,
+                                    boxWidth: 12,
+                                    padding: 16,
+                                    font: {
+                                        family: 'inherit',
+                                        weight: '600',
+                                        size: 11
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const pct = ((context.raw / total) * 100).toFixed(1);
+                                        return context.label + ': kr ' + context.raw.toLocaleString('no-NO') + ' (' + pct + '%)';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+        };
+
+        const updateGivingView = () => {
+            const filtered = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                const year = date ? date.getFullYear() : null;
+                const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+                
+                const type = (d.type || 'Gave').toLowerCase();
+                const matchesType = (selectedType === 'all' || 
+                    (selectedType === 'gave' && type === 'gave') || 
+                    (selectedType === 'butikk' && type === 'butikk'));
+                
+                return matchesYear && matchesType;
+            });
+
+            // Update stats chips
+            const currentYear = new Date().getFullYear();
+            const statsYear = selectedYear === 'all' ? currentYear : parseInt(selectedYear);
+            const yearTotal = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                return date && date.getFullYear() === statsYear && (d.type || 'Gave').toLowerCase() === 'gave';
+            }).reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
+
+            const stat1Label = container.querySelector('#giving-stat-year-label');
+            const stat1Value = container.querySelector('#giving-stat-year-value');
+            if (stat1Label) {
+                stat1Label.textContent = t('giving.givenInYear', { year: statsYear });
+            }
+            if (stat1Value) {
+                stat1Value.textContent = yearTotal > 0 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}` : '—';
+            }
+
+            const filteredGiftsOnly = filtered.filter(d => (d.type || 'Gave').toLowerCase() === 'gave');
+            const lastGift = filteredGiftsOnly[0];
+            const lastGiftAmount = lastGift ? this._normalizeDonationAmountNok(lastGift) : 0;
+            const stat2Value = container.querySelector('#giving-stat-last-value');
+            const stat2Sub = container.querySelector('#giving-stat-last-sub');
+            if (stat2Value) {
+                stat2Value.textContent = lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—';
+            }
+            if (stat2Sub) {
+                stat2Sub.textContent = lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') || '') : '';
+            }
+
+            const stat3Value = container.querySelector('#giving-stat-count-value');
+            if (stat3Value) {
+                stat3Value.textContent = filtered.length || '—';
+            }
+
+            const tableContainer = container.querySelector('#giving-table-wrapper');
+            if (tableContainer) {
+                if (filtered.length === 0) {
+                    tableContainer.innerHTML = `
+                        <div class="empty-state ms-empty-state-giving" style="padding: 40px 20px; text-align: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); margin-bottom: 12px;">volunteer_activism</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">${t('giving.noGiftsYet')}</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">${t('giving.noGiftsSub')}</p>
+                        </div>
+                    `;
+                } else {
+                    tableContainer.innerHTML = `
+                        <div class="table-responsive">
+                            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>${t('giving.colDate')}</th>
+                                        <th>${t('giving.colType')}</th>
+                                        <th>${t('giving.colMethod')}</th>
+                                        <th class="text-right">${t('giving.colAmount')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filtered.map(d => {
+                                        const date = this._getDonationDate(d) || new Date();
+                                        const amountNok = this._normalizeDonationAmountNok(d);
+                                        const typeStr = (d.type || 'Gave');
+                                        const typeLabel = typeStr.charAt(0).toUpperCase() + typeStr.slice(1);
+                                        return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0" style="cursor: pointer;">
+                                            <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                            <td>${this._escapeHtml(typeLabel)}</td>
+                                            <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
+                                            <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+                    tableContainer.querySelectorAll('.donation-row').forEach(row => {
+                        const open = () => this.showDonationDetails(row.dataset.donationId);
+                        row?.addEventListener('click', open);
+                        row?.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                open();
+                            }
+                        });
+                    });
+                }
+            }
+            updateGivingCharts();
+        };
+
+        container.innerHTML = `
+        <div>
+            <div class="giving-stats">
+                <!-- Gitt i år -->
+                <div class="stat-chip bento-orange">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">trending_up</span>
+                    </div>
+                    <div class="stat-chip-label" id="giving-stat-year-label">${t('giving.givenInYear', { year: new Date().getFullYear() })}</div>
+                    <div class="stat-chip-value" id="giving-stat-year-value">—</div>
+                </div>
+
+                <!-- Siste gave -->
+                <div class="stat-chip bento-brand-blue">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">history</span>
+                    </div>
+                    <div class="stat-chip-label">${t('giving.lastGift')}</div>
+                    <div class="stat-chip-value" id="giving-stat-last-value">—</div>
+                    <div class="stat-chip-sub" id="giving-stat-last-sub"></div>
+                </div>
+
+                <!-- Totalt antall gaver -->
+                <div class="stat-chip bento-teal">
+                    <div class="bento-card-header">
+                        <div class="bento-icon-wrap">
+                            <span class="material-symbols-outlined">analytics</span>
+                        </div>
+                        <span class="material-symbols-outlined bento-indicator">done_all</span>
+                    </div>
+                    <div class="stat-chip-label">${t('giving.totalGiftsCount')}</div>
+                    <div class="stat-chip-value" id="giving-stat-count-value">—</div>
+                </div>
+            </div>
+
+            <div class="giving-charts-card">
+                <div class="table-card" style="padding: 24px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartTrendsTitle')}</h3>
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 200px; width: 100%;">
+                        <canvas id="giving-trends-chart"></canvas>
+                    </div>
+                </div>
+                <div class="table-card" style="padding: 24px; display: flex; flex-direction: column; height: 320px; box-sizing: border-box;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">${t('giving.chartMethodsTitle')}</h3>
+                    <div style="flex-grow: 1; position: relative; height: 0; min-height: 200px; width: 100%;">
+                        <canvas id="giving-methods-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h3>${t('giving.givingHistory')}</h3>
+                    
+                    <div class="table-card-actions">
+                        <select id="giving-type-filter" class="giving-filter-select">
+                            <option value="all">${allTypesLabel}</option>
+                            <option value="gave">${typeGiftLabel}</option>
+                            <option value="butikk">${typeShopLabel}</option>
+                        </select>
+                        <select id="giving-year-filter" class="giving-filter-select" style="width: 100px !important;">
+                            <option value="all">${allYearsLabel}</option>
+                            ${yearsList.map(y => `<option value="${y}">${y}</option>`).join('')}
+                        </select>
+                        <button type="button" class="btn-giving-print" id="giving-print-report-btn">
+                            <span class="material-symbols-outlined">print</span>
+                            <span>${printReportLabel}</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="giving-table-wrapper"></div>
+            </div>
+        </div>`;
+
+        const typeFilter = container.querySelector('#giving-type-filter');
+        const yearFilter = container.querySelector('#giving-year-filter');
+        const printBtn = container.querySelector('#giving-print-report-btn');
+
+        if (typeFilter) {
+            typeFilter?.addEventListener('change', (e) => {
+                selectedType = e.target.value;
+                updateGivingView();
+            });
+        }
+        if (yearFilter) {
+            yearFilter?.addEventListener('change', (e) => {
+                selectedYear = e.target.value;
+                updateGivingView();
+            });
+        }
+        if (printBtn) {
+            printBtn?.addEventListener('click', () => {
+                this.printGivingReport(selectedType, selectedYear);
+            });
+        }
+
+        updateGivingView();
     }
 
     // ──────────────────────────────────────────────────────────

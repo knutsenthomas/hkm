@@ -1029,9 +1029,7 @@
                         const profileBtn = document.getElementById('header-profile-link');
                         if (profileBtn) profileBtn.classList.remove('hidden');
                     }
-                    if (currentCourse) {
-                        await checkAccessAndUpdateUI();
-                    }
+                    await checkAccessAndUpdateUI();
                 });
             }
 
@@ -1143,9 +1141,25 @@
             window.courseTimerInterval = setInterval(update, 1000);
         }
 
+        function isUserLoggedIn() {
+            if (currentUser || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser)) {
+                return true;
+            }
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.startsWith('firebase:authUser:') || key.includes('firebase_user') || key.includes('hkm_user'))) {
+                        return true;
+                    }
+                }
+            } catch (e) {}
+            return false;
+        }
+
         async function checkAccessAndUpdateUI() {
             if (!currentCourse) return;
-            userHasAccess = !!currentUser || !currentCourse.price || currentCourse.price === 0;
+            // Any logged in user has access to view the course
+            userHasAccess = isUserLoggedIn() || !currentCourse.price || currentCourse.price === 0;
             window.selectLesson(currentLessonIndex);
         }
 
