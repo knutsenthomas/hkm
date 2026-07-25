@@ -1285,6 +1285,13 @@ class MinSideManager {
         
         this.currentViewArgs = queryParams;
         
+        if (cleanViewId === 'course-player') {
+            const cId = queryParams.courseId || queryParams.id || '';
+            const lVal = queryParams.lessonId || queryParams.lesson || '0';
+            window.location.href = `/kurs-detaljer.html?id=${encodeURIComponent(cId)}&lesson=${encodeURIComponent(lVal)}`;
+            return;
+        }
+
         if (cleanViewId === 'prayer-wall' && !this.prayerWallEnabled) {
             cleanViewId = 'overview';
         }
@@ -4815,7 +4822,6 @@ class MinSideManager {
                             ` : `
                                 <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
                                     ${courseLessons.map((l, lIdx) => {
-                                        const paid = hasPaidForLesson(c, l);
                                         let dateStr = '';
                                         if (l.date) {
                                             try {
@@ -4848,32 +4854,11 @@ class MinSideManager {
                                                 </div>
                                             </div>
                                             <div>
-                                                ${paid ? `
-                                                    <div style="display:flex; gap:8px; align-items:center;">
-                                                        ${l.videoUrl ? `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">play_circle</span> Start leksjon
-                                                            </a>
-                                                        ` : (l.zoomUrl ? `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">video_camera_front</span> Bli med på Zoom
-                                                            </a>
-                                                        ` : `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">school</span> Åpne leksjon
-                                                            </a>
-                                                        `)}
-                                                    </div>
-                                                ` : `
-                                                    <div style="display:flex; gap:8px; align-items:center;">
-                                                        <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
-                                                            <span class="material-symbols-outlined" style="font-size:16px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">lock</span> Låst (kr ${l.price || 300},-)
-                                                        </span>
-                                                        <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                            Lås opp
-                                                        </a>
-                                                    </div>
-                                                `}
+                                                <div style="display:flex; gap:8px; align-items:center;">
+                                                    <a href="/kurs-detaljer.html?id=${encodeURIComponent(c.id)}&lesson=${lIdx}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                        <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">${l.zoomUrl ? 'video_camera_front' : 'play_circle'}</span> ${l.zoomUrl ? 'Bli med på Zoom' : 'Start leksjon'}
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                         `;

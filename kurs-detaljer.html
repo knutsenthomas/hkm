@@ -1020,6 +1020,13 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id') || urlParams.get('courseId');
+            const lessonParam = urlParams.get('lesson') || urlParams.get('lessonId');
+            if (lessonParam !== null && lessonParam !== undefined) {
+                const pIdx = parseInt(lessonParam, 10);
+                if (!isNaN(pIdx) && pIdx >= 0) {
+                    currentLessonIndex = pIdx;
+                }
+            }
 
             if (typeof firebase !== 'undefined' && firebase.auth) {
                 currentUser = firebase.auth().currentUser;
@@ -1218,6 +1225,13 @@
             currentLessonIndex = index;
             const lesson = currentCourse.lessons[index] || currentCourse.lessons[0];
             if (!lesson) return;
+
+            if (history.replaceState && currentCourse && currentCourse.id) {
+                try {
+                    const newUrl = window.location.pathname + `?id=${encodeURIComponent(currentCourse.id)}&lesson=${index}`;
+                    history.replaceState(null, '', newUrl);
+                } catch (e) {}
+            }
 
             document.querySelectorAll('.lesson-item').forEach((el, idx) => {
                 el.classList.toggle('active', idx === index);
