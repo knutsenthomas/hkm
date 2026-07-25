@@ -8562,10 +8562,15 @@ class BibleReader {
         }
         
         const speedSelect = document.getElementById('audio-speed-select');
-        if (speedSelect) speedSelect.value = String(this.audioSpeed);
+        if (speedSelect) speedSelect.value = String(this.audioSpeed || 1.0);
+
+        const validVoices = ['onyx', 'nova', 'echo', 'alloy', 'fable', 'shimmer'];
+        if (!validVoices.includes(this.audioVoice)) {
+            this.audioVoice = 'onyx';
+        }
 
         const voiceSelect = document.getElementById('audio-voice-select');
-        if (voiceSelect) voiceSelect.value = String(this.audioVoice);
+        if (voiceSelect) voiceSelect.value = this.audioVoice;
         
         setTimeout(() => playerBar.classList.add('active'), 50);
         

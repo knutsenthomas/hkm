@@ -8007,9 +8007,10 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
         display: none;
     }
     .audio-voice-select {
-        font-size: 10px;
+        font-size: 11px;
         padding: 4px 6px;
-        max-width: 95px;
+        max-width: 140px;
+        min-width: 100px;
     }
     .audio-speed-select {
         font-size: 10px;
