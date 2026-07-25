@@ -928,19 +928,7 @@
                 </div>
 
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--hkm-navy); margin-bottom: 12px;">Last ned materialer</h3>
-                <div class="resources-grid">
-                    <a href="#" class="resource-card">
-                        <div class="resource-icon"><i class="fas fa-file-pdf"></i></div>
-                        <div class="resource-title">Visjonsplan Mal.pdf</div>
-                    </a>
-                    <a href="#" class="resource-card">
-                        <div class="resource-icon"><i class="fas fa-file-word"></i></div>
-                        <div class="resource-title">Leksjonsnotater.docx</div>
-                    </a>
-                    <a href="#" class="resource-card">
-                        <div class="resource-icon"><i class="fas fa-file-alt"></i></div>
-                        <div class="resource-title">Ytterligere Lesning.pdf</div>
-                    </a>
+                <div class="resources-grid" id="overview-resources-grid">
                 </div>
             </div>
 
@@ -950,11 +938,7 @@
                 <p class="overview-text">
                     Her finner du alle tilhørende leselister, bibelstudier og nedlastbart materiale for denne leksjonen.
                 </p>
-                <div class="resources-grid">
-                    <a href="#" class="resource-card">
-                        <div class="resource-icon"><i class="fas fa-book"></i></div>
-                        <div class="resource-title">Studieguide Module 1.pdf</div>
-                    </a>
+                <div class="resources-grid" id="tab-ressurser-grid">
                 </div>
             </div>
 
@@ -1300,10 +1284,41 @@
                     const fill = progressWrapper.querySelector('.progress-bar-fill');
                     if (label) label.textContent = `${percent}% Fullført`;
                     if (fill) fill.style.width = `${percent}%`;
-                } else {
-                    progressWrapper.style.display = 'none';
+            // Render resources dynamically for both Overview tab and Ressurser tab
+            const rawResources = (lesson && (lesson.resources || lesson.materials || lesson.files)) || 
+                                 (currentCourse && (currentCourse.resources || currentCourse.materials)) || [];
+
+            const renderResourcesHTML = (resList) => {
+                if (!resList || !resList.length) {
+                    return `
+                        <div style="grid-column: 1 / -1; padding: 20px 24px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center; color: #64748b; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <i class="fas fa-folder-open" style="font-size: 20px; color: #94a3b8;"></i>
+                            <span>Ingen dokumenter eller ressursfiler er lagt til for denne leksjonen ennå.</span>
+                        </div>
+                    `;
                 }
-            }
+                return resList.map(r => {
+                    const title = typeof r === 'string' ? r : (r.title || r.name || 'Dokument');
+                    const url = typeof r === 'string' ? '#' : (r.url || r.link || '#');
+                    let icon = 'fas fa-file-alt';
+                    if (title.toLowerCase().endsWith('.pdf')) icon = 'fas fa-file-pdf';
+                    else if (title.toLowerCase().endsWith('.doc') || title.toLowerCase().endsWith('.docx')) icon = 'fas fa-file-word';
+                    else if (title.toLowerCase().endsWith('.xls') || title.toLowerCase().endsWith('.xlsx')) icon = 'fas fa-file-excel';
+                    
+                    return `
+                        <a href="${url}" target="_blank" download class="resource-card">
+                            <div class="resource-icon"><i class="${icon}"></i></div>
+                            <div class="resource-title">${title}</div>
+                        </a>
+                    `;
+                }).join('');
+            };
+
+            const overviewResGrid = document.getElementById('overview-resources-grid');
+            if (overviewResGrid) overviewResGrid.innerHTML = renderResourcesHTML(rawResources);
+
+            const tabResGrid = document.getElementById('tab-ressurser-grid');
+            if (tabResGrid) tabResGrid.innerHTML = renderResourcesHTML(rawResources);
 
             const videoContainer = document.getElementById('video-card-container');
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
