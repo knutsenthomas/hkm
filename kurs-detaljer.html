@@ -1569,42 +1569,135 @@
         }
 
         async function checkUserCourseEnrollment(courseId) {
-            if (!courseId) return false;
-            
+            if (!courseId && !currentCourse) return false;
+            const targetId = courseId || (currentCourse ? (currentCourse.id || currentCourse.slug) : null);
+
+            // 1. Resolve active user from all possible sources
+            let activeUser = currentUser || (firebaseService && firebaseService.currentUser);
+            if (!activeUser && typeof firebase !== 'undefined' && firebase.auth) {
+                activeUser = firebase.auth().currentUser;
+            }
+            if (!activeUser) {
+                try {
+                    const cached = localStorage.getItem('hkm_public_user_cache');
+                    if (cached) activeUser = JSON.parse(cached);
+                } catch (e) {}
+            }
+
+            const email = activeUser ? (activeUser.email || '').toLowerCase().trim() : '';
+            const uid = activeUser ? (activeUser.uid || '') : '';
+
+            // 2. Admin access override: Thomas Knutsen or any admin email gets instant full access
+            if (
+                email === 'thomasknutsen87@gmail.com' ||
+                email.includes('admin') ||
+                (activeUser && (activeUser.isAdmin || activeUser.role === 'admin')) ||
+                localStorage.getItem('hkm_is_admin') === 'true'
+            ) {
+                try {
+                    if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true');
+                } catch (e) {}
+                return true;
+            }
+
+            // 3. LocalStorage enrollment check
             try {
-                if (localStorage.getItem(`hkm_enrolled_${courseId}`) === 'true') {
-                    return true;
-                }
+                if (targetId && localStorage.getItem(`hkm_enrolled_${targetId}`) === 'true') return true;
+                if (currentCourse && localStorage.getItem(`hkm_enrolled_${currentCourse.id}`) === 'true') return true;
+                if (currentCourse && currentCourse.slug && localStorage.getItem(`hkm_enrolled_${currentCourse.slug}`) === 'true') return true;
+
                 const enrolledList = localStorage.getItem('hkm_enrolled_courses');
                 if (enrolledList) {
                     const list = JSON.parse(enrolledList);
-                    if (Array.isArray(list) && list.includes(String(courseId))) {
-                        return true;
+                    if (Array.isArray(list)) {
+                        const keys = [String(targetId), currentCourse?.id, currentCourse?.slug, currentCourse?.title].filter(Boolean).map(String);
+                        if (list.some(item => keys.includes(String(item)))) return true;
                     }
                 }
             } catch (e) {}
 
-            const activeUser = currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
-            if (activeUser && activeUser.uid) {
+            if (!activeUser && !email && !uid) return false;
+
+            // Build all potential course identifier keys to match against
+            const courseKeys = [String(targetId)];
+            if (currentCourse) {
+                if (currentCourse.id) courseKeys.push(String(currentCourse.id));
+                if (currentCourse.slug) courseKeys.push(String(currentCourse.slug));
+                if (currentCourse.title) courseKeys.push(String(currentCourse.title));
+            }
+
+            // 4. Firestore check doc users/{uid}
+            if (uid && typeof firebase !== 'undefined' && firebase.firestore) {
                 try {
-                    const userDoc = await firebase.firestore().collection('users').doc(activeUser.uid).get();
+                    const userDoc = await firebase.firestore().collection('users').doc(uid).get();
                     if (userDoc.exists) {
                         const uData = userDoc.data();
-                        if (uData && (uData.role === 'admin' || uData.isAdmin)) {
-                            return true; // Admins always have access
+                        if (uData && (uData.role === 'admin' || uData.isAdmin || uData.isSuperAdmin)) return true;
+                        if (uData && Array.isArray(uData.enrolledCourses)) {
+                            const userEnrolled = uData.enrolledCourses.map(String);
+                            if (courseKeys.some(k => userEnrolled.includes(k))) {
+                                try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                                return true;
+                            }
                         }
-                        if (uData && Array.isArray(uData.enrolledCourses) && uData.enrolledCourses.includes(String(courseId))) {
+                    }
+                } catch (e) {}
+            }
+
+            // 5. Firestore collection 'user_enrollments' by userId
+            if (uid && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const snap = await firebase.firestore().collection('user_enrollments')
+                        .where('userId', '==', uid)
+                        .get();
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
                             return true;
                         }
                     }
                 } catch (e) {}
+            }
 
+            // 6. Firestore collection 'user_enrollments' by email
+            if (email && typeof firebase !== 'undefined' && firebase.firestore) {
                 try {
                     const snap = await firebase.firestore().collection('user_enrollments')
-                        .where('userId', '==', activeUser.uid)
-                        .where('courseId', '==', String(courseId))
+                        .where('email', '==', email)
                         .get();
-                    if (!snap.empty) return true;
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 7. Firestore collection 'courseEnrollments' by email
+            if (email && typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    const snap = await firebase.firestore().collection('courseEnrollments')
+                        .where('email', '==', email)
+                        .get();
+                    if (!snap.empty) {
+                        const found = snap.docs.some(doc => {
+                            const d = doc.data();
+                            return courseKeys.includes(String(d.courseId)) || courseKeys.includes(String(d.courseSlug)) || courseKeys.includes(String(d.courseTitle));
+                        });
+                        if (found) {
+                            try { if (targetId) localStorage.setItem(`hkm_enrolled_${targetId}`, 'true'); } catch (e) {}
+                            return true;
+                        }
+                    }
                 } catch (e) {}
             }
 
@@ -1622,7 +1715,7 @@
             } else if (isFreeCourse) {
                 userHasAccess = true;
             } else {
-                const isEnrolled = await checkUserCourseEnrollment(currentCourse.id);
+                const isEnrolled = await checkUserCourseEnrollment(currentCourse.id || currentCourse.slug);
                 userHasAccess = isEnrolled;
             }
 
