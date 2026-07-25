@@ -2014,22 +2014,21 @@
                 if (coverImgEl) coverImgEl.style.display = 'none';
                 if (lockedOverlay) lockedOverlay.style.display = 'none';
                 
-                let targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date));
+                let targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date || currentCourse.zoomDate));
                 let isFutureCountdown = false;
 
                 if (targetDateVal) {
                     try {
                         const d = new Date(targetDateVal);
                         const now = Date.now();
-                        const fifteenMinsMs = 15 * 60 * 1000;
-                        if (!isNaN(d.getTime()) && (d.getTime() - now) > fifteenMinsMs) {
+                        if (!isNaN(d.getTime()) && (d.getTime() - now) > 0) {
                             isFutureCountdown = true;
                         }
                     } catch (e) {}
                 }
 
                 if (isFutureCountdown) {
-                    videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url('${courseImg}')`;
+                    videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
                     videoContainer.style.backgroundSize = 'cover';
                     videoContainer.style.backgroundPosition = 'center';
                     
@@ -2040,7 +2039,7 @@
                             </div>
                             <h3 style="font-size:1.7rem; font-weight:800; margin-bottom:8px;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.5; margin-bottom:20px;">
-                                ${lesson.description || 'Nedtelling pågår for denne leksjonen. Zoom-møtet åpnes 15 minutter før start!'}
+                                ${lesson.description || 'Nedtelling pågår for denne leksjonen. Zoom-møtet åpnes før start!'}
                             </p>
 
                             <div class="countdown-grid" id="countdown-timer-grid" style="display:flex; gap:12px; margin-bottom:16px;">
@@ -2049,7 +2048,7 @@
                                 <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTTER</label></div>
                                 <div class="countdown-box"><span id="cd-secs">00</span><label>SEKUNDER</label></div>
                             </div>
-                            ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; padding: 10px 22px; font-size: 0.9rem; margin-top: 8px;"><i class="fas fa-video"></i> Åpne Zoom-lenke</a>` : ''}
+                            ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; padding: 12px 26px; font-size: 0.98rem; margin-top: 8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-video"></i> Åpne Zoom-lenke</a>` : ''}
                         </div>
                     `;
                     startCountdownTimer(targetDateVal);
@@ -2059,11 +2058,11 @@
                     if (lesson.videoUrl.includes('youtube.com/watch?v=')) {
                         embedUrl = lesson.videoUrl.replace('watch?v=', 'embed/');
                     }
-                    videoContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
-                } else if (lesson.videoUrl) {
+                    videoContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen style="width:100%;height:100%;border:none;border-radius:16px;"></iframe>`;
+                } else if (lesson.videoUrl && String(lesson.videoUrl).trim().length > 0) {
                     videoContainer.style.backgroundImage = 'none';
-                    videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;"></video>`;
-                } else if (lesson.zoomUrl && String(lesson.zoomUrl).trim().length > 0) {
+                    videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;border-radius:16px;"></video>`;
+                } else if (zoomUrl && String(zoomUrl).trim().length > 0) {
                     videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
                     videoContainer.style.backgroundSize = 'cover';
                     videoContainer.style.backgroundPosition = 'center';
@@ -2071,14 +2070,14 @@
                     videoContainer.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:32px 24px; position:relative; z-index:2;">
                             <div style="background: rgba(209, 125, 57, 0.25); border: 1px solid var(--hkm-terracotta); color: #ffffff; padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; font-weight: 800; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);">
-                                <i class="fas fa-video" style="color: #ffffff; font-size: 0.95rem;"></i> Live Zoom-økt åpnet
+                                <i class="fas fa-video" style="color: #ffffff; font-size: 0.95rem;"></i> Live Zoom-økt tilgjengelig
                             </div>
                             <h3 style="font-size:1.8rem; font-weight:800; margin-bottom:10px;">${lesson.title}</h3>
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
-                                Denne leksjonen er en direkte Zoom-sending med Hilde Karin Knutsen. Klikk på knappen nedenfor for å bli med i Zoom-møtet.
+                                ${lesson.description || 'Klikk på knappen nedenfor for å bli med i Zoom-møtet for denne leksjonen.'}
                             </p>
-                            <a href="${lesson.zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
-                                <i class="fas fa-video" style="font-size: 1.15rem;"></i> Bli med på Zoom-møtet nå
+                            <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 1.05rem; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-video" style="font-size: 1.15rem;"></i> Åpne i Zoom-appen
                             </a>
                         </div>
                     `;
@@ -2096,6 +2095,11 @@
                             <p style="color:#cbd5e1; max-width:520px; font-size:0.95rem; line-height:1.6; margin-bottom: 12px;">
                                 ${lesson.description || 'Les teksten og oppgavene nedenfor for denne leksjonen.'}
                             </p>
+                            ${zoomUrl ? `
+                                <a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="font-size: 0.98rem; padding: 12px 28px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; margin-top: 12px;">
+                                    <i class="fas fa-video"></i> Åpne Zoom-møtet
+                                </a>
+                            ` : ''}
                         </div>
                     `;
                 }
