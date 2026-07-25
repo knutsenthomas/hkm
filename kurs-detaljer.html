@@ -808,12 +808,7 @@
         <main class="main-panel">
             <!-- Top Breadcrumb & Progress Bar -->
             <div class="panel-top-bar">
-                <div class="breadcrumb-trail">
-                    <a href="/">Hjem</a> <span>&gt;</span>
-                    <a href="/kurs">Kurs</a> <span>&gt;</span>
-                    <span id="bc-course-title" style="color: var(--hkm-navy); font-weight: 700;">Seerkurs</span> <span>&gt;</span>
-                    <span id="bc-lesson-title">Leksjon 1.1</span>
-                </div>
+                <h2 id="course-lesson-heading" style="font-size: 1.25rem; font-weight: 800; color: var(--hkm-navy); margin: 0; letter-spacing: -0.01em;">Seerkurs med aktivering – Leksjon 1.1</h2>
 
                 <div class="progress-wrapper">
                     <span class="progress-label">70% Fullført</span>
@@ -1088,8 +1083,10 @@
                 el.classList.toggle('active', idx === index);
             });
 
-            const bcLesson = document.getElementById('bc-lesson-title');
-            if (bcLesson) bcLesson.textContent = `Leksjon ${index + 1}`;
+            const courseHeading = document.getElementById('course-lesson-heading');
+            if (courseHeading && currentCourse) {
+                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}`;
+            }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
             if (overviewTitle) overviewTitle.textContent = `Oversikt over leksjonen: ${lesson.title}`;
