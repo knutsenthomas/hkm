@@ -1108,15 +1108,15 @@ class MinSideManager {
                     await this.syncProfileFromGoogleProvider();
                     this.profileData = await this.getMergedProfile(user);
                     await this.refreshProfileSubCollections(user.uid);
-                    if (typeof this.updateHeader === 'function') this.updateHeader();
-                    if (typeof this.initNotificationBadge === 'function') this.initNotificationBadge();
-                    if (typeof this.showPendingFlashNotice === 'function') this.showPendingFlashNotice();
+                    this.updateHeader();
+                    this.initNotificationBadge();
+                    this.showPendingFlashNotice();
 
                     // Translate immediately on auth state change
-                    if (typeof translateStaticHTML === 'function') translateStaticHTML();
+                    translateStaticHTML();
 
                     // Initialize Global Search Overlay
-                    if (typeof this.initGlobalSearch === 'function') this.initGlobalSearch();
+                    this.initGlobalSearch();
 
                     // Apply bottom navigation settings (user custom first, then admin default)
                     try {
@@ -1253,134 +1253,11 @@ class MinSideManager {
         });
     }
 
-    async syncUserProfile(user) {
-        if (!user) return;
-        try {
-            const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
-            const userRef = firebaseService.db.collection('users').doc(user.uid);
-            const userDoc = await userRef.get();
-            const userData = {
-                email: user.email || '',
-                displayName: user.displayName || googleProvider?.displayName || user.email || '',
-                photoURL: user.photoURL || googleProvider?.photoURL || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            if (!userDoc.exists) {
-                userData.role = 'medlem';
-                userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                await userRef.set(userData);
-            } else {
-                const docData = userDoc.data();
-                if (!docData.createdAt) {
-                    userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                }
-                await userRef.update(userData);
-            }
-        } catch (e) {
-            console.warn('syncUserProfile warning:', e);
-        }
-    }
-
-    async syncProfileFromGoogleProvider() {
-        try {
-            const user = firebase.auth().currentUser;
-            if (!user) return;
-            const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
-            if (googleProvider) {
-                const updates = {};
-                if (googleProvider.displayName && !user.displayName) updates.displayName = googleProvider.displayName;
-                if (googleProvider.photoURL && !user.photoURL) updates.photoURL = googleProvider.photoURL;
-                if (Object.keys(updates).length > 0) {
-                    await user.updateProfile(updates);
-                }
-            }
-        } catch (e) {
-            console.warn('syncProfileFromGoogleProvider warning:', e);
-        }
-    }
-
-    async getMergedProfile(user) {
-        if (!user) return {};
-        try {
-            const doc = await firebaseService.db.collection('users').doc(user.uid).get();
-            const dbData = doc.exists ? doc.data() : {};
-            return {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || dbData.displayName || user.email,
-                photoURL: user.photoURL || dbData.photoURL || '',
-                role: dbData.role || 'medlem',
-                ...dbData
-            };
-        } catch (e) {
-            console.warn('getMergedProfile warning:', e);
-            return {
-                uid: user?.uid,
-                email: user?.email,
-                displayName: user?.displayName || user?.email || '',
-                photoURL: user?.photoURL || ''
-            };
-        }
-    }
-
-    updateHeader() {
-        if (!this.currentUser) return;
-        const name = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser.displayName || this.currentUser.email || 'Medlem';
-        const nameEl = document.getElementById('ph-name') || document.getElementById('user-display-name') || document.getElementById('header-user-name');
-        if (nameEl) {
-            nameEl.textContent = name;
-        }
-        const roleEl = document.getElementById('ph-role');
-        if (roleEl) {
-            roleEl.textContent = this.profileData?.role ? (this.profileData.role.charAt(0).toUpperCase() + this.profileData.role.slice(1)) : 'Medlem';
-        }
-        const avatarEl = document.getElementById('ph-avatar') || document.getElementById('user-avatar') || document.getElementById('header-user-avatar');
-        if (avatarEl && (this.profileData?.photoURL || this.currentUser.photoURL)) {
-            const photo = this.profileData?.photoURL || this.currentUser.photoURL;
-            avatarEl.innerHTML = `<img src="${photo}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
-        }
-    }
-
-    initNotificationBadge() {
-        try {
-            const badge = document.getElementById('notification-badge');
-            if (badge) badge.classList.add('hidden');
-        } catch (e) {
-            console.warn('initNotificationBadge warning:', e);
-        }
-    }
-
-    showPendingFlashNotice() {
-        try {
-            const notice = document.getElementById('flash-notice');
-            if (notice) notice.classList.add('hidden');
-        } catch (e) {
-            console.warn('showPendingFlashNotice warning:', e);
-        }
-    }
-
-    initGlobalSearch() {
-        try {
-            // Placeholder for global search
-        } catch (e) {
-            console.warn('initGlobalSearch warning:', e);
-        }
-    }
-
-    async refreshProfileSubCollections(uid) {
-        if (!uid) return;
-        try {
-            // Placeholder for subcollections refresh
-        } catch (e) {
-            console.warn('refreshProfileSubCollections warning:', e);
-        }
-    }
-
     // Dynamic Language Switching Routine
     handleLanguageChange(lang) {
         document.documentElement.lang = lang;
         translateStaticHTML();
-        if (typeof this.updateHeader === 'function') this.updateHeader();
+        this.updateHeader();
         
         // Reload current view with translated strings
         const currentView = window.location.hash.replace('#', '') || 'overview';
@@ -1450,1165 +1327,669 @@ class MinSideManager {
         document.querySelector(`.mobile-nav-item[data-view="${cleanViewId}"]`)?.classList.add('active');
 
         const container = document.getElementById('view-container') || document.getElementById('content-area');
-        if (!container) return;
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>${t('common.loading')}...</p></div>`;
 
-        if (cleanViewId === 'course-player') {
-            this.renderCoursePlayer(container, queryParams);
-        } else if (cleanViewId === 'reading-plans') {
-            this.renderReadingPlans(container);
-        } else if (cleanViewId === 'notes') {
-            this.renderNotes(container);
-        } else if (cleanViewId === 'prayer-wall') {
-            this.renderPrayerWall(container);
-        } else if (cleanViewId === 'courses') {
-            this.renderCourses(container);
-        } else if (cleanViewId === 'profile') {
-            this.renderProfile(container);
-        } else {
-            this.renderOverview(container);
+        setTimeout(async () => {
+            try {
+                await this.views[cleanViewId].call(this, container, queryParams);
+            } catch (err) {
+                console.error(`View "${cleanViewId}" error:`, err);
+                container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${t('common.errorOccurred')}</h3><p>${err.message}</p></div>`;
+            }
+        }, 80);
+    }
+
+    _notify(message, type = 'warning', duration = 4500) {
+        if (!message) return;
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type, duration);
+            return;
+        }
+
+        let host = document.getElementById('minside-inline-notice');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'minside-inline-notice';
+            host.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;max-width:360px;padding:12px 14px;border-radius:12px;font:500 14px/1.35 Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.1);';
+            document.body.appendChild(host);
+        }
+        const palette = type === 'success'
+            ? { bg: '#ecfdf5', fg: '#166534' }
+            : type === 'error'
+                ? { bg: '#fef2f2', fg: '#991b1b' }
+                : { bg: '#fffbeb', fg: '#92400e' };
+        host.style.background = palette.bg;
+        host.style.color = palette.fg;
+        host.style.border = '1px solid rgba(15,23,42,.08)';
+        host.textContent = String(message);
+        clearTimeout(this._inlineNoticeTimer);
+        this._inlineNoticeTimer = setTimeout(() => {
+            if (host && host.parentNode) host.parentNode.removeChild(host);
+        }, Math.max(1500, duration));
+    }
+
+    showPendingFlashNotice() {
+        try {
+            const raw = sessionStorage.getItem('hkm_flash_notice');
+            if (!raw) return;
+            sessionStorage.removeItem('hkm_flash_notice');
+            const notice = JSON.parse(raw);
+            if (!notice || !notice.message) return;
+            if (notice.createdAt && (Date.now() - notice.createdAt > 30000)) return;
+            this._notify(notice.message, notice.type || 'warning', notice.duration || 5000);
+        } catch (e) {
+            // noop
         }
     }
 
-    async renderCoursePlayer(container, queryParams = {}) {
-        container.innerHTML = `
-            <style>
-                /* Style Overrides for Stitch Premium Leksjonsside */
-                .hkm-player-grid {
-                    display: flex;
-                    flex-direction: row;
-                    gap: 28px;
-                    width: 100%;
-                    margin-top: 16px;
+    // ──────────────────────────────────────────────────────────
+    // HEADER
+    // ──────────────────────────────────────────────────────────
+    updateHeader() {
+        const p = this.profileData;
+        const name = p.displayName || this.currentUser?.email || t('role.fallbackUser');
+
+        // Name
+        const nameEl = document.getElementById('ph-name');
+        if (nameEl) nameEl.textContent = name;
+
+        // Avatar
+        this._setAvatarEl(document.getElementById('ph-avatar'), p.photoURL, name);
+
+        // Role
+        const roleEl = document.getElementById('ph-role');
+        if (roleEl) roleEl.textContent = this._roleLabel(p.role);
+
+        // Admin link visibility
+        const normalizedRole = String(p.role || '').trim().toLowerCase();
+        const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
+
+        document.getElementById('ph-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
+        document.getElementById('sidebar-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
+
+        // Dynamically inject Dagens andakt shortcut button before the profile link if missing
+        // DISABLED: Shortcut button removed as per user request
+        let devBtn = null;
+
+        // Check cache first for instant render
+        try {
+            const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+            if (cachedUserRaw && devBtn) {
+                const cachedUser = JSON.parse(cachedUserRaw);
+                if (cachedUser && cachedUser.uid === this.currentUser?.uid && cachedUser.activePlanId) {
+                    const lang = document.documentElement.lang || 'no';
+                    const prefix = lang.startsWith('no') ? '' : `/${lang.split('-')[0]}`;
+                    devBtn.href = `${prefix}/bibel.html?plan=${cachedUser.activePlanId}&day=${cachedUser.activePlanDay || 1}`;
+                    devBtn.classList.remove('hidden');
+                    devBtn.classList.add('flex');
                 }
-                @media (max-width: 1024px) {
-                    .hkm-player-grid {
-                        flex-direction: column;
-                    }
-                }
-                .hkm-player-sidebar {
-                    width: 340px;
-                    flex-shrink: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                }
-                @media (max-width: 1024px) {
-                    .hkm-player-sidebar {
-                        width: 100%;
-                    }
-                }
-                .hkm-player-main {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                    min-width: 0;
-                }
-                .hkm-card {
-                    background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 20px;
-                    padding: 28px;
-                    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
-                    transition: all 0.3s ease;
-                }
-                
-                /* Sidebar Dark Theme Styling */
-                .stitch-sidebar-card {
-                    background: linear-gradient(135deg, #09281e 0%, #0d3b2e 100%) !important;
-                    color: #ffffff !important;
-                    border: 1px solid rgba(255,255,255,0.1) !important;
-                    border-radius: 20px !important;
-                    padding: 0 !important;
-                    overflow: hidden !important;
-                    box-shadow: 0 10px 30px rgba(9, 40, 30, 0.25) !important;
-                }
-                .stitch-sidebar-card .hkm-tabs-header {
-                    background: rgba(0, 0, 0, 0.2);
-                    border-bottom: 1px solid rgba(255,255,255,0.1);
-                }
-                .stitch-sidebar-card .hkm-tab-btn {
-                    color: rgba(255,255,255,0.6) !important;
-                    border-right-color: rgba(255,255,255,0.1) !important;
-                }
-                .stitch-sidebar-card .hkm-tab-btn.active {
-                    color: #4ade80 !important;
-                    background: rgba(34, 197, 94, 0.15) !important;
-                    border-bottom: 2px solid #22c55e !important;
-                }
-
-                .player-lesson-item {
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 12px;
-                    padding: 14px 16px;
-                    margin-bottom: 10px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    color: #f8fafc;
-                    position: relative;
-                }
-                .player-lesson-item:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-color: rgba(255, 255, 255, 0.2);
-                }
-                .player-lesson-item.active {
-                    background: rgba(34, 197, 94, 0.15) !important;
-                    border-color: #22c55e !important;
-                    border-left: 4px solid #22c55e !important;
-                }
-
-                /* Breadcrumbs & Progress */
-                .player-top-breadcrumbs {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    font-size: 13.5px;
-                    color: #64748b;
-                    flex-wrap: wrap;
-                    gap: 16px;
-                    margin-bottom: 8px;
-                }
-                .player-top-breadcrumbs .crumb-link {
-                    color: #475569;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
-                .player-top-breadcrumbs .crumb-current {
-                    color: #0f172a;
-                    font-weight: 750;
-                }
-                .player-progress-badge {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    font-weight: 700;
-                    font-size: 13px;
-                    color: #16a34a;
-                }
-                .player-progress-bar-bg {
-                    width: 120px;
-                    height: 8px;
-                    background: #e2e8f0;
-                    border-radius: 9999px;
-                    overflow: hidden;
-                }
-                .player-progress-bar-fill {
-                    height: 100%;
-                    background: #22c55e;
-                    border-radius: 9999px;
-                }
-
-                /* Main Tabs */
-                .hkm-main-tabs {
-                    display: flex;
-                    gap: 32px;
-                    border-bottom: 2px solid #f1f5f9;
-                    margin: 24px 0 20px;
-                }
-                .hkm-main-tab-btn {
-                    padding: 12px 0;
-                    font-size: 15px;
-                    font-weight: 700;
-                    color: #64748b;
-                    background: none;
-                    border: none;
-                    border-bottom: 3px solid transparent;
-                    margin-bottom: -2px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-                .hkm-main-tab-btn.active {
-                    color: #22c55e;
-                    border-bottom-color: #22c55e;
-                }
-            </style>
-
-            <div class="hkm-player-grid">
-                <!-- Left Side: Sidebar Navigation (Dark Forest Green Accordion) -->
-                <div class="hkm-player-sidebar">
-                    <div class="hkm-card stitch-sidebar-card" style="height: 100%;">
-                        <!-- Tabs Header -->
-                        <div class="hkm-tabs-header">
-                            <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons">
-                                <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
-                            </button>
-                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="notes">
-                                <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
-                            </button>
-                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="bible">
-                                <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span> Bibel
-                            </button>
-                        </div>
-
-                        <!-- Tab Panels scroll wrapper -->
-                        <div class="hkm-sidebar-scroll" style="padding: 20px;">
-                            <!-- Panel 1: Lessons List -->
-                            <div class="sidebar-panel active" id="panel-lessons">
-                                <div class="player-lessons-list">
-                                    ${lessons.map((l, idx) => {
-                                        const isActive = idx === activeLessonIndex;
-                                        const cleanItemTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
-                                        
-                                        const isLessonUnlocked = true;
-                                        
-                                        if (!isLessonUnlocked) {
-                                            return `
-                                                <div class="player-lesson-item locked" data-idx="${idx}" style="opacity: 0.6;">
-                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                                                        <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                            <span style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
-                                                            <span style="font-weight:600; font-size:14px; color:#e2e8f0; line-height:1.2;">${cleanItemTitle}</span>
-                                                        </div>
-                                                        <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">lock</span>
-                                                    </div>
-                                                </div>
-                                            `;
-                                        }
-                                        
-                                        return `
-                                            <div class="player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
-                                                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                                                    <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
-                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#4ade80' : '#94a3b8'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
-                                                        <span style="font-weight:600; font-size:14px; color:#ffffff; line-height:1.2;">${cleanItemTitle}</span>
-                                                    </div>
-                                                    <span class="material-symbols-outlined" style="font-size:20px; color:${isActive ? '#4ade80' : '#94a3b8'};">
-                                                        ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
-                                                    </span>
-                                                </div>
-                                                ${isActive ? `
-                                                    <div style="margin-top: 10px; height: 3.5px; width: 100%; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
-                                                        <div style="height: 100%; background: #22c55e; width: 70%;"></div>
-                                                    </div>
-                                                ` : ''}
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </div>
-
-                            <!-- Panel 2: Notes Editor -->
-                            <div class="sidebar-panel" id="panel-notes">
-                                <div style="display:flex; flex-direction:column; gap:16px;">
-                                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                                        <h4 style="font-size:14px; font-weight:700; color:#ffffff; margin:0;">Dine leksjonsnotater</h4>
-                                        <span id="notes-save-status" class="notes-autosave-status" style="font-size:11px; font-weight:600; color:#4ade80;">
-                                            <span class="material-symbols-outlined" style="font-size:14px; color:#22c55e;">cloud_done</span> Lagret
-                                        </span>
-                                    </div>
-                                    <div class="rte-wrapper">
-                                        <div class="rte-toolbar" id="rte-toolbar-lesson">
-                                            <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
-                                            <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
-                                            <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
-                                            <div class="rte-divider"></div>
-                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
-                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
-                                            <div class="rte-divider"></div>
-                                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                                            <div class="rte-divider"></div>
-                                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
-                                        </div>
-                                        <div class="rte-editor" id="lesson-notes-editor" contenteditable="true"
-                                            data-placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Panel 3: Bible Lookup -->
-                            <div class="sidebar-panel" id="panel-bible" style="position: relative;">
-                                <div style="display:flex; flex-direction:column; gap:16px; height: 100%;">
-                                    <div>
-                                        <h4 style="font-size:14px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">Slå opp i Bibelen</h4>
-                                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                                            <select id="bib-trans-select" class="hkm-bible-select">
-                                                <option value="NO1930">Norsk (1930)</option>
-                                                <option value="BSN">Norsk (BSN)</option>
-                                                <option value="KJV">English (KJV)</option>
-                                            </select>
-                                            <select id="bib-book-select" class="hkm-bible-select"></select>
-                                        </div>
-                                        <div style="display:flex; gap:8px; margin-top:8px;">
-                                            <select id="bib-chap-select" class="hkm-bible-select" style="flex:1;"></select>
-                                        </div>
-                                    </div>
-                                    <div id="bib-display" class="hkm-bible-display" style="flex:1; min-height: 220px; max-height: 380px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
-                                        <p style="color:#94a3b8; font-size:13px; text-align:center; margin-top:40px;">Velg kapittel over for å lese vers.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Side: Player & Lesson Details -->
-                <div class="hkm-player-main">
-                    <!-- Top Breadcrumb & Progress Header -->
-                    <div class="player-top-breadcrumbs">
-                        <div>
-                            <a href="/minside/index.html" class="crumb-link">Hjem</a> &rsaquo; 
-                            <a href="/kurs" class="crumb-link">Kurs</a> &rsaquo; 
-                            <span class="crumb-link">${course.title}</span> &rsaquo; 
-                            <span class="crumb-current">Leksjon ${activeLessonIndex + 1}</span>
-                        </div>
-                        <div class="player-progress-badge">
-                            <span>70% Fullført</span>
-                            <div class="player-progress-bar-bg">
-                                <div class="player-progress-bar-fill" style="width: 70%;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Videospiller container -->
-                    <div class="video-player-container" id="player-container" style="border-radius: 20px; overflow: hidden; box-shadow: 0 12px 32px rgba(15,23,42,0.12);">
-                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#0f172a; font-weight:600; font-size:1.1rem; padding: 24px; text-align:center;">
-                            Laster spiller...
-                        </div>
-                    </div>
-
-                    <!-- Details Card (Oversikt & Lærer) -->
-                    <div class="hkm-card">
-                        <!-- Navigation Tabs under player -->
-                        <div class="hkm-main-tabs">
-                            <button class="hkm-main-tab-btn active">Oversikt</button>
-                            <button class="hkm-main-tab-btn">Ressurser</button>
-                            <button class="hkm-main-tab-btn">Diskusjon</button>
-                        </div>
-
-                        <!-- Oversikt over leksjonen -->
-                        <h2 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0 0 12px 0;">
-                            Oversikt over leksjonen: ${cleanLTitle}
-                        </h2>
-                        <p style="font-size: 1rem; color: #475569; line-height: 1.65; margin: 0 0 32px 0;">
-                            ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser, lesestoff og bønneguider nedenfor.'}
-                        </p>
-
-                        <!-- Læreren din Section -->
-                        <div style="border-top: 1.5px solid #f1f5f9; padding-top: 28px; margin-top: 28px;">
-                            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 18px 0;">Læreren din</h3>
-                            <div style="display: flex; gap: 20px; align-items: center; background: #f8fafc; padding: 20px 24px; border-radius: 16px; border: 1.5px solid #e2e8f0;">
-                                <div style="width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 2.5px solid #22c55e; flex-shrink: 0;">
-                                    <img src="/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg" alt="Hilde Karin Knutsen" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                                <div>
-                                    <h4 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">Hilde Karin Knutsen</h4>
-                                    <span style="font-size: 0.82rem; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">Kurslærer & Sjelesorgmentor</span>
-                                    <p style="font-size: 0.92rem; color: #64748b; margin: 0; line-height: 1.5;">Brenner for indre helbredelse, bønneaktivering og å hjelpe mennesker inn i en dypere relasjon med Gud.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Last ned materialer Section -->
-                        <div style="border-top: 1.5px solid #f1f5f9; padding-top: 28px; margin-top: 28px;">
-                            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0 0 18px 0;">Last ned materialer</h3>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-                                <a href="${lesson.resourceUrl || '#'}" target="_blank" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; text-decoration: none; color: #0f172a; font-weight: 600; font-size: 0.92rem; transition: all 0.2s ease;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px; color: #16a34a;">description</span>
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Leksjonsplan_Mal.pdf</span>
-                                </a>
-                                <a href="${lesson.resourceUrl || '#'}" target="_blank" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; text-decoration: none; color: #0f172a; font-weight: 600; font-size: 0.92rem; transition: all 0.2s ease;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px; color: #2563eb;">article</span>
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Leksjonsnotater.docx</span>
-                                </a>
-                                <a href="${lesson.resourceUrl || '#'}" target="_blank" style="display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; text-decoration: none; color: #0f172a; font-weight: 600; font-size: 0.92rem; transition: all 0.2s ease;">
-                                    <span class="material-symbols-outlined" style="font-size: 24px; color: #8b5cf6;">menu_book</span>
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ytterligere_Lesning.pdf</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;// 3. Mount Player Media Embed
-        const playerContainer = document.getElementById('player-container');
-
-        const loadZoomSDK = () => {
-            return new Promise((resolve, reject) => {
-                if (window.ZoomMtgEmbedded) {
-                    resolve(window.ZoomMtgEmbedded);
-                    return;
-                }
-
-                // Load Zoom CSS
-                const cssUrl = 'https://source.zoom.us/zoom-meeting-embedded-3.8.0.css';
-                if (!document.querySelector(`link[href="${cssUrl}"]`)) {
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = cssUrl;
-                    document.head.appendChild(link);
-                }
-
-                const scripts = [
-                    'https://source.zoom.us/3.8.0/lib/vendor/react.min.js',
-                    'https://source.zoom.us/3.8.0/lib/vendor/react-dom.min.js',
-                    'https://source.zoom.us/3.8.0/lib/vendor/redux.min.js',
-                    'https://source.zoom.us/3.8.0/lib/vendor/redux-thunk.min.js',
-                    'https://source.zoom.us/3.8.0/lib/vendor/lodash.min.js',
-                    'https://source.zoom.us/zoom-meeting-embedded-3.8.0.min.js'
-                ];
-
-                let loadedCount = 0;
-
-                const loadNext = () => {
-                    if (loadedCount >= scripts.length) {
-                        if (window.ZoomMtgEmbedded) {
-                            resolve(window.ZoomMtgEmbedded);
-                        } else {
-                            reject(new Error('ZoomMtgEmbedded was not loaded successfully.'));
-                        }
-                        return;
-                    }
-
-                    const scriptUrl = scripts[loadedCount];
-                    if (document.querySelector(`script[src="${scriptUrl}"]`)) {
-                        loadedCount++;
-                        loadNext();
-                        return;
-                    }
-
-                    const script = document.createElement('script');
-                    script.src = scriptUrl;
-                    script.async = false;
-                    script.onload = () => {
-                        loadedCount++;
-                        loadNext();
-                    };
-                    script.onerror = (err) => {
-                        reject(err);
-                    };
-                    document.body.appendChild(script);
-                };
-
-                loadNext();
-            });
-        };
-        
-        const loadPlayer = () => {
-            if (!playerContainer) return;
-            // Reset to default 16:9 aspect ratio styling first
-            playerContainer.style.paddingTop = '56.25%';
-            playerContainer.style.height = 'auto';
-
-            if (lesson.videoUrl) {
-                // Recorded Video Player
-                const ytId = parseYoutube(lesson.videoUrl);
-                const vimId = parseVimeo(lesson.videoUrl);
-                
-                if (ytId) {
-                    playerContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?rel=0&autoplay=1" title="YouTube Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-                } else if (vimId) {
-                    playerContainer.innerHTML = `<iframe src="https://player.vimeo.com/video/${vimId}?autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-                } else {
-                    // Direct media player
-                    playerContainer.innerHTML = `<video src="${lesson.videoUrl}" controls autoplay></video>`;
-                }
-            } else if (lesson.zoomUrl) {
-                // Zoom embed
-                const zoomData = parseZoom(lesson.zoomUrl);
-                if (zoomData) {
-                    // Increase container height for Zoom meeting interface to prevent clipping
-                    playerContainer.style.paddingTop = '0px';
-                    playerContainer.style.height = '600px';
-
-                    const studentName = this.profileData?.name || this.currentUser?.displayName || 'Student';
-
-                    // Try to load Zoom Meeting SDK (Component View)
-                    playerContainer.innerHTML = `
-                        <div id="zoom-sdk-loading" style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
-                            <span class="material-symbols-outlined spinner" style="font-size: 48px; color: #d17d39; animation: spin 1.5s linear infinite;">sync</span>
-                            <div>
-                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Starter Zoom-spiller...</h3>
-                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Laster inn integrert Zoom-klient med chat og video. Vennligst vent.</p>
-                            </div>
-                        </div>
-                        <div id="zoom-sdk-element" style="width: 100%; height: 100%; display: none;"></div>
-                    `;
-
-                    const loadEmbeddedZoom = async () => {
-                        try {
-                            // 1. Fetch signature from API
-                            const sigRes = await fetch('/api/zoom-signature', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    meetingNumber: zoomData.meetingId,
-                                    role: 0 // participant
-                                })
-                            });
-                            const sigData = await sigRes.json();
-                            if (!sigRes.ok || sigData.error) {
-                                throw new Error(sigData.error || 'Failed to fetch signature');
-                            }
-
-                            // 2. Load scripts dynamically
-                            const embeddedSDK = await loadZoomSDK();
-
-                            // Hide loading, show element
-                            const sdkEl = document.getElementById('zoom-sdk-element');
-                            const loaderEl = document.getElementById('zoom-sdk-loading');
-                            if (sdkEl && loaderEl) {
-                                loaderEl.style.display = 'none';
-                                sdkEl.style.display = 'block';
-                            }
-
-                            // 3. Initialize and join
-                            const client = embeddedSDK.createClient();
-                            client.init({
-                                zoomAppRoot: sdkEl,
-                                language: 'no-NO'
-                            });
-
-                            await client.join({
-                                sdkKey: sigData.sdkKey,
-                                signature: sigData.signature,
-                                meetingNumber: String(zoomData.meetingId),
-                                password: zoomData.pwd || '',
-                                userName: studentName
-                            });
-                            
-                            console.log('Zoom SDK joined successfully!');
-                        } catch (err) {
-                            console.error('Zoom SDK error:', err);
-                            const errStr = JSON.stringify(err) || '';
-                            const errMsg = err.message || errStr || 'Ukjent feil';
-                            const errorCode = err.errorCode || (err.detail && err.detail.errorCode);
-                            const reason = err.reason || '';
-                            
-                            // Check if the meeting has not started yet (errorCode 3008)
-                            if (errorCode === 3008 || reason.includes('Meeting has not started') || errStr.includes('3008') || errMsg.includes('3008')) {
-                                playerContainer.innerHTML = `
-                                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
-                                        <style>
-                                            @keyframes zoom-pulse {
-                                                0%, 100% { opacity: 1; transform: scale(1); }
-                                                50% { opacity: 0.6; transform: scale(0.95); }
-                                            }
-                                        </style>
-                                        <span class="material-symbols-outlined" style="font-size: 48px; color: #3b82f6; animation: zoom-pulse 2s infinite;">schedule</span>
-                                        <div>
-                                            <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #93c5fd;">Møtet har ikke startet ennå</h3>
-                                            <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
-                                                Webinaret er planlagt til et senere tidspunkt. Vi overfører deg til Zooms venterom om 3 sekunder...
-                                            </p>
-                                        </div>
-                                    </div>
-                                `;
-                                
-                                setTimeout(() => {
-                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
-                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
-                                }, 3000);
-                                return;
-                            }
-                            
-                            playerContainer.innerHTML = `
-                                <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
-                                    <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
-                                    <div>
-                                        <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #f87171;">Zoom SDK Feil</h3>
-                                        <p style="margin: 0 0 16px; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
-                                            Kunne ikke starte den integrerte spilleren: <code>${errMsg}</code>
-                                        </p>
-                                        <button id="zoom-fallback-trigger-btn" class="player-btn-zoom-app" style="background:#ef4444 !important; border-color:#ef4444 !important; font-size:0.8rem !important; height:38px !important; padding:6px 16px !important; border-radius:30px !important;">
-                                            Start reserveløsning (iframe)
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                            
-                            const fallbackBtn = document.getElementById('zoom-fallback-trigger-btn');
-                            if (fallbackBtn) {
-                                fallbackBtn?.addEventListener('click', () => {
-                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
-                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
-                                });
-                            }
-                        }
-                    };
-
-                    loadEmbeddedZoom();
-                } else {
-                    playerContainer.innerHTML = `
-                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
-                            <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39;">video_camera_front</span>
-                            <div>
-                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Zoom Live Class</h3>
-                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Live Zoom-kobling er klar. Vennligst bruk knappen nedenfor for å åpne timen i Zoom-appen.</p>
-                            </div>
-                            <a href="${lesson.zoomUrl}" target="_blank" class="player-btn-zoom-app" style="box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);">
-                                <span class="material-symbols-outlined">launch</span> Åpne Zoom-kobling
-                            </a>
-                        </div>`;
-                }
-            } else {
-                playerContainer.innerHTML = `
-                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 12px;">
-                        <span class="material-symbols-outlined" style="font-size:40px; color:#94a3b8;">school</span>
-                        <div>Leksjonen har ingen live Zoom-time eller opptaks-video registrert ennå.</div>
-                    </div>`;
             }
-        };
-        
-        loadPlayer();
+        } catch (e) {}
 
-        // Fullscreen Toggle Logic
-        const fsBtn = container.querySelector('#player-fullscreen-btn');
-        if (fsBtn) {
-            fsBtn?.addEventListener('click', () => {
-                const doc = document;
-                const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
-                
-                if (!isFs) {
-                    if (playerContainer.requestFullscreen) {
-                        playerContainer.requestFullscreen();
-                    } else if (playerContainer.webkitRequestFullscreen) {
-                        playerContainer.webkitRequestFullscreen();
-                    } else if (playerContainer.mozRequestFullScreen) {
-                        playerContainer.mozRequestFullScreen();
-                    } else if (playerContainer.msRequestFullscreen) {
-                        playerContainer.msRequestFullscreen();
-                    }
-                } else {
-                    if (doc.exitFullscreen) {
-                        doc.exitFullscreen();
-                    } else if (doc.webkitExitFullscreen) {
-                        doc.webkitExitFullscreen();
-                    } else if (doc.mozCancelFullScreen) {
-                        doc.mozCancelFullScreen();
-                    } else if (doc.msExitFullscreen) {
-                        doc.msExitFullscreen();
-                    }
-                }
-            });
-
-            const updateFullscreenUI = () => {
-                const doc = document;
-                const isFs = doc.fullscreenElement === playerContainer || 
-                             doc.webkitFullscreenElement === playerContainer || 
-                             doc.mozFullScreenElement === playerContainer || 
-                             doc.msFullscreenElement === playerContainer;
-                
-                fsBtn.innerHTML = isFs 
-                    ? `<span class="material-symbols-outlined">fullscreen_exit</span> Avslutt`
-                    : `<span class="material-symbols-outlined">fullscreen</span> Fullskjerm`;
-            };
-
-            playerContainer?.addEventListener('fullscreenchange', updateFullscreenUI);
-            playerContainer?.addEventListener('webkitfullscreenchange', updateFullscreenUI);
-            playerContainer?.addEventListener('mozfullscreenchange', updateFullscreenUI);
-            playerContainer?.addEventListener('MSFullscreenChange', updateFullscreenUI);
-        }
-
-        // 4. Setup Tab Navigation
-        const tabs = container.querySelectorAll('.sidebar-tab-btn');
-        const panels = container.querySelectorAll('.sidebar-panel');
-        tabs.forEach(tab => {
-            tab?.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.remove('active'));
-                
-                tab.classList.add('active');
-                const panelId = `panel-${tab.dataset.tab}`;
-                container.querySelector(`#${panelId}`).classList.add('active');
-            });
-        });
-
-        // 5. Sidebar Lesson Switcher
-        container.querySelectorAll('.player-lesson-item').forEach(item => {
-            item?.addEventListener('click', () => {
-                const idx = parseInt(item.dataset.idx);
-                const nextLesson = lessons[idx];
-                this.loadView('course-player', { courseId, lessonId: nextLesson.id });
-            });
-        });
-
-        // 6. Notes Auto-save Logic
-        const editor = container.querySelector('#lesson-notes-editor');
-        const saveStatus = container.querySelector('#notes-save-status');
-        let noteDocId = null;
-        let saveTimeout = null;
-// Wire the Rich Text Editor toolbar
-        this._wireRteToolbar('rte-toolbar-lesson', 'lesson-notes-editor');
-
-        const loadNotes = async () => {
-            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
-            try {
-                const snap = await firebase.firestore().collection('personal_notes')
-                    .where('userId', '==', uid)
-                    .where('lessonId', '==', lesson.id)
-                    .limit(1)
-                    .get();
-                
-                if (!snap.empty) {
-                    const noteDoc = snap.docs[0];
-                    noteDocId = noteDoc.id;
-                    if (editor) editor.innerHTML = noteDoc.data().text || '';
-                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
-                } else {
-                    if (editor) editor.innerHTML = '';
-                    if (saveStatus) saveStatus.innerHTML = `Ingen lagrede notater`;
-                }
-            } catch (e) {
-                console.error("Notes fetch error:", e);
-                if (saveStatus) saveStatus.innerHTML = `Feil ved innlasting`;
-            }
-        };
-
-        loadNotes();
-
-        editor?.addEventListener('input', () => {
-            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
-            clearTimeout(saveTimeout);
-            
-            saveTimeout = setTimeout(async () => {
-                const noteText = editor.innerHTML.trim();
-                const plainText = editor.innerText.trim();
-                if (!plainText) {
-                    if (saveStatus) saveStatus.innerHTML = `Tomt notat`;
-                    return;
-                }
-                
-                try {
-                    if (noteDocId) {
-                        await firebase.firestore().collection('personal_notes').doc(noteDocId).update({
-                            text: noteText,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        // Fetch active reading plan and update shortcut button from Firestore
+        if (this.currentUser) {
+            firebase.firestore().collection('users')
+                .doc(this.currentUser.uid)
+                .collection('reading_plans')
+                .where('completed', '==', false)
+                .get()
+                .then(snap => {
+                    if (!snap.empty) {
+                        const userPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Sort in memory by lastActiveAt descending
+                        userPlans.sort((a, b) => {
+                            const aTime = a.lastActiveAt?.toMillis ? a.lastActiveAt.toMillis() : (a.lastActiveAt?.seconds ? a.lastActiveAt.seconds * 1000 : 0);
+                            const bTime = b.lastActiveAt?.toMillis ? b.lastActiveAt.toMillis() : (b.lastActiveAt?.seconds ? b.lastActiveAt.seconds * 1000 : 0);
+                            return bTime - aTime;
                         });
+                        
+                        const activePlan = userPlans[0];
+                        const planId = activePlan.planId;
+                        const currentDay = activePlan.currentDay || 1;
+
+                        if (planId && devBtn) {
+                            const lang = document.documentElement.lang || 'no';
+                            const prefix = lang.startsWith('no') ? '' : `/${lang.split('-')[0]}`;
+                            devBtn.href = `${prefix}/bibel.html?plan=${planId}&day=${currentDay}`;
+                            devBtn.classList.remove('hidden');
+                            devBtn.classList.add('flex');
+
+                            // Update cache
+                            try {
+                                const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
+                                let cachedData = cachedUserRaw ? JSON.parse(cachedUserRaw) : {};
+                                if (!cachedData || cachedData.uid !== this.currentUser.uid) {
+                                    cachedData = { uid: this.currentUser.uid };
+                                }
+                                cachedData.activePlanId = planId;
+                                cachedData.activePlanDay = currentDay;
+                                localStorage.setItem('hkm_public_user_cache', JSON.stringify(cachedData));
+                            } catch (cacheErr) {}
+                        }
                     } else {
-                        const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
-                        const docRef = await firebase.firestore().collection('personal_notes').add({
-                            userId: uid,
-                            courseId: course.id,
-                            lessonId: lesson.id,
-                            title: `Notater: Leksjon ${activeLessonIndex + 1} - ${cleanLTitle}`,
-                            text: noteText,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            category: 'Kurs'
-                        });
-                        noteDocId = docRef.id;
-                    }
-                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret i skyen ✓`;
-                    setTimeout(() => {
-                        if (saveStatus.textContent.includes('skyen')) {
-                            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                        if (devBtn) {
+                            devBtn.classList.add('hidden');
+                            devBtn.classList.remove('flex');
                         }
-                    }, 2000);
-                } catch (e) {
-                    console.error("Notes autosave error:", e);
-                    if (saveStatus) saveStatus.innerHTML = `Kunne ikke lagre`;
-                }
-            }, 1000); // 1 sec debounce
-        });
+                    }
+                })
+                .catch(err => {
+                    console.warn('[DevotionalShortcut] Failed to fetch active plan:', err);
+                    if (devBtn) {
+                        devBtn.classList.add('hidden');
+                        devBtn.classList.remove('flex');
+                    }
+                });
+        }
+    }
 
-        // 7. Bible Reader Widget Logic
-        const bibTransSelect = container.querySelector('#bible-select-translation');
-        const bibBookSelect = container.querySelector('#bible-select-book');
-        const bibChapSelect = container.querySelector('#bible-select-chapter');
-        const bibDisplay = container.querySelector('#bible-verses-display');
+    _setAvatarEl(el, photoURL, name) {
+        if (!el) return;
         
-        // Dictionary Overlay Elements
-        const dictOverlay = container.querySelector('#bible-dict-overlay');
-        const dictTitle = container.querySelector('#bible-dict-title');
-        const dictContent = container.querySelector('#bible-dict-content');
-        const dictClose = container.querySelector('#bible-dict-close');
+        if (photoURL) {
+            el.classList.remove('has-initials');
+            el.innerHTML = `<img src="${photoURL}" alt="${name}" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">`;
+        } else {
+            el.classList.add('has-initials');
+            const initials = (name || '?')
+                .split(' ')
+                .filter(n => n.length > 0)
+                .map(n => n[0].toUpperCase())
+                .slice(0, 2)
+                .join('');
+            
+            el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important;">${initials || '?'}</span>`;
+        }
+        
+        if (photoURL) el.dataset.photoUrl = photoURL;
+    }
 
-        let bibleList = [];
-        let isBibleInit = true;
-        let selectedVerses = [];
-        let bibleLayout = 'verse'; // 'verse' | 'paragraph'
-        let bibleFontSize = 15; // default size matches new Inter CSS style
-
-        const updateToolbarStates = () => {
-            const hasSelected = selectedVerses.length > 0;
-            const btnCopy = container.querySelector('#bible-btn-copy');
-            const btnHighlight = container.querySelector('#bible-btn-highlight');
-            if (btnCopy) btnCopy.disabled = !hasSelected;
-            if (btnHighlight) btnHighlight.disabled = !hasSelected;
-        };
-
-        const loadBibleData = async () => {
-            try {
-                const res = await fetch('/api/bible/bibles');
-                const payload = await res.json();
-                bibleList = payload.data || payload || [];
-                
-                if (bibTransSelect) bibTransSelect.innerHTML = bibleList.map(b => `
-                    <option value="${b.id}">${b.abbreviation}</option>
-                `).join('');
-                
-                if (bibleList.length > 0) {
-                    await loadBooks(bibleList[0].id, isBibleInit);
-                    isBibleInit = false;
-                }
-            } catch (e) {
-                console.error("Bible widget init error:", e);
-            }
-        };
-
-        const loadBooks = async (bibleId, autoSelect = false) => {
-            try {
-                bibBookSelect.disabled = true;
-                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
-                
-                const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
-                const payload = await res.json();
-                const books = payload.data || payload || [];
-                
-                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
-                    <option value="${b.id}">${b.name}</option>
-                `).join('');
-                bibBookSelect.disabled = false;
-
-                if (autoSelect && books.length > 0) {
-                    const defaultBook = books.find(b => 
-                        b.id.toLowerCase() === 'jhn' || 
-                        b.id.toLowerCase().includes('jhn') || 
-                        b.name.toLowerCase().includes('johannes')
-                    ) || books[0];
-
-                    bibBookSelect.value = defaultBook.id;
-                    await loadChapters(bibleId, defaultBook.id, true);
-                }
-            } catch (e) {
-                console.error("Bible widget loadBooks error:", e);
-            }
-        };
-
-        const loadVerses = async (bibleId, chapterId) => {
-            try {
-                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
-                
-                // Clear active selection on reload
-                selectedVerses = [];
-                updateToolbarStates();
-
-                const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
-                const payload = await res.json();
-                const data = payload.data || payload || {};
-                const verses = data.verses || [];
-                
-                if (verses.length === 0) {
-                    if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
-                    return;
-                }
-                
-                const highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
-                
-                if (bibleLayout === 'paragraph') {
-                    if (bibDisplay) bibDisplay.innerHTML = `<div style="font-family: 'Inter', system-ui, sans-serif; font-size:${bibleFontSize}px; line-height:1.75; color:#334155; text-align:left;">` + 
-                        verses.map(v => {
-                            const verseNum = v.verse || v.number || '';
-                            const isHighlighted = highlights.some(h => 
-                                h.bibleId === bibleId && 
-                                h.chapterId === chapterId && 
-                                h.verseNum === verseNum.toString()
-                            );
-                            const highlightClass = isHighlighted ? 'highlighted-verse' : '';
-                            const isSelected = selectedVerses.includes(verseNum.toString());
-                            const selectedClass = isSelected ? 'selected-verse' : '';
-                            
-                            return `
-                                <span class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="cursor:pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s; display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone;">
-                                    <span class="bible-verse-num" style="font-size: 10px; font-weight: 700; color: #d17d39; margin-left: 6px; margin-right: 4px; vertical-align: super;">${verseNum}</span>${v.text}
-                                </span>
-                            `;
-                        }).join('') + `</div>`;
+    applyBottomNavSettings(activeIds) {
+        if (!Array.isArray(activeIds)) return;
+        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item').forEach(el => {
+            const view = el.getAttribute('data-view');
+            if (view) {
+                if (activeIds.includes(view)) {
+                    el.style.display = 'flex';
                 } else {
-                    if (bibDisplay) bibDisplay.innerHTML = verses.map(v => {
-                        const verseNum = v.verse || v.number || '';
-                        const isHighlighted = highlights.some(h => 
-                            h.bibleId === bibleId && 
-                            h.chapterId === chapterId && 
-                            h.verseNum === verseNum.toString()
-                        );
-                        const highlightClass = isHighlighted ? 'highlighted-verse' : '';
-                        const isSelected = selectedVerses.includes(verseNum.toString());
-                        const selectedClass = isSelected ? 'selected-verse' : '';
-                        
-                        return `
-                            <p class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="margin-bottom:12px; font-size:${bibleFontSize}px; line-height:1.65; color:#334155; cursor:pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s; display: block; border-left: 3px solid transparent;">
-                                <span class="bible-verse-num" style="font-size: 11px; font-weight: 700; color: #d17d39; margin-right: 8px; vertical-align: super;">${verseNum}</span>${v.text}
-                            </p>
-                        `;
-                    }).join('');
+                    el.style.display = 'none';
                 }
-                
-                // Attach click handlers for verse items selection
-                bibDisplay.querySelectorAll('.bible-verse-item').forEach(item => {
-                    item?.addEventListener('click', (e) => {
-                        if (e.detail > 1) return; // Prevent selection trigger on double-click
-                        
-                        const verseNum = item.dataset.verse;
-                        const idx = selectedVerses.indexOf(verseNum);
-                        if (idx > -1) {
-                            selectedVerses.splice(idx, 1);
-                            item.classList.remove('selected-verse');
-                        } else {
-                            selectedVerses.push(verseNum);
-                            item.classList.add('selected-verse');
-                        }
-                        updateToolbarStates();
-                    });
-                });
-
-                // Attach double-click handler for Bible Dictionary lookup
-                bibDisplay?.addEventListener('dblclick', () => {
-                    const selection = window.getSelection().toString().trim();
-                    const cleanedWord = selection.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").trim();
-                    if (cleanedWord && cleanedWord.length > 1 && cleanedWord.length < 30) {
-                        lookupWord(cleanedWord);
-                    }
-                });
-
-                bibDisplay.scrollTop = 0;
-            } catch (e) {
-                console.error("Bible widget loadVerses error:", e);
-                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
             }
+        });
+    }
+
+    _roleLabel(role) {
+        const map = {
+            superadmin: t('role.superadmin'),
+            admin: t('role.admin'),
+            pastor: t('role.pastor'),
+            leder: t('role.leader'),
+            frivillig: t('role.volunteer'),
+            giver: t('role.donor')
+        };
+        return map[role] || t('role.member');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // FIREBASE SYNC
+    // ──────────────────────────────────────────────────────────
+    _emptyProfileSubCollections() {
+        return {
+            communication: { items: [], count: 0 },
+            activity: { items: [], count: 0 },
+            notes: { personal: [], shared: [], count: 0 }
+        };
+    }
+
+    _normalizeNotificationDoc(docLike) {
+        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        return {
+            id: docLike?.id || raw.id || '',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert'),
+            body: typeof raw.body === 'string' ? raw.body : '',
+            type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
+            link: typeof raw.link === 'string' ? raw.link : '',
+            read: raw.read === true,
+            archived: raw.archived === true,
+            createdAt: raw.createdAt || null,
+        };
+    }
+
+    _normalizeNoteDoc(docLike, fallbackSource = 'personal') {
+        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        return {
+            id: docLike?.id || raw.id || '',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notes.untitled'),
+            text: typeof raw.text === 'string' ? raw.text : '',
+            authorName: typeof raw.authorName === 'string' && raw.authorName.trim() ? raw.authorName.trim() : t('notes.hkmTeam'),
+            createdAt: raw.createdAt || null,
+            updatedAt: raw.updatedAt || null,
+            source: raw.source || fallbackSource,
+            userId: raw.userId || this.currentUser?.uid || '',
+            category: typeof raw.category === 'string' ? raw.category.trim() : '',
+        };
+    }
+
+    _normalizeDonationAmountNok(donation) {
+        const raw = donation || {};
+        const explicitNok = raw.amountNok ?? raw.amountNOK ?? raw.totalNok;
+        if (explicitNok != null) return this._parseAmountNumber(explicitNok);
+
+        const explicitOre = raw.amountOre ?? raw.amountCents;
+        if (explicitOre != null) return this._parseAmountNumber(explicitOre) / 100;
+
+        const amount = this._parseAmountNumber(raw.amount);
+        if (!amount) return 0;
+
+        // Older Stripe client records stored amount in ore, while server-created
+        // Stripe/Vipps donation records store amount in NOK.
+        if (raw.paymentIntentId && !raw.transactionId) return amount / 100;
+        return amount;
+    }
+
+    _parseAmountNumber(value) {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        if (typeof value === 'string') {
+            const parsed = Number(value.replace(',', '.').replace(/[^\d.-]/g, ''));
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+        return 0;
+    }
+
+    _escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[char]));
+    }
+
+    _getDonationDate(donation) {
+        const raw = donation || {};
+        return raw.completedAt?.toDate?.()
+            || raw.timestamp?.toDate?.()
+            || raw.createdAt?.toDate?.()
+            || (raw.completedAt ? new Date(raw.completedAt) : null)
+            || (raw.timestamp ? new Date(raw.timestamp) : null)
+            || (raw.createdAt ? new Date(raw.createdAt) : null);
+    }
+
+    _donationStatusIsVisible(donation) {
+        const status = String(donation?.status || '').trim().toLowerCase();
+        return !status || ['completed', 'succeeded', 'captured', 'pending', 'processing'].includes(status);
+    }
+
+    _getDonationStatusLabel(status) {
+        const normalized = String(status || '').trim().toLowerCase();
+        const labels = {
+            completed: t('giving.statusCompleted'),
+            succeeded: t('giving.statusCompleted'),
+            captured: t('giving.statusCompleted'),
+            pending: t('giving.statusPending'),
+            processing: t('giving.statusProcessing'),
+            failed: t('giving.statusFailed'),
+            canceled: t('giving.statusCanceled'),
+            cancelled: t('giving.statusCanceled')
+        };
+        return labels[normalized] || (status || t('giving.statusUnknown'));
+    }
+
+    _getDonationMethodLabel(method) {
+        const normalized = String(method || '').trim().toLowerCase();
+        const labels = {
+            card: t('giving.methodCard'),
+            stripe: t('giving.methodStripe'),
+            vipps: t('giving.methodVipps'),
+            bank: t('giving.methodBank'),
+            manual: t('giving.methodManual'),
+            cash: t('giving.methodCash')
+        };
+        return labels[normalized] || (method || t('giving.methodUnknown'));
+    }
+
+    _getDonationReference(donation) {
+        const raw = donation || {};
+        return raw.reference
+            || raw.transactionId
+            || raw.paymentIntentId
+            || raw.manualDonationId
+            || raw.id
+            || '';
+    }
+
+    _getPhoneCountries() {
+        return [
+            ['NO', '+47', 'Norge'], ['SE', '+46', 'Sverige'], ['DK', '+45', 'Danmark'], ['FI', '+358', 'Finland'],
+            ['IS', '+354', 'Island'], ['GB', '+44', 'Storbritannia'], ['US', '+1', 'USA'], ['CA', '+1', 'Canada'],
+            ['AF', '+93', 'Afghanistan'], ['AL', '+355', 'Albania'], ['DZ', '+213', 'Algerie'], ['AS', '+1684', 'Amerikansk Samoa'],
+            ['AD', '+376', 'Andorra'], ['AO', '+244', 'Angola'], ['AI', '+1264', 'Anguilla'], ['AG', '+1268', 'Antigua og Barbuda'],
+            ['AR', '+54', 'Argentina'], ['AM', '+374', 'Armenia'], ['AW', '+297', 'Aruba'], ['AU', '+61', 'Australia'],
+            ['AT', '+43', 'Østerrike'], ['AZ', '+994', 'Aserbajdsjan'], ['BS', '+1242', 'Bahamas'], ['BH', '+973', 'Bahrain'],
+            ['BD', '+880', 'Bangladesh'], ['BB', '+1246', 'Barbados'], ['BY', '+375', 'Belarus'], ['BE', '+32', 'Belgia'],
+            ['BZ', '+501', 'Belize'], ['BJ', '+229', 'Benin'], ['BM', '+1441', 'Bermuda'], ['BT', '+975', 'Bhutan'],
+            ['BO', '+591', 'Bolivia'], ['BA', '+387', 'Bosnia-Hercegovina'], ['BW', '+267', 'Botswana'], ['BR', '+55', 'Brasil'],
+            ['IO', '+246', 'Britisk territorium i Indiahavet'], ['VG', '+1284', 'De britiske jomfruøyene'], ['BN', '+673', 'Brunei'],
+            ['BG', '+359', 'Bulgaria'], ['BF', '+226', 'Burkina Faso'], ['BI', '+257', 'Burundi'], ['KH', '+855', 'Kambodsja'],
+            ['CM', '+237', 'Kamerun'], ['CV', '+238', 'Kapp Verde'], ['KY', '+1345', 'Caymanøyene'], ['CF', '+236', 'Den sentralafrikanske republikk'],
+            ['TD', '+235', 'Tsjad'], ['CL', '+56', 'Chile'], ['CN', '+86', 'Kina'], ['CX', '+61', 'Christmasøya'],
+            ['CC', '+61', 'Kokosøyene'], ['CO', '+57', 'Colombia'], ['KM', '+269', 'Komorene'], ['CG', '+242', 'Kongo-Brazzaville'],
+            ['CD', '+243', 'Kongo-Kinshasa'], ['CK', '+682', 'Cookøyene'], ['CR', '+506', 'Costa Rica'], ['CI', '+225', 'Elfenbenskysten'],
+            ['HR', '+385', 'Kroatia'], ['CU', '+53', 'Cuba'], ['CW', '+599', 'Curaçao'], ['CY', '+357', 'Kypros'],
+            ['CZ', '+420', 'Tsjekkia'], ['DJ', '+253', 'Djibouti'], ['DM', '+1767', 'Dominica'], ['DO', '+1809', 'Den dominikanske republikk'],
+            ['EC', '+593', 'Ecuador'], ['EG', '+20', 'Egypt'], ['SV', '+503', 'El Salvador'], ['GQ', '+240', 'Ekvatorial-Guinea'],
+            ['ER', '+291', 'Eritrea'], ['EE', '+372', 'Estland'], ['SZ', '+268', 'Eswatini'], ['ET', '+251', 'Etiopia'],
+            ['FK', '+500', 'Falklandsøyene'], ['FO', '+298', 'Færøyene'], ['FJ', '+679', 'Fiji'], ['FR', '+33', 'Frankrike'],
+            ['GF', '+594', 'Fransk Guyana'], ['PF', '+689', 'Fransk Polynesia'], ['GA', '+241', 'Gabon'], ['GM', '+220', 'Gambia'],
+            ['GE', '+995', 'Georgia'], ['DE', '+49', 'Tyskland'], ['GH', '+233', 'Ghana'], ['GI', '+350', 'Gibraltar'],
+            ['GR', '+30', 'Hellas'], ['GL', '+299', 'Grønland'], ['GD', '+1473', 'Grenada'], ['GP', '+590', 'Guadeloupe'],
+            ['GU', '+1671', 'Guam'], ['GT', '+502', 'Guatemala'], ['GG', '+44', 'Guernsey'], ['GN', '+224', 'Guinea'],
+            ['GW', '+245', 'Guinea-Bissau'], ['GY', '+592', 'Guyana'], ['HT', '+509', 'Haiti'], ['HN', '+504', 'Honduras'],
+            ['HK', '+852', 'Hongkong'], ['HU', '+36', 'Ungarn'], ['IN', '+91', 'India'], ['ID', '+62', 'Indonesia'],
+            ['IR', '+98', 'Iran'], ['IQ', '+964', 'Irak'], ['IE', '+353', 'Irland'], ['IM', '+44', 'Man'],
+            ['IL', '+972', 'Israel'], ['IT', '+39', 'Italia'], ['JM', '+1876', 'Jamaica'], ['JP', '+81', 'Japan'],
+            ['JE', '+44', 'Jersey'], ['JO', '+962', 'Jordan'], ['KZ', '+7', 'Kasakhstan'], ['KE', '+254', 'Kenya'],
+            ['KI', '+686', 'Kiribati'], ['XK', '+383', 'Kosovo'], ['KW', '+965', 'Kuwait'], ['KG', '+996', 'Kirgisistan'],
+            ['LA', '+856', 'Laos'], ['LV', '+371', 'Latvia'], ['LB', '+961', 'Libanon'], ['LS', '+266', 'Lesotho'],
+            ['LR', '+231', 'Liberia'], ['LY', '+218', 'Libya'], ['LI', '+423', 'Liechtenstein'], ['LT', '+370', 'Litauen'],
+            ['LU', '+352', 'Luxembourg'], ['MO', '+853', 'Macao'], ['MG', '+261', 'Madagaskar'], ['MW', '+265', 'Malawi'],
+            ['MY', '+60', 'Malaysia'], ['MV', '+960', 'Maldivene'], ['ML', '+223', 'Mali'], ['MT', '+356', 'Malta'],
+            ['MH', '+692', 'Marshalløyene'], ['MQ', '+596', 'Martinique'], ['MR', '+222', 'Mauritania'], ['MU', '+230', 'Mauritius'],
+            ['YT', '+262', 'Mayotte'], ['MX', '+52', 'Mexico'], ['FM', '+691', 'Mikronesia'], ['MD', '+373', 'Moldova'],
+            ['MC', '+377', 'Monaco'], ['MN', '+976', 'Mongolia'], ['ME', '+382', 'Montenegro'], ['MS', '+1664', 'Montserrat'],
+            ['MA', '+212', 'Marokko'], ['MZ', '+258', 'Mosambik'], ['MM', '+95', 'Myanmar'], ['NA', '+264', 'Namibia'],
+            ['NR', '+674', 'Nauru'], ['NP', '+977', 'Nepal'], ['NL', '+31', 'Nederland'], ['NC', '+687', 'Ny-Caledonia'],
+            ['NZ', '+64', 'New Zealand'], ['NI', '+505', 'Nicaragua'], ['NE', '+227', 'Niger'], ['NG', '+234', 'Nigeria'],
+            ['NU', '+683', 'Niue'], ['NF', '+672', 'Norfolkøya'], ['KP', '+850', 'Nord-Korea'], ['MK', '+389', 'Nord-Makedonia'],
+            ['MP', '+1670', 'Nord-Marianene'], ['OM', '+968', 'Oman'], ['PK', '+92', 'Pakistan'], ['PW', '+680', 'Palau'],
+            ['PS', '+970', 'Palestina'], ['PA', '+507', 'Panama'], ['PG', '+675', 'Papua Ny-Guinea'], ['PY', '+595', 'Paraguay'],
+            ['PE', '+51', 'Peru'], ['PH', '+63', 'Filippinene'], ['PL', '+48', 'Polen'], ['PT', '+351', 'Portugal'],
+            ['PR', '+1787', 'Puerto Rico'], ['QA', '+974', 'Qatar'], ['RE', '+262', 'Réunion'], ['RO', '+40', 'Romania'],
+            ['RU', '+7', 'Russland'], ['RW', '+250', 'Rwanda'], ['WS', '+685', 'Samoa'], ['SM', '+378', 'San Marino'],
+            ['ST', '+239', 'São Tomé og Príncipe'], ['SA', '+966', 'Saudi-Arabia'], ['SN', '+221', 'Senegal'], ['RS', '+381', 'Serbia'],
+            ['SC', '+248', 'Seychellene'], ['SL', '+232', 'Sierra Leone'], ['SG', '+65', 'Singapore'], ['SX', '+1721', 'Sint Maarten'],
+            ['SK', '+421', 'Slovakia'], ['SI', '+386', 'Slovenia'], ['SB', '+677', 'Salomonøyene'], ['SO', '+252', 'Somalia'],
+            ['ZA', '+27', 'Sør-Afrika'], ['KR', '+82', 'Sør-Korea'], ['SS', '+211', 'Sør-Sudan'], ['ES', '+34', 'Spania'],
+            ['LK', '+94', 'Sri Lanka'], ['BL', '+590', 'Saint-Barthélemy'], ['SH', '+290', 'St. Helena'], ['KN', '+1869', 'Saint Kitts og Nevis'],
+            ['LC', '+1758', 'Saint Lucia'], ['MF', '+590', 'Saint-Martin'], ['PM', '+508', 'Saint-Pierre og Miquelon'], ['VC', '+1784', 'Saint Vincent og Grenadinene'],
+            ['SD', '+249', 'Sudan'], ['SR', '+597', 'Surinam'], ['CH', '+41', 'Sveits'], ['SY', '+963', 'Syria'],
+            ['TW', '+886', 'Taiwan'], ['TJ', '+992', 'Tadsjikistan'], ['TZ', '+255', 'Tanzania'], ['TH', '+66', 'Thailand'],
+            ['TL', '+670', 'Timor-Leste'], ['TG', '+228', 'Togo'], ['TK', '+690', 'Tokelau'], ['TO', '+676', 'Tonga'],
+            ['TT', '+1868', 'Trinidad og Tobago'], ['TN', '+216', 'Tunisia'], ['TR', '+90', 'Tyrkia'], ['TM', '+993', 'Turkmenistan'],
+            ['TC', '+1649', 'Turks- og Caicosøyene'], ['TV', '+688', 'Tuvalu'], ['UG', '+256', 'Uganda'], ['UA', '+380', 'Ukraina'],
+            ['AE', '+971', 'De forente arabiske emirater'], ['UY', '+598', 'Uruguay'], ['UZ', '+998', 'Usbekistan'], ['VU', '+678', 'Vanuatu'],
+            ['VA', '+379', 'Vatikanstaten'], ['VE', '+58', 'Venezuela'], ['VN', '+84', 'Vietnam'], ['VI', '+1340', 'De amerikanske jomfruøyene'],
+            ['WF', '+681', 'Wallis og Futuna'], ['EH', '+212', 'Vest-Sahara'], ['YE', '+967', 'Jemen'], ['ZM', '+260', 'Zambia'],
+            ['ZW', '+263', 'Zimbabwe']
+        ];
+    }
+
+    async _fetchCurrentUserDonations({ order = false } = {}) {
+        const uid = this.currentUser?.uid;
+        const email = (this.currentUser?.email || '').trim().toLowerCase();
+        const authEmail = (firebase.auth().currentUser?.email || '').trim();
+        if (!uid && !email) return [];
+
+        const db = firebase.firestore();
+        const byId = new Map();
+        const addSnap = (snap) => {
+            snap.forEach(doc => byId.set(doc.id, { id: doc.id, ...doc.data() }));
         };
 
-        const lookupWord = async (word) => {
-            dictOverlay.style.display = 'flex';
-            dictTitle.textContent = `Eksikon: "${word}"`;
-            dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Søker i Bibeleksikon...</p>`;
-            
-            try {
-                const lang = document.documentElement.lang || 'no';
-                const res = await fetch(`/api/bible/dictionary?word=${encodeURIComponent(word)}&lang=${lang}`);
-                if (!res.ok) throw new Error("Fetch failed");
-                const dictRes = await res.json();
-                
-                if (dictRes && dictRes.definition) {
-                    const parsedDef = dictRes.definition
-                        .replace(/\n/g, '<br>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
-                    
-                    let html = `<p style="margin-bottom:8px;"><strong>Kategori:</strong> ${dictRes.category || 'Ordbok'}</p>`;
-                    html += `<p style="margin-top:12px; font-size: 13.5px; line-height: 1.6; color:#1e293b;">${parsedDef}</p>`;
-                    if (dictRes.contextualNote) {
-                        const parsedNote = dictRes.contextualNote
-                            .replace(/\n/g, '<br>')
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            .replace(/\*(.*?)\*/g, '<em>$1</em>');
-                        html += `<div style="margin-top:16px; padding:12px; background:#f8fafc; border-left:3px solid #d17d39; border-radius:4px; font-size:12px; line-height: 1.5; color: #475569;">${parsedNote}</div>`;
-                    }
-                    dictContent.innerHTML = html;
-                } else {
-                    dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Fant ingen definisjon på "${word}" i leksikonet.</p>`;
-                }
-            } catch (e) {
-                console.error("Word lookup error:", e);
-                dictContent.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; padding-top:40px;">Feil ved søk i leksikon.</p>`;
-            }
-        };
-
-        dictClose?.addEventListener('click', () => {
-            dictOverlay.style.display = 'none';
-        });
-
-        // Copy selected verses
-        container.querySelector('#bible-btn-copy')?.addEventListener('click', () => {
-            if (selectedVerses.length === 0) return;
-            selectedVerses.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-            
-            const bookName = bibBookSelect.options[bibBookSelect.selectedIndex].text;
-            const chapterNum = bibChapSelect.options[bibChapSelect.selectedIndex].text;
-            
-            const textToCopy = selectedVerses.map(vNum => {
-                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${vNum}"]`);
-                return el ? `[v. ${vNum}] ${el.innerText.replace(vNum, '').trim()}` : '';
-            }).filter(Boolean).join('\n');
-            
-            const fullRef = `${bookName} ${chapterNum}:${selectedVerses.join(', ')}`;
-            const finalString = `${fullRef}\n\n${textToCopy}\n\n(Delt fra His Kingdom Ministry)`;
-            
-            navigator.clipboard.writeText(finalString).then(() => {
-                window.showToast?.('Bibelversene er kopiert!', 'success') || alert('Kopiert til utklippstavle!');
-                selectedVerses = [];
-                bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
-                updateToolbarStates();
-            });
-        });
-
-        // Highlight/Bookmark selected verses
-        container.querySelector('#bible-btn-highlight')?.addEventListener('click', () => {
-            if (selectedVerses.length === 0) return;
-            const bibleId = bibTransSelect.value;
-            const bookId = bibBookSelect.value;
-            const chapterId = bibChapSelect.value;
-            
-            let highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
-            
-            selectedVerses.forEach(verseNum => {
-                const matchIdx = highlights.findIndex(h => 
-                    h.bibleId === bibleId && 
-                    h.chapterId === chapterId && 
-                    h.verseNum === verseNum.toString()
-                );
-                
-                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${verseNum}"]`);
-                
-                if (matchIdx > -1) {
-                    highlights.splice(matchIdx, 1);
-                    if (el) el.classList.remove('highlighted-verse');
-                } else {
-                    highlights.push({ bibleId, bookId, chapterId, verseNum: verseNum.toString() });
-                    if (el) el.classList.add('highlighted-verse');
-                }
-            });
-            
-            localStorage.setItem('hkm_bible_highlights', JSON.stringify(highlights));
-            window.showToast?.('Markeringsstatus oppdatert!', 'success');
-            
-            selectedVerses = [];
-            bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
-            updateToolbarStates();
-        });
-
-        // Toggle layout layout-paragraph vs layout-verse
-        container.querySelector('#bible-btn-layout')?.addEventListener('click', () => {
-            const btn = container.querySelector('#bible-btn-layout');
-            if (bibleLayout === 'verse') {
-                bibleLayout = 'paragraph';
-                btn.classList.add('active');
-            } else {
-                bibleLayout = 'verse';
-                btn.classList.remove('active');
-            }
-            // Trigger re-render of verses with new layout
-            const bibleId = bibTransSelect.value;
-            const chapterId = bibChapSelect.value;
-            if (bibleId && chapterId) {
-                loadVerses(bibleId, chapterId);
-            }
-        });
-
-        // Font size adjustments
-        const updateFontSizeDisplay = () => {
-            container.querySelector('#bible-font-size-indicator').textContent = `${bibleFontSize}px`;
-            const bibleId = bibTransSelect.value;
-            const chapterId = bibChapSelect.value;
-            if (bibleId && chapterId) {
-                loadVerses(bibleId, chapterId);
-            }
-        };
-
-        container.querySelector('#bible-btn-font-dec')?.addEventListener('click', () => {
-            if (bibleFontSize > 11) {
-                bibleFontSize -= 1;
-                updateFontSizeDisplay();
-            }
-        });
-
-        container.querySelector('#bible-btn-font-inc')?.addEventListener('click', () => {
-            if (bibleFontSize < 24) {
-                bibleFontSize += 1;
-                updateFontSizeDisplay();
-            }
-        });
-
-        const loadChapters = async (bibleId, bookId, autoSelect = false) => {
-            try {
-                bibChapSelect.disabled = true;
-                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
-                
-                const res = await fetch(`/api/bible/bibles/${bibleId}/books/${bookId}/chapters`);
-                const payload = await res.json();
-                const chapters = payload.data || payload || [];
-                
-                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
-                    <option value="${c.id}">${c.number}</option>
-                `).join('');
-                bibChapSelect.disabled = false;
-
-                if (autoSelect && chapters.length > 0) {
-                    // Pre-select Chapter 1, fallback to first chapter
-                    const defaultChapter = chapters.find(c => c.number === '1' || c.number === 1) || chapters[0];
-                    bibChapSelect.value = defaultChapter.id;
-                    await loadVerses(bibleId, defaultChapter.id);
-                }
-            } catch (e) {
-                console.error("Bible widget loadChapters error:", e);
-            }
-        };
-
-        bibTransSelect?.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            if (bibId) loadBooks(bibId, true);
-        });
-
-        bibBookSelect?.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            const bookId = bibBookSelect.value;
-            if (bibId && bookId) loadChapters(bibId, bookId, true);
-        });
-
-        bibChapSelect?.addEventListener('change', () => {
-            const bibId = bibTransSelect.value;
-            const chapId = bibChapSelect.value;
-            if (bibId && chapId) loadVerses(bibId, chapId);
-        });
-
-        // Trigger initial data load
-        loadBibleData();
-
-
-
-        // Setup Live Zoom Countdown Timer
-        if (window._playerCountdownInterval) {
-            clearInterval(window._playerCountdownInterval);
-            window._playerCountdownInterval = null;
+        const queries = [];
+        if (uid) {
+            queries.push(db.collection('donations').where('userId', '==', uid).get());
+            queries.push(db.collection('donations').where('uid', '==', uid).get());
+        }
+        if (email) {
+            queries.push(db.collection('donations').where('donorEmail', '==', email).get());
+            queries.push(db.collection('donations').where('email', '==', email).get());
+        }
+        if (authEmail && authEmail !== email) {
+            queries.push(db.collection('donations').where('donorEmail', '==', authEmail).get());
+            queries.push(db.collection('donations').where('email', '==', authEmail).get());
         }
 
-        const countdownEl = container.querySelector('#zoom-countdown');
-        if (countdownEl) {
-            const targetTime = parseInt(countdownEl.getAttribute('data-target'), 10);
-            
-            const updateTimer = () => {
-                const el = document.getElementById('zoom-countdown');
-                if (!el) {
-                    if (window._playerCountdownInterval) {
-                        clearInterval(window._playerCountdownInterval);
-                        window._playerCountdownInterval = null;
-                    }
-                    return;
-                }
+        const results = await Promise.allSettled(queries);
+        results.forEach(result => {
+            if (result.status === 'fulfilled') addSnap(result.value);
+            if (result.status === 'rejected') console.warn('Kunne ikke hente gave-spørring:', result.reason);
+        });
 
-                const now = Date.now();
-                const diff = targetTime - now;
-                
-                if (diff <= 0) {
-                    el.innerHTML = '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>';
-                    if (window._playerCountdownInterval) {
-                        clearInterval(window._playerCountdownInterval);
-                        window._playerCountdownInterval = null;
-                    }
-                    return;
+        const donations = Array.from(byId.values()).filter(donation => this._donationStatusIsVisible(donation));
+        donations.sort((a, b) => {
+            const at = this._getDonationDate(a)?.getTime?.() || 0;
+            const bt = this._getDonationDate(b)?.getTime?.() || 0;
+            return bt - at;
+        });
+        return donations;
+    }
+
+    async refreshProfileSubCollections(uid) {
+        if (!uid) {
+            this.profileData.subCollections = this._emptyProfileSubCollections();
+            return this.profileData.subCollections;
+        }
+
+        const empty = this._emptyProfileSubCollections();
+
+        try {
+            const [notifications, personalNotes, sharedNotes] = await Promise.all([
+                window.firebaseService.getCachedCollection('user_notifications', `notifs:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+                window.firebaseService.getCachedCollection('personal_notes', `personal_notes:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+                window.firebaseService.getCachedCollection('user_notes', `shared_notes:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+            ]);
+
+            const normalizedNotifs = (notifications || []).map(d => this._normalizeNotificationDoc(d));
+            const communicationItems = normalizedNotifs.filter(item =>
+                ['push', 'message', 'email', 'announcement'].includes(item.type) || !!item.body
+            );
+
+            const normalizedPersonal = (personalNotes || []).map(d => this._normalizeNoteDoc(d, 'personal'));
+            const normalizedShared = (sharedNotes || []).map(d => this._normalizeNoteDoc(d, 'shared'));
+
+            const mapped = {
+                communication: {
+                    items: communicationItems,
+                    count: communicationItems.length
+                },
+                activity: {
+                    items: normalizedNotifs,
+                    count: normalizedNotifs.length
+                },
+                notes: {
+                    personal: normalizedPersonal,
+                    shared: normalizedShared,
+                    count: normalizedPersonal.length + normalizedShared.length
                 }
-                
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                let timeStr = '';
-                if (days > 0) {
-                    timeStr += `${days}d ${hours}t ${minutes}m`;
-                } else if (hours > 0) {
-                    timeStr += `${hours}t ${minutes}m ${seconds}s`;
-                } else {
-                    timeStr += `${minutes}m ${seconds}s`;
-                }
-                
-                el.textContent = timeStr;
             };
-            
-            updateTimer();
-            window._playerCountdownInterval = setInterval(updateTimer, 1000);
+
+            this.profileData = {
+                ...this.profileData,
+                subCollections: mapped
+            };
+
+            return mapped;
+        } catch (e) {
+            console.warn('refreshProfileSubCollections:', e);
+            this.profileData = {
+                ...this.profileData,
+                subCollections: empty
+            };
+            return empty;
+        }
+    }
+
+    async getMergedProfile(user) {
+        if (!user) return {};
+        let data = {};
+        try {
+            const doc = await withTimeout(
+                firebase.firestore().collection('users').doc(user.uid).get(),
+                3000
+            );
+            if (doc && doc.exists) data = doc.data() || {};
+        } catch (e) { console.warn('getMergedProfile:', e); }
+
+        const google = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
+        
+        let role = 'medlem';
+        try {
+            if (window.firebaseService && typeof window.firebaseService.getUserRole === 'function') {
+                role = await window.firebaseService.getUserRole(user.uid);
+            } else {
+                role = data.role || 'medlem';
+            }
+        } catch (e) {
+            console.warn('getMergedProfile role fetch failed, fallback to local/default:', e);
+            role = data.role || 'medlem';
+        }
+
+        return {
+            ...data,
+            displayName: data.displayName || user.displayName || google.displayName || user.email || '',
+            photoURL: data.photoURL || user.photoURL || google.photoURL || '',
+            role: role || data.role || 'medlem',
+            subCollections: this.profileData?.subCollections || data.subCollections || this._emptyProfileSubCollections(),
+        };
+    }
+
+    async syncUserProfile(user) {
+        if (!user) return;
+        try {
+            const ref = firebase.firestore().collection('users').doc(user.uid);
+            const doc = await withTimeout(ref.get(), 3000);
+            if (doc && !doc.exists) {
+                await withTimeout(ref.set({
+                    email: (user.email || '').toLowerCase().trim(),
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    role: 'medlem',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                }), 3000);
+                await this.createAdminNotification({
+                    type: 'NEW_USER_REGISTRATION',
+                    userId: user.uid,
+                    userEmail: user.email,
+                    userName: user.displayName || user.email,
+                    message: `Ny bruker: ${user.displayName || user.email}`,
+                });
+            }
+
+            // Auto-register FCM token if notification permission is already granted
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && firebase.messaging && firebase.messaging.isSupported()) {
+                (async () => {
+                    try {
+                        const msg = firebase.messaging();
+                        
+                        // Handle foreground push notifications
+                        msg.onMessage((payload) => {
+                            console.log('[MinSide] Foreground message received:', payload);
+                            const title = payload.notification?.title || 'Ny oppdatering';
+                            const body = payload.notification?.body || '';
+                            if (typeof window.showToast === 'function') {
+                                window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
+                            }
+                        });
+
+                        const registration = await Promise.race([
+                            navigator.serviceWorker.ready,
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+                        ]);
+                        const token = await msg.getToken({
+                            vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                            serviceWorkerRegistration: registration
+                        });
+                        if (token) {
+                            await ref.update({
+                                fcmTokens: firebase.firestore.FieldValue.arrayUnion(token),
+                                pushEnabled: true
+                            });
+                            console.log('[MinSide] Auto-registered FCM token:', token);
+                        }
+                    } catch (fcmErr) {
+                        console.warn('[MinSide] Auto FCM registration failed:', fcmErr.message);
+                        if (window.hkmLogger) {
+                            window.hkmLogger.warn(`Auto FCM registration failed: ${fcmErr.message || fcmErr}`);
+                        }
+                    }
+                })();
+            }
+        } catch (e) { console.warn('syncUserProfile:', e); }
+    }
+
+    async syncProfileFromGoogleProvider() {
+        const user = this.currentUser;
+        if (!user) return;
+        const google = (user.providerData || []).find(p => p.providerId === 'google.com');
+        if (!google) return;
+        try {
+            const updates = {};
+            if (!user.displayName && google.displayName) updates.displayName = google.displayName;
+            if (!user.photoURL && google.photoURL) updates.photoURL = google.photoURL;
+            if (Object.keys(updates).length) await user.updateProfile(updates);
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                displayName: user.displayName || google.displayName || '',
+                photoURL: user.photoURL || google.photoURL || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+        } catch (e) { console.warn('syncGoogleProvider:', e); }
+    }
+
+    async createAdminNotification(data) {
+        try {
+            await firebase.firestore().collection('admin_notifications').add({
+                ...data,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false,
+            });
+        } catch (e) { console.warn('createAdminNotification:', e); }
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // NOTIFICATION BADGE
+    // ──────────────────────────────────────────────────────────
+    initNotificationBadge() {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        try {
+            this._badgeUnsubscribe = firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .where('read', '==', false)
+                .onSnapshot(
+                    snap => this._setBadge(snap.size),
+                    err => console.warn('[MinSide] notification badge listener error:', err)
+                );
+        } catch (e) { console.warn('badge listener:', e); }
+    }
+
+    _setBadge(count) {
+        const el = document.getElementById('notif-badge');
+        const headerDot = document.getElementById('notif-badge-header');
+        const bottomDot = document.getElementById('notif-badge-bottom');
+        const bellDot = document.getElementById('notif-badge-header-bell');
+        
+        if (el) {
+            el.textContent = count > 9 ? '9+' : count;
+            el.style.setProperty('display', count > 0 ? 'inline-block' : 'none', 'important');
+        }
+        
+        if (headerDot) {
+            headerDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
+        }
+
+        if (bottomDot) {
+            bottomDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
+        }
+
+        if (bellDot) {
+            bellDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
         }
     }
 
@@ -2670,35 +2051,9 @@ class MinSideManager {
         return date.toLocaleDateString(localeCode, { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
-    _normalizeNotificationDoc(docLike) {
-        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
-        return {
-            id: docLike?.id || raw.id || '',
-            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert'),
-            body: typeof raw.body === 'string' ? raw.body : '',
-            type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
-            link: typeof raw.link === 'string' ? raw.link : '',
-            read: raw.read === true,
-            archived: raw.archived === true,
-            createdAt: raw.createdAt || null,
-        };
-    }
-
-    async _fetchCurrentUserDonations() {
-        if (!this.currentUser) return [];
-        try {
-            const snap = await firebase.firestore().collection('donations')
-                .where('userId', '==', this.currentUser.uid)
-                .get();
-            let donations = [];
-            snap.forEach(doc => donations.push({ id: doc.id, ...doc.data() }));
-            return donations;
-        } catch (e) {
-            console.warn('_fetchCurrentUserDonations warning:', e);
-            return [];
-        }
-    }
-
+    // ══════════════════════════════════════════════════════════
+    // VIEW: OVERSIKT (Dashboard forside)
+    // ══════════════════════════════════════════════════════════
     async renderOverview(container) {
         const p = this.profileData;
         const user = this.currentUser;
@@ -2857,7 +2212,7 @@ class MinSideManager {
                 this._fetchCurrentUserDonations(),
                 firebase.firestore().collection('siteContent').doc('collection_courses').get(),
                 firebase.firestore().collection('user_notifications')
-                    .where('userId', '==', uid).get()
+                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get()
             ];
             if (this.prayerWallEnabled) {
                 promises.push(firebase.firestore().collection('prayers').get());
@@ -2979,18 +2334,11 @@ class MinSideManager {
             // Recent notifications list
             const recentEl = document.getElementById('ov-recent-notifs');
             if (recentEl) {
-                if (!recentSnap || recentSnap.empty) {
+                if (recentSnap.empty) {
                     recentEl.innerHTML = `<div class="ms-overview-notifs-empty">${t('overview.noNotificationsYet')}</div>`;
                 } else {
-                    const sortedNotifs = recentSnap.docs.map(doc => this._normalizeNotificationDoc(doc));
-                    sortedNotifs.sort((a, b) => {
-                        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
-                        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
-                        return bTime - aTime;
-                    });
-                    const topNotifs = sortedNotifs.slice(0, 4);
-
-                    recentEl.innerHTML = topNotifs.map(d => {
+                    recentEl.innerHTML = recentSnap.docs.map(doc => {
+                        const d = this._normalizeNotificationDoc(doc);
                         const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
                         return `<div class="ms-overview-notif-row">
                             <div class="ms-overview-notif-dot ${d.read ? 'is-read' : ''}"></div>
@@ -3002,7 +2350,7 @@ class MinSideManager {
                         </div>`;
                     }).join('') + `<div class="ms-overview-notifs-footer">
                         <button class="btn btn-ghost btn-sm ms-btn-full"
-                            onclick="if (window.minSideApp) window.minSideApp.loadView('notifications'); else if (window.minSideManager) window.minSideManager.loadView('notifications');">
+                            onclick="window.minSideManager.loadView('notifications')">
                             ${t('overview.showAllNotifications')}
                         </button></div>`;
                 }
@@ -3014,299 +2362,287 @@ class MinSideManager {
                 const ovEventsFeed = document.getElementById('ov-events-feed-preview');
                 if (!ovEventsCard || !ovEventsFeed) return;
 
+                // Image library helpers matching content-manager.js
+                const generateEventImage = (title) => {
+                    const imageLibrary = {
+                        'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
+                        'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
+                        'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
+                        'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
+                        'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
+                        'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
+                        'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
+                        'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
+                        'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
+                        'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
+                        'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
+                        'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
+                        'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
+                        'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
+                        'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
+                    };
+
+                    if (!title) return imageLibrary.default;
+
+                    const titleLower = title.toLowerCase();
+                    const keywordMap = {
+                        'bønn': 'prayer',
+                        'gudstjeneste': 'worship',
+                        'seminar': 'conference',
+                        'konferanse': 'conference',
+                        'undervisning': 'teaching',
+                        'skole': 'teaching',
+                        'kurs': 'teaching',
+                        'bibel': 'bible',
+                        'leseplan': 'bible',
+                        'ungdom': 'youth',
+                        'teens': 'youth',
+                        'barn': 'children',
+                        'søndagsskole': 'children',
+                        'familie': 'family',
+                        'påske': 'easter',
+                        'jul': 'christmas',
+                        'konsert': 'concert',
+                        'musikk': 'concert',
+                        'møte': 'meeting',
+                        'basar': 'family',
+                        'fellesskap': 'gathering'
+                    };
+
+                    for (const [key, category] of Object.entries(keywordMap)) {
+                        if (titleLower.includes(key)) {
+                            return imageLibrary[category];
+                        }
+                    }
+                    return imageLibrary.default;
+                };
+
+                const getEventImage = (event) => {
+                    if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
+                    return event.imageUrl || generateEventImage(event.title);
+                };
+
+                const normalizeGCalEvent = (item) => {
+                    const startVal = item.start.dateTime || item.start.date;
+                    const dateObj = new Date(startVal);
+                    return {
+                        id: item.id,
+                        title: item.summary || 'Uten tittel',
+                        description: item.description || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
+                        eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: 'Arrangement'
+                    };
+                };
+
+                const normalizeFirestoreEvent = (item) => {
+                    const dateObj = new Date(item.date);
+                    return {
+                        id: item.id,
+                        title: item.title || 'Uten tittel',
+                        description: item.description || item.seoDescription || '',
+                        date: dateObj,
+                        location: item.location || '',
+                        imageUrl: item.imageUrl || item.image || '',
+                        eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                        category: item.category || 'Arrangement'
+                    };
+                };
+
+                let allEvents = [];
+                let enrollments = [];
+                const email = firebase.auth().currentUser?.email;
+
+                // 1. Fetch user enrollments
+                if (email || uid) {
+                    try {
+                        const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
+                        if (targetEmails.length > 0) {
+                            const enrollSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('email', 'in', targetEmails)
+                                .get();
+                            enrollSnap.forEach(d => enrollments.push(d.data()));
+                        }
+                        if (uid) {
+                            const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('userId', '==', uid)
+                                .get();
+                            enrollUserSnap.forEach(d => enrollments.push(d.data()));
+                        }
+                    } catch (e) {
+                        console.error("Error fetching course enrollments for dashboard:", e);
+                    }
+                }
+                const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
+
+                const isUserEnrolledInCourse = (courseId) => {
+                    if (isAdmin) return true;
+                    return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
+                };
+
+                // 2. Fetch GCal events
+                let gcalEventsNormalized = [];
                 try {
-                    // Image library helpers matching content-manager.js
-                    const generateEventImage = (title) => {
-                        const imageLibrary = {
-                            'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
-                            'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
-                            'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
-                            'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
-                            'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
-                            'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
-                            'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
-                            'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
-                            'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
-                            'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
-                            'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
-                            'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
-                            'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
-                            'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
-                            'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
-                        };
-
-                        if (!title) return imageLibrary.default;
-
-                        const titleLower = title.toLowerCase();
-                        const keywordMap = {
-                            'bønn': 'prayer',
-                            'gudstjeneste': 'worship',
-                            'seminar': 'conference',
-                            'konferanse': 'conference',
-                            'undervisning': 'teaching',
-                            'skole': 'teaching',
-                            'kurs': 'teaching',
-                            'bibel': 'bible',
-                            'leseplan': 'bible',
-                            'ungdom': 'youth',
-                            'teens': 'youth',
-                            'barn': 'children',
-                            'søndagsskole': 'children',
-                            'familie': 'family',
-                            'påske': 'easter',
-                            'jul': 'christmas',
-                            'konsert': 'concert',
-                            'musikk': 'concert',
-                            'møte': 'meeting',
-                            'basar': 'family',
-                            'fellesskap': 'gathering'
-                        };
-
-                        for (const [key, category] of Object.entries(keywordMap)) {
-                            if (titleLower.includes(key)) {
-                                return imageLibrary[category];
+                    const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
+                    if (settingsSnap.exists) {
+                        const settings = settingsSnap.data();
+                        const gcal = settings.googleCalendar || {};
+                        if (gcal && gcal.apiKey && gcal.calendarId) {
+                            const nowIso = new Date().toISOString();
+                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
+                            const resp = await fetch(url);
+                            if (resp.ok) {
+                                const data = await resp.json();
+                                const gcalItems = data.items || [];
+                                gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
                             }
-                        }
-                        return imageLibrary.default;
-                    };
-
-                    const getEventImage = (event) => {
-                        if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
-                        return event.imageUrl || generateEventImage(event.title);
-                    };
-
-                    const normalizeGCalEvent = (item) => {
-                        const startVal = item.start.dateTime || item.start.date;
-                        const dateObj = new Date(startVal);
-                        return {
-                            id: item.id,
-                            title: item.summary || 'Uten tittel',
-                            description: item.description || '',
-                            date: dateObj,
-                            location: item.location || '',
-                            imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
-                            eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
-                            category: 'Arrangement'
-                        };
-                    };
-
-                    const normalizeFirestoreEvent = (item) => {
-                        const dateObj = new Date(item.date);
-                        return {
-                            id: item.id,
-                            title: item.title || 'Uten tittel',
-                            description: item.description || item.seoDescription || '',
-                            date: dateObj,
-                            location: item.location || '',
-                            imageUrl: item.imageUrl || item.image || '',
-                            eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
-                            category: item.category || 'Arrangement'
-                        };
-                    };
-
-                    let allEvents = [];
-                    let enrollments = [];
-                    const email = firebase.auth().currentUser?.email;
-
-                    // 1. Fetch user enrollments
-                    if (email || uid) {
-                        try {
-                            const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
-                            if (targetEmails.length > 0) {
-                                const enrollSnap = await firebase.firestore().collection('courseEnrollments')
-                                    .where('email', 'in', targetEmails)
-                                    .get();
-                                enrollSnap.forEach(d => enrollments.push(d.data()));
-                            }
-                            if (uid) {
-                                const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
-                                    .where('userId', '==', uid)
-                                    .get();
-                                enrollUserSnap.forEach(d => enrollments.push(d.data()));
-                            }
-                        } catch (e) {
-                            console.error("Error fetching course enrollments for dashboard:", e);
                         }
                     }
-                    const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
+                } catch (e) {
+                    console.error("Failed to fetch GCal events:", e);
+                }
 
-                    const isUserEnrolledInCourse = (courseId) => {
-                        if (isAdmin) return true;
-                        return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
-                    };
-
-                    // 2. Fetch GCal events
-                    let gcalEventsNormalized = [];
-                    try {
-                        const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
-                        if (settingsSnap.exists) {
-                            const settings = settingsSnap.data();
-                            const gcal = settings.googleCalendar || {};
-                            if (gcal && gcal.apiKey && gcal.calendarId) {
-                                const nowIso = new Date().toISOString();
-                                const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
-                                const resp = await fetch(url);
-                                if (resp.ok) {
-                                    const data = await resp.json();
-                                    const gcalItems = data.items || [];
-                                    gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Failed to fetch GCal events:", e);
-                    }
-
-                    // 3. Fetch Firestore events
-                    let firestoreEventsNormalized = [];
-                    try {
-                        const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
-                        if (fsEventsSnap.exists) {
-                            const fsData = fsEventsSnap.data();
-                            const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
-                            const now = new Date();
-                            
-                            firestoreEventsNormalized = fsItems
-                                .map(normalizeFirestoreEvent)
-                                .filter(ev => ev.date >= now); // only future events
-                        }
-                    } catch (e) {
-                        console.error("Failed to fetch Firestore events:", e);
-                    }
-
-                    // Deduplicate and Merge GCal and Firestore events
-                    const isSameDay = (d1, d2) => {
-                        return d1.getFullYear() === d2.getFullYear() &&
-                               d1.getMonth() === d2.getMonth() &&
-                               d1.getDate() === d2.getDate();
-                    };
-
-                    const mergedGCal = [];
-                    const matchedFirestoreIds = new Set();
-                    
-                    gcalEventsNormalized.forEach(gEvent => {
-                        const match = firestoreEventsNormalized.find(fEvent => {
-                            const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
-                            const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
-                            return sameId || sameDayMatch;
-                        });
+                // 3. Fetch Firestore events
+                let firestoreEventsNormalized = [];
+                try {
+                    const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
+                    if (fsEventsSnap.exists) {
+                        const fsData = fsEventsSnap.data();
+                        const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
+                        const now = new Date();
                         
-                        if (match) {
-                            matchedFirestoreIds.add(match.id);
-                            
-                            // Prioritize database override description, fallback to GCal description
-                            const gcalDesc = gEvent.description || '';
-                            const fsDesc = match.description || '';
+                        firestoreEventsNormalized = fsItems
+                            .map(normalizeFirestoreEvent)
+                            .filter(ev => ev.date >= now); // only future events
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch Firestore events:", e);
+                }
 
-                            mergedGCal.push({
-                                ...gEvent,
-                                ...match,
-                                date: match.date || gEvent.date,
-                                description: fsDesc || gcalDesc
-                            });
-                        } else {
-                            mergedGCal.push(gEvent);
-                        }
+                // Deduplicate and Merge GCal and Firestore events
+                const isSameDay = (d1, d2) => {
+                    return d1.getFullYear() === d2.getFullYear() &&
+                           d1.getMonth() === d2.getMonth() &&
+                           d1.getDate() === d2.getDate();
+                };
+
+                const mergedGCal = [];
+                const matchedFirestoreIds = new Set();
+                
+                gcalEventsNormalized.forEach(gEvent => {
+                    const match = firestoreEventsNormalized.find(fEvent => {
+                        const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
+                        const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
+                        return sameId || sameDayMatch;
                     });
                     
-                    const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
-                    
-                    allEvents.push(...mergedGCal, ...uniqueFirestore);
+                    if (match) {
+                        matchedFirestoreIds.add(match.id);
+                        
+                        // Prioritize database override description, fallback to GCal description
+                        const gcalDesc = gEvent.description || '';
+                        const fsDesc = match.description || '';
 
-                    // 4. Filter events based on course enrollment
-                    const filteredEvents = allEvents.filter(ev => {
-                        const cat = String(ev.category || '').toLowerCase();
-                        if (cat === 'kurs' || cat === 'courses') {
-                            // Extract courseId from eventLink
-                            const match = ev.eventLink?.match(/courseId=([^&]+)/);
-                            const courseId = match ? match[1] : null;
-                            if (courseId) {
-                                return isUserEnrolledInCourse(courseId);
-                            }
-                            return false; // hide course events if we can't determine the course ID
-                        }
-                        return true; // show all other events
-                    });
-
-                    // 5. Sort by date ascending
-                    filteredEvents.sort((a, b) => a.date - b.date);
-
-                    // 6. Take top 3
-                    const topEvents = filteredEvents.slice(0, 3);
-
-                    if (topEvents.length > 0) {
-                        ovEventsFeed.innerHTML = topEvents.map(item => {
-                            const dateObj = item.date;
-                            const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
-                            
-                            const lang = document.documentElement.lang || 'no';
-                            const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
-                            const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
-                            const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
-                            const day = dateObj.getDate();
-
-                            const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-                            let timeLabel = '';
-                            if (hasTime) {
-                                const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
-                                if (lang === 'en') {
-                                    timeLabel = `, at ${startTime}`;
-                                } else if (lang === 'es') {
-                                    timeLabel = `, a las ${startTime}`;
-                                } else {
-                                    timeLabel = `, kl. ${startTime}`;
-                                }
-                            }
-                            
-                            const imageSrc = getEventImage(item);
-                            const imageAlt = item.title;
-                            
-                            const rawDesc = item.description || '';
-                            const cleanExcerpt = typeof rawDesc === 'string' 
-                                ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
-                                : '';
-                            const limitExcerpt = cleanExcerpt.length > 120 
-                                ? cleanExcerpt.slice(0, 117) + '...' 
-                                : cleanExcerpt;
-
-                            return `
-                                <a href="${item.eventLink}" class="ov-event-card">
-                                    <div class="ov-event-image">
-                                        <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
-                                        <div class="ov-event-date-badge">
-                                            <span class="month">${monthUpper}</span>
-                                            <span class="day">${day}</span>
-                                        </div>
-                                    </div>
-                                    <div class="ov-event-content">
-                                        <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
-                                        ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
-                                        <div class="ov-event-meta">
-                                            <span class="material-symbols-outlined">calendar_today</span>
-                                            <span>${dateLabel}${timeLabel}</span>
-                                        </div>
-                                    </div>
-                                </a>
-                            `;
-                        }).join('');
+                        mergedGCal.push({
+                            ...gEvent,
+                            ...match,
+                            date: match.date || gEvent.date,
+                            description: fsDesc || gcalDesc
+                        });
                     } else {
-                        ovEventsFeed.innerHTML = `
-                            <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
-                                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
-                                <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
-                            </div>
-                        `;
+                        mergedGCal.push(gEvent);
                     }
-                } catch (err) {
-                    console.warn("Calendar events preview error:", err);
-                    if (ovEventsFeed) {
-                        ovEventsFeed.innerHTML = `
-                            <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
-                                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
-                                <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
-                            </div>
-                        `;
+                });
+                
+                const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
+                
+                allEvents.push(...mergedGCal, ...uniqueFirestore);
+
+                // 4. Filter events based on course enrollment
+                const filteredEvents = allEvents.filter(ev => {
+                    const cat = String(ev.category || '').toLowerCase();
+                    if (cat === 'kurs' || cat === 'courses') {
+                        // Extract courseId from eventLink
+                        const match = ev.eventLink?.match(/courseId=([^&]+)/);
+                        const courseId = match ? match[1] : null;
+                        if (courseId) {
+                            return isUserEnrolledInCourse(courseId);
+                        }
+                        return false; // hide course events if we can't determine the course ID
                     }
+                    return true; // show all other events
+                });
+
+                // 5. Sort by date ascending
+                filteredEvents.sort((a, b) => a.date - b.date);
+
+                // 6. Take top 3
+                const topEvents = filteredEvents.slice(0, 3);
+
+                if (topEvents.length > 0) {
+                    ovEventsFeed.innerHTML = topEvents.map(item => {
+                        const dateObj = item.date;
+                        const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
+                        
+                        const lang = document.documentElement.lang || 'no';
+                        const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+                        const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
+                        const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
+                        const day = dateObj.getDate();
+
+                        const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+                        let timeLabel = '';
+                        if (hasTime) {
+                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
+                            if (lang === 'en') {
+                                timeLabel = `, at ${startTime}`;
+                            } else if (lang === 'es') {
+                                timeLabel = `, a las ${startTime}`;
+                            } else {
+                                timeLabel = `, kl. ${startTime}`;
+                            }
+                        }
+                        
+                        const imageSrc = getEventImage(item);
+                        const imageAlt = item.title;
+                        
+                        const rawDesc = item.description || '';
+                        const cleanExcerpt = typeof rawDesc === 'string' 
+                            ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
+                            : '';
+                        const limitExcerpt = cleanExcerpt.length > 120 
+                            ? cleanExcerpt.slice(0, 117) + '...' 
+                            : cleanExcerpt;
+
+                        return `
+                            <a href="${item.eventLink}" class="ov-event-card">
+                                <div class="ov-event-image">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                    <div class="ov-event-date-badge">
+                                        <span class="month">${monthUpper}</span>
+                                        <span class="day">${day}</span>
+                                    </div>
+                                </div>
+                                <div class="ov-event-content">
+                                    <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
+                                    ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
+                                    <div class="ov-event-meta">
+                                        <span class="material-symbols-outlined">calendar_today</span>
+                                        <span>${dateLabel}${timeLabel}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+                } else {
+                    ovEventsFeed.innerHTML = `
+                        <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
+                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
+                        </div>
+                    `;
                 }
             })();
         } catch (e) {
@@ -3314,152 +2650,9 @@ class MinSideManager {
         }
     }
 
-    async renderCourses(container) {
-        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
-        let courses = [];
-        try {
-            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
-            courses = (snap.exists ? snap.data()?.items : null) || [];
-        } catch (e) {
-            console.error("Error fetching courses:", e);
-        }
-
-        if (courses.length === 0) {
-            container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
-                <span class="material-symbols-outlined">school</span>
-                <h3>${t('courses.noCoursesYet')}</h3>
-                <p>${t('courses.noCoursesSub')}</p>
-            </div></div>`;
-            return;
-        }
-
-        // Fetch enrollments for current user to authorize lessons access
-        let enrollments = [];
-        if (this.currentUser?.email || this.currentUser?.uid) {
-            try {
-                const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
-                if (targetEmails.length > 0) {
-                    const eSnap = await firebase.firestore().collection('courseEnrollments')
-                        .where('email', 'in', targetEmails)
-                        .get();
-                    eSnap.forEach(d => enrollments.push(d.data()));
-                }
-                if (this.currentUser?.uid) {
-                    const eUserSnap = await firebase.firestore().collection('courseEnrollments')
-                        .where('userId', '==', this.currentUser.uid)
-                        .get();
-                    eUserSnap.forEach(d => enrollments.push(d.data()));
-                }
-            } catch (e) {
-                console.error("Error fetching course enrollments:", e);
-            }
-        }
-
-        const hasPaidForLesson = (course, lesson) => true;
-
-        container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
-            ${courses.map((c, cIdx) => {
-                const courseLessons = c.lessons || [];
-                
-                return `
-                <div class="course-card-premium">
-                    <div style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap;">
-                        <div class="course-thumbnail">
-                            ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
-                        </div>
-                        <div style="flex:1; min-width:200px;">
-                            <span class="course-category-tag">${c.category || 'Generelt'}</span>
-                            <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
-                            <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="course-lessons-accordion">
-                        <div class="accordion-header" data-course-id="${c.id || cIdx}">
-                            <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin:0; display:flex; align-items:center; gap:8px;">
-                                <span class="material-symbols-outlined" style="font-size: 20px !important;">format_list_bulleted</span> Leksjoner og Live-økter
-                            </h4>
-                            <span class="material-symbols-outlined expand-chevron">expand_more</span>
-                        </div>
-                        
-                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 24px 24px 24px; flex-direction:column; gap:12px;">
-                            ${courseLessons.length === 0 ? `
-                                <p style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
-                            ` : `
-                                <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
-                                    ${courseLessons.map((l, lIdx) => {
-                                        const paid = hasPaidForLesson(c, l);
-                                        let dateStr = '';
-                                        if (l.date) {
-                                            try {
-                                                const d = new Date(l.date);
-                                                const datePart = d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
-                                                const timePart = d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
-                                                dateStr = `Klasse: ${datePart} • kl. ${timePart}`;
-                                            } catch (e) {
-                                                dateStr = `Klasse: ${l.date}`;
-                                            }
-                                        }
-                                        
-                                        const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
-                                        return `
-                                        <div class="course-lesson-row">
-                                            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
-                                                <div class="lesson-index-badge">
-                                                    ${lIdx + 1}
-                                                </div>
-                                                <div style="flex:1; min-width:0;">
-                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2; word-break:break-word;">
-                                                        ${cleanTitle}
-                                                    </div>
-                                                    ${dateStr ? `
-                                                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; display:flex; align-items:center; gap:4px; line-height: 1;">
-                                                            <span class="material-symbols-outlined" style="font-size: 14px !important;">calendar_today</span>
-                                                            <span style="display: inline-block; line-height: 1;">${dateStr}</span>
-                                                        </div>
-                                                    ` : ''}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                ${paid ? `
-                                                    <div style="display:flex; gap:8px; align-items:center;">
-                                                        ${l.videoUrl ? `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">play_circle</span> Start leksjon
-                                                            </a>
-                                                        ` : (l.zoomUrl ? `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">video_camera_front</span> Bli med på Zoom
-                                                            </a>
-                                                        ` : `
-                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">school</span> Åpne leksjon
-                                                            </a>
-                                                        `)}
-                                                    </div>
-                                                ` : `
-                                                    <div style="display:flex; gap:8px; align-items:center;">
-                                                        <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
-                                                            <span class="material-symbols-outlined" style="font-size:16px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">lock</span> Låst (kr ${l.price || 300},-)
-                                                        </span>
-                                                        <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
-                                                            Lås opp
-                                                        </a>
-                                                    </div>
-                                                `}
-                                            </div>
-                                        </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>`;
-    }
-
+    // ══════════════════════════════════════════════════════════
+    // VIEW: PROFIL (PCO style)
+    // ══════════════════════════════════════════════════════════
     async renderProfile(container) {
         const uid = this.currentUser?.uid;
         if (!uid) return;
@@ -4142,6 +3335,433 @@ class MinSideManager {
         document.getElementById('delete-account-btn')?.addEventListener('click', () => this.showDeleteConfirmModal());
     }
 
+    async _saveProfileFields(formEl, fields) {
+        if (!this.currentUser) return;
+        if (!formEl) return;
+        const btn = formEl.querySelector('button[id^="save-"]');
+        if (btn) { btn.disabled = true; btn.textContent = t('common.saving'); }
+        try {
+            const updates = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            fields.forEach(f => {
+                const input = formEl.querySelector(`[name="${f}"]`);
+                if (input) updates[f] = input.value;
+            });
+            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
+                await this.currentUser.updateProfile({ displayName: updates.displayName });
+            }
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
+        } catch (e) {
+            console.error('saveProfileFields:', e);
+            alert(t('common.saveError') + ': ' + e.message);
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = t('common.saved'); }
+        }
+    }
+
+    _wireAddressAutocomplete() {
+        const input = document.getElementById('profile-address-input');
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+        if (!input || !resultsEl || !statusEl) return;
+
+        input?.addEventListener('input', () => {
+            clearTimeout(this._addressSearchTimer);
+            const query = input.value.trim();
+
+            if (query.length < 3) {
+                this._addressSuggestions = [];
+                resultsEl.innerHTML = '';
+                statusEl.textContent = '';
+                return;
+            }
+
+            statusEl.textContent = t('profile.searchingAddresses');
+            this._addressSearchTimer = setTimeout(() => {
+                this.searchGlobalAddresses(query);
+            }, 350);
+        });
+    }
+
+    _formatPhotonAddress(properties = {}) {
+        const street = [properties.street, properties.housenumber].filter(Boolean).join(' ').trim();
+        const primary = properties.name && !street ? properties.name : street || properties.name || '';
+        const locality = properties.city || properties.locality || properties.district || properties.county || properties.state || '';
+        const regionLine = [properties.postcode, locality].filter(Boolean).join(' ').trim();
+        const country = properties.country || '';
+        const label = [primary, regionLine, country].filter(Boolean).join(', ');
+
+        return {
+            address: primary || label,
+            zip: properties.postcode || '',
+            city: locality,
+            country,
+            countryCode: properties.countrycode || '',
+            label
+        };
+    }
+
+    async searchGlobalAddresses(query) {
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+        if (!resultsEl || !statusEl) return;
+
+        try {
+            if (this._addressSearchAbort) this._addressSearchAbort.abort();
+            this._addressSearchAbort = new AbortController();
+
+            const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6`;
+            const response = await fetch(url, { signal: this._addressSearchAbort.signal });
+            if (!response.ok) throw new Error(`Address search failed: ${response.status}`);
+
+            const data = await response.json();
+            this._addressSuggestions = (data.features || [])
+                .map(feature => this._formatPhotonAddress(feature.properties || {}))
+                .filter(item => item.label);
+
+            if (!this._addressSuggestions.length) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = t('profile.noAddressSuggestions');
+                return;
+            }
+
+            statusEl.textContent = '';
+            resultsEl.innerHTML = this._addressSuggestions.map((item, index) => `
+                <button class="address-result-row" type="button" data-address-index="${index}">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <span>
+                        <strong>${this._escapeHtml(item.address || item.label)}</strong>
+                        <small>${this._escapeHtml([item.zip, item.city, item.country].filter(Boolean).join(', '))}</small>
+                    </span>
+                </button>
+            `).join('');
+
+            resultsEl.querySelectorAll('.address-result-row').forEach(row => {
+                row?.addEventListener('click', () => {
+                    this.selectAddressSuggestion(Number(row.dataset.addressIndex));
+                });
+            });
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            console.error('searchGlobalAddresses:', error);
+            resultsEl.innerHTML = '';
+            statusEl.textContent = t('profile.couldNotFetchAddresses');
+        }
+    }
+
+    selectAddressSuggestion(index) {
+        const item = (this._addressSuggestions || [])[index];
+        if (!item) return;
+
+        const addressInput = document.querySelector('[name="address"]');
+        const zipInput = document.querySelector('[name="zip"]');
+        const cityInput = document.querySelector('[name="city"]');
+        const countryInput = document.querySelector('[name="country"]');
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+
+        if (addressInput) addressInput.value = item.address || item.label;
+        if (zipInput) zipInput.value = item.zip || '';
+        if (cityInput) cityInput.value = item.city || '';
+        if (countryInput) countryInput.value = item.country || '';
+        if (resultsEl) resultsEl.innerHTML = '';
+        if (statusEl) statusEl.textContent = item.country ? t('profile.selectedCountry', { country: item.country }) : t('profile.addressSelected');
+    }
+
+    _wireFamilySearch() {
+        const input = document.getElementById('family-search-input');
+        const resultsEl = document.getElementById('family-search-results');
+        const statusEl = document.getElementById('family-search-status');
+        if (!input || !resultsEl || !statusEl) return;
+
+        input?.addEventListener('input', () => {
+            clearTimeout(this._familySearchTimer);
+            const query = input.value.trim();
+
+            if (query.length < 2) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = '';
+                return;
+            }
+
+            statusEl.textContent = t('profile.searching');
+            this._familySearchTimer = setTimeout(() => {
+                this.searchFamilyMembers(query);
+            }, 300);
+        });
+    }
+
+    async searchFamilyMembers(query) {
+        const resultsEl = document.getElementById('family-search-results');
+        const statusEl = document.getElementById('family-search-status');
+        if (!resultsEl || !statusEl) return;
+
+        if (!firebase.functions) {
+            statusEl.textContent = t('profile.searchUnavailable');
+            return;
+        }
+
+        try {
+            const callable = firebase.functions().httpsCallable('searchFamilyMembers');
+            const response = await callable({ query });
+            const existingIds = new Set((this.profileData.familyMembers || []).map(member => member.uid).filter(Boolean));
+            const members = (response.data?.members || []).filter(member => !existingIds.has(member.uid));
+
+            if (!members.length) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = t('profile.noMatches');
+                return;
+            }
+
+            statusEl.textContent = '';
+            resultsEl.innerHTML = members.map(member => `
+                <button class="family-result-row" type="button" data-member='${this._escapeHtml(JSON.stringify(member))}'>
+                    <span class="member-avatar">${member.photoURL ? `<img src="${this._escapeHtml(member.photoURL)}" alt="">` : this._escapeHtml((member.name || '?').charAt(0).toUpperCase())}</span>
+                    <span class="member-info">
+                        <span class="member-info-name">${this._escapeHtml(member.name || 'Uten navn')}</span>
+                        <span class="member-info-sub">${this._escapeHtml(member.email || '')}</span>
+                    </span>
+                    <span class="material-symbols-outlined family-result-add">add</span>
+                </button>
+            `).join('');
+
+            resultsEl.querySelectorAll('.family-result-row').forEach(row => {
+                row?.addEventListener('click', async () => {
+                    try {
+                        await this.addFamilyMember(JSON.parse(row.dataset.member || '{}'));
+                    } catch (error) {
+                        console.warn('family add parse:', error);
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('searchFamilyMembers:', error);
+            resultsEl.innerHTML = '';
+            statusEl.textContent = t('profile.couldNotSearch');
+        }
+    }
+
+    async addFamilyMember(member) {
+        if (!this.currentUser || !member?.uid || member.uid === this.currentUser.uid) return;
+
+        const existing = Array.isArray(this.profileData.familyMembers) ? this.profileData.familyMembers : [];
+        if (existing.some(item => item.uid === member.uid)) return;
+
+        const nextMembers = [
+            ...existing,
+            {
+                uid: member.uid,
+                name: member.name || 'Uten navn',
+                email: member.email || '',
+                photoURL: member.photoURL || '',
+                role: member.role || t('profile.familyMemberRole')
+            }
+        ];
+
+        await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+            familyMembers: nextMembers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        this.profileData.familyMembers = nextMembers;
+        this.loadView('profile');
+    }
+
+    async removeFamilyMember(memberUid) {
+        if (!this.currentUser || !memberUid) return;
+
+        const existing = Array.isArray(this.profileData.familyMembers) ? this.profileData.familyMembers : [];
+        const nextMembers = existing.filter(member => member.uid !== memberUid);
+        if (nextMembers.length === existing.length) return;
+
+        await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+            familyMembers: nextMembers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        this.profileData.familyMembers = nextMembers;
+        this.loadView('profile');
+    }
+
+    async _requestPushPermission(showSuccessToast = true) {
+        try {
+            if (!('Notification' in window)) {
+                if (window.hkmLogger) window.hkmLogger.warn("Push not supported: 'Notification' in window is false");
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Nettleseren din støtter ikke push-varslinger.", "error", 5000);
+                } else {
+                    alert("Nettleseren din støtter ikke push-varslinger.");
+                }
+                return;
+            }
+            if (!firebase.messaging || !firebase.messaging.isSupported()) {
+                if (window.hkmLogger) window.hkmLogger.warn("Push not supported: firebase.messaging.isSupported() is false");
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Push-varslinger er ikke støttet i denne nettleseren.", "error", 5000);
+                } else {
+                    alert("Push-varslinger er ikke støttet i denne nettleseren.");
+                }
+                return;
+            }
+
+            const currentPermission = Notification.permission;
+            if (currentPermission === 'denied') {
+                if (window.hkmLogger) window.hkmLogger.warn("Push permission is denied");
+                const msg = "Varsler er blokkert for dette nettstedet i nettleseren din. Vennligst tilbakestill tillatelsen i nettleserinnstillingene dine.";
+                if (typeof window.showToast === 'function') {
+                    window.showToast(msg, "warning", 7000);
+                } else {
+                    alert(msg);
+                }
+                return;
+            }
+
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') {
+                if (window.hkmLogger) window.hkmLogger.warn("Push permission was not granted by user: " + perm);
+                const msg = "Du må tillate varsler for å motta push-meldinger på denne enheten.";
+                if (typeof window.showToast === 'function') {
+                    window.showToast(msg, "warning", 5000);
+                } else {
+                    alert(msg);
+                }
+                return;
+            }
+
+            if (window.hkmLogger) window.hkmLogger.log("FCM: Henter service worker registration...");
+            const msg = firebase.messaging();
+            
+            // Handle foreground push notifications
+            msg.onMessage((payload) => {
+                console.log('[MinSide] Foreground message received:', payload);
+                const title = payload.notification?.title || 'Ny oppdatering';
+                const body = payload.notification?.body || '';
+                if (typeof window.showToast === 'function') {
+                    window.showToast(`🔔 ${title}: ${body}`, "success", 10000);
+                }
+            });
+
+            const registration = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Service Worker ready-tilstand tidsavbrutt (4s)")), 4000))
+            ]);
+            
+            if (window.hkmLogger) window.hkmLogger.log(`FCM: SW ready. Aktiv SW: ${registration.active?.scriptURL || 'ingen'}`);
+            
+            const token = await msg.getToken({
+                vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                serviceWorkerRegistration: registration
+            });
+            if (token) {
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+                if (window.hkmLogger) window.hkmLogger.log("Push notifications registered successfully on device");
+                if (showSuccessToast && typeof window.showToast === 'function') {
+                    window.showToast("Push-varslinger ble vellykket registrert på denne enheten!", "success", 5000);
+                }
+            } else {
+                throw new Error("Kunne ikke hente varslingstoken.");
+            }
+        } catch (e) {
+            console.warn('push permission:', e);
+            if (window.hkmLogger) {
+                window.hkmLogger.error(`FCM Registration failed: ${e.message || e}. Stack: ${e.stack || ''}`);
+            }
+            const errorMsg = `Kunne ikke registrere push-varsler: ${e.message || e}`;
+            if (typeof window.showToast === 'function') {
+                window.showToast(errorMsg, "error", 7000);
+            } else {
+                alert(errorMsg);
+            }
+        }
+    }
+
+
+    async handlePhotoUpload(e) {
+        const file = e.target.files?.[0];
+        if (!file || !this.currentUser) return;
+        try {
+            const ref = firebase.storage().ref(`profiles/${this.currentUser.uid}/avatar`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            await this.currentUser.updateProfile({ photoURL: url });
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({ photoURL: url }, { merge: true });
+            this.profileData.photoURL = url;
+            this._setAvatarEl(document.getElementById('ph-avatar'), url, this.profileData.displayName);
+        } catch (err) {
+            console.error('Photo upload failed:', err);
+            alert(t('common.saveError') + ': ' + err.message);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: AKTIVITET
+    // ══════════════════════════════════════════════════════════
+    async renderActivity(container) {
+        const uid = this.currentUser?.uid;
+        container.innerHTML = `<div class="ms-full-width" id="activity-inner"><div class="loading-state ms-loading-min-120"><div class="spinner"></div></div></div>`;
+        const list = container.querySelector('#activity-inner');
+
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get();
+
+            if (snap.empty) {
+                list.innerHTML = `<div class="empty-state">
+                    <span class="material-symbols-outlined">history</span>
+                    <h3>${t('activity.noActivityYet')}</h3>
+                    <p>${t('activity.noActivitySub')}</p>
+                </div>`;
+                return;
+            }
+
+            const iconMap = {
+                push: { icon: 'campaign', toneClass: 'activity-icon-tone-push' },
+                message: { icon: 'mail', toneClass: 'activity-icon-tone-message' },
+                default: { icon: 'notifications', toneClass: 'activity-icon-tone-default' },
+            };
+
+            const items = snap.docs.map(doc => this._normalizeNotificationDoc(doc));
+
+            list.innerHTML = items.map(d => {
+                const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
+                const m = iconMap[d.type] || iconMap.default;
+                return `
+                <div class="activity-item ${!d.read ? 'unread' : ''}" data-id="${d.id}" style="cursor: pointer;">
+                    <div class="activity-icon ${m.toneClass}">
+                        <span class="material-symbols-outlined">${m.icon}</span>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${d.title}</div>
+                        ${d.body ? `<div class="activity-body">${d.body}</div>` : ''}
+                        <div class="activity-time">${this._timeAgo(date)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            list.querySelectorAll('.activity-item').forEach(el => {
+                el?.addEventListener('click', () => {
+                    const notif = items.find(n => n.id === el.dataset.id);
+                    if (notif) this.showNotificationModal(notif);
+                    if (notif && !notif.read) el.classList.remove('unread');
+                });
+            });
+
+        } catch (err) {
+            console.error('renderActivity error:', err);
+            this._notify(t('activity.loadErrorNotice'), 'warning');
+            list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>${t('activity.loadErrorCopy')}</p></div>`;
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // VIEW: VARSLINGER & LOGG (combined)
+    // ══════════════════════════════════════════════════════════
     async renderNotifications(container) {
         const uid = this.currentUser?.uid;
         const activeFilter = this._notifFilter || 'all';
@@ -4415,6 +4035,11 @@ class MinSideManager {
         }
     }
 
+
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: GAVER
+    // ══════════════════════════════════════════════════════════
     async renderGiving(container) {
         const uid = this.currentUser?.uid;
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
@@ -4862,6 +4487,2323 @@ class MinSideManager {
         }
 
         updateGivingView();
+    }
+
+    printGivingReport(selectedType, selectedYear) {
+        const donations = this.currentGivingDonations || [];
+        const filtered = donations.filter(d => {
+            const date = this._getDonationDate(d);
+            const year = date ? date.getFullYear() : null;
+            const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+            
+            const type = (d.type || 'Gave').toLowerCase();
+            const matchesType = (selectedType === 'all' || 
+                (selectedType === 'gave' && type === 'gave') || 
+                (selectedType === 'butikk' && type === 'butikk'));
+            
+            return matchesYear && matchesType;
+        });
+
+        const totalSum = filtered.reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
+
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const title = isNo ? 'Gaveoversikt' : (isEs ? 'Resumen de Ofrendas' : 'Donation Overview');
+        const subtitle = isNo ? 'Min gaveoversikt' : (isEs ? 'Mi historial de ofrendas' : 'My giving overview');
+        const dateLabel = isNo ? 'Dato' : (isEs ? 'Fecha' : 'Date');
+        const typeLabelStr = isNo ? 'Type' : (isEs ? 'Tipo' : 'Type');
+        const methodLabelStr = isNo ? 'Metode' : (isEs ? 'Método' : 'Method');
+        const amountLabelStr = isNo ? 'Beløp' : (isEs ? 'Monto' : 'Amount');
+        const totalLabelStr = isNo ? 'Total sum' : (isEs ? 'Suma total' : 'Total sum');
+        const periodLabelStr = isNo ? 'Periode' : (isEs ? 'Periodo' : 'Period');
+        const filterLabelStr = isNo ? 'Filter' : (isEs ? 'Filtro' : 'Filter');
+        const countLabelStr = isNo ? 'Antall poster' : (isEs ? 'Registros' : 'Record count');
+        const noTransLabel = isNo ? 'Ingen transaksjoner funnet.' : (isEs ? 'No se encontraron transacciones.' : 'No transactions found.');
+        const docLabel = isNo ? 'Dette dokumentet viser dine registrerte gaver og betalinger hos His Kingdom Ministry.' : (isEs ? 'Este documento muestra sus ofrendas y pagos registrados en His Kingdom Ministry.' : 'This document shows your registered donations and payments with His Kingdom Ministry.');
+        const previewLabel = isNo ? 'Dette er en forhåndsvisning av din gaveoversikt. Bruk utskriftsknappen eller Ctrl+P/Cmd+P for å lagre som PDF / skrive ut.' : (isEs ? 'Esta es una vista previa de su historial de ofrendas. Use el botón de impresión o Ctrl+P/Cmd+P para guardar como PDF / imprimir.' : 'This is a preview of your donation overview. Use the print button or Ctrl+P/Cmd+P to save as PDF / print.');
+        const printBtnLabel = isNo ? 'Skriv ut / PDF' : (isEs ? 'Imprimir / PDF' : 'Print / PDF');
+
+        const periodText = selectedYear === 'all' ? (isNo ? 'Alle år' : (isEs ? 'Todos los años' : 'All years')) : `${selectedYear}`;
+        const typeText = selectedType === 'all' ? (isNo ? 'Alle transaksjoner' : (isEs ? 'Todas las transacciones' : 'All transactions')) : (selectedType === 'gave' ? (isNo ? 'Kun gaver' : (isEs ? 'Solo ofrendas' : 'Donations only')) : (isNo ? 'Kun butikkjøp' : (isEs ? 'Solo tienda' : 'Shop purchases only')));
+
+        const userName = this.profileData?.fullName || this.currentUser?.displayName || (isNo ? 'Medlem' : (isEs ? 'Miembro' : 'Member'));
+        const userEmail = this.currentUser?.email || '';
+        const userAddress = [
+            this.profileData?.adresse,
+            [this.profileData?.postnummer, this.profileData?.poststed].filter(Boolean).join(' '),
+            this.profileData?.land
+        ].filter(Boolean).join(', ') || (isNo ? 'Ingen registrert adresse' : (isEs ? 'Sin dirección registrada' : 'No registered address'));
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            this._notify('Popup-blokkerer forhindret åpning av utskriftsvinduet. Vennligst tillat popups.', 'warning');
+            return;
+        }
+
+        const rowsHtml = filtered.map(d => {
+            const date = this._getDonationDate(d) || new Date();
+            const amountNok = this._normalizeDonationAmountNok(d);
+            const typeStr = (d.type || 'Gave');
+            const typeLabel = typeStr.charAt(0).toUpperCase() + typeStr.slice(1);
+            const methodLabel = this._getDonationMethodLabel(d.method || 'Kort');
+            
+            return `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:8px; font-size:11px; color:#334155;">${date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${typeLabel}</td>
+                    <td style="padding:8px; font-size:11px; color:#475569;">${methodLabel}</td>
+                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:700; text-align:right;">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+        }).join('');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>${title} - His Kingdom Ministry</title>
+                <style>
+                    body {
+                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        color: #1e293b;
+                        background: white;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print" style="margin-bottom:20px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#475569; font-weight:500;">${previewLabel}</span>
+                    <button onclick="window.print()" style="background:#d17d39; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">
+                        ${printBtnLabel}
+                    </button>
+                </div>
+
+                <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+                    <!-- Logo & Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #d17d39; padding-bottom:16px; margin-bottom:24px;">
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <img src="/img/logo-hkm.png" alt="Logo" style="height:55px; width:auto; object-fit:contain; border-radius:4px;">
+                            <div>
+                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#d17d39; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                                <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">${subtitle}</p>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <p style="margin:0; font-size:11px; color:#64748b;">Dato: ${new Date().toLocaleDateString('no-NO')}</p>
+                        </div>
+                    </div>
+
+                    <!-- Member Info & Meta -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:24px; gap:20px;">
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
+                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giver</h3>
+                            <p style="margin:0; font-size:14px; font-weight:700; color:#0f172a;">${this._escapeHtml(userName)}</p>
+                            ${userEmail ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userEmail)}</p>` : ''}
+                            ${userAddress && userAddress !== 'Ingen registrert adresse' && userAddress !== 'Sin dirección registrada' && userAddress !== 'No registered address' ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
+                        </div>
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
+                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Rapportinfo</h3>
+                            <p style="margin:0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${periodLabelStr}:</strong> ${periodText}</p>
+                            <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${filterLabelStr}:</strong> ${typeText}</p>
+                            <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${countLabelStr}:</strong> ${filtered.length}</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Table -->
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:32px;">
+                        <thead>
+                            <tr style="border-bottom:2px solid #d17d39; text-align:left;">
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${dateLabel}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${typeLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase;">${methodLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#d17d39; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml || `<tr><td colspan="4" style="padding:24px; text-align:center; color:#64748b;">${noTransLabel}</td></tr>`}
+                        </tbody>
+                    </table>
+
+                    <!-- Total Block -->
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:40px;">
+                        <div style="background:#d17d39; color:white; padding:12px 24px; border-radius:8px; text-align:right; min-width:200px;">
+                            <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;">${totalLabelStr}</span>
+                            <div style="font-size:22px; font-weight:800; margin-top:2px;">kr ${totalSum.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Details -->
+                    <div style="border-top:1px dashed #cbd5e1; padding-top:20px; text-align:center; color:#64748b; font-size:11px; line-height:1.5;">
+                        <p style="margin:0; font-weight:600; color:#475569;">His Kingdom Ministry</p>
+                        <p style="margin:2px 0 0;">Org.nr: 928 290 839 | E-post: post@hkm.no | Web: www.hkm.no</p>
+                        <p style="margin:4px 0 0; font-style:italic;">${docLabel}</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    showDonationDetails(donationId) {
+        const donation = (this.currentGivingDonations || []).find(item => item.id === donationId);
+        if (!donation) return;
+
+        const existing = document.getElementById('donation-detail-modal');
+        if (existing) existing.remove();
+
+        const amountNok = this._normalizeDonationAmountNok(donation);
+        const date = this._getDonationDate(donation);
+        const reference = this._getDonationReference(donation);
+        const rows = [
+            [t('giving.lblAmount'), `kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`],
+            [t('giving.lblDate'), date ? date.toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : t('giving.statusUnknown')],
+            [t('giving.lblPaidWith'), this._getDonationMethodLabel(donation.method)],
+            [t('giving.lblStatus'), this._getDonationStatusLabel(donation.status)],
+            [t('giving.lblType'), donation.type || t('giving.typeGift')],
+            [t('giving.lblReference'), reference || t('giving.referenceNotRegistered')]
+        ];
+        if (donation.message) rows.push([t('giving.lblMessage'), donation.message]);
+        if (donation.currency) rows.push([t('giving.lblCurrency'), String(donation.currency).toUpperCase()]);
+
+        const modal = document.createElement('div');
+        modal.id = 'donation-detail-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+            <div class="hkm-modal-container ms-donation-detail-modal">
+                <div class="ms-note-modal-header">
+                    <div>
+                        <div class="hkm-modal-title ms-note-modal-title">${t('giving.detailsTitle')}</div>
+                        <div class="ms-donation-detail-subtitle">${this._escapeHtml(date ? date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') : '')}</div>
+                    </div>
+                    <button id="close-donation-detail-modal" class="ms-icon-button" type="button">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="ms-donation-detail-amount">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
+                <div class="ms-donation-detail-grid">
+                    ${rows.map(([label, value]) => `
+                        <div class="ms-donation-detail-row">
+                            <span>${this._escapeHtml(label)}</span>
+                            <strong>${this._escapeHtml(value)}</strong>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        const onEsc = (event) => {
+            if (event.key === 'Escape') close();
+        };
+        const close = () => {
+            document.removeEventListener('keydown', onEsc);
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300);
+        };
+        modal.querySelector('#close-donation-detail-modal')?.addEventListener('click', close);
+        modal?.addEventListener('click', event => {
+            if (event.target === modal) close();
+        });
+        document?.addEventListener('keydown', onEsc);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: KURS
+    // ══════════════════════════════════════════════════════════
+    async renderCourses(container) {
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+        let courses = [];
+        try {
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            courses = (snap.exists ? snap.data()?.items : null) || [];
+        } catch (e) {
+            console.error("Error fetching courses:", e);
+        }
+
+        if (courses.length === 0) {
+            container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
+                <span class="material-symbols-outlined">school</span>
+                <h3>${t('courses.noCoursesYet')}</h3>
+                <p>${t('courses.noCoursesSub')}</p>
+            </div></div>`;
+            return;
+        }
+
+        // Fetch enrollments for current user to authorize lessons access
+        let enrollments = [];
+        if (this.currentUser?.email || this.currentUser?.uid) {
+            try {
+                const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
+                if (targetEmails.length > 0) {
+                    const eSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('email', 'in', targetEmails)
+                        .get();
+                    eSnap.forEach(d => enrollments.push(d.data()));
+                }
+                if (this.currentUser?.uid) {
+                    const eUserSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('userId', '==', this.currentUser.uid)
+                        .get();
+                    eUserSnap.forEach(d => enrollments.push(d.data()));
+                }
+            } catch (e) {
+                console.error("Error fetching course enrollments:", e);
+            }
+        }
+
+        const hasPaidForLesson = (course, lesson) => {
+            const isCourseFree = !course.price || course.price === 0;
+            if (isCourseFree) return true;
+
+            const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
+            if (isAdmin) return true;
+
+            const coursePaid = enrollments.find(e => 
+                e.courseId === course.id && 
+                (e.status === 'paid' || e.status === 'success')
+            );
+
+            if (!coursePaid) return false;
+
+            if (!coursePaid.paidLessons || coursePaid.paidLessons.length === 0) {
+                return true;
+            }
+
+            return coursePaid.paidLessons.includes(lesson.id);
+        };
+
+        container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
+            ${courses.map((c, cIdx) => {
+                const courseLessons = c.lessons || [];
+                
+                return `
+                <div class="course-card-premium">
+                    <div style="display:flex; gap:24px; padding:24px; border-bottom:1px solid var(--border-color); align-items:center; flex-wrap:wrap;">
+                        <div class="course-thumbnail">
+                            ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;"><span class="material-symbols-outlined">school</span></div>`}
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <span class="course-category-tag">${c.category || 'Generelt'}</span>
+                            <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-main); margin:4px 0 6px;">${c.title || t('courses.untitled')}</h3>
+                            <p style="font-size:0.88rem; color:var(--text-muted); margin:0; line-height:1.5;">${c.excerpt || c.intro || ''}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="course-lessons-accordion">
+                        <div class="accordion-header" data-course-id="${c.id || cIdx}">
+                            <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin:0; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size: 20px !important;">format_list_bulleted</span> Leksjoner og Live-økter
+                            </h4>
+                            <span class="material-symbols-outlined expand-chevron">expand_more</span>
+                        </div>
+                        
+                        <div class="accordion-body" id="lessons-body-${c.id || cIdx}" style="display:flex; padding:0 24px 24px 24px; flex-direction:column; gap:12px;">
+                            ${courseLessons.length === 0 ? `
+                                <p style="font-size:0.85rem; color:var(--text-muted); font-style:italic; margin:0; padding-top:10px;">Ingen leksjoner lagt til ennå.</p>
+                            ` : `
+                                <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
+                                    ${courseLessons.map((l, lIdx) => {
+                                        const paid = hasPaidForLesson(c, l);
+                                        let dateStr = '';
+                                        if (l.date) {
+                                            try {
+                                                const d = new Date(l.date);
+                                                const datePart = d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
+                                                const timePart = d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+                                                dateStr = `Klasse: ${datePart} • kl. ${timePart}`;
+                                            } catch (e) {
+                                                dateStr = `Klasse: ${l.date}`;
+                                            }
+                                        }
+                                        
+                                        const cleanTitle = (l.title || 'Leksjonsøving').replace(/^leksjon\s+\d+:\s*/i, '');
+                                        return `
+                                        <div class="course-lesson-row">
+                                            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                                                <div class="lesson-index-badge">
+                                                    ${lIdx + 1}
+                                                </div>
+                                                <div style="flex:1; min-width:0;">
+                                                    <div style="font-weight:700; font-size:0.92rem; color:var(--text-main); line-height:1.2; word-break:break-word;">
+                                                        ${cleanTitle}
+                                                    </div>
+                                                    ${dateStr ? `
+                                                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; display:flex; align-items:center; gap:4px; line-height: 1;">
+                                                            <span class="material-symbols-outlined" style="font-size: 14px !important;">calendar_today</span>
+                                                            <span style="display: inline-block; line-height: 1;">${dateStr}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                ${paid ? `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        ${l.videoUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">play_circle</span> Start leksjon
+                                                            </a>
+                                                        ` : (l.zoomUrl ? `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; background:#16a34a; border-color:#16a34a; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none; color:white;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">video_camera_front</span> Bli med på Zoom
+                                                            </a>
+                                                        ` : `
+                                                            <a href="#course-player?courseId=${c.id}&lessonId=${l.id}" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                                <span class="material-symbols-outlined" style="font-size:18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">school</span> Åpne leksjon
+                                                            </a>
+                                                        `)}
+                                                    </div>
+                                                ` : `
+                                                    <div style="display:flex; gap:8px; align-items:center;">
+                                                        <span style="font-size:0.85rem; color:#64748b; font-weight:600; background:#f1f5f9; padding:4px 10px; border-radius:6px; display:flex; align-items:center; gap:4px;">
+                                                            <span class="material-symbols-outlined" style="font-size:16px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">lock</span> Låst (kr ${l.price || 300},-)
+                                                        </span>
+                                                        <a href="/kurs.html" class="btn btn-primary btn-sm" style="background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:6px 14px; text-decoration:none;">
+                                                            Lås opp
+                                                        </a>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+    }
+
+    async renderCoursePlayer(container, args) {
+        const uid = this.currentUser?.uid;
+        if (!uid) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Logg inn</h3>
+                    <p>Du må være logget inn for å få tilgang til kurset.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const { courseId, lessonId } = args || {};
+        if (!courseId) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Manglende kurs-ID</h3>
+                    <p>Kan ikke åpne spilleren uten en gyldig kurs-ID.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
+
+        // 1. Fetch Course details
+        let course = null;
+        try {
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            const courses = (snap.exists ? snap.data()?.items : null) || [];
+            course = courses.find(c => c.id === courseId);
+        } catch (e) {
+            console.error("Error fetching course:", e);
+        }
+
+        if (!course) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Kurset ble ikke funnet</h3>
+                    <p>Det oppstod en feil under henting av kurset fra databasen.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Find active lesson (or fallback to first lesson)
+        const lessons = course.lessons || [];
+        if (lessons.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">error</span>
+                    <h3>Ingen leksjoner funnet</h3>
+                    <p>Dette kurset har ingen leksjoner ennå.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let activeLessonIndex = lessons.findIndex(l => l.id === lessonId);
+        if (activeLessonIndex === -1) activeLessonIndex = 0;
+        const lesson = lessons[activeLessonIndex];
+
+        // 2. Fetch Enrollments to verify access
+        let enrollments = [];
+        try {
+            const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
+            if (targetEmails.length > 0) {
+                const eSnap = await firebase.firestore().collection('courseEnrollments')
+                    .where('email', 'in', targetEmails)
+                    .get();
+                eSnap.forEach(d => enrollments.push(d.data()));
+            }
+            if (this.currentUser?.uid) {
+                const eUserSnap = await firebase.firestore().collection('courseEnrollments')
+                    .where('userId', '==', this.currentUser.uid)
+                    .get();
+                eUserSnap.forEach(d => enrollments.push(d.data()));
+            }
+        } catch (e) {
+            console.error("Error fetching course enrollments:", e);
+        }
+
+        const isCourseFree = !course.price || course.price === 0;
+        const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
+        const hasEnrollment = enrollments.some(e => 
+            e.courseId === course.id && 
+            (e.status === 'paid' || e.status === 'success') &&
+            (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(lesson.id))
+        );
+
+        const isUnlocked = isCourseFree || isAdmin || hasEnrollment;
+
+        if (!isUnlocked) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">lock</span>
+                    <h3>Leksjonen er låst</h3>
+                    <p>Du må melde deg på og fullføre betalingen for dette kurset for å få tilgang.</p>
+                    <a href="/kurs.html" class="btn btn-primary" style="margin-top: 16px; background:#d17d39; border-color:#d17d39; border-radius:30px; font-weight:600; padding:8px 20px; text-decoration:none; display:inline-block;">
+                        Meld deg på kurset
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
+        // Helper parsers
+        const parseZoom = (url) => {
+            if (!url) return null;
+            try {
+                const u = new URL(url);
+                const pathParts = u.pathname.split('/');
+                const meetingId = pathParts[pathParts.length - 1];
+                const pwd = u.searchParams.get('pwd') || '';
+                return { meetingId, pwd };
+            } catch (e) {
+                const match = url.match(/j\/(\d+)/);
+                if (match) {
+                    const meetingId = match[1];
+                    const pwdMatch = url.match(/pwd=([^&]+)/);
+                    const pwd = pwdMatch ? pwdMatch[1] : '';
+                    return { meetingId, pwd };
+                }
+                return null;
+            }
+        };
+
+        const parseYoutube = (url) => {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const parseVimeo = (url) => {
+            if (!url) return null;
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            return match ? match[1] : null;
+        };
+
+        const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+
+        // Build metadata dynamically based on actual database values
+        const metaItems = [];
+        if (lesson.videoUrl) {
+            metaItems.push({
+                icon: 'play_circle',
+                label: 'Type',
+                val: 'Video-undervisning',
+                class: ''
+            });
+            if (lesson.duration) {
+                metaItems.push({
+                    icon: 'schedule',
+                    label: 'Varighet',
+                    val: lesson.duration,
+                    class: 'secondary'
+                });
+            }
+        } else if (lesson.zoomUrl) {
+            metaItems.push({
+                icon: 'videocam',
+                label: 'Type',
+                val: 'Live Zoom-møte',
+                class: ''
+            });
+            if (lesson.date) {
+                let formattedDate = new Date(lesson.date).toLocaleDateString(
+                    document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'nb-NO',
+                    { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+                );
+                // Remove the comma after abbreviation dots in Norwegian (e.g. "7. aug., 19:00" -> "7. aug. 19:00")
+                formattedDate = formattedDate.replace('.,', '.');
+                metaItems.push({
+                    icon: 'calendar_month',
+                    label: 'Tidspunkt',
+                    val: formattedDate,
+                    class: 'secondary'
+                });
+
+                // Legg til status eller nedtelling basert på tidspunkt
+                const lessonTime = new Date(lesson.date).getTime();
+                const now = Date.now();
+                if (lessonTime > now) {
+                    metaItems.push({
+                        icon: 'alarm',
+                        label: 'Starter om',
+                        val: `<span id="zoom-countdown" data-target="${lessonTime}">Laster nedtelling...</span>`,
+                        class: 'secondary'
+                    });
+                } else {
+                    const hoursPassed = (now - lessonTime) / (1000 * 60 * 60);
+                    if (hoursPassed < 2) {
+                        // Mindre enn 2 timer siden start (anta at sendingen pågår)
+                        metaItems.push({
+                            icon: 'live_tv',
+                            label: 'Status',
+                            val: '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>',
+                            class: 'secondary'
+                        });
+                    } else {
+                        // Mer enn 2 timer siden start, og admin har ennå ikke lagt til opptak (siden videoUrl mangler)
+                        metaItems.push({
+                            icon: 'lock_clock',
+                            label: 'Status',
+                            val: '<span style="color: #64748b; font-weight: 600; font-size: 13.5px;">Avsluttet (Opptak kommer)</span>',
+                            class: 'secondary'
+                        });
+                    }
+                }
+            }
+        } else {
+            metaItems.push({
+                icon: 'auto_stories',
+                label: 'Type',
+                val: 'Tekstleksjon',
+                class: ''
+            });
+        }
+
+        // Resources (only show if exists in database)
+        if (lesson.resource || lesson.resourceUrl) {
+            metaItems.push({
+                icon: 'description',
+                label: 'Ressurser',
+                val: lesson.resource || 'Leksjonsmateriell',
+                class: 'tertiary',
+                link: lesson.resourceUrl
+            });
+        }
+
+        // Community/Replies (only show if exists in database)
+        if (lesson.commentsCount) {
+            metaItems.push({
+                icon: 'forum',
+                label: 'Fellesskap',
+                val: `${lesson.commentsCount} svar`,
+                class: 'tertiary'
+            });
+        }
+
+        let metaGridHtml = '';
+        if (metaItems.length > 0) {
+            metaGridHtml = `
+                <div class="hkm-meta-grid">
+                    ${metaItems.map(item => {
+                        const iconHtml = `<span class="material-symbols-outlined">${item.icon}</span>`;
+                        const contentHtml = `
+                            <div class="hkm-meta-icon ${item.class}">
+                                ${iconHtml}
+                            </div>
+                            <div class="hkm-meta-text">
+                                <span class="hkm-meta-label">${item.label}</span>
+                                <span class="hkm-meta-val">${item.val}</span>
+                            </div>
+                        `;
+                        if (item.link) {
+                            return `
+                                <a href="${item.link}" target="_blank" class="hkm-meta-item" style="text-decoration:none; color:inherit; cursor:pointer;">
+                                    ${contentHtml}
+                                </a>
+                            `;
+                        }
+                        return `
+                            <div class="hkm-meta-item">
+                                ${contentHtml}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Pre-compute lesson image HTML safely
+        const activeLessonImg = lesson.imageUrl || lesson.image || course.imageUrl || course.image || course.heroImage || course.thumbnail || '/img/fb_fallback_church.jpg';
+        const lessonImageHtml = activeLessonImg ? `<div style="width: 105px; height: 105px; border-radius: 16px; overflow: hidden; flex-shrink: 0; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 14px rgba(0,0,0,0.06);"><img src="${activeLessonImg}" alt="${cleanLTitle}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : '';
+
+        // Render Layout
+        container.innerHTML = `
+            <style>
+                /* Style Overrides for modern design */
+                .hkm-player-grid {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 24px;
+                    width: 100%;
+                    margin-top: 24px;
+                }
+                @media (max-width: 1024px) {
+                    .hkm-player-grid {
+                        flex-direction: column;
+                    }
+                }
+                .hkm-player-main {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+                .hkm-player-sidebar {
+                    width: 380px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+                @media (max-width: 1024px) {
+                    .hkm-player-sidebar {
+                        width: 100%;
+                    }
+                }
+                .hkm-card {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 16px;
+                    padding: 24px;
+                    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+                    transition: all 0.3s ease;
+                }
+                .hkm-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    text-decoration: none;
+                    height: 44px;
+                    box-sizing: border-box;
+                }
+                .hkm-btn:active {
+                    transform: scale(0.97);
+                }
+                .hkm-btn-fs {
+                    background: #d17d39;
+                    color: #ffffff;
+                    border: none;
+                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
+                }
+                .hkm-btn-fs:hover {
+                    background: #bd4f2a;
+                    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.25);
+                    transform: translateY(-1px);
+                }
+                .hkm-btn-zoom {
+                    background: #1B4965;
+                    color: white;
+                    border: none;
+                    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15);
+                }
+                .hkm-btn-zoom:hover {
+                    background: #255d80;
+                    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.25);
+                    transform: translateY(-1px);
+                }
+                
+                /* Metadata Grid */
+                .hkm-meta-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 24px;
+                    padding-top: 24px;
+                    border-top: 1px solid rgba(226, 232, 240, 0.8);
+                }
+                @media (max-width: 640px) {
+                    .hkm-meta-grid {
+                        grid-template-columns: 1fr;
+                        gap: 16px;
+                    }
+                }
+                .hkm-meta-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    transition: all 0.2s ease;
+                }
+                .hkm-meta-text {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .hkm-meta-icon {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 12px;
+                    background: rgba(209, 125, 57, 0.08); /* Secondary orange tint by default */
+                    color: #d17d39;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    transition: all 0.2s ease;
+                }
+                .hkm-meta-icon.secondary {
+                    background: rgba(209, 125, 57, 0.08); /* Secondary orange tint */
+                    color: #d17d39;
+                }
+                .hkm-meta-icon.tertiary {
+                    background: rgba(14, 165, 233, 0.08); /* Sky blue tint */
+                    color: #0ea5e9;
+                }
+                .hkm-meta-label {
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    color: #64748b;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    letter-spacing: 0.05em;
+                    line-height: 1;
+                }
+                .hkm-meta-val {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    line-height: 1.2;
+                }
+                #zoom-countdown {
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                    font-size: 14.5px;
+                    letter-spacing: -0.02em;
+                    color: #d17d39;
+                    font-weight: 700;
+                    background: rgba(209, 125, 57, 0.06);
+                    padding: 2px 6px;
+                    border-radius: 6px;
+                }
+                
+                
+                /* Sidebar navigation and Tabs */
+                .hkm-tabs-header {
+                    display: flex;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+                .hkm-tab-btn {
+                    flex: 1;
+                    padding: 16px 8px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: rgba(100, 116, 139, 0.6);
+                    background: transparent;
+                    border-top: none;
+                    border-left: none;
+                    border-right: 1px solid #e2e8f0;
+                    border-bottom: 2px solid transparent;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                }
+                .hkm-tab-btn:last-child {
+                    border-right: none;
+                }
+                .hkm-tab-btn:hover {
+                    color: #1e293b;
+                }
+                .hkm-tab-btn.active {
+                    color: #d17d39;
+                    border-bottom-color: #d17d39;
+                    background: rgba(209, 125, 57, 0.04);
+                }
+                
+                /* Lesson Item Card */
+                .hkm-lesson-card {
+                    border-radius: 12px;
+                    border: 1px solid #e2e8f0;
+                    padding: 16px;
+                    cursor: pointer;
+                    background: transparent;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    margin-bottom: 16px;
+                }
+                .hkm-lesson-card:hover {
+                    transform: translateX(4px);
+                    background: #f8fafc;
+                    border-color: #cbd5e1;
+                }
+                .player-lesson-item {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    gap: 0px !important;
+                    background: #ffffff !important;
+                    border: 1px solid #e2e8f0 !important;
+                }
+                .player-lesson-item:hover {
+                    background: #f8fafc !important;
+                    border-color: #cbd5e1 !important;
+                    transform: translateX(4px) !important;
+                }
+                .player-lesson-item.active {
+                    background: rgba(209, 125, 57, 0.04) !important;
+                    border-color: rgba(209, 125, 57, 0.4) !important;
+                }
+                .hkm-lesson-card.locked {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    background: rgba(241, 245, 249, 0.4) !important;
+                    border-color: #e2e8f0 !important;
+                }
+                .hkm-lesson-card.locked:hover {
+                    transform: none !important;
+                    background: rgba(241, 245, 249, 0.4) !important;
+                }
+
+                /* Layout stretching overrides */
+                .hkm-player-grid {
+                    align-items: stretch !important;
+                }
+                .hkm-player-sidebar {
+                    height: auto !important;
+                }
+                .hkm-player-sidebar > .hkm-card {
+                    height: 100% !important;
+                }
+                .hkm-sidebar-scroll {
+                    max-height: none !important;
+                    height: calc(100vh - 380px) !important;
+                    min-height: 420px !important;
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                /* Panel containers */
+                .hkm-sidebar-scroll > .sidebar-panel {
+                    flex: 1;
+                    display: none;
+                    flex-direction: column;
+                    height: 100%;
+                }
+                .hkm-sidebar-scroll > .sidebar-panel.active {
+                    display: flex;
+                }
+
+                /* Notes Editor custom overrides */
+                #panel-notes > div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                    flex: 1;
+                    height: 100%;
+                }
+                #panel-notes .rte-wrapper {
+                    border: 1.5px solid #cbd5e1;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+                #panel-notes .rte-wrapper:focus-within {
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15);
+                }
+                #panel-notes .rte-toolbar {
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e2e8f0;
+                    padding: 8px 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    flex-wrap: wrap;
+                }
+                #panel-notes .rte-editor {
+                    flex: 1;
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #1e293b;
+                    outline: none;
+                    white-space: pre-wrap;
+                    overflow-y: auto;
+                    padding: 16px;
+                    background: #ffffff;
+                    min-height: 200px;
+                }
+                #panel-notes .rte-btn {
+                    width: 32px;
+                    height: 32px;
+                    border: none;
+                    background: transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    transition: background 0.15s, color 0.15s;
+                }
+                #panel-notes .rte-btn:hover {
+                    background: #e2e8f0;
+                    color: #1e293b;
+                }
+                #panel-notes .rte-btn.active {
+                    background: rgba(209, 125, 57, 0.08);
+                    color: #d17d39;
+                }
+                #panel-notes .rte-divider {
+                    width: 1px;
+                    height: 20px;
+                    background: #e2e8f0;
+                    margin: 0 4px;
+                }
+
+                /* Bible Widget selectors */
+                .hkm-bible-selects {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                    margin-bottom: 16px;
+                }
+                .hkm-bible-select {
+                    width: 100%;
+                    border: 1px solid #cbd5e1;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    padding: 8px;
+                    font-size: 12px;
+                    color: #1e293b;
+                    outline: none;
+                }
+                #panel-bible > div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                    flex: 1;
+                    height: 100%;
+                }
+                .hkm-bible-display {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    padding: 16px;
+                    flex: 1;
+                    height: auto !important;
+                    overflow-y: auto;
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+                    position: relative;
+                }
+                .hkm-bible-display p {
+                    font-family: 'Inter', system-ui, sans-serif !important;
+                    font-size: 15px !important;
+                    line-height: 1.65 !important;
+                    color: #334155 !important;
+                    margin-bottom: 12px !important;
+                    text-align: left !important;
+                }
+                .hkm-bible-display .bible-verse-num {
+                    font-family: 'Inter', system-ui, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    color: #d17d39 !important;
+                    margin-right: 8px !important;
+                    vertical-align: super !important;
+                }
+                .hkm-bible-tool-btn {
+                    width: 28px;
+                    height: 28px;
+                    border: 1px solid #cbd5e1;
+                    background: #ffffff;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #64748b;
+                    font-size: 11px;
+                    font-weight: 700;
+                    transition: all 0.15s ease;
+                }
+                .hkm-bible-tool-btn:hover:not(:disabled) {
+                    border-color: #d17d39;
+                    color: #d17d39;
+                    background: rgba(209, 125, 57, 0.04);
+                }
+                .hkm-bible-tool-btn:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                }
+                .hkm-bible-tool-btn.active {
+                    background: rgba(209, 125, 57, 0.08);
+                    border-color: #d17d39;
+                    color: #d17d39;
+                }
+                .hkm-bible-display .bible-verse-item.highlighted-verse {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-left: 3px solid #d17d39 !important;
+                    padding-left: 5px !important;
+                }
+                .hkm-bible-display .bible-verse-item.selected-verse {
+                    background: rgba(14, 165, 233, 0.08) !important;
+                    border-left: 3px solid #0ea5e9 !important;
+                    padding-left: 5px !important;
+                }
+                .hkm-bible-display span.bible-verse-item.highlighted-verse {
+                    background: rgba(209, 125, 57, 0.15) !important;
+                    border-left: none !important;
+                    padding-left: 2px !important;
+                }
+                .hkm-bible-display span.bible-verse-item.selected-verse {
+                    background: rgba(14, 165, 233, 0.15) !important;
+                    border-left: none !important;
+                    padding-left: 2px !important;
+                }
+                
+                .hkm-bible-select:focus {
+                    border-color: #d17d39;
+                    box-shadow: 0 0 0 2px rgba(209, 125, 57, 0.15);
+                }
+
+                /* Scrollbar styling */
+                .hkm-bible-display::-webkit-scrollbar,
+                .hkm-sidebar-scroll::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .hkm-bible-display::-webkit-scrollbar-track,
+                .hkm-sidebar-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .hkm-bible-display::-webkit-scrollbar-thumb,
+                .hkm-sidebar-scroll::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 4px;
+                }
+                .hkm-bible-display::-webkit-scrollbar-thumb:hover,
+                .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+
+                /* Bible Verse Card */
+                .hkm-verse-card {
+                    background: #d17d39;
+                    color: #ffffff;
+                    padding: 24px;
+                    border-radius: 16px;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 4px 20px rgba(209, 125, 57, 0.15);
+                }
+                .hkm-verse-card::before {
+                    content: '';
+                    position: absolute;
+                    top: -64px;
+                    right: -64px;
+                    width: 144px;
+                    height: 144px;
+                    background: rgba(255, 255, 255, 0.08);
+                    border-radius: 50%;
+                    filter: blur(16px);
+                }
+
+                /* Landscape Media Guard */
+                @media (orientation: landscape) and (max-height: 500px) {
+                    .hkm-player-grid {
+                        gap: 16px;
+                    }
+                    .hkm-card {
+                        padding: 16px;
+                    }
+                    .hkm-meta-grid {
+                        gap: 16px;
+                        padding-top: 16px;
+                    }
+                }
+
+                @keyframes hkm-pulse {
+                    0% { opacity: 0.4; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.4; }
+                }
+                .hkm-live-pulse {
+                    animation: hkm-pulse 1.5s infinite ease-in-out;
+                }
+
+                /* Dark Mode Overrides for Course Player */
+                html[data-theme="dark"] .hkm-card {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+                }
+                html[data-theme="dark"] .hkm-card h2,
+                html[data-theme="dark"] .hkm-card h2[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-card p {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-card p strong {
+                    color: #cbd5e1 !important;
+                }
+                html[data-theme="dark"] .hkm-meta-label {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-meta-val {
+                    color: #f8fafc !important;
+                }
+                
+                /* Tabs */
+                html[data-theme="dark"] .hkm-tabs-header {
+                    border-bottom-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn {
+                    color: rgba(148, 163, 184, 0.6) !important;
+                    border-right-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn:last-child {
+                    border-right-color: transparent !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn[style*="border-right"] {
+                    border-right-color: #334155 !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn:hover {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-tab-btn.active {
+                    color: #d17d39 !important;
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-bottom-color: #d17d39 !important;
+                }
+
+                /* Lessons List */
+                html[data-theme="dark"] .player-lesson-item {
+                    background: #1e293b !important;
+                    border-color: #334155 !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item:hover {
+                    background: #2d3748 !important;
+                    border-color: #4a5568 !important;
+                }
+                html[data-theme="dark"] .player-lesson-item.active {
+                    background: rgba(209, 125, 57, 0.08) !important;
+                    border-color: rgba(209, 125, 57, 0.5) !important;
+                }
+                html[data-theme="dark"] .player-lesson-item span[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item .lesson-title {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .player-lesson-item .lesson-meta {
+                    color: #94a3b8 !important;
+                }
+
+                /* Notes Panel */
+                html[data-theme="dark"] #panel-notes h4[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-wrapper {
+                    border-color: #334155 !important;
+                    background: #0f172a !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-toolbar {
+                    background: #1e293b !important;
+                    border-bottom-color: #334155 !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-editor {
+                    background: #0f172a !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-btn {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-btn:hover {
+                    background: #334155 !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-notes .rte-divider {
+                    background: #334155 !important;
+                }
+
+                /* Bible Panel */
+                html[data-theme="dark"] #panel-bible h4[style*="color:#1e293b"] {
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] #panel-bible p[style*="color"] {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-select {
+                    border-color: #334155 !important;
+                    background: #0f172a !important;
+                    color: #f8fafc !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display {
+                    background: #0f172a !important;
+                    border-color: #334155 !important;
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display p {
+                    color: #cbd5e1 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-tool-btn {
+                    border-color: #334155 !important;
+                    background: #1e293b !important;
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-tool-btn:hover:not(:disabled) {
+                    border-color: #d17d39 !important;
+                    color: #d17d39 !important;
+                    background: rgba(209, 125, 57, 0.08) !important;
+                }
+                html[data-theme="dark"] #bible-font-size-indicator {
+                    color: #94a3b8 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display::-webkit-scrollbar-thumb,
+                html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb {
+                    background: #475569 !important;
+                }
+                html[data-theme="dark"] .hkm-bible-display::-webkit-scrollbar-thumb:hover,
+                html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #64748b !important;
+                }
+            </style>
+            <div class="hkm-player-grid">
+                <!-- Left Side: Player & Lesson Details -->
+                <div class="hkm-player-main">
+                    <!-- Leksjon info kort -->
+                    <div class="hkm-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+                            <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 250px;">
+                                ${lessonImageHtml}
+                                <div style="flex:1;">
+                                    <span style="font-size: 13px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon ${activeLessonIndex + 1}</span>
+                                    <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
+                                    <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <button id="player-fullscreen-btn" class="hkm-btn hkm-btn-fs">
+                                    <span class="material-symbols-outlined">fullscreen</span> Fullskjerm
+                                </button>
+                                ${lesson.zoomUrl ? `
+                                    <a href="${lesson.zoomUrl}" target="_blank" class="hkm-btn hkm-btn-zoom">
+                                        <span class="material-symbols-outlined">open_in_new</span> Åpne i Zoom-appen
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Beskrivelse -->
+                        <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 24px 0;">
+                            ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.'}
+                        </p>
+
+                        <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
+                        ${metaGridHtml}
+                    </div>
+
+                    <!-- Videospiller container -->
+                    <div class="video-player-container" id="player-container">
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; font-size:1.1rem; padding: 24px; text-align:center;">
+                            Laster spiller...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Sidebar Navigation and Tabs -->
+                <div class="hkm-player-sidebar">
+                    <div class="hkm-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
+                        <!-- Tabs Header -->
+                        <div class="hkm-tabs-header" style="display: flex;">
+                            <button class="hkm-tab-btn active sidebar-tab-btn" data-tab="lessons">
+                                <span class="material-symbols-outlined" style="font-size:18px;">format_list_bulleted</span> Innhold
+                            </button>
+                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="notes">
+                                <span class="material-symbols-outlined" style="font-size:18px;">notes</span> Notater
+                            </button>
+                            <button class="hkm-tab-btn sidebar-tab-btn" data-tab="bible">
+                                <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span> Bibel
+                            </button>
+                        </div>
+
+                        <!-- Tab Panels scroll wrapper -->
+                        <div class="hkm-sidebar-scroll" style="padding: 24px;">
+                            <!-- Panel 1: Lessons List -->
+                            <div class="sidebar-panel active" id="panel-lessons">
+                                <div class="player-lessons-list">
+                                    ${lessons.map((l, idx) => {
+                                        const isActive = idx === activeLessonIndex;
+                                        const cleanItemTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+                                        
+                                        const isLessonUnlocked = isCourseFree || isAdmin || enrollments.some(e => 
+                                            e.courseId === course.id && 
+                                            (e.status === 'paid' || e.status === 'success') &&
+                                            (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(l.id))
+                                        );
+                                        
+                                        if (!isLessonUnlocked) {
+                                            return `
+                                                <div class="hkm-lesson-card locked player-lesson-item" data-idx="${idx}">
+                                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                                                        <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                                                            <span style="font-size:10px; font-weight:700; color:rgba(100, 116, 139, 0.4); text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
+                                                            <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
+                                                        </div>
+                                                        <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">lock</span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }
+                                        
+                                        return `
+                                            <div class="hkm-lesson-card player-lesson-item ${isActive ? 'active' : ''}" data-idx="${idx}">
+                                                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                                                    <div style="display:flex; flex-direction:column; gap:2px; flex:1;">
+                                                        <span style="font-size:10px; font-weight:700; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.6)'}; text-transform:uppercase; letter-spacing: 0.05em;">Leksjon ${idx + 1}</span>
+                                                        <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.2;">${cleanItemTitle}</span>
+                                                    </div>
+                                                    <span class="material-symbols-outlined" style="font-size:18px; color:${isActive ? '#d17d39' : 'rgba(100, 116, 139, 0.4)'};">
+                                                        ${isActive ? 'play_circle' : (l.videoUrl ? 'play_circle' : 'video_camera_front')}
+                                                    </span>
+                                                </div>
+                                                ${isActive && l.videoUrl ? `
+                                                    <div style="margin-top: 16px; height: 4px; width: 100%; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
+                                                        <div style="height: 100%; background: #d17d39; width: 65%;"></div>
+                                                    </div>
+                                                    <p style="margin: 8px 0 0 0; font-size: 10px; font-weight: 700; color: #d17d39;">PÅGÅENDE - 65% ferdig</p>
+                                                ` : ''}
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Notes Editor (Dynamic autosave) -->
+                            <div class="sidebar-panel" id="panel-notes">
+                                <div style="display:flex; flex-direction:column; gap:16px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin:0;">Dine leksjonsnotater</h4>
+                                        <span id="notes-save-status" class="notes-autosave-status" style="font-size:11px; font-weight:600; color:#64748b;">
+                                            <span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret
+                                        </span>
+                                    </div>
+                                    <div class="rte-wrapper">
+                                        <div class="rte-toolbar" id="rte-toolbar-lesson">
+                                            <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                                            <div class="rte-divider"></div>
+                                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
+                                        </div>
+                                        <div class="rte-editor" id="lesson-notes-editor" contenteditable="true"
+                                            data-placeholder="Skriv dine notater for denne leksjonen her... De lagres automatisk til kontoen din."></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel 3: Bible Lookup (Dynamic API loader) -->
+                            <div class="sidebar-panel" id="panel-bible" style="position: relative;">
+                                <div style="display:flex; flex-direction:column; gap:16px; height: 100%;">
+                                    <div>
+                                        <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin:0;">Slå opp i Bibelen</h4>
+                                        <p style="font-size:11px; color:rgba(100, 116, 139, 0.6); margin:8px 0 0 0;">Dobbeltklikk på ord for ordbok. Velg vers for å kopiere eller markere.</p>
+                                    </div>
+                                    <div class="hkm-bible-selects">
+                                        <select id="bible-select-translation" class="hkm-bible-select">
+                                            <option value="">Laster...</option>
+                                        </select>
+                                        <select id="bible-select-book" class="hkm-bible-select" disabled>
+                                            <option value="">Bok</option>
+                                        </select>
+                                        <select id="bible-select-chapter" class="hkm-bible-select" disabled>
+                                            <option value="">Kapittel</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Interactive Tools Toolbar -->
+                                    <div class="hkm-bible-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-top: -8px; margin-bottom: -4px;">
+                                        <div style="display: flex; gap: 6px;">
+                                            <button type="button" id="bible-btn-layout" class="hkm-bible-tool-btn" title="Bytt visning (Vers / Løpende tekst)">
+                                                <span class="material-symbols-outlined" style="font-size:16px;">segment</span>
+                                            </button>
+                                            <button type="button" id="bible-btn-copy" class="hkm-bible-tool-btn" title="Kopier markerte vers" disabled>
+                                                <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+                                            </button>
+                                            <button type="button" id="bible-btn-highlight" class="hkm-bible-tool-btn" title="Marker vers" disabled>
+                                                <span class="material-symbols-outlined" style="font-size:16px;">border_color</span>
+                                            </button>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                            <button type="button" id="bible-btn-font-dec" class="hkm-bible-tool-btn" title="Mindre skrift" style="font-size:9px;">A-</button>
+                                            <span id="bible-font-size-indicator" style="font-size: 11px; font-weight: 600; color: #64748b; width: 34px; text-align: center;">15px</span>
+                                            <button type="button" id="bible-btn-font-inc" class="hkm-bible-tool-btn" title="Større skrift" style="font-size:9px;">A+</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="bible-verses-display" class="hkm-bible-display">
+                                        <p style="color:rgba(100, 116, 139, 0.5); text-align:center; font-style:italic; font-size:12px; padding-top:40px; margin: 0;">Velg bok og kapittel for å begynne å lese.</p>
+                                    </div>
+                                    
+                                    <!-- Bible Dictionary Overlay -->
+                                    <div id="bible-dict-overlay" style="display: none; position: absolute; inset: 0; background: #ffffff; z-index: 10; padding: 20px; flex-direction: column; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                                            <h4 id="bible-dict-title" style="font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 700; color: #1b4965; margin: 0;">Bibeleksikon</h4>
+                                            <button type="button" id="bible-dict-close" class="hkm-bible-tool-btn" style="border: none; background: transparent;">
+                                                <span class="material-symbols-outlined" style="font-size: 18px; color: #64748b;">close</span>
+                                            </button>
+                                        </div>
+                                        <div id="bible-dict-content" style="flex: 1; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #334155; padding-right: 4px;">
+                                            Laster forklaring...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+
+        // 3. Mount Player Media Embed
+        const playerContainer = document.getElementById('player-container');
+
+        const loadZoomSDK = () => {
+            return new Promise((resolve, reject) => {
+                if (window.ZoomMtgEmbedded) {
+                    resolve(window.ZoomMtgEmbedded);
+                    return;
+                }
+
+                // Load Zoom CSS
+                const cssUrl = 'https://source.zoom.us/zoom-meeting-embedded-3.8.0.css';
+                if (!document.querySelector(`link[href="${cssUrl}"]`)) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = cssUrl;
+                    document.head.appendChild(link);
+                }
+
+                const scripts = [
+                    'https://source.zoom.us/3.8.0/lib/vendor/react.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/react-dom.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/redux.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/redux-thunk.min.js',
+                    'https://source.zoom.us/3.8.0/lib/vendor/lodash.min.js',
+                    'https://source.zoom.us/zoom-meeting-embedded-3.8.0.min.js'
+                ];
+
+                let loadedCount = 0;
+
+                const loadNext = () => {
+                    if (loadedCount >= scripts.length) {
+                        if (window.ZoomMtgEmbedded) {
+                            resolve(window.ZoomMtgEmbedded);
+                        } else {
+                            reject(new Error('ZoomMtgEmbedded was not loaded successfully.'));
+                        }
+                        return;
+                    }
+
+                    const scriptUrl = scripts[loadedCount];
+                    if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+                        loadedCount++;
+                        loadNext();
+                        return;
+                    }
+
+                    const script = document.createElement('script');
+                    script.src = scriptUrl;
+                    script.async = false;
+                    script.onload = () => {
+                        loadedCount++;
+                        loadNext();
+                    };
+                    script.onerror = (err) => {
+                        reject(err);
+                    };
+                    document.body.appendChild(script);
+                };
+
+                loadNext();
+            });
+        };
+        
+        const loadPlayer = () => {
+            if (!playerContainer) return;
+            // Reset to default 16:9 aspect ratio styling first
+            playerContainer.style.paddingTop = '56.25%';
+            playerContainer.style.height = 'auto';
+
+            if (lesson.videoUrl) {
+                // Recorded Video Player
+                const ytId = parseYoutube(lesson.videoUrl);
+                const vimId = parseVimeo(lesson.videoUrl);
+                
+                if (ytId) {
+                    playerContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?rel=0&autoplay=1" title="YouTube Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+                } else if (vimId) {
+                    playerContainer.innerHTML = `<iframe src="https://player.vimeo.com/video/${vimId}?autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+                } else {
+                    // Direct media player
+                    playerContainer.innerHTML = `<video src="${lesson.videoUrl}" controls autoplay></video>`;
+                }
+            } else if (lesson.zoomUrl) {
+                // Zoom embed
+                const zoomData = parseZoom(lesson.zoomUrl);
+                if (zoomData) {
+                    // Increase container height for Zoom meeting interface to prevent clipping
+                    playerContainer.style.paddingTop = '0px';
+                    playerContainer.style.height = '600px';
+
+                    const studentName = this.profileData?.name || this.currentUser?.displayName || 'Student';
+
+                    // Try to load Zoom Meeting SDK (Component View)
+                    playerContainer.innerHTML = `
+                        <div id="zoom-sdk-loading" style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
+                            <span class="material-symbols-outlined spinner" style="font-size: 48px; color: #d17d39; animation: spin 1.5s linear infinite;">sync</span>
+                            <div>
+                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Starter Zoom-spiller...</h3>
+                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Laster inn integrert Zoom-klient med chat og video. Vennligst vent.</p>
+                            </div>
+                        </div>
+                        <div id="zoom-sdk-element" style="width: 100%; height: 100%; display: none;"></div>
+                    `;
+
+                    const loadEmbeddedZoom = async () => {
+                        try {
+                            // 1. Fetch signature from API
+                            const sigRes = await fetch('/api/zoom-signature', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    meetingNumber: zoomData.meetingId,
+                                    role: 0 // participant
+                                })
+                            });
+                            const sigData = await sigRes.json();
+                            if (!sigRes.ok || sigData.error) {
+                                throw new Error(sigData.error || 'Failed to fetch signature');
+                            }
+
+                            // 2. Load scripts dynamically
+                            const embeddedSDK = await loadZoomSDK();
+
+                            // Hide loading, show element
+                            const sdkEl = document.getElementById('zoom-sdk-element');
+                            const loaderEl = document.getElementById('zoom-sdk-loading');
+                            if (sdkEl && loaderEl) {
+                                loaderEl.style.display = 'none';
+                                sdkEl.style.display = 'block';
+                            }
+
+                            // 3. Initialize and join
+                            const client = embeddedSDK.createClient();
+                            client.init({
+                                zoomAppRoot: sdkEl,
+                                language: 'no-NO'
+                            });
+
+                            await client.join({
+                                sdkKey: sigData.sdkKey,
+                                signature: sigData.signature,
+                                meetingNumber: String(zoomData.meetingId),
+                                password: zoomData.pwd || '',
+                                userName: studentName
+                            });
+                            
+                            console.log('Zoom SDK joined successfully!');
+                        } catch (err) {
+                            console.error('Zoom SDK error:', err);
+                            const errStr = JSON.stringify(err) || '';
+                            const errMsg = err.message || errStr || 'Ukjent feil';
+                            const errorCode = err.errorCode || (err.detail && err.detail.errorCode);
+                            const reason = err.reason || '';
+                            
+                            // Check if the meeting has not started yet (errorCode 3008)
+                            if (errorCode === 3008 || reason.includes('Meeting has not started') || errStr.includes('3008') || errMsg.includes('3008')) {
+                                playerContainer.innerHTML = `
+                                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
+                                        <style>
+                                            @keyframes zoom-pulse {
+                                                0%, 100% { opacity: 1; transform: scale(1); }
+                                                50% { opacity: 0.6; transform: scale(0.95); }
+                                            }
+                                        </style>
+                                        <span class="material-symbols-outlined" style="font-size: 48px; color: #3b82f6; animation: zoom-pulse 2s infinite;">schedule</span>
+                                        <div>
+                                            <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #93c5fd;">Møtet har ikke startet ennå</h3>
+                                            <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
+                                                Webinaret er planlagt til et senere tidspunkt. Vi overfører deg til Zooms venterom om 3 sekunder...
+                                            </p>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                setTimeout(() => {
+                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                                }, 3000);
+                                return;
+                            }
+                            
+                            playerContainer.innerHTML = `
+                                <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px; z-index: 10;">
+                                    <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
+                                    <div>
+                                        <h3 style="margin: 0 0 8px; font-size: 1.15rem; color: #f87171;">Zoom SDK Feil</h3>
+                                        <p style="margin: 0 0 16px; font-size: 0.88rem; font-weight: 400; color: #cbd5e1; max-width: 450px;">
+                                            Kunne ikke starte den integrerte spilleren: <code>${errMsg}</code>
+                                        </p>
+                                        <button id="zoom-fallback-trigger-btn" class="player-btn-zoom-app" style="background:#ef4444 !important; border-color:#ef4444 !important; font-size:0.8rem !important; height:38px !important; padding:6px 16px !important; border-radius:30px !important;">
+                                            Start reserveløsning (iframe)
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            const fallbackBtn = document.getElementById('zoom-fallback-trigger-btn');
+                            if (fallbackBtn) {
+                                fallbackBtn?.addEventListener('click', () => {
+                                    const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
+                                    playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
+                                });
+                            }
+                        }
+                    };
+
+                    loadEmbeddedZoom();
+                } else {
+                    playerContainer.innerHTML = `
+                        <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 16px;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39;">video_camera_front</span>
+                            <div>
+                                <h3 style="margin: 0 0 8px; font-size: 1.15rem;">Zoom Live Class</h3>
+                                <p style="margin: 0; font-size: 0.88rem; font-weight: 400; color: #94a3b8; max-width: 320px;">Live Zoom-kobling er klar. Vennligst bruk knappen nedenfor for å åpne timen i Zoom-appen.</p>
+                            </div>
+                            <a href="${lesson.zoomUrl}" target="_blank" class="player-btn-zoom-app" style="box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);">
+                                <span class="material-symbols-outlined">launch</span> Åpne Zoom-kobling
+                            </a>
+                        </div>`;
+                }
+            } else {
+                playerContainer.innerHTML = `
+                    <div style="position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; background:#1e293b; font-weight:600; padding: 20px; text-align:center; gap: 12px;">
+                        <span class="material-symbols-outlined" style="font-size:40px; color:#94a3b8;">school</span>
+                        <div>Leksjonen har ingen live Zoom-time eller opptaks-video registrert ennå.</div>
+                    </div>`;
+            }
+        };
+        
+        loadPlayer();
+
+        // Fullscreen Toggle Logic
+        const fsBtn = container.querySelector('#player-fullscreen-btn');
+        if (fsBtn) {
+            fsBtn?.addEventListener('click', () => {
+                const doc = document;
+                const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+                
+                if (!isFs) {
+                    if (playerContainer.requestFullscreen) {
+                        playerContainer.requestFullscreen();
+                    } else if (playerContainer.webkitRequestFullscreen) {
+                        playerContainer.webkitRequestFullscreen();
+                    } else if (playerContainer.mozRequestFullScreen) {
+                        playerContainer.mozRequestFullScreen();
+                    } else if (playerContainer.msRequestFullscreen) {
+                        playerContainer.msRequestFullscreen();
+                    }
+                } else {
+                    if (doc.exitFullscreen) {
+                        doc.exitFullscreen();
+                    } else if (doc.webkitExitFullscreen) {
+                        doc.webkitExitFullscreen();
+                    } else if (doc.mozCancelFullScreen) {
+                        doc.mozCancelFullScreen();
+                    } else if (doc.msExitFullscreen) {
+                        doc.msExitFullscreen();
+                    }
+                }
+            });
+
+            const updateFullscreenUI = () => {
+                const doc = document;
+                const isFs = doc.fullscreenElement === playerContainer || 
+                             doc.webkitFullscreenElement === playerContainer || 
+                             doc.mozFullScreenElement === playerContainer || 
+                             doc.msFullscreenElement === playerContainer;
+                
+                fsBtn.innerHTML = isFs 
+                    ? `<span class="material-symbols-outlined">fullscreen_exit</span> Avslutt`
+                    : `<span class="material-symbols-outlined">fullscreen</span> Fullskjerm`;
+            };
+
+            playerContainer?.addEventListener('fullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('mozfullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('MSFullscreenChange', updateFullscreenUI);
+        }
+
+        // 4. Setup Tab Navigation
+        const tabs = container.querySelectorAll('.sidebar-tab-btn');
+        const panels = container.querySelectorAll('.sidebar-panel');
+        tabs.forEach(tab => {
+            tab?.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const panelId = `panel-${tab.dataset.tab}`;
+                container.querySelector(`#${panelId}`).classList.add('active');
+            });
+        });
+
+        // 5. Sidebar Lesson Switcher
+        container.querySelectorAll('.player-lesson-item').forEach(item => {
+            item?.addEventListener('click', () => {
+                const idx = parseInt(item.dataset.idx);
+                const nextLesson = lessons[idx];
+                this.loadView('course-player', { courseId, lessonId: nextLesson.id });
+            });
+        });
+
+        // 6. Notes Auto-save Logic
+        const editor = container.querySelector('#lesson-notes-editor');
+        const saveStatus = container.querySelector('#notes-save-status');
+        let noteDocId = null;
+        let saveTimeout = null;
+// Wire the Rich Text Editor toolbar
+        this._wireRteToolbar('rte-toolbar-lesson', 'lesson-notes-editor');
+
+        const loadNotes = async () => {
+            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
+            try {
+                const snap = await firebase.firestore().collection('personal_notes')
+                    .where('userId', '==', uid)
+                    .where('lessonId', '==', lesson.id)
+                    .limit(1)
+                    .get();
+                
+                if (!snap.empty) {
+                    const noteDoc = snap.docs[0];
+                    noteDocId = noteDoc.id;
+                    if (editor) editor.innerHTML = noteDoc.data().text || '';
+                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                } else {
+                    if (editor) editor.innerHTML = '';
+                    if (saveStatus) saveStatus.innerHTML = `Ingen lagrede notater`;
+                }
+            } catch (e) {
+                console.error("Notes fetch error:", e);
+                if (saveStatus) saveStatus.innerHTML = `Feil ved innlasting`;
+            }
+        };
+
+        await loadNotes();
+
+        editor?.addEventListener('input', () => {
+            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
+            clearTimeout(saveTimeout);
+            
+            saveTimeout = setTimeout(async () => {
+                const noteText = editor.innerHTML.trim();
+                const plainText = editor.innerText.trim();
+                if (!plainText) {
+                    if (saveStatus) saveStatus.innerHTML = `Tomt notat`;
+                    return;
+                }
+                
+                try {
+                    if (noteDocId) {
+                        await firebase.firestore().collection('personal_notes').doc(noteDocId).update({
+                            text: noteText,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        const cleanLTitle = (lesson.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
+                        const docRef = await firebase.firestore().collection('personal_notes').add({
+                            userId: uid,
+                            courseId: course.id,
+                            lessonId: lesson.id,
+                            title: `Notater: Leksjon ${activeLessonIndex + 1} - ${cleanLTitle}`,
+                            text: noteText,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            category: 'Kurs'
+                        });
+                        noteDocId = docRef.id;
+                    }
+                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret i skyen ✓`;
+                    setTimeout(() => {
+                        if (saveStatus.textContent.includes('skyen')) {
+                            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                        }
+                    }, 2000);
+                } catch (e) {
+                    console.error("Notes autosave error:", e);
+                    if (saveStatus) saveStatus.innerHTML = `Kunne ikke lagre`;
+                }
+            }, 1000); // 1 sec debounce
+        });
+
+        // 7. Bible Reader Widget Logic
+        const bibTransSelect = container.querySelector('#bible-select-translation');
+        const bibBookSelect = container.querySelector('#bible-select-book');
+        const bibChapSelect = container.querySelector('#bible-select-chapter');
+        const bibDisplay = container.querySelector('#bible-verses-display');
+        
+        // Dictionary Overlay Elements
+        const dictOverlay = container.querySelector('#bible-dict-overlay');
+        const dictTitle = container.querySelector('#bible-dict-title');
+        const dictContent = container.querySelector('#bible-dict-content');
+        const dictClose = container.querySelector('#bible-dict-close');
+
+        let bibleList = [];
+        let isBibleInit = true;
+        let selectedVerses = [];
+        let bibleLayout = 'verse'; // 'verse' | 'paragraph'
+        let bibleFontSize = 15; // default size matches new Inter CSS style
+
+        const updateToolbarStates = () => {
+            const hasSelected = selectedVerses.length > 0;
+            const btnCopy = container.querySelector('#bible-btn-copy');
+            const btnHighlight = container.querySelector('#bible-btn-highlight');
+            if (btnCopy) btnCopy.disabled = !hasSelected;
+            if (btnHighlight) btnHighlight.disabled = !hasSelected;
+        };
+
+        const loadBibleData = async () => {
+            try {
+                const res = await fetch('/api/bible/bibles');
+                const payload = await res.json();
+                bibleList = payload.data || payload || [];
+                
+                if (bibTransSelect) bibTransSelect.innerHTML = bibleList.map(b => `
+                    <option value="${b.id}">${b.abbreviation}</option>
+                `).join('');
+                
+                if (bibleList.length > 0) {
+                    await loadBooks(bibleList[0].id, isBibleInit);
+                    isBibleInit = false;
+                }
+            } catch (e) {
+                console.error("Bible widget init error:", e);
+            }
+        };
+
+        const loadBooks = async (bibleId, autoSelect = false) => {
+            try {
+                bibBookSelect.disabled = true;
+                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
+                const payload = await res.json();
+                const books = payload.data || payload || [];
+                
+                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
+                    <option value="${b.id}">${b.name}</option>
+                `).join('');
+                bibBookSelect.disabled = false;
+
+                if (autoSelect && books.length > 0) {
+                    const defaultBook = books.find(b => 
+                        b.id.toLowerCase() === 'jhn' || 
+                        b.id.toLowerCase().includes('jhn') || 
+                        b.name.toLowerCase().includes('johannes')
+                    ) || books[0];
+
+                    bibBookSelect.value = defaultBook.id;
+                    await loadChapters(bibleId, defaultBook.id, true);
+                }
+            } catch (e) {
+                console.error("Bible widget loadBooks error:", e);
+            }
+        };
+
+        const loadVerses = async (bibleId, chapterId) => {
+            try {
+                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
+                
+                // Clear active selection on reload
+                selectedVerses = [];
+                updateToolbarStates();
+
+                const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
+                const payload = await res.json();
+                const data = payload.data || payload || {};
+                const verses = data.verses || [];
+                
+                if (verses.length === 0) {
+                    if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
+                    return;
+                }
+                
+                const highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
+                
+                if (bibleLayout === 'paragraph') {
+                    if (bibDisplay) bibDisplay.innerHTML = `<div style="font-family: 'Inter', system-ui, sans-serif; font-size:${bibleFontSize}px; line-height:1.75; color:#334155; text-align:left;">` + 
+                        verses.map(v => {
+                            const verseNum = v.verse || v.number || '';
+                            const isHighlighted = highlights.some(h => 
+                                h.bibleId === bibleId && 
+                                h.chapterId === chapterId && 
+                                h.verseNum === verseNum.toString()
+                            );
+                            const highlightClass = isHighlighted ? 'highlighted-verse' : '';
+                            const isSelected = selectedVerses.includes(verseNum.toString());
+                            const selectedClass = isSelected ? 'selected-verse' : '';
+                            
+                            return `
+                                <span class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="cursor:pointer; padding: 2px 4px; border-radius: 4px; transition: background 0.15s; display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone;">
+                                    <span class="bible-verse-num" style="font-size: 10px; font-weight: 700; color: #d17d39; margin-left: 6px; margin-right: 4px; vertical-align: super;">${verseNum}</span>${v.text}
+                                </span>
+                            `;
+                        }).join('') + `</div>`;
+                } else {
+                    if (bibDisplay) bibDisplay.innerHTML = verses.map(v => {
+                        const verseNum = v.verse || v.number || '';
+                        const isHighlighted = highlights.some(h => 
+                            h.bibleId === bibleId && 
+                            h.chapterId === chapterId && 
+                            h.verseNum === verseNum.toString()
+                        );
+                        const highlightClass = isHighlighted ? 'highlighted-verse' : '';
+                        const isSelected = selectedVerses.includes(verseNum.toString());
+                        const selectedClass = isSelected ? 'selected-verse' : '';
+                        
+                        return `
+                            <p class="bible-verse-item ${highlightClass} ${selectedClass}" data-verse="${verseNum}" style="margin-bottom:12px; font-size:${bibleFontSize}px; line-height:1.65; color:#334155; cursor:pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.15s; display: block; border-left: 3px solid transparent;">
+                                <span class="bible-verse-num" style="font-size: 11px; font-weight: 700; color: #d17d39; margin-right: 8px; vertical-align: super;">${verseNum}</span>${v.text}
+                            </p>
+                        `;
+                    }).join('');
+                }
+                
+                // Attach click handlers for verse items selection
+                bibDisplay.querySelectorAll('.bible-verse-item').forEach(item => {
+                    item?.addEventListener('click', (e) => {
+                        if (e.detail > 1) return; // Prevent selection trigger on double-click
+                        
+                        const verseNum = item.dataset.verse;
+                        const idx = selectedVerses.indexOf(verseNum);
+                        if (idx > -1) {
+                            selectedVerses.splice(idx, 1);
+                            item.classList.remove('selected-verse');
+                        } else {
+                            selectedVerses.push(verseNum);
+                            item.classList.add('selected-verse');
+                        }
+                        updateToolbarStates();
+                    });
+                });
+
+                // Attach double-click handler for Bible Dictionary lookup
+                bibDisplay?.addEventListener('dblclick', () => {
+                    const selection = window.getSelection().toString().trim();
+                    const cleanedWord = selection.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").trim();
+                    if (cleanedWord && cleanedWord.length > 1 && cleanedWord.length < 30) {
+                        lookupWord(cleanedWord);
+                    }
+                });
+
+                bibDisplay.scrollTop = 0;
+            } catch (e) {
+                console.error("Bible widget loadVerses error:", e);
+                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
+            }
+        };
+
+        const lookupWord = async (word) => {
+            dictOverlay.style.display = 'flex';
+            dictTitle.textContent = `Eksikon: "${word}"`;
+            dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Søker i Bibeleksikon...</p>`;
+            
+            try {
+                const lang = document.documentElement.lang || 'no';
+                const res = await fetch(`/api/bible/dictionary?word=${encodeURIComponent(word)}&lang=${lang}`);
+                if (!res.ok) throw new Error("Fetch failed");
+                const dictRes = await res.json();
+                
+                if (dictRes && dictRes.definition) {
+                    const parsedDef = dictRes.definition
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    
+                    let html = `<p style="margin-bottom:8px;"><strong>Kategori:</strong> ${dictRes.category || 'Ordbok'}</p>`;
+                    html += `<p style="margin-top:12px; font-size: 13.5px; line-height: 1.6; color:#1e293b;">${parsedDef}</p>`;
+                    if (dictRes.contextualNote) {
+                        const parsedNote = dictRes.contextualNote
+                            .replace(/\n/g, '<br>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                        html += `<div style="margin-top:16px; padding:12px; background:#f8fafc; border-left:3px solid #d17d39; border-radius:4px; font-size:12px; line-height: 1.5; color: #475569;">${parsedNote}</div>`;
+                    }
+                    dictContent.innerHTML = html;
+                } else {
+                    dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Fant ingen definisjon på "${word}" i leksikonet.</p>`;
+                }
+            } catch (e) {
+                console.error("Word lookup error:", e);
+                dictContent.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; padding-top:40px;">Feil ved søk i leksikon.</p>`;
+            }
+        };
+
+        dictClose?.addEventListener('click', () => {
+            dictOverlay.style.display = 'none';
+        });
+
+        // Copy selected verses
+        container.querySelector('#bible-btn-copy')?.addEventListener('click', () => {
+            if (selectedVerses.length === 0) return;
+            selectedVerses.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+            
+            const bookName = bibBookSelect.options[bibBookSelect.selectedIndex].text;
+            const chapterNum = bibChapSelect.options[bibChapSelect.selectedIndex].text;
+            
+            const textToCopy = selectedVerses.map(vNum => {
+                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${vNum}"]`);
+                return el ? `[v. ${vNum}] ${el.innerText.replace(vNum, '').trim()}` : '';
+            }).filter(Boolean).join('\n');
+            
+            const fullRef = `${bookName} ${chapterNum}:${selectedVerses.join(', ')}`;
+            const finalString = `${fullRef}\n\n${textToCopy}\n\n(Delt fra His Kingdom Ministry)`;
+            
+            navigator.clipboard.writeText(finalString).then(() => {
+                window.showToast?.('Bibelversene er kopiert!', 'success') || alert('Kopiert til utklippstavle!');
+                selectedVerses = [];
+                bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
+                updateToolbarStates();
+            });
+        });
+
+        // Highlight/Bookmark selected verses
+        container.querySelector('#bible-btn-highlight')?.addEventListener('click', () => {
+            if (selectedVerses.length === 0) return;
+            const bibleId = bibTransSelect.value;
+            const bookId = bibBookSelect.value;
+            const chapterId = bibChapSelect.value;
+            
+            let highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
+            
+            selectedVerses.forEach(verseNum => {
+                const matchIdx = highlights.findIndex(h => 
+                    h.bibleId === bibleId && 
+                    h.chapterId === chapterId && 
+                    h.verseNum === verseNum.toString()
+                );
+                
+                const el = bibDisplay.querySelector(`.bible-verse-item[data-verse="${verseNum}"]`);
+                
+                if (matchIdx > -1) {
+                    highlights.splice(matchIdx, 1);
+                    if (el) el.classList.remove('highlighted-verse');
+                } else {
+                    highlights.push({ bibleId, bookId, chapterId, verseNum: verseNum.toString() });
+                    if (el) el.classList.add('highlighted-verse');
+                }
+            });
+            
+            localStorage.setItem('hkm_bible_highlights', JSON.stringify(highlights));
+            window.showToast?.('Markeringsstatus oppdatert!', 'success');
+            
+            selectedVerses = [];
+            bibDisplay.querySelectorAll('.bible-verse-item').forEach(el => el.classList.remove('selected-verse'));
+            updateToolbarStates();
+        });
+
+        // Toggle layout layout-paragraph vs layout-verse
+        container.querySelector('#bible-btn-layout')?.addEventListener('click', () => {
+            const btn = container.querySelector('#bible-btn-layout');
+            if (bibleLayout === 'verse') {
+                bibleLayout = 'paragraph';
+                btn.classList.add('active');
+            } else {
+                bibleLayout = 'verse';
+                btn.classList.remove('active');
+            }
+            // Trigger re-render of verses with new layout
+            const bibleId = bibTransSelect.value;
+            const chapterId = bibChapSelect.value;
+            if (bibleId && chapterId) {
+                loadVerses(bibleId, chapterId);
+            }
+        });
+
+        // Font size adjustments
+        const updateFontSizeDisplay = () => {
+            container.querySelector('#bible-font-size-indicator').textContent = `${bibleFontSize}px`;
+            const bibleId = bibTransSelect.value;
+            const chapterId = bibChapSelect.value;
+            if (bibleId && chapterId) {
+                loadVerses(bibleId, chapterId);
+            }
+        };
+
+        container.querySelector('#bible-btn-font-dec')?.addEventListener('click', () => {
+            if (bibleFontSize > 11) {
+                bibleFontSize -= 1;
+                updateFontSizeDisplay();
+            }
+        });
+
+        container.querySelector('#bible-btn-font-inc')?.addEventListener('click', () => {
+            if (bibleFontSize < 24) {
+                bibleFontSize += 1;
+                updateFontSizeDisplay();
+            }
+        });
+
+        const loadChapters = async (bibleId, bookId, autoSelect = false) => {
+            try {
+                bibChapSelect.disabled = true;
+                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
+                
+                const res = await fetch(`/api/bible/bibles/${bibleId}/books/${bookId}/chapters`);
+                const payload = await res.json();
+                const chapters = payload.data || payload || [];
+                
+                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
+                    <option value="${c.id}">${c.number}</option>
+                `).join('');
+                bibChapSelect.disabled = false;
+
+                if (autoSelect && chapters.length > 0) {
+                    // Pre-select Chapter 1, fallback to first chapter
+                    const defaultChapter = chapters.find(c => c.number === '1' || c.number === 1) || chapters[0];
+                    bibChapSelect.value = defaultChapter.id;
+                    await loadVerses(bibleId, defaultChapter.id);
+                }
+            } catch (e) {
+                console.error("Bible widget loadChapters error:", e);
+            }
+        };
+
+        bibTransSelect?.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            if (bibId) loadBooks(bibId, true);
+        });
+
+        bibBookSelect?.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const bookId = bibBookSelect.value;
+            if (bibId && bookId) loadChapters(bibId, bookId, true);
+        });
+
+        bibChapSelect?.addEventListener('change', () => {
+            const bibId = bibTransSelect.value;
+            const chapId = bibChapSelect.value;
+            if (bibId && chapId) loadVerses(bibId, chapId);
+        });
+
+        // Trigger initial data load
+        loadBibleData();
+
+
+
+        // Setup Live Zoom Countdown Timer
+        if (window._playerCountdownInterval) {
+            clearInterval(window._playerCountdownInterval);
+            window._playerCountdownInterval = null;
+        }
+
+        const countdownEl = container.querySelector('#zoom-countdown');
+        if (countdownEl) {
+            const targetTime = parseInt(countdownEl.getAttribute('data-target'), 10);
+            
+            const updateTimer = () => {
+                const el = document.getElementById('zoom-countdown');
+                if (!el) {
+                    if (window._playerCountdownInterval) {
+                        clearInterval(window._playerCountdownInterval);
+                        window._playerCountdownInterval = null;
+                    }
+                    return;
+                }
+
+                const now = Date.now();
+                const diff = targetTime - now;
+                
+                if (diff <= 0) {
+                    el.innerHTML = '<span style="color: #ef4444; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined hkm-live-pulse" style="font-size: 16px; color: #ef4444;">radio_button_checked</span> LIVE NÅ</span>';
+                    if (window._playerCountdownInterval) {
+                        clearInterval(window._playerCountdownInterval);
+                        window._playerCountdownInterval = null;
+                    }
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                let timeStr = '';
+                if (days > 0) {
+                    timeStr += `${days}d ${hours}t ${minutes}m`;
+                } else if (hours > 0) {
+                    timeStr += `${hours}t ${minutes}m ${seconds}s`;
+                } else {
+                    timeStr += `${minutes}m ${seconds}s`;
+                }
+                
+                el.textContent = timeStr;
+            };
+            
+            updateTimer();
+            window._playerCountdownInterval = setInterval(updateTimer, 1000);
+        }
     }
 
     // ──────────────────────────────────────────────────────────
