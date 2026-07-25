@@ -4735,7 +4735,6 @@ window.addEventListener('load', () => {
     async function initHeaderProfile() {
         const profileLink = document.getElementById('header-profile-link');
         const mobileProfileLink = document.getElementById('mobile-menu-profile-link');
-        if (!profileLink && !mobileProfileLink) return;
 
         const profileImg = document.getElementById('header-profile-img');
         const profileIcon = profileLink ? profileLink.querySelector('.material-symbols-outlined') : null;

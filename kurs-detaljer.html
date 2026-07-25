@@ -934,7 +934,6 @@
                                     Norsk</a>
                                 <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                                     data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
-                                    English</a>
                                 <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                                     data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
                                     Español</a>
@@ -943,9 +942,11 @@
                     </div>
                 </div>
 
-
-
-                <!-- Primary CTA: Donate (Pill Style, gradient) -->
+                <!-- Profile Button -->
+                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                </a>
                 <a href="/donasjoner"
                     class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] active:scale-[0.98] transition-all shadow-md shadow-orange-500/10 header-donate-btn">
                     <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span>
@@ -997,7 +998,11 @@
                     </div>
 
                     <div class="ml-auto flex items-center gap-3">
-
+                        <!-- Mobile Menu Profile Link -->
+                        <a href="/minside/index.html" id="mobile-menu-profile-link" class="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden" aria-label="My Page" title="My Page">
+                            <span class="material-symbols-outlined text-2xl">account_circle</span>
+                            <img id="mobile-menu-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
+                        </a>
                         <button class="mobile-theme-toggle-btn flex items-center justify-center h-12 w-12 border border-gray-200 rounded-full bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-colors" aria-label="Bytt tema" title="Bytt tema">
                             <span class="material-symbols-outlined text-2xl theme-toggle-icon">dark_mode</span>
                         </button>
@@ -1262,6 +1267,10 @@
 
             <!-- Tab 1: Oversikt -->
             <div class="tab-content-panel active" id="tab-oversikt">
+                <div id="user-status-pill" style="display: none; align-items: center; gap: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); color: #166534; padding: 5px 14px; border-radius: 20px; font-size: 0.84rem; font-weight: 700; margin-bottom: 14px; display: inline-flex;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);"></span>
+                    <span id="user-status-text">Innlogget tilgang aktivert</span>
+                </div>
                 <h2 class="overview-title" id="lesson-overview-title">Oversikt over leksjonen: Hvordan se i ånden</h2>
                 <p class="overview-text" id="lesson-overview-text">
                     I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.
@@ -1718,6 +1727,22 @@
             } else {
                 const isEnrolled = await checkUserCourseEnrollment(currentCourse.id || currentCourse.slug);
                 userHasAccess = isEnrolled || loggedIn;
+            }
+
+            const profileBtn = document.getElementById('header-profile-link');
+            if (profileBtn) profileBtn.classList.toggle('hidden', !loggedIn);
+
+            const statusPill = document.getElementById('user-status-pill');
+            const statusText = document.getElementById('user-status-text');
+            if (statusPill && statusText) {
+                if (loggedIn) {
+                    statusPill.style.display = 'inline-flex';
+                    const activeUser = currentUser || (firebaseService && firebaseService.currentUser);
+                    const nameOrEmail = (activeUser && (activeUser.displayName || activeUser.email)) || 'Innlogget bruker';
+                    statusText.textContent = `Innlogget som ${nameOrEmail}`;
+                } else {
+                    statusPill.style.display = 'none';
+                }
             }
 
             window.selectLesson(currentLessonIndex);
