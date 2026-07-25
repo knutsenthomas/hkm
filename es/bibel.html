@@ -900,6 +900,40 @@
             color: var(--text-base);
         }
 
+        @media (min-width: 769px) {
+            .sheet-handle-bar {
+                display: none !important;
+            }
+            .floating-settings-popover {
+                position: absolute !important;
+                bottom: calc(100% + 16px) !important;
+                right: 0 !important;
+                left: auto !important;
+                top: auto !important;
+                width: 330px !important;
+                max-width: 330px !important;
+                border-radius: 20px !important;
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16) !important;
+                transform-origin: bottom right !important;
+            }
+            .floating-chapter-popover {
+                position: absolute !important;
+                bottom: calc(100% + 16px) !important;
+                left: 50% !important;
+                right: auto !important;
+                top: auto !important;
+                transform: translateX(-50%) scale(0.95) !important;
+                transform-origin: bottom center !important;
+                width: 340px !important;
+                max-width: 340px !important;
+                border-radius: 20px !important;
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16) !important;
+            }
+            .floating-chapter-popover.active {
+                transform: translateX(-50%) scale(1) !important;
+            }
+        }
+
         /* Unified Mobile Bottom Sheets for All Dialog Boxes */
         @media (max-width: 768px) {
             .floating-settings-popover,
