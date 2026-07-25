@@ -1270,10 +1270,6 @@
 
             <!-- Tab 1: Oversikt -->
             <div class="tab-content-panel active" id="tab-oversikt">
-                <div id="user-status-pill" style="display: none; align-items: center; gap: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); color: #166534; padding: 5px 14px; border-radius: 20px; font-size: 0.84rem; font-weight: 700; margin-bottom: 14px; display: inline-flex;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);"></span>
-                    <span id="user-status-text">Innlogget tilgang aktivert</span>
-                </div>
                 <h2 class="overview-title" id="lesson-overview-title">Oversikt over leksjonen: Hvordan se i ånden</h2>
                 <p class="overview-text" id="lesson-overview-text">
                     I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.
@@ -1734,19 +1730,6 @@
 
             const profileBtn = document.getElementById('header-profile-link');
             if (profileBtn) profileBtn.classList.toggle('hidden', !loggedIn);
-
-            const statusPill = document.getElementById('user-status-pill');
-            const statusText = document.getElementById('user-status-text');
-            if (statusPill && statusText) {
-                if (loggedIn) {
-                    statusPill.style.display = 'inline-flex';
-                    const activeUser = currentUser || (firebaseService && firebaseService.currentUser);
-                    const nameOrEmail = (activeUser && (activeUser.displayName || activeUser.email)) || 'Innlogget bruker';
-                    statusText.textContent = `Innlogget som ${nameOrEmail}`;
-                } else {
-                    statusPill.style.display = 'none';
-                }
-            }
 
             window.selectLesson(currentLessonIndex);
         }
