@@ -8869,8 +8869,14 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
 
 /* Header Profile Link styling */
 #header-profile-link {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
