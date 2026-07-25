@@ -5777,18 +5777,23 @@ class MinSideManager {
                 html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
                     background: #64748b !important;
                 }
-            </style>
-
             <div class="hkm-player-grid">
                 <!-- Left Side: Player & Lesson Details -->
                 <div class="hkm-player-main">
                     <!-- Leksjon info kort -->
                     <div class="hkm-card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
-                            <div style="flex:1; min-width: 250px;">
-                                <span style="font-size: 13px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon ${activeLessonIndex + 1}</span>
-                                <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
-                                <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                            <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 250px;">
+                                ${(lesson.imageUrl || lesson.image || course.imageUrl || course.image || course.heroImage || course.thumbnail || '/img/fb_fallback_church.jpg') ? `
+                                    <div style="width: 105px; height: 105px; border-radius: 16px; overflow: hidden; flex-shrink: 0; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+                                        <img src="${lesson.imageUrl || lesson.image || course.imageUrl || course.image || course.heroImage || course.thumbnail || '/img/fb_fallback_church.jpg'}" alt="${cleanLTitle}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                ` : ''}
+                                <div style="flex:1;">
+                                    <span style="font-size: 13px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon ${activeLessonIndex + 1}</span>
+                                    <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
+                                    <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                                </div>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                 <button id="player-fullscreen-btn" class="hkm-btn hkm-btn-fs">
