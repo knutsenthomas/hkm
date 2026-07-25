@@ -4909,13 +4909,15 @@ window.addEventListener('load', () => {
 
         const hideProfileDOM = () => {
             if (profileLink) {
-                profileLink.classList.remove('md:flex');
-                profileLink.classList.add('hidden');
+                profileLink.classList.remove('hidden');
+                profileLink.classList.add('hidden', 'md:flex');
+                profileLink.href = '/minside/login.html';
                 if (profileImg) profileImg.classList.add('hidden');
                 if (profileIcon) profileIcon.classList.remove('hidden');
             }
             if (mobileProfileLink) {
-                mobileProfileLink.classList.add('hidden');
+                mobileProfileLink.classList.remove('hidden');
+                mobileProfileLink.href = '/minside/login.html';
                 if (mobileProfileImg) mobileProfileImg.classList.add('hidden');
                 if (mobileProfileIcon) mobileProfileIcon.classList.remove('hidden');
             }

@@ -1771,13 +1771,8 @@
 
             const profileBtn = document.getElementById('header-profile-link');
             if (profileBtn) {
-                if (loggedIn) {
-                    profileBtn.classList.remove('hidden');
-                    profileBtn.classList.add('hidden', 'md:flex');
-                } else {
-                    profileBtn.classList.remove('md:flex');
-                    profileBtn.classList.add('hidden');
-                }
+                profileBtn.classList.remove('hidden');
+                profileBtn.classList.add('hidden', 'md:flex');
             }
 
             window.selectLesson(currentLessonIndex);
