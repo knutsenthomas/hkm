@@ -2682,7 +2682,20 @@ class MinSideManager {
         };
     }
 
-    async _fetchCurrentUserDonations({ order = false }
+    async _fetchCurrentUserDonations() {
+        if (!this.currentUser) return [];
+        try {
+            const snap = await firebase.firestore().collection('donations')
+                .where('userId', '==', this.currentUser.uid)
+                .get();
+            let donations = [];
+            snap.forEach(doc => donations.push({ id: doc.id, ...doc.data() }));
+            return donations;
+        } catch (e) {
+            console.warn('_fetchCurrentUserDonations warning:', e);
+            return [];
+        }
+    }
 
     async renderOverview(container) {
         const p = this.profileData;
