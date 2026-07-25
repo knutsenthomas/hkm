@@ -539,7 +539,8 @@
         .hero-btn-primary {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            gap: 8px !important;
             padding: 16px 36px;
             background: #d17d39;
             color: white;
@@ -551,6 +552,11 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .hero-btn-primary i {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
         .hero-btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(209, 125, 57, 0.5);
@@ -560,6 +566,7 @@
         .hero-btn-primary i.fa-chevron-right,
         .hero-btn-primary i.fa-long-arrow-alt-right {
             display: inline-block;
+            margin-left: 8px !important;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -1849,8 +1856,8 @@
                 Lær å se i ånden og anvende Guds ord for dypere åndelig innsikt og et aktivt bønneliv.
             </p>
             <div style="display: flex; gap: 18px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <button class="hero-btn-primary" id="hero-primary-btn" onclick="if(allCourses && allCourses[0]) openEnrollModal(allCourses[0]); return false;" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 800; padding: 18px 40px; border-radius: 16px; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(209, 125, 57, 0.45); transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-graduation-cap" style="margin-right: 6px;"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right" style="margin-left: 14px;"></i>
+                <button class="hero-btn-primary" id="hero-primary-btn" onclick="if(allCourses && allCourses[0]) openEnrollModal(allCourses[0]); return false;" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 800; padding: 18px 40px; border-radius: 16px; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(209, 125, 57, 0.45); transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-graduation-cap"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right"></i>
                 </button>
                 <a href="#kurs-grid-section" class="hero-btn-secondary" style="background: rgba(255,255,255,0.15); color: #ffffff !important; border: 1.5px solid rgba(255,255,255,0.35); padding: 18px 34px; border-radius: 16px; font-weight: 700; text-decoration: none; backdrop-filter: blur(12px); font-size: 1.05rem; display: inline-flex; align-items: center; justify-content: center;">
                     <i class="fas fa-list-ul" style="margin-right: 8px;"></i> Se kursplan & leksjoner <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.88rem;"></i>
@@ -2662,14 +2669,14 @@
                     }
 
                     if (hasAccess) {
-                        btn.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 6px;"></i><span>Gå til kurset</span><i class="fas fa-arrow-right" style="margin-left: 14px;"></i>`;
+                        btn.innerHTML = `<i class="fas fa-play-circle"></i><span>Gå til kurset</span><i class="fas fa-arrow-right"></i>`;
                         btn.onclick = function(e) {
                             e.preventDefault();
                             window.location.href = `kurs-detaljer.html?id=${course.id}`;
                             return false;
                         };
                     } else {
-                        btn.innerHTML = `<i class="fas fa-graduation-cap" style="margin-right: 6px;"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right" style="margin-left: 14px;"></i>`;
+                        btn.innerHTML = `<i class="fas fa-graduation-cap"></i><span>Meld deg på nå</span><i class="fas fa-arrow-right"></i>`;
                         btn.onclick = function(e) {
                             e.preventDefault();
                             openEnrollModal(course);
