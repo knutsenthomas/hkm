@@ -1277,9 +1277,9 @@
         }
 
         function isUserLoggedIn() {
-            if (currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser)) {
-                return true;
-            }
+            const user = currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            if (user && (user.uid || user.email)) return true;
+            
             try {
                 const cached = localStorage.getItem('hkm_public_user_cache');
                 if (cached) {
@@ -1287,22 +1287,77 @@
                     if (parsed && (parsed.uid || parsed.email)) return true;
                 }
             } catch (e) {}
+            return false;
+        }
+
+        async function checkUserCourseEnrollment(courseId) {
+            if (!courseId) return false;
+            
             try {
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && (key.startsWith('firebase:authUser:') || key.includes('firebase_user') || key.includes('hkm_user'))) {
+                if (localStorage.getItem(`hkm_enrolled_${courseId}`) === 'true') {
+                    return true;
+                }
+                const enrolledList = localStorage.getItem('hkm_enrolled_courses');
+                if (enrolledList) {
+                    const list = JSON.parse(enrolledList);
+                    if (Array.isArray(list) && list.includes(String(courseId))) {
                         return true;
                     }
                 }
             } catch (e) {}
+
+            const activeUser = currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            if (activeUser && activeUser.uid) {
+                try {
+                    const userDoc = await firebase.firestore().collection('users').doc(activeUser.uid).get();
+                    if (userDoc.exists) {
+                        const uData = userDoc.data();
+                        if (uData && (uData.role === 'admin' || uData.isAdmin)) {
+                            return true; // Admins always have access
+                        }
+                        if (uData && Array.isArray(uData.enrolledCourses) && uData.enrolledCourses.includes(String(courseId))) {
+                            return true;
+                        }
+                    }
+                } catch (e) {}
+
+                try {
+                    const snap = await firebase.firestore().collection('user_enrollments')
+                        .where('userId', '==', activeUser.uid)
+                        .where('courseId', '==', String(courseId))
+                        .get();
+                    if (!snap.empty) return true;
+                } catch (e) {}
+            }
+
             return false;
         }
 
         async function checkAccessAndUpdateUI() {
             if (!currentCourse) return;
-            userHasAccess = isUserLoggedIn();
+            
+            const loggedIn = isUserLoggedIn();
+            const isFreeCourse = currentCourse.isFree === true || currentCourse.price === 0 || currentCourse.price === '0' || String(currentCourse.price).toLowerCase() === 'gratis';
+            
+            if (!loggedIn) {
+                userHasAccess = false;
+            } else if (isFreeCourse) {
+                userHasAccess = true;
+            } else {
+                const isEnrolled = await checkUserCourseEnrollment(currentCourse.id);
+                userHasAccess = isEnrolled;
+            }
+
+            const profileBtn = document.getElementById('header-profile-link');
+            if (profileBtn) profileBtn.classList.toggle('hidden', !loggedIn);
+
             window.selectLesson(currentLessonIndex);
         }
+
+        window.triggerEnrollmentModal = function() {
+            if (!currentCourse) return;
+            window.location.href = `/kurs.html?enroll=${encodeURIComponent(currentCourse.id)}`;
+        };
 
         function getLessonTypeIcon(l) {
             if (l.videoUrl && String(l.videoUrl).trim().length > 0) {
@@ -1673,26 +1728,49 @@
                     coverImgEl.style.display = 'block';
                     coverImgEl.src = courseImg;
                 }
-                videoContainer.style.backgroundImage = `url('${courseImg}')`;
+                videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.92)), url('${courseImg}')`;
                 videoContainer.style.backgroundSize = 'cover';
                 videoContainer.style.backgroundPosition = 'center';
 
                 const redirectParam = encodeURIComponent(window.location.href);
+                const loggedIn = isUserLoggedIn();
+                const priceBadgeText = currentCourse?.priceDisplay || (currentCourse?.price ? `kr ${currentCourse.price},-` : 'Betalt kurs');
 
-                videoContainer.innerHTML = `
-                    <div class="locked-overlay" id="locked-overlay">
-                        <div class="lock-badge">
-                            <i class="fas fa-lock"></i>
+                if (!loggedIn) {
+                    videoContainer.innerHTML = `
+                        <div class="locked-overlay" id="locked-overlay" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 24px; position:relative; z-index:10;">
+                            <div class="lock-badge" style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1px solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                                <i class="fas fa-lock" style="font-size:24px; color:var(--hkm-terracotta);"></i>
+                            </div>
+                            <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: white;">Logg inn for tilgang</h3>
+                            <p style="color: #cbd5e1; max-width: 460px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
+                                Du må være registrert og innlogget for å få tilgang til kurset <strong>${currentCourse?.title || ''}</strong> (${priceBadgeText}).
+                            </p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                                <a href="/minside/login.html?redirect=${redirectParam}" class="btn-terracotta" id="auth-btn" style="text-decoration:none; padding:12px 26px; border-radius:10px;">
+                                    <i class="fas fa-sign-in-alt"></i> Logg inn / Registrer deg nå
+                                </a>
+                            </div>
                         </div>
-                        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Logg inn for å se kurset</h3>
-                        <p style="color: #cbd5e1; max-width: 440px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
-                            Dette kurset krever at du har en brukerkonto og er innlogget for å spilles av.
-                        </p>
-                        <a href="/minside/login.html?redirect=${redirectParam}" class="btn-terracotta" id="auth-btn">
-                            <i class="fas fa-sign-in-alt"></i> Logg inn nå
-                        </a>
-                    </div>
-                `;
+                    `;
+                } else {
+                    videoContainer.innerHTML = `
+                        <div class="locked-overlay" id="locked-overlay" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 24px; position:relative; z-index:10;">
+                            <div class="lock-badge" style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1px solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                                <i class="fas fa-credit-card" style="font-size:24px; color:var(--hkm-terracotta);"></i>
+                            </div>
+                            <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: white;">Påmelding & Betaling påkrevd</h3>
+                            <p style="color: #cbd5e1; max-width: 480px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
+                                Du er innlogget, men har ennå ikke kjøpt tilgang til <strong>${currentCourse?.title || 'dette kurset'}</strong> (${priceBadgeText}).
+                            </p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                                <button type="button" onclick="window.triggerEnrollmentModal()" class="btn-terracotta" style="padding:12px 26px; border-radius:10px; border:none; cursor:pointer;">
+                                    <i class="fas fa-shopping-cart"></i> Meld deg på & Kjøp tilgang (${priceBadgeText})
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
             }
         };
 
