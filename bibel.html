@@ -974,6 +974,8 @@
                 pointer-events: none !important;
                 flex-direction: column !important;
                 gap: 16px !important;
+                overscroll-behavior: contain !important;
+                -webkit-overflow-scrolling: touch !important;
             }
 
             .floating-settings-popover.active,
@@ -988,11 +990,17 @@
             .floating-chapter-popover #floating-chapter-grid {
                 max-height: 55vh !important;
                 grid-template-columns: repeat(5, 1fr) !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain !important;
+                -webkit-overflow-scrolling: touch !important;
             }
 
             /* Allow books list to expand on mobile */
             .floating-chapter-popover #floating-books-container {
                 max-height: 60vh !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain !important;
+                -webkit-overflow-scrolling: touch !important;
             }
         }
 

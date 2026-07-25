@@ -3688,8 +3688,13 @@ class BibleReader {
 
         element.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            const scrollable = e.target.closest('.verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, #floating-chapter-grid') || (element.scrollHeight > element.clientHeight ? element : null);
-            if (scrollable && scrollable.scrollTop > 0 && currentDeltaY === 0) return;
+            const scrollable = e.target.closest('.verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, #floating-chapter-grid, #floating-books-container, .floating-book-item, #verse-crossref-list, .dict-body') || (element.scrollHeight > element.clientHeight ? element : null);
+            if (scrollable) {
+                // If user is swiping UP to scroll down through the list, or container is already scrolled down, let internal container scroll naturally
+                if (e.touches[0].clientY < startY || scrollable.scrollTop > 0) {
+                    return;
+                }
+            }
             onMove(e.touches[0].clientY, e);
         }, { passive: false });
 
