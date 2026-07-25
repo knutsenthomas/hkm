@@ -1142,7 +1142,7 @@ class MinSideManager {
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
 
-                    window.addEventListener('hashchange', () => {
+                    window?.addEventListener('hashchange', () => {
                         const hash = window.location.hash.replace('#', '') || 'overview';
                         if (this.lastLoadedHash === window.location.hash) return;
                         this.loadView(hash);
@@ -1165,7 +1165,7 @@ class MinSideManager {
     // ──────────────────────────────────────────────────────────
     setupNavigation() {
         document.querySelectorAll('.nav-link[data-view], .mobile-nav-item[data-view], .logo[data-view]').forEach(link => {
-            link.addEventListener('click', e => {
+            link?.addEventListener('click', e => {
                 e.preventDefault();
                 this.loadView(link.dataset.view);
                 if (window.innerWidth <= 1024) this.toggleSidebar(false);
@@ -1196,13 +1196,13 @@ class MinSideManager {
             e.stopPropagation();
             actionsMenu.classList.toggle('open');
         });
-        document.addEventListener('click', () => actionsMenu?.classList.remove('open'));
+        document?.addEventListener('click', () => actionsMenu?.classList.remove('open'));
 
         // Profile photo upload
         document.getElementById('ph-upload')?.addEventListener('change', e => this.handlePhotoUpload(e));
 
         // Collapsible course accordion event delegation
-        document.addEventListener('click', e => {
+        document?.addEventListener('click', e => {
             const header = e.target.closest('.course-lessons-accordion .accordion-header');
             if (header) {
                 const accordion = header.closest('.course-lessons-accordion');
@@ -1242,7 +1242,7 @@ class MinSideManager {
 
         updateIcon();
 
-        toggleBtn.addEventListener('click', () => {
+        toggleBtn?.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
@@ -2190,7 +2190,7 @@ class MinSideManager {
 
         // Quick action clicks
         container.querySelectorAll('.ov-action-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.loadView(btn.dataset.view));
+            btn?.addEventListener('click', () => this.loadView(btn.dataset.view));
         });
 
         // Stat: member since
@@ -3133,7 +3133,7 @@ class MinSideManager {
         // Tab switching events
         const tabBtns = container.querySelectorAll('.profile-tab-btn');
         tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn?.addEventListener('click', () => {
                 const target = btn.getAttribute('data-profile-tab');
                 this._activeProfileTab = target;
 
@@ -3225,7 +3225,7 @@ class MinSideManager {
         this._wireAddressAutocomplete();
 
         document.querySelectorAll('.member-remove-btn').forEach(button => {
-            button.addEventListener('click', async () => {
+            button?.addEventListener('click', async () => {
                 await this.removeFamilyMember(button.dataset.memberUid);
             });
         });
@@ -3353,7 +3353,7 @@ class MinSideManager {
         const statusEl = document.getElementById('address-search-status');
         if (!input || !resultsEl || !statusEl) return;
 
-        input.addEventListener('input', () => {
+        input?.addEventListener('input', () => {
             clearTimeout(this._addressSearchTimer);
             const query = input.value.trim();
 
@@ -3425,7 +3425,7 @@ class MinSideManager {
             `).join('');
 
             resultsEl.querySelectorAll('.address-result-row').forEach(row => {
-                row.addEventListener('click', () => {
+                row?.addEventListener('click', () => {
                     this.selectAddressSuggestion(Number(row.dataset.addressIndex));
                 });
             });
@@ -3462,7 +3462,7 @@ class MinSideManager {
         const statusEl = document.getElementById('family-search-status');
         if (!input || !resultsEl || !statusEl) return;
 
-        input.addEventListener('input', () => {
+        input?.addEventListener('input', () => {
             clearTimeout(this._familySearchTimer);
             const query = input.value.trim();
 
@@ -3514,7 +3514,7 @@ class MinSideManager {
             `).join('');
 
             resultsEl.querySelectorAll('.family-result-row').forEach(row => {
-                row.addEventListener('click', async () => {
+                row?.addEventListener('click', async () => {
                     try {
                         await this.addFamilyMember(JSON.parse(row.dataset.member || '{}'));
                     } catch (error) {
@@ -3733,7 +3733,7 @@ class MinSideManager {
             }).join('');
 
             list.querySelectorAll('.activity-item').forEach(el => {
-                el.addEventListener('click', () => {
+                el?.addEventListener('click', () => {
                     const notif = items.find(n => n.id === el.dataset.id);
                     if (notif) this.showNotificationModal(notif);
                     if (notif && !notif.read) el.classList.remove('unread');
@@ -3857,7 +3857,7 @@ class MinSideManager {
 
             // Bind click to open detail modal (but NOT when clicking action buttons)
             inner.querySelectorAll('.activity-item').forEach(el => {
-                el.addEventListener('click', (e) => {
+                el?.addEventListener('click', (e) => {
                     if (e.target.closest('.notif-actions')) return;
                     
                     const notif = items.find(n => n.id === el.dataset.id);
@@ -3880,13 +3880,13 @@ class MinSideManager {
 
             // Bind action buttons hover
             inner.querySelectorAll('.btn-archive-notif, .btn-delete-notif').forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
+                btn?.addEventListener('mouseenter', () => {
                     btn.style.backgroundColor = 'var(--border-solid)';
                     if (!btn.classList.contains('btn-delete-notif')) {
                         btn.style.color = 'var(--text-main)';
                     }
                 });
-                btn.addEventListener('mouseleave', () => {
+                btn?.addEventListener('mouseleave', () => {
                     btn.style.backgroundColor = 'transparent';
                     if (!btn.classList.contains('btn-delete-notif')) {
                         btn.style.color = 'var(--text-muted)';
@@ -3896,7 +3896,7 @@ class MinSideManager {
 
             // Bind archive click
             inner.querySelectorAll('.btn-archive-notif').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn?.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const notifId = btn.dataset.id;
                     const notif = allItems.find(n => n.id === notifId);
@@ -3922,7 +3922,7 @@ class MinSideManager {
 
             // Bind delete click
             inner.querySelectorAll('.btn-delete-notif').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn?.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const notifId = btn.dataset.id;
                     const confirmMsg = isNo 
@@ -3987,7 +3987,7 @@ class MinSideManager {
 
             // Filter tab clicks
             container.querySelectorAll('.notif-filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn?.addEventListener('click', () => {
                     this._notifFilter = btn.dataset.filter;
                     this.renderNotifications(container);
                 });
@@ -4360,8 +4360,8 @@ class MinSideManager {
 
                     tableContainer.querySelectorAll('.donation-row').forEach(row => {
                         const open = () => this.showDonationDetails(row.dataset.donationId);
-                        row.addEventListener('click', open);
-                        row.addEventListener('keydown', (event) => {
+                        row?.addEventListener('click', open);
+                        row?.addEventListener('keydown', (event) => {
                             if (event.key === 'Enter' || event.key === ' ') {
                                 event.preventDefault();
                                 open();
@@ -4458,19 +4458,19 @@ class MinSideManager {
         const printBtn = container.querySelector('#giving-print-report-btn');
 
         if (typeFilter) {
-            typeFilter.addEventListener('change', (e) => {
+            typeFilter?.addEventListener('change', (e) => {
                 selectedType = e.target.value;
                 updateGivingView();
             });
         }
         if (yearFilter) {
-            yearFilter.addEventListener('change', (e) => {
+            yearFilter?.addEventListener('change', (e) => {
                 selectedYear = e.target.value;
                 updateGivingView();
             });
         }
         if (printBtn) {
-            printBtn.addEventListener('click', () => {
+            printBtn?.addEventListener('click', () => {
                 this.printGivingReport(selectedType, selectedYear);
             });
         }
@@ -4702,10 +4702,10 @@ class MinSideManager {
             setTimeout(() => modal.remove(), 300);
         };
         modal.querySelector('#close-donation-detail-modal')?.addEventListener('click', close);
-        modal.addEventListener('click', event => {
+        modal?.addEventListener('click', event => {
             if (event.target === modal) close();
         });
-        document.addEventListener('keydown', onEsc);
+        document?.addEventListener('keydown', onEsc);
     }
 
     // ══════════════════════════════════════════════════════════
@@ -6184,7 +6184,7 @@ class MinSideManager {
                             
                             const fallbackBtn = document.getElementById('zoom-fallback-trigger-btn');
                             if (fallbackBtn) {
-                                fallbackBtn.addEventListener('click', () => {
+                                fallbackBtn?.addEventListener('click', () => {
                                     const zoomIframeUrl = `https://zoom.us/wc/${zoomData.meetingId}/join?prefer=1&pwd=${zoomData.pwd}&dn=${encodeURIComponent(studentName)}`;
                                     playerContainer.innerHTML = `<iframe src="${zoomIframeUrl}" allow="camera; microphone; fullscreen; speaker; display-capture; clipboard-write; clipboard-read" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>`;
                                 });
@@ -6220,7 +6220,7 @@ class MinSideManager {
         // Fullscreen Toggle Logic
         const fsBtn = container.querySelector('#player-fullscreen-btn');
         if (fsBtn) {
-            fsBtn.addEventListener('click', () => {
+            fsBtn?.addEventListener('click', () => {
                 const doc = document;
                 const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
                 
@@ -6259,17 +6259,17 @@ class MinSideManager {
                     : `<span class="material-symbols-outlined">fullscreen</span> Fullskjerm`;
             };
 
-            playerContainer.addEventListener('fullscreenchange', updateFullscreenUI);
-            playerContainer.addEventListener('webkitfullscreenchange', updateFullscreenUI);
-            playerContainer.addEventListener('mozfullscreenchange', updateFullscreenUI);
-            playerContainer.addEventListener('MSFullscreenChange', updateFullscreenUI);
+            playerContainer?.addEventListener('fullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('mozfullscreenchange', updateFullscreenUI);
+            playerContainer?.addEventListener('MSFullscreenChange', updateFullscreenUI);
         }
 
         // 4. Setup Tab Navigation
         const tabs = container.querySelectorAll('.sidebar-tab-btn');
         const panels = container.querySelectorAll('.sidebar-panel');
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab?.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 panels.forEach(p => p.classList.remove('active'));
                 
@@ -6281,7 +6281,7 @@ class MinSideManager {
 
         // 5. Sidebar Lesson Switcher
         container.querySelectorAll('.player-lesson-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item?.addEventListener('click', () => {
                 const idx = parseInt(item.dataset.idx);
                 const nextLesson = lessons[idx];
                 this.loadView('course-player', { courseId, lessonId: nextLesson.id });
@@ -6322,7 +6322,7 @@ class MinSideManager {
 
         await loadNotes();
 
-        editor.addEventListener('input', () => {
+        editor?.addEventListener('input', () => {
             if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
             clearTimeout(saveTimeout);
             
@@ -6502,7 +6502,7 @@ class MinSideManager {
                 
                 // Attach click handlers for verse items selection
                 bibDisplay.querySelectorAll('.bible-verse-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
+                    item?.addEventListener('click', (e) => {
                         if (e.detail > 1) return; // Prevent selection trigger on double-click
                         
                         const verseNum = item.dataset.verse;
@@ -6519,7 +6519,7 @@ class MinSideManager {
                 });
 
                 // Attach double-click handler for Bible Dictionary lookup
-                bibDisplay.addEventListener('dblclick', () => {
+                bibDisplay?.addEventListener('dblclick', () => {
                     const selection = window.getSelection().toString().trim();
                     const cleanedWord = selection.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").trim();
                     if (cleanedWord && cleanedWord.length > 1 && cleanedWord.length < 30) {
@@ -6570,12 +6570,12 @@ class MinSideManager {
             }
         };
 
-        dictClose.addEventListener('click', () => {
+        dictClose?.addEventListener('click', () => {
             dictOverlay.style.display = 'none';
         });
 
         // Copy selected verses
-        container.querySelector('#bible-btn-copy').addEventListener('click', () => {
+        container.querySelector('#bible-btn-copy')?.addEventListener('click', () => {
             if (selectedVerses.length === 0) return;
             selectedVerses.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
             
@@ -6599,7 +6599,7 @@ class MinSideManager {
         });
 
         // Highlight/Bookmark selected verses
-        container.querySelector('#bible-btn-highlight').addEventListener('click', () => {
+        container.querySelector('#bible-btn-highlight')?.addEventListener('click', () => {
             if (selectedVerses.length === 0) return;
             const bibleId = bibTransSelect.value;
             const bookId = bibBookSelect.value;
@@ -6634,7 +6634,7 @@ class MinSideManager {
         });
 
         // Toggle layout layout-paragraph vs layout-verse
-        container.querySelector('#bible-btn-layout').addEventListener('click', () => {
+        container.querySelector('#bible-btn-layout')?.addEventListener('click', () => {
             const btn = container.querySelector('#bible-btn-layout');
             if (bibleLayout === 'verse') {
                 bibleLayout = 'paragraph';
@@ -6661,14 +6661,14 @@ class MinSideManager {
             }
         };
 
-        container.querySelector('#bible-btn-font-dec').addEventListener('click', () => {
+        container.querySelector('#bible-btn-font-dec')?.addEventListener('click', () => {
             if (bibleFontSize > 11) {
                 bibleFontSize -= 1;
                 updateFontSizeDisplay();
             }
         });
 
-        container.querySelector('#bible-btn-font-inc').addEventListener('click', () => {
+        container.querySelector('#bible-btn-font-inc')?.addEventListener('click', () => {
             if (bibleFontSize < 24) {
                 bibleFontSize += 1;
                 updateFontSizeDisplay();
@@ -6700,18 +6700,18 @@ class MinSideManager {
             }
         };
 
-        bibTransSelect.addEventListener('change', () => {
+        bibTransSelect?.addEventListener('change', () => {
             const bibId = bibTransSelect.value;
             if (bibId) loadBooks(bibId, true);
         });
 
-        bibBookSelect.addEventListener('change', () => {
+        bibBookSelect?.addEventListener('change', () => {
             const bibId = bibTransSelect.value;
             const bookId = bibBookSelect.value;
             if (bibId && bookId) loadChapters(bibId, bookId, true);
         });
 
-        bibChapSelect.addEventListener('change', () => {
+        bibChapSelect?.addEventListener('change', () => {
             const bibId = bibTransSelect.value;
             const chapId = bibChapSelect.value;
             if (bibId && chapId) loadVerses(bibId, chapId);
@@ -8382,7 +8382,7 @@ class MinSideManager {
 
         // Category pills click events
         container.querySelectorAll('.category-pill-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn?.addEventListener('click', () => {
                 const cat = btn.dataset.category;
                 localStorage.setItem('hkm_notes_selected_category', cat);
                 this._renderNotesUI(container, personalNotes, hkmNotes, categories);
@@ -8520,7 +8520,7 @@ class MinSideManager {
 
         // Edit buttons
         container.querySelectorAll('.note-btn-edit').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn?.addEventListener('click', () => {
                 const id = btn.dataset.id;
                 const note = personalNotes.find(n => n.id === id);
                 if (!note) return;
@@ -8626,7 +8626,7 @@ class MinSideManager {
 
         // Delete buttons
         container.querySelectorAll('.note-btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn?.addEventListener('click', () => {
                 const id = btn.dataset.id;
                 if (!confirm(t('notes.deleteConfirm'))) return;
                 firebase.firestore().collection('personal_notes').doc(id).delete()
@@ -8647,7 +8647,7 @@ class MinSideManager {
 
         // Execute formatting commands
         toolbar.querySelectorAll('.rte-btn').forEach(btn => {
-            btn.addEventListener('mousedown', e => {
+            btn?.addEventListener('mousedown', e => {
                 e.preventDefault(); // keep focus in editor
                 const cmd = btn.dataset.cmd;
                 const val = btn.dataset.val || null;
@@ -8658,10 +8658,10 @@ class MinSideManager {
         });
 
         // Update active states on selection change
-        editor.addEventListener('keyup', () => this._updateRteActiveStates(toolbar));
-        editor.addEventListener('mouseup', () => this._updateRteActiveStates(toolbar));
-        editor.addEventListener('focus', () => toolbar.classList.add('rte-focused'));
-        editor.addEventListener('blur', () => toolbar.classList.remove('rte-focused'));
+        editor?.addEventListener('keyup', () => this._updateRteActiveStates(toolbar));
+        editor?.addEventListener('mouseup', () => this._updateRteActiveStates(toolbar));
+        editor?.addEventListener('focus', () => toolbar.classList.add('rte-focused'));
+        editor?.addEventListener('blur', () => toolbar.classList.remove('rte-focused'));
     }
 
     _updateRteActiveStates(toolbar) {
@@ -8708,11 +8708,11 @@ class MinSideManager {
         requestAnimationFrame(() => modal.classList.add('active'));
 
         const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 300); };
-        modal.querySelector('#close-notif-modal').addEventListener('click', close);
-        modal.addEventListener('click', e => { if (e.target === modal) close(); });
+        modal.querySelector('#close-notif-modal')?.addEventListener('click', close);
+        modal?.addEventListener('click', e => { if (e.target === modal) close(); });
 
         // Delete action
-        modal.querySelector('#delete-notif-modal').addEventListener('click', async () => {
+        modal.querySelector('#delete-notif-modal')?.addEventListener('click', async () => {
             if (!confirm(t('notifications.deleteConfirm'))) return;
             const btn = modal.querySelector('#delete-notif-modal');
             btn.disabled = true;
@@ -8770,18 +8770,18 @@ class MinSideManager {
         document.body.appendChild(modal);
         requestAnimationFrame(() => modal.classList.add('active'));
 
-        modal.querySelector('#cancel-delete-btn').addEventListener('click', () => {
+        modal.querySelector('#cancel-delete-btn')?.addEventListener('click', () => {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         });
 
-        modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
+        modal.querySelector('#confirm-delete-btn')?.addEventListener('click', async () => {
             if (!confirm(t('deleteAccount.doubleConfirm'))) return;
             await this.performAccountDeletion();
             modal.remove();
         });
 
-        modal.addEventListener('click', e => {
+        modal?.addEventListener('click', e => {
             if (e.target === modal) {
                 modal.classList.remove('active');
                 setTimeout(() => modal.remove(), 300);
@@ -9302,12 +9302,12 @@ class MinSideManager {
 
         btn?.addEventListener('click', openSearch);
         closeBtn?.addEventListener('click', closeSearch);
-        overlay.addEventListener('click', (e) => {
+        overlay?.addEventListener('click', (e) => {
             if (e.target === overlay) closeSearch();
         });
 
         // Global hotkeys (CMD+K / ESC)
-        window.addEventListener('keydown', (e) => {
+        window?.addEventListener('keydown', (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
                 if (overlay.style.display === 'none' || !overlay.style.display) {
@@ -9577,7 +9577,7 @@ class MinSideManager {
             resultsContainer.innerHTML = html;
         };
 
-        input.addEventListener('input', () => {
+        input?.addEventListener('input', () => {
             const query = input.value.trim();
             latestMinSideQuery = query.toLowerCase();
 
