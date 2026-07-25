@@ -6297,7 +6297,7 @@ class MinSideManager {
         this._wireRteToolbar('rte-toolbar-lesson', 'lesson-notes-editor');
 
         const loadNotes = async () => {
-            saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
+            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Henter...`;
             try {
                 const snap = await firebase.firestore().collection('personal_notes')
                     .where('userId', '==', uid)
@@ -6308,29 +6308,29 @@ class MinSideManager {
                 if (!snap.empty) {
                     const noteDoc = snap.docs[0];
                     noteDocId = noteDoc.id;
-                    editor.innerHTML = noteDoc.data().text || '';
-                    saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                    if (editor) editor.innerHTML = noteDoc.data().text || '';
+                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
                 } else {
-                    editor.innerHTML = '';
-                    saveStatus.innerHTML = `Ingen lagrede notater`;
+                    if (editor) editor.innerHTML = '';
+                    if (saveStatus) saveStatus.innerHTML = `Ingen lagrede notater`;
                 }
             } catch (e) {
                 console.error("Notes fetch error:", e);
-                saveStatus.innerHTML = `Feil ved innlasting`;
+                if (saveStatus) saveStatus.innerHTML = `Feil ved innlasting`;
             }
         };
 
         await loadNotes();
 
         editor.addEventListener('input', () => {
-            saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
+            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined spinner" style="font-size:14px; animation: spin 1s linear infinite;">sync</span> Lagrer...`;
             clearTimeout(saveTimeout);
             
             saveTimeout = setTimeout(async () => {
                 const noteText = editor.innerHTML.trim();
                 const plainText = editor.innerText.trim();
                 if (!plainText) {
-                    saveStatus.innerHTML = `Tomt notat`;
+                    if (saveStatus) saveStatus.innerHTML = `Tomt notat`;
                     return;
                 }
                 
@@ -6354,15 +6354,15 @@ class MinSideManager {
                         });
                         noteDocId = docRef.id;
                     }
-                    saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret i skyen ✓`;
+                    if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret i skyen ✓`;
                     setTimeout(() => {
                         if (saveStatus.textContent.includes('skyen')) {
-                            saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
+                            if (saveStatus) saveStatus.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px; color:#16a34a;">cloud_done</span> Lagret`;
                         }
                     }, 2000);
                 } catch (e) {
                     console.error("Notes autosave error:", e);
-                    saveStatus.innerHTML = `Kunne ikke lagre`;
+                    if (saveStatus) saveStatus.innerHTML = `Kunne ikke lagre`;
                 }
             }, 1000); // 1 sec debounce
         });
@@ -6399,7 +6399,7 @@ class MinSideManager {
                 const payload = await res.json();
                 bibleList = payload.data || payload || [];
                 
-                bibTransSelect.innerHTML = bibleList.map(b => `
+                if (bibTransSelect) bibTransSelect.innerHTML = bibleList.map(b => `
                     <option value="${b.id}">${b.abbreviation}</option>
                 `).join('');
                 
@@ -6415,13 +6415,13 @@ class MinSideManager {
         const loadBooks = async (bibleId, autoSelect = false) => {
             try {
                 bibBookSelect.disabled = true;
-                bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
+                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Bok...</option>`;
                 
                 const res = await fetch(`/api/bible/bibles/${bibleId}/books`);
                 const payload = await res.json();
                 const books = payload.data || payload || [];
                 
-                bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
+                if (bibBookSelect) bibBookSelect.innerHTML = `<option value="">Velg bok</option>` + books.map(b => `
                     <option value="${b.id}">${b.name}</option>
                 `).join('');
                 bibBookSelect.disabled = false;
@@ -6443,7 +6443,7 @@ class MinSideManager {
 
         const loadVerses = async (bibleId, chapterId) => {
             try {
-                bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
+                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Laster bibeltekst...</p>`;
                 
                 // Clear active selection on reload
                 selectedVerses = [];
@@ -6455,14 +6455,14 @@ class MinSideManager {
                 const verses = data.verses || [];
                 
                 if (verses.length === 0) {
-                    bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
+                    if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#94a3b8; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Fant ingen vers.</p>`;
                     return;
                 }
                 
                 const highlights = JSON.parse(localStorage.getItem('hkm_bible_highlights') || '[]');
                 
                 if (bibleLayout === 'paragraph') {
-                    bibDisplay.innerHTML = `<div style="font-family: 'Inter', system-ui, sans-serif; font-size:${bibleFontSize}px; line-height:1.75; color:#334155; text-align:left;">` + 
+                    if (bibDisplay) bibDisplay.innerHTML = `<div style="font-family: 'Inter', system-ui, sans-serif; font-size:${bibleFontSize}px; line-height:1.75; color:#334155; text-align:left;">` + 
                         verses.map(v => {
                             const verseNum = v.verse || v.number || '';
                             const isHighlighted = highlights.some(h => 
@@ -6481,7 +6481,7 @@ class MinSideManager {
                             `;
                         }).join('') + `</div>`;
                 } else {
-                    bibDisplay.innerHTML = verses.map(v => {
+                    if (bibDisplay) bibDisplay.innerHTML = verses.map(v => {
                         const verseNum = v.verse || v.number || '';
                         const isHighlighted = highlights.some(h => 
                             h.bibleId === bibleId && 
@@ -6530,7 +6530,7 @@ class MinSideManager {
                 bibDisplay.scrollTop = 0;
             } catch (e) {
                 console.error("Bible widget loadVerses error:", e);
-                bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
+                if (bibDisplay) bibDisplay.innerHTML = `<p style="color:#e74c3c; text-align:center; font-style:italic; font-size:0.85rem; padding-top:40px;">Feil ved henting av tekst.</p>`;
             }
         };
 
@@ -6678,13 +6678,13 @@ class MinSideManager {
         const loadChapters = async (bibleId, bookId, autoSelect = false) => {
             try {
                 bibChapSelect.disabled = true;
-                bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
+                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kap...</option>`;
                 
                 const res = await fetch(`/api/bible/bibles/${bibleId}/books/${bookId}/chapters`);
                 const payload = await res.json();
                 const chapters = payload.data || payload || [];
                 
-                bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
+                if (bibChapSelect) bibChapSelect.innerHTML = `<option value="">Kapittel</option>` + chapters.map(c => `
                     <option value="${c.id}">${c.number}</option>
                 `).join('');
                 bibChapSelect.disabled = false;
