@@ -3098,18 +3098,7 @@ class BibleReader {
                     this.isProgrammaticScrolling = true;
                     
                     // Scroll container programmatically to avoid scrolling the main window/viewport
-                    const pane = this.dom.readingPane.closest('.bible-content-pane');
-                    if (pane) {
-                        const paneRect = pane.getBoundingClientRect();
-                        const pRect = p.getBoundingClientRect();
-                        const targetScrollTop = pane.scrollTop + (pRect.top - paneRect.top) - (paneRect.height / 2) + (pRect.height / 2);
-                        pane.scrollTo({
-                            top: targetScrollTop,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        p.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    this.scrollToVerseElement(p);
                     
                     p.classList.add('verse-temp-highlight');
                     this.highlightedVerseElement = p;
@@ -3122,6 +3111,26 @@ class BibleReader {
                 }
             }
         }, 300);
+    }
+
+    scrollToVerseElement(el) {
+        if (!el) return;
+        const pane = el.closest('.bible-content-pane') || (this.dom && this.dom.readingPane ? this.dom.readingPane.closest('.bible-content-pane') : null);
+        if (pane) {
+            const paneRect = pane.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            const targetScrollTop = pane.scrollTop + (elRect.top - paneRect.top) - (paneRect.height / 2) + (elRect.height / 2);
+            pane.scrollTo({
+                top: Math.max(0, targetScrollTop),
+                behavior: 'smooth'
+            });
+        } else {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // Force window scrollY to 0 so the document body never scrolls down to expose the footer
+        if (window.scrollY !== 0) {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
     }
 
     getCurrentReferenceText() {
@@ -8434,7 +8443,7 @@ class BibleReader {
                             if (idx === activeIdx) {
                                 if (!p.classList.contains('audio-playing-highlight')) {
                                     p.classList.add('audio-playing-highlight');
-                                    p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    this.scrollToVerseElement(p);
                                 }
                             } else {
                                 p.classList.remove('audio-playing-highlight');
