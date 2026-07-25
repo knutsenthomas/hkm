@@ -737,7 +737,7 @@ class BibleReader {
             // Set up show books view trigger inside popover
             const btnShowBooks = document.getElementById('btn-show-books-view');
             if (btnShowBooks) {
-                btnShowBooks.addEventListener('click', (e) => {
+                btnShowBooks.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const headerChapters = document.getElementById('floating-popover-header-chapters');
                     const headerBooks = document.getElementById('floating-popover-header-books');
@@ -749,7 +749,7 @@ class BibleReader {
                     if (chapGrid) chapGrid.style.display = 'none';
                     if (booksCont) {
                         booksCont.style.display = 'flex';
-                        this.renderFloatingBooks();
+                        await this.renderFloatingBooks();
                     }
                 });
             }
@@ -2443,9 +2443,18 @@ class BibleReader {
         }
     }
 
-    renderFloatingBooks() {
+    async renderFloatingBooks() {
         const container = document.getElementById('floating-books-container');
         if (!container) return;
+
+        if (!this.books || !this.books.length) {
+            await this.loadBooks();
+        }
+
+        if (!this.books || !this.books.length) {
+            container.innerHTML = `<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">Laster bøker...</div>`;
+            return;
+        }
 
         container.innerHTML = this.books.map(b => {
             const isActive = b.id === this.selectedBookId ? 'active' : '';
