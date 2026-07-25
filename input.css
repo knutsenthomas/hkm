@@ -7874,27 +7874,35 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
 /* 3. Audio Bibelavspiller (Sticky Player Bar) */
 .hkm-audio-player-bar {
     position: fixed;
-    bottom: 24px;
+    bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 0px)));
     left: 50%;
-    transform: translateX(-50%) translateY(150px);
+    transform: translateX(-50%) translateY(140px);
     width: calc(100% - 32px);
-    max-width: 550px;
-    background: rgba(15, 23, 42, 0.85); /* Dark slate with blur */
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 12px 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    max-width: 580px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(209, 125, 57, 0.25);
+    border-radius: 9999px;
+    padding: 10px 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(209, 125, 57, 0.08);
     z-index: 10002;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-    color: #ffffff;
+    color: #1e293b;
     opacity: 0;
     pointer-events: none;
+}
+
+[data-theme="dark"] .hkm-audio-player-bar,
+body.dark-mode .hkm-audio-player-bar {
+    background: rgba(15, 23, 42, 0.92);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
 }
 
 .hkm-audio-player-bar.active {
@@ -7906,13 +7914,13 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
 .audio-controls-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .audio-btn {
     background: transparent;
     border: none;
-    color: #ffffff;
+    color: #64748b;
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -7925,9 +7933,14 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
     outline: none;
 }
 
+[data-theme="dark"] .audio-btn,
+body.dark-mode .audio-btn {
+    color: rgba(255, 255, 255, 0.7);
+}
+
 .audio-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--primary-orange);
+    background: rgba(209, 125, 57, 0.1);
+    color: var(--primary-orange, #d17d39);
 }
 
 .audio-btn:active {
@@ -7935,51 +7948,85 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
 }
 
 .audio-btn.play-pause-btn {
-    background: #d17d39; /* primary orange */
-    width: 40px;
-    height: 40px;
+    background: var(--hkm-terracotta, #d17d39);
+    color: #ffffff !important;
+    width: 42px;
+    height: 42px;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.35);
 }
 
 .audio-btn.play-pause-btn:hover {
     background: #bd4f2a;
-    color: #ffffff;
+    color: #ffffff !important;
+    transform: scale(1.05);
 }
 
 .audio-info-display {
     flex: 1;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+[data-theme="dark"] .audio-info-display,
+body.dark-mode .audio-info-display {
     color: #f1f5f9;
 }
 
 .audio-speed-select,
 .audio-voice-select {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff !important;
-    border-radius: 8px;
-    padding: 4px 8px;
-    font-size: 11px;
-    font-weight: 600;
+    background: rgba(209, 125, 57, 0.08);
+    border: 1px solid rgba(209, 125, 57, 0.2);
+    color: var(--hkm-terracotta, #d17d39) !important;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
     outline: none;
     height: auto !important;
     width: auto !important;
     min-height: 0 !important;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.audio-speed-select:hover,
+.audio-voice-select:hover {
+    background: rgba(209, 125, 57, 0.15);
+}
+
+[data-theme="dark"] .audio-speed-select,
+[data-theme="dark"] .audio-voice-select,
+body.dark-mode .audio-speed-select,
+body.dark-mode .audio-voice-select {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff !important;
 }
 
 .audio-speed-select option,
 .audio-voice-select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+[data-theme="dark"] .audio-speed-select option,
+[data-theme="dark"] .audio-voice-select option,
+body.dark-mode .audio-speed-select option,
+body.dark-mode .audio-voice-select option {
     background: #0f172a;
     color: #ffffff;
 }
 
 .audio-close-btn {
-    color: rgba(255, 255, 255, 0.5);
+    color: #94a3b8;
 }
 
 .audio-close-btn:hover {
@@ -7988,32 +8035,33 @@ html[data-theme="dark"] .mega-menu div.rounded-full .text-gray-400 {
 
 /* Audio active reading highlight */
 .audio-playing-highlight {
-    background-color: rgba(209, 125, 57, 0.12) !important; /* primary orange overlay */
-    border-left: 3px solid var(--primary-orange) !important;
+    background-color: rgba(209, 125, 57, 0.12) !important;
+    border-left: 3px solid var(--primary-orange, #d17d39) !important;
     padding-left: 12px !important;
     border-radius: 0 4px 4px 0 !important;
     transition: background-color 0.3s ease, border-left-color 0.3s ease;
 }
 
 /* Mobile responsive adjustments for sticky audio player bar to prevent overflow */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
     .hkm-audio-player-bar {
-        padding: 8px 12px;
+        padding: 8px 14px;
         gap: 8px;
-        width: calc(100% - 16px);
-        bottom: 12px;
+        width: calc(100% - 24px);
+        bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px)));
+        border-radius: 28px;
     }
     .audio-info-display {
-        display: none;
+        font-size: 11px;
     }
     .audio-voice-select {
         font-size: 11px;
-        padding: 4px 6px;
-        max-width: 140px;
-        min-width: 100px;
+        padding: 4px 8px;
+        max-width: 120px;
+        min-width: 90px;
     }
     .audio-speed-select {
-        font-size: 10px;
+        font-size: 11px;
         padding: 4px 6px;
     }
     .audio-btn {

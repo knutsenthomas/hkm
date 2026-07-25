@@ -8500,12 +8500,12 @@ class BibleReader {
                     ${this.t('playing_verse')}...
                 </div>
                 <select class="audio-voice-select" id="audio-voice-select" title="${labelVoice}">
-                    <option value="onyx">ChatGPT Onyx (Mann - Dyp & Rolig)</option>
-                    <option value="nova">ChatGPT Nova (Kvinne - Varm & Klar)</option>
-                    <option value="echo">ChatGPT Echo (Mann - Tydelig)</option>
-                    <option value="alloy">ChatGPT Alloy (Nøytral)</option>
-                    <option value="fable">ChatGPT Fable (Forteller)</option>
-                    <option value="shimmer">ChatGPT Shimmer (Kvinne - Lys)</option>
+                    <option value="onyx">Onyx (Mann)</option>
+                    <option value="nova">Nova (Kvinne)</option>
+                    <option value="echo">Echo (Mann)</option>
+                    <option value="alloy">Alloy (Nøytral)</option>
+                    <option value="fable">Fable (Forteller)</option>
+                    <option value="shimmer">Shimmer (Kvinne)</option>
                 </select>
                 <select class="audio-speed-select" id="audio-speed-select" title="Hastighet">
                     <option value="0.8">0.8x</option>
