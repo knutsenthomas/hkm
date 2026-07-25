@@ -3140,6 +3140,10 @@ html[data-theme="dark"] .main-content {
   background-color: #0f172a !important;
 }
 
+.user-info-text {
+  display: none !important;
+}
+
 html[data-theme="dark"] body.minside-body .user-profile-link,
 html[data-theme="dark"] .user-profile-link {
   background: #1e293b !important;
