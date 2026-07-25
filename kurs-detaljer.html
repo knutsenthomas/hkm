@@ -1257,13 +1257,10 @@
             const lockedOverlay = document.getElementById('locked-overlay');
             const coverImgEl = document.getElementById('course-cover-img');
 
-            // Check if course is upcoming
-            const isUpcoming = currentCourse && (
+            // Check if course is upcoming (only for non-logged-in visitors)
+            const isUpcoming = !currentUser && currentCourse && (
                 currentCourse.isUpcoming === true || 
-                currentCourse.status === 'upcoming' ||
-                (currentCourse.releaseDate && new Date(currentCourse.releaseDate).getTime() > Date.now()) ||
-                (currentCourse.startDate && new Date(currentCourse.startDate).getTime() > Date.now()) ||
-                (currentCourse.date && new Date(currentCourse.date).getTime() > Date.now())
+                currentCourse.status === 'upcoming'
             );
 
             if (isUpcoming) {
@@ -1297,7 +1294,7 @@
                 return;
             }
 
-            if (userHasAccess) {
+            if (userHasAccess || isUserLoggedIn()) {
                 if (coverImgEl) coverImgEl.style.display = 'none';
                 if (lockedOverlay) lockedOverlay.style.display = 'none';
                 videoContainer.style.backgroundImage = 'none';
@@ -1327,35 +1324,22 @@
                 videoContainer.style.backgroundSize = 'cover';
                 videoContainer.style.backgroundPosition = 'center';
 
-                if (!lockedOverlay) {
-                    videoContainer.innerHTML = `
-                        <div class="locked-overlay" id="locked-overlay">
-                            <div class="lock-badge">
-                                <i class="fas fa-lock"></i>
-                            </div>
-                            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Logg inn for å se kurset</h3>
-                            <p style="color: #cbd5e1; max-width: 440px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
-                                Dette kurset krever at du har en brukerkonto og er innlogget for å spilles av.
-                            </p>
-                            <a href="/minside/login.html" class="btn-terracotta" id="auth-btn">
-                                <i class="fas fa-sign-in-alt"></i> Logg inn nå
-                            </a>
-                        </div>
-                    `;
-                } else {
-                    lockedOverlay.style.display = 'flex';
-                }
+                const redirectParam = encodeURIComponent(window.location.href);
 
-                const authBtn = document.getElementById('auth-btn');
-                if (authBtn) {
-                    if (!currentUser) {
-                        authBtn.href = '/minside/login.html';
-                        authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Logg inn nå';
-                    } else {
-                        authBtn.href = '/minside/index.html#course-player?courseId=' + currentCourse.id;
-                        authBtn.innerHTML = '<i class="fas fa-unlock"></i> Meld deg på for kr ' + (currentCourse.price || 0) + ',-';
-                    }
-                }
+                videoContainer.innerHTML = `
+                    <div class="locked-overlay" id="locked-overlay">
+                        <div class="lock-badge">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Logg inn for å se kurset</h3>
+                        <p style="color: #cbd5e1; max-width: 440px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
+                            Dette kurset krever at du har en brukerkonto og er innlogget for å spilles av.
+                        </p>
+                        <a href="/minside/login.html?redirect=${redirectParam}" class="btn-terracotta" id="auth-btn">
+                            <i class="fas fa-sign-in-alt"></i> Logg inn nå
+                        </a>
+                    </div>
+                `;
             }
         };
 

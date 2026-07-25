@@ -489,11 +489,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const queryParams = new URLSearchParams(window.location.search);
         const redirectUrl = queryParams.get('redirect');
 
-        if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
-            window.location.href = redirectUrl;
-        } else {
-            window.location.href = '/minside/index.html';
+        if (redirectUrl) {
+            try {
+                const urlObj = new URL(redirectUrl, window.location.origin);
+                if (urlObj.origin === window.location.origin) {
+                    window.location.href = urlObj.href;
+                    return;
+                }
+            } catch (e) {
+                if (redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+            }
         }
+        window.location.href = '/minside/index.html';
     }
 
     function getErrorMessage(error) {
