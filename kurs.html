@@ -1128,6 +1128,252 @@
         .social-link:active {
             transform: scale(0.95);
         }
+
+        /* ==========================================================================
+           COMPREHENSIVE MOBILE RESPONSIVE OVERRIDES (iOS & Android)
+           ========================================================================== */
+
+        @media (max-width: 768px) {
+            /* Hero Section Mobile Optimization */
+            #kurs-hero-section {
+                min-height: auto !important;
+                padding: 130px 16px 56px !important;
+            }
+
+            #hero-course-title {
+                font-size: clamp(1.6rem, 6.5vw, 2.25rem) !important;
+                margin-bottom: 12px !important;
+                padding: 0 4px !important;
+            }
+
+            #hero-course-desc {
+                font-size: 0.96rem !important;
+                margin-bottom: 24px !important;
+                padding: 0 8px !important;
+                line-height: 1.55 !important;
+            }
+
+            #kurs-hero-section .container > div:last-child {
+                flex-direction: column !important;
+                width: 100% !important;
+                gap: 12px !important;
+            }
+
+            #kurs-hero-section .hero-btn-primary,
+            #kurs-hero-section .hero-btn-secondary {
+                width: 100% !important;
+                min-height: 48px !important;
+                justify-content: center !important;
+                font-size: 0.95rem !important;
+                padding: 14px 20px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Featured Section & Horizontal Cards */
+            .featured-section {
+                padding: 36px 16px !important;
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+
+            .spotlight-card {
+                min-height: 320px !important;
+                padding: 24px 18px !important;
+            }
+
+            .spotlight-card h3 {
+                font-size: 1.35rem !important;
+            }
+
+            .horizontal-course-card {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                padding: 16px !important;
+                gap: 14px !important;
+            }
+
+            .horizontal-course-thumb {
+                width: 100% !important;
+                height: 170px !important;
+                border-radius: 12px !important;
+            }
+
+            /* Controls & Filter Bar */
+            .kurs-controls {
+                padding: 12px 14px !important;
+                top: 60px !important;
+            }
+
+            .kurs-controls-inner {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+
+            .search-box {
+                width: 100% !important;
+                max-width: none !important;
+            }
+
+            .search-box input {
+                height: 44px !important;
+                font-size: 0.95rem !important;
+            }
+
+            .filter-scroll {
+                width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 6px !important;
+                gap: 8px !important;
+                display: flex !important;
+                flex-wrap: nowrap !important;
+            }
+
+            .filter-btn {
+                flex-shrink: 0 !important;
+                min-height: 44px !important;
+                padding: 10px 16px !important;
+                font-size: 0.88rem !important;
+                display: inline-flex !important;
+                align-items: center !important;
+            }
+
+            /* Main Course Grid & Cards */
+            .kurs-main {
+                padding: 24px 16px 60px !important;
+            }
+
+            .kurs-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+
+            .course-thumb {
+                height: 180px !important;
+            }
+
+            .course-body {
+                padding: 20px 16px !important;
+            }
+
+            .course-body h3 {
+                font-size: 1.18rem !important;
+                line-height: 1.35 !important;
+            }
+
+            .course-card-actions {
+                display: flex !important;
+                gap: 8px !important;
+                width: 100% !important;
+            }
+
+            .enroll-btn {
+                flex: 1 !important;
+                min-height: 46px !important;
+                font-size: 0.92rem !important;
+                padding: 12px 14px !important;
+            }
+
+            .btn-share-course {
+                min-height: 46px !important;
+                min-width: 46px !important;
+                width: 46px !important;
+                height: 46px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Features & Community Wave Sections */
+            .hkm-course-features-section {
+                padding: 48px 16px !important;
+            }
+
+            .hkm-course-features-section h2 {
+                font-size: 1.65rem !important;
+            }
+
+            .hkm-course-features-section .container > div {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+
+            .hkm-feature-card {
+                padding: 24px 20px !important;
+            }
+
+            section[style*="background: linear-gradient(135deg, #1B4965"] {
+                padding: 48px 16px !important;
+            }
+
+            section[style*="background: linear-gradient(135deg, #1B4965"] .container {
+                grid-template-columns: 1fr !important;
+                gap: 24px !important;
+                text-align: center !important;
+            }
+
+            section[style*="background: linear-gradient(135deg, #1B4965"] img {
+                height: 220px !important;
+            }
+
+            /* Teachers Section */
+            .hkm-mentors-section {
+                padding: 48px 16px !important;
+            }
+
+            .hkm-mentors-section h2 {
+                font-size: 1.65rem !important;
+            }
+
+            .hkm-mentor-card {
+                padding: 28px 20px !important;
+            }
+
+            /* Modal Adjustments for Mobile */
+            .enroll-modal,
+            #share-modal {
+                max-width: 92vw !important;
+                padding: 24px 18px !important;
+                margin: 16px !important;
+            }
+        }
+
+        /* Small Smartphone Extra Fixes (< 480px) */
+        @media (max-width: 480px) {
+            .hero-stats-container {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+
+            .hero-stat-card {
+                padding: 16px 12px !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                gap: 16px !important;
+                text-align: left !important;
+            }
+
+            .hero-stat-icon-wrapper {
+                margin-bottom: 0 !important;
+                flex-shrink: 0 !important;
+            }
+        }
+
+        /* Mobile Landscape Guard */
+        @media (orientation: landscape) and (max-height: 500px) {
+            #kurs-hero-section {
+                min-height: auto !important;
+                padding: 90px 16px 36px !important;
+            }
+
+            .kurs-controls {
+                position: relative !important;
+                top: 0 !important;
+            }
+        }
     </style>
     <!-- Loader Safety Net -->
     <script>
