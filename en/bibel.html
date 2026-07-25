@@ -1793,10 +1793,13 @@
         /* Dotted text underline for selected verses (Matching reference design) */
         .bible-reading-pane p.selected-verse,
         .bible-reading-pane.layout-paragraph p.selected-verse {
-            background: transparent !important;
             text-decoration: underline dotted #475569 !important;
             text-underline-offset: 5px !important;
             text-decoration-thickness: 2px !important;
+        }
+        .bible-reading-pane p.selected-verse:not([data-highlight-color]),
+        .bible-reading-pane.layout-paragraph p.selected-verse:not([data-highlight-color]) {
+            background: transparent !important;
         }
 
         html[data-theme="dark"] .bible-reading-pane p.selected-verse,

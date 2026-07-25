@@ -1685,6 +1685,7 @@ class BibleReader {
                     this.selectedVerses.forEach(v => {
                         v.paragraph.setAttribute('data-highlight-color', 'custom');
                         v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
+                        this.saveVerseHighlight(v.verseNum, 'custom', currentColorHex);
                     });
                 }
                 window.closeColorWheelModal(e);
@@ -1694,7 +1695,10 @@ class BibleReader {
         // Color swatch listeners for bottom action sheet
         document.querySelectorAll('#verse-context-toolbar .color-swatch-circle').forEach(swatch => {
             const applySwatchColor = (e) => {
-                if (e && e.stopPropagation) e.stopPropagation();
+                if (e) {
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault && e.cancelable) e.preventDefault();
+                }
                 const color = swatch.getAttribute('data-color');
                 if (color === 'custom' || color === 'multi') {
                     openColorWheelModal();
@@ -1702,6 +1706,7 @@ class BibleReader {
                         this.selectedVerses.forEach(v => {
                             v.paragraph.setAttribute('data-highlight-color', 'custom');
                             v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
+                            this.saveVerseHighlight(v.verseNum, 'custom', currentColorHex);
                         });
                     }
                     return;
@@ -1711,10 +1716,14 @@ class BibleReader {
                         if (color === 'none') {
                             v.paragraph.removeAttribute('data-highlight-color');
                             v.paragraph.style.removeProperty('--custom-highlight-bg');
+                            this.saveVerseHighlight(v.verseNum, 'none');
                         } else {
                             v.paragraph.setAttribute('data-highlight-color', color);
                             if (color === 'custom') {
                                 v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
+                                this.saveVerseHighlight(v.verseNum, 'custom', currentColorHex);
+                            } else {
+                                this.saveVerseHighlight(v.verseNum, color);
                             }
                         }
                     });
@@ -3233,8 +3242,40 @@ class BibleReader {
         this.restoreHighlights();
     }
 
+    saveVerseHighlight(verseNum, color, customHex = null) {
+        if (!this.verseHighlights) {
+            try {
+                this.verseHighlights = JSON.parse(localStorage.getItem('hkm_verse_highlights') || '{}');
+            } catch(e) {
+                this.verseHighlights = {};
+            }
+        }
+        const key = `${this.selectedBibleId}_${this.selectedBookId}_${this.selectedChapterId}_v${verseNum}`;
+        if (color === 'none' || !color) {
+            delete this.verseHighlights[key];
+        } else {
+            this.verseHighlights[key] = { color, hex: customHex };
+        }
+        this.safeSetLocalStorage('hkm_verse_highlights', JSON.stringify(this.verseHighlights));
+    }
+
     restoreHighlights() {
-        const ref = this.getCurrentReferenceText();
+        if (!this.verseHighlights) {
+            try {
+                this.verseHighlights = JSON.parse(localStorage.getItem('hkm_verse_highlights') || '{}');
+            } catch(e) {
+                this.verseHighlights = {};
+            }
+        }
+
+        const hexToRgba = (hex, opacity = 0.35) => {
+            if (!hex) return `rgba(209, 125, 57, ${opacity})`;
+            let c = hex.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const num = parseInt(c, 16);
+            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${opacity})`;
+        };
+
         const activeBookmarks = this.bookmarks.filter(b => b.chapterId === this.selectedChapterId && b.bibleId === this.selectedBibleId);
         
         // Build a Set of all bookmarked verse numbers in this chapter
@@ -3248,11 +3289,25 @@ class BibleReader {
         paragraphs.forEach(p => {
             const sup = p.querySelector('sup.v');
             if (sup) {
-                const verseNum = parseInt(sup.innerText.trim(), 10);
+                const verseStr = sup.innerText.trim();
+                const verseNum = parseInt(verseStr, 10);
                 if (bookmarkedVerses.has(verseNum)) {
                     p.classList.add('highlighted');
                 } else {
                     p.classList.remove('highlighted');
+                }
+
+                // Restore saved color highlights
+                const key = `${this.selectedBibleId}_${this.selectedBookId}_${this.selectedChapterId}_v${verseStr}`;
+                const hl = this.verseHighlights[key];
+                if (hl) {
+                    p.setAttribute('data-highlight-color', hl.color);
+                    if (hl.hex) {
+                        p.style.setProperty('--custom-highlight-bg', hexToRgba(hl.hex, 0.35));
+                    }
+                } else {
+                    p.removeAttribute('data-highlight-color');
+                    p.style.removeProperty('--custom-highlight-bg');
                 }
             }
         });
