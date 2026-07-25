@@ -873,7 +873,7 @@
         .sheet-overlay-backdrop {
             position: fixed;
             inset: 0;
-            z-index: 9998;
+            z-index: 19999 !important;
             background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -1285,16 +1285,16 @@
 
         /* Dictionary Drawer Sidepanel (Sliding from right) */
         .dictionary-drawer {
-            position: absolute;
+            position: fixed;
             top: 0;
             right: -340px;
             width: 320px;
-            height: 100%;
+            height: 100dvh;
             background: var(--bg-sidebar);
             border-left: 1px solid var(--border-color);
             box-shadow: -5px 0 25px rgba(0,0,0,0.08);
             transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 150;
+            z-index: 25000 !important;
             display: flex;
             flex-direction: column;
         }
@@ -2602,11 +2602,12 @@
             .dictionary-drawer {
                 width: 100% !important;
                 right: -100% !important;
-                z-index: 3000 !important;
+                z-index: 25000 !important;
                 transition: right 0.3s ease !important;
             }
             .dictionary-drawer.active {
                 right: 0 !important;
+                z-index: 25000 !important;
             }
             .toggle-expand-dict-btn {
                 display: none !important;
@@ -3564,7 +3565,7 @@
                 </button>
                 
                 <!-- Backdrop Overlay for Floating Sheets & Popovers -->
-                <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover').forEach(el => el.classList.remove('active')); this.classList.remove('active');"></div>
+                <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover, .dictionary-drawer').forEach(el => el.classList.remove('active', 'expanded')); this.classList.remove('active');"></div>
 
                 <!-- Floating Settings Popover -->
                 <div class="floating-settings-popover" id="floating-settings-popover">
