@@ -1432,9 +1432,6 @@
     <section class="kurs-hero" style="background: linear-gradient(135deg, #09281e 0%, #0d3b2e 50%, #124e3d 100%); padding: 120px 24px 96px; position: relative; overflow: hidden;">
         <div class="container" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; text-align: left;">
             <div>
-                <div class="hero-category-badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(34, 197, 94, 0.12); border: 1.5px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 18px; border-radius: 9999px; margin-bottom: 24px;">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> SEERKURS MED AKTIVERING
-                </div>
                 <h1 id="hero-course-title" style="font-size: clamp(2.25rem, 5.5vw, 3.5rem); font-weight: 850; color: white; margin: 0 0 20px 0; line-height: 1.15; letter-spacing: -0.02em;">
                     Seerkurs med <span style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">aktivering</span>
                 </h1>
@@ -2245,7 +2242,6 @@
                             const heroTitleEl = document.getElementById('hero-course-title');
                             const heroDescEl = document.getElementById('hero-course-desc');
                             const heroImgEl = document.getElementById('hero-course-img');
-                            const heroBadgeEl = document.querySelector('.hero-category-badge');
 
                             if (heroTitleEl && mainCourse.title) {
                                 heroTitleEl.innerHTML = mainCourse.title;
@@ -2255,9 +2251,6 @@
                             }
                             if (heroImgEl && mainCourse.imageUrl) {
                                 heroImgEl.src = mainCourse.imageUrl;
-                            }
-                            if (heroBadgeEl && mainCourse.category) {
-                                heroBadgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> ${mainCourse.title.toUpperCase()}`;
                             }
                         }
 // sync-hero-marker
