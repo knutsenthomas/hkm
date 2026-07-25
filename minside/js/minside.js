@@ -1251,6 +1251,85 @@ class MinSideManager {
         });
     }
 
+    async syncUserProfile(user) {
+        if (!user) return;
+        try {
+            const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
+            const userRef = firebaseService.db.collection('users').doc(user.uid);
+            const userDoc = await userRef.get();
+            const userData = {
+                email: user.email || '',
+                displayName: user.displayName || googleProvider?.displayName || user.email || '',
+                photoURL: user.photoURL || googleProvider?.photoURL || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (!userDoc.exists) {
+                userData.role = 'medlem';
+                userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                await userRef.set(userData);
+            } else {
+                const docData = userDoc.data();
+                if (!docData.createdAt) {
+                    userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                }
+                await userRef.update(userData);
+            }
+        } catch (e) {
+            console.warn('syncUserProfile warning:', e);
+        }
+    }
+
+    async syncProfileFromGoogleProvider() {
+        try {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
+            if (googleProvider) {
+                const updates = {};
+                if (googleProvider.displayName && !user.displayName) updates.displayName = googleProvider.displayName;
+                if (googleProvider.photoURL && !user.photoURL) updates.photoURL = googleProvider.photoURL;
+                if (Object.keys(updates).length > 0) {
+                    await user.updateProfile(updates);
+                }
+            }
+        } catch (e) {
+            console.warn('syncProfileFromGoogleProvider warning:', e);
+        }
+    }
+
+    async getMergedProfile(user) {
+        if (!user) return {};
+        try {
+            const doc = await firebaseService.db.collection('users').doc(user.uid).get();
+            const dbData = doc.exists ? doc.data() : {};
+            return {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || dbData.displayName || user.email,
+                photoURL: user.photoURL || dbData.photoURL || '',
+                role: dbData.role || 'medlem',
+                ...dbData
+            };
+        } catch (e) {
+            console.warn('getMergedProfile warning:', e);
+            return {
+                uid: user?.uid,
+                email: user?.email,
+                displayName: user?.displayName || user?.email || '',
+                photoURL: user?.photoURL || ''
+            };
+        }
+    }
+
+    async refreshProfileSubCollections(uid) {
+        if (!uid) return;
+        try {
+            // Placeholder for subcollections refresh
+        } catch (e) {
+            console.warn('refreshProfileSubCollections warning:', e);
+        }
+    }
+
     // Dynamic Language Switching Routine
     handleLanguageChange(lang) {
         document.documentElement.lang = lang;
