@@ -2847,7 +2847,7 @@ class ContentManager {
             if (imageEl) {
                 const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
                 const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
-                const effectiveImage = liveImage || (config.useLiveFeed ? '' : fallbackSrc);
+                const effectiveImage = liveImage || fallbackSrc;
 
                 if (effectiveImage) {
                     if (imageEl.getAttribute('src') !== effectiveImage) {
