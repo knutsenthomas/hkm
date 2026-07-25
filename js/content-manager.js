@@ -2580,6 +2580,17 @@ class ContentManager {
         const { section } = config;
         if (!section) return;
 
+        const getFallbackImageByContent = (text) => {
+            if (!text || typeof text !== 'string') return '/img/fb_fallback_bible.jpg';
+            const norm = text.toLowerCase();
+            if (/basar|bazaar|sommerbasar|gave|butikk|design|kjøp|vipps/i.test(norm)) return '/img/fb_fallback_bazaar.jpg';
+            if (/lovsang|worship|lovsynge|podcast|spotify|youtube|episode|sang|musikk|lytt/i.test(norm)) return '/img/fb_fallback_worship.jpg';
+            if (/bibel|bible|tidslinje|leseplan|undervisning|studie|skrift|ordet/i.test(norm)) return '/img/fb_fallback_bible.jpg';
+            if (/kirke|church|dallas|walls|shake|prophetic|samling|møte|fellesskap/i.test(norm)) return '/img/fb_fallback_church.jpg';
+            if (/bønn|pray|gud|jesus|tro|faith/i.test(norm)) return '/img/fb_fallback_prayer.jpg';
+            return '/img/fb_fallback_bible.jpg';
+        };
+
         if (!config.enabled) {
             section.style.display = 'none';
             return;
@@ -2655,7 +2666,7 @@ class ContentManager {
                         title: title,
                         excerpt: excerpt,
                         cta: isYoutube ? "Se på YouTube" : "Les på Facebook",
-                        image: item.image || "",
+                        image: item.image || getFallbackImageByContent(cleanText),
                         link: link,
                         likes: typeof item.like_count === 'number' ? item.like_count : 0,
                         comments: typeof item.comment_count === 'number' ? item.comment_count : 0,
@@ -2722,7 +2733,7 @@ class ContentManager {
                         title: (cleanText && cleanText.length > 50) ? (cleanText.substring(0, 47) + "...") : (title || "Innlegg"),
                         excerpt: excerpt,
                         cta: "Les på Facebook",
-                        image: image,
+                        image: image || getFallbackImageByContent(cleanText),
                         link: link
                     };
                 });
@@ -2847,7 +2858,7 @@ class ContentManager {
             if (imageEl) {
                 const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
                 const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
-                const effectiveImage = liveImage || (config.useLiveFeed ? '' : fallbackSrc);
+                const effectiveImage = liveImage || fallbackSrc;
 
                 if (effectiveImage) {
                     if (imageEl.getAttribute('src') !== effectiveImage) {
