@@ -570,57 +570,91 @@
 
             <!-- SECTION 3: READING GUIDE -->
             <section id="section-leseguide" class="space-y-8 hidden">
-                <div class="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-amber-600 text-3xl">lightbulb</span>
+                <div class="p-6 md:p-8 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+                            <span class="material-symbols-outlined text-2xl">lightbulb</span>
+                        </div>
                         <div>
-                            <h2 class="text-xl font-bold text-slate-900">How to Read the Bible</h2>
-                            <p class="text-sm text-slate-600">If you open the Bible on page 1 and try to read cover-to-cover, most people stall mid-Leviticus. Here are practical strategies to build a strong habit.</p>
+                            <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-1">How to Read the Bible</h2>
+                            <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                                If you open the Bible on page 1 and try to read cover-to-cover, most people stall mid-Leviticus. Here are practical strategies and recommended starting points to build a strong habit.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-card p-8">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-600 font-bold text-lg">1</div>
-                        <h3 class="text-2xl font-bold text-slate-900">Start with the Essentials (For Beginners)</h3>
+                <div class="section-card p-6 md:p-8 bg-white border border-slate-200/80 rounded-2xl shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-500 text-white font-extrabold text-sm shrink-0 shadow-sm shadow-amber-500/30">1</span>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">Start with the Essentials</h3>
+                        </div>
+                        <span class="text-xs font-bold px-3 py-1 bg-amber-500/10 text-amber-700 rounded-full w-fit">Recommended for Beginners</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                            <div class="font-bold text-slate-900 mb-1 flex items-center justify-between">
-                                <span>Gospel of Mark</span>
-                                <span class="material-symbols-outlined text-amber-600 text-sm">bolt</span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-xl">bolt</span>
+                                </div>
+                                <h4 class="text-base font-extrabold text-slate-900 mb-1.5">Gospel of Mark</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">The shortest, action-packed Gospel giving a fast-paced overview of Jesus.</p>
                             </div>
-                            <p class="text-xs text-slate-600">The shortest, action-packed Gospel giving a fast-paced overview of Jesus.</p>
+                            <a href="/en/bibel?book=MRK&chapter=1" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 mt-4 pt-3 border-t border-slate-100 transition-colors">
+                                <span>Read Mark</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
-                        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                            <div class="font-bold text-slate-900 mb-1 flex items-center justify-between">
-                                <span>Gospel of John</span>
-                                <span class="material-symbols-outlined text-amber-600 text-sm">favorite</span>
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-xl">favorite</span>
+                                </div>
+                                <h4 class="text-base font-extrabold text-slate-900 mb-1.5">Gospel of John</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Great for understanding the profound spiritual depth of Jesus' claims.</p>
                             </div>
-                            <p class="text-xs text-slate-600">Great for understanding the profound spiritual depth of Jesus' claims.</p>
+                            <a href="/en/bibel?book=JHN&chapter=1" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 mt-4 pt-3 border-t border-slate-100 transition-colors">
+                                <span>Read John</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
-                        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                            <div class="font-bold text-slate-900 mb-1 flex items-center justify-between">
-                                <span>Acts of the Apostles</span>
-                                <span class="material-symbols-outlined text-amber-600 text-sm">groups</span>
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-xl">groups</span>
+                                </div>
+                                <h4 class="text-base font-extrabold text-slate-900 mb-1.5">Acts of the Apostles</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Exciting narrative of how the first church exploded across the Roman world.</p>
                             </div>
-                            <p class="text-xs text-slate-600">Exciting narrative of how the first church exploded across the Roman world.</p>
+                            <a href="/en/bibel?book=ACT&chapter=1" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 mt-4 pt-3 border-t border-slate-100 transition-colors">
+                                <span>Read Acts</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
-                        <div class="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                            <div class="font-bold text-slate-900 mb-1 flex items-center justify-between">
-                                <span>Psalms / Proverbs</span>
-                                <span class="material-symbols-outlined text-amber-600 text-sm">auto_stories</span>
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-xl">auto_stories</span>
+                                </div>
+                                <h4 class="text-base font-extrabold text-slate-900 mb-1.5">Psalms / Proverbs</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Read a chapter daily for spiritual devotion, prayer, and daily wisdom.</p>
                             </div>
-                            <p class="text-xs text-slate-600">Read a chapter daily for spiritual devotion, prayer, and daily wisdom.</p>
+                            <a href="/en/bibel?book=PSA&chapter=1" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 mt-4 pt-3 border-t border-slate-100 transition-colors">
+                                <span>Read Psalms</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 bg-slate-900 text-white rounded-2xl border border-amber-500/30 flex items-start gap-4">
-                    <span class="material-symbols-outlined text-amber-400 text-3xl shrink-0">info</span>
+                <div class="p-6 md:p-8 bg-slate-900 text-white rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start gap-4 shadow-lg shadow-slate-900/10">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-2xl">info</span>
+                    </div>
                     <div>
-                        <h4 class="text-lg font-bold text-amber-400 mb-1">Tip on Interpretation</h4>
+                        <h4 class="text-lg font-extrabold text-amber-400 mb-1">Tip on Interpretation</h4>
                         <p class="text-sm text-slate-300 leading-relaxed">
                             Always consider the <strong>genre</strong> you are reading. Poetry (Psalms) should not be interpreted the same way as narrative history (Kings) or practical adages (Proverbs).
                         </p>
