@@ -1287,6 +1287,24 @@
             const overviewText = document.getElementById('lesson-overview-text');
             if (overviewText) overviewText.textContent = lesson.description || 'Ingen leksjonsbeskrivelse spesifisert.';
 
+            // Progress bar is only visible if watching a recorded lesson (videoUrl present)
+            const progressWrapper = document.querySelector('.progress-wrapper');
+            const hasRecordedVideo = Boolean(lesson && lesson.videoUrl && String(lesson.videoUrl).trim().length > 0);
+
+            if (progressWrapper) {
+                if (hasRecordedVideo) {
+                    progressWrapper.style.display = 'flex';
+                    const totalLessons = (currentCourse && currentCourse.lessons) ? currentCourse.lessons.length : 1;
+                    const percent = Math.min(100, Math.round(((index + 1) / totalLessons) * 100));
+                    const label = progressWrapper.querySelector('.progress-label');
+                    const fill = progressWrapper.querySelector('.progress-bar-fill');
+                    if (label) label.textContent = `${percent}% Fullført`;
+                    if (fill) fill.style.width = `${percent}%`;
+                } else {
+                    progressWrapper.style.display = 'none';
+                }
+            }
+
             const videoContainer = document.getElementById('video-card-container');
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
             const lockedOverlay = document.getElementById('locked-overlay');
