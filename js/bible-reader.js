@@ -1818,6 +1818,20 @@ class BibleReader {
             });
         }
 
+        // Swipe down to dismiss for color wheel modal
+        const colorWheelCard = document.querySelector('#color-wheel-modal .color-wheel-card');
+        if (colorWheelCard) {
+            const colorWheelModal = document.getElementById('color-wheel-modal');
+            this.setupBottomSheetSwipeDown(colorWheelCard, () => {
+                if (colorWheelModal) {
+                    colorWheelModal.classList.remove('active');
+                    setTimeout(() => {
+                        colorWheelModal.style.display = 'none';
+                    }, 250);
+                }
+            });
+        }
+
         // Swipe down to dismiss for verse note modal
         const verseNoteCard = document.querySelector('#verse-note-modal .color-wheel-card');
         if (verseNoteCard) {
@@ -3582,12 +3596,18 @@ class BibleReader {
         let currentDeltaY = 0;
         let isDragging = false;
 
+        const getBackdrop = () => {
+            return element.closest('.color-wheel-modal-overlay') || document.getElementById('hkm-sheet-backdrop-overlay');
+        };
+
         const onStart = (clientY, target) => {
-            if (target && target.closest('.color-swatch-circle, button, a, input, textarea')) return false;
+            if (target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) return false;
             startY = clientY;
             currentDeltaY = 0;
             isDragging = true;
             element.style.transition = 'none';
+            const backdrop = getBackdrop();
+            if (backdrop) backdrop.style.transition = 'none';
             return true;
         };
 
@@ -3598,33 +3618,48 @@ class BibleReader {
                 if (e && e.cancelable) e.preventDefault();
                 currentDeltaY = deltaY;
                 element.style.transform = `translateY(${deltaY}px)`;
-                element.style.opacity = `${Math.max(0.2, 1 - deltaY / 250)}`;
+                element.style.opacity = `${Math.max(0.2, 1 - deltaY / 280)}`;
+                const backdrop = getBackdrop();
+                if (backdrop) {
+                    backdrop.style.opacity = `${Math.max(0, 1 - deltaY / 220)}`;
+                }
             } else if (deltaY < -10 && element.style.transform) {
                 element.style.transform = 'translateY(0)';
                 element.style.opacity = '1';
+                const backdrop = getBackdrop();
+                if (backdrop) backdrop.style.opacity = '1';
             }
         };
 
         const onEnd = () => {
             if (!isDragging) return;
             isDragging = false;
-            element.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
-            
-            if (currentDeltaY > 50) {
+            element.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+            const backdrop = getBackdrop();
+            if (backdrop) backdrop.style.transition = 'opacity 0.28s ease';
+
+            if (currentDeltaY > 55) {
                 element.style.transform = 'translateY(100%)';
                 element.style.opacity = '0';
+                if (backdrop) backdrop.style.opacity = '0';
                 setTimeout(() => {
                     element.style.transform = '';
                     element.style.opacity = '';
                     element.style.transition = '';
+                    if (backdrop) {
+                        backdrop.style.opacity = '';
+                        backdrop.style.transition = '';
+                    }
                     if (typeof closeCallback === 'function') closeCallback();
-                }, 240);
+                }, 260);
             } else {
                 element.style.transform = 'translateY(0)';
                 element.style.opacity = '1';
+                if (backdrop) backdrop.style.opacity = '1';
                 setTimeout(() => {
                     element.style.transition = '';
-                }, 240);
+                    if (backdrop) backdrop.style.transition = '';
+                }, 260);
             }
             currentDeltaY = 0;
         };
