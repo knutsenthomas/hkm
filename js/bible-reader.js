@@ -2418,7 +2418,6 @@ class BibleReader {
                 const headerBooks = document.getElementById('floating-popover-header-books');
                 const chapGrid = document.getElementById('floating-chapter-grid');
                 const booksCont = document.getElementById('floating-books-container');
-
                 if (headerChapters) headerChapters.style.display = 'flex';
                 if (headerBooks) headerBooks.style.display = 'none';
                 if (chapGrid) chapGrid.style.display = 'grid';
@@ -2433,6 +2432,12 @@ class BibleReader {
 
         this.clearSelection();
         this.selectedChapterId = chapterId;
+
+        // Synchronize selectedBookId if chapterId contains BOOKID_CHAPTERNUM
+        const [bookPartId] = chapterId.includes('_') ? chapterId.split('_') : [null];
+        if (bookPartId && this.selectedBookId !== bookPartId) {
+            this.selectedBookId = bookPartId;
+        }
 
         // Save last read position to localStorage
         this.safeSetLocalStorage('hkm_bible_last_chapter', chapterId);
@@ -2460,6 +2465,7 @@ class BibleReader {
         });
 
         // Show loading spinner
+        this.dom.readingPane = this.dom.readingPane || document.getElementById('bible-reading-pane');
         if (this.dom.readingPane) {
             this.dom.readingPane.innerHTML = `
                 <div style="text-align: center; padding: 100px 0; color: #64748b;">
@@ -2471,8 +2477,8 @@ class BibleReader {
 
         try {
             const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
             const payload = await res.json();
-            if (this.selectedChapterId !== chapterId) return;
             this.activeChapterData = payload.data;
 
             if (this.activeChapterData) {
@@ -2623,89 +2629,101 @@ class BibleReader {
     }
 
     renderActiveChapter() {
-        if (!this.dom.readingPane || !this.activeChapterData) return;
+        if (!this.activeChapterData) return;
+        this.dom.readingPane = this.dom.readingPane || document.getElementById('bible-reading-pane');
+        if (!this.dom.readingPane) return;
 
         // Render reference title
-        const currentBook = this.books.find(b => b.id === this.selectedBookId);
-        const chapterNum = this.selectedChapterId.split('_')[1];
-        
-        if (this.dom.currentBookBadge) {
-            this.dom.currentBookBadge.innerText = currentBook ? currentBook.name.toUpperCase() : '';
-        }
-        if (this.dom.currentChapterNumber) {
-            this.dom.currentChapterNumber.innerText = chapterNum;
-        }
-        if (this.dom.currentReferenceTitle) {
-            this.dom.currentReferenceTitle.innerText = `${currentBook ? currentBook.name : ''} ${chapterNum}`;
-        }
-        
-        const currentBible = this.bibles.find(t => t.id === this.selectedBibleId);
-        if (this.dom.currentTranslationAbbr) {
-            this.dom.currentTranslationAbbr.innerText = currentBible ? currentBible.abbreviation : '';
+        try {
+            const currentBook = (this.books || []).find(b => b.id === this.selectedBookId);
+            const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
+            
+            this.dom.currentBookBadge = this.dom.currentBookBadge || document.getElementById('current-book-badge');
+            this.dom.currentChapterNumber = this.dom.currentChapterNumber || document.getElementById('current-chapter-number');
+            this.dom.currentReferenceTitle = this.dom.currentReferenceTitle || document.getElementById('current-reference-title');
+            this.dom.currentTranslationAbbr = this.dom.currentTranslationAbbr || document.getElementById('current-translation-abbr');
+
+            if (this.dom.currentBookBadge) {
+                this.dom.currentBookBadge.innerText = currentBook ? currentBook.name.toUpperCase() : '';
+            }
+            if (this.dom.currentChapterNumber) {
+                this.dom.currentChapterNumber.innerText = chapterNum;
+            }
+            if (this.dom.currentReferenceTitle) {
+                this.dom.currentReferenceTitle.innerText = `${currentBook ? currentBook.name : ''} ${chapterNum}`;
+            }
+            
+            const currentBible = (this.bibles || []).find(t => t.id === this.selectedBibleId);
+            if (this.dom.currentTranslationAbbr) {
+                this.dom.currentTranslationAbbr.innerText = currentBible ? currentBible.abbreviation : '';
+            }
+        } catch (titleErr) {
+            console.warn("[BibleReader] Error rendering title header:", titleErr);
         }
 
-        // Render verses HTML
+        // Render verses HTML - CRITICAL
         this.dom.readingPane.innerHTML = this.activeChapterData.content || '';
 
-        // Load chapter cross-references mapping & attach buttons only to verses with crossrefs or notes
-        this.loadChapterVerseCrossReferences();
-
-        // Restore bookmarks highlight
-        this.restoreHighlights();
-
-        // Highlight reading plan verses if in plan mode
-        this.applyReadingPlanHighlights();
+        // Safe secondary steps
+        try { this.loadChapterVerseCrossReferences(); } catch (e) { console.warn(e); }
+        try { this.restoreHighlights(); } catch (e) { console.warn(e); }
+        try { this.applyReadingPlanHighlights(); } catch (e) { console.warn(e); }
 
         // Inject Audio Play Button & Cross References Button dynamically in side-by-side bar
-        if (this.dom.btnLookupChapter) {
-            let actionBar = document.getElementById('chapter-header-action-bar');
-            if (!actionBar) {
-                actionBar = document.createElement('div');
-                actionBar.id = 'chapter-header-action-bar';
-                actionBar.style.cssText = 'display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; width: 100%;';
-                this.dom.btnLookupChapter.parentNode.insertBefore(actionBar, this.dom.btnLookupChapter.nextSibling);
+        try {
+            this.dom.btnLookupChapter = this.dom.btnLookupChapter || document.getElementById('btn-lookup-chapter');
+            if (this.dom.btnLookupChapter) {
+                let actionBar = document.getElementById('chapter-header-action-bar');
+                if (!actionBar) {
+                    actionBar = document.createElement('div');
+                    actionBar.id = 'chapter-header-action-bar';
+                    actionBar.style.cssText = 'display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; width: 100%;';
+                    this.dom.btnLookupChapter.parentNode.insertBefore(actionBar, this.dom.btnLookupChapter.nextSibling);
+                }
+
+                let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
+                if (!playAudioBtn) {
+                    playAudioBtn = document.createElement('button');
+                    playAudioBtn.id = 'btn-play-audio-dynamic';
+                    playAudioBtn.className = 'nav-btn';
+                    playAudioBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
+                    playAudioBtn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
+                        <span>${this.t('play_audio')}</span>
+                    `;
+                    playAudioBtn.addEventListener('click', () => this.toggleAudioPlayback());
+                    actionBar.appendChild(playAudioBtn);
+                } else {
+                    const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
+                    if (labelSpan) labelSpan.textContent = this.t('play_audio');
+                }
+
+                let crossrefBtn = document.getElementById('btn-crossref-chapter-dynamic');
+                if (!crossrefBtn) {
+                    crossrefBtn = document.createElement('button');
+                    crossrefBtn.id = 'btn-crossref-chapter-dynamic';
+                    crossrefBtn.className = 'nav-btn';
+                    crossrefBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
+                    crossrefBtn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--hkm-terracotta, #d17d39);">article</span>
+                        <span class="crossref-btn-label">${this.t('cross_references')}</span>
+                    `;
+
+                    crossrefBtn.addEventListener('click', () => {
+                        const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+                        const bookName = currentBook ? currentBook.name : '';
+                        const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
+                        this.openVerseCrossReferenceModal('1', `${bookName} ${chapterNum}`);
+                    });
+
+                    actionBar.appendChild(crossrefBtn);
+                } else {
+                    const labelSpan = crossrefBtn.querySelector('.crossref-btn-label');
+                    if (labelSpan) labelSpan.textContent = this.t('cross_references');
+                }
             }
-
-            let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
-            if (!playAudioBtn) {
-                playAudioBtn = document.createElement('button');
-                playAudioBtn.id = 'btn-play-audio-dynamic';
-                playAudioBtn.className = 'nav-btn';
-                playAudioBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
-                playAudioBtn.innerHTML = `
-                    <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
-                    <span>${this.t('play_audio')}</span>
-                `;
-                playAudioBtn.addEventListener('click', () => this.toggleAudioPlayback());
-                actionBar.appendChild(playAudioBtn);
-            } else {
-                const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
-                if (labelSpan) labelSpan.textContent = this.t('play_audio');
-            }
-
-            let crossrefBtn = document.getElementById('btn-crossref-chapter-dynamic');
-            if (!crossrefBtn) {
-                crossrefBtn = document.createElement('button');
-                crossrefBtn.id = 'btn-crossref-chapter-dynamic';
-                crossrefBtn.className = 'nav-btn';
-                crossrefBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
-                crossrefBtn.innerHTML = `
-                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--hkm-terracotta, #d17d39);">article</span>
-                    <span class="crossref-btn-label">${this.t('cross_references')}</span>
-                `;
-
-                crossrefBtn.addEventListener('click', () => {
-                    const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
-                    const bookName = currentBook ? currentBook.name : '';
-                    const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
-                    this.openVerseCrossReferenceModal('1', `${bookName} ${chapterNum}`);
-                });
-
-                actionBar.appendChild(crossrefBtn);
-            } else {
-                const labelSpan = crossrefBtn.querySelector('.crossref-btn-label');
-                if (labelSpan) labelSpan.textContent = this.t('cross_references');
-            }
+        } catch (btnErr) {
+            console.warn("[BibleReader] Error injecting header action bar:", btnErr);
         }
 
         // Scroll reading pane to top
