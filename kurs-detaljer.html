@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/kurs-detaljer">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kursdetaljer | His Kingdom Ministry</title>
+    <meta name="description" content="Sjå kursdetaljer, undervisning og leksjoner hos His Kingdom Ministry.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&display=swap"></noscript>
+
+    <!-- Icons -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"></noscript>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css?v=2026.04.22">
+    <link rel="stylesheet" href="css/subpage-hero.css">
+
+    <!-- Firebase Config & Services -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js"></script>
+
+    <style>
+        :root {
+            --hkm-navy: #1B4965;
+            --hkm-navy-dark: #0b2536;
+            --hkm-terracotta: #d17d39;
+            --hkm-terracotta-dark: #bd4f2a;
+            --hkm-bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--hkm-bg-light);
+            color: #1e293b;
+        }
+
+        .course-hero-banner {
+            background: linear-gradient(135deg, #1B4965 0%, #0b2536 100%);
+            padding: 140px 24px 70px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.5;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumbs a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumbs a:hover {
+            color: #ffffff;
+        }
+
+        .badge-terracotta {
+            background: rgba(209, 125, 57, 0.2);
+            border: 1px solid rgba(209, 125, 57, 0.4);
+            color: #fb923c;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+        }
+
+        .course-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 36px;
+            max-width: 1240px;
+            margin: -40px auto 80px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+            .course-layout-grid {
+                grid-template-columns: 1fr;
+                margin-top: 20px;
+            }
+        }
+
+        .main-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(27, 73, 101, 0.08);
+            overflow: hidden;
+            padding: 32px;
+        }
+
+        .player-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #0f172a;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            margin-bottom: 32px;
+        }
+
+        .player-container iframe,
+        .player-container video {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .locked-preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(11, 37, 54, 0.85), rgba(11, 37, 54, 0.95)), var(--course-bg-img);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            color: white;
+        }
+
+        .lock-icon-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(209, 125, 57, 0.2);
+            border: 2px solid #d17d39;
+            color: #fb923c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary-terracotta {
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            color: white;
+            font-weight: 750;
+            padding: 14px 32px;
+            border-radius: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(209, 125, 57, 0.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-terracotta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(209, 125, 57, 0.45);
+        }
+
+        .sidebar-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(27, 73, 101, 0.08);
+            padding: 28px;
+            height: fit-content;
+        }
+
+        .curriculum-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        .curriculum-item:hover {
+            border-color: #d17d39;
+            background: #fdf8f4;
+        }
+
+        .curriculum-item.active {
+            border-color: #d17d39;
+            background: #fff7ed;
+        }
+
+        .curriculum-item.active .lesson-title {
+            color: #d17d39;
+            font-weight: 700;
+        }
+
+        .teacher-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-top: 32px;
+        }
+
+        .teacher-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #d17d39;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dynamic Header -->
+    <header class="header" id="header">
+        <div class="header-container container">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                </div>
+                <span class="logo-text">His Kingdom Ministry</span>
+            </a>
+            <div class="header-actions">
+                <a href="/minside/index.html" id="header-profile-link" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all relative overflow-hidden hidden">
+                    <span class="material-symbols-outlined text-2xl">account_circle</span>
+                </a>
+                <a href="/donasjoner" class="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-[1.03] transition-all shadow-md">
+                    <span>Gi gave</span>
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </a>
+                <button class="menu-toggle w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/15 border border-white/10" id="menu-toggle">
+                    <span class="material-symbols-outlined text-2xl open-icon">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Course Hero Banner -->
+    <section class="course-hero-banner">
+        <div class="container" style="max-width: 1240px; margin: 0 auto; position: relative; z-index: 2;">
+            <div class="breadcrumbs">
+                <a href="/">Hjem</a> <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                <a href="/kurs">Kurs</a> <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                <span id="breadcrumb-course-title" style="color: #ffffff; font-weight: 600;">Laster kurs...</span>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+                <span class="badge-terracotta" id="course-category-badge"><i class="fas fa-graduation-cap"></i> KURS</span>
+                <span id="course-access-status-badge" style="background: rgba(255,255,255,0.15); color: white; padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700;">
+                    <i class="fas fa-lock"></i> Krever innlogging
+                </span>
+            </div>
+
+            <h1 id="course-hero-title" style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 850; margin: 0 0 16px 0; color: #ffffff; line-height: 1.2;">
+                Laster kurs...
+            </h1>
+            <p id="course-hero-desc" style="font-size: 1.15rem; color: #cbd5e1; max-width: 760px; margin: 0 0 24px 0; line-height: 1.6;">
+                Vennligst vent mens kurset hentes.
+            </p>
+
+            <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap; font-size: 0.95rem; color: #e2e8f0;">
+                <div><i class="fas fa-book-open" style="color: #fb923c; margin-right: 6px;"></i> <span id="course-lessons-count">-- leksjoner</span></div>
+                <div><i class="fas fa-user-circle" style="color: #fb923c; margin-right: 6px;"></i> Instruktør: <strong>Hilde Karin Knutsen</strong></div>
+                <div><i class="fas fa-tag" style="color: #fb923c; margin-right: 6px;"></i> Pris: <strong id="course-price-text">--</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Course Layout Grid -->
+    <div class="course-layout-grid">
+        <!-- Left: Course Player & Overview -->
+        <div>
+            <div class="main-card">
+                <!-- Video / Audio Player Container -->
+                <div class="player-container" id="player-container">
+                    <div class="locked-preview-overlay" id="locked-overlay">
+                        <div class="lock-icon-circle">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: white;">Logg inn for å se kurset</h3>
+                        <p style="color: #cbd5e1; max-width: 460px; margin-bottom: 24px; font-size: 1rem; line-height: 1.5;" id="lock-reason-text">
+                            Dette kurset krever at du har en brukerkonto og er innlogget for å spilles av.
+                        </p>
+                        <a href="/minside/login.html" class="btn-primary-terracotta" id="auth-action-btn">
+                            <i class="fas fa-sign-in-alt"></i> Logg inn nå
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Lesson Header & Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;">
+                    <div>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;" id="active-lesson-index">Leksjon 1</span>
+                        <h2 style="font-size: 1.5rem; font-weight: 800; color: #1B4965; margin: 4px 0 0 0;" id="active-lesson-title">Velkommen til kurset</h2>
+                    </div>
+                    <div style="display: flex; gap: 10px;" id="lesson-nav-buttons">
+                        <button id="prev-lesson-btn" class="btn-primary-terracotta" style="padding: 10px 18px; font-size: 0.9rem; background: #f1f5f9; color: #475569; box-shadow: none;" disabled>
+                            <i class="fas fa-chevron-left"></i> Forrige
+                        </button>
+                        <button id="next-lesson-btn" class="btn-primary-terracotta" style="padding: 10px 18px; font-size: 0.9rem;">
+                            Neste leksjon <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lesson / Course Content Text -->
+                <div style="color: #334155; line-height: 1.7; font-size: 1.05rem;" id="lesson-content-body">
+                    <h3>Om kurset</h3>
+                    <p id="course-full-description">Kurset blir lastet inn...</p>
+                </div>
+
+                <!-- Instructor Card -->
+                <div class="teacher-card">
+                    <img src="/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg" alt="Hilde Karin Knutsen" class="teacher-avatar">
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #1B4965;">Hilde Karin Knutsen</h4>
+                        <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.9rem;">Hovedlærer & Grunnlegger av His Kingdom Ministry</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Curriculum Accordion -->
+        <div>
+            <div class="sidebar-card">
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #1B4965; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-list-ol" style="color: #d17d39; margin-right: 8px;"></i> Kursinnhold</span>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;" id="curriculum-meta-count">--</span>
+                </h3>
+
+                <div id="curriculum-list-container">
+                    <div style="padding: 20px; text-align: center; color: #64748b;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #d17d39;"></i>
+                        <p style="margin-top: 10px;">Laster leksjoner...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Dynamic Course Loading & Player Logic -->
+    <script type="module">
+        import { firebaseService } from '/js/firebase-service.js';
+
+        let currentCourse = null;
+        let currentLessonIndex = 0;
+        let currentUser = null;
+        let userHasAccess = false;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id') || urlParams.get('courseId');
+
+            // Listen for Auth state
+            firebase.auth().onAuthStateChanged(async (user) => {
+                currentUser = user;
+                if (user) {
+                    const profileBtn = document.getElementById('header-profile-link');
+                    if (profileBtn) profileBtn.classList.remove('hidden');
+                }
+                if (courseId) {
+                    await loadCourseData(courseId);
+                } else {
+                    document.getElementById('course-hero-title').textContent = 'Kurs ikke funnet';
+                    document.getElementById('course-hero-desc').textContent = 'Ingen kurs-ID spesifisert i adresselenken.';
+                }
+            });
+        });
+
+        async function loadCourseData(courseId) {
+            try {
+                const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                const courses = (snap.exists ? snap.data()?.items : []) || [];
+                currentCourse = courses.find(c => c.id === courseId) || courses[0];
+
+                if (!currentCourse) {
+                    document.getElementById('course-hero-title').textContent = 'Kurset finnes ikke';
+                    return;
+                }
+
+                // Check user enrollment & access
+                const isFree = !currentCourse.price || currentCourse.price === 0;
+                let isEnrolled = false;
+
+                if (currentUser) {
+                    try {
+                        const enrollSnap = await firebase.firestore().collection('enrollments')
+                            .where('userId', '==', currentUser.uid)
+                            .where('courseId', '==', currentCourse.id)
+                            .get();
+                        isEnrolled = !enrollSnap.empty;
+                    } catch (e) {
+                        console.warn('Enrollment check error:', e);
+                    }
+                }
+
+                userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
+
+                // Render UI
+                document.getElementById('breadcrumb-course-title').textContent = currentCourse.title || 'Kurs';
+                document.getElementById('course-hero-title').textContent = currentCourse.title || 'Uten tittel';
+                document.getElementById('course-hero-desc').textContent = currentCourse.description || '';
+                document.getElementById('course-category-badge').innerHTML = `<i class="fas fa-graduation-cap"></i> ${currentCourse.category || 'SEERKURS'}`;
+                
+                const accessBadge = document.getElementById('course-access-status-badge');
+                if (userHasAccess) {
+                    accessBadge.style.background = '#22c55e';
+                    accessBadge.innerHTML = '<i class="fas fa-check-circle"></i> Du har tilgang';
+                } else {
+                    accessBadge.style.background = 'rgba(255,255,255,0.18)';
+                    accessBadge.innerHTML = '<i class="fas fa-lock"></i> Krever innlogging';
+                }
+
+                const lessons = currentCourse.lessons || [];
+                document.getElementById('course-lessons-count').textContent = `${lessons.length} leksjoner`;
+                document.getElementById('course-price-text').textContent = isFree ? 'Gratis' : `kr ${currentCourse.price},-`;
+                document.getElementById('course-full-description').textContent = currentCourse.description || '';
+                document.getElementById('curriculum-meta-count').textContent = `${lessons.length} deler`;
+
+                renderCurriculumList(lessons);
+                selectLesson(0);
+
+            } catch (err) {
+                console.error('Error loading course details:', err);
+            }
+        }
+
+        function renderCurriculumList(lessons) {
+            const container = document.getElementById('curriculum-list-container');
+            if (!lessons || lessons.length === 0) {
+                container.innerHTML = '<p style="color: #64748b; font-size: 0.9rem;">Ingen leksjoner registrert på dette kurset ennå.</p>';
+                return;
+            }
+
+            container.innerHTML = lessons.map((l, idx) => `
+                <div class="curriculum-item ${idx === 0 ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="curriculum-item-${idx}">
+                    <div>
+                        <div style="font-size: 0.78rem; font-weight: 700; color: #64748b;">LEKSJON ${idx + 1}</div>
+                        <div class="lesson-title" style="font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-top: 2px;">${l.title || 'Leksjon ' + (idx + 1)}</div>
+                    </div>
+                    <div style="color: ${userHasAccess ? '#22c55e' : '#94a3b8'};">
+                        <i class="fas ${userHasAccess ? 'fa-play-circle' : 'fa-lock'}"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.selectLesson = function(index) {
+            if (!currentCourse || !currentCourse.lessons) return;
+            currentLessonIndex = index;
+            const lesson = currentCourse.lessons[index];
+            if (!lesson) return;
+
+            document.querySelectorAll('.curriculum-item').forEach((el, idx) => {
+                el.classList.toggle('active', idx === index);
+            });
+
+            document.getElementById('active-lesson-index').textContent = `Leksjon ${index + 1} av ${currentCourse.lessons.length}`;
+            document.getElementById('active-lesson-title').textContent = lesson.title || `Leksjon ${index + 1}`;
+            
+            const playerContainer = document.getElementById('player-container');
+            const lockedOverlay = document.getElementById('locked-overlay');
+
+            if (userHasAccess) {
+                lockedOverlay.style.display = 'none';
+                if (lesson.videoUrl && (lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('vimeo'))) {
+                    let embedUrl = lesson.videoUrl;
+                    if (lesson.videoUrl.includes('youtube.com/watch?v=')) {
+                        embedUrl = lesson.videoUrl.replace('watch?v=', 'embed/');
+                    }
+                    playerContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+                } else if (lesson.videoUrl) {
+                    playerContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;"></video>`;
+                } else {
+                    playerContainer.innerHTML = `
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:white;text-align:center;padding:20px;">
+                            <i class="fas fa-graduation-cap" style="font-size:48px;color:#d17d39;margin-bottom:12px;"></i>
+                            <h3>${lesson.title}</h3>
+                            <p style="color:#cbd5e1;max-width:500px;">${lesson.description || 'Les teksten nedenfor for denne leksjonen.'}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                lockedOverlay.style.display = 'flex';
+                const authBtn = document.getElementById('auth-action-btn');
+                if (!currentUser) {
+                    authBtn.href = '/minside/login.html';
+                    authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Logg inn for å se kurset';
+                } else {
+                    authBtn.href = '/minside/index.html#course-player?courseId=' + currentCourse.id;
+                    authBtn.innerHTML = '<i class="fas fa-unlock"></i> Meld deg på for kr ' + (currentCourse.price || 0) + ',-';
+                }
+            }
+
+            document.getElementById('lesson-content-body').innerHTML = `
+                <h3>${lesson.title}</h3>
+                <p>${lesson.content || lesson.description || 'Ingen skriftlig materiale for denne leksjonen.'}</p>
+            `;
+        };
+    </script>
+</body>
+
+</html>
