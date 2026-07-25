@@ -1410,53 +1410,97 @@ class BibleReader {
         }
 
         if (this.dom.toolbarBtnSaveUser) {
-            this.dom.toolbarBtnSaveUser.addEventListener('click', async (e) => {
+            this.dom.toolbarBtnSaveUser.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (!this.currentUser) {
-                    alert('Du må være logget inn for å lagre notater på brukeren din. Du kan fortsatt laste ned som fil!');
-                    return;
-                }
-                
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
-                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
                     const refRange = this.getSelectedVersesReference();
                     
-                    const combinedHtmlText = sorted.map(v => {
+                    const combinedText = sorted.map(v => {
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = v.paragraph.innerHTML;
                         tempDiv.querySelectorAll('sup').forEach(s => s.remove());
-                        return `<p><sup>${v.verseNum}</sup> ${tempDiv.innerText.trim()}</p>`;
-                    }).join('');
+                        return `v.${v.verseNum}: "${tempDiv.innerText.trim()}"`;
+                    }).join(' ');
 
-                    const fullNoteHtml = `<blockquote>${combinedHtmlText}</blockquote><p><em>— Lagret vers fra ${refRange} (${translation})</em></p>`;
+                    const noteModal = document.getElementById('verse-note-modal');
+                    const noteTitle = document.getElementById('verse-note-title');
+                    const notePreview = document.getElementById('verse-note-quote-preview');
+                    const noteInput = document.getElementById('verse-note-input');
+                    const noteSaveBtn = document.getElementById('verse-note-save-btn');
+                    const noteDeleteBtn = document.getElementById('verse-note-delete-btn');
 
-                    try {
-                        const db = this.getFirestore();
-                        if (db) {
-                            await db.collection('personal_notes').add({
-                                userId: this.currentUser.uid,
-                                title: refRange,
-                                text: fullNoteHtml,
-                                createdAt: this.getServerTimestamp(),
-                                updatedAt: this.getServerTimestamp()
-                            });
-                            
-                            if (typeof window.showToast === 'function') {
-                                window.showToast('Versene ble lagret i dine notater på Min Side!', 'success');
-                            } else {
-                                alert('Lagret på din bruker! Du finner det under notater på Min Side.');
-                            }
-                            this.loadNotes();
-                        } else {
-                            throw new Error("Database utilgjengelig");
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        alert('Feil under lagring: ' + err.message);
+                    if (!noteModal) return;
+
+                    const path = window.location.pathname;
+                    const isEn = path.includes('/en/');
+                    const isEs = path.includes('/es/');
+
+                    if (noteTitle) {
+                        noteTitle.textContent = isEn ? `Note: ${refRange}` : (isEs ? `Nota: ${refRange}` : `Notat: ${refRange}`);
                     }
-                    
-                    this.clearSelection();
+                    if (notePreview) {
+                        notePreview.textContent = combinedText;
+                    }
+
+                    // Check existing note in localStorage
+                    const noteKey = `hkm_note_${refRange}`;
+                    const existingNote = localStorage.getItem(noteKey) || '';
+                    if (noteInput) {
+                        noteInput.value = existingNote;
+                    }
+
+                    if (noteDeleteBtn) {
+                        noteDeleteBtn.style.display = existingNote ? 'block' : 'none';
+                        noteDeleteBtn.onclick = () => {
+                            localStorage.removeItem(noteKey);
+                            if (noteInput) noteInput.value = '';
+                            noteModal.classList.remove('active');
+                            noteModal.style.display = 'none';
+                            const toastMsg = isEn ? 'Note deleted' : (isEs ? 'Nota eliminada' : 'Notat slettet');
+                            this.showToast(toastMsg);
+                            this.clearSelection();
+                        };
+                    }
+
+                    if (noteSaveBtn) {
+                        noteSaveBtn.onclick = async () => {
+                            const val = noteInput ? noteInput.value.trim() : '';
+                            if (val) {
+                                localStorage.setItem(noteKey, val);
+                                
+                                // Sync to Firestore if user is logged in
+                                if (this.currentUser) {
+                                    try {
+                                        const db = this.getFirestore();
+                                        if (db) {
+                                            await db.collection('personal_notes').add({
+                                                userId: this.currentUser.uid,
+                                                title: refRange,
+                                                text: `<p>${val}</p><blockquote>${combinedText}</blockquote>`,
+                                                createdAt: this.getServerTimestamp(),
+                                                updatedAt: this.getServerTimestamp()
+                                            });
+                                        }
+                                    } catch (err) {
+                                        console.warn("Firestore note save warning:", err);
+                                    }
+                                }
+
+                                const toastMsg = isEn ? 'Note saved!' : (isEs ? '¡Nota guardada!' : 'Notatet ditt ble lagret!');
+                                this.showToast(toastMsg);
+                            } else {
+                                localStorage.removeItem(noteKey);
+                            }
+                            noteModal.classList.remove('active');
+                            noteModal.style.display = 'none';
+                            this.clearSelection();
+                        };
+                    }
+
+                    noteModal.classList.add('active');
+                    noteModal.style.display = 'flex';
+                    if (noteInput) noteInput.focus();
                 }
             });
         }

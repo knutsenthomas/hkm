@@ -3036,6 +3036,9 @@
 
                     <div class="sheet-scrollable-row">
                         <!-- Color Pickers -->
+                        <button class="color-swatch-circle" data-color="none" style="background: var(--bg-card, #ffffff); border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center;" title="Quitar color">
+                            <span class="material-symbols-outlined" style="font-size: 15px; color: #94a3b8;">block</span>
+                        </button>
                         <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Amarillo"></button>
                         <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Verde"></button>
                         <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Azul"></button>
@@ -3064,11 +3067,6 @@
                         <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Explicar en el Lexicón">
                             <span class="material-symbols-outlined">menu_book</span>
                             <span>Lexicón</span>
-                        </button>
-
-                        <button id="toolbar-btn-range" class="sheet-action-btn" title="Seleccionar rango">
-                            <span class="material-symbols-outlined">select_all</span>
-                            <span>Rango</span>
                         </button>
 
                         <button id="toolbar-btn-share" class="sheet-action-btn" title="Compartir versículo">
@@ -3504,6 +3502,34 @@
             </div>
             <div class="color-wheel-footer" style="margin-top: 14px;">
                 <button id="color-wheel-apply-btn" class="color-wheel-apply-btn" onclick="const m=document.getElementById('color-wheel-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">Aplicar color</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verse Note Modal -->
+    <div id="verse-note-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+        <div class="color-wheel-card" style="max-width: 480px; width: 92%; padding: 20px;" onclick="event.stopPropagation();">
+            <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, #e2e8f0); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 24px;">edit_note</span>
+                    <h3 id="verse-note-title" style="margin: 0; font-size: 17px; font-weight: 700;">Escribir nota</h3>
+                </div>
+                <button class="color-wheel-close-btn" title="Cerrar" onclick="const m=document.getElementById('verse-note-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="color-wheel-body" style="margin-top: 14px;">
+                <div id="verse-note-quote-preview" style="background: var(--bg-surface, #f8fafc); border-left: 3px solid var(--hkm-terracotta, #d17d39); padding: 10px 14px; border-radius: 8px; font-style: italic; font-size: 13.5px; margin-bottom: 14px; max-height: 100px; overflow-y: auto; color: var(--text-muted, #64748b);"></div>
+                
+                <label for="verse-note-input" style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--text-base, #1e293b);">Tu nota / reflexión:</label>
+                <textarea id="verse-note-input" placeholder="Escribe tus pensamientos, oraciones o reflexiones aquí..." style="width: 100%; min-height: 120px; padding: 12px; border-radius: 12px; border: 1px solid var(--border-subtle, #cbd5e1); background: var(--bg-card, #ffffff); color: var(--text-base, #1e293b); font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box; outline: none;"></textarea>
+            </div>
+            <div class="color-wheel-footer" style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <button id="verse-note-delete-btn" style="background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 8px 16px; font-weight: 600; cursor: pointer; display: none;">Eliminar nota</button>
+                <div style="display: flex; gap: 8px; margin-left: auto;">
+                    <button type="button" onclick="const m=document.getElementById('verse-note-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #334155); border: none; border-radius: 10px; padding: 8px 16px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                    <button id="verse-note-save-btn" class="color-wheel-apply-btn" style="padding: 8px 20px;">Guardar nota</button>
+                </div>
             </div>
         </div>
     </div>
