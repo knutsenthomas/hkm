@@ -399,62 +399,113 @@
         let currentUser = null;
         let userHasAccess = false;
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        async function initPage() {
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id') || urlParams.get('courseId');
 
-            // Listen for Auth state
-            firebase.auth().onAuthStateChanged(async (user) => {
-                currentUser = user;
-                if (user) {
-                    const profileBtn = document.getElementById('header-profile-link');
-                    if (profileBtn) profileBtn.classList.remove('hidden');
-                }
-                if (courseId) {
-                    await loadCourseData(courseId);
-                } else {
-                    document.getElementById('course-hero-title').textContent = 'Kurs ikke funnet';
-                    document.getElementById('course-hero-desc').textContent = 'Ingen kurs-ID spesifisert i adresselenken.';
-                }
-            });
-        });
+            // Load Course Data immediately without waiting for auth
+            await loadCourseData(courseId);
+
+            // Listen for Auth state to update access dynamically
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    currentUser = user;
+                    if (user) {
+                        const profileBtn = document.getElementById('header-profile-link');
+                        if (profileBtn) profileBtn.classList.remove('hidden');
+                    }
+                    if (currentCourse) {
+                        await checkAccessAndUpdateUI();
+                    }
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            initPage();
+        }
 
         async function loadCourseData(courseId) {
             try {
-                const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
-                const courses = (snap.exists ? snap.data()?.items : []) || [];
-                currentCourse = courses.find(c => c.id === courseId) || courses[0];
-
-                if (!currentCourse) {
-                    document.getElementById('course-hero-title').textContent = 'Kurset finnes ikke';
-                    return;
+                let courses = [];
+                // 1. Try Firestore siteContent/collection_courses
+                try {
+                    const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                    if (snap.exists && snap.data()?.items) {
+                        courses = snap.data().items;
+                    }
+                } catch (e) {
+                    console.warn('Firestore collection_courses error:', e);
                 }
 
-                // Check user enrollment & access
-                const isFree = !currentCourse.price || currentCourse.price === 0;
-                let isEnrolled = false;
-
-                if (currentUser) {
+                // 2. Fallback to collection('courses') if empty
+                if (!courses.length) {
                     try {
-                        const enrollSnap = await firebase.firestore().collection('enrollments')
-                            .where('userId', '==', currentUser.uid)
-                            .where('courseId', '==', currentCourse.id)
-                            .get();
-                        isEnrolled = !enrollSnap.empty;
+                        const snap = await firebase.firestore().collection('courses').get();
+                        courses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     } catch (e) {
-                        console.warn('Enrollment check error:', e);
+                        console.warn('Firestore courses collection fallback error:', e);
                     }
                 }
 
-                userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
+                if (courseId) {
+                    currentCourse = courses.find(c => c.id === courseId);
+                }
+                if (!currentCourse && courses.length > 0) {
+                    currentCourse = courses[0];
+                }
 
-                // Render UI
+                if (!currentCourse) {
+                    document.getElementById('course-hero-title').textContent = 'Kurset finnes ikke';
+                    document.getElementById('course-hero-desc').textContent = 'Finner ikke oppgitt kurs i databasen.';
+                    return;
+                }
+
+                // Render Course Information
                 document.getElementById('breadcrumb-course-title').textContent = currentCourse.title || 'Kurs';
                 document.getElementById('course-hero-title').textContent = currentCourse.title || 'Uten tittel';
                 document.getElementById('course-hero-desc').textContent = currentCourse.description || '';
                 document.getElementById('course-category-badge').innerHTML = `<i class="fas fa-graduation-cap"></i> ${currentCourse.category || 'SEERKURS'}`;
                 
-                const accessBadge = document.getElementById('course-access-status-badge');
+                const lessons = currentCourse.lessons || [];
+                const isFree = !currentCourse.price || currentCourse.price === 0;
+                document.getElementById('course-lessons-count').textContent = `${lessons.length} leksjoner`;
+                document.getElementById('course-price-text').textContent = isFree ? 'Gratis' : `kr ${currentCourse.price},-`;
+                document.getElementById('course-full-description').textContent = currentCourse.description || '';
+                document.getElementById('curriculum-meta-count').textContent = `${lessons.length} deler`;
+
+                renderCurriculumList(lessons);
+                await checkAccessAndUpdateUI();
+
+            } catch (err) {
+                console.error('Error loading course details:', err);
+                document.getElementById('course-hero-title').textContent = 'Feil ved lasting av kurs';
+            }
+        }
+
+        async function checkAccessAndUpdateUI() {
+            if (!currentCourse) return;
+            const isFree = !currentCourse.price || currentCourse.price === 0;
+            let isEnrolled = false;
+
+            if (currentUser) {
+                try {
+                    const enrollSnap = await firebase.firestore().collection('enrollments')
+                        .where('userId', '==', currentUser.uid)
+                        .where('courseId', '==', currentCourse.id)
+                        .get();
+                    isEnrolled = !enrollSnap.empty;
+                } catch (e) {
+                    console.warn('Enrollment check error:', e);
+                }
+            }
+
+            userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
+
+            const accessBadge = document.getElementById('course-access-status-badge');
+            if (accessBadge) {
                 if (userHasAccess) {
                     accessBadge.style.background = '#22c55e';
                     accessBadge.innerHTML = '<i class="fas fa-check-circle"></i> Du har tilgang';
@@ -462,19 +513,11 @@
                     accessBadge.style.background = 'rgba(255,255,255,0.18)';
                     accessBadge.innerHTML = '<i class="fas fa-lock"></i> Krever innlogging';
                 }
-
-                const lessons = currentCourse.lessons || [];
-                document.getElementById('course-lessons-count').textContent = `${lessons.length} leksjoner`;
-                document.getElementById('course-price-text').textContent = isFree ? 'Gratis' : `kr ${currentCourse.price},-`;
-                document.getElementById('course-full-description').textContent = currentCourse.description || '';
-                document.getElementById('curriculum-meta-count').textContent = `${lessons.length} deler`;
-
-                renderCurriculumList(lessons);
-                selectLesson(0);
-
-            } catch (err) {
-                console.error('Error loading course details:', err);
             }
+
+            const lessons = currentCourse.lessons || [];
+            renderCurriculumList(lessons);
+            selectLesson(currentLessonIndex);
         }
 
         function renderCurriculumList(lessons) {
