@@ -1770,13 +1770,15 @@ class BibleReader {
         }
 
         // Swipe down to dismiss for verse crossref modal
-        const verseCrossrefCard = document.querySelector('#verse-crossref-modal .color-wheel-card');
+        const verseCrossrefCard = document.querySelector('#verse-crossref-modal .verse-crossref-sheet-card, #verse-crossref-modal .color-wheel-card');
         if (verseCrossrefCard) {
             const verseCrossrefModal = document.getElementById('verse-crossref-modal');
             this.setupBottomSheetSwipeDown(verseCrossrefCard, () => {
                 if (verseCrossrefModal) {
                     verseCrossrefModal.classList.remove('active');
-                    verseCrossrefModal.style.display = 'none';
+                    setTimeout(() => {
+                        verseCrossrefModal.style.display = 'none';
+                    }, 250);
                 }
             });
         }
@@ -2562,7 +2564,7 @@ class BibleReader {
                     <div class="verse-crossref-row-item" data-idx="${idx}" style="display: flex; align-items: baseline; gap: 14px; padding: 12px 6px; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); cursor: pointer; transition: background 0.15s ease;">
                         <span style="font-weight: 700; font-size: 13px; color: var(--text-muted, #64748b); width: 14px; flex-shrink: 0; text-align: center;">${letter}</span>
                         <div style="flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;">
-                            <span class="crossref-ref-link" style="color: #2563eb; font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer;">${item.ref}</span>
+                            <span class="crossref-ref-link" style="color: var(--hkm-terracotta, #d17d39); font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer;">${item.ref}</span>
                             <span style="font-size: 13.5px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</span>
                         </div>
                     </div>
@@ -3444,29 +3446,30 @@ class BibleReader {
         let currentDeltaY = 0;
         let isDragging = false;
 
-        const onTouchStart = (e) => {
-            if (e.target.closest('.color-swatch-circle, button, a, input, textarea')) return;
-            const touch = e.touches[0];
-            startY = touch.clientY;
+        const onStart = (clientY, target) => {
+            if (target && target.closest('.color-swatch-circle, button, a, input, textarea')) return false;
+            startY = clientY;
             currentDeltaY = 0;
             isDragging = true;
             element.style.transition = 'none';
+            return true;
         };
 
-        const onTouchMove = (e) => {
+        const onMove = (clientY, e) => {
             if (!isDragging) return;
-            const touch = e.touches[0];
-            const deltaY = touch.clientY - startY;
-            
+            const deltaY = clientY - startY;
             if (deltaY > 0) {
-                if (e.cancelable) e.preventDefault();
+                if (e && e.cancelable) e.preventDefault();
                 currentDeltaY = deltaY;
                 element.style.transform = `translateY(${deltaY}px)`;
-                element.style.opacity = `${Math.max(0.3, 1 - deltaY / 250)}`;
+                element.style.opacity = `${Math.max(0.2, 1 - deltaY / 250)}`;
+            } else if (deltaY < -10 && element.style.transform) {
+                element.style.transform = 'translateY(0)';
+                element.style.opacity = '1';
             }
         };
 
-        const onTouchEnd = () => {
+        const onEnd = () => {
             if (!isDragging) return;
             isDragging = false;
             element.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
@@ -3490,9 +3493,32 @@ class BibleReader {
             currentDeltaY = 0;
         };
 
-        element.addEventListener('touchstart', onTouchStart, { passive: false });
-        element.addEventListener('touchmove', onTouchMove, { passive: false });
-        element.addEventListener('touchend', onTouchEnd);
+        // Touch Listeners
+        element.addEventListener('touchstart', (e) => {
+            onStart(e.touches[0].clientY, e.target);
+        }, { passive: false });
+
+        element.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const scrollable = e.target.closest('.verse-crossref-sheet-body, .sheet-scroll-body');
+            if (scrollable && scrollable.scrollTop > 0 && currentDeltaY === 0) return;
+            onMove(e.touches[0].clientY, e);
+        }, { passive: false });
+
+        element.addEventListener('touchend', onEnd);
+
+        // Pointer/Mouse Listeners (for dragging handle bar on PC)
+        const handleBar = element.querySelector('.sheet-handle-bar') || element;
+        handleBar.addEventListener('pointerdown', (e) => {
+            if (onStart(e.clientY, e.target)) {
+                try { handleBar.setPointerCapture(e.pointerId); } catch(err){}
+            }
+        });
+        handleBar.addEventListener('pointermove', (e) => {
+            if (isDragging) onMove(e.clientY, e);
+        });
+        handleBar.addEventListener('pointerup', onEnd);
+        handleBar.addEventListener('pointercancel', onEnd);
     }
 
     saveVerseHighlight(verseNum, color, customHex = null) {
