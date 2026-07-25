@@ -3405,17 +3405,24 @@ class BibleReader {
             .replace(/\\n/g, '\n')
             .replace(/\r/g, '');
 
+        // Convert short lines wrapped entirely in **Text** (under 70 chars) to ### headings if no # prefix
+        const rawLines = html.split('\n');
+        const cleanedLines = rawLines.map(line => {
+            const trimmed = line.trim();
+            if (/^\*\*[^*]{3,70}\*\*$/.test(trimmed)) {
+                return '### ' + trimmed.replace(/^\*\*|\*\*$/g, '');
+            }
+            return line;
+        });
+        html = cleanedLines.join('\n');
+
         // Preprocessing: Fix missing spacing/newlines before and after header tags (e.g. "word.### Heading" -> "word.\n\n### Heading")
         html = html.replace(/([^#\n])(#{1,3}\s+)/g, '$1\n\n$2');
 
-        // Preprocessing: Fix missing newlines at lowercase-to-uppercase boundaries (e.g. "kontekstI" -> "kontekst\n\nI")
-        // This splits combined headers and paragraph text if newlines were stripped.
-        html = html.replace(/([a-zæøå])([A-ZÆØÅ])/g, '$1\n\n$2');
-
         // Headers (using multiline anchors to match line-by-line accurately)
-        html = html.replace(/^### (.*?)$/gm, '<h5 style="font-weight:700; font-size:14px; margin-top:16px; margin-bottom:8px; color:var(--text-base);">$1</h5>');
-        html = html.replace(/^## (.*?)$/gm, '<h4 style="font-weight:700; font-size:15px; margin-top:20px; margin-bottom:10px; color:var(--text-base);">$1</h4>');
-        html = html.replace(/^# (.*?)$/gm, '<h3 style="font-weight:700; font-size:16px; margin-top:24px; margin-bottom:12px; color:var(--text-base);">$1</h3>');
+        html = html.replace(/^### (.*?)$/gm, '<h5 style="font-weight:700; font-size:14.5px; margin-top:18px; margin-bottom:8px; color:var(--text-base, #1e293b);">$1</h5>');
+        html = html.replace(/^## (.*?)$/gm, '<h4 style="font-weight:700; font-size:15.5px; margin-top:20px; margin-bottom:10px; color:var(--text-base, #1e293b);">$1</h4>');
+        html = html.replace(/^# (.*?)$/gm, '<h3 style="font-weight:700; font-size:16.5px; margin-top:24px; margin-bottom:12px; color:var(--text-base, #1e293b);">$1</h3>');
 
         // Bold & Italic
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -3434,7 +3441,7 @@ class BibleReader {
                     processedLines.push('<ul style="margin-top:8px; margin-bottom:12px; padding-left:20px; list-style-type:disc;">');
                     inList = true;
                 }
-                processedLines.push(`<li style="font-size:13px; line-height:1.5; color:var(--text-base); margin-bottom:4px;">${content}</li>`);
+                processedLines.push(`<li style="font-size:13.5px; line-height:1.5; color:var(--text-base); margin-bottom:4px; font-weight:400;">${content}</li>`);
             } else {
                 if (inList) {
                     processedLines.push('</ul>');
@@ -3449,16 +3456,20 @@ class BibleReader {
 
         html = processedLines.join('\n');
 
-        // Paragraphs: Split on single newlines so any text lines get wrapped as paragraphs for maximum readability.
+        // Paragraphs: Split on single newlines so any text lines get wrapped as paragraphs
         const blocks = html.split('\n');
         const processedBlocks = [];
         for (let block of blocks) {
-            const trimmed = block.trim();
+            let trimmed = block.trim();
             if (!trimmed) continue;
             if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<li') || trimmed.startsWith('</ul')) {
                 processedBlocks.push(trimmed);
             } else {
-                processedBlocks.push(`<p style="margin-bottom:16px; line-height:1.6; font-size:14px; color:var(--text-base);">${trimmed}</p>`);
+                // If a paragraph is wrapped entirely in <strong>...</strong> and has more than 60 chars, strip full-paragraph bolding
+                if (/^<strong>.*<\/strong>$/s.test(trimmed) && trimmed.length > 60) {
+                    trimmed = trimmed.replace(/^<strong>(.*)<\/strong>$/s, '$1');
+                }
+                processedBlocks.push(`<p style="margin-bottom:14px; line-height:1.65; font-size:13.5px; font-weight:400; color:var(--text-base);">${trimmed}</p>`);
             }
         }
         html = processedBlocks.join('\n');
