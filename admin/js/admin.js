@@ -4081,7 +4081,8 @@ class AdminManager {
                 { id: 'seminarer', label: 'Seminarer' },
                 { id: 'settings_global', label: 'Globale tekster (Footer)' },
                 { id: 'settings_facebook_feed', label: 'Facebook-feed' },
-                { id: 'podcast', label: 'Podcast' }
+                { id: 'podcast', label: 'Podcast' },
+                { id: 'kurs', label: 'Kurs-portalside' }
             ];
 
             for (const page of pages) {
@@ -24623,6 +24624,24 @@ class AdminManager {
                     emptyCatalogDescription: 'Vi oppdaterer katalogen akkurat nå. Vennligst sjekk igjen senere.',
                     noDynamicFilters: 'Ingen ekstra filtre tilgjengelig for produktene akkurat nå.',
                     allOptionLabel: 'Alle'
+                }
+            },
+            'kurs': {
+                hero: {
+                    badge: 'Utvalgt kurs',
+                    title: 'Seerkurs med aktivering',
+                    description: 'Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden',
+                    btnText: 'Meld deg på nå'
+                },
+                communityBanner: {
+                    title: 'Fellesskap & åndelig vekst i hverdagen',
+                    description: 'Våre kurs gir deg mer enn bare teori – du blir en del av et oppmuntrende fellesskap der vi ber sammen, søker Guds nærvær og opplever sammenheng mellom tro og liv.',
+                    btnText: 'Bli med i dag',
+                    imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80'
+                },
+                features: {
+                    title: 'Hvorfor delta på våre kurs?',
+                    subtitle: 'Utrustning for tro og hverdag'
                 }
             },
             'om-oss': {

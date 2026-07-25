@@ -1943,8 +1943,8 @@
     <!-- Key Features Section (Stitch Design) -->
     <section class="hkm-course-features-section" style="padding: 80px 24px; background: #ffffff;">
         <div class="container" style="max-width: 1200px; margin: 0 auto; text-align: center;">
-            <h2 style="font-size: 2.25rem; font-weight: 800; color: #1B4965; margin: 0 0 12px 0; letter-spacing: -0.02em;">Hvorfor delta på våre kurs?</h2>
-            <p style="color: #64748b; font-size: 1.05rem; max-width: 600px; margin: 0 auto 48px; line-height: 1.6;">Lær, berik ditt bønneliv og voks i troen sammen med oss.</p>
+            <h2 id="kurs-features-title" style="font-size: 2.25rem; font-weight: 800; color: #1B4965; margin: 0 0 12px 0; letter-spacing: -0.02em;">Hvorfor delta på våre kurs?</h2>
+            <p id="kurs-features-subtitle" style="color: #64748b; font-size: 1.05rem; max-width: 600px; margin: 0 auto 48px; line-height: 1.6;">Lær, berik ditt bønneliv og voks i troen sammen med oss.</p>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; text-align: center;">
                 <div class="hkm-feature-card" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 36px 28px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
@@ -2002,17 +2002,17 @@
     <section class="hkm-community-banner-section" style="background: linear-gradient(135deg, #0b1329 0%, #172447 100%); border-top: 1px solid rgba(209, 125, 57, 0.25); border-bottom: 1px solid rgba(209, 125, 57, 0.25); padding: 80px 24px; color: white; position: relative; overflow: hidden;">
         <div class="container" style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
             <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 16px 36px rgba(0,0,0,0.4); border: 2px solid rgba(209, 125, 57, 0.3);">
-                <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80" alt="Fellesskap & åndelig vekst" style="width: 100%; height: 340px; object-fit: cover; display: block;">
+                <img id="community-banner-img" src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80" alt="Fellesskap & åndelig vekst" style="width: 100%; height: 340px; object-fit: cover; display: block;">
             </div>
             <div>
-                <h2 style="font-size: 2.25rem; font-weight: 850; color: white; margin: 0 0 16px 0; line-height: 1.2;">
+                <h2 id="community-banner-title" style="font-size: 2.25rem; font-weight: 850; color: white; margin: 0 0 16px 0; line-height: 1.2;">
                     Fellesskap & åndelig vekst i hverdagen
                 </h2>
-                <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.65; margin: 0 0 28px 0;">
+                <p id="community-banner-desc" style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.65; margin: 0 0 28px 0;">
                     Våre kurs gir deg mer enn bare teori – du blir en del av et oppmuntrende fellesskap der vi ber sammen, søker Guds nærvær og opplever sammenheng mellom tro og liv.
                 </p>
-                <a href="#kurs-grid-section" class="hero-btn-primary" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; font-weight: 800; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>Bli med i dag</span><i class="fas fa-arrow-right"></i>
+                <a id="community-banner-btn" href="#kurs-grid-section" class="hero-btn-primary" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff !important; font-weight: 800; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span id="community-banner-btn-text">Bli med i dag</span><i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
@@ -2774,9 +2774,29 @@
                                 heroSecEl.style.setProperty('background', `linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
                             }
 
-                            updateHeroPrimaryButton(mainCourse);
+                        // Sync dynamic CMS page content for Kurs portalside from Admin (page_content/kurs)
+                        if (window.contentManager && typeof window.contentManager.getPageContent === 'function') {
+                            window.contentManager.getPageContent('kurs').then(cmsData => {
+                                if (!cmsData) return;
+                                if (cmsData.communityBanner) {
+                                    const cb = cmsData.communityBanner;
+                                    const cbTitle = document.getElementById('community-banner-title');
+                                    const cbDesc = document.getElementById('community-banner-desc');
+                                    const cbBtnText = document.getElementById('community-banner-btn-text');
+                                    const cbImg = document.getElementById('community-banner-img');
+                                    if (cbTitle && cb.title) cbTitle.textContent = cb.title;
+                                    if (cbDesc && cb.description) cbDesc.textContent = cb.description;
+                                    if (cbBtnText && cb.btnText) cbBtnText.textContent = cb.btnText;
+                                    if (cbImg && cb.imageUrl) cbImg.src = cb.imageUrl;
+                                }
+                                if (cmsData.features) {
+                                    const fTitle = document.getElementById('kurs-features-title');
+                                    const fSub = document.getElementById('kurs-features-subtitle');
+                                    if (fTitle && cmsData.features.title) fTitle.textContent = cmsData.features.title;
+                                    if (fSub && cmsData.features.subtitle) fSub.textContent = cmsData.features.subtitle;
+                                }
+                            }).catch(e => console.warn('CMS kurs page sync skipped:', e));
                         }
-// sync-hero-marker
                         
 
                         // Check if a specific course should be opened on load
