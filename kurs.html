@@ -1428,57 +1428,84 @@
         </div>
     </div>
 
-    <!-- Hero -->
-    <section class="kurs-hero" style="background: linear-gradient(135deg, #09281e 0%, #0d3b2e 50%, #124e3d 100%); padding: 120px 24px 96px; position: relative; overflow: hidden;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; text-align: left;">
-            <div>
-                <h1 id="hero-course-title" style="font-size: clamp(2.25rem, 5.5vw, 3.5rem); font-weight: 850; color: white; margin: 0 0 20px 0; line-height: 1.15; letter-spacing: -0.02em;">
-                    Seerkurs med <span style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">aktivering</span>
-                </h1>
-                <p id="hero-course-desc" style="font-size: 1.125rem; color: #cbd5e1; margin: 0 0 36px 0; line-height: 1.65; max-width: 580px;">
-                    Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden
-                </p>
-                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                    <a href="#kurs-grid-section" class="hero-btn-primary" style="background: #22c55e; color: #042f1a; font-weight: 800; padding: 16px 36px; border-radius: 12px; font-size: 1.05rem; box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35); text-decoration: none; transition: all 0.2s ease;">
-                        Bli med i dag <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
-                    </a>
-                    <a href="#featured-teaching" class="hero-btn-secondary" style="background: rgba(255,255,255,0.06); color: white; border: 1.5px solid rgba(255,255,255,0.2); padding: 16px 28px; border-radius: 12px; font-weight: 600; text-decoration: none; backdrop-filter: blur(12px);">
-                        Se leksjoner
-                    </a>
+        <!-- Subpage Hero (Full Width Background Image) -->
+    <section id="kurs-hero-section" style="background: linear-gradient(rgba(9, 40, 30, 0.78), rgba(9, 40, 30, 0.88)), url('https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080') no-repeat center center / cover !important; min-height: 440px; padding: 140px 24px 90px; text-align: center; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 2;">
+            <h1 id="hero-course-title" style="font-size: clamp(2.5rem, 5.5vw, 3.75rem); font-weight: 850; color: #ffffff !important; margin: 0 auto 20px auto; line-height: 1.15; letter-spacing: -0.02em; max-width: 800px;">
+                Seerkurs med <span style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">aktivering</span>
+            </h1>
+            <p id="hero-course-desc" style="font-size: 1.25rem; color: #e2e8f0 !important; margin: 0 auto 36px auto; line-height: 1.65; max-width: 680px; text-align: center;">
+                Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden
+            </p>
+            <div style="display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <button class="hero-btn-primary" onclick="if(allCourses && allCourses[0]) handleCourseCardClick(allCourses[0].id, false); return false;" style="background: #22c55e; color: #042f1a; font-weight: 800; padding: 16px 40px; border-radius: 14px; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4); transition: all 0.2s ease;">
+                    Start kurs nå <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                </button>
+                <a href="#kurs-grid-section" class="hero-btn-secondary" style="background: rgba(255,255,255,0.15); color: #ffffff !important; border: 1.5px solid rgba(255,255,255,0.3); padding: 16px 32px; border-radius: 14px; font-weight: 700; text-decoration: none; backdrop-filter: blur(12px); font-size: 1.05rem;">
+                    Se alle kurs
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search + Filters -->
+    <div class="kurs-controls">
+        <div class="kurs-controls-inner">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="course-search" placeholder="Søk etter kurs...">
+            </div>
+            <div class="filter-scroll" id="filter-scroll" style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="filter-btn active" data-cat="all">Alle kurs</button>
+                <button class="filter-btn" data-cat="Bibelstudium">Bibelstudium</button>
+                <button class="filter-btn" data-cat="Bønn">Bønn</button>
+                <button class="filter-btn" data-cat="Lederskap">Lederskap</button>
+                <button class="filter-btn" data-cat="Helbredelse">Helbredelse</button>
+                <button class="filter-btn" data-cat="Identitet">Identitet</button>
+                <button class="filter-btn" data-cat="Evangelisering">Evangelisering</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <section class="kurs-main" id="kurs-grid-section">
+        <p class="results-meta" id="results-meta">Laster kurs...</p>
+        <div class="kurs-grid" id="kurs-grid">
+            <!-- Skeleton -->
+            <!-- Skeleton -->
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
                 </div>
             </div>
-            <div style="position: relative;">
-                <div style="position: absolute; inset: -12px; background: radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, transparent 70%); filter: blur(24px); border-radius: 32px; z-index: 0;"></div>
-                <div style="position: relative; z-index: 1; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.15);">
-                    <img id="hero-course-img" src="https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080" alt="Seerkurs med aktivering" style="width: 100%; height: 420px; object-fit: cover; display: block;">
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
+                </div>
+            </div>
+            <div class="course-card skeleton" style="cursor:default;">
+                <div class="course-thumb skeleton-block"></div>
+                <div class="course-body">
+                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
+                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
+                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
+                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured Teaching Section -->
-    <section class="featured-teaching-section" id="featured-teaching">
-        <div class="container">
-            <div class="featured-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
-                <div style="text-align: left;">
-                    <h2 class="featured-title" style="font-size:2rem; font-weight:800; color:#1B4965; margin:0;">Utvalgt Undervisning</h2>
-                    <p class="featured-subtitle" style="color:#64748b; font-size:1rem; margin-top:8px; max-width:600px;">Dykk ned i våre mest populære emner, nøye utvalgt for din personlige og åndelige vekst.</p>
-                </div>
-                <a href="#kurs-grid-section" class="see-all-courses-link" style="color:#d17d39; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:8px; font-size:1rem; transition:color 0.2s;">
-                    Se alle kurs <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-            
-            <div class="featured-grid" id="featured-courses-container">
-                <!-- Skeleton Loader for Featured Section -->
-                <div class="spotlight-card skeleton" style="cursor:default; min-height:480px; background:#f8fafc;"></div>
-                <div class="featured-list-col">
-                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
-                    <div class="horizontal-course-card skeleton" style="cursor:default; height:130px; background:#f8fafc;"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
+
+
 
     <!-- Key Features Section (Stitch Design) -->
     <section class="hkm-course-features-section" style="padding: 80px 24px; background: #ffffff;">
@@ -1557,60 +1584,7 @@
         </div>
     </section>
 
-    <!-- Search + Filters -->
-    <div class="kurs-controls">
-        <div class="kurs-controls-inner">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="course-search" placeholder="Søk etter kurs...">
-            </div>
-            <div class="filter-scroll" id="filter-scroll" style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="filter-btn active" data-cat="all">Alle kurs</button>
-                <button class="filter-btn" data-cat="Bibelstudium">Bibelstudium</button>
-                <button class="filter-btn" data-cat="Bønn">Bønn</button>
-                <button class="filter-btn" data-cat="Lederskap">Lederskap</button>
-                <button class="filter-btn" data-cat="Helbredelse">Helbredelse</button>
-                <button class="filter-btn" data-cat="Identitet">Identitet</button>
-                <button class="filter-btn" data-cat="Evangelisering">Evangelisering</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Grid -->
-    <section class="kurs-main" id="kurs-grid-section">
-        <p class="results-meta" id="results-meta">Laster kurs...</p>
-        <div class="kurs-grid" id="kurs-grid">
-            <!-- Skeleton -->
-            <!-- Skeleton -->
-            <div class="course-card skeleton" style="cursor:default;">
-                <div class="course-thumb skeleton-block"></div>
-                <div class="course-body">
-                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
-                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
-                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
-                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
-                </div>
-            </div>
-            <div class="course-card skeleton" style="cursor:default;">
-                <div class="course-thumb skeleton-block"></div>
-                <div class="course-body">
-                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
-                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
-                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
-                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
-                </div>
-            </div>
-            <div class="course-card skeleton" style="cursor:default;">
-                <div class="course-thumb skeleton-block"></div>
-                <div class="course-body">
-                    <div class="skeleton-block" style="height:18px;width:80%;margin-bottom:10px;"></div>
-                    <div class="skeleton-block" style="height:14px;margin-bottom:6px;"></div>
-                    <div class="skeleton-block" style="height:14px;width:60%;margin-bottom:20px;"></div>
-                    <div class="skeleton-block" style="height:42px;border-radius:10px;"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Mentors / Teachers Section (Stitch Design) -->
     <section class="hkm-mentors-section" style="padding: 80px 24px; background: #ffffff;">
@@ -1632,55 +1606,9 @@
         </div>
     </section>
 
-    <!-- Testimonials Section (Stitch Design) -->
-    <section class="hkm-testimonials-section" style="padding: 80px 24px; background: #0d3b2e; color: white; position: relative; overflow: hidden;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; text-align: center; position: relative; z-index: 2;">
-            <h2 style="font-size: 2.25rem; font-weight: 850; color: white; margin: 0 0 12px 0;">Møt våre deltakere</h2>
-            <p style="color: #a7f3d0; font-size: 1.05rem; max-width: 600px; margin: 0 auto 48px; line-height: 1.6;">Tilbakemeldinger fra studenter som har gjennomført våre kurs og opplevd forvandling.</p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; text-align: left;">
-                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    <div style="color: #facc15; font-size: 1.2rem; margin-bottom: 16px;">★★★★★</div>
-                    <p style="color: #e2e8f0; font-size: 1rem; line-height: 1.65; margin: 0 0 20px 0; font-style: italic;">"Seerkurset forandret min forståelse av bønn og åndelig seing. Undervisningen er så praktisk, varm og grundig forankret i Bibelen!"</p>
-                    <div>
-                        <strong style="color: white; font-size: 0.95rem; display: block;">Maria K.</strong>
-                        <span style="color: #a7f3d0; font-size: 0.85rem;">Deltaker, Seerkurs med aktivering</span>
-                    </div>
-                </div>
 
-                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    <div style="color: #facc15; font-size: 1.2rem; margin-bottom: 16px;">★★★★★</div>
-                    <p style="color: #e2e8f0; font-size: 1rem; line-height: 1.65; margin: 0 0 20px 0; font-style: italic;">"Live Zoom-møtene ga en fantastisk trygghet og fellesskapsfølelse. Å kunne stille spørsmål direkte til lærerne var utrolig verdifullt."</p>
-                    <div>
-                        <strong style="color: white; font-size: 0.95rem; display: block;">Erik H.</strong>
-                        <span style="color: #a7f3d0; font-size: 0.85rem;">Deltaker, Bibelstudium og lederskap</span>
-                    </div>
-                </div>
-
-                <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    <div style="color: #facc15; font-size: 1.2rem; margin-bottom: 16px;">★★★★★</div>
-                    <p style="color: #e2e8f0; font-size: 1rem; line-height: 1.65; margin: 0 0 20px 0; font-style: italic;">"Nøye strukturerte leksjoner og utrolig gode notater på Min Side. Jeg kan gå tilbake og repetere undervisningen akkurat når det passer meg."</p>
-                    <div>
-                        <strong style="color: white; font-size: 0.95rem; display: block;">Astrid S.</strong>
-                        <span style="color: #a7f3d0; font-size: 0.85rem;">Deltaker, Tro og identitet</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final Call to Action Section (Stitch Design) -->
-    <section class="hkm-cta-section" style="padding: 80px 24px; background: #ffffff;">
-        <div class="container" style="max-width: 1000px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #09281e 0%, #0d3b2e 100%); border-radius: 28px; padding: 64px 36px; text-align: center; color: white; box-shadow: 0 20px 50px rgba(13, 59, 46, 0.3); position: relative; overflow: hidden; border: 2px solid rgba(255,255,255,0.1);">
-                <h2 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 850; color: white; margin: 0 0 16px 0; line-height: 1.2;">Klar til å starte din reise?</h2>
-                <p style="color: #cbd5e1; font-size: 1.125rem; max-width: 620px; margin: 0 auto 36px; line-height: 1.65;">Bli med på vårt 12-ukers Seerkurs med aktivering og opplev en ny dimensjon av tro og bønn.</p>
-                <a href="#kurs-grid-section" class="hero-btn-primary" style="font-size: 1.1rem; padding: 18px 44px; border-radius: 14px; background: #22c55e; color: #042f1a; font-weight: 850; text-decoration: none; box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4); display: inline-block;">
-                    Meld deg på nå
-                </a>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Enroll Modal -->
     <div class="enroll-modal-overlay" id="enroll-modal-overlay">
@@ -2241,12 +2169,13 @@
                             if (heroDescEl && mainCourse.description) {
                                 heroDescEl.textContent = mainCourse.description;
                             }
-                            if (heroImgEl && mainCourse.imageUrl) {
-                                heroImgEl.src = mainCourse.imageUrl;
+                            const heroSecEl = document.getElementById('kurs-hero-section');
+                            if (heroSecEl && mainCourse.imageUrl) {
+                                heroSecEl.style.setProperty('background', `linear-gradient(rgba(9, 40, 30, 0.78), rgba(9, 40, 30, 0.88)), url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
                             }
                         }
 // sync-hero-marker
-                        renderFeaturedSection();
+                        
 
                         // Check if a specific course should be opened on load
                         checkDirectCourseAccess();
