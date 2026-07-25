@@ -412,13 +412,8 @@
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 14px;
-            padding: 24px 20px;
-            min-width: 85px;
-            min-height: 86px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 16px 20px;
+            min-width: 88px;
             text-align: center;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(8px);
@@ -426,8 +421,8 @@
         }
 
         .countdown-box span {
-            font-size: 1.55rem;
-            font-weight: 700;
+            font-size: 1.95rem;
+            font-weight: 800;
             color: #ffffff;
             display: block;
             line-height: 1;
@@ -435,10 +430,10 @@
         }
 
         .countdown-box label {
-            font-size: 0.62rem;
-            font-weight: 700;
+            font-size: 0.68rem;
+            font-weight: 750;
             color: #94a3b8;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             margin-top: 6px;
             display: block;
         }
@@ -2058,22 +2053,22 @@
                     videoContainer.style.backgroundPosition = 'center';
                     
                     videoContainer.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:24px 20px; position:relative; z-index:2;">
-                            <div style="background: var(--hkm-terracotta); color: #ffffff; padding: 5px 14px; border-radius: 30px; font-size: 0.78rem; font-weight: 600; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4);">
-                                <i class="fas fa-clock" style="color: #ffffff; font-size: 0.82rem;"></i> Leksjonen starter om
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:28px 24px; position:relative; z-index:2;">
+                            <div style="background: var(--hkm-terracotta); color: #ffffff; padding: 6px 16px; border-radius: 30px; font-size: 0.82rem; font-weight: 650; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4);">
+                                <i class="fas fa-clock" style="color: #ffffff; font-size: 0.85rem;"></i> Leksjonen starter om
                             </div>
-                            <h3 style="font-size:1.35rem; font-weight:750; margin-bottom:4px; letter-spacing: -0.01em;">${lesson.title}</h3>
-                            <p style="color:#cbd5e1; max-width:460px; font-size:0.88rem; line-height:1.45; margin-bottom:16px; opacity: 0.9;">
+                            <h3 style="font-size:1.45rem; font-weight:750; margin-bottom:6px; letter-spacing: -0.01em;">${lesson.title}</h3>
+                            <p style="color:#cbd5e1; max-width:480px; font-size:0.9rem; line-height:1.45; margin-bottom:18px; opacity: 0.9;">
                                 ${lesson.description || 'Nedtelling pågår for denne leksjonen. Zoom-møtet åpnes før start!'}
                             </p>
 
-                            <div class="countdown-grid" id="countdown-timer-grid" style="display:flex; gap:12px; margin-bottom:16px;">
+                            <div class="countdown-grid" id="countdown-timer-grid" style="display:flex; gap:12px; margin-bottom:18px;">
                                 <div class="countdown-box"><span id="cd-days">00</span><label>DAGER</label></div>
                                 <div class="countdown-box"><span id="cd-hours">00</span><label>TIMER</label></div>
                                 <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTTER</label></div>
                                 <div class="countdown-box"><span id="cd-secs">00</span><label>SEKUNDER</label></div>
                             </div>
-                            ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; padding: 10px 22px; font-size: 0.88rem; margin-top: 4px; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;"><i class="fas fa-video" style="font-size: 0.9rem;"></i> Åpne Zoom-lenke</a>` : ''}
+                            ${zoomUrl ? `<a href="${zoomUrl}" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="border: none; text-decoration: none; padding: 11px 24px; font-size: 0.92rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;"><i class="fas fa-video"></i> Åpne Zoom-lenke</a>` : ''}
                         </div>
                     `;
                     startCountdownTimer(targetDateVal);
