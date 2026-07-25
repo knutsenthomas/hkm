@@ -1557,6 +1557,11 @@ class BibleReader {
             }
         };
 
+        window.closeColorWheelModal = (e) => {
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (colorWheelModal) colorWheelModal.style.display = 'none';
+        };
+
         const openColorWheelModal = () => {
             if (!colorWheelModal) return;
             colorWheelModal.style.display = 'flex';
@@ -1565,13 +1570,6 @@ class BibleReader {
             });
             if (colorWheelPreview) colorWheelPreview.style.background = currentColorHex;
             if (colorWheelHex) colorWheelHex.textContent = currentColorHex.toUpperCase();
-        };
-
-        const closeColorWheelModal = (e) => {
-            if (e) {
-                if (e.stopPropagation) e.stopPropagation();
-            }
-            if (colorWheelModal) colorWheelModal.style.display = 'none';
         };
 
         if (colorWheelCanvas) {
@@ -1601,45 +1599,30 @@ class BibleReader {
 
         // Quick Swatches inside Color Wheel
         document.querySelectorAll('.cw-quick-btn').forEach(btn => {
-            const handleQuickSelect = (e) => {
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 const hex = btn.getAttribute('data-hex');
                 if (hex) {
                     currentColorHex = hex;
                     if (colorWheelPreview) colorWheelPreview.style.background = hex;
                     if (colorWheelHex) colorWheelHex.textContent = hex.toUpperCase();
                 }
-            };
-            btn.addEventListener('click', handleQuickSelect);
-            btn.addEventListener('touchend', handleQuickSelect);
+            });
         });
 
         if (colorWheelClose) {
-            colorWheelClose.addEventListener('click', closeColorWheelModal);
-            colorWheelClose.addEventListener('touchend', closeColorWheelModal);
+            colorWheelClose.addEventListener('click', (e) => window.closeColorWheelModal(e));
         }
 
         if (colorWheelModal) {
             colorWheelModal.addEventListener('click', (e) => {
-                if (e.target === colorWheelModal) closeColorWheelModal(e);
+                if (e.target === colorWheelModal) window.closeColorWheelModal(e);
             });
-            colorWheelModal.addEventListener('touchend', (e) => {
-                if (e.target === colorWheelModal) closeColorWheelModal(e);
-            });
-            const card = colorWheelModal.querySelector('.color-wheel-card');
-            if (card) {
-                ['touchstart', 'touchmove', 'touchend'].forEach(evt => {
-                    card.addEventListener(evt, (e) => { e.stopPropagation(); }, { passive: true });
-                });
-            }
         }
 
         if (colorWheelApply) {
-            const handleApply = (e) => {
-                if (e) {
-                    if (e.stopPropagation) e.stopPropagation();
-                }
+            colorWheelApply.addEventListener('click', (e) => {
+                if (e && e.stopPropagation) e.stopPropagation();
                 localStorage.setItem('hkm_custom_verse_color', currentColorHex);
                 updateCustomBtnStyle(currentColorHex);
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
@@ -1648,10 +1631,8 @@ class BibleReader {
                         v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
                     });
                 }
-                closeColorWheelModal(e);
-            };
-            colorWheelApply.addEventListener('click', handleApply);
-            colorWheelApply.addEventListener('touchend', handleApply);
+                window.closeColorWheelModal(e);
+            });
         }
 
         // Color swatch listeners for bottom action sheet
