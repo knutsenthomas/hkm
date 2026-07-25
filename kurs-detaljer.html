@@ -185,29 +185,91 @@
             color: #cbd5e1 !important;
         }
 
+        /* Light Mode Tab Card Styles */
+        .empty-resources-card {
+            grid-column: 1 / -1;
+            padding: 24px;
+            background: #ffffff;
+            border: 1.5px dashed #e2e8f0;
+            border-radius: 16px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .discussion-locked-box {
+            background: #ffffff;
+            border: 1.5px dashed #cbd5e1;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .discussion-form-box {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            margin-bottom: 24px;
+        }
+
+        .comment-item-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            margin-bottom: 12px;
+        }
+
         /* Teacher Card & Tab Contents in Dark Mode */
+        html[data-theme="dark"] .instructor-card,
         html[data-theme="dark"] .teacher-card,
         html[data-theme="dark"] .resource-card,
-        html[data-theme="dark"] .discussion-comment-item,
-        html[data-theme="dark"] .comment-box,
-        html[data-theme="dark"] [style*="background: #ffffff"],
-        html[data-theme="dark"] [style*="background:#ffffff"] {
+        html[data-theme="dark"] .empty-resources-card,
+        html[data-theme="dark"] .discussion-locked-box,
+        html[data-theme="dark"] .discussion-form-box,
+        html[data-theme="dark"] .comment-item-card,
+        html[data-theme="dark"] [style*="background: white"],
+        html[data-theme="dark"] [style*="background:#ffffff"],
+        html[data-theme="dark"] [style*="background: #f8fafc"],
+        html[data-theme="dark"] [style*="background:#f8fafc"] {
             background: #1e293b !important;
+            background-color: #1e293b !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
         }
 
+        html[data-theme="dark"] .instructor-name,
+        html[data-theme="dark"] .discussion-locked-box h4,
+        html[data-theme="dark"] .comment-item-card strong,
         html[data-theme="dark"] .teacher-card h3,
-        html[data-theme="dark"] .teacher-card h4,
-        html[data-theme="dark"] h2,
-        html[data-theme="dark"] h3,
-        html[data-theme="dark"] h4 {
+        html[data-theme="dark"] .teacher-card h4 {
             color: #f8fafc !important;
         }
 
-        html[data-theme="dark"] .teacher-card p,
-        html[data-theme="dark"] p {
+        html[data-theme="dark"] .instructor-bio,
+        html[data-theme="dark"] .empty-resources-card span,
+        html[data-theme="dark"] .discussion-locked-box p,
+        html[data-theme="dark"] .comment-item-card p,
+        html[data-theme="dark"] .teacher-card p {
             color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] textarea#discussion-comment-input {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
         }
 
         html[data-theme="dark"] textarea,
@@ -2162,7 +2224,7 @@
             const renderResourcesHTML = (resList) => {
                 if (!resList || !resList.length) {
                     return `
-                        <div style="grid-column: 1 / -1; padding: 20px 24px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center; color: #64748b; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <div class="empty-resources-card">
                             <i class="fas fa-folder-open" style="font-size: 20px; color: #94a3b8;"></i>
                             <span>Ingen dokumenter eller ressursfiler er lagt til for denne leksjonen ennå.</span>
                         </div>
@@ -2495,12 +2557,12 @@
             if (formContainer) {
                 if (isLocked) {
                     formContainer.innerHTML = `
-                        <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; padding: 24px; border-radius: 16px; text-align: center; color: #64748b; margin-bottom: 24px;">
+                        <div class="discussion-locked-box">
                             <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(209, 125, 57, 0.12); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                                 <i class="fas fa-lock" style="font-size: 1.2rem; color: var(--hkm-terracotta);"></i>
                             </div>
-                            <h4 style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin-bottom: 6px;">Diskusjonsfeltet er foreløpig stengt</h4>
-                            <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.5; color: #64748b;">
+                            <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 6px;">Diskusjonsfeltet er foreløpig stengt</h4>
+                            <p style="font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.5;">
                                 Du kan stille spørsmål og sende meldinger her fra 15 minutter før live-møtet starter og etter at sendingen er i gang eller gjennomført.
                             </p>
                         </div>
@@ -2510,10 +2572,10 @@
                     const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
 
                     formContainer.innerHTML = `
-                        <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-bottom: 24px;">
-                            <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..." style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px; font-family: inherit; margin-bottom: 14px; min-height: 90px; font-size: 0.95rem; outline: none; transition: border 0.2s;"></textarea>
+                        <div class="discussion-form-box">
+                            <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..."></textarea>
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                                <span style="font-size: 0.85rem; color: #64748b;" id="comment-author-info">Innlogget som: ${userName}</span>
+                                <span style="font-size: 0.85rem;" id="comment-author-info">Innlogget som: ${userName}</span>
                                 <button type="button" class="btn-terracotta" id="post-comment-btn" onclick="window.handlePostComment()" style="padding: 10px 24px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 8px;">
                                     <i class="fas fa-paper-plane"></i> Send refleksjon
                                 </button>
@@ -2543,17 +2605,17 @@
             }
 
             listEl.innerHTML = comments.map(c => `
-                <div style="background: white; padding: 16px 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 12px;">
-                    <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" alt="${c.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid #e2e8f0;">
+                <div class="comment-item-card">
+                    <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" alt="${c.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid rgba(148, 163, 184, 0.3);">
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px;">
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <strong style="font-size: 0.92rem; color: #1e293b; font-weight: 750;">${c.author}</strong>
+                                <strong style="font-size: 0.92rem; font-weight: 750;">${c.author}</strong>
                                 ${c.role ? `<span style="background: rgba(209,125,57,0.12); color: #d17d39; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; display: inline-block;">${c.role}</span>` : ''}
                             </div>
-                            <span style="font-size: 0.78rem; color: #94a3b8; white-space: nowrap; margin-left: auto;">${c.date}</span>
+                            <span style="font-size: 0.78rem; opacity: 0.7; white-space: nowrap; margin-left: auto;">${c.date}</span>
                         </div>
-                        <p style="font-size: 0.92rem; color: #475569; margin: 0; line-height: 1.5;">${c.text}</p>
+                        <p style="font-size: 0.92rem; margin: 0; line-height: 1.5;">${c.text}</p>
                     </div>
                 </div>
             `).join('');
