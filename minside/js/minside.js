@@ -1076,71 +1076,7 @@ class MinSideManager {
                 if (user) {
                     this.currentUser = user;
 
-                    // Load features config
-                    let prayerWallEnabled = false;
-                    try {
-                        const featuresDoc = await withTimeout(
-                            firebase.firestore().collection('content').doc('settings_features').get(),
-                            3000
-                        );
-                        if (featuresDoc && featuresDoc.exists) {
-                            prayerWallEnabled = !!featuresDoc.data().prayerWallEnabled;
-                        }
-                    } catch (err) {
-                        console.error("Error loading features config:", err);
-                    }
-                    this.prayerWallEnabled = prayerWallEnabled;
-
-                    // Apply visibility on navigation links
-                    document.querySelectorAll('[data-view="prayer-wall"]').forEach(el => {
-                        if (prayerWallEnabled) {
-                            el.style.display = '';
-                            const li = el.closest('.nav-item');
-                            if (li) li.style.display = '';
-                        } else {
-                            el.style.display = 'none';
-                            const li = el.closest('.nav-item');
-                            if (li) li.style.display = 'none';
-                        }
-                    });
-
-                    await this.syncUserProfile(user);
-                    await this.syncProfileFromGoogleProvider();
-                    this.profileData = await this.getMergedProfile(user);
-                    await this.refreshProfileSubCollections(user.uid);
-                    this.updateHeader();
-                    this.initNotificationBadge();
-                    this.showPendingFlashNotice();
-
-                    // Translate immediately on auth state change
-                    translateStaticHTML();
-
-                    // Initialize Global Search Overlay
-                    this.initGlobalSearch();
-
-                    // Apply bottom navigation settings (user custom first, then admin default)
-                    try {
-                        if (this.profileData && Array.isArray(this.profileData.customBottomNav) && this.profileData.customBottomNav.length > 0) {
-                            localStorage.setItem('hkm_user_custom_nav', JSON.stringify(this.profileData.customBottomNav));
-                            this.applyBottomNavSettings(this.profileData.customBottomNav);
-                        } else {
-                            localStorage.removeItem('hkm_user_custom_nav');
-                            if (window.firebaseService && typeof window.firebaseService.getPageContent === 'function') {
-                                const designSettings = await window.firebaseService.getPageContent('settings_design');
-                                if (designSettings && Array.isArray(designSettings.minsideBottomNav)) {
-                                    const cached = localStorage.getItem('hkm_cache_settings_design');
-                                    let designObj = cached ? JSON.parse(cached) : {};
-                                    designObj.minsideBottomNav = designSettings.minsideBottomNav;
-                                    localStorage.setItem('hkm_cache_settings_design', JSON.stringify(designObj));
-
-                                    this.applyBottomNavSettings(designSettings.minsideBottomNav);
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.warn("Failed to load design settings for bottom nav:", e);
-                    }
-
+                    // Immediately trigger initial view load to eliminate initial UX waiting delay
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
 
@@ -1149,6 +1085,65 @@ class MinSideManager {
                         if (this.lastLoadedHash === window.location.hash) return;
                         this.loadView(hash);
                     });
+
+                    // Update UI elements & translate static HTML immediately
+                    this.updateHeader();
+                    translateStaticHTML();
+                    this.initGlobalSearch();
+
+                    // Apply cached bottom nav settings immediately if present
+                    try {
+                        const userCustomNav = localStorage.getItem('hkm_user_custom_nav');
+                        if (userCustomNav) {
+                            this.applyBottomNavSettings(JSON.parse(userCustomNav));
+                        } else {
+                            const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
+                            if (cachedDesign) {
+                                const designObj = JSON.parse(cachedDesign);
+                                if (designObj.minsideBottomNav) this.applyBottomNavSettings(designObj.minsideBottomNav);
+                            }
+                        }
+                    } catch (navErr) {}
+
+                    // Run background sync and feature loading asynchronously without blocking UI
+                    (async () => {
+                        // Features config
+                        try {
+                            const featuresDoc = await withTimeout(
+                                firebase.firestore().collection('content').doc('settings_features').get(),
+                                2000
+                            );
+                            if (featuresDoc && featuresDoc.exists) {
+                                this.prayerWallEnabled = !!featuresDoc.data().prayerWallEnabled;
+                                document.querySelectorAll('[data-view="prayer-wall"]').forEach(el => {
+                                    el.style.display = this.prayerWallEnabled ? '' : 'none';
+                                    const li = el.closest('.nav-item');
+                                    if (li) li.style.display = this.prayerWallEnabled ? '' : 'none';
+                                });
+                            }
+                        } catch (err) {}
+
+                        // Profile sync
+                        try {
+                            await Promise.all([
+                                this.syncUserProfile(user),
+                                this.syncProfileFromGoogleProvider()
+                            ]);
+                            this.profileData = await this.getMergedProfile(user);
+                            this.updateHeader();
+                            this.initNotificationBadge();
+                            this.showPendingFlashNotice();
+
+                            if (this.profileData && Array.isArray(this.profileData.customBottomNav) && this.profileData.customBottomNav.length > 0) {
+                                localStorage.setItem('hkm_user_custom_nav', JSON.stringify(this.profileData.customBottomNav));
+                                this.applyBottomNavSettings(this.profileData.customBottomNav);
+                            }
+
+                            this.refreshProfileSubCollections(user.uid);
+                        } catch (pErr) {
+                            console.warn("[BackgroundSync] Profile sync warning:", pErr);
+                        }
+                    })();
                 } else {
                     window.location.href = '/minside/login.html';
                 }
