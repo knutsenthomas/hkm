@@ -417,6 +417,7 @@ class BibleReader {
         this.applySettings();
         this.bindEvents();
         this.setupSwipeGestures();
+        this.setupModalHistoryNavigation();
         
         // Listen to Firebase auth state for synchronizing notes (supports lazy-loaded Firebase SDK)
         const setupAuthObserver = () => {
@@ -682,6 +683,11 @@ class BibleReader {
                     if (chapPopover) chapPopover.classList.remove('active');
                     const isActive = popover.classList.toggle('active');
                     toggleBackdrop(isActive);
+                    if (isActive) {
+                        this.pushModalHistoryState('floating-settings-popover');
+                    } else if (window.history.state && window.history.state.hkmModalActive) {
+                        window.history.back();
+                    }
                 });
                 
                 // Prevent closing when clicking inside popover
@@ -712,6 +718,11 @@ class BibleReader {
                         }
                         const isActive = chapPopover.classList.toggle('active');
                         toggleBackdrop(isActive);
+                        if (isActive) {
+                            this.pushModalHistoryState('floating-chapter-popover');
+                        } else if (window.history.state && window.history.state.hkmModalActive) {
+                            window.history.back();
+                        }
                     }
                 });
                 
@@ -1159,6 +1170,7 @@ class BibleReader {
         if (this.dom.dictManualTrigger) {
             this.dom.dictManualTrigger.addEventListener('click', () => {
                 this.dom.dictDrawer.classList.add('active');
+                this.pushModalHistoryState('dictionary-drawer');
                 const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
                 if (backdrop) backdrop.classList.add('active');
                 if (this.dom.dictContentWrap.style.display === 'none' && this.dom.dictSpinner.style.display === 'none') {
@@ -1524,6 +1536,7 @@ class BibleReader {
 
                     noteModal.classList.add('active');
                     noteModal.style.display = 'flex';
+                    this.pushModalHistoryState('verse-note-modal');
                     if (noteInput) noteInput.focus();
                 }
             });
@@ -2639,6 +2652,7 @@ class BibleReader {
         // Open modal instantly with zero animation delay
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('active'));
+        this.pushModalHistoryState('verse-crossref-sheet-card');
 
         // Instant Cache Hit!
         if (this.crossrefCache[fullRef]) {
@@ -3159,6 +3173,7 @@ class BibleReader {
 
     async lookupWord(word, contextText, refText) {
         if (this.dom.dictDrawer) this.dom.dictDrawer.classList.add('active');
+        this.pushModalHistoryState('dictionary-drawer');
         const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
         if (backdrop) backdrop.classList.add('active');
         const dictBody = this.dom.dictDrawer ? this.dom.dictDrawer.querySelector('.dict-body') : null;
@@ -3605,6 +3620,69 @@ class BibleReader {
         });
         handleBar.addEventListener('pointerup', onEnd);
         handleBar.addEventListener('pointercancel', onEnd);
+    }
+
+    setupModalHistoryNavigation() {
+        if (this._hasSetupModalHistoryNav) return;
+        this._hasSetupModalHistoryNav = true;
+
+        window.addEventListener('popstate', (e) => {
+            const activeModals = document.querySelectorAll(`
+                .floating-settings-popover.active,
+                .floating-chapter-popover.active,
+                .dictionary-drawer.active,
+                .verse-crossref-sheet-card.active,
+                .verse-note-modal.active,
+                #color-wheel-modal.active,
+                .bible-nav-right.active
+            `);
+
+            if (activeModals.length > 0) {
+                activeModals.forEach(el => el.classList.remove('active'));
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
+            }
+        });
+
+        // BFCache safety guard - reload cleanly if pageshow restored from BFcache
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                window.location.reload();
+            }
+        });
+    }
+
+    pushModalHistoryState(modalId) {
+        this.setupModalHistoryNavigation();
+        try {
+            if (!window.history.state || !window.history.state.hkmModalActive) {
+                window.history.pushState({ hkmModalActive: true, modalId: modalId }, '');
+            }
+        } catch (e) {
+            console.warn('[BibleReader] Could not push modal history state:', e);
+        }
+    }
+
+    closeActiveModalsWithHistory() {
+        const activeModals = document.querySelectorAll(`
+            .floating-settings-popover.active,
+            .floating-chapter-popover.active,
+            .dictionary-drawer.active,
+            .verse-crossref-sheet-card.active,
+            .verse-note-modal.active,
+            #color-wheel-modal.active,
+            .bible-nav-right.active
+        `);
+
+        if (activeModals.length > 0) {
+            activeModals.forEach(el => el.classList.remove('active'));
+            const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+            if (backdrop) backdrop.classList.remove('active');
+
+            if (window.history.state && window.history.state.hkmModalActive) {
+                window.history.back();
+            }
+        }
     }
 
     saveVerseHighlight(verseNum, color, customHex = null) {

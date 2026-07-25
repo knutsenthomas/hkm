@@ -141,6 +141,7 @@
 
         .icon-youtube { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
         .icon-podcast { background: rgba(209, 125, 57, 0.1); color: #d17d39; }
+        .icon-kurs { background: rgba(209, 125, 57, 0.12); color: #d17d39; }
         .icon-bibelstudier { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
         .icon-leseplaner { background: rgba(16, 185, 129, 0.1); color: #10b981; }
         .icon-tidslinje { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
@@ -254,15 +255,15 @@
   <script type="module" crossorigin src="/assets/firebase-service.js_v_2026.05.10-DoXEpGH-.js"></script>
   <script type="module" crossorigin src="/assets/firebase-service-CDnfk-I0.js"></script>
   <script type="module" crossorigin src="/assets/interactions-DDnMhidD.js"></script>
-  <script type="module" crossorigin src="/assets/content-manager.js_v_2026.05.10-CaeU8zNJ.js"></script>
+  <script type="module" crossorigin src="/assets/content-manager.js_v_2026.05.10-C_RXkUME.js"></script>
   <script type="module" crossorigin src="/assets/preload-helper-D7HrI6pR.js"></script>
-  <script type="module" crossorigin src="/assets/script.js_v_2026.06.21.10-BjUQQ1KP.js"></script>
+  <script type="module" crossorigin src="/assets/script.js_v_2026.06.21.10-BCQq-GVv.js"></script>
   <script type="module" crossorigin src="/assets/teaching-loader-BUjvByjU.js"></script>
   <script type="module" crossorigin src="/assets/media-B4Seb4GM.js"></script>
   <script type="module" crossorigin src="/assets/cookie-consent-only-C34FRB-v.js"></script>
   <script type="module" crossorigin src="/assets/i18n-B7rRb1_p.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/script.js_v_2026.06.21-ClbbkiQX.css">
-  <link rel="stylesheet" crossorigin href="/assets/styles-Bj13IYaw.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-vU7pTH8K.css">
   <link rel="stylesheet" crossorigin href="/assets/cookie-consent-DsovetHY.css">
 </head>
 
@@ -321,7 +322,7 @@
                 </div>
 
                 <!-- Profile Button -->
-                <a href="/minside/index.html" id="header-profile-link" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
+                <a href="/minside/index.html" id="header-profile-link" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Min Side" title="Min Side">
                     <span class="material-symbols-outlined text-xl">account_circle</span>
                     <img id="header-profile-img" src="" alt="Profilbilde" class="absolute inset-0 w-full h-full object-cover hidden rounded-full">
                 </a>
@@ -598,6 +599,19 @@
                     <p class="dashboard-card-text">Lytt til podcasten "Tro og Liv" for daglig oppmuntring og bibelsk undervisning.</p>
                     <div class="dashboard-card-footer">
                         <span>Hør episoder</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+
+                <!-- 2b. Kurs -->
+                <a href="/kurs" class="dashboard-card group">
+                    <div class="dashboard-card-icon icon-kurs">
+                        <i class="fas fa-graduation-cap text-2xl"></i>
+                    </div>
+                    <h3 class="dashboard-card-title">Kurs & Undervisning</h3>
+                    <p class="dashboard-card-text">Utrust deg med interaktive kurs, leksjoner og aktivering for troen og bønnelivet.</p>
+                    <div class="dashboard-card-footer">
+                        <span>Utforsk kurs</span>
                         <i class="fas fa-arrow-right"></i>
                     </div>
                 </a>
