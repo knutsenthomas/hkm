@@ -3028,41 +3028,6 @@
                 </div>
             </div>
 
-            <!-- Color Wheel Modal -->
-            <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;">
-                <div class="color-wheel-card">
-                    <div class="color-wheel-header">
-                        <h3>Elegir color</h3>
-                        <button id="color-wheel-close" class="color-wheel-close-btn" title="Cerrar">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="color-wheel-body">
-                        <div class="wheel-canvas-container" style="position: relative; width: 220px; height: 220px; margin: 0 auto;">
-                            <canvas id="color-wheel-canvas" width="220" height="220" style="border-radius: 50%; cursor: crosshair; touch-action: none; box-shadow: 0 4px 16px rgba(0,0,0,0.15);"></canvas>
-                            <div id="color-wheel-picker-handle" style="position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); pointer-events: none; transform: translate(-50%, -50%); display: none;"></div>
-                        </div>
-                        
-                        <div class="color-wheel-preview-row" style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px;">
-                            <div id="color-wheel-preview" style="width: 36px; height: 36px; border-radius: 50%; background: #d17d39; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
-                            <span id="color-wheel-hex" style="font-weight: 700; font-family: monospace; font-size: 14px; color: var(--text-base);">#D17D39</span>
-                        </div>
-
-                        <div class="color-wheel-quick-swatches" style="display: flex; justify-content: center; gap: 8px; margin-top: 14px;">
-                            <button class="cw-quick-btn" data-hex="#d17d39" style="background: #d17d39;" title="Terracota"></button>
-                            <button class="cw-quick-btn" data-hex="#ec4899" style="background: #ec4899;" title="Rosa"></button>
-                            <button class="cw-quick-btn" data-hex="#8b5cf6" style="background: #8b5cf6;" title="Púrpura"></button>
-                            <button class="cw-quick-btn" data-hex="#f59e0b" style="background: #f59e0b;" title="Ámbar"></button>
-                            <button class="cw-quick-btn" data-hex="#10b981" style="background: #10b981;" title="Esmeralda"></button>
-                            <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Azul cielo"></button>
-                        </div>
-                    </div>
-                    <div class="color-wheel-footer" style="margin-top: 16px;">
-                        <button id="color-wheel-apply-btn" class="color-wheel-apply-btn">Aplicar color</button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Fly-out Dictionary Drawer -->
             <aside class="dictionary-drawer" id="dictionary-drawer">
                 <div class="dict-header">
@@ -3453,6 +3418,41 @@
 
         </div>
     </div>
+    <!-- Color Wheel Modal -->
+    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;">
+        <div class="color-wheel-card">
+            <div class="color-wheel-header">
+                <h3>Elegir color</h3>
+                <button id="color-wheel-close" class="color-wheel-close-btn" title="Cerrar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="color-wheel-body">
+                <div class="wheel-canvas-container" style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
+                    <canvas id="color-wheel-canvas" width="200" height="200" style="border-radius: 50%; cursor: crosshair; touch-action: none; box-shadow: 0 4px 16px rgba(0,0,0,0.15);"></canvas>
+                    <div id="color-wheel-picker-handle" style="position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); pointer-events: none; transform: translate(-50%, -50%); display: none;"></div>
+                </div>
+                
+                <div class="color-wheel-preview-row" style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px;">
+                    <div id="color-wheel-preview" style="width: 36px; height: 36px; border-radius: 50%; background: #d17d39; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
+                    <span id="color-wheel-hex" style="font-weight: 700; font-family: monospace; font-size: 14px; color: var(--text-base);">#D17D39</span>
+                </div>
+
+                <div class="color-wheel-quick-swatches" style="display: flex; justify-content: center; gap: 8px; margin-top: 12px;">
+                    <button class="cw-quick-btn" data-hex="#d17d39" style="background: #d17d39;" title="Terracota"></button>
+                    <button class="cw-quick-btn" data-hex="#ec4899" style="background: #ec4899;" title="Rosa"></button>
+                    <button class="cw-quick-btn" data-hex="#8b5cf6" style="background: #8b5cf6;" title="Púrpura"></button>
+                    <button class="cw-quick-btn" data-hex="#f59e0b" style="background: #f59e0b;" title="Ámbar"></button>
+                    <button class="cw-quick-btn" data-hex="#10b981" style="background: #10b981;" title="Esmeralda"></button>
+                    <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Azul cielo"></button>
+                </div>
+            </div>
+            <div class="color-wheel-footer" style="margin-top: 14px;">
+                <button id="color-wheel-apply-btn" class="color-wheel-apply-btn">Aplicar color</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

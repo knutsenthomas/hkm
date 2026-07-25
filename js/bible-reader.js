@@ -1495,8 +1495,8 @@ class BibleReader {
         const drawColorWheel = () => {
             if (!colorWheelCanvas) return;
             const ctx = colorWheelCanvas.getContext('2d');
-            const width = colorWheelCanvas.width;
-            const height = colorWheelCanvas.height;
+            const width = colorWheelCanvas.width || 200;
+            const height = colorWheelCanvas.height || 200;
             const radius = width / 2;
             const toRad = Math.PI / 180;
             
@@ -1528,7 +1528,7 @@ class BibleReader {
             let canvasX = x - rect.left;
             let canvasY = y - rect.top;
             
-            const radius = colorWheelCanvas.width / 2;
+            const radius = (colorWheelCanvas.width || 200) / 2;
             const dx = canvasX - radius;
             const dy = canvasY - radius;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1539,29 +1539,38 @@ class BibleReader {
                 canvasY = radius + Math.sin(angle) * (radius - 1);
             }
 
-            const pixel = ctx.getImageData(Math.floor(canvasX), Math.floor(canvasY), 1, 1).data;
-            if (pixel[3] > 0) {
-                const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase()}`;
-                currentColorHex = hex;
-                if (colorWheelPreview) colorWheelPreview.style.background = hex;
-                if (colorWheelHex) colorWheelHex.textContent = hex;
-                if (colorWheelHandle) {
-                    colorWheelHandle.style.left = `${canvasX}px`;
-                    colorWheelHandle.style.top = `${canvasY}px`;
-                    colorWheelHandle.style.display = 'block';
+            try {
+                const pixel = ctx.getImageData(Math.floor(canvasX), Math.floor(canvasY), 1, 1).data;
+                if (pixel[3] > 0) {
+                    const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase()}`;
+                    currentColorHex = hex;
+                    if (colorWheelPreview) colorWheelPreview.style.background = hex;
+                    if (colorWheelHex) colorWheelHex.textContent = hex;
+                    if (colorWheelHandle) {
+                        colorWheelHandle.style.left = `${canvasX}px`;
+                        colorWheelHandle.style.top = `${canvasY}px`;
+                        colorWheelHandle.style.display = 'block';
+                    }
                 }
+            } catch (err) {
+                console.warn("Color wheel sample error:", err);
             }
         };
 
         const openColorWheelModal = () => {
             if (!colorWheelModal) return;
             colorWheelModal.style.display = 'flex';
-            drawColorWheel();
+            requestAnimationFrame(() => {
+                drawColorWheel();
+            });
             if (colorWheelPreview) colorWheelPreview.style.background = currentColorHex;
             if (colorWheelHex) colorWheelHex.textContent = currentColorHex.toUpperCase();
         };
 
-        const closeColorWheelModal = () => {
+        const closeColorWheelModal = (e) => {
+            if (e) {
+                if (e.stopPropagation) e.stopPropagation();
+            }
             if (colorWheelModal) colorWheelModal.style.display = 'none';
         };
 
@@ -1592,29 +1601,45 @@ class BibleReader {
 
         // Quick Swatches inside Color Wheel
         document.querySelectorAll('.cw-quick-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            const handleQuickSelect = (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const hex = btn.getAttribute('data-hex');
                 if (hex) {
                     currentColorHex = hex;
                     if (colorWheelPreview) colorWheelPreview.style.background = hex;
                     if (colorWheelHex) colorWheelHex.textContent = hex.toUpperCase();
                 }
-            });
+            };
+            btn.addEventListener('click', handleQuickSelect);
+            btn.addEventListener('touchend', handleQuickSelect);
         });
 
         if (colorWheelClose) {
             colorWheelClose.addEventListener('click', closeColorWheelModal);
+            colorWheelClose.addEventListener('touchend', closeColorWheelModal);
         }
 
         if (colorWheelModal) {
             colorWheelModal.addEventListener('click', (e) => {
-                if (e.target === colorWheelModal) closeColorWheelModal();
+                if (e.target === colorWheelModal) closeColorWheelModal(e);
             });
+            colorWheelModal.addEventListener('touchend', (e) => {
+                if (e.target === colorWheelModal) closeColorWheelModal(e);
+            });
+            const card = colorWheelModal.querySelector('.color-wheel-card');
+            if (card) {
+                ['touchstart', 'touchmove', 'touchend'].forEach(evt => {
+                    card.addEventListener(evt, (e) => { e.stopPropagation(); }, { passive: true });
+                });
+            }
         }
 
         if (colorWheelApply) {
-            colorWheelApply.addEventListener('click', () => {
+            const handleApply = (e) => {
+                if (e) {
+                    if (e.stopPropagation) e.stopPropagation();
+                }
                 localStorage.setItem('hkm_custom_verse_color', currentColorHex);
                 updateCustomBtnStyle(currentColorHex);
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
@@ -1623,8 +1648,10 @@ class BibleReader {
                         v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
                     });
                 }
-                closeColorWheelModal();
-            });
+                closeColorWheelModal(e);
+            };
+            colorWheelApply.addEventListener('click', handleApply);
+            colorWheelApply.addEventListener('touchend', handleApply);
         }
 
         // Color swatch listeners for bottom action sheet
