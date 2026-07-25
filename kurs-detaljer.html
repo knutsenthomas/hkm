@@ -1255,12 +1255,7 @@
                 <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
                     <i class="fas fa-chevron-left"></i> Forrige leksjon
                 </button>
-                <div class="lesson-step-wrapper" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                    <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
-                    <a id="zoom-nav-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="display: none; padding: 6px 14px; font-size: 0.82rem; background: var(--hkm-terracotta); border: none; text-decoration: none; border-radius: 8px;">
-                        <i class="fas fa-video"></i> Åpne i Zoom-appen
-                    </a>
-                </div>
+                <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
                 <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="window.selectNextLesson()">
                     Neste leksjon <i class="fas fa-chevron-right"></i>
                 </button>
@@ -1772,10 +1767,6 @@
             const zoomBanner = document.getElementById('zoom-banner-container');
 
             if (zoomUrl && String(zoomUrl).trim().length > 0) {
-                if (zoomNavLink) {
-                    zoomNavLink.href = zoomUrl;
-                    zoomNavLink.style.display = 'inline-flex';
-                }
                 if (zoomBanner) {
                     zoomBanner.style.display = 'block';
                     zoomBanner.innerHTML = `
