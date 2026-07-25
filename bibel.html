@@ -894,21 +894,45 @@
             pointer-events: auto;
         }
         .sheet-close-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--bg-surface, rgba(0,0,0,0.05));
-            border: 1px solid var(--border-color, rgba(0,0,0,0.08));
-            color: var(--text-muted, #64748b);
+            width: 34px !important;
+            height: 34px !important;
+            border-radius: 50% !important;
+            background: var(--bg-surface, rgba(0, 0, 0, 0.06)) !important;
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+            color: var(--text-base, #1e293b) !important;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            flex-shrink: 0 !important;
         }
         .sheet-close-btn:hover {
-            background: var(--bg-base);
-            color: var(--text-base);
+            background: var(--bible-primary, #d17d39) !important;
+            color: #ffffff !important;
+            border-color: var(--bible-primary, #d17d39) !important;
+            transform: scale(1.08) !important;
+        }
+        .sheet-close-btn:active {
+            transform: scale(0.95) !important;
+        }
+        html[data-theme="dark"] .sheet-close-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            color: #f8fafc !important;
+        }
+
+        .sheet-handle-bar {
+            width: 48px !important;
+            height: 5px !important;
+            background: rgba(0, 0, 0, 0.22) !important;
+            border-radius: 99px !important;
+            margin: 0 auto 14px !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+        }
+        html[data-theme="dark"] .sheet-handle-bar {
+            background: rgba(255, 255, 255, 0.3) !important;
         }
 
         @media (min-width: 769px) {
@@ -3850,23 +3874,33 @@
 
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
-                    <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer; flex-shrink: 0;"></div>
+                    <div class="sheet-handle-bar"></div>
                     <!-- Header for Chapters (default view) -->
                     <div id="floating-popover-header-chapters" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Velg kapittel</span>
-                        <button id="btn-show-books-view" onclick="const hc=document.getElementById('floating-popover-header-chapters'), hb=document.getElementById('floating-popover-header-books'), cg=document.getElementById('floating-chapter-grid'), bc=document.getElementById('floating-books-container'); if(hc)hc.style.display='none'; if(hb)hb.style.display='flex'; if(cg)cg.style.display='none'; if(bc){bc.style.display='flex'; if(window.bibleReader) window.bibleReader.renderFloatingBooks();}" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
-                            <span>Velg bok</span>
-                        </button>
+                        <span style="font-weight: 700; font-size: 15px; color: var(--text-base);">Velg kapittel</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button id="btn-show-books-view" onclick="const hc=document.getElementById('floating-popover-header-chapters'), hb=document.getElementById('floating-popover-header-books'), cg=document.getElementById('floating-chapter-grid'), bc=document.getElementById('floating-books-container'); if(hc)hc.style.display='none'; if(hb)hb.style.display='flex'; if(cg)cg.style.display='none'; if(bc){bc.style.display='flex'; if(window.bibleReader) window.bibleReader.renderFloatingBooks();}" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; font-weight: 700 !important; color: var(--bible-primary, #d17d39) !important; background: rgba(209, 125, 57, 0.1) !important; border: 1px solid rgba(209, 125, 57, 0.25) !important; border-radius: 20px !important; padding: 6px 14px !important; cursor: pointer; text-decoration: none; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                                <span>Velg bok</span>
+                            </button>
+                            <button type="button" class="sheet-close-btn" title="Lukk" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Header for Books (books view) -->
                     <div id="floating-popover-header-books" style="display: none; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Velg bok</span>
-                        <button id="btn-show-chapters-view" style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px !important; font-weight: 600 !important; color: var(--bible-primary, #d17d39) !important; background: transparent !important; border: none !important; padding: 4px 8px !important; cursor: pointer; text-decoration: none;">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
-                            <span>Tilbake</span>
-                        </button>
+                        <span style="font-weight: 700; font-size: 15px; color: var(--text-base);">Velg bok</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button id="btn-show-chapters-view" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px !important; font-weight: 700 !important; color: var(--bible-primary, #d17d39) !important; background: rgba(209, 125, 57, 0.1) !important; border: 1px solid rgba(209, 125, 57, 0.25) !important; border-radius: 20px !important; padding: 6px 14px !important; cursor: pointer; text-decoration: none; transition: all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                                <span>Tilbake</span>
+                            </button>
+                            <button type="button" class="sheet-close-btn" title="Lukk" onclick="document.getElementById('floating-chapter-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Chapters Container -->

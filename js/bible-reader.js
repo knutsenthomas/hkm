@@ -2500,8 +2500,11 @@ class BibleReader {
             const isActive = b.id === this.selectedBookId ? 'active' : '';
             return `
                 <div class="floating-book-item ${isActive}" data-id="${b.id}">
-                    <span>${b.name}</span>
-                    <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.6;">chevron_right</span>
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        ${isActive ? '<span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">check_circle</span>' : ''}
+                        <span>${b.name}</span>
+                    </span>
+                    <span class="material-symbols-outlined" style="font-size: 16px; opacity: ${isActive ? '1' : '0.5'};">${isActive ? 'check' : 'chevron_right'}</span>
                 </div>
             `;
         }).join('');
@@ -2528,6 +2531,14 @@ class BibleReader {
                 if (booksCont) booksCont.style.display = 'none';
             });
         });
+
+        // Scroll active book into view smoothly
+        const activeItem = container.querySelector('.floating-book-item.active');
+        if (activeItem) {
+            setTimeout(() => {
+                activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 50);
+        }
     }
 
     async selectChapter(chapterId) {
