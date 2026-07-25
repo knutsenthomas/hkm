@@ -2536,6 +2536,8 @@ class BibleReader {
 
         if (!modal || !listEl) return;
 
+        this.crossrefCache = this.crossrefCache || {};
+
         const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
         const bookName = currentBook ? currentBook.name : '';
         const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
@@ -2544,58 +2546,70 @@ class BibleReader {
         if (titleEl) titleEl.textContent = fullRef;
         if (previewEl) previewEl.textContent = verseText;
 
+        const renderList = (crossRefs) => {
+            if (!crossRefs || crossRefs.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13.5px;">
+                        Ingen kryssreferanser funnet.
+                    </div>
+                `;
+                return;
+            }
+            const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+            listEl.innerHTML = crossRefs.map((item, idx) => {
+                const letter = letters[idx % letters.length];
+                return `
+                    <div class="verse-crossref-row-item" data-idx="${idx}" style="display: flex; align-items: baseline; gap: 14px; padding: 12px 6px; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); cursor: pointer; transition: background 0.15s ease;">
+                        <span style="font-weight: 700; font-size: 13px; color: var(--text-muted, #64748b); width: 14px; flex-shrink: 0; text-align: center;">${letter}</span>
+                        <div style="flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;">
+                            <span class="crossref-ref-link" style="color: #2563eb; font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer;">${item.ref}</span>
+                            <span style="font-size: 13.5px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const rows = listEl.querySelectorAll('.verse-crossref-row-item');
+            rows.forEach((row, idx) => {
+                row.addEventListener('mouseenter', () => {
+                    row.style.background = 'rgba(37, 99, 235, 0.04)';
+                });
+                row.addEventListener('mouseleave', () => {
+                    row.style.background = 'transparent';
+                });
+                row.addEventListener('click', () => {
+                    const targetRef = crossRefs[idx].ref;
+                    modal.classList.remove('active');
+                    setTimeout(() => modal.style.display = 'none', 250);
+                    this.parseAndNavigateToReference(targetRef);
+                });
+            });
+        };
+
+        // Open modal instantly with zero animation delay
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        // Instant Cache Hit!
+        if (this.crossrefCache[fullRef]) {
+            renderList(this.crossrefCache[fullRef]);
+            return;
+        }
+
+        // Fast placeholder while fetching
         listEl.innerHTML = `
-            <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
-                <div class="spinner" style="margin: 0 auto 12px;"></div>
+            <div style="text-align: center; padding: 24px 0; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 10px;"></div>
                 <p style="font-size: 13px;">Henter kryssreferanser...</p>
             </div>
         `;
-
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => modal.classList.add('active'));
 
         try {
             const res = await fetch(`/api/bible/cross-references?chapterName=${encodeURIComponent(fullRef)}`);
             if (!res.ok) throw new Error("Failed to fetch cross references");
             const crossRefs = await res.json();
-
-            if (crossRefs && crossRefs.length > 0) {
-                const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-                listEl.innerHTML = crossRefs.map((item, idx) => {
-                    const letter = letters[idx % letters.length];
-                    return `
-                        <div class="verse-crossref-row-item" data-idx="${idx}" style="display: flex; align-items: baseline; gap: 14px; padding: 12px 6px; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); cursor: pointer; transition: background 0.15s ease;">
-                            <span style="font-weight: 700; font-size: 13px; color: var(--text-muted, #64748b); width: 14px; flex-shrink: 0; text-align: center;">${letter}</span>
-                            <div style="flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;">
-                                <span class="crossref-ref-link" style="color: #2563eb; font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer;">${item.ref}</span>
-                                <span style="font-size: 13.5px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                const rows = listEl.querySelectorAll('.verse-crossref-row-item');
-                rows.forEach((row, idx) => {
-                    row.addEventListener('mouseenter', () => {
-                        row.style.background = 'rgba(37, 99, 235, 0.04)';
-                    });
-                    row.addEventListener('mouseleave', () => {
-                        row.style.background = 'transparent';
-                    });
-                    row.addEventListener('click', () => {
-                        const targetRef = crossRefs[idx].ref;
-                        modal.classList.remove('active');
-                        setTimeout(() => modal.style.display = 'none', 250);
-                        this.parseAndNavigateToReference(targetRef);
-                    });
-                });
-            } else {
-                listEl.innerHTML = `
-                    <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13.5px;">
-                        Ingen kryssreferanser funnet for dette verset.
-                    </div>
-                `;
-            }
+            this.crossrefCache[fullRef] = crossRefs;
+            renderList(crossRefs);
         } catch (e) {
             console.error("Error fetching verse cross references:", e);
             listEl.innerHTML = `
@@ -2640,40 +2654,42 @@ class BibleReader {
         // Highlight reading plan verses if in plan mode
         this.applyReadingPlanHighlights();
 
-        // Inject Audio Play Button & Cross References Button dynamically
+        // Inject Audio Play Button & Cross References Button dynamically in side-by-side bar
         if (this.dom.btnLookupChapter) {
+            let actionBar = document.getElementById('chapter-header-action-bar');
+            if (!actionBar) {
+                actionBar = document.createElement('div');
+                actionBar.id = 'chapter-header-action-bar';
+                actionBar.style.cssText = 'display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; width: 100%;';
+                this.dom.btnLookupChapter.parentNode.insertBefore(actionBar, this.dom.btnLookupChapter.nextSibling);
+            }
+
             let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
             if (!playAudioBtn) {
                 playAudioBtn = document.createElement('button');
                 playAudioBtn.id = 'btn-play-audio-dynamic';
                 playAudioBtn.className = 'nav-btn';
-                playAudioBtn.style.cssText = 'margin-top: 4px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;';
+                playAudioBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
                 playAudioBtn.innerHTML = `
                     <span class="material-symbols-outlined" style="font-size: 16px;">play_circle</span>
                     <span>${this.t('play_audio')}</span>
                 `;
-                
-                // Click listener
                 playAudioBtn.addEventListener('click', () => this.toggleAudioPlayback());
-                
-                // Insert after lookup button
-                this.dom.btnLookupChapter.parentNode.insertBefore(playAudioBtn, this.dom.btnLookupChapter.nextSibling);
+                actionBar.appendChild(playAudioBtn);
             } else {
-                // Update translation text if language changed
                 const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
                 if (labelSpan) labelSpan.textContent = this.t('play_audio');
             }
 
-            // Inject Cross References Button next to Audio Play button
             let crossrefBtn = document.getElementById('btn-crossref-chapter-dynamic');
             if (!crossrefBtn) {
                 crossrefBtn = document.createElement('button');
                 crossrefBtn.id = 'btn-crossref-chapter-dynamic';
                 crossrefBtn.className = 'nav-btn';
-                crossrefBtn.style.cssText = 'margin-top: 4px; margin-left: 6px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;';
+                crossrefBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
                 crossrefBtn.innerHTML = `
                     <span class="material-symbols-outlined" style="font-size: 16px; color: var(--hkm-terracotta, #d17d39);">article</span>
-                    <span>${this.t('cross_references')}</span>
+                    <span class="crossref-btn-label">${this.t('cross_references')}</span>
                 `;
 
                 crossrefBtn.addEventListener('click', () => {
@@ -2683,10 +2699,9 @@ class BibleReader {
                     this.openVerseCrossReferenceModal('1', `${bookName} ${chapterNum}`);
                 });
 
-                const parent = playAudioBtn ? playAudioBtn.parentNode : this.dom.btnLookupChapter.parentNode;
-                parent.appendChild(crossrefBtn);
+                actionBar.appendChild(crossrefBtn);
             } else {
-                const labelSpan = crossrefBtn.querySelector('span:not(.material-symbols-outlined)');
+                const labelSpan = crossrefBtn.querySelector('.crossref-btn-label');
                 if (labelSpan) labelSpan.textContent = this.t('cross_references');
             }
         }

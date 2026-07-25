@@ -4,6 +4,7 @@ import path from 'path';
 
 // Global caching of the GoogleGenAI instance to optimize serverless cold starts
 let globalAi = null;
+const crossRefMemoryCache = new Map();
 function getGenAI() {
   if (!globalAi) {
     const key = process.env.GEMINI_API_KEY;
@@ -994,6 +995,10 @@ ${JSON.stringify(quotesToTranslate)}`;
         return res.status(400).json({ error: "chapterName query parameter is required" });
       }
 
+      if (crossRefMemoryCache.has(chapterName)) {
+        return res.status(200).json(crossRefMemoryCache.get(chapterName));
+      }
+
       const geminiApiKey = process.env.GEMINI_API_KEY;
       if (geminiApiKey) {
         try {
@@ -1034,7 +1039,9 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
           });
 
           if (response.text) {
-            return res.status(200).json(JSON.parse(response.text));
+            const parsed = JSON.parse(response.text);
+            crossRefMemoryCache.set(chapterName, parsed);
+            return res.status(200).json(parsed);
           }
         } catch (aiErr) {
           console.error("Gemini cross-references lookup failed:", aiErr);
