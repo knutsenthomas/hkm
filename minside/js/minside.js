@@ -5808,6 +5808,7 @@ class MinSideManager {
                 html[data-theme="dark"] .hkm-sidebar-scroll::-webkit-scrollbar-thumb:hover {
                     background: #64748b !important;
                 }
+            </style>
             <div class="hkm-player-grid">
                 <!-- Left Side: Player & Lesson Details -->
                 <div class="hkm-player-main">
