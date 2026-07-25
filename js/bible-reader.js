@@ -1672,7 +1672,7 @@ class BibleReader {
                             this.dom.verseToolbar.style.display = 'flex';
                             const sheetRefEl = document.getElementById('sheet-verse-reference');
                             if (sheetRefEl) {
-                                sheetRefEl.textContent = this.getSelectedVersesReferenceText();
+                                sheetRefEl.textContent = this.getSelectedVersesReference() || 'Velg vers';
                             }
                         }
                         return;

@@ -1900,23 +1900,25 @@
             line-height: 1.3;
         }
 
-        .sheet-controls-row {
+        .sheet-scrollable-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 8px;
+            gap: 10px;
+            overflow-x: auto;
             width: 100%;
+            padding: 4px 2px 8px 2px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
 
-        .sheet-color-pickers {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .sheet-scrollable-row::-webkit-scrollbar {
+            display: none;
         }
 
         .color-swatch-circle {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -1932,27 +1934,27 @@
             transform: scale(0.95);
         }
 
-        .sheet-action-btns {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            overflow-x: auto;
-            max-width: 100%;
-            padding: 2px 0;
-            -webkit-overflow-scrolling: touch;
+        .sheet-divider-v {
+            width: 1px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.12);
+            flex-shrink: 0;
+            margin: 0 2px;
         }
-        .sheet-action-btns::-webkit-scrollbar {
-            display: none;
+
+        html[data-theme="dark"] .sheet-divider-v {
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .sheet-action-btn {
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 3px;
-            min-width: 54px;
-            height: 56px;
+            min-width: 58px;
+            height: 58px;
             padding: 4px 8px;
             background: #f1f5f9;
             border: 1px solid #e2e8f0;
@@ -2918,51 +2920,49 @@
                     <div class="sheet-handle-bar"></div>
                     <div id="sheet-verse-reference" class="sheet-verse-reference">Velg vers</div>
 
-                    <div class="sheet-controls-row">
+                    <div class="sheet-scrollable-row">
                         <!-- Color Pickers -->
-                        <div class="sheet-color-pickers">
-                            <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Gul"></button>
-                            <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Grønn"></button>
-                            <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
-                            <button class="color-swatch-circle" data-color="multi" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Flerfarget"></button>
-                        </div>
+                        <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Gul"></button>
+                        <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Grønn"></button>
+                        <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
+                        <button class="color-swatch-circle" data-color="multi" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Flerfarget"></button>
+
+                        <div class="sheet-divider-v"></div>
 
                         <!-- Action Buttons -->
-                        <div class="sheet-action-btns">
-                            <button id="toolbar-btn-bookmark" class="sheet-action-btn" title="Lagre vers">
-                                <span class="material-symbols-outlined">bookmark</span>
-                                <span id="toolbar-bookmark-text">Lagre</span>
-                            </button>
+                        <button id="toolbar-btn-bookmark" class="sheet-action-btn" title="Lagre vers">
+                            <span class="material-symbols-outlined">bookmark</span>
+                            <span id="toolbar-bookmark-text">Lagre</span>
+                        </button>
 
-                            <button id="toolbar-btn-save-user" class="sheet-action-btn" title="Skriv notat">
-                                <span class="material-symbols-outlined">edit_note</span>
-                                <span>Notat</span>
-                            </button>
+                        <button id="toolbar-btn-save-user" class="sheet-action-btn" title="Skriv notat">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Notat</span>
+                        </button>
 
-                            <button id="toolbar-btn-download" class="sheet-action-btn" title="Kopier vers">
-                                <span class="material-symbols-outlined">content_copy</span>
-                                <span>Kopier</span>
-                            </button>
+                        <button id="toolbar-btn-download" class="sheet-action-btn" title="Kopier vers">
+                            <span class="material-symbols-outlined">content_copy</span>
+                            <span>Kopier</span>
+                        </button>
 
-                            <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Forklar i Bibeleksikon">
-                                <span class="material-symbols-outlined">menu_book</span>
-                                <span>Leksikon</span>
-                            </button>
+                        <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Forklar i Bibeleksikon">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <span>Leksikon</span>
+                        </button>
 
-                            <button id="toolbar-btn-range" class="sheet-action-btn" title="Velg flere vers">
-                                <span class="material-symbols-outlined">select_all</span>
-                                <span>Område</span>
-                            </button>
+                        <button id="toolbar-btn-range" class="sheet-action-btn" title="Velg flere vers">
+                            <span class="material-symbols-outlined">select_all</span>
+                            <span>Område</span>
+                        </button>
 
-                            <button id="toolbar-btn-share" class="sheet-action-btn" title="Del vers">
-                                <span class="material-symbols-outlined">share</span>
-                                <span>Del</span>
-                            </button>
+                        <button id="toolbar-btn-share" class="sheet-action-btn" title="Del vers">
+                            <span class="material-symbols-outlined">share</span>
+                            <span>Del</span>
+                        </button>
 
-                            <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 36px; height: 56px; background: transparent; border: none; color: #94a3b8; padding: 0;">
-                                <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
-                            </button>
-                        </div>
+                        <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 40px; height: 58px; background: transparent; border: none; color: #94a3b8; padding: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
+                        </button>
                     </div>
                 </div>
             </div>
