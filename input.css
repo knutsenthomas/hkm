@@ -8848,6 +8848,42 @@ html[data-theme="dark"] .hkm-chat-field textarea:focus {
     background: #1e293b !important;
 }
 
+/* Dictionary Drawer & Close Button Enhancements */
+.dictionary-drawer {
+    z-index: 30000 !important;
+}
+.dictionary-drawer.active {
+    z-index: 30000 !important;
+}
+.close-dict-btn {
+    background: rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 50% !important;
+    color: var(--text-base, #1e293b) !important;
+    transition: all 0.2s ease !important;
+    touch-action: manipulation !important;
+    z-index: 10 !important;
+}
+.close-dict-btn:hover,
+.close-dict-btn:active {
+    background: rgba(209, 125, 57, 0.15) !important;
+    color: var(--hkm-terracotta, #d17d39) !important;
+}
+[data-theme="dark"] .close-dict-btn,
+body.dark-mode .close-dict-btn {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
 /* Bible Lexicon Extended Analysis styles */
 .dict-extended-btn {
     background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;

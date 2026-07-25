@@ -1126,12 +1126,22 @@ class BibleReader {
 
         // Close Dictionary
         if (this.dom.closeDictBtn) {
-            this.dom.closeDictBtn.addEventListener('click', () => {
-                this.dom.dictDrawer.classList.remove('active');
-                this.dom.dictDrawer.classList.remove('expanded');
+            const closeDictHandler = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                if (this.dom.dictDrawer) {
+                    this.dom.dictDrawer.classList.remove('active');
+                    this.dom.dictDrawer.classList.remove('expanded');
+                }
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
                 const expandBtnIcon = this.dom.toggleExpandDictBtn ? this.dom.toggleExpandDictBtn.querySelector('span') : null;
                 if (expandBtnIcon) expandBtnIcon.textContent = 'open_in_full';
-            });
+            };
+            this.dom.closeDictBtn.addEventListener('click', closeDictHandler);
+            this.dom.closeDictBtn.addEventListener('pointerdown', closeDictHandler);
         }
 
         // Toggle Expand/Shrink Dictionary Drawer
@@ -1149,6 +1159,8 @@ class BibleReader {
         if (this.dom.dictManualTrigger) {
             this.dom.dictManualTrigger.addEventListener('click', () => {
                 this.dom.dictDrawer.classList.add('active');
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.add('active');
                 if (this.dom.dictContentWrap.style.display === 'none' && this.dom.dictSpinner.style.display === 'none') {
                     if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'flex';
                 }
@@ -3142,7 +3154,9 @@ class BibleReader {
     }
 
     async lookupWord(word, contextText, refText) {
-        this.dom.dictDrawer.classList.add('active');
+        if (this.dom.dictDrawer) this.dom.dictDrawer.classList.add('active');
+        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (backdrop) backdrop.classList.add('active');
         const dictBody = this.dom.dictDrawer ? this.dom.dictDrawer.querySelector('.dict-body') : null;
         if (dictBody) dictBody.scrollTop = 0;
         if (this.dom.dictWelcomeState) this.dom.dictWelcomeState.style.display = 'none';
