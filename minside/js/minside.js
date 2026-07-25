@@ -6546,7 +6546,7 @@ class MinSideManager {
 
         const lookupWord = async (word) => {
             dictOverlay.style.display = 'flex';
-            dictTitle.textContent = `Eksikon: "${word}"`;
+            dictTitle.textContent = `Leksikon: "${word}"`;
             dictContent.innerHTML = `<p style="color:#64748b; text-align:center; font-style:italic; padding-top:40px;">Søker i Bibeleksikon...</p>`;
             
             try {

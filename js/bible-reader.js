@@ -646,7 +646,7 @@ class BibleReader {
 
                 const docLang = document.documentElement.lang || 'no';
                 const labels = {
-                    no: { dict: 'Eksikon', read: 'Lesemodus', user: 'Min side' },
+                    no: { dict: 'Leksikon', read: 'Lesemodus', user: 'Min side' },
                     en: { dict: 'Lexicon', read: 'Reader', user: 'My Page' },
                     es: { dict: 'Léxico', read: 'Lectura', user: 'Mi página' }
                 };
