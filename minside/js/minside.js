@@ -2855,7 +2855,7 @@ class MinSideManager {
                 this._fetchCurrentUserDonations(),
                 firebase.firestore().collection('siteContent').doc('collection_courses').get(),
                 firebase.firestore().collection('user_notifications')
-                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get()
+                    .where('userId', '==', uid).get()
             ];
             if (this.prayerWallEnabled) {
                 promises.push(firebase.firestore().collection('prayers').get());
@@ -2977,11 +2977,18 @@ class MinSideManager {
             // Recent notifications list
             const recentEl = document.getElementById('ov-recent-notifs');
             if (recentEl) {
-                if (recentSnap.empty) {
+                if (!recentSnap || recentSnap.empty) {
                     recentEl.innerHTML = `<div class="ms-overview-notifs-empty">${t('overview.noNotificationsYet')}</div>`;
                 } else {
-                    recentEl.innerHTML = recentSnap.docs.map(doc => {
-                        const d = this._normalizeNotificationDoc(doc);
+                    const sortedNotifs = recentSnap.docs.map(doc => this._normalizeNotificationDoc(doc));
+                    sortedNotifs.sort((a, b) => {
+                        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+                        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+                        return bTime - aTime;
+                    });
+                    const topNotifs = sortedNotifs.slice(0, 4);
+
+                    recentEl.innerHTML = topNotifs.map(d => {
                         const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
                         return `<div class="ms-overview-notif-row">
                             <div class="ms-overview-notif-dot ${d.read ? 'is-read' : ''}"></div>
@@ -2993,7 +3000,7 @@ class MinSideManager {
                         </div>`;
                     }).join('') + `<div class="ms-overview-notifs-footer">
                         <button class="btn btn-ghost btn-sm ms-btn-full"
-                            onclick="window.minSideManager.loadView('notifications')">
+                            onclick="if (window.minSideApp) window.minSideApp.loadView('notifications'); else if (window.minSideManager) window.minSideManager.loadView('notifications');">
                             ${t('overview.showAllNotifications')}
                         </button></div>`;
                 }
