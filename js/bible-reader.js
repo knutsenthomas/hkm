@@ -756,37 +756,35 @@ class BibleReader {
     }
 
     bindEvents() {
-        // Translation change
+        const openTransModalHandler = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.openTranslationModal();
+        };
+
         if (this.dom.translationSelect) {
-            this.dom.translationSelect.addEventListener('change', async (e) => {
-                this.selectedBibleId = e.target.value;
-                const currentLang = document.documentElement.lang || 'no';
-                this.safeSetLocalStorage(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
-                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-                if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
-                await this.loadBooks();
-                // Re-navigate to current book/chapter if possible
-                const activeBookId = this.selectedBookId;
-                const activeChapterNum = (this.selectedChapterId && this.selectedChapterId.includes('_')) ? this.selectedChapterId.split('_')[1] : '1';
-                await this.selectBook(activeBookId);
-                await this.selectChapter(`${activeBookId}_${activeChapterNum}`);
-            });
+            this.dom.translationSelect.addEventListener('mousedown', openTransModalHandler);
+            this.dom.translationSelect.addEventListener('touchstart', openTransModalHandler);
+            this.dom.translationSelect.addEventListener('click', openTransModalHandler);
         }
 
-        // Mobile translation change
         const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
         if (mobileTransSelect) {
-            mobileTransSelect.addEventListener('change', async (e) => {
-                this.selectedBibleId = e.target.value;
-                const currentLang = document.documentElement.lang || 'no';
-                this.safeSetLocalStorage(`hkm_bible_translation_${currentLang}`, this.selectedBibleId);
-                if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
-                await this.loadBooks();
-                // Re-navigate to current book/chapter if possible
-                const activeBookId = this.selectedBookId;
-                const activeChapterNum = (this.selectedChapterId && this.selectedChapterId.includes('_')) ? this.selectedChapterId.split('_')[1] : '1';
-                await this.selectBook(activeBookId);
-                await this.selectChapter(`${activeBookId}_${activeChapterNum}`);
+            mobileTransSelect.addEventListener('mousedown', openTransModalHandler);
+            mobileTransSelect.addEventListener('touchstart', openTransModalHandler);
+            mobileTransSelect.addEventListener('click', openTransModalHandler);
+        }
+
+        const translationModalCard = document.querySelector('#translation-selection-modal .translation-modal-card');
+        if (translationModalCard) {
+            const translationModal = document.getElementById('translation-selection-modal');
+            this.setupBottomSheetSwipeDown(translationModalCard, () => {
+                if (translationModal) {
+                    translationModal.classList.remove('active');
+                    translationModal.style.display = 'none';
+                }
             });
         }
 
@@ -2099,6 +2097,52 @@ class BibleReader {
                 btn.classList.remove('active');
             }
         });
+    }
+
+    openTranslationModal() {
+        const modal = document.getElementById('translation-selection-modal');
+        const container = document.getElementById('translation-modal-options-list');
+        if (!modal || !container) return;
+
+        container.innerHTML = (this.bibles || []).map(t => {
+            const isSelected = t.id === this.selectedBibleId;
+            return `
+                <button type="button" class="translation-option-btn ${isSelected ? 'active' : ''}" data-id="${t.id}">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-weight: 700; font-size: 14.5px; color: var(--text-base);">${t.name}</span>
+                        <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">${t.abbreviation || ''} ${t.languageName ? '• ' + t.languageName : ''}</span>
+                    </div>
+                    <div class="radio-indicator">
+                        ${isSelected ? '<span class="material-symbols-outlined" style="font-size: 14px; color: white; font-weight: bold;">check</span>' : ''}
+                    </div>
+                </button>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.translation-option-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const bibleId = btn.getAttribute('data-id');
+                if (bibleId && bibleId !== this.selectedBibleId) {
+                    this.selectedBibleId = bibleId;
+                    const activeLang = window.HKM_CURRENT_LANG || 'no';
+                    this.safeSetLocalStorage(`hkm_bible_translation_${activeLang}`, this.selectedBibleId);
+                    
+                    if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
+                    const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                    if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
+
+                    await this.loadBooks();
+                    await this.loadChapterText();
+                    this.updateUrl();
+                }
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            });
+        });
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('active'));
     }
 
     async loadTranslations() {
