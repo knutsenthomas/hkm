@@ -1902,8 +1902,22 @@
                 }
             }
 
-            // Render Zoom banner in Overview tab ONLY if not showing live countdown video overlay
+            // Calculate future countdown state
             const zoomUrl = lesson.zoomUrl || (currentCourse && currentCourse.zoomUrl);
+            const targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date || currentCourse.zoomDate));
+            let isFutureCountdown = false;
+
+            if (targetDateVal) {
+                try {
+                    const d = new Date(targetDateVal);
+                    const now = Date.now();
+                    if (!isNaN(d.getTime()) && (d.getTime() - now) > 0) {
+                        isFutureCountdown = true;
+                    }
+                } catch (e) {}
+            }
+
+            // Render Zoom banner in Overview tab ONLY if not showing live countdown video overlay
             const zoomBanner = document.getElementById('zoom-banner-container');
 
             if (zoomUrl && String(zoomUrl).trim().length > 0 && !isFutureCountdown) {
@@ -2038,19 +2052,6 @@
             if (hasAccess) {
                 if (coverImgEl) coverImgEl.style.display = 'none';
                 if (lockedOverlay) lockedOverlay.style.display = 'none';
-                
-                let targetDateVal = lesson.date || lesson.releaseDate || (currentCourse && (currentCourse.releaseDate || currentCourse.startDate || currentCourse.date || currentCourse.zoomDate));
-                let isFutureCountdown = false;
-
-                if (targetDateVal) {
-                    try {
-                        const d = new Date(targetDateVal);
-                        const now = Date.now();
-                        if (!isNaN(d.getTime()) && (d.getTime() - now) > 0) {
-                            isFutureCountdown = true;
-                        }
-                    } catch (e) {}
-                }
 
                 if (isFutureCountdown) {
                     videoContainer.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.88)), url('${courseImg}')`;
