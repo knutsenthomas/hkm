@@ -1894,25 +1894,32 @@
 
                 function checkDirectCourseAccess() {
                     if (hasProcessedParam) return;
-                    if (!authLoaded || !allCourses || allCourses.length === 0) return;
+                    if (!allCourses || allCourses.length === 0) return;
                     
                     const urlParams = new URLSearchParams(window.location.search);
+                    const enrollParam = urlParams.get('enroll') || urlParams.get('enrollId') || urlParams.get('buy');
                     const courseIdParam = urlParams.get('courseId') || urlParams.get('course');
-                    if (!courseIdParam) return;
+                    const targetId = enrollParam || courseIdParam;
+                    if (!targetId) return;
                     
-                    const course = allCourses.find(c => c.id === courseIdParam);
+                    const course = allCourses.find(c => String(c.id) === String(targetId));
                     if (!course) return;
                     
                     hasProcessedParam = true;
                     
-                    const isFree = !course.price || course.price === 0;
+                    if (enrollParam) {
+                        setTimeout(() => openEnrollModal(course), 100);
+                        return;
+                    }
+                    
+                    const isFree = !course.price || course.price === 0 || course.price === '0';
                     const isAdmin = currentUserRole === 'admin' || currentUserRole === 'superadmin';
                     const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                     
                     if (hasAccess) {
                         window.location.href = '/minside/index.html#course-player?courseId=' + course.id;
                     } else {
-                        openEnrollModal(course);
+                        setTimeout(() => openEnrollModal(course), 100);
                     }
                 }
 
