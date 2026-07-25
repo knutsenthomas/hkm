@@ -769,26 +769,58 @@
             /* Navigation Bar Between Lessons */
             .lesson-nav-bar {
                 flex-direction: column !important;
-                gap: 10px !important;
-                padding: 12px !important;
+                gap: 12px !important;
+                padding: 14px 12px !important;
                 align-items: stretch !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
 
+            .lesson-step-wrapper {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 100% !important;
+                gap: 8px !important;
+                order: 2 !important;
+            }
+
+            #prev-lesson-btn {
+                order: 1 !important;
+            }
+
+            #next-lesson-btn {
+                order: 3 !important;
+            }
+
             .lesson-nav-btn {
                 width: 100% !important;
                 justify-content: center !important;
-                min-height: 44px !important;
-                font-size: 0.9rem !important;
+                min-height: 46px !important;
+                font-size: 0.92rem !important;
                 box-sizing: border-box !important;
             }
 
             #lesson-step-indicator {
-                order: -1 !important;
                 text-align: center !important;
                 width: 100% !important;
                 display: block !important;
+                font-size: 0.9rem !important;
+                font-weight: 750 !important;
+                color: #475569 !important;
+            }
+
+            #zoom-nav-link {
+                width: 100% !important;
+                justify-content: center !important;
+                text-align: center !important;
+                box-sizing: border-box !important;
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+                padding: 12px 16px !important;
+                border-radius: 10px !important;
+                display: inline-flex !important;
             }
 
             /* Content Tabs */
@@ -1211,7 +1243,7 @@
                 <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
                     <i class="fas fa-chevron-left"></i> Forrige leksjon
                 </button>
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div class="lesson-step-wrapper" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
                     <a id="zoom-nav-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-terracotta" style="display: none; padding: 6px 14px; font-size: 0.82rem; background: var(--hkm-terracotta); border: none; text-decoration: none; border-radius: 8px;">
                         <i class="fas fa-video"></i> Åpne i Zoom-appen
