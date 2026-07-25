@@ -603,6 +603,163 @@
             font-weight: 700;
             color: #1e293b;
         }
+
+        /* ==========================================================================
+           COMPREHENSIVE MOBILE RESPONSIVE OVERRIDES FOR KURS DETALJER (iOS & Android)
+           ========================================================================== */
+
+        @media (max-width: 900px) {
+            .platform-container {
+                flex-direction: column !important;
+                margin-top: 64px !important;
+                min-height: auto !important;
+            }
+
+            .sidebar-nav {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
+            }
+
+            .sidebar-header {
+                padding: 16px !important;
+            }
+
+            .module-header {
+                padding: 14px 16px !important;
+                font-size: 0.9rem !important;
+            }
+
+            .lesson-item {
+                padding: 12px 16px !important;
+                font-size: 0.88rem !important;
+                min-height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .main-panel {
+                padding: 20px 14px 40px !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .panel-top-bar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+
+            #course-lesson-heading {
+                font-size: 1.05rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .progress-wrapper {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+
+            .progress-bar-bg {
+                flex-grow: 1 !important;
+                max-width: 180px !important;
+            }
+
+            /* Video & Overlays */
+            .video-card {
+                border-radius: 12px !important;
+                margin-bottom: 14px !important;
+            }
+
+            .locked-overlay,
+            .upcoming-overlay {
+                padding: 16px 12px !important;
+            }
+
+            .locked-overlay h3,
+            .upcoming-overlay h3 {
+                font-size: 1.15rem !important;
+                margin-bottom: 6px !important;
+            }
+
+            .locked-overlay p,
+            .upcoming-overlay p {
+                font-size: 0.85rem !important;
+                margin-bottom: 14px !important;
+                line-height: 1.4 !important;
+            }
+
+            .locked-overlay .btn-terracotta,
+            .upcoming-overlay .btn-terracotta {
+                padding: 10px 18px !important;
+                font-size: 0.88rem !important;
+                min-height: 44px !important;
+            }
+
+            /* Navigation Bar Between Lessons */
+            .lesson-nav-bar {
+                flex-direction: column !important;
+                gap: 10px !important;
+                padding: 12px !important;
+                align-items: stretch !important;
+            }
+
+            .lesson-nav-btn {
+                width: 100% !important;
+                justify-content: center !important;
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+                box-sizing: border-box !important;
+            }
+
+            #lesson-step-indicator {
+                order: -1 !important;
+                text-align: center !important;
+                width: 100% !important;
+                display: block !important;
+            }
+
+            /* Content Tabs */
+            .content-tabs {
+                display: flex !important;
+                width: 100% !important;
+                gap: 6px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .tab-btn {
+                flex: 1 !important;
+                text-align: center !important;
+                padding: 10px 6px !important;
+                font-size: 0.86rem !important;
+                min-height: 44px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 8px !important;
+            }
+
+            /* Instructor Card */
+            .instructor-card {
+                flex-direction: column !important;
+                text-align: center !important;
+                padding: 20px 16px !important;
+                align-items: center !important;
+                gap: 12px !important;
+            }
+
+            .instructor-avatar {
+                margin: 0 auto !important;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .platform-container {
+                margin-top: 56px !important;
+            }
+        }
     </style>
 </head>
 
