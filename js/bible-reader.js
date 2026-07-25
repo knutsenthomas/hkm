@@ -2502,24 +2502,35 @@ class BibleReader {
 
     attachVerseCrossReferenceButtons() {
         if (!this.dom.readingPane) return;
-        const paragraphs = this.dom.readingPane.querySelectorAll('p');
-        paragraphs.forEach(p => {
-            const verseSup = p.querySelector('sup.v');
-            if (!verseSup) return;
-            const verseNum = verseSup.innerText.trim();
+        
+        // Remove any previous icons
+        this.dom.readingPane.querySelectorAll('.verse-crossref-icon-btn').forEach(b => b.remove());
+
+        // Prepare container with dedicated right gutter padding for icons
+        this.dom.readingPane.style.position = 'relative';
+        this.dom.readingPane.style.paddingRight = '52px';
+        this.dom.readingPane.style.boxSizing = 'border-box';
+
+        const verseSups = this.dom.readingPane.querySelectorAll('sup.v, span.v');
+        if (!verseSups || verseSups.length === 0) return;
+
+        const readingPaneRect = this.dom.readingPane.getBoundingClientRect();
+        const scrollTop = this.dom.readingPane.scrollTop || 0;
+
+        verseSups.forEach(sup => {
+            const verseNum = sup.innerText.trim();
             if (!verseNum) return;
 
-            p.style.position = 'relative';
-            p.style.paddingRight = '36px';
-
-            if (p.querySelector('.verse-crossref-icon-btn')) return;
+            const p = sup.closest('p') || sup.parentElement;
+            const supRect = sup.getBoundingClientRect();
+            const verseTop = (supRect.top - readingPaneRect.top) + scrollTop;
 
             const iconBtn = document.createElement('button');
             iconBtn.type = 'button';
             iconBtn.className = 'verse-crossref-icon-btn';
-            iconBtn.title = 'Kryssreferanser og notat';
+            iconBtn.title = `Kryssreferanser og notat (Vers ${verseNum})`;
             iconBtn.setAttribute('data-verse-num', verseNum);
-            iconBtn.style.cssText = 'position: absolute; right: 10px; top: 2px; background: var(--bg-surface, rgba(0,0,0,0.04)); border: 1px solid var(--border-subtle, rgba(0,0,0,0.08)); color: var(--text-muted, #64748b); opacity: 0.65; cursor: pointer; padding: 2px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; z-index: 5;';
+            iconBtn.style.cssText = `position: absolute; right: 4px; top: ${Math.max(0, verseTop - 2)}px; background: var(--bg-surface, rgba(0,0,0,0.04)); border: 1px solid var(--border-subtle, rgba(0,0,0,0.08)); color: var(--text-muted, #64748b); opacity: 0.65; cursor: pointer; padding: 2px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; z-index: 5;`;
             iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">article</span>`;
 
             iconBtn.addEventListener('mouseenter', () => {
@@ -2540,18 +2551,19 @@ class BibleReader {
             const openCrossref = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                // Clean verse text without child button
-                const clone = p.cloneNode(true);
-                const btn = clone.querySelector('.verse-crossref-icon-btn');
-                if (btn) btn.remove();
-                const verseText = clone.innerText.trim();
+                let verseText = '';
+                if (p) {
+                    const clone = p.cloneNode(true);
+                    clone.querySelectorAll('.verse-crossref-icon-btn').forEach(btn => btn.remove());
+                    verseText = clone.innerText.trim();
+                }
                 this.openVerseCrossReferenceModal(verseNum, verseText);
             };
 
             iconBtn.addEventListener('click', openCrossref);
             iconBtn.addEventListener('touchend', openCrossref);
 
-            p.appendChild(iconBtn);
+            this.dom.readingPane.appendChild(iconBtn);
         });
     }
 
