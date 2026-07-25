@@ -1378,29 +1378,30 @@ class BibleReader {
         }
 
         if (this.dom.toolbarBtnDownload) {
-            this.dom.toolbarBtnDownload.addEventListener('click', (e) => {
+            this.dom.toolbarBtnDownload.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
-                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
                     const refRange = this.getSelectedVersesReference();
                     
                     const combinedText = sorted.map(v => {
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = v.paragraph.innerHTML;
                         tempDiv.querySelectorAll('sup').forEach(s => s.remove());
-                        return `[Vers ${v.verseNum}] ${tempDiv.innerText.trim()}`;
+                        return `${v.verseNum}. ${tempDiv.innerText.trim()}`;
                     }).join('\n');
 
-                    const fileText = `Bibelvers fra His Kingdom Ministry\nReferanse: ${refRange}\nOversettelse: ${translation}\nDato: ${new Date().toLocaleDateString()}\n\n${combinedText}\n`;
+                    const textToCopy = `${refRange}\n\n${combinedText}\n\n— His Kingdom Ministry`;
 
-                    const blob = new Blob([fileText], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `HKM_Bibel_${refRange.replace(/[\s:]/g, '_')}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
+                        const isEn = window.location.pathname.includes('/en/');
+                        const isEs = window.location.pathname.includes('/es/');
+                        const toastMsg = isEn ? 'Copied to clipboard!' : (isEs ? '¡Copiado al portapapeles!' : 'Kopiert til utklippstavlen!');
+                        this.showToast(toastMsg);
+                    } catch(err) {
+                        console.error('Clipboard copy error:', err);
+                    }
                     this.clearSelection();
                 }
             });
@@ -1464,6 +1465,19 @@ class BibleReader {
                 this.clearSelection();
             });
         }
+
+        // Color swatch listeners for bottom action sheet
+        document.querySelectorAll('#verse-context-toolbar .color-swatch-circle').forEach(swatch => {
+            swatch.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const color = swatch.getAttribute('data-color');
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    this.selectedVerses.forEach(v => {
+                        v.paragraph.setAttribute('data-highlight-color', color);
+                    });
+                }
+            });
+        });
 
         // Hide toolbar, clear highlight, and show/hide floating nav on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
@@ -1645,45 +1659,13 @@ class BibleReader {
                             bookmarkIcon.innerText = allBookmarked ? 'bookmark_remove' : 'bookmark';
                         }
 
-                        // Position and show toolbar
+                        // Show bottom action sheet toolbar & update reference header
                         if (this.dom.verseToolbar) {
                             this.dom.verseToolbar.style.display = 'flex';
-                            
-                            // Calculate position relative to scrollable pane to handle inline layout correctly
-                            const pane = this.dom.readingPane.closest('.bible-content-pane');
-                            const paneRect = pane.getBoundingClientRect();
-                            const clickRelativeY = e.clientY - paneRect.top;
-                            const paneHeight = pane.clientHeight;
-                            
-                            // Estimate toolbar height as 380px for layout bounding
-                            const toolbarHeight = 380;
-                            
-                            // Determine position (above or below clicked verse)
-                            const showBelow = clickRelativeY < 350;
-                            
-                            let y;
-                            if (showBelow) {
-                                this.dom.verseToolbar.classList.add('position-below');
-                                // Position below click
-                                let topY = clickRelativeY + 15;
-                                // Bound bottom edge to prevent cutoff/overlap with bottom elements
-                                if (topY + toolbarHeight > paneHeight - 16) {
-                                    topY = Math.max(16, paneHeight - toolbarHeight - 16);
-                                }
-                                y = topY + pane.scrollTop;
-                            } else {
-                                this.dom.verseToolbar.classList.remove('position-below');
-                                // Position above click
-                                let bottomY = clickRelativeY - 10;
-                                // Bound top edge to prevent cutoff at the top
-                                if (bottomY - toolbarHeight < 16) {
-                                    bottomY = toolbarHeight + 16;
-                                }
-                                y = bottomY + pane.scrollTop;
+                            const sheetRefEl = document.getElementById('sheet-verse-reference');
+                            if (sheetRefEl) {
+                                sheetRefEl.textContent = this.getSelectedVersesReferenceText();
                             }
-                            
-                            this.dom.verseToolbar.style.left = '50%';
-                            this.dom.verseToolbar.style.top = `${y}px`;
                         }
                         return;
                     }

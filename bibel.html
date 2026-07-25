@@ -1802,151 +1802,182 @@
             display: none !important;
         }
 
-        /* Multi-verse selection styling */
-        .bible-reading-pane p.selected-verse {
-            background: rgba(27, 73, 101, 0.12) !important;
-            border-radius: 4px !important;
-        }        /* Premium Floating Verse Toolbar (Vertical Card Style for PC & Mobile) */
-        #verse-context-toolbar {
-            position: absolute !important;
-            background: rgba(30, 41, 59, 0.8) !important;
-            backdrop-filter: blur(16px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 20px !important;
-            padding: 16px !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
-            z-index: 2100 !important;
+        /* Dotted text underline for selected verses (Matching reference design) */
+        .bible-reading-pane p.selected-verse,
+        .bible-reading-pane.layout-paragraph p.selected-verse {
+            background: transparent !important;
+            text-decoration: underline dotted #475569 !important;
+            text-underline-offset: 5px !important;
+            text-decoration-thickness: 2px !important;
+        }
+
+        html[data-theme="dark"] .bible-reading-pane p.selected-verse,
+        html[data-theme="dark"] .bible-reading-pane.layout-paragraph p.selected-verse {
+            text-decoration: underline dotted #cbd5e1 !important;
+        }
+
+        html[data-theme="cream"] .bible-reading-pane p.selected-verse,
+        html[data-theme="cream"] .bible-reading-pane.layout-paragraph p.selected-verse {
+            text-decoration: underline dotted #475569 !important;
+        }
+
+        .bible-reading-pane p.selected-verse[data-highlight-color="yellow"] {
+            text-decoration: underline dotted #eab308 !important;
+        }
+        .bible-reading-pane p.selected-verse[data-highlight-color="green"] {
+            text-decoration: underline dotted #22c55e !important;
+        }
+        .bible-reading-pane p.selected-verse[data-highlight-color="cyan"] {
+            text-decoration: underline dotted #06b6d4 !important;
+        }
+        .bible-reading-pane p.selected-verse[data-highlight-color="multi"] {
+            text-decoration: underline dotted #a855f7 !important;
+        }
+
+        /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal) */
+        #verse-context-toolbar,
+        #verse-context-toolbar.position-below {
+            position: fixed !important;
+            bottom: 0 !important;
+            top: auto !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 100% !important;
+            max-width: 520px !important;
+            background: #ffffff !important;
+            border-radius: 28px 28px 0 0 !important;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18) !important;
+            padding: 12px 20px 28px !important;
+            z-index: 22000 !important;
             display: none;
             flex-direction: column !important;
-            gap: 4px !important;
-            width: 300px !important;
-            max-width: calc(100vw - 32px) !important;
-            max-height: 400px;
-            overflow-y: auto;
+            gap: 12px !important;
             box-sizing: border-box !important;
-            animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-            transform: translate(-50%, -105%) !important;
-            top: auto;
-            left: 50%;
+            animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
         }
 
-        html[data-theme="light"] #verse-context-toolbar {
-            background: rgba(255, 255, 255, 0.85) !important;
-            border: 1px solid rgba(0, 0, 0, 0.08) !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+        html[data-theme="dark"] #verse-context-toolbar,
+        html[data-theme="dark"] #verse-context-toolbar.position-below {
+            background: #1e293b !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5) !important;
         }
 
-        #verse-context-toolbar .toolbar-mobile-header {
-            display: flex !important;
+        html[data-theme="cream"] #verse-context-toolbar,
+        html[data-theme="cream"] #verse-context-toolbar.position-below {
+            background: #fdfbf7 !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
 
-        #verse-context-toolbar .floating-book-item {
-            background: rgba(255, 255, 255, 0.02) !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            border-radius: 10px !important;
-            width: 100% !important;
-            min-height: 44px !important;
-            height: auto !important;
-            padding: 10px 16px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            gap: 10px !important;
-            margin-bottom: 4px !important;
-            transition: all 0.2s ease !important;
-            cursor: pointer !important;
-            color: var(--text-base) !important;
-            text-transform: none !important;
-            font-family: inherit !important;
-            box-shadow: none !important;
-            position: relative !important;
-        }
-
-        html[data-theme="light"] #verse-context-toolbar .floating-book-item {
-            background: rgba(0, 0, 0, 0.02) !important;
-            border: 1px solid rgba(0, 0, 0, 0.06) !important;
-        }
-
-        #verse-context-toolbar .floating-book-item:hover {
-            transform: scale(1.02) !important;
-            background: var(--active-bg) !important;
-            color: var(--bible-primary) !important;
-        }
-
-        #verse-context-toolbar .floating-book-item:active {
-            transform: scale(0.98) !important;
-        }
-
-        #verse-context-toolbar .toolbar-btn-text {
-            display: inline !important;
-        }
-
-        #verse-context-toolbar .toolbar-divider {
-            display: none !important;
-        }
-
-        #verse-context-toolbar .floating-book-item::after {
-            display: none !important;
-        }
-
-        #verse-context-toolbar #toolbar-btn-lookup {
-            color: var(--bible-primary) !important;
-        }
-        #verse-context-toolbar #toolbar-btn-clear {
-            color: #bd4f2a !important;
-        }
-
-        @keyframes popoverFadeIn {
+        @keyframes sheetSlideUp {
             from {
-                opacity: 0;
-                transform: translate(-50%, -95%) scale(0.95);
+                transform: translate(-50%, 100%);
             }
             to {
-                opacity: 1;
-                transform: translate(-50%, -105%) scale(1);
+                transform: translate(-50%, 0);
             }
         }
 
-        #verse-context-toolbar.position-below {
-            transform: translate(-50%, 15px) !important;
-            animation: popoverFadeInBelow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        .sheet-handle-bar {
+            width: 44px;
+            height: 5px;
+            background: #cbd5e1;
+            border-radius: 99px;
+            margin: 4px auto 4px;
         }
 
-        @keyframes popoverFadeInBelow {
-            from {
-                opacity: 0;
-                transform: translate(-50%, 5px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, 15px) scale(1);
-            }
+        html[data-theme="dark"] .sheet-handle-bar {
+            background: #475569;
         }
 
-        /* Mobile Adaptation (<= 768px) */
-        @media (max-width: 768px) {
-            #verse-context-toolbar,
-            #verse-context-toolbar.position-below {
-                position: fixed !important;
-                bottom: 80px !important;
-                top: auto !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                z-index: 10002 !important;
-                animation: popoverFadeInMobile 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-            }
+        .sheet-verse-reference {
+            font-size: 1.05rem;
+            font-weight: 800;
+            text-align: center;
+            color: var(--text-base);
+            margin: 0 0 4px 0;
+            line-height: 1.3;
         }
 
-        @keyframes popoverFadeInMobile {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) scale(1);
-            }
+        .sheet-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sheet-color-pickers {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-swatch-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .color-swatch-circle:hover {
+            transform: scale(1.12);
+        }
+
+        .color-swatch-circle:active {
+            transform: scale(0.95);
+        }
+
+        .sheet-action-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sheet-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            min-width: 54px;
+            height: 56px;
+            padding: 4px 8px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+        }
+
+        html[data-theme="dark"] .sheet-action-btn {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        html[data-theme="cream"] .sheet-action-btn {
+            background: #f3efe6;
+            border-color: #e5dec9;
+            color: #44403c;
+        }
+
+        .sheet-action-btn:hover {
+            transform: translateY(-2px);
+            background: var(--active-bg);
+            color: var(--bible-primary);
+        }
+
+        .sheet-action-btn .material-symbols-outlined {
+            font-size: 20px;
         }
             
         @media (max-width: 768px) {
@@ -2875,55 +2906,47 @@
                     </div>
                 </div>
 
-                <!-- Verse Context Actions Toolbar -->
+                <!-- Verse Context Actions Toolbar (Bottom Action Sheet) -->
                 <div id="verse-context-toolbar">
-                    <div class="toolbar-mobile-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; width: 100%;">
-                        <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Valg for vers</span>
-                        <button onclick="document.getElementById('toolbar-btn-clear').click()" style="display: inline-flex; align-items: center; justify-content: center; background: transparent; border: none; color: #bd4f2a; cursor: pointer; padding: 4px;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-                        </button>
+                    <div class="sheet-handle-bar"></div>
+                    <div id="sheet-verse-reference" class="sheet-verse-reference">Velg vers</div>
+
+                    <div class="sheet-controls-row">
+                        <!-- Color Pickers -->
+                        <div class="sheet-color-pickers">
+                            <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Gul"></button>
+                            <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Grønn"></button>
+                            <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
+                            <button class="color-swatch-circle" data-color="multi" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Flerfarget"></button>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="sheet-action-btns">
+                            <button id="toolbar-btn-bookmark" class="sheet-action-btn" title="Lagre vers">
+                                <span class="material-symbols-outlined">bookmark</span>
+                                <span id="toolbar-bookmark-text">Lagre</span>
+                            </button>
+
+                            <button id="toolbar-btn-save-user" class="sheet-action-btn" title="Skriv notat">
+                                <span class="material-symbols-outlined">edit_note</span>
+                                <span>Notat</span>
+                            </button>
+
+                            <button id="toolbar-btn-download" class="sheet-action-btn" title="Kopier vers">
+                                <span class="material-symbols-outlined">content_copy</span>
+                                <span>Kopier</span>
+                            </button>
+
+                            <button id="toolbar-btn-share" class="sheet-action-btn" title="Del vers">
+                                <span class="material-symbols-outlined">share</span>
+                                <span>Del</span>
+                            </button>
+
+                            <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 36px; height: 56px; background: transparent; border: none; color: #94a3b8; padding: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <button id="toolbar-btn-bookmark" class="floating-book-item" data-tooltip="Bokmerk">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">bookmark</span>
-                        <span class="toolbar-btn-text" id="toolbar-bookmark-text">Bokmerk</span>
-                    </button>
-
-                    <button id="toolbar-btn-range" class="floating-book-item" data-tooltip="Velg område">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">select_all</span>
-                        <span class="toolbar-btn-text">Velg flere vers</span>
-                    </button>
-
-                    <div class="toolbar-divider"></div>
-
-                    <button id="toolbar-btn-lookup" class="floating-book-item" data-tooltip="Forklar i Bibeleksikon">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
-                        <span class="toolbar-btn-text">Forklar i Bibeleksikon</span>
-                    </button>
-
-                    <div class="toolbar-divider"></div>
-
-                    <button id="toolbar-btn-share" class="floating-book-item" data-tooltip="Del vers">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
-                        <span class="toolbar-btn-text">Del vers</span>
-                    </button>
-
-                    <button id="toolbar-btn-download" class="floating-book-item" data-tooltip="Last ned">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                        <span class="toolbar-btn-text">Kopier / Last ned</span>
-                    </button>
-
-                    <button id="toolbar-btn-save-user" class="floating-book-item" data-tooltip="Lagre på Min Side">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">edit_note</span>
-                        <span class="toolbar-btn-text">Lagre på Min Side</span>
-                    </button>
-
-                    <div class="toolbar-divider"></div>
-
-                    <button id="toolbar-btn-clear" class="floating-book-item" data-tooltip="Nullstill valg">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-                        <span class="toolbar-btn-text">Fjern valg</span>
-                    </button>
                 </div>
             </div>
 
