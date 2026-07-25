@@ -2692,7 +2692,9 @@ class BibleReader {
                 row.addEventListener('click', () => {
                     const targetRef = crossRefs[idx].ref;
                     modal.classList.remove('active');
-                    setTimeout(() => modal.style.display = 'none', 250);
+                    modal.style.display = 'none';
+                    this.clearSelection();
+                    this.touchMoved = false;
                     this.parseAndNavigateToReference(targetRef);
                 });
             });
@@ -2701,7 +2703,7 @@ class BibleReader {
         // Open modal instantly with zero animation delay
         modal.style.display = 'flex';
         requestAnimationFrame(() => modal.classList.add('active'));
-        this.pushModalHistoryState('verse-crossref-sheet-card');
+        this.pushModalHistoryState('verse-crossref-modal');
 
         // Instant Cache Hit!
         if (this.crossrefCache[fullRef]) {
@@ -2970,6 +2972,20 @@ class BibleReader {
 
     async parseAndNavigateToReference(query) {
         if (!query) return;
+
+        // Dismiss all active modals and backdrops immediately
+        const crossrefModal = document.getElementById('verse-crossref-modal');
+        if (crossrefModal) {
+            crossrefModal.classList.remove('active');
+            crossrefModal.style.display = 'none';
+        }
+        const dictDrawer = document.getElementById('dictionary-drawer');
+        if (dictDrawer) dictDrawer.classList.remove('active');
+        const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (backdrop) backdrop.classList.remove('active');
+        
+        this.clearSelection();
+        this.touchMoved = false;
 
         try {
             // Split by conjunctions to get the first reference (e.g. "Salomos ordspråk 5-8 & Filipperne 4" -> "Salomos ordspråk 5-8")
@@ -3702,14 +3718,20 @@ class BibleReader {
                 .floating-settings-popover.active,
                 .floating-chapter-popover.active,
                 .dictionary-drawer.active,
-                .verse-crossref-sheet-card.active,
+                #verse-crossref-modal.active,
+                .verse-crossref-sheet-overlay.active,
                 .verse-note-modal.active,
                 #color-wheel-modal.active,
                 .bible-nav-right.active
             `);
 
             if (activeModals.length > 0) {
-                activeModals.forEach(el => el.classList.remove('active'));
+                activeModals.forEach(el => {
+                    el.classList.remove('active');
+                    if (el.id === 'verse-crossref-modal' || el.classList.contains('verse-crossref-sheet-overlay')) {
+                        el.style.display = 'none';
+                    }
+                });
                 const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
                 if (backdrop) backdrop.classList.remove('active');
             }
@@ -3739,14 +3761,20 @@ class BibleReader {
             .floating-settings-popover.active,
             .floating-chapter-popover.active,
             .dictionary-drawer.active,
-            .verse-crossref-sheet-card.active,
+            #verse-crossref-modal.active,
+            .verse-crossref-sheet-overlay.active,
             .verse-note-modal.active,
             #color-wheel-modal.active,
             .bible-nav-right.active
         `);
 
         if (activeModals.length > 0) {
-            activeModals.forEach(el => el.classList.remove('active'));
+            activeModals.forEach(el => {
+                el.classList.remove('active');
+                if (el.id === 'verse-crossref-modal' || el.classList.contains('verse-crossref-sheet-overlay')) {
+                    el.style.display = 'none';
+                }
+            });
             const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
             if (backdrop) backdrop.classList.remove('active');
 
