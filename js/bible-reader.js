@@ -666,13 +666,22 @@ class BibleReader {
                 settingsDropdown.remove();
             }
             
+            const toggleBackdrop = (show) => {
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (!backdrop) return;
+                if (show) backdrop.classList.add('active');
+                else backdrop.classList.remove('active');
+            };
+
             // 4. Set up click listener for the floating settings button to toggle popover
             const settingsBtn = document.getElementById('floating-settings-btn');
             if (settingsBtn) {
                 settingsBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    document.getElementById('floating-chapter-popover')?.classList.remove('active');
-                    popover.classList.toggle('active');
+                    const chapPopover = document.getElementById('floating-chapter-popover');
+                    if (chapPopover) chapPopover.classList.remove('active');
+                    const isActive = popover.classList.toggle('active');
+                    toggleBackdrop(isActive);
                 });
                 
                 // Prevent closing when clicking inside popover
@@ -686,7 +695,7 @@ class BibleReader {
             if (pill) {
                 pill.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    document.getElementById('floating-settings-popover')?.classList.remove('active');
+                    popover.classList.remove('active');
                     const chapPopover = document.getElementById('floating-chapter-popover');
                     if (chapPopover) {
                         // Reset view to chapters on open
@@ -701,7 +710,8 @@ class BibleReader {
                             if (chapGrid) chapGrid.style.display = 'grid';
                             if (booksCont) booksCont.style.display = 'none';
                         }
-                        chapPopover.classList.toggle('active');
+                        const isActive = chapPopover.classList.toggle('active');
+                        toggleBackdrop(isActive);
                     }
                 });
                 
@@ -1780,6 +1790,26 @@ class BibleReader {
                         verseCrossrefModal.style.display = 'none';
                     }, 250);
                 }
+            });
+        }
+
+        // Swipe down to dismiss for floating settings popover
+        const settingsPopoverCard = document.getElementById('floating-settings-popover');
+        if (settingsPopoverCard) {
+            this.setupBottomSheetSwipeDown(settingsPopoverCard, () => {
+                settingsPopoverCard.classList.remove('active');
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
+            });
+        }
+
+        // Swipe down to dismiss for floating chapter popover
+        const chapterPopoverCard = document.getElementById('floating-chapter-popover');
+        if (chapterPopoverCard) {
+            this.setupBottomSheetSwipeDown(chapterPopoverCard, () => {
+                chapterPopoverCard.classList.remove('active');
+                const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+                if (backdrop) backdrop.classList.remove('active');
             });
         }
 

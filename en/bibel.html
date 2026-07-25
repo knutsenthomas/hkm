@@ -870,22 +870,73 @@
             background: rgba(0, 0, 0, 0.05) !important;
         }
 
-        @media (max-width: 768px) {
-            .floating-chapter-popover {
-                width: 290px !important;
-            }
+        .sheet-overlay-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sheet-overlay-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .sheet-close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-surface, rgba(0,0,0,0.05));
+            border: 1px solid var(--border-color, rgba(0,0,0,0.08));
+            color: var(--text-muted, #64748b);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .sheet-close-btn:hover {
+            background: var(--bg-base);
+            color: var(--text-base);
         }
 
-        /* Responsive Popover centering on Mobile */
+        /* Unified Mobile Bottom Sheets for All Dialog Boxes */
         @media (max-width: 768px) {
-            .floating-settings-popover {
-                width: 290px !important;
-                right: 50% !important;
-                transform: translateX(50%) scale(0.95) !important;
+            .floating-settings-popover,
+            .floating-chapter-popover {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                top: auto !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 85vh !important;
+                border-radius: 24px 24px 0 0 !important;
+                background: var(--bg-card, #ffffff) !important;
+                border: 1px solid var(--border-color, rgba(0,0,0,0.1)) !important;
+                border-bottom: none !important;
+                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
+                padding: 16px 20px calc(20px + env(safe-area-inset-bottom)) !important;
+                box-sizing: border-box !important;
+                z-index: 10000 !important;
+                transform: translateY(100%) !important;
                 transform-origin: bottom center !important;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease !important;
+                opacity: 0 !important;
+                overflow-y: auto !important;
+                pointer-events: none !important;
             }
-            .floating-settings-popover.active {
-                transform: translateX(50%) scale(1) !important;
+
+            .floating-settings-popover.active,
+            .floating-chapter-popover.active {
+                display: flex !important;
+                transform: translateY(0) !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
             }
         }
 
@@ -3508,13 +3559,24 @@
                     <span class="material-symbols-outlined">tune</span>
                 </button>
                 
+                <!-- Backdrop Overlay for Floating Sheets & Popovers -->
+                <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover').forEach(el => el.classList.remove('active')); this.classList.remove('active');"></div>
+
                 <!-- Floating Settings Popover -->
                 <div class="floating-settings-popover" id="floating-settings-popover">
+                    <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer; flex-shrink: 0;"></div>
+                    <div class="popover-sheet-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 0 4px; flex-shrink: 0;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base); font-family: var(--font-heading, inherit);">Settings & Tools</h3>
+                        <button type="button" class="sheet-close-btn" title="Close" onclick="document.getElementById('floating-settings-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                        </button>
+                    </div>
                     <!-- Content moved here via JS -->
                 </div>
 
                 <!-- Floating Chapter Popover -->
                 <div class="floating-chapter-popover" id="floating-chapter-popover">
+                    <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer; flex-shrink: 0;"></div>
                     <!-- Header for Chapters (default view) -->
                     <div id="floating-popover-header-chapters" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
                         <span style="font-weight: 700; font-size: 14px; color: var(--text-base);">Select chapter</span>
