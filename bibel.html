@@ -1821,32 +1821,69 @@
             text-decoration: underline dotted #475569 !important;
         }
 
-        /* Dotted Underline Verse Highlights */
+        /* Background Highlight Colors (Color Marker State) */
         .bible-reading-pane p[data-highlight-color="yellow"],
         .bible-reading-pane span[data-highlight-color="yellow"] {
-            text-decoration: underline dotted #eab308 !important;
-            text-underline-offset: 5px !important;
-            text-decoration-thickness: 2.5px !important;
+            background-color: rgba(254, 240, 138, 0.75) !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
         .bible-reading-pane p[data-highlight-color="green"],
         .bible-reading-pane span[data-highlight-color="green"] {
-            text-decoration: underline dotted #22c55e !important;
-            text-underline-offset: 5px !important;
-            text-decoration-thickness: 2.5px !important;
+            background-color: rgba(187, 247, 208, 0.75) !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
         .bible-reading-pane p[data-highlight-color="cyan"],
         .bible-reading-pane span[data-highlight-color="cyan"] {
-            text-decoration: underline dotted #06b6d4 !important;
-            text-underline-offset: 5px !important;
-            text-decoration-thickness: 2.5px !important;
+            background-color: rgba(165, 243, 252, 0.75) !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        .bible-reading-pane p[data-highlight-color="terracotta"],
+        .bible-reading-pane span[data-highlight-color="terracotta"] {
+            background-color: rgba(254, 215, 170, 0.75) !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
         .bible-reading-pane p[data-highlight-color="multi"],
         .bible-reading-pane p[data-highlight-color="custom"],
         .bible-reading-pane span[data-highlight-color="multi"],
         .bible-reading-pane span[data-highlight-color="custom"] {
-            text-decoration: underline dotted var(--custom-dotted-color, #d17d39) !important;
-            text-underline-offset: 5px !important;
-            text-decoration-thickness: 2.5px !important;
+            background-color: var(--custom-highlight-bg, rgba(209, 125, 57, 0.35)) !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+
+        html[data-theme="dark"] .bible-reading-pane p[data-highlight-color="yellow"],
+        html[data-theme="dark"] .bible-reading-pane span[data-highlight-color="yellow"] {
+            background-color: rgba(234, 179, 8, 0.35) !important;
+            color: #fef08a !important;
+        }
+        html[data-theme="dark"] .bible-reading-pane p[data-highlight-color="green"],
+        html[data-theme="dark"] .bible-reading-pane span[data-highlight-color="green"] {
+            background-color: rgba(34, 197, 94, 0.35) !important;
+            color: #bbf7d0 !important;
+        }
+        html[data-theme="dark"] .bible-reading-pane p[data-highlight-color="cyan"],
+        html[data-theme="dark"] .bible-reading-pane span[data-highlight-color="cyan"] {
+            background-color: rgba(6, 182, 212, 0.35) !important;
+            color: #a5f3fc !important;
+        }
+        html[data-theme="dark"] .bible-reading-pane p[data-highlight-color="terracotta"],
+        html[data-theme="dark"] .bible-reading-pane span[data-highlight-color="terracotta"] {
+            background-color: rgba(209, 125, 57, 0.35) !important;
+            color: #fed7aa !important;
         }
 
         /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal) */

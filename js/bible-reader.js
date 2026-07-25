@@ -1624,6 +1624,14 @@ class BibleReader {
             });
         }
 
+        const hexToRgba = (hex, opacity = 0.35) => {
+            if (!hex) return `rgba(209, 125, 57, ${opacity})`;
+            let c = hex.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const num = parseInt(c, 16);
+            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${opacity})`;
+        };
+
         if (colorWheelApply) {
             colorWheelApply.addEventListener('click', (e) => {
                 if (e && e.stopPropagation) e.stopPropagation();
@@ -1632,7 +1640,7 @@ class BibleReader {
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     this.selectedVerses.forEach(v => {
                         v.paragraph.setAttribute('data-highlight-color', 'custom');
-                        v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
+                        v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
                     });
                 }
                 window.closeColorWheelModal(e);
@@ -1649,7 +1657,7 @@ class BibleReader {
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
                         this.selectedVerses.forEach(v => {
                             v.paragraph.setAttribute('data-highlight-color', 'custom');
-                            v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
+                            v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
                         });
                     }
                     return;
@@ -1658,8 +1666,12 @@ class BibleReader {
                     this.selectedVerses.forEach(v => {
                         if (color === 'none') {
                             v.paragraph.removeAttribute('data-highlight-color');
+                            v.paragraph.style.removeProperty('--custom-highlight-bg');
                         } else {
                             v.paragraph.setAttribute('data-highlight-color', color);
+                            if (color === 'custom') {
+                                v.paragraph.style.setProperty('--custom-highlight-bg', hexToRgba(currentColorHex, 0.35));
+                            }
                         }
                     });
                 }
