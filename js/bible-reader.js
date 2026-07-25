@@ -2581,14 +2581,14 @@ class BibleReader {
 
         // Render Sticky Genre Filter & Search Controls
         let html = `
-            <div class="book-genre-filter-container" style="position: sticky; top: 0; background: var(--bg-card, #ffffff); z-index: 20; padding: 4px 0 8px 0; margin-bottom: 8px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
-                <div style="position: relative; margin-bottom: 6px;">
-                    <input type="text" id="floating-book-search-input" placeholder="${searchPlaceholder}" style="width: 100%; padding: 6px 12px 6px 30px; font-size: 12px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border-color, rgba(0,0,0,0.15)); background: var(--bg-body, #faf9f6); color: var(--text-base, #1e293b); outline: none;">
-                    <span class="material-symbols-outlined" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text-muted, #94a3b8); pointer-events: none;">search</span>
+            <div class="book-genre-filter-container" style="position: sticky; top: 0; background: var(--bg-card, #ffffff); z-index: 20; padding: 4px 0 12px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
+                <div style="position: relative; margin-bottom: 10px;">
+                    <input type="text" id="floating-book-search-input" placeholder="${searchPlaceholder}" style="width: 100%; padding: 9px 14px 9px 36px; font-size: 13px; font-weight: 500; border-radius: 12px; border: 1px solid var(--border-color, rgba(0,0,0,0.15)); background: var(--bg-body, #faf9f6); color: var(--text-base, #1e293b); outline: none;">
+                    <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted, #94a3b8); pointer-events: none;">search</span>
                 </div>
-                <div class="genre-pills-bar" style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+                <div class="genre-pills-bar" style="display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 8px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
                     ${genres.map(g => `
-                        <button type="button" class="genre-pill-btn ${g.key === 'all' ? 'active' : ''}" data-genre="${g.key}" style="padding: 3px 10px; font-size: 11px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'var(--border-color, rgba(0,0,0,0.12))'}; background: ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'rgba(0,0,0,0.04)'}; color: ${g.key === 'all' ? '#ffffff' : 'var(--text-base, #334155)'}; transition: all 0.2s ease;">
+                        <button type="button" class="genre-pill-btn ${g.key === 'all' ? 'active' : ''}" data-genre="${g.key}" style="padding: 7px 16px; font-size: 12px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'var(--border-color, rgba(0,0,0,0.12))'}; background: ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'rgba(0,0,0,0.04)'}; color: ${g.key === 'all' ? '#ffffff' : 'var(--text-base, #334155)'}; transition: all 0.2s ease;">
                             ${g.label}
                         </button>
                     `).join('')}
