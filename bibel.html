@@ -1934,6 +1934,41 @@
             }
         }
 
+        .verse-crossref-sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 25000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .verse-crossref-sheet-overlay.active {
+            opacity: 1;
+        }
+        .verse-crossref-sheet-card {
+            background: var(--bg-card, #ffffff);
+            width: 100%;
+            max-width: 620px;
+            border-radius: 24px 24px 0 0;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+        .verse-crossref-sheet-overlay.active .verse-crossref-sheet-card {
+            transform: translateY(0);
+        }
+        html[data-theme="dark"] .verse-crossref-sheet-card {
+            background: var(--bg-card, #1e293b);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .sheet-handle-bar {
             width: 44px;
             height: 5px;
@@ -3871,24 +3906,37 @@
         </div>
     </div>
 
-    <!-- Verse Cross-References Modal -->
-    <div id="verse-crossref-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
-        <div class="color-wheel-card" onclick="event.stopPropagation();">
-            <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 24px;">link</span>
-                    <h3 id="verse-crossref-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">Kryssreferanser</h3>
-                </div>
-                <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-crossref-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
-                    <span class="material-symbols-outlined">close</span>
+    <!-- Verse Cross-References Bottom Sheet Modal -->
+    <div id="verse-crossref-modal" class="verse-crossref-sheet-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
+        <div class="verse-crossref-sheet-card" onclick="event.stopPropagation();">
+            <!-- Drag Handle Bar -->
+            <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer;"></div>
+            
+            <!-- Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 0 4px;">
+                <h3 id="verse-crossref-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base); font-family: var(--font-heading, inherit);">Kryssreferanser</h3>
+                <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-crossref-modal'); if(m){ m.classList.remove('active'); setTimeout(() => m.style.display='none', 250); }">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">info</span>
                 </button>
             </div>
-            <div class="color-wheel-body" style="margin-top: 16px;">
-                <div id="verse-crossref-quote-preview" style="background: rgba(209, 125, 57, 0.06); border-left: 4px solid var(--hkm-terracotta, #d17d39); padding: 12px 16px; border-radius: 12px; font-style: italic; font-size: 13.5px; margin-bottom: 16px; max-height: 100px; overflow-y: auto; color: var(--text-base);"></div>
+
+            <!-- Body Content -->
+            <div class="verse-crossref-sheet-body" style="max-height: 65vh; overflow-y: auto; padding-right: 2px;">
+                <!-- Verse Text Quote -->
+                <div id="verse-crossref-quote-preview" style="font-size: 15.5px; line-height: 1.6; color: var(--text-base); font-family: var(--font-serif, Georgia, serif); margin-bottom: 20px; padding: 0 4px;"></div>
                 
-                <div id="verse-crossref-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 4px;">
-                    <!-- Dynamically loaded cross references -->
+                <!-- References & Footnotes List -->
+                <div id="verse-crossref-list" style="display: flex; flex-direction: column; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.08));">
+                    <!-- Dynamically loaded entries -->
                 </div>
+            </div>
+
+            <!-- Bottom Floating Action -->
+            <div style="margin-top: 18px; display: flex; justify-content: center;">
+                <button type="button" id="verse-crossref-related-btn" style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #334155); border-radius: 9999px; padding: 9px 20px; font-weight: 600; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.2s ease;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--hkm-terracotta, #d17d39);">view_agenda</span>
+                    <span>Relaterte ressurser</span>
+                </button>
             </div>
         </div>
     </div>

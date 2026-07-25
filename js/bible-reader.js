@@ -2568,11 +2568,8 @@ class BibleReader {
         const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
         const fullRef = `${bookName} ${chapterNum}:${verseNum}`;
 
-        const lang = window.HKM_CURRENT_LANG || 'no';
-        const titleText = lang === 'en' ? `Cross References (${fullRef})` : (lang === 'es' ? `Referencias Cruzadas (${fullRef})` : `Kryssreferanser (${fullRef})`);
-
-        if (titleEl) titleEl.textContent = titleText;
-        if (previewEl) previewEl.textContent = `"${verseText}"`;
+        if (titleEl) titleEl.textContent = fullRef;
+        if (previewEl) previewEl.textContent = verseText;
 
         listEl.innerHTML = `
             <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
@@ -2590,39 +2587,39 @@ class BibleReader {
             const crossRefs = await res.json();
 
             if (crossRefs && crossRefs.length > 0) {
-                listEl.innerHTML = crossRefs.map((item, idx) => `
-                    <div class="verse-crossref-card-item" data-idx="${idx}" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s ease; cursor: pointer; width: 100%; box-sizing: border-box;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--hkm-terracotta, #d17d39); font-size: 14px;">
-                            <span>${item.ref}</span>
-                            <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.8;">open_in_new</span>
+                const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+                listEl.innerHTML = crossRefs.map((item, idx) => {
+                    const letter = letters[idx % letters.length];
+                    return `
+                        <div class="verse-crossref-row-item" data-idx="${idx}" style="display: flex; align-items: baseline; gap: 14px; padding: 12px 6px; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); cursor: pointer; transition: background 0.15s ease;">
+                            <span style="font-weight: 700; font-size: 13px; color: var(--text-muted, #64748b); width: 14px; flex-shrink: 0; text-align: center;">${letter}</span>
+                            <div style="flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;">
+                                <span class="crossref-ref-link" style="color: #2563eb; font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer;">${item.ref}</span>
+                                <span style="font-size: 13.5px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</span>
+                            </div>
                         </div>
-                        <div style="font-size: 13px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
-                const cards = listEl.querySelectorAll('.verse-crossref-card-item');
-                cards.forEach((card, idx) => {
-                    card.addEventListener('mouseenter', () => {
-                        card.style.borderColor = 'var(--hkm-terracotta, #d17d39)';
-                        card.style.transform = 'translateY(-1px)';
-                        card.style.boxShadow = '0 4px 12px rgba(209, 125, 57, 0.12)';
+                const rows = listEl.querySelectorAll('.verse-crossref-row-item');
+                rows.forEach((row, idx) => {
+                    row.addEventListener('mouseenter', () => {
+                        row.style.background = 'rgba(37, 99, 235, 0.04)';
                     });
-                    card.addEventListener('mouseleave', () => {
-                        card.style.borderColor = 'var(--border-color, #e2e8f0)';
-                        card.style.transform = 'none';
-                        card.style.boxShadow = 'none';
+                    row.addEventListener('mouseleave', () => {
+                        row.style.background = 'transparent';
                     });
-                    card.addEventListener('click', () => {
+                    row.addEventListener('click', () => {
                         const targetRef = crossRefs[idx].ref;
                         modal.classList.remove('active');
-                        modal.style.display = 'none';
+                        setTimeout(() => modal.style.display = 'none', 250);
                         this.parseAndNavigateToReference(targetRef);
                     });
                 });
             } else {
                 listEl.innerHTML = `
-                    <div style="text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13.5px;">
-                        Ingen direkte kryssreferanser funnet for dette verset.
+                    <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13.5px;">
+                        Ingen kryssreferanser funnet for dette verset.
                     </div>
                 `;
             }
