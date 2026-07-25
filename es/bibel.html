@@ -1924,6 +1924,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 2px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sheet-action-btns::-webkit-scrollbar {
+            display: none;
         }
 
         .sheet-action-btn {
@@ -2893,6 +2900,16 @@
                             <button id="toolbar-btn-download" class="sheet-action-btn" title="Copiar versículo">
                                 <span class="material-symbols-outlined">content_copy</span>
                                 <span>Copiar</span>
+                            </button>
+
+                            <button id="toolbar-btn-lookup" class="sheet-action-btn" title="Explicar en el Lexicón">
+                                <span class="material-symbols-outlined">menu_book</span>
+                                <span>Lexicón</span>
+                            </button>
+
+                            <button id="toolbar-btn-range" class="sheet-action-btn" title="Seleccionar rango">
+                                <span class="material-symbols-outlined">select_all</span>
+                                <span>Rango</span>
                             </button>
 
                             <button id="toolbar-btn-share" class="sheet-action-btn" title="Compartir versículo">
