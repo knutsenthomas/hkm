@@ -1257,43 +1257,61 @@ class ContentManager {
 
     populatePurposeDropdown(causes) {
         const selectEl = document.getElementById('donation-purpose');
-        if (!selectEl) return;
+        const gridEl = document.getElementById('donation-purpose-grid');
+        if (!selectEl && !gridEl) return;
 
         const lang = this.getCurrentLanguage();
-        let defaultLabel = 'Generell gave (der det trengs mest)';
+        let defaultLabel = 'Generell gave';
         let basarLabel = 'Basar';
         let misjonLabel = 'Misjon';
         if (lang === 'en') {
-            defaultLabel = 'General donation (where it is needed most)';
+            defaultLabel = 'General donation';
             basarLabel = 'Bazaar';
             misjonLabel = 'Missions';
         } else if (lang === 'es') {
-            defaultLabel = 'Donación general (donde más se necesite)';
+            defaultLabel = 'Donación general';
             basarLabel = 'Bazar';
             misjonLabel = 'Misiones';
         }
 
-        selectEl.innerHTML = `
-            <option value="general">${defaultLabel}</option>
-            <option value="basar">${basarLabel}</option>
-            <option value="misjon">${misjonLabel}</option>
-        `;
+        const items = [
+            { id: 'general', title: defaultLabel, icon: 'favorite' },
+            { id: 'basar', title: basarLabel, icon: 'storefront' },
+            { id: 'misjon', title: misjonLabel, icon: 'public' }
+        ];
 
         if (causes && Array.isArray(causes)) {
             causes.forEach(cause => {
                 const causeId = cause.id || this.getContentItemStableId(cause) || this.generateSlug(cause.title || '');
-                const option = document.createElement('option');
-                option.value = causeId;
-                option.textContent = cause.title || 'Innsamlingsaksjon';
-                selectEl.appendChild(option);
+                items.push({ id: causeId, title: cause.title || 'Innsamlingsaksjon', icon: 'campaign' });
             });
         }
 
-        // Check for URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const fundParam = urlParams.get('fund');
-        if (fundParam) {
-            selectEl.value = fundParam;
+        let selectedId = fundParam || (selectEl ? selectEl.value : 'general') || 'general';
+
+        if (gridEl) {
+            gridEl.innerHTML = items.map(item => `
+                <button type="button" class="purpose-option-btn ${item.id === selectedId ? 'active' : ''}" data-value="${item.id}">
+                    <span class="material-symbols-outlined" style="font-size: 22px;">${item.icon}</span>
+                    <span>${item.title}</span>
+                </button>
+            `).join('');
+
+            if (selectEl) selectEl.value = selectedId;
+
+            gridEl.querySelectorAll('.purpose-option-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.getAttribute('data-value');
+                    if (selectEl) selectEl.value = val;
+                    gridEl.querySelectorAll('.purpose-option-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        } else if (selectEl && selectEl.tagName === 'SELECT') {
+            selectEl.innerHTML = items.map(item => `<option value="${item.id}">${item.title}</option>`).join('');
+            selectEl.value = selectedId;
         }
     }
 

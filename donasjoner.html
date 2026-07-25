@@ -48,6 +48,60 @@
     <link rel="stylesheet" href="css/stripe-checkout.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
     <style>
+        .hkm-purpose-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            margin-top: 8px !important;
+        }
+
+        .purpose-option-btn {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            padding: 16px 12px !important;
+            background: var(--bg-card, #ffffff) !important;
+            border: 2px solid var(--border-color, #e2e8f0) !important;
+            border-radius: 14px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: var(--text-base, #1e293b) !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            text-align: center !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .purpose-option-btn:hover {
+            border-color: var(--hkm-terracotta, #d17d39) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.12) !important;
+        }
+
+        .purpose-option-btn.active {
+            border-color: var(--hkm-terracotta, #d17d39) !important;
+            background: rgba(209, 125, 57, 0.08) !important;
+            color: var(--hkm-terracotta, #d17d39) !important;
+            font-weight: 700 !important;
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.2) !important;
+        }
+
+        html[data-theme="dark"] .purpose-option-btn {
+            background: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #f1f5f9 !important;
+        }
+
+        html[data-theme="dark"] .purpose-option-btn.active {
+            background: rgba(209, 125, 57, 0.18) !important;
+            border-color: var(--hkm-terracotta, #d17d39) !important;
+            color: #f97316 !important;
+        }
+
         .donations-page-view .payment-method-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -617,11 +671,21 @@
                         <!-- Purpose Selection -->
                         <div style="margin-bottom: 30px;">
                             <label style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">Hva ønsker du å støtte?</label>
-                            <select id="donation-purpose" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; background: white; outline: none; cursor: pointer; transition: border-color 0.3s ease;">
-                                <option value="general">Generell gave (der det trengs mest)</option>
-                                <option value="basar">Basar</option>
-                                <option value="misjon">Misjon</option>
-                            </select>
+                            <div class="hkm-purpose-grid" id="donation-purpose-grid">
+                                <button type="button" class="purpose-option-btn active" data-value="general">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">favorite</span>
+                                    <span>Generell gave</span>
+                                </button>
+                                <button type="button" class="purpose-option-btn" data-value="basar">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">storefront</span>
+                                    <span>Basar</span>
+                                </button>
+                                <button type="button" class="purpose-option-btn" data-value="misjon">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">public</span>
+                                    <span>Misjon</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="donation-purpose" value="general">
                         </div>
 
                         <!-- Payment Method -->
