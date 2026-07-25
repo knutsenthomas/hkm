@@ -1106,15 +1106,15 @@ class MinSideManager {
                     await this.syncProfileFromGoogleProvider();
                     this.profileData = await this.getMergedProfile(user);
                     await this.refreshProfileSubCollections(user.uid);
-                    this.updateHeader();
-                    this.initNotificationBadge();
-                    this.showPendingFlashNotice();
+                    if (typeof this.updateHeader === 'function') this.updateHeader();
+                    if (typeof this.initNotificationBadge === 'function') this.initNotificationBadge();
+                    if (typeof this.showPendingFlashNotice === 'function') this.showPendingFlashNotice();
 
                     // Translate immediately on auth state change
-                    translateStaticHTML();
+                    if (typeof translateStaticHTML === 'function') translateStaticHTML();
 
                     // Initialize Global Search Overlay
-                    this.initGlobalSearch();
+                    if (typeof this.initGlobalSearch === 'function') this.initGlobalSearch();
 
                     // Apply bottom navigation settings (user custom first, then admin default)
                     try {
@@ -1333,6 +1333,32 @@ class MinSideManager {
         }
     }
 
+    initNotificationBadge() {
+        try {
+            const badge = document.getElementById('notification-badge');
+            if (badge) badge.classList.add('hidden');
+        } catch (e) {
+            console.warn('initNotificationBadge warning:', e);
+        }
+    }
+
+    showPendingFlashNotice() {
+        try {
+            const notice = document.getElementById('flash-notice');
+            if (notice) notice.classList.add('hidden');
+        } catch (e) {
+            console.warn('showPendingFlashNotice warning:', e);
+        }
+    }
+
+    initGlobalSearch() {
+        try {
+            // Placeholder for global search
+        } catch (e) {
+            console.warn('initGlobalSearch warning:', e);
+        }
+    }
+
     async refreshProfileSubCollections(uid) {
         if (!uid) return;
         try {
@@ -1346,7 +1372,7 @@ class MinSideManager {
     handleLanguageChange(lang) {
         document.documentElement.lang = lang;
         translateStaticHTML();
-        this.updateHeader();
+        if (typeof this.updateHeader === 'function') this.updateHeader();
         
         // Reload current view with translated strings
         const currentView = window.location.hash.replace('#', '') || 'overview';
@@ -1416,6 +1442,26 @@ class MinSideManager {
         document.querySelector(`.mobile-nav-item[data-view="${cleanViewId}"]`)?.classList.add('active');
 
         const container = document.getElementById('view-container') || document.getElementById('content-area');
+        if (!container) return;
+
+        if (cleanViewId === 'course-player') {
+            this.renderCoursePlayer(container, queryParams);
+        } else if (cleanViewId === 'reading-plans') {
+            this.renderReadingPlans(container);
+        } else if (cleanViewId === 'notes') {
+            this.renderNotes(container);
+        } else if (cleanViewId === 'prayer-wall') {
+            this.renderPrayerWall(container);
+        } else if (cleanViewId === 'courses') {
+            this.renderCourses(container);
+        } else if (cleanViewId === 'profile') {
+            this.renderProfile(container);
+        } else {
+            this.renderOverview(container);
+        }
+    }
+
+    async renderCoursePlayer(container, queryParams = {}) {
         container.innerHTML = `
             <style>
                 /* Style Overrides for Stitch Premium Leksjonsside */
@@ -2560,6 +2606,84 @@ class MinSideManager {
             updateTimer();
             window._playerCountdownInterval = setInterval(updateTimer, 1000);
         }
+    }
+
+    async renderOverview(container) {
+        const name = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser?.displayName || 'Medlem';
+        container.innerHTML = `
+            <div class="ms-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                <div class="hkm-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: 20px; padding: 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);">
+                    <span style="font-size: 12px; font-weight: 800; color: #fb923c; text-transform: uppercase; letter-spacing: 0.08em;">VELKOMMEN TILBAKE</span>
+                    <h2 style="font-size: 26px; font-weight: 800; color: white; margin: 8px 0 12px;">Velkommen, ${name}!</h2>
+                    <p style="color: #cbd5e1; margin-bottom: 20px; line-height: 1.6;">Velkommen til din personlige HKM-portal. Her har du tilgang til dine kurs, leseplaner, notater og bønnevegg.</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="if (window.minSideApp) window.minSideApp.loadView('courses'); else if (window.minSideManager) window.minSideManager.loadView('courses');">
+                            <span class="material-symbols-outlined">school</span> Mine kurs
+                        </button>
+                        <button class="btn btn-secondary" style="background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer;" onclick="if (window.minSideApp) window.minSideApp.loadView('reading-plans'); else if (window.minSideManager) window.minSideManager.loadView('reading-plans');">
+                            <span class="material-symbols-outlined">auto_stories</span> Leseplaner
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async renderCourses(container) {
+        container.innerHTML = `<div class="loading-state" style="padding: 40px; text-align: center;"><div class="spinner"></div> Laster dine kurs...</div>`;
+        try {
+            const snap = await firebase.firestore().collection('courses').get();
+            let courses = [];
+            snap.forEach(d => courses.push({ id: d.id, ...d.data() }));
+
+            if (courses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 60px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">school</span>
+                        <h3 style="margin-top: 12px; color: #1e293b;">Ingen kurs tilgjengelig</h3>
+                        <p style="color: #64748b;">Sjekk ut kursene våre på nettsiden.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+                    ${courses.map(c => `
+                        <div class="hkm-card" style="border-radius: 16px; overflow: hidden; padding: 0; cursor: pointer;" onclick="window.location.href='/kurs-detaljer?id=${c.id}'">
+                            <img src="${c.coverUrl || c.thumbnailUrl || '/img/bible-timeline-hero.webp'}" style="width: 100%; height: 160px; object-fit: cover;">
+                            <div style="padding: 20px;">
+                                <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">${c.title || 'Uten tittel'}</h3>
+                                <p style="font-size: 14px; color: #64748b; margin-bottom: 16px; line-height: 1.5;">${c.excerpt || c.description || ''}</p>
+                                <a href="/kurs-detaljer?id=${c.id}" class="btn btn-primary btn-sm" style="width: 100%; text-align: center; justify-content: center;">Åpne kurs</a>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } catch (e) {
+            console.error("renderCourses error:", e);
+            container.innerHTML = `<div class="empty-state">Kunne ikke laste kurs.</div>`;
+        }
+    }
+
+    async renderProfile(container) {
+        const user = this.currentUser || {};
+        container.innerHTML = `
+            <div class="hkm-card" style="max-width: 600px; border-radius: 20px; padding: 28px;">
+                <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">Min Profil</h3>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="font-size: 13px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Navn</label>
+                        <input type="text" value="${user.displayName || (this.profileData && this.profileData.name) || ''}" disabled style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #334155;">
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">E-post</label>
+                        <input type="email" value="${user.email || ''}" disabled style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #334155;">
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     // ──────────────────────────────────────────────────────────
