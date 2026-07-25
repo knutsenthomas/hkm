@@ -3617,8 +3617,21 @@ class BibleReader {
         };
 
         const onStart = (clientY, target) => {
-            const isHeader = target && target.closest('.sheet-handle-bar, .popover-sheet-header, .color-wheel-header');
-            if (!isHeader && target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) return false;
+            const isHeader = target && target.closest('.sheet-handle-bar, .popover-sheet-header, .color-wheel-header, #floating-popover-header-chapters, #floating-popover-header-books');
+            const isScrollBody = target && target.closest('#floating-books-container, #floating-chapter-grid, .verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, .dict-body');
+
+            // If touched inside a scrollable list body and NOT on the top handle bar/header,
+            // do not activate sheet dragging. Let touch handle list scrolling exclusively.
+            if (isScrollBody && !isHeader) {
+                isDragging = false;
+                return false;
+            }
+
+            if (!isHeader && target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) {
+                isDragging = false;
+                return false;
+            }
+
             startY = clientY;
             currentDeltaY = 0;
             isDragging = true;
