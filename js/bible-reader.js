@@ -8316,7 +8316,27 @@ class BibleReader {
         }
     }
 
-    startAudioPlayback() {
+    async ensureFirebaseSDK() {
+        if (typeof window.firebase === 'undefined' || !window.firebase.functions) {
+            if (!document.querySelector('script[src*="firebase-app-compat.js"]')) {
+                const s1 = document.createElement('script');
+                s1.src = "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js";
+                document.head.appendChild(s1);
+                await new Promise(r => s1.onload = r);
+            }
+            if (!document.querySelector('script[src*="firebase-functions-compat.js"]')) {
+                const s2 = document.createElement('script');
+                s2.src = "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js";
+                document.head.appendChild(s2);
+                await new Promise(r => s2.onload = r);
+            }
+        }
+        if (window.firebaseConfig && window.firebase && (!window.firebase.apps || !window.firebase.apps.length)) {
+            window.firebase.initializeApp(window.firebaseConfig);
+        }
+    }
+
+    async startAudioPlayback() {
         if (!this.dom.readingPane) return;
         
         // Find all paragraphs containing verses
@@ -8351,6 +8371,12 @@ class BibleReader {
         }
 
         const lang = document.documentElement.lang || 'no';
+
+        try {
+            await this.ensureFirebaseSDK();
+        } catch (e) {
+            console.error("[BibleAudio] Failed to load Firebase SDK:", e);
+        }
 
         // Call getBibleChapterAudio Cloud Function for ChatGPT OpenAI TTS
         if (typeof firebase !== 'undefined' && firebase.functions) {
@@ -8390,11 +8416,11 @@ class BibleReader {
             })
             .catch(err => {
                 console.error("[BibleAudio] Error generating ChatGPT audio:", err);
-                alert("Kunne ikke generere ChatGPT AI-lyd for dette kapittelet. Prøv igjen om et øyeblikk.");
+                alert("Kunne ikke generere ChatGPT AI-lyd for dette kapittelet: " + (err.message || 'Prøv igjen om et øyeblikk'));
                 this.stopAudioPlayback();
             });
         } else {
-            alert('Lydtjenesten kobler til... Prøv igjen om et øyeblikk.');
+            alert('Lydtjenesten var utilgjengelig. Prøv å laste siden på nytt.');
             this.stopAudioPlayback();
         }
     }
