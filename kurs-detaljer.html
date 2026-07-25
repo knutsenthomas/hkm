@@ -2374,15 +2374,15 @@
             }
 
             listEl.innerHTML = comments.map(c => `
-                <div style="background: white; padding: 16px 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="background: white; padding: 16px 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02); margin-bottom: 12px;">
                     <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" alt="${c.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid #e2e8f0;">
-                    <div style="flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <strong style="font-size: 0.95rem; color: #1e293b;">${c.author}</strong>
-                                ${c.role ? `<span style="background: rgba(209,125,57,0.12); color: #d17d39; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">${c.role}</span>` : ''}
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong style="font-size: 0.92rem; color: #1e293b; font-weight: 750;">${c.author}</strong>
+                                ${c.role ? `<span style="background: rgba(209,125,57,0.12); color: #d17d39; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; display: inline-block;">${c.role}</span>` : ''}
                             </div>
-                            <span style="font-size: 0.8rem; color: #94a3b8;">${c.date}</span>
+                            <span style="font-size: 0.78rem; color: #94a3b8; white-space: nowrap; margin-left: auto;">${c.date}</span>
                         </div>
                         <p style="font-size: 0.92rem; color: #475569; margin: 0; line-height: 1.5;">${c.text}</p>
                     </div>
