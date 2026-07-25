@@ -825,6 +825,7 @@
 
             <!-- Video Player Area -->
             <div class="video-card" id="video-card-container">
+                <img id="course-cover-img" src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80" alt="Kursbilde" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
                 <div class="locked-overlay" id="locked-overlay">
                     <div class="lock-badge">
                         <i class="fas fa-lock"></i>
@@ -1021,6 +1022,10 @@
                 const bcCourse = document.getElementById('bc-course-title');
                 if (bcCourse) bcCourse.textContent = currentCourse.title || 'Kurs';
 
+                const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
+                const coverImgEl = document.getElementById('course-cover-img');
+                if (coverImgEl) coverImgEl.src = courseImg;
+
                 const lessons = currentCourse.lessons || [];
                 renderSidebarModules(lessons);
                 await checkAccessAndUpdateUI();
@@ -1095,8 +1100,10 @@
             const videoContainer = document.getElementById('video-card-container');
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
             const lockedOverlay = document.getElementById('locked-overlay');
+            const coverImgEl = document.getElementById('course-cover-img');
 
             if (userHasAccess) {
+                if (coverImgEl) coverImgEl.style.display = 'none';
                 if (lockedOverlay) lockedOverlay.style.display = 'none';
                 videoContainer.style.backgroundImage = 'none';
                 if (lesson.videoUrl && (lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('vimeo'))) {
@@ -1117,6 +1124,10 @@
                     `;
                 }
             } else {
+                if (coverImgEl) {
+                    coverImgEl.style.display = 'block';
+                    coverImgEl.src = courseImg;
+                }
                 videoContainer.style.backgroundImage = `url('${courseImg}')`;
                 videoContainer.style.backgroundSize = 'cover';
                 videoContainer.style.backgroundPosition = 'center';
