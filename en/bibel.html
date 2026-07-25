@@ -3556,6 +3556,9 @@
                 </div>
             </aside>
 
+            <!-- Backdrop Overlay for Floating Sheets & Popovers -->
+            <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover, .dictionary-drawer').forEach(el => el.classList.remove('active', 'expanded')); this.classList.remove('active');"></div>
+
             <!-- Central Reading Area Bottom Floating Navigation -->
             <div class="floating-bible-nav" id="floating-bible-nav">
                 <button class="floating-nav-btn" id="floating-prev-btn" title="Previous chapter">
@@ -3575,9 +3578,6 @@
                     <span class="material-symbols-outlined">tune</span>
                 </button>
                 
-                <!-- Backdrop Overlay for Floating Sheets & Popovers -->
-                <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover, .dictionary-drawer').forEach(el => el.classList.remove('active', 'expanded')); this.classList.remove('active');"></div>
-
                 <!-- Floating Settings Popover -->
                 <div class="floating-settings-popover" id="floating-settings-popover">
                     <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer; flex-shrink: 0;"></div>
