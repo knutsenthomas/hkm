@@ -1818,8 +1818,9 @@
         .bible-reading-pane p.selected-verse[data-highlight-color="cyan"] {
             text-decoration: underline dotted #06b6d4 !important;
         }
-        .bible-reading-pane p.selected-verse[data-highlight-color="multi"] {
-            text-decoration: underline dotted #a855f7 !important;
+        .bible-reading-pane p.selected-verse[data-highlight-color="multi"],
+        .bible-reading-pane p.selected-verse[data-highlight-color="custom"] {
+            text-decoration: underline dotted var(--custom-dotted-color, #a855f7) !important;
         }
 
         /* Bottom Action Sheet Verse Toolbar (Pinned Bottom Modal) */
@@ -2883,7 +2884,10 @@
                         <button class="color-swatch-circle" data-color="yellow" style="background: #facc15;" title="Amarillo"></button>
                         <button class="color-swatch-circle" data-color="green" style="background: #4ade80;" title="Verde"></button>
                         <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Azul"></button>
-                        <button class="color-swatch-circle" data-color="multi" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Multicolor"></button>
+                        <div class="color-swatch-wrapper" style="position: relative; display: inline-flex; flex-shrink: 0;">
+                            <button class="color-swatch-circle" id="custom-color-swatch-btn" data-color="custom" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Elegir color personalizado"></button>
+                            <input type="color" id="bible-custom-color-picker" style="position: absolute; top:0; left:0; width: 40px; height: 40px; opacity: 0; cursor: pointer; border: none; padding: 0;" value="#a855f7">
+                        </div>
 
                         <div class="sheet-divider-v"></div>
 

@@ -1468,11 +1468,41 @@ class BibleReader {
             });
         }
 
+        // Custom color picker support for rightmost swatch button
+        const customPickerInput = document.getElementById('bible-custom-color-picker');
+        const customSwatchBtn = document.getElementById('custom-color-swatch-btn');
+        const savedCustomColor = localStorage.getItem('hkm_custom_verse_color');
+
+        const updateCustomBtnStyle = (hexColor) => {
+            if (customSwatchBtn && hexColor) {
+                customSwatchBtn.style.background = hexColor;
+                customSwatchBtn.style.boxShadow = `0 0 0 2px #fff, 0 0 0 4px ${hexColor}, 0 2px 8px rgba(0,0,0,0.25)`;
+            }
+        };
+
+        if (savedCustomColor) {
+            updateCustomBtnStyle(savedCustomColor);
+            if (customPickerInput) customPickerInput.value = savedCustomColor;
+        }
+
         // Color swatch listeners for bottom action sheet
         document.querySelectorAll('#verse-context-toolbar .color-swatch-circle').forEach(swatch => {
             swatch.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const color = swatch.getAttribute('data-color');
+                if (color === 'custom' || color === 'multi') {
+                    if (customPickerInput) {
+                        customPickerInput.click();
+                    }
+                    const activeColor = customPickerInput ? customPickerInput.value : (savedCustomColor || '#a855f7');
+                    if (this.selectedVerses && this.selectedVerses.length > 0) {
+                        this.selectedVerses.forEach(v => {
+                            v.paragraph.setAttribute('data-highlight-color', 'custom');
+                            v.paragraph.style.setProperty('--custom-dotted-color', activeColor);
+                        });
+                    }
+                    return;
+                }
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     this.selectedVerses.forEach(v => {
                         v.paragraph.setAttribute('data-highlight-color', color);
@@ -1480,6 +1510,22 @@ class BibleReader {
                 }
             });
         });
+
+        if (customPickerInput) {
+            const handleColorChange = (e) => {
+                const hexColor = e.target.value;
+                localStorage.setItem('hkm_custom_verse_color', hexColor);
+                updateCustomBtnStyle(hexColor);
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    this.selectedVerses.forEach(v => {
+                        v.paragraph.setAttribute('data-highlight-color', 'custom');
+                        v.paragraph.style.setProperty('--custom-dotted-color', hexColor);
+                    });
+                }
+            };
+            customPickerInput.addEventListener('input', handleColorChange);
+            customPickerInput.addEventListener('change', handleColorChange);
+        }
 
         // Prevent touch/pointer drag events inside bottom action sheet from closing it or triggering chapter swipe
         if (this.dom.verseToolbar) {
