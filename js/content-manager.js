@@ -2592,7 +2592,7 @@ class ContentManager {
         }
 
         // Juicer.io Integration (parsed on client side into custom cards)
-        if (config.feedSource === 'juicer' && config.juicerFeedId) {
+        if ((config.feedSource === 'juicer' || config.feedSource === 'meta') && config.juicerFeedId) {
             try {
                 // Use JSONP to bypass CORS restrictions in the browser
                 const callbackName = 'juicer_jsonp_' + Date.now() + Math.round(Math.random() * 1000);
