@@ -8347,96 +8347,56 @@ class BibleReader {
         
         const infoDisplay = document.getElementById('audio-info-display');
         if (infoDisplay) {
-            infoDisplay.textContent = 'Spiller av kapittel...';
+            infoDisplay.textContent = 'Genererer ChatGPT AI-stemme...';
         }
 
         const lang = document.documentElement.lang || 'no';
 
-        // Check if Firebase Callable getBibleChapterAudio is available
-        let triedCloud = false;
+        // Call getBibleChapterAudio Cloud Function for ChatGPT OpenAI TTS
         if (typeof firebase !== 'undefined' && firebase.functions) {
-            try {
-                const callable = firebase.functions().httpsCallable('getBibleChapterAudio');
-                triedCloud = true;
+            const callable = firebase.functions().httpsCallable('getBibleChapterAudio');
+            callable({
+                bookId: this.selectedBookId,
+                chapterNum: this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1',
+                lang: lang,
+                text: chapterText,
+                voice: this.audioVoice || 'onyx'
+            })
+            .then(result => {
+                if (!this.audioIsPlaying) return;
+                const audioUrl = result.data ? result.data.audioUrl : null;
+                if (!audioUrl) throw new Error("Ingen lyd-URL mottatt fra serveren.");
+
+                console.log("Playing ChatGPT AI audio:", audioUrl);
+                this.bibleAudio = new Audio(audioUrl);
+                this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
+                this.bibleAudio.onended = () => this.stopAudioPlayback();
+                this.bibleAudio.onerror = (err) => {
+                    console.error("[BibleAudio] Audio playback error:", err);
+                    alert("Feil under avspilling av ChatGPT AI-lydfilen.");
+                    this.stopAudioPlayback();
+                };
                 
-                // Set a timeout of 4s for Cloud TTS, falling back to Web Speech API if slow/failing
-                const cloudTimeout = setTimeout(() => {
-                    if (this.audioIsPlaying && !this.bibleAudio && !this.speechUtterance) {
-                        console.warn("[BibleAudio] Cloud TTS timed out, falling back to Web Speech API");
-                        this.fallbackWebSpeechPlayback(chapterText, lang);
+                this.bibleAudio.play().then(() => {
+                    if (infoDisplay) {
+                        infoDisplay.textContent = 'Spiller av ChatGPT AI-stemme...';
                     }
-                }, 4000);
-
-                callable({
-                    bookId: this.selectedBookId,
-                    chapterNum: this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1',
-                    lang: lang,
-                    text: chapterText,
-                    voice: this.audioVoice || 'onyx'
-                })
-                .then(result => {
-                    clearTimeout(cloudTimeout);
-                    if (!this.audioIsPlaying) return;
-                    const audioUrl = result.data ? result.data.audioUrl : null;
-                    if (!audioUrl) throw new Error("Ingen lyd-URL mottatt");
-
-                    console.log("Playing Bible AI audio:", audioUrl);
-                    this.bibleAudio = new Audio(audioUrl);
-                    this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
-                    this.bibleAudio.onended = () => this.stopAudioPlayback();
-                    this.bibleAudio.onerror = () => this.fallbackWebSpeechPlayback(chapterText, lang);
-                    this.bibleAudio.play().then(() => {
-                        this.updateAudioPlayerUI();
-                    }).catch(() => this.fallbackWebSpeechPlayback(chapterText, lang));
-                })
-                .catch(err => {
-                    clearTimeout(cloudTimeout);
-                    console.warn("[BibleAudio] Cloud TTS error, falling back to Web Speech API:", err);
-                    this.fallbackWebSpeechPlayback(chapterText, lang);
+                    this.updateAudioPlayerUI();
+                }).catch(playErr => {
+                    console.error("[BibleAudio] Audio play failed:", playErr);
+                    alert("Kunne ikke starte avspilling av AI-lydfilen.");
+                    this.stopAudioPlayback();
                 });
-            } catch (e) {
-                console.warn("[BibleAudio] Firebase callable error:", e);
-                triedCloud = false;
-            }
-        }
-
-        if (!triedCloud) {
-            this.fallbackWebSpeechPlayback(chapterText, lang);
-        }
-    }
-
-    fallbackWebSpeechPlayback(text, lang) {
-        if (!this.audioIsPlaying) return;
-        if (!('speechSynthesis' in window)) {
-            alert('Nettleseren din støtter dessverre ikke lydopplesning.');
+            })
+            .catch(err => {
+                console.error("[BibleAudio] Error generating ChatGPT audio:", err);
+                alert("Kunne ikke generere ChatGPT AI-lyd for dette kapittelet. Prøv igjen om et øyeblikk.");
+                this.stopAudioPlayback();
+            });
+        } else {
+            alert('Lydtjenesten kobler til... Prøv igjen om et øyeblikk.');
             this.stopAudioPlayback();
-            return;
         }
-
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        const langMap = { 'no': 'nb-NO', 'en': 'en-US', 'es': 'es-ES' };
-        utterance.lang = langMap[lang] || 'nb-NO';
-        utterance.rate = this.audioSpeed || 1.0;
-
-        // Pick a natural voice if available
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-            const matchLang = utterance.lang.substring(0, 2);
-            const preferredVoice = voices.find(v => v.lang.toLowerCase().startsWith(matchLang) && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Siri') || v.name.includes('Enhanced') || v.name.includes('Nora') || v.name.includes('Stian')));
-            if (preferredVoice) utterance.voice = preferredVoice;
-        }
-
-        utterance.onend = () => this.stopAudioPlayback();
-        utterance.onerror = (e) => {
-            console.error("[SpeechSynthesis] Error:", e);
-            this.stopAudioPlayback();
-        };
-
-        this.speechUtterance = utterance;
-        window.speechSynthesis.speak(utterance);
-        this.updateAudioPlayerUI();
     }
 
     stopAudioPlayback() {
@@ -8450,11 +8410,6 @@ class BibleReader {
             this.bibleAudio.onended = null;
             this.bibleAudio.onerror = null;
             this.bibleAudio = null;
-        }
-
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            this.speechUtterance = null;
         }
         
         this.hideAudioPlayerBar();
