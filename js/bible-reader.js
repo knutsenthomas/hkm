@@ -5234,7 +5234,7 @@ class BibleReader {
 
         const modal = document.createElement('div');
         modal.className = 'modal modal-open';
-        modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.3); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px;';
+        modal.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.4); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px;';
         
         modal.innerHTML = `
             <div style="background:#ffffff; border-radius:20px; max-width:450px; width:100%; padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid #e2e8f0; text-align:left;">
