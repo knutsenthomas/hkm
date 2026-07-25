@@ -132,22 +132,49 @@
             background: rgba(209, 125, 57, 0.25);
             color: #f39c12;
         }
+        .tab-nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 5px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+        html[data-theme="dark"] .tab-nav-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
         .tab-btn-pill {
-            padding: 10px 20px;
+            flex: 1 1 0%;
+            min-width: max-content;
+            padding: 10px 16px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted, #64748b);
             background: transparent;
-            border: 1px solid transparent;
+            border: none;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .tab-btn-pill:hover {
+            color: var(--text-base, #1e293b);
         }
         .tab-btn-pill.active {
             background: #d17d39;
             color: #ffffff;
-            border-color: #d17d39;
-            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);
         }
         .book-chip {
             background: rgba(0, 0, 0, 0.04);
@@ -305,21 +332,24 @@
             </div>
 
             <!-- Navigation Tabs -->
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
-                <div class="flex flex-wrap gap-2">
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200">
+                <div class="tab-nav-bar">
                     <button class="tab-btn-pill active" onclick="switchSection('gt', event)">
-                        <span class="material-symbols-outlined text-base align-sub">history</span> Det gamle testamente (39)
+                        <span class="material-symbols-outlined text-base">history</span>
+                        <span>Det gamle testamente (39)</span>
                     </button>
                     <button class="tab-btn-pill" onclick="switchSection('nt', event)">
-                        <span class="material-symbols-outlined text-base align-sub">auto_awesome</span> Det nye testamente (27)
+                        <span class="material-symbols-outlined text-base">auto_awesome</span>
+                        <span>Det nye testamente (27)</span>
                     </button>
                     <button class="tab-btn-pill" onclick="switchSection('leseguide', event)">
-                        <span class="material-symbols-outlined text-base align-sub">lightbulb</span> Leseguide & Strategier
+                        <span class="material-symbols-outlined text-base">lightbulb</span>
+                        <span>Leseguide & Strategier</span>
                     </button>
                 </div>
                 <!-- Quick search filter -->
-                <div class="relative w-full md:w-64">
-                    <input type="text" id="genre-search" onkeyup="filterGenres()" placeholder="Søk etter bok eller sjanger..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-all">
+                <div class="relative w-full md:w-64 shrink-0">
+                    <input type="text" id="genre-search" onkeyup="filterGenres()" placeholder="Søk etter bok eller sjanger..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-all">
                     <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-lg">search</span>
                 </div>
             </div>
