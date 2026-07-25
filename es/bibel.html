@@ -987,12 +987,12 @@
         }
 
         .floating-settings-popover .popover-sheet-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
-            margin-bottom: 2px;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0 0 14px 0 !important;
+            border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08)) !important;
+            margin-bottom: 8px !important;
         }
 
         .floating-settings-popover .popover-sheet-header h3 {
@@ -1001,6 +1001,27 @@
             letter-spacing: -0.01em;
             color: var(--text-base) !important;
             margin: 0 !important;
+            line-height: 1 !important;
+        }
+
+        .floating-settings-popover .sheet-close-btn {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% !important;
+            background: transparent !important;
+            border: none !important;
+            color: var(--text-muted, #64748b) !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.15s ease !important;
+            margin: 0 !important;
+        }
+
+        .floating-settings-popover .sheet-close-btn:hover {
+            background: var(--bg-base, rgba(0,0,0,0.06)) !important;
+            color: var(--text-base) !important;
         }
 
         .floating-settings-popover .settings-row {
@@ -3784,8 +3805,8 @@
                 <!-- Floating Settings Popover -->
                 <div class="floating-settings-popover" id="floating-settings-popover">
                     <div class="sheet-handle-bar" style="width: 40px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 14px; cursor: pointer; flex-shrink: 0;"></div>
-                    <div class="popover-sheet-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 0 4px; flex-shrink: 0;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base); font-family: var(--font-heading, inherit);">Ajustes y Herramientas</h3>
+                    <div class="popover-sheet-header">
+                        <h3>Ajustes y Herramientas</h3>
                         <button type="button" class="sheet-close-btn" title="Cerrar" onclick="document.getElementById('floating-settings-popover').classList.remove('active'); const b=document.getElementById('hkm-sheet-backdrop-overlay'); if(b) b.classList.remove('active');">
                             <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                         </button>
