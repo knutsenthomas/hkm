@@ -719,9 +719,9 @@
 
         /* Floating Minimalist Bottom Navigation */
         .floating-bible-nav {
-            position: absolute;
-            bottom: 32px;
-            left: 50%;
+            position: fixed !important;
+            bottom: max(20px, calc(16px + env(safe-area-inset-bottom, 0px))) !important;
+            left: 50% !important;
             transform: translateX(-50%) translateZ(0);
             display: flex;
             align-items: center;
