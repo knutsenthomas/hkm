@@ -953,7 +953,7 @@
 
             <!-- Next / Prev Lesson Navigation Sub-bar -->
             <div class="lesson-nav-bar" id="lesson-nav-bar">
-                <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex - 1)">
+                <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="window.selectPrevLesson()">
                     <i class="fas fa-chevron-left"></i> Forrige leksjon
                 </button>
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
@@ -962,7 +962,7 @@
                         <i class="fas fa-video"></i> Åpne i Zoom-appen
                     </a>
                 </div>
-                <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex + 1)">
+                <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="window.selectNextLesson()">
                     Neste leksjon <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
@@ -1352,16 +1352,30 @@
             container.innerHTML = html;
         }
 
+        window.selectNextLesson = function() {
+            const nextIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex) + 1;
+            window.selectLesson(nextIdx);
+        };
+
+        window.selectPrevLesson = function() {
+            const prevIdx = (typeof window.currentLessonIndex === 'number' ? window.currentLessonIndex : currentLessonIndex) - 1;
+            window.selectLesson(prevIdx);
+        };
+
         window.selectLesson = function(index) {
             if (!currentCourse) return;
+            let parsedIdx = parseInt(index, 10);
+            if (isNaN(parsedIdx)) parsedIdx = 0;
+
             const lessons = getAllCourseLessons();
             const total = lessons.length;
             
-            if (index < 0) index = 0;
-            if (index >= total) index = total - 1;
+            if (parsedIdx < 0) parsedIdx = 0;
+            if (parsedIdx >= total) parsedIdx = total - 1;
             
-            currentLessonIndex = index;
-            const lesson = lessons[index] || lessons[0];
+            currentLessonIndex = parsedIdx;
+            window.currentLessonIndex = parsedIdx;
+            const lesson = lessons[parsedIdx] || lessons[0];
             if (!lesson) return;
 
             if (history.replaceState && currentCourse && currentCourse.id) {
