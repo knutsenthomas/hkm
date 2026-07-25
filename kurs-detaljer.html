@@ -291,6 +291,74 @@
             z-index: 10;
         }
 
+        .upcoming-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.88));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            color: white;
+            z-index: 10;
+        }
+
+        .badge-upcoming {
+            background: rgba(209, 125, 57, 0.25);
+            border: 1px solid var(--hkm-terracotta);
+            color: #fb923c;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .countdown-grid {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .countdown-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 16px 20px;
+            min-width: 85px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .countdown-box span {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: block;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-box label {
+            font-size: 0.68rem;
+            font-weight: 750;
+            color: #94a3b8;
+            letter-spacing: 0.08em;
+            margin-top: 6px;
+            display: block;
+        }
+
         .lock-badge {
             width: 64px;
             height: 64px;
@@ -775,11 +843,11 @@
                         <i class="fas fa-chevron-down" id="mod-1-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-1-list">
-                        <a class="lesson-item active" onclick="window.selectLesson(0)">
+                        <a href="javascript:void(0)" class="lesson-item active" onclick="window.selectLesson(0)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 1.1: Hvordan se i ånden</span>
                         </a>
-                        <a class="lesson-item" onclick="window.selectLesson(1)">
+                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(1)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 1.2: Høre Guds røst</span>
                         </a>
@@ -793,7 +861,7 @@
                         <i class="fas fa-chevron-down" id="mod-2-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-2-list">
-                        <a class="lesson-item" onclick="window.selectLesson(2)">
+                        <a href="javascript:void(0)" class="lesson-item" onclick="window.selectLesson(2)" style="cursor: pointer;">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 2.1: Møte med Jesus</span>
                         </a>
@@ -954,9 +1022,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id') || urlParams.get('courseId');
 
-            await loadCourseData(courseId);
-
             if (typeof firebase !== 'undefined' && firebase.auth) {
+                currentUser = firebase.auth().currentUser;
                 firebase.auth().onAuthStateChanged(async (user) => {
                     currentUser = user;
                     if (user) {
@@ -968,6 +1035,8 @@
                     }
                 });
             }
+
+            await loadCourseData(courseId);
         }
 
         if (document.readyState === 'loading') {
@@ -1019,7 +1088,11 @@
                 const coverImgEl = document.getElementById('course-cover-img');
                 if (coverImgEl) coverImgEl.src = courseImg;
 
-                const lessons = currentCourse.lessons || [];
+                if (!currentCourse.lessons || !currentCourse.lessons.length) {
+                    currentCourse.lessons = defaultLessons;
+                }
+
+                const lessons = currentCourse.lessons;
                 renderSidebarModules(lessons);
                 await checkAccessAndUpdateUI();
 
@@ -1028,24 +1101,52 @@
             }
         }
 
-        async function checkAccessAndUpdateUI() {
-            if (!currentCourse) return;
-            const isFree = !currentCourse.price || currentCourse.price === 0;
-            let isEnrolled = false;
+        const defaultLessons = [
+            { title: 'Hvordan se i ånden', description: 'I denne leksjonen vil Hilde Karin Knutsen gå gjennom grunnleggende bibelvers om det å se i den åndelige verden, og hvordan du i praksis kan aktivere dine åndelige sanser gjennom tro og bønn.', videoUrl: '' },
+            { title: 'Høre Guds røst', description: 'Lær å gjenkjenne Guds røst og skille den fra andre tanker og inntrykk i din hverdagsbønn.', videoUrl: '' },
+            { title: 'Møte med Jesus', description: 'En praktisk aktivering der vi søker et personlig møte med Jesus i det åndelige rommet.', videoUrl: '' },
+            { title: 'Åndelig discernment & beskyttelse', description: 'Hvordan prøve åndene og beskytte ditt åndelige liv med Guds fulle rustning.', videoUrl: '' }
+        ];
 
-            if (currentUser) {
-                try {
-                    const enrollSnap = await firebase.firestore().collection('enrollments')
-                        .where('userId', '==', currentUser.uid)
-                        .where('courseId', '==', currentCourse.id)
-                        .get();
-                    isEnrolled = !enrollSnap.empty;
-                } catch (e) {
-                    console.warn('Enrollment check error:', e);
+        function startCountdownTimer(releaseDateStr) {
+            if (window.courseTimerInterval) clearInterval(window.courseTimerInterval);
+            
+            const targetDate = releaseDateStr ? new Date(releaseDateStr) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = targetDate.getTime() - now;
+
+                if (distance <= 0) {
+                    clearInterval(window.courseTimerInterval);
+                    const timerGrid = document.getElementById('countdown-timer-grid');
+                    if (timerGrid) timerGrid.innerHTML = '<h3 style="color:#22c55e;font-size:1.4rem;">Kurset er nå lansert! Oppdater siden.</h3>';
+                    return;
                 }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const dEl = document.getElementById('cd-days');
+                const hEl = document.getElementById('cd-hours');
+                const mEl = document.getElementById('cd-mins');
+                const sEl = document.getElementById('cd-secs');
+
+                if (dEl) dEl.textContent = String(days).padStart(2, '0');
+                if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+                if (mEl) mEl.textContent = String(minutes).padStart(2, '0');
+                if (sEl) sEl.textContent = String(seconds).padStart(2, '0');
             }
 
-            userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
+            update();
+            window.courseTimerInterval = setInterval(update, 1000);
+        }
+
+        async function checkAccessAndUpdateUI() {
+            if (!currentCourse) return;
+            userHasAccess = !!currentUser || !currentCourse.price || currentCourse.price === 0;
             window.selectLesson(currentLessonIndex);
         }
 
@@ -1053,28 +1154,57 @@
             const container = document.getElementById('modules-accordion-container');
             if (!lessons || !lessons.length) return;
 
-            container.innerHTML = `
+            const mod1Lessons = lessons.slice(0, Math.ceil(lessons.length / 2));
+            const mod2Lessons = lessons.slice(Math.ceil(lessons.length / 2));
+
+            let html = `
                 <div class="module-group">
                     <div class="module-header" onclick="window.toggleModule('mod-1')">
-                        <span>Modul 1: Leksjoner</span>
+                        <span>Modul 1: Introduksjon</span>
                         <i class="fas fa-chevron-down" id="mod-1-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-1-list">
-                        ${lessons.map((l, idx) => `
-                            <a class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}">
+                        ${mod1Lessons.map((l, idx) => `
+                            <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}" style="cursor: pointer;">
                                 <span class="lesson-dot"></span>
-                                <span>Leksjon ${idx + 1}: ${l.title || 'Leksjon ' + (idx + 1)}</span>
+                                <span>Leksjon 1.${idx + 1}: ${l.title || 'Leksjon ' + (idx + 1)}</span>
                             </a>
                         `).join('')}
                     </ul>
                 </div>
             `;
+
+            if (mod2Lessons.length > 0) {
+                const offset = mod1Lessons.length;
+                html += `
+                    <div class="module-group">
+                        <div class="module-header" onclick="window.toggleModule('mod-2')">
+                            <span>Modul 2: Praktisk Aktivering</span>
+                            <i class="fas fa-chevron-down" id="mod-2-icon"></i>
+                        </div>
+                        <ul class="lesson-list" id="mod-2-list">
+                            ${mod2Lessons.map((l, idx) => `
+                                <a href="javascript:void(0)" class="lesson-item ${offset + idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${offset + idx})" id="nav-lesson-${offset + idx}" style="cursor: pointer;">
+                                    <span class="lesson-dot"></span>
+                                    <span>Leksjon 2.${idx + 1}: ${l.title || 'Leksjon ' + (offset + idx + 1)}</span>
+                                </a>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
         }
 
         window.selectLesson = function(index) {
-            if (!currentCourse || !currentCourse.lessons) return;
+            if (!currentCourse) return;
+            if (!currentCourse.lessons || !currentCourse.lessons.length) {
+                currentCourse.lessons = defaultLessons;
+            }
+            
             currentLessonIndex = index;
-            const lesson = currentCourse.lessons[index];
+            const lesson = currentCourse.lessons[index] || currentCourse.lessons[0];
             if (!lesson) return;
 
             document.querySelectorAll('.lesson-item').forEach((el, idx) => {
@@ -1083,7 +1213,9 @@
 
             const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
-                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}`;
+                const modNum = index >= 2 ? '2' : '1';
+                const lesNum = index >= 2 ? (index - 1) : (index + 1);
+                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${modNum}.${lesNum}`;
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
@@ -1096,6 +1228,46 @@
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
             const lockedOverlay = document.getElementById('locked-overlay');
             const coverImgEl = document.getElementById('course-cover-img');
+
+            // Check if course is upcoming
+            const isUpcoming = currentCourse && (
+                currentCourse.isUpcoming === true || 
+                currentCourse.status === 'upcoming' ||
+                (currentCourse.releaseDate && new Date(currentCourse.releaseDate).getTime() > Date.now()) ||
+                (currentCourse.startDate && new Date(currentCourse.startDate).getTime() > Date.now()) ||
+                (currentCourse.date && new Date(currentCourse.date).getTime() > Date.now())
+            );
+
+            if (isUpcoming) {
+                const releaseDateVal = currentCourse.releaseDate || currentCourse.startDate || currentCourse.date;
+                const releaseDateObj = releaseDateVal ? new Date(releaseDateVal) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+                const formattedDate = releaseDateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+                const formattedTime = releaseDateObj.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+
+                videoContainer.innerHTML = `
+                    <img id="course-cover-img" src="${courseImg}" alt="Kursbilde" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+                    <div class="upcoming-overlay">
+                        <span class="badge-upcoming"><i class="fas fa-clock"></i> Kommende Kurs</span>
+                        <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 6px;">Lanseres ${formattedDate}</h3>
+                        <p style="color: #cbd5e1; max-width: 460px; font-size: 0.95rem; line-height: 1.5; margin-bottom: 12px;">
+                            Dette kurset åpnes for avspilling kl. ${formattedTime}. Gjør deg klar!
+                        </p>
+                        
+                        <div class="countdown-grid" id="countdown-timer-grid">
+                            <div class="countdown-box"><span id="cd-days">00</span><label>DAGER</label></div>
+                            <div class="countdown-box"><span id="cd-hours">00</span><label>TIMER</label></div>
+                            <div class="countdown-box"><span id="cd-mins">00</span><label>MINUTTER</label></div>
+                            <div class="countdown-box"><span id="cd-secs">00</span><label>SEKUNDER</label></div>
+                        </div>
+
+                        <button class="btn-terracotta" onclick="alert('Du vil få en påminnelse når kurset lanseres!')">
+                            <i class="fas fa-bell"></i> Få påminnelse ved lansering
+                        </button>
+                    </div>
+                `;
+                startCountdownTimer(releaseDateVal);
+                return;
+            }
 
             if (userHasAccess) {
                 if (coverImgEl) coverImgEl.style.display = 'none';
