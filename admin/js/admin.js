@@ -25913,6 +25913,14 @@ class AdminManager {
                                     placeholder: 'https://rss.app/feeds/...'
                                 })}
                                 ${this.renderFacebookFeedField({
+                                    key: 'facebookFeed.accessToken',
+                                    label: 'Meta Page Access Token (Sidetilgangskode)',
+                                    value: feed.accessToken || '',
+                                    type: 'password',
+                                    placeholder: 'EAACEdEose0cBA...',
+                                    help: 'Kreves kun hvis kilde er Meta API. Lim inn din permanente Facebook Page Access Token her.'
+                                })}
+                                ${this.renderFacebookFeedField({
                                     key: 'facebookFeed.pageCta',
                                     label: 'Knappetekst',
                                     value: feed.pageCta || ''

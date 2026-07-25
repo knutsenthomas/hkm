@@ -26,3 +26,6 @@ build_*.txt
 dist/
 .vercel
 scratch/
+.env*.local
+.env.production
+.env
