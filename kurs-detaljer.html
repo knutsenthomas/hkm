@@ -641,16 +641,46 @@
                 border-bottom: 1px solid #e2e8f0 !important;
                 box-shadow: none !important;
                 box-sizing: border-box !important;
+                border-radius: 12px !important;
+                margin-bottom: 12px !important;
+                overflow: hidden !important;
             }
 
             .sidebar-header {
-                padding: 18px 16px !important;
+                padding: 14px 16px !important;
+                cursor: pointer !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                background: #f8fafc !important;
             }
 
             .sidebar-title {
-                font-size: 1.35rem !important;
-                font-weight: 850 !important;
-                line-height: 1.25 !important;
+                font-size: 1.1rem !important;
+                font-weight: 800 !important;
+            }
+
+            .mobile-sidebar-toggle-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 50% !important;
+                background: rgba(209, 125, 57, 0.1) !important;
+                color: var(--hkm-terracotta) !important;
+            }
+
+            #modules-accordion-container {
+                display: none;
+            }
+
+            .sidebar-nav.mobile-expanded #modules-accordion-container {
+                display: block !important;
+            }
+
+            .sidebar-nav.mobile-expanded #mobile-sidebar-chevron {
+                transform: rotate(180deg);
             }
 
             .module-header {
@@ -667,7 +697,7 @@
             }
 
             .main-panel {
-                padding: 16px 12px 40px !important;
+                padding: 12px 10px 40px !important;
                 max-width: 100% !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
@@ -675,20 +705,17 @@
             }
 
             .panel-top-bar {
-                flex-direction: column !important;
-                align-items: flex-start !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
                 gap: 12px !important;
-                margin-bottom: 16px !important;
+                margin-bottom: 12px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
 
             #course-lesson-heading {
-                font-size: 1.05rem !important;
-                line-height: 1.4 !important;
-                word-break: break-word !important;
-                overflow-wrap: break-word !important;
-                width: 100% !important;
+                display: none !important;
             }
 
             .progress-wrapper {
@@ -704,8 +731,8 @@
             /* Video & Overlays */
             .video-card {
                 border-radius: 12px !important;
-                margin-bottom: 14px !important;
-                min-height: 280px !important;
+                margin-bottom: 12px !important;
+                min-height: 260px !important;
                 height: auto !important;
                 aspect-ratio: auto !important;
             }
@@ -718,28 +745,28 @@
 
             .locked-overlay,
             .upcoming-overlay {
-                padding: 20px 12px !important;
+                padding: 16px 10px !important;
                 box-sizing: border-box !important;
                 width: 100% !important;
             }
 
             .locked-overlay h3,
             .upcoming-overlay h3 {
-                font-size: 1.15rem !important;
-                margin-bottom: 6px !important;
+                font-size: 1.1rem !important;
+                margin-bottom: 4px !important;
             }
 
             .locked-overlay p,
             .upcoming-overlay p {
-                font-size: 0.85rem !important;
-                margin-bottom: 14px !important;
-                line-height: 1.4 !important;
+                font-size: 0.82rem !important;
+                margin-bottom: 12px !important;
+                line-height: 1.35 !important;
             }
 
             .locked-overlay .btn-terracotta,
             .upcoming-overlay .btn-terracotta {
-                padding: 10px 18px !important;
-                font-size: 0.88rem !important;
+                padding: 8px 16px !important;
+                font-size: 0.85rem !important;
                 min-height: 44px !important;
             }
 
@@ -751,7 +778,7 @@
                 gap: 6px !important;
                 justify-content: center !important;
                 align-items: center !important;
-                margin: 12px 0 16px 0 !important;
+                margin: 10px 0 14px 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
@@ -760,77 +787,55 @@
             .countdown-box {
                 flex: 1 1 0% !important;
                 min-width: 0 !important;
-                padding: 10px 4px !important;
-                border-radius: 10px !important;
+                padding: 8px 3px !important;
+                border-radius: 8px !important;
                 box-sizing: border-box !important;
             }
 
             .countdown-box span {
-                font-size: 1.35rem !important;
+                font-size: 1.25rem !important;
                 line-height: 1.1 !important;
             }
 
             .countdown-box label {
-                font-size: 0.58rem !important;
+                font-size: 0.55rem !important;
                 letter-spacing: 0.02em !important;
-                margin-top: 4px !important;
+                margin-top: 3px !important;
             }
 
-            /* Navigation Bar Between Lessons */
+            /* Sleek 1-Row Compact Navigation Bar Between Lessons */
             .lesson-nav-bar {
-                flex-direction: column !important;
-                gap: 12px !important;
-                padding: 14px 12px !important;
-                align-items: stretch !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+                padding: 8px 10px !important;
+                margin-bottom: 16px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
-            }
-
-            .lesson-step-wrapper {
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                width: 100% !important;
-                gap: 8px !important;
-                order: 2 !important;
-            }
-
-            #prev-lesson-btn {
-                order: 1 !important;
-            }
-
-            #next-lesson-btn {
-                order: 3 !important;
             }
 
             .lesson-nav-btn {
-                width: 100% !important;
+                flex: 1 1 0% !important;
+                width: auto !important;
+                min-height: 44px !important;
+                padding: 8px 10px !important;
+                font-size: 0.82rem !important;
                 justify-content: center !important;
-                min-height: 46px !important;
-                font-size: 0.92rem !important;
-                box-sizing: border-box !important;
+                white-space: nowrap !important;
             }
 
             #lesson-step-indicator {
-                text-align: center !important;
-                width: 100% !important;
-                display: block !important;
-                font-size: 0.9rem !important;
+                flex-shrink: 0 !important;
+                font-size: 0.84rem !important;
                 font-weight: 750 !important;
                 color: #475569 !important;
-            }
-
-            #zoom-nav-link {
-                width: 100% !important;
-                justify-content: center !important;
                 text-align: center !important;
-                box-sizing: border-box !important;
-                min-height: 44px !important;
-                font-size: 0.9rem !important;
-                padding: 12px 16px !important;
-                border-radius: 10px !important;
-                display: inline-flex !important;
+                padding: 0 4px !important;
+                order: 0 !important;
+                width: auto !important;
+                display: inline-block !important;
             }
 
             /* Content Tabs */
@@ -1179,9 +1184,10 @@
     <!-- Platform Container -->
     <div id="platform-container" class="platform-container">
         <!-- Left Sidebar: Course Modules & Lessons Navigation -->
-        <aside class="sidebar-nav">
-            <div class="sidebar-header">
+        <aside class="sidebar-nav" id="sidebar-nav">
+            <div class="sidebar-header" onclick="window.toggleMobileSidebar()">
                 <span class="sidebar-title" id="sidebar-course-title">Seerkurs med aktivering</span>
+                <span class="mobile-sidebar-toggle-btn"><i class="fas fa-chevron-down" id="mobile-sidebar-chevron"></i></span>
             </div>
 
             <div id="modules-accordion-container">
@@ -1756,17 +1762,26 @@
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
-            if (overviewTitle) overviewTitle.textContent = `Oversikt over leksjonen: ${lesson.title}`;
+            if (overviewTitle) overviewTitle.textContent = `Om leksjonen: ${lesson.title}`;
 
             const overviewText = document.getElementById('lesson-overview-text');
-            if (overviewText) overviewText.textContent = lesson.description || 'Ingen leksjonsbeskrivelse spesifisert.';
+            if (overviewText) {
+                const desc = (lesson.description || '').trim();
+                const titleStr = (lesson.title || '').trim();
+                if (desc && desc.toLowerCase() !== titleStr.toLowerCase()) {
+                    overviewText.textContent = desc;
+                    overviewText.style.display = 'block';
+                } else {
+                    overviewText.textContent = '';
+                    overviewText.style.display = 'none';
+                }
+            }
 
-            // Render Zoom link button and banner if zoomUrl is present
+            // Render Zoom banner in Overview tab ONLY if not showing live countdown video overlay
             const zoomUrl = lesson.zoomUrl || (currentCourse && currentCourse.zoomUrl);
-            const zoomNavLink = document.getElementById('zoom-nav-link');
             const zoomBanner = document.getElementById('zoom-banner-container');
 
-            if (zoomUrl && String(zoomUrl).trim().length > 0) {
+            if (zoomUrl && String(zoomUrl).trim().length > 0 && !isFutureCountdown) {
                 if (zoomBanner) {
                     zoomBanner.style.display = 'block';
                     zoomBanner.innerHTML = `
@@ -1786,7 +1801,6 @@
                     `;
                 }
             } else {
-                if (zoomNavLink) zoomNavLink.style.display = 'none';
                 if (zoomBanner) {
                     zoomBanner.style.display = 'none';
                     zoomBanner.innerHTML = '';
@@ -2035,6 +2049,13 @@
                         </div>
                     `;
                 }
+            }
+        };
+
+        window.toggleMobileSidebar = function() {
+            const sidebar = document.getElementById('sidebar-nav');
+            if (sidebar) {
+                sidebar.classList.toggle('mobile-expanded');
             }
         };
 
