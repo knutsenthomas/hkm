@@ -8407,6 +8407,41 @@ class BibleReader {
                     if (infoDisplay) {
                         infoDisplay.textContent = 'Spiller av ChatGPT AI-stemme...';
                     }
+
+                    // Set up dynamic text highlighting as audio plays
+                    const paragraphLengths = paragraphs.map(p => p.innerText.trim().length);
+                    const totalCharCount = paragraphLengths.reduce((a, b) => a + b, 0);
+
+                    this.bibleAudio.ontimeupdate = () => {
+                        if (!this.bibleAudio || !this.bibleAudio.duration || totalCharCount === 0) return;
+                        const currentTime = this.bibleAudio.currentTime;
+                        const duration = this.bibleAudio.duration;
+                        const progress = currentTime / duration;
+                        const targetCharIndex = progress * totalCharCount;
+
+                        let accumulated = 0;
+                        let activeIdx = 0;
+
+                        for (let i = 0; i < paragraphLengths.length; i++) {
+                            accumulated += paragraphLengths[i];
+                            if (targetCharIndex <= accumulated) {
+                                activeIdx = i;
+                                break;
+                            }
+                        }
+
+                        paragraphs.forEach((p, idx) => {
+                            if (idx === activeIdx) {
+                                if (!p.classList.contains('audio-playing-highlight')) {
+                                    p.classList.add('audio-playing-highlight');
+                                    p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            } else {
+                                p.classList.remove('audio-playing-highlight');
+                            }
+                        });
+                    };
+
                     this.updateAudioPlayerUI();
                 }).catch(playErr => {
                     console.error("[BibleAudio] Audio play failed:", playErr);
@@ -8435,7 +8470,13 @@ class BibleReader {
             this.bibleAudio.pause();
             this.bibleAudio.onended = null;
             this.bibleAudio.onerror = null;
+            this.bibleAudio.ontimeupdate = null;
             this.bibleAudio = null;
+        }
+
+        if (this.dom && this.dom.readingPane) {
+            const highlights = this.dom.readingPane.querySelectorAll('.audio-playing-highlight');
+            highlights.forEach(el => el.classList.remove('audio-playing-highlight'));
         }
         
         this.hideAudioPlayerBar();
