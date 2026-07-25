@@ -3601,7 +3601,8 @@ class BibleReader {
         };
 
         const onStart = (clientY, target) => {
-            if (target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) return false;
+            const isHeader = target && target.closest('.sheet-handle-bar, .popover-sheet-header, .color-wheel-header');
+            if (!isHeader && target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) return false;
             startY = clientY;
             currentDeltaY = 0;
             isDragging = true;
@@ -3671,7 +3672,7 @@ class BibleReader {
 
         element.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            const scrollable = e.target.closest('.verse-crossref-sheet-body, .sheet-scroll-body');
+            const scrollable = e.target.closest('.verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, #floating-chapter-grid') || (element.scrollHeight > element.clientHeight ? element : null);
             if (scrollable && scrollable.scrollTop > 0 && currentDeltaY === 0) return;
             onMove(e.touches[0].clientY, e);
         }, { passive: false });
