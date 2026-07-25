@@ -1559,11 +1559,15 @@ class BibleReader {
 
         window.closeColorWheelModal = (e) => {
             if (e && e.stopPropagation) e.stopPropagation();
-            if (colorWheelModal) colorWheelModal.style.display = 'none';
+            if (colorWheelModal) {
+                colorWheelModal.classList.remove('active');
+                colorWheelModal.style.display = 'none';
+            }
         };
 
         const openColorWheelModal = () => {
             if (!colorWheelModal) return;
+            colorWheelModal.classList.add('active');
             colorWheelModal.style.display = 'flex';
             requestAnimationFrame(() => {
                 drawColorWheel();

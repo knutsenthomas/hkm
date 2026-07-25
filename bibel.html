@@ -1912,11 +1912,15 @@
             backdrop-filter: blur(6px) !important;
             -webkit-backdrop-filter: blur(6px) !important;
             z-index: 35000 !important;
-            display: flex !important;
+            display: none;
             align-items: center !important;
             justify-content: center !important;
             padding: 16px !important;
             animation: fadeIn 0.2s ease-out !important;
+        }
+
+        .color-wheel-modal-overlay.active {
+            display: flex !important;
         }
 
         .color-wheel-card {
@@ -3505,11 +3509,11 @@
         </div>
     </div>
     <!-- Color Wheel Modal -->
-    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this) this.style.display='none';">
+    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card" onclick="event.stopPropagation();">
             <div class="color-wheel-header">
                 <h3>Velg farge</h3>
-                <button id="color-wheel-close" class="color-wheel-close-btn" title="Lukk" onclick="document.getElementById('color-wheel-modal').style.display='none';">
+                <button id="color-wheel-close" class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('color-wheel-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -3534,7 +3538,7 @@
                 </div>
             </div>
             <div class="color-wheel-footer" style="margin-top: 14px;">
-                <button id="color-wheel-apply-btn" class="color-wheel-apply-btn" onclick="document.getElementById('color-wheel-modal').style.display='none';">Bruk farge</button>
+                <button id="color-wheel-apply-btn" class="color-wheel-apply-btn" onclick="const m=document.getElementById('color-wheel-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">Bruk farge</button>
             </div>
         </div>
     </div>
