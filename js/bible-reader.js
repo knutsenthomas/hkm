@@ -1752,6 +1752,18 @@ class BibleReader {
             });
         }
 
+        // Swipe down to dismiss for verse crossref modal
+        const verseCrossrefCard = document.querySelector('#verse-crossref-modal .color-wheel-card');
+        if (verseCrossrefCard) {
+            const verseCrossrefModal = document.getElementById('verse-crossref-modal');
+            this.setupBottomSheetSwipeDown(verseCrossrefCard, () => {
+                if (verseCrossrefModal) {
+                    verseCrossrefModal.classList.remove('active');
+                    verseCrossrefModal.style.display = 'none';
+                }
+            });
+        }
+
         // Hide toolbar, clear highlight, and show/hide floating nav on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
         const floatingNav = document.getElementById('floating-bible-nav');
@@ -2469,53 +2481,140 @@ class BibleReader {
     }
 
     async loadChapterCrossReferences() {
-        if (!this.dom.chapterCrossRefsSection || !this.dom.chapterCrossRefsList) return;
+        if (this.dom.chapterCrossRefsSection) {
+            this.dom.chapterCrossRefsSection.style.display = 'none';
+        }
+    }
 
-        this.dom.chapterCrossRefsSection.style.display = 'none';
-        this.dom.chapterCrossRefsList.innerHTML = '';
+    attachVerseCrossReferenceButtons() {
+        if (!this.dom.readingPane) return;
+        const paragraphs = this.dom.readingPane.querySelectorAll('p');
+        paragraphs.forEach(p => {
+            const verseSup = p.querySelector('sup.v');
+            if (!verseSup) return;
+            const verseNum = verseSup.innerText.trim();
+            if (!verseNum) return;
+
+            p.style.position = 'relative';
+            p.style.paddingRight = '36px';
+
+            if (p.querySelector('.verse-crossref-icon-btn')) return;
+
+            const iconBtn = document.createElement('button');
+            iconBtn.type = 'button';
+            iconBtn.className = 'verse-crossref-icon-btn';
+            iconBtn.title = 'Kryssreferanser';
+            iconBtn.setAttribute('data-verse-num', verseNum);
+            iconBtn.style.cssText = 'position: absolute; right: 10px; top: 4px; background: transparent; border: none; color: var(--hkm-terracotta, #d17d39); opacity: 0.4; cursor: pointer; padding: 4px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; user-select: none; z-index: 5;';
+            iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">link</span>`;
+
+            iconBtn.addEventListener('mouseenter', () => {
+                iconBtn.style.opacity = '1';
+                iconBtn.style.background = 'rgba(209, 125, 57, 0.1)';
+                iconBtn.style.transform = 'scale(1.15)';
+            });
+            iconBtn.addEventListener('mouseleave', () => {
+                iconBtn.style.opacity = '0.4';
+                iconBtn.style.background = 'transparent';
+                iconBtn.style.transform = 'none';
+            });
+
+            const openCrossref = (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                // Clean verse text without child button
+                const clone = p.cloneNode(true);
+                const btn = clone.querySelector('.verse-crossref-icon-btn');
+                if (btn) btn.remove();
+                const verseText = clone.innerText.trim();
+                this.openVerseCrossReferenceModal(verseNum, verseText);
+            };
+
+            iconBtn.addEventListener('click', openCrossref);
+            iconBtn.addEventListener('touchend', openCrossref);
+
+            p.appendChild(iconBtn);
+        });
+    }
+
+    async openVerseCrossReferenceModal(verseNum, verseText) {
+        const modal = document.getElementById('verse-crossref-modal');
+        const titleEl = document.getElementById('verse-crossref-title');
+        const previewEl = document.getElementById('verse-crossref-quote-preview');
+        const listEl = document.getElementById('verse-crossref-list');
+
+        if (!modal || !listEl) return;
+
+        const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+        const bookName = currentBook ? currentBook.name : '';
+        const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
+        const fullRef = `${bookName} ${chapterNum}:${verseNum}`;
+
+        const lang = window.HKM_CURRENT_LANG || 'no';
+        const titleText = lang === 'en' ? `Cross References (${fullRef})` : (lang === 'es' ? `Referencias Cruzadas (${fullRef})` : `Kryssreferanser (${fullRef})`);
+
+        if (titleEl) titleEl.textContent = titleText;
+        if (previewEl) previewEl.textContent = `"${verseText}"`;
+
+        listEl.innerHTML = `
+            <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
+                <div class="spinner" style="margin: 0 auto 12px;"></div>
+                <p style="font-size: 13px;">Henter kryssreferanser...</p>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('active'));
 
         try {
-            const currentRef = this.getCurrentReferenceText();
-            const res = await fetch(`/api/bible/cross-references?chapterName=${encodeURIComponent(currentRef)}`);
+            const res = await fetch(`/api/bible/cross-references?chapterName=${encodeURIComponent(fullRef)}`);
             if (!res.ok) throw new Error("Failed to fetch cross references");
             const crossRefs = await res.json();
 
             if (crossRefs && crossRefs.length > 0) {
-                this.dom.chapterCrossRefsList.innerHTML = crossRefs.map(item => `
-                    <div class="cross-ref-item" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; transition: all 0.2s; cursor: pointer; box-sizing: border-box; width: 100%;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--bible-primary); font-size: 14px;">
+                listEl.innerHTML = crossRefs.map((item, idx) => `
+                    <div class="verse-crossref-card-item" data-idx="${idx}" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s ease; cursor: pointer; width: 100%; box-sizing: border-box;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--hkm-terracotta, #d17d39); font-size: 14px;">
                             <span>${item.ref}</span>
-                            <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.8;">open_in_new</span>
                         </div>
-                        <div style="font-size: 13px; color: var(--text-base); line-height: 1.4;">${item.explanation}</div>
+                        <div style="font-size: 13px; color: var(--text-base, #334155); line-height: 1.45;">${item.explanation}</div>
                     </div>
                 `).join('');
 
-                const items = this.dom.chapterCrossRefsList.querySelectorAll('.cross-ref-item');
-                items.forEach((element, index) => {
-                    element.addEventListener('click', () => {
-                        this.parseAndNavigateToReference(crossRefs[index].ref);
+                const cards = listEl.querySelectorAll('.verse-crossref-card-item');
+                cards.forEach((card, idx) => {
+                    card.addEventListener('mouseenter', () => {
+                        card.style.borderColor = 'var(--hkm-terracotta, #d17d39)';
+                        card.style.transform = 'translateY(-1px)';
+                        card.style.boxShadow = '0 4px 12px rgba(209, 125, 57, 0.12)';
                     });
-                    
-                    element.addEventListener('mouseenter', () => {
-                        element.style.borderColor = 'var(--bible-primary)';
-                        element.style.transform = 'translateY(-1px)';
-                        element.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                    card.addEventListener('mouseleave', () => {
+                        card.style.borderColor = 'var(--border-color, #e2e8f0)';
+                        card.style.transform = 'none';
+                        card.style.boxShadow = 'none';
                     });
-                    element.addEventListener('mouseleave', () => {
-                        element.style.borderColor = 'var(--border-color)';
-                        element.style.transform = 'none';
-                        element.style.boxShadow = 'none';
+                    card.addEventListener('click', () => {
+                        const targetRef = crossRefs[idx].ref;
+                        modal.classList.remove('active');
+                        modal.style.display = 'none';
+                        this.parseAndNavigateToReference(targetRef);
                     });
                 });
-
-                this.dom.chapterCrossRefsSection.style.display = 'block';
             } else {
-                this.dom.chapterCrossRefsSection.style.display = 'none';
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13.5px;">
+                        Ingen direkte kryssreferanser funnet for dette verset.
+                    </div>
+                `;
             }
         } catch (e) {
-            console.error("Error loading chapter cross references:", e);
-            this.dom.chapterCrossRefsSection.style.display = 'none';
+            console.error("Error fetching verse cross references:", e);
+            listEl.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #ef4444; font-size: 13px;">
+                    Kunne ikke laste kryssreferanser. Sjekk tilkoblingen din.
+                </div>
+            `;
         }
     }
 
@@ -2543,6 +2642,9 @@ class BibleReader {
 
         // Render verses HTML
         this.dom.readingPane.innerHTML = this.activeChapterData.content || '';
+
+        // Attach inline verse cross-reference buttons
+        this.attachVerseCrossReferenceButtons();
 
         // Restore bookmarks highlight
         this.restoreHighlights();

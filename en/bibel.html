@@ -3796,6 +3796,28 @@
         </div>
     </div>
 
+    <!-- Verse Cross-References Modal -->
+    <div id="verse-crossref-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+        <div class="color-wheel-card" onclick="event.stopPropagation();">
+            <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 24px;">link</span>
+                    <h3 id="verse-crossref-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">Cross References</h3>
+                </div>
+                <button class="color-wheel-close-btn" title="Close" onclick="const m=document.getElementById('verse-crossref-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="color-wheel-body" style="margin-top: 16px;">
+                <div id="verse-crossref-quote-preview" style="background: rgba(209, 125, 57, 0.06); border-left: 4px solid var(--hkm-terracotta, #d17d39); padding: 12px 16px; border-radius: 12px; font-style: italic; font-size: 13.5px; margin-bottom: 16px; max-height: 100px; overflow-y: auto; color: var(--text-base);"></div>
+                
+                <div id="verse-crossref-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Dynamically loaded cross references -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Translation Selection Modal -->
     <div id="translation-selection-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card translation-modal-card" onclick="event.stopPropagation();">
