@@ -311,6 +311,34 @@
             box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
         }
 
+        .btn-terracotta {
+            background-color: var(--hkm-terracotta, #d17d39) !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);
+            text-decoration: none;
+        }
+
+        .btn-terracotta:hover {
+            background-color: #b8692b !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(209, 125, 57, 0.4);
+        }
+
+        .btn-terracotta:active {
+            transform: translateY(0);
+        }
+
         .lesson-nav-btn.disabled {
             opacity: 0.45;
             cursor: not-allowed;
