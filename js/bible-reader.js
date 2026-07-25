@@ -2131,9 +2131,18 @@ class BibleReader {
                     const activeLang = window.HKM_CURRENT_LANG || 'no';
                     this.safeSetLocalStorage(`hkm_bible_translation_${activeLang}`, this.selectedBibleId);
                     
-                    if (this.dom.translationSelect) this.dom.translationSelect.value = this.selectedBibleId;
-                    const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-                    if (mobileTransSelect) mobileTransSelect.value = this.selectedBibleId;
+                    const selectedBible = (this.bibles || []).find(t => t.id === this.selectedBibleId);
+                    const activeName = selectedBible ? (selectedBible.abbreviation ? `${selectedBible.name} (${selectedBible.abbreviation})` : selectedBible.name) : 'Bibeloversettelse';
+
+                    const updateTrigger = (el) => {
+                        if (!el) return;
+                        if (el.tagName === 'SELECT') el.value = this.selectedBibleId;
+                        const textSpan = el.querySelector('.selected-translation-name');
+                        if (textSpan) textSpan.textContent = activeName;
+                    };
+
+                    updateTrigger(this.dom.translationSelect);
+                    updateTrigger(document.getElementById('bible-translation-select-mobile'));
 
                     await this.loadBooks();
                     await this.loadChapterText();
@@ -2154,20 +2163,21 @@ class BibleReader {
             const payload = await res.json();
             this.bibles = payload.data || [];
             
-            const optionsHtml = this.bibles.map(t => 
-                `<option value="${t.id}">${t.name} (${t.abbreviation})</option>`
-            ).join('');
+            const selectedBible = this.bibles.find(t => t.id === this.selectedBibleId) || this.bibles[0];
+            const activeName = selectedBible ? (selectedBible.abbreviation ? `${selectedBible.name} (${selectedBible.abbreviation})` : selectedBible.name) : 'Bibeloversettelse';
 
-            if (this.dom.translationSelect) {
-                this.dom.translationSelect.innerHTML = optionsHtml;
-                this.dom.translationSelect.value = this.selectedBibleId;
-            }
+            const updateElement = (el) => {
+                if (!el) return;
+                if (el.tagName === 'SELECT') {
+                    el.innerHTML = this.bibles.map(t => `<option value="${t.id}">${t.name} (${t.abbreviation})</option>`).join('');
+                    el.value = this.selectedBibleId;
+                }
+                const textSpan = el.querySelector('.selected-translation-name');
+                if (textSpan) textSpan.textContent = activeName;
+            };
 
-            const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-            if (mobileTransSelect) {
-                mobileTransSelect.innerHTML = optionsHtml;
-                mobileTransSelect.value = this.selectedBibleId;
-            }
+            updateElement(this.dom.translationSelect);
+            updateElement(document.getElementById('bible-translation-select-mobile'));
         } catch (e) {
             console.error("Error loading translations:", e);
         }
