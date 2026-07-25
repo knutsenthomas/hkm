@@ -446,6 +446,26 @@
             color: #1e293b;
         }
     </style>
+
+    <!-- Force Visibility Safety Script -->
+    <script>
+        (function() {
+            function forceShow() {
+                if (document.body) {
+                    document.body.classList.remove('cms-loading');
+                    var container = document.querySelector('.platform-container');
+                    if (container) {
+                        container.style.display = 'flex';
+                        container.style.visibility = 'visible';
+                        container.style.opacity = '1';
+                    }
+                }
+            }
+            document.addEventListener('DOMContentLoaded', forceShow);
+            setTimeout(forceShow, 100);
+            setTimeout(forceShow, 1000);
+        })();
+    </script>
 </head>
 
 <body class="header-always-scrolled">
