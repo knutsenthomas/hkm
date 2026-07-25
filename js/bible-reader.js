@@ -2496,9 +2496,34 @@ class BibleReader {
             return;
         }
 
-        container.innerHTML = this.books.map(b => {
+        const isEn = document.documentElement.lang === 'en' || window.location.pathname.includes('/en/');
+        const isEs = document.documentElement.lang === 'es' || window.location.pathname.includes('/es/');
+        
+        const otTitle = isEn ? 'Old Testament' : (isEs ? 'Antiguo Testamento' : 'Det Gamle Testamente');
+        const ntTitle = isEn ? 'New Testament' : (isEs ? 'Nuevo Testamento' : 'Det Nye Testamente');
+
+        const isNewTestament = (bookId, index) => {
+            if (this.books.length === 66) return index >= 39;
+            const bookIdNum = parseInt(bookId, 10);
+            return bookIdNum >= 40 || ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JO', '2JO', '3JO', 'JUD', 'REV'].includes(bookId);
+        };
+
+        let html = '';
+        let hasAddedOT = false;
+        let hasAddedNT = false;
+
+        this.books.forEach((b, index) => {
+            const isNT = isNewTestament(b.id, index);
+            if (!isNT && !hasAddedOT) {
+                html += `<div class="testament-header-pill" style="padding: 6px 12px; margin: 4px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${otTitle}</div>`;
+                hasAddedOT = true;
+            } else if (isNT && !hasAddedNT) {
+                html += `<div class="testament-header-pill" style="padding: 6px 12px; margin: 16px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${ntTitle}</div>`;
+                hasAddedNT = true;
+            }
+
             const isActive = b.id === this.selectedBookId ? 'active' : '';
-            return `
+            html += `
                 <div class="floating-book-item ${isActive}" data-id="${b.id}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         ${isActive ? '<span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">check_circle</span>' : ''}
@@ -2507,7 +2532,9 @@ class BibleReader {
                     <span class="material-symbols-outlined" style="font-size: 16px; opacity: ${isActive ? '1' : '0.5'};">${isActive ? 'check' : 'chevron_right'}</span>
                 </div>
             `;
-        }).join('');
+        });
+
+        container.innerHTML = html;
 
         container.querySelectorAll('.floating-book-item').forEach(item => {
             item.addEventListener('click', async () => {
