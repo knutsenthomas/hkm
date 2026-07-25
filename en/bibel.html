@@ -2047,6 +2047,50 @@
             box-shadow: 0 6px 16px rgba(209, 125, 57, 0.4);
         }
 
+        /* Responsive Full-Screen Note Modal for Mobile */
+        @media (max-width: 768px) {
+            #verse-note-modal {
+                padding: 0 !important;
+                align-items: stretch !important;
+                justify-content: stretch !important;
+            }
+            #verse-note-modal .color-wheel-card {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px)) 20px !important;
+                box-sizing: border-box !important;
+            }
+            #verse-note-modal .color-wheel-body {
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                margin-top: 14px !important;
+                overflow: hidden !important;
+            }
+            #verse-note-modal #verse-note-quote-preview {
+                max-height: 90px !important;
+                flex-shrink: 0 !important;
+            }
+            #verse-note-modal #verse-note-input {
+                flex: 1 1 auto !important;
+                min-height: 120px !important;
+                height: 100% !important;
+            }
+            #verse-note-modal .color-wheel-footer {
+                flex-shrink: 0 !important;
+                margin-top: 14px !important;
+            }
+        }
+
         .sheet-scrollable-row {
             display: flex;
             align-items: center;
