@@ -1321,6 +1321,18 @@ class MinSideManager {
         }
     }
 
+    updateHeader() {
+        if (!this.currentUser) return;
+        const nameEl = document.getElementById('user-display-name') || document.getElementById('header-user-name');
+        if (nameEl) {
+            nameEl.textContent = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser.displayName || this.currentUser.email || 'Medlem';
+        }
+        const avatarEl = document.getElementById('user-avatar') || document.getElementById('header-user-avatar');
+        if (avatarEl && (this.profileData?.photoURL || this.currentUser.photoURL)) {
+            avatarEl.src = this.profileData?.photoURL || this.currentUser.photoURL;
+        }
+    }
+
     async refreshProfileSubCollections(uid) {
         if (!uid) return;
         try {
