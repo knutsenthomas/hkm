@@ -8058,6 +8058,19 @@ html[data-theme="dark"] #overview-section .overview-hero-action-secondary:hover 
   border-color: #475569 !important;
 }
 
+html[data-theme="dark"] #global-error-container {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #global-error-container h2 {
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] #global-error-container p {
+  color: #cbd5e1 !important;
+}
+
 /* Stat Cards Dark Mode Overrides */
 html[data-theme="dark"] .stat-card.modern {
   background: #1e293b !important;
