@@ -871,6 +871,7 @@
         }
 
         .sheet-overlay-backdrop {
+            display: none !important;
             position: fixed;
             inset: 0;
             z-index: 19999 !important;
@@ -879,9 +880,14 @@
             pointer-events: none;
             transition: opacity 0.25s ease;
         }
-        .sheet-overlay-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
+        @media (max-width: 768px) {
+            .sheet-overlay-backdrop {
+                display: block !important;
+            }
+            .sheet-overlay-backdrop.active {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
         }
         .sheet-close-btn {
             width: 32px;
