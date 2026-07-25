@@ -427,8 +427,20 @@
 
         .hero-btn-primary:hover {
             transform: translateY(-2px);
-            background: #e0883f;
             box-shadow: 0 8px 24px rgba(209, 125, 57, 0.5);
+        }
+
+        .hero-btn-primary i.fa-arrow-right,
+        .hero-btn-primary i.fa-chevron-right,
+        .hero-btn-primary i.fa-long-arrow-alt-right {
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-primary:hover i.fa-arrow-right,
+        .hero-btn-primary:hover i.fa-chevron-right,
+        .hero-btn-primary:hover i.fa-long-arrow-alt-right {
+            transform: translateX(6px);
         }
 
         .hero-btn-primary:active {
@@ -450,6 +462,15 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-secondary i.fa-chevron-down {
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-btn-secondary:hover i.fa-chevron-down {
+            transform: translateY(4px);
         }
 
         .hero-btn-secondary:hover {
