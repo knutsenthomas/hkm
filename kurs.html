@@ -2774,6 +2774,9 @@
                                 heroSecEl.style.setProperty('background', `linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
                             }
 
+                            updateHeroPrimaryButton(mainCourse);
+                        }
+
                         // Sync dynamic CMS page content for Kurs portalside from Admin (page_content/kurs)
                         if (window.contentManager && typeof window.contentManager.getPageContent === 'function') {
                             window.contentManager.getPageContent('kurs').then(cmsData => {
