@@ -1733,6 +1733,20 @@ class BibleReader {
             swatch.addEventListener('touchend', applySwatchColor);
         });
 
+        // Toolbar Cross-References button listener
+        const btnCrossref = document.getElementById('toolbar-btn-crossref');
+        if (btnCrossref) {
+            btnCrossref.addEventListener('click', () => {
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    const first = this.selectedVerses[0];
+                    const clone = first.paragraph.cloneNode(true);
+                    const btn = clone.querySelector('.verse-crossref-icon-btn');
+                    if (btn) btn.remove();
+                    this.openVerseCrossReferenceModal(first.verseNum, clone.innerText.trim());
+                }
+            });
+        }
+
         // Swipe down to dismiss for bottom action sheet
         if (this.dom.verseToolbar) {
             this.setupBottomSheetSwipeDown(this.dom.verseToolbar, () => {
@@ -2503,19 +2517,23 @@ class BibleReader {
             const iconBtn = document.createElement('button');
             iconBtn.type = 'button';
             iconBtn.className = 'verse-crossref-icon-btn';
-            iconBtn.title = 'Kryssreferanser';
+            iconBtn.title = 'Kryssreferanser og notat';
             iconBtn.setAttribute('data-verse-num', verseNum);
-            iconBtn.style.cssText = 'position: absolute; right: 10px; top: 4px; background: transparent; border: none; color: var(--hkm-terracotta, #d17d39); opacity: 0.4; cursor: pointer; padding: 4px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; user-select: none; z-index: 5;';
-            iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">link</span>`;
+            iconBtn.style.cssText = 'position: absolute; right: 10px; top: 2px; background: var(--bg-surface, rgba(0,0,0,0.04)); border: 1px solid var(--border-subtle, rgba(0,0,0,0.08)); color: var(--text-muted, #64748b); opacity: 0.65; cursor: pointer; padding: 2px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; z-index: 5;';
+            iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">article</span>`;
 
             iconBtn.addEventListener('mouseenter', () => {
                 iconBtn.style.opacity = '1';
-                iconBtn.style.background = 'rgba(209, 125, 57, 0.1)';
-                iconBtn.style.transform = 'scale(1.15)';
+                iconBtn.style.background = 'rgba(209, 125, 57, 0.12)';
+                iconBtn.style.borderColor = 'var(--hkm-terracotta, #d17d39)';
+                iconBtn.style.color = 'var(--hkm-terracotta, #d17d39)';
+                iconBtn.style.transform = 'scale(1.08)';
             });
             iconBtn.addEventListener('mouseleave', () => {
-                iconBtn.style.opacity = '0.4';
-                iconBtn.style.background = 'transparent';
+                iconBtn.style.opacity = '0.65';
+                iconBtn.style.background = 'var(--bg-surface, rgba(0,0,0,0.04))';
+                iconBtn.style.borderColor = 'var(--border-subtle, rgba(0,0,0,0.08))';
+                iconBtn.style.color = 'var(--text-muted, #64748b)';
                 iconBtn.style.transform = 'none';
             });
 
