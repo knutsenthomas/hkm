@@ -530,14 +530,11 @@ class NewsletterBuilder {
             // Prevent accidental deletion of product or event cards via backspace or delete key
             container.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        document.execCommand('insertLineBreak', false);
-                    } else {
-                        document.execCommand('insertParagraph', false);
-                    }
-                    this.syncUnifiedBlocks();
-                    this.triggerAutosave();
+                    // Let the browser handle standard line break/paragraph insertion naturally
+                    setTimeout(() => {
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
+                    }, 0);
                     return;
                 }
                 if (e.key === 'Backspace') {
