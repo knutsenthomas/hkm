@@ -1995,7 +1995,7 @@
             transform: translateX(-50%) !important;
             width: 100% !important;
             max-width: 520px !important;
-            background: #ffffff !important;
+            background: var(--bg-card, #ffffff) !important;
             border-radius: 28px 28px 0 0 !important;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18) !important;
             padding: 12px 20px 28px !important;
@@ -2008,17 +2008,31 @@
             border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
         }
 
+        @media (min-width: 769px) {
+            #verse-context-toolbar,
+            #verse-context-toolbar.position-below {
+                bottom: 88px !important;
+                border-radius: 24px !important;
+                border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+                box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18) !important;
+                padding: 16px 20px 16px !important;
+            }
+            #verse-context-toolbar .sheet-handle-bar {
+                display: none !important;
+            }
+        }
+
         html[data-theme="dark"] #verse-context-toolbar,
         html[data-theme="dark"] #verse-context-toolbar.position-below {
             background: #1e293b !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5) !important;
         }
 
         html[data-theme="cream"] #verse-context-toolbar,
         html[data-theme="cream"] #verse-context-toolbar.position-below {
             background: #fdfbf7 !important;
-            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
         }
 
         @keyframes sheetSlideUp {
