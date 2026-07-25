@@ -4523,6 +4523,9 @@ class BibleReader {
                     });
                 }
             });
+        } catch (e) {
+            console.error("Error matching timelines in searchLocalResources:", e);
+        }
         // Match Bible Structure guide
         try {
             const bibleStructureKeywords = ['bibel', 'testament', 'oppbygning', 'sjanger', 'lese', 'leseguide', 'mosebok', 'evangelie', 'profet', 'brev', 'structure', 'genre', 'books'];
