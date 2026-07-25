@@ -161,9 +161,14 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             text-decoration: none;
+        }
+
+        .lesson-item i {
+            color: #94a3b8;
+            transition: color 0.2s ease;
         }
 
         .lesson-item:hover {
@@ -171,16 +176,24 @@
             color: #0f172a;
         }
 
+        .lesson-item:hover i {
+            color: var(--hkm-terracotta);
+        }
+
         .lesson-item.active {
-            background: rgba(34, 197, 94, 0.08);
-            color: #15803d;
+            background: rgba(209, 125, 57, 0.08);
+            color: var(--hkm-navy);
             font-weight: 750;
-            border-left-color: var(--hkm-green-accent);
+            border-left-color: var(--hkm-terracotta);
+        }
+
+        .lesson-item.active i {
+            color: var(--hkm-terracotta) !important;
         }
 
         .lesson-item.active .lesson-dot {
-            background-color: var(--hkm-green-accent);
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+            background-color: var(--hkm-terracotta);
+            box-shadow: 0 0 8px rgba(209, 125, 57, 0.4);
         }
 
         .lesson-dot {
@@ -1777,21 +1790,21 @@
 
         function getLessonTypeIcon(l) {
             if (l.videoUrl && String(l.videoUrl).trim().length > 0) {
-                return '<i class="fas fa-play-circle" style="color:var(--hkm-terracotta); font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
+                return '<i class="fas fa-play-circle" style="font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
             }
             if (l.zoomUrl && String(l.zoomUrl).trim().length > 0) {
-                return '<i class="fas fa-video" style="color:var(--hkm-terracotta); font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
+                return '<i class="fas fa-video" style="font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
             }
             const lDate = l.date || l.releaseDate;
             if (lDate) {
                 try {
                     const d = new Date(lDate);
                     if (!isNaN(d.getTime()) && d.getTime() > Date.now()) {
-                        return '<i class="fas fa-clock" style="color:#f97316; font-size:0.95rem; margin-right:6px;" title="Kommende økt"></i>';
+                        return '<i class="fas fa-clock" style="font-size:0.95rem; margin-right:6px;" title="Kommende økt"></i>';
                     }
                 } catch (e) {}
             }
-            return '<i class="fas fa-file-alt" style="color:#64748b; font-size:0.85rem; margin-right:6px;" title="Leksjonsnotat"></i>';
+            return '<i class="fas fa-file-alt" style="font-size:0.85rem; margin-right:6px;" title="Leksjonsnotat"></i>';
         }
 
         function renderSidebarModules(lessons) {
