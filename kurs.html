@@ -2112,15 +2112,20 @@
                                 }
                             } catch (e) {
                                 console.error("Error fetching enrollments/role on auth change:", e);
-                                                     authLoaded = true;
-                          renderGrid(getFiltered());
-                          renderFeaturedSection();
-                          checkDirectCourseAccess();
-                          if (allCourses && allCourses.length > 0) {
-                              updateHeroPrimaryButton(allCourses[0]);
-                          }
-                        });
-                   }
+                            }
+                        } else {
+                            userEnrollments = [];
+                            currentUserRole = 'medlem';
+                        }
+                        authLoaded = true;
+                        renderGrid(getFiltered());
+                        renderFeaturedSection();
+                        checkDirectCourseAccess();
+                        if (allCourses && allCourses.length > 0) {
+                            updateHeroPrimaryButton(allCourses[0]);
+                        }
+                    });
+                }
                 listenToAuth();
 
                 async function checkUserCourseEnrollment(courseId) {
