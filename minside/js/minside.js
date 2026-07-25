@@ -1325,13 +1325,19 @@ class MinSideManager {
 
     updateHeader() {
         if (!this.currentUser) return;
-        const nameEl = document.getElementById('user-display-name') || document.getElementById('header-user-name');
+        const name = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser.displayName || this.currentUser.email || 'Medlem';
+        const nameEl = document.getElementById('ph-name') || document.getElementById('user-display-name') || document.getElementById('header-user-name');
         if (nameEl) {
-            nameEl.textContent = (this.profileData && (this.profileData.displayName || this.profileData.name)) || this.currentUser.displayName || this.currentUser.email || 'Medlem';
+            nameEl.textContent = name;
         }
-        const avatarEl = document.getElementById('user-avatar') || document.getElementById('header-user-avatar');
+        const roleEl = document.getElementById('ph-role');
+        if (roleEl) {
+            roleEl.textContent = this.profileData?.role ? (this.profileData.role.charAt(0).toUpperCase() + this.profileData.role.slice(1)) : 'Medlem';
+        }
+        const avatarEl = document.getElementById('ph-avatar') || document.getElementById('user-avatar') || document.getElementById('header-user-avatar');
         if (avatarEl && (this.profileData?.photoURL || this.currentUser.photoURL)) {
-            avatarEl.src = this.profileData?.photoURL || this.currentUser.photoURL;
+            const photo = this.profileData?.photoURL || this.currentUser.photoURL;
+            avatarEl.innerHTML = `<img src="${photo}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
         }
     }
 
@@ -3012,287 +3018,299 @@ class MinSideManager {
                 const ovEventsFeed = document.getElementById('ov-events-feed-preview');
                 if (!ovEventsCard || !ovEventsFeed) return;
 
-                // Image library helpers matching content-manager.js
-                const generateEventImage = (title) => {
-                    const imageLibrary = {
-                        'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
-                        'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
-                        'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
-                        'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
-                        'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
-                        'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
-                        'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
-                        'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
-                        'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
-                        'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
-                        'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
-                        'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
-                        'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
-                        'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
-                        'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
+                try {
+                    // Image library helpers matching content-manager.js
+                    const generateEventImage = (title) => {
+                        const imageLibrary = {
+                            'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
+                            'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
+                            'conference': 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800&h=600&fit=crop&q=80',
+                            'teaching': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80',
+                            'bible': 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop&q=80',
+                            'youth': 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop&q=80',
+                            'children': 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop&q=80',
+                            'family': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&h=600&fit=crop&q=80',
+                            'easter': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop&q=80',
+                            'christmas': 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=800&h=600&fit=crop&q=80',
+                            'concert': 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&h=600&fit=crop&q=80',
+                            'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
+                            'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
+                            'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
+                            'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
+                        };
+
+                        if (!title) return imageLibrary.default;
+
+                        const titleLower = title.toLowerCase();
+                        const keywordMap = {
+                            'bønn': 'prayer',
+                            'gudstjeneste': 'worship',
+                            'seminar': 'conference',
+                            'konferanse': 'conference',
+                            'undervisning': 'teaching',
+                            'skole': 'teaching',
+                            'kurs': 'teaching',
+                            'bibel': 'bible',
+                            'leseplan': 'bible',
+                            'ungdom': 'youth',
+                            'teens': 'youth',
+                            'barn': 'children',
+                            'søndagsskole': 'children',
+                            'familie': 'family',
+                            'påske': 'easter',
+                            'jul': 'christmas',
+                            'konsert': 'concert',
+                            'musikk': 'concert',
+                            'møte': 'meeting',
+                            'basar': 'family',
+                            'fellesskap': 'gathering'
+                        };
+
+                        for (const [key, category] of Object.entries(keywordMap)) {
+                            if (titleLower.includes(key)) {
+                                return imageLibrary[category];
+                            }
+                        }
+                        return imageLibrary.default;
                     };
 
-                    if (!title) return imageLibrary.default;
-
-                    const titleLower = title.toLowerCase();
-                    const keywordMap = {
-                        'bønn': 'prayer',
-                        'gudstjeneste': 'worship',
-                        'seminar': 'conference',
-                        'konferanse': 'conference',
-                        'undervisning': 'teaching',
-                        'skole': 'teaching',
-                        'kurs': 'teaching',
-                        'bibel': 'bible',
-                        'leseplan': 'bible',
-                        'ungdom': 'youth',
-                        'teens': 'youth',
-                        'barn': 'children',
-                        'søndagsskole': 'children',
-                        'familie': 'family',
-                        'påske': 'easter',
-                        'jul': 'christmas',
-                        'konsert': 'concert',
-                        'musikk': 'concert',
-                        'møte': 'meeting',
-                        'basar': 'family',
-                        'fellesskap': 'gathering'
+                    const getEventImage = (event) => {
+                        if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
+                        return event.imageUrl || generateEventImage(event.title);
                     };
 
-                    for (const [key, category] of Object.entries(keywordMap)) {
-                        if (titleLower.includes(key)) {
-                            return imageLibrary[category];
+                    const normalizeGCalEvent = (item) => {
+                        const startVal = item.start.dateTime || item.start.date;
+                        const dateObj = new Date(startVal);
+                        return {
+                            id: item.id,
+                            title: item.summary || 'Uten tittel',
+                            description: item.description || '',
+                            date: dateObj,
+                            location: item.location || '',
+                            imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
+                            eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                            category: 'Arrangement'
+                        };
+                    };
+
+                    const normalizeFirestoreEvent = (item) => {
+                        const dateObj = new Date(item.date);
+                        return {
+                            id: item.id,
+                            title: item.title || 'Uten tittel',
+                            description: item.description || item.seoDescription || '',
+                            date: dateObj,
+                            location: item.location || '',
+                            imageUrl: item.imageUrl || item.image || '',
+                            eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
+                            category: item.category || 'Arrangement'
+                        };
+                    };
+
+                    let allEvents = [];
+                    let enrollments = [];
+                    const email = firebase.auth().currentUser?.email;
+
+                    // 1. Fetch user enrollments
+                    if (email || uid) {
+                        try {
+                            const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
+                            if (targetEmails.length > 0) {
+                                const enrollSnap = await firebase.firestore().collection('courseEnrollments')
+                                    .where('email', 'in', targetEmails)
+                                    .get();
+                                enrollSnap.forEach(d => enrollments.push(d.data()));
+                            }
+                            if (uid) {
+                                const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
+                                    .where('userId', '==', uid)
+                                    .get();
+                                enrollUserSnap.forEach(d => enrollments.push(d.data()));
+                            }
+                        } catch (e) {
+                            console.error("Error fetching course enrollments for dashboard:", e);
                         }
                     }
-                    return imageLibrary.default;
-                };
+                    const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
 
-                const getEventImage = (event) => {
-                    if (!event) return 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80';
-                    return event.imageUrl || generateEventImage(event.title);
-                };
-
-                const normalizeGCalEvent = (item) => {
-                    const startVal = item.start.dateTime || item.start.date;
-                    const dateObj = new Date(startVal);
-                    return {
-                        id: item.id,
-                        title: item.summary || 'Uten tittel',
-                        description: item.description || '',
-                        date: dateObj,
-                        location: item.location || '',
-                        imageUrl: item.dashboardImage || item.imageUrl || item.image || item.imageLink || '',
-                        eventLink: `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
-                        category: 'Arrangement'
+                    const isUserEnrolledInCourse = (courseId) => {
+                        if (isAdmin) return true;
+                        return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
                     };
-                };
 
-                const normalizeFirestoreEvent = (item) => {
-                    const dateObj = new Date(item.date);
-                    return {
-                        id: item.id,
-                        title: item.title || 'Uten tittel',
-                        description: item.description || item.seoDescription || '',
-                        date: dateObj,
-                        location: item.location || '',
-                        imageUrl: item.imageUrl || item.image || '',
-                        eventLink: item.eventLink || `/arrangement-detaljer.html?id=${encodeURIComponent(item.id)}`,
-                        category: item.category || 'Arrangement'
-                    };
-                };
-
-                let allEvents = [];
-                let enrollments = [];
-                const email = firebase.auth().currentUser?.email;
-
-                // 1. Fetch user enrollments
-                if (email || uid) {
+                    // 2. Fetch GCal events
+                    let gcalEventsNormalized = [];
                     try {
-                        const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
-                        if (targetEmails.length > 0) {
-                            const enrollSnap = await firebase.firestore().collection('courseEnrollments')
-                                .where('email', 'in', targetEmails)
-                                .get();
-                            enrollSnap.forEach(d => enrollments.push(d.data()));
-                        }
-                        if (uid) {
-                            const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
-                                .where('userId', '==', uid)
-                                .get();
-                            enrollUserSnap.forEach(d => enrollments.push(d.data()));
+                        const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
+                        if (settingsSnap.exists) {
+                            const settings = settingsSnap.data();
+                            const gcal = settings.googleCalendar || {};
+                            if (gcal && gcal.apiKey && gcal.calendarId) {
+                                const nowIso = new Date().toISOString();
+                                const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
+                                const resp = await fetch(url);
+                                if (resp.ok) {
+                                    const data = await resp.json();
+                                    const gcalItems = data.items || [];
+                                    gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
+                                }
+                            }
                         }
                     } catch (e) {
-                        console.error("Error fetching course enrollments for dashboard:", e);
+                        console.error("Failed to fetch GCal events:", e);
                     }
-                }
-                const isAdmin = window.minSideManager?.profileData?.role === 'admin' || window.minSideManager?.profileData?.role === 'superadmin';
 
-                const isUserEnrolledInCourse = (courseId) => {
-                    if (isAdmin) return true;
-                    return enrollments.some(e => e.courseId === courseId && (e.status === 'paid' || e.status === 'success' || e.status === 'active'));
-                };
-
-                // 2. Fetch GCal events
-                let gcalEventsNormalized = [];
-                try {
-                    const settingsSnap = await firebase.firestore().collection('content').doc('settings_integrations').get();
-                    if (settingsSnap.exists) {
-                        const settings = settingsSnap.data();
-                        const gcal = settings.googleCalendar || {};
-                        if (gcal && gcal.apiKey && gcal.calendarId) {
-                            const nowIso = new Date().toISOString();
-                            const url = `https://www.googleapis.com/calendar/v3/calendars/${gcal.calendarId}/events?key=${gcal.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=10`;
-                            const resp = await fetch(url);
-                            if (resp.ok) {
-                                const data = await resp.json();
-                                const gcalItems = data.items || [];
-                                gcalEventsNormalized = gcalItems.map(normalizeGCalEvent);
-                            }
+                    // 3. Fetch Firestore events
+                    let firestoreEventsNormalized = [];
+                    try {
+                        const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
+                        if (fsEventsSnap.exists) {
+                            const fsData = fsEventsSnap.data();
+                            const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
+                            const now = new Date();
+                            
+                            firestoreEventsNormalized = fsItems
+                                .map(normalizeFirestoreEvent)
+                                .filter(ev => ev.date >= now); // only future events
                         }
+                    } catch (e) {
+                        console.error("Failed to fetch Firestore events:", e);
                     }
-                } catch (e) {
-                    console.error("Failed to fetch GCal events:", e);
-                }
 
-                // 3. Fetch Firestore events
-                let firestoreEventsNormalized = [];
-                try {
-                    const fsEventsSnap = await firebase.firestore().collection('content').doc('collection_events').get();
-                    if (fsEventsSnap.exists) {
-                        const fsData = fsEventsSnap.data();
-                        const fsItems = Array.isArray(fsData) ? fsData : (fsData?.items || []);
-                        const now = new Date();
+                    // Deduplicate and Merge GCal and Firestore events
+                    const isSameDay = (d1, d2) => {
+                        return d1.getFullYear() === d2.getFullYear() &&
+                               d1.getMonth() === d2.getMonth() &&
+                               d1.getDate() === d2.getDate();
+                    };
+
+                    const mergedGCal = [];
+                    const matchedFirestoreIds = new Set();
+                    
+                    gcalEventsNormalized.forEach(gEvent => {
+                        const match = firestoreEventsNormalized.find(fEvent => {
+                            const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
+                            const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
+                            return sameId || sameDayMatch;
+                        });
                         
-                        firestoreEventsNormalized = fsItems
-                            .map(normalizeFirestoreEvent)
-                            .filter(ev => ev.date >= now); // only future events
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch Firestore events:", e);
-                }
+                        if (match) {
+                            matchedFirestoreIds.add(match.id);
+                            
+                            // Prioritize database override description, fallback to GCal description
+                            const gcalDesc = gEvent.description || '';
+                            const fsDesc = match.description || '';
 
-                // Deduplicate and Merge GCal and Firestore events
-                const isSameDay = (d1, d2) => {
-                    return d1.getFullYear() === d2.getFullYear() &&
-                           d1.getMonth() === d2.getMonth() &&
-                           d1.getDate() === d2.getDate();
-                };
-
-                const mergedGCal = [];
-                const matchedFirestoreIds = new Set();
-                
-                gcalEventsNormalized.forEach(gEvent => {
-                    const match = firestoreEventsNormalized.find(fEvent => {
-                        const sameId = fEvent.id === gEvent.id || (fEvent.gcalId && fEvent.gcalId === gEvent.id);
-                        const sameDayMatch = (fEvent.title && gEvent.title && fEvent.title.toLowerCase() === gEvent.title.toLowerCase()) && isSameDay(fEvent.date, gEvent.date);
-                        return sameId || sameDayMatch;
+                            mergedGCal.push({
+                                ...gEvent,
+                                ...match,
+                                date: match.date || gEvent.date,
+                                description: fsDesc || gcalDesc
+                            });
+                        } else {
+                            mergedGCal.push(gEvent);
+                        }
                     });
                     
-                    if (match) {
-                        matchedFirestoreIds.add(match.id);
-                        
-                        // Prioritize database override description, fallback to GCal description
-                        const gcalDesc = gEvent.description || '';
-                        const fsDesc = match.description || '';
+                    const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
+                    
+                    allEvents.push(...mergedGCal, ...uniqueFirestore);
 
-                        mergedGCal.push({
-                            ...gEvent,
-                            ...match,
-                            date: match.date || gEvent.date,
-                            description: fsDesc || gcalDesc
-                        });
-                    } else {
-                        mergedGCal.push(gEvent);
-                    }
-                });
-                
-                const uniqueFirestore = firestoreEventsNormalized.filter(fEvent => !matchedFirestoreIds.has(fEvent.id));
-                
-                allEvents.push(...mergedGCal, ...uniqueFirestore);
-
-                // 4. Filter events based on course enrollment
-                const filteredEvents = allEvents.filter(ev => {
-                    const cat = String(ev.category || '').toLowerCase();
-                    if (cat === 'kurs' || cat === 'courses') {
-                        // Extract courseId from eventLink
-                        const match = ev.eventLink?.match(/courseId=([^&]+)/);
-                        const courseId = match ? match[1] : null;
-                        if (courseId) {
-                            return isUserEnrolledInCourse(courseId);
-                        }
-                        return false; // hide course events if we can't determine the course ID
-                    }
-                    return true; // show all other events
-                });
-
-                // 5. Sort by date ascending
-                filteredEvents.sort((a, b) => a.date - b.date);
-
-                // 6. Take top 3
-                const topEvents = filteredEvents.slice(0, 3);
-
-                if (topEvents.length > 0) {
-                    ovEventsFeed.innerHTML = topEvents.map(item => {
-                        const dateObj = item.date;
-                        const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
-                        
-                        const lang = document.documentElement.lang || 'no';
-                        const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
-                        const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
-                        const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
-                        const day = dateObj.getDate();
-
-                        const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-                        let timeLabel = '';
-                        if (hasTime) {
-                            const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
-                            if (lang === 'en') {
-                                timeLabel = `, at ${startTime}`;
-                            } else if (lang === 'es') {
-                                timeLabel = `, a las ${startTime}`;
-                            } else {
-                                timeLabel = `, kl. ${startTime}`;
+                    // 4. Filter events based on course enrollment
+                    const filteredEvents = allEvents.filter(ev => {
+                        const cat = String(ev.category || '').toLowerCase();
+                        if (cat === 'kurs' || cat === 'courses') {
+                            // Extract courseId from eventLink
+                            const match = ev.eventLink?.match(/courseId=([^&]+)/);
+                            const courseId = match ? match[1] : null;
+                            if (courseId) {
+                                return isUserEnrolledInCourse(courseId);
                             }
+                            return false; // hide course events if we can't determine the course ID
                         }
-                        
-                        const imageSrc = getEventImage(item);
-                        const imageAlt = item.title;
-                        
-                        const rawDesc = item.description || '';
-                        const cleanExcerpt = typeof rawDesc === 'string' 
-                            ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
-                            : '';
-                        const limitExcerpt = cleanExcerpt.length > 120 
-                            ? cleanExcerpt.slice(0, 117) + '...' 
-                            : cleanExcerpt;
+                        return true; // show all other events
+                    });
 
-                        return `
-                            <a href="${item.eventLink}" class="ov-event-card">
-                                <div class="ov-event-image">
-                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
-                                    <div class="ov-event-date-badge">
-                                        <span class="month">${monthUpper}</span>
-                                        <span class="day">${day}</span>
+                    // 5. Sort by date ascending
+                    filteredEvents.sort((a, b) => a.date - b.date);
+
+                    // 6. Take top 3
+                    const topEvents = filteredEvents.slice(0, 3);
+
+                    if (topEvents.length > 0) {
+                        ovEventsFeed.innerHTML = topEvents.map(item => {
+                            const dateObj = item.date;
+                            const hasTime = dateObj.getHours() !== 0 || dateObj.getMinutes() !== 0;
+                            
+                            const lang = document.documentElement.lang || 'no';
+                            const locale = lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : 'no-NO');
+                            const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' });
+                            const monthUpper = monthShort.replace('.', '').substring(0, 3).toUpperCase();
+                            const day = dateObj.getDate();
+
+                            const dateLabel = dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+                            let timeLabel = '';
+                            if (hasTime) {
+                                const startTime = dateObj.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: lang === 'en' });
+                                if (lang === 'en') {
+                                    timeLabel = `, at ${startTime}`;
+                                } else if (lang === 'es') {
+                                    timeLabel = `, a las ${startTime}`;
+                                } else {
+                                    timeLabel = `, kl. ${startTime}`;
+                                }
+                            }
+                            
+                            const imageSrc = getEventImage(item);
+                            const imageAlt = item.title;
+                            
+                            const rawDesc = item.description || '';
+                            const cleanExcerpt = typeof rawDesc === 'string' 
+                                ? rawDesc.replace(/<[^>]*>?/gm, '').trim() 
+                                : '';
+                            const limitExcerpt = cleanExcerpt.length > 120 
+                                ? cleanExcerpt.slice(0, 117) + '...' 
+                                : cleanExcerpt;
+
+                            return `
+                                <a href="${item.eventLink}" class="ov-event-card">
+                                    <div class="ov-event-image">
+                                        <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                        <div class="ov-event-date-badge">
+                                            <span class="month">${monthUpper}</span>
+                                            <span class="day">${day}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="ov-event-content">
-                                    <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
-                                    ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
-                                    <div class="ov-event-meta">
-                                        <span class="material-symbols-outlined">calendar_today</span>
-                                        <span>${dateLabel}${timeLabel}</span>
+                                    <div class="ov-event-content">
+                                        <h4 class="ov-event-title">${this._escapeHtml(item.title)}</h4>
+                                        ${limitExcerpt ? `<p class="ov-event-excerpt">${this._escapeHtml(limitExcerpt)}</p>` : ''}
+                                        <div class="ov-event-meta">
+                                            <span class="material-symbols-outlined">calendar_today</span>
+                                            <span>${dateLabel}${timeLabel}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            `;
+                        }).join('');
+                    } else {
+                        ovEventsFeed.innerHTML = `
+                            <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
+                                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
+                                <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
+                            </div>
                         `;
-                    }).join('');
-                } else {
-                    ovEventsFeed.innerHTML = `
-                        <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
-                            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
-                            <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
-                        </div>
-                    `;
+                    }
+                } catch (err) {
+                    console.warn("Calendar events preview error:", err);
+                    if (ovEventsFeed) {
+                        ovEventsFeed.innerHTML = `
+                            <div class="empty-state ms-empty-state-compact" style="grid-column: 1 / -1; padding: 24px; text-align: center; width: 100%;">
+                                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">calendar_today</span>
+                                <p style="font-size: 13.5px; color: var(--text-muted); margin: 8px 0 0 0;">Ingen planlagte arrangementer for øyeblikket.</p>
+                            </div>
+                        `;
+                    }
                 }
             })();
         } catch (e) {
