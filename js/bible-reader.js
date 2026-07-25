@@ -364,7 +364,8 @@ class BibleReader {
                 'paused': 'Pauset',
                 'extended_btn': 'Vis dypere teologisk analyse',
                 'extended_loading': 'Analyserer dypere...',
-                'extended_header': 'Dypere analyse'
+                'extended_header': 'Dypere analyse',
+                'cross_references': 'Kryssreferanser'
             },
             'en': {
                 'empty_bookmarks': 'No saved verses yet. Click on a verse in the text to save it.',
@@ -382,7 +383,8 @@ class BibleReader {
                 'paused': 'Paused',
                 'extended_btn': 'Show deeper theological analysis',
                 'extended_loading': 'Analyzing deeper...',
-                'extended_header': 'Deeper analysis'
+                'extended_header': 'Deeper analysis',
+                'cross_references': 'Cross references'
             },
             'es': {
                 'empty_bookmarks': 'Aún no hay versículos guardados. Haz clic en un versículo en el texto para guardarlo.',
@@ -400,7 +402,8 @@ class BibleReader {
                 'paused': 'Pausado',
                 'extended_btn': 'Ver análisis teológico profundo',
                 'extended_loading': 'Analizando en detalle...',
-                'extended_header': 'Análisis profundo'
+                'extended_header': 'Análisis profundo',
+                'cross_references': 'Referencias cruzadas'
             }
         };
         return (translations[lang] || translations['no'])[key] || key;
@@ -2517,76 +2520,12 @@ class BibleReader {
         }
     }
 
-    attachVerseCrossReferenceButtons(crossrefMap = null) {
+    attachVerseCrossReferenceButtons() {
         if (!this.dom.readingPane) return;
         
-        // Remove any previous icons
+        // Remove any verse icons from reading pane so text flow remains 100% clean
         this.dom.readingPane.querySelectorAll('.verse-crossref-icon-btn').forEach(b => b.remove());
-
-        // Prepare container with dedicated right gutter padding for icons
-        this.dom.readingPane.style.position = 'relative';
-        this.dom.readingPane.style.paddingRight = '52px';
-        this.dom.readingPane.style.boxSizing = 'border-box';
-
-        const verseSups = this.dom.readingPane.querySelectorAll('sup.v, span.v');
-        if (!verseSups || verseSups.length === 0) return;
-
-        const readingPaneRect = this.dom.readingPane.getBoundingClientRect();
-        const scrollTop = this.dom.readingPane.scrollTop || 0;
-
-        verseSups.forEach(sup => {
-            const verseNum = sup.innerText.trim();
-            if (!verseNum) return;
-
-            // Only render icon if this verse has cross references or user notes
-            const hasCrossref = crossrefMap && (crossrefMap[verseNum] || crossrefMap[String(verseNum)]);
-            const hasUserNote = this.userNotes && this.userNotes[verseNum];
-            if (!hasCrossref && !hasUserNote) return;
-
-            const p = sup.closest('p') || sup.parentElement;
-            const supRect = sup.getBoundingClientRect();
-            const verseTop = (supRect.top - readingPaneRect.top) + scrollTop;
-
-            const iconBtn = document.createElement('button');
-            iconBtn.type = 'button';
-            iconBtn.className = 'verse-crossref-icon-btn';
-            iconBtn.title = `Kryssreferanser (Vers ${verseNum})`;
-            iconBtn.setAttribute('data-verse-num', verseNum);
-            iconBtn.style.cssText = `position: absolute; right: 4px; top: ${Math.max(0, verseTop - 2)}px; background: var(--bg-surface, rgba(0,0,0,0.04)); border: 1px solid var(--border-subtle, rgba(0,0,0,0.08)); color: var(--text-muted, #64748b); opacity: 0.65; cursor: pointer; padding: 2px 5px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; z-index: 5;`;
-            iconBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">article</span>`;
-
-            iconBtn.addEventListener('mouseenter', () => {
-                iconBtn.style.opacity = '1';
-                iconBtn.style.background = 'rgba(209, 125, 57, 0.12)';
-                iconBtn.style.borderColor = 'var(--hkm-terracotta, #d17d39)';
-                iconBtn.style.color = 'var(--hkm-terracotta, #d17d39)';
-                iconBtn.style.transform = 'scale(1.08)';
-            });
-            iconBtn.addEventListener('mouseleave', () => {
-                iconBtn.style.opacity = '0.65';
-                iconBtn.style.background = 'var(--bg-surface, rgba(0,0,0,0.04))';
-                iconBtn.style.borderColor = 'var(--border-subtle, rgba(0,0,0,0.08))';
-                iconBtn.style.color = 'var(--text-muted, #64748b)';
-                iconBtn.style.transform = 'none';
-            });
-
-            const openCrossref = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                let verseText = '';
-                if (p) {
-                    const clone = p.cloneNode(true);
-                    clone.querySelectorAll('.verse-crossref-icon-btn').forEach(btn => btn.remove());
-                    verseText = clone.innerText.trim();
-                }
-                this.openVerseCrossReferenceModal(verseNum, verseText);
-            };
-
-            iconBtn.addEventListener('click', openCrossref);
-            iconBtn.addEventListener('touchend', openCrossref);
-
-            this.dom.readingPane.appendChild(iconBtn);
-        });
+        this.dom.readingPane.style.paddingRight = '0px';
     }
 
     async openVerseCrossReferenceModal(verseNum, verseText) {
@@ -2701,7 +2640,7 @@ class BibleReader {
         // Highlight reading plan verses if in plan mode
         this.applyReadingPlanHighlights();
 
-        // Inject Audio Play Button dynamically next to Lookup Chapter button
+        // Inject Audio Play Button & Cross References Button dynamically
         if (this.dom.btnLookupChapter) {
             let playAudioBtn = document.getElementById('btn-play-audio-dynamic');
             if (!playAudioBtn) {
@@ -2723,6 +2662,32 @@ class BibleReader {
                 // Update translation text if language changed
                 const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
                 if (labelSpan) labelSpan.textContent = this.t('play_audio');
+            }
+
+            // Inject Cross References Button next to Audio Play button
+            let crossrefBtn = document.getElementById('btn-crossref-chapter-dynamic');
+            if (!crossrefBtn) {
+                crossrefBtn = document.createElement('button');
+                crossrefBtn.id = 'btn-crossref-chapter-dynamic';
+                crossrefBtn.className = 'nav-btn';
+                crossrefBtn.style.cssText = 'margin-top: 4px; margin-left: 6px; font-size: 12px; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-base); transition: all 0.2s; font-weight: 600; box-shadow: none !important; text-transform: none !important; min-height: 0 !important; min-width: 0 !important; height: auto !important;';
+                crossrefBtn.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--hkm-terracotta, #d17d39);">article</span>
+                    <span>${this.t('cross_references')}</span>
+                `;
+
+                crossrefBtn.addEventListener('click', () => {
+                    const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
+                    const bookName = currentBook ? currentBook.name : '';
+                    const chapterNum = this.selectedChapterId ? this.selectedChapterId.split('_')[1] : '1';
+                    this.openVerseCrossReferenceModal('1', `${bookName} ${chapterNum}`);
+                });
+
+                const parent = playAudioBtn ? playAudioBtn.parentNode : this.dom.btnLookupChapter.parentNode;
+                parent.appendChild(crossrefBtn);
+            } else {
+                const labelSpan = crossrefBtn.querySelector('span:not(.material-symbols-outlined)');
+                if (labelSpan) labelSpan.textContent = this.t('cross_references');
             }
         }
 
