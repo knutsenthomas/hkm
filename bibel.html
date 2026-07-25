@@ -893,32 +893,59 @@
             opacity: 1;
             pointer-events: auto;
         }
-        .sheet-close-btn {
-            width: 34px !important;
-            height: 34px !important;
+        /* Universal Premium Close Button Styling */
+        .sheet-close-btn,
+        .color-wheel-close-btn,
+        .close-dict-btn,
+        .close-sidebar-btn,
+        .close-sidebar-mobile-btn,
+        #verse-note-modal .color-wheel-close-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
             border-radius: 50% !important;
-            background: var(--bg-surface, rgba(0, 0, 0, 0.06)) !important;
-            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+            background: var(--bg-surface, rgba(0, 0, 0, 0.07)) !important;
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.14)) !important;
             color: var(--text-base, #1e293b) !important;
-            cursor: pointer;
+            cursor: pointer !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
             flex-shrink: 0 !important;
+            padding: 0 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
         }
-        .sheet-close-btn:hover {
+
+        .sheet-close-btn:hover,
+        .color-wheel-close-btn:hover,
+        .close-dict-btn:hover,
+        .close-sidebar-btn:hover,
+        .close-sidebar-mobile-btn:hover,
+        #verse-note-modal .color-wheel-close-btn:hover {
             background: var(--bible-primary, #d17d39) !important;
             color: #ffffff !important;
             border-color: var(--bible-primary, #d17d39) !important;
             transform: scale(1.08) !important;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.35) !important;
         }
-        .sheet-close-btn:active {
+
+        .sheet-close-btn:active,
+        .color-wheel-close-btn:active,
+        .close-dict-btn:active,
+        .close-sidebar-btn:active,
+        .close-sidebar-mobile-btn:active {
             transform: scale(0.95) !important;
         }
-        html[data-theme="dark"] .sheet-close-btn {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+
+        html[data-theme="dark"] .sheet-close-btn,
+        html[data-theme="dark"] .color-wheel-close-btn,
+        html[data-theme="dark"] .close-dict-btn,
+        html[data-theme="dark"] .close-sidebar-btn,
+        html[data-theme="dark"] .close-sidebar-mobile-btn {
+            background: rgba(255, 255, 255, 0.14) !important;
+            border: 1px solid rgba(255, 255, 255, 0.22) !important;
             color: #f8fafc !important;
         }
 
