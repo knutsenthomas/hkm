@@ -2901,6 +2901,10 @@ class BibleReader {
         }
     }
 
+    async nextChapter() {
+        return this.navigateChapter(1);
+    }
+
     async parseAndNavigateToReference(query) {
         if (!query) return;
 
@@ -8432,16 +8436,20 @@ class BibleReader {
                 this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
                 this.bibleAudio.onended = async () => {
                     console.log("[BibleAudio] Chapter finished. Auto-advancing to next chapter for continuous reading...");
-                    if (this.dom && this.dom.readingPane) {
-                        this.dom.readingPane.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
-                    }
-                    if (this.audioIsPlaying) {
-                        await this.nextChapter();
-                        setTimeout(() => {
-                            if (this.audioIsPlaying) {
-                                this.playAudioForCurrentChapter();
-                            }
-                        }, 400);
+                    try {
+                        if (this.dom && this.dom.readingPane) {
+                            this.dom.readingPane.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
+                        }
+                        if (this.audioIsPlaying) {
+                            await this.navigateChapter(1);
+                            setTimeout(() => {
+                                if (this.audioIsPlaying) {
+                                    this.playAudioForCurrentChapter();
+                                }
+                            }, 300);
+                        }
+                    } catch (err) {
+                        console.error("[BibleAudio] Error auto-advancing to next chapter:", err);
                     }
                 };
                 this.bibleAudio.onerror = (err) => {
