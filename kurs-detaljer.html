@@ -483,26 +483,31 @@
         })();
     </script>
 
+    
+
     <style id="kurs-detaljer-override-style">
-        html body.cms-loading > .platform-container,
-        html body.cms-loading > footer,
-        html body.cms-loading > .footer,
-        html body > .platform-container,
-        html body > footer,
-        html body > .footer {
+        html body#body.cms-loading > #platform-container,
+        html body#body > #platform-container,
+        html #platform-container,
+        #platform-container {
             display: flex !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
-        html body.cms-loading > footer,
-        html body.cms-loading > .footer {
+        html body#body.cms-loading > #footer-section,
+        html body#body > #footer-section,
+        html #footer-section,
+        #footer-section {
             display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
     </style>
+
 </head>
 
-<body class="header-always-scrolled">
+<body id="body" class="header-always-scrolled">
 
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
@@ -627,7 +632,7 @@
                 </div>
             </div>
 
-    <div class="platform-container">
+    <div id="platform-container" class="platform-container">
         <!-- Left Sidebar: Course Modules & Lessons Navigation -->
         <aside class="sidebar-nav">
             <div class="sidebar-header">
