@@ -2368,12 +2368,8 @@
                         <p>${excerpt}</p>
                         <div class="course-card-actions">
                             ${hasAccess 
-                                ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white; flex:1;">
-                                     <i class="fas fa-play-circle"></i> ${t('goToCourse')}
-                                   </button>`
-                                : `<button class="enroll-btn ${isFree ? 'free' : ''}" style="flex:1;">
-                                     ${isFree ? '<i class="fas fa-graduation-cap"></i> ' + t('startFree') : '<i class="fas fa-shopping-cart"></i> ' + t('enroll')}
-                                   </button>`
+                                ? `<button class="enroll-btn" style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color:white; flex:1;"><i class="fas fa-play-circle"></i><span>${t('goToCourse')}</span></button>`
+                                : `<button class="enroll-btn ${isFree ? 'free' : ''}" style="flex:1;"><i class="${isFree ? 'fas fa-graduation-cap' : 'fas fa-shopping-cart'}"></i><span>${isFree ? t('startFree') : t('enroll')}</span></button>`
                             }
                             <button class="btn-share-course" title="${t('shareThisCourse')}" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')">
                                 <i class="fas fa-share-nodes"></i>
