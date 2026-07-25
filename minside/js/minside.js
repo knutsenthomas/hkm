@@ -5812,36 +5812,41 @@ class MinSideManager {
             <div class="hkm-player-grid">
                 <!-- Left Side: Player & Lesson Details -->
                 <div class="hkm-player-main">
-                    <!-- Leksjon info kort -->
-                    <div class="hkm-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
-                            <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 250px;">
-                                ${lessonImageHtml}
-                                <div style="flex:1;">
-                                    <span style="font-size: 13px; font-weight: 700; color: #d17d39; text-transform: uppercase; letter-spacing: 0.05em;">Leksjon ${activeLessonIndex + 1}</span>
-                                    <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 700; color: #1e293b; margin: 8px 0 8px; line-height: 1.2;">${cleanLTitle}</h2>
-                                    <p style="font-size: 14px; color: #64748b; margin: 0; line-height: 1.5;">Kursside: <strong>${course.title}</strong></p>
+                    <!-- Leksjon info kort (Stitch Hero Header) -->
+                    <div class="hkm-card hkm-stitch-hero-header" style="position: relative; overflow: hidden; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 20px !important; padding: 28px !important; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.15) !important; margin-bottom: 24px;">
+                        <div style="position: absolute; top: -40px; right: -40px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(209, 125, 57, 0.15) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+                        <div style="position: relative; z-index: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+                                <div style="display: flex; gap: 20px; align-items: center; flex: 1; min-width: 260px;">
+                                    ${lessonImageHtml}
+                                    <div style="flex:1;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: rgba(209, 125, 57, 0.18); border: 1px solid rgba(209, 125, 57, 0.4); border-radius: 9999px; font-size: 12px; font-weight: 800; color: #fb923c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">LEKSJON ${activeLessonIndex + 1}</span>
+                                        <h2 style="font-family: 'Work Sans', sans-serif; font-size: 24px; font-weight: 800; color: #ffffff !important; margin: 4px 0 6px; line-height: 1.25; letter-spacing: -0.01em;">${cleanLTitle}</h2>
+                                        <p style="font-size: 14px; color: #cbd5e1 !important; margin: 0; line-height: 1.5; font-weight: 500;">Kursside: <span style="color: #f1f5f9 !important; font-weight: 600;">${course.title}</span></p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <button id="player-fullscreen-btn" class="hkm-btn hkm-btn-fs" style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); border-radius: 10px; padding: 10px 18px; font-weight: 600;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">fullscreen</span> Fullskjerm
+                                    </button>
+                                    ${lesson.zoomUrl ? `
+                                        <a href="${lesson.zoomUrl}" target="_blank" class="hkm-btn hkm-btn-zoom" style="background: #2563eb; color: white; border-radius: 10px; padding: 10px 18px; font-weight: 700; text-decoration: none;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">open_in_new</span> Åpne i Zoom-appen
+                                        </a>
+                                    ` : ''}
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                <button id="player-fullscreen-btn" class="hkm-btn hkm-btn-fs">
-                                    <span class="material-symbols-outlined">fullscreen</span> Fullskjerm
-                                </button>
-                                ${lesson.zoomUrl ? `
-                                    <a href="${lesson.zoomUrl}" target="_blank" class="hkm-btn hkm-btn-zoom">
-                                        <span class="material-symbols-outlined">open_in_new</span> Åpne i Zoom-appen
-                                    </a>
-                                ` : ''}
+
+                            <!-- Beskrivelse -->
+                            <p style="font-size: 14.5px; color: #94a3b8 !important; line-height: 1.65; margin: 0 0 20px 0; max-width: 800px;">
+                                ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.'}
+                            </p>
+
+                            <!-- Metadata Grid -->
+                            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; margin-top: 18px;">
+                                ${metaGridHtml}
                             </div>
                         </div>
-
-                        <!-- Beskrivelse -->
-                        <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 24px 0;">
-                            ${lesson.description || 'I denne leksjonen går vi gjennom det fundamentale grunnlaget for undervisningen. Du finner ressurser og bønneguider i sidemenyen.'}
-                        </p>
-
-                        <!-- Metadata Grid (Varighet, ressurser, kommentarer) -->
-                        ${metaGridHtml}
                     </div>
 
                     <!-- Videospiller container -->
