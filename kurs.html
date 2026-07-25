@@ -220,7 +220,7 @@
         }
 
         .horizontal-course-card:hover {
-            transform: translateY(-4px);
+            transform: none !important;
             border-color: #e2e8f0;
             box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
         }
@@ -719,7 +719,7 @@
         }
 
         .course-card:hover {
-            transform: none;
+            transform: none !important;
             box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
         }
 
@@ -730,10 +730,13 @@
             overflow: hidden;
         }
 
-        .course-thumb img {
+        .course-thumb img,
+        .course-card:hover .course-thumb img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform: none !important;
+            transition: none !important;
         }
 
         .course-thumb-placeholder {
