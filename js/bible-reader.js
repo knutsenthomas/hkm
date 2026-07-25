@@ -643,17 +643,43 @@ class BibleReader {
             if (dictBtn || readBtn || bookmarkBtn) {
                 const strip = document.createElement('div');
                 strip.className = 'popover-icon-strip';
+
+                const docLang = document.documentElement.lang || 'no';
+                const labels = {
+                    no: { dict: 'Eksikon', read: 'Lesemodus', user: 'Min side' },
+                    en: { dict: 'Lexicon', read: 'Reader', user: 'My Page' },
+                    es: { dict: 'Léxico', read: 'Lectura', user: 'Mi página' }
+                };
+                const langLbl = labels[docLang] || labels.no;
                 
                 if (dictBtn) {
                     dictBtn.className = 'popover-icon-btn';
+                    if (!dictBtn.querySelector('.btn-label')) {
+                        const span = document.createElement('span');
+                        span.className = 'btn-label';
+                        span.textContent = langLbl.dict;
+                        dictBtn.appendChild(span);
+                    }
                     strip.appendChild(dictBtn);
                 }
                 if (readBtn) {
                     readBtn.className = 'popover-icon-btn';
+                    if (!readBtn.querySelector('.btn-label')) {
+                        const span = document.createElement('span');
+                        span.className = 'btn-label';
+                        span.textContent = langLbl.read;
+                        readBtn.appendChild(span);
+                    }
                     strip.appendChild(readBtn);
                 }
                 if (bookmarkBtn) {
                     bookmarkBtn.className = 'popover-icon-btn';
+                    if (!bookmarkBtn.querySelector('.btn-label')) {
+                        const span = document.createElement('span');
+                        span.className = 'btn-label';
+                        span.textContent = langLbl.user;
+                        bookmarkBtn.appendChild(span);
+                    }
                     strip.appendChild(bookmarkBtn);
                 }
                 popover.appendChild(strip);
