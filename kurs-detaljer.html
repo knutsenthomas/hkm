@@ -1030,16 +1030,22 @@
                 }
             }
 
+            const handleUser = async (user) => {
+                currentUser = user || (firebaseService && firebaseService.currentUser) || null;
+                if (currentUser || isUserLoggedIn()) {
+                    userHasAccess = true;
+                    const profileBtn = document.getElementById('header-profile-link');
+                    if (profileBtn) profileBtn.classList.remove('hidden');
+                }
+                await checkAccessAndUpdateUI();
+            };
+
+            if (firebaseService && typeof firebaseService.onAuthChange === 'function') {
+                firebaseService.onAuthChange(handleUser);
+            }
+
             if (typeof firebase !== 'undefined' && firebase.auth) {
-                currentUser = firebase.auth().currentUser;
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    currentUser = user;
-                    if (user) {
-                        const profileBtn = document.getElementById('header-profile-link');
-                        if (profileBtn) profileBtn.classList.remove('hidden');
-                    }
-                    await checkAccessAndUpdateUI();
-                });
+                firebase.auth().onAuthStateChanged(handleUser);
             }
 
             await loadCourseData(courseId);
@@ -1151,9 +1157,16 @@
         }
 
         function isUserLoggedIn() {
-            if (currentUser || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser)) {
+            if (currentUser || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser)) {
                 return true;
             }
+            try {
+                const cached = localStorage.getItem('hkm_public_user_cache');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && (parsed.uid || parsed.email)) return true;
+                }
+            } catch (e) {}
             try {
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
@@ -1167,7 +1180,7 @@
 
         async function checkAccessAndUpdateUI() {
             if (!currentCourse) return;
-            userHasAccess = true;
+            userHasAccess = isUserLoggedIn();
             window.selectLesson(currentLessonIndex);
         }
 
@@ -1257,8 +1270,10 @@
             const lockedOverlay = document.getElementById('locked-overlay');
             const coverImgEl = document.getElementById('course-cover-img');
 
+            const hasAccess = userHasAccess || isUserLoggedIn();
+
             // Check if course is upcoming (only for non-logged-in visitors)
-            const isUpcoming = !currentUser && currentCourse && (
+            const isUpcoming = !hasAccess && currentCourse && (
                 currentCourse.isUpcoming === true || 
                 currentCourse.status === 'upcoming'
             );
@@ -1294,7 +1309,7 @@
                 return;
             }
 
-            if (userHasAccess || isUserLoggedIn()) {
+            if (hasAccess) {
                 if (coverImgEl) coverImgEl.style.display = 'none';
                 if (lockedOverlay) lockedOverlay.style.display = 'none';
                 videoContainer.style.backgroundImage = 'none';
