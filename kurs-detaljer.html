@@ -1284,6 +1284,11 @@
                     const fill = progressWrapper.querySelector('.progress-bar-fill');
                     if (label) label.textContent = `${percent}% Fullført`;
                     if (fill) fill.style.width = `${percent}%`;
+                } else {
+                    progressWrapper.style.display = 'none';
+                }
+            }
+
             // Render resources dynamically for both Overview tab and Ressurser tab
             const rawResources = (lesson && (lesson.resources || lesson.materials || lesson.files)) || 
                                  (currentCourse && (currentCourse.resources || currentCourse.materials)) || [];
