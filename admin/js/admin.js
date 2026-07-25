@@ -5496,8 +5496,8 @@ class AdminManager {
         // Load content lists (Removed undefined loadContentList calls)
         
         // Add event listeners for new content buttons
-        document.getElementById('new-blog-post').addEventListener('click', () => this.openContentModal('blog'));
-        document.getElementById('new-teaching-series').addEventListener('click', () => this.openContentModal('teaching'));
+        document.getElementById('new-blog-post')?.addEventListener('click', () => this.openContentModal('blog'));
+        document.getElementById('new-teaching-series')?.addEventListener('click', () => this.openContentModal('teaching'));
 
         // Keep existing posts translated in background without adding an extra manual button.
         this.translateAllExistingBlogPosts({ force: true, silent: true }).catch((error) => {
@@ -9527,7 +9527,7 @@ class AdminManager {
             });
         });
 
-        document.getElementById('save-content').addEventListener('click', () => this.savePageContent());
+        document.getElementById('save-content')?.addEventListener('click', () => this.savePageContent());
         this.loadPageFields('index');
     }
 

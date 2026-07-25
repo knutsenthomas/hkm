@@ -552,12 +552,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 suggestionsContainer.classList.remove('hidden');
             }
             if (resultsContainer) resultsContainer.classList.add('hidden');
-            setTimeout(() => searchInput.focus(), 100);
+            setTimeout(() => searchInput?.focus(), 100);
         }
     }
 
     function closeSearchModal() {
-        searchModal.classList.remove('active');
+        searchModal?.classList.remove('active');
         unlockBodyScroll('site-search-v2');
         selectedIndex = -1;
     }
@@ -574,13 +574,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lukk ved klikk utenfor container
-    searchModal.addEventListener('click', (e) => {
-        if (e.target === searchModal) closeSearchModal();
-    });
+    if (searchModal) {
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) closeSearchModal();
+        });
+    }
 
     // Snarveier (Lukk med ESC, åpne med CMD+K / Ctrl+K, piltaster + enter navigasjon)
     document.addEventListener('keydown', (e) => {
-        if (!searchModal.classList.contains('active')) {
+        if (!searchModal || !searchModal.classList.contains('active')) {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
                 openSearch();

@@ -3116,7 +3116,7 @@
                 }
 
                 let searchTimeout;
-                document.getElementById('course-search').addEventListener('input', e => {
+                document.getElementById('course-search')?.addEventListener('input', e => {
                     clearTimeout(searchTimeout);
                     searchTimeout = setTimeout(() => {
                         searchQuery = e.target.value.trim();

@@ -2168,6 +2168,10 @@ class ContentManager {
             const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?key=${apiKey}&timeMin=${encodeURIComponent(minIso)}${maxParam}&orderBy=startTime&singleEvents=true&maxResults=250`;
 
             const response = await fetch(url);
+            if (!response.ok) {
+                console.warn(`[ContentManager] GCal API returned status ${response.status}`);
+                return [];
+            }
             const data = await response.json();
 
             if (data.error) {
