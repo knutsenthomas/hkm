@@ -470,6 +470,9 @@ class BibleReader {
         // Handle deep-linking from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
+        const bookParam = urlParams.get('book') || urlParams.get('b'); // e.g. "ISA", "GEN", "JOB", "MAT"
+        const chapterParam = urlParams.get('chapter') || urlParams.get('c') || '1';
+        const genreParam = urlParams.get('genre') || urlParams.get('g');
         const transParam = urlParams.get('trans'); // e.g. "DNB"
         const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
         const planParam = urlParams.get('plan');
@@ -492,8 +495,24 @@ class BibleReader {
             if (rpTabBtn) {
                 rpTabBtn.style.display = 'none';
             }
+
+            let targetBook = bookParam;
+            if (genreParam) {
+                const cleanGenre = genreParam.toLowerCase().trim();
+                if (cleanGenre.includes('mose') || cleanGenre.includes('pentateuch')) targetBook = 'GEN';
+                else if (cleanGenre.includes('hist')) targetBook = 'JOS';
+                else if (cleanGenre.includes('visdom') || cleanGenre.includes('wisdom') || cleanGenre.includes('poesi')) targetBook = 'JOB';
+                else if (cleanGenre.includes('profet') || cleanGenre.includes('prophet')) targetBook = 'ISA';
+                else if (cleanGenre.includes('evangel') || cleanGenre.includes('gospel')) targetBook = 'MAT';
+                else if (cleanGenre.includes('brev') || cleanGenre.includes('epistle')) targetBook = 'ROM';
+                else if (cleanGenre.includes('åpenbaring') || cleanGenre.includes('revelation') || cleanGenre.includes('apokalyptisk')) targetBook = 'REV';
+            }
+
             if (refParam) {
                 await this.parseAndNavigateToReference(refParam);
+            } else if (targetBook) {
+                const targetRef = `${targetBook}_${chapterParam}`;
+                await this.parseAndNavigateToReference(targetRef);
             } else {
                 // Restore last read book and chapter from localStorage if available
                 const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
@@ -3301,7 +3320,22 @@ class BibleReader {
                 "2 johannes": 63, "2. johannes": 63, "2joh": 63, "2. joh": 63, "2 joh": 63, "2 johannes brev": 63, "2 johannes": 63,
                 "3 johannes": 64, "3. johannes": 64, "3joh": 64, "3. joh": 64, "3 joh": 64, "3 johannes brev": 64, "3 johannes": 64,
                 "judas": 65, "jud": 65, "judas brev": 65, "judas": 65,
-                "åpenbaringen": 66, "åp": 66, "johannes åpenbaring": 66, "åpenbaring": 66
+                "åpenbaringen": 66, "åp": 66, "johannes åpenbaring": 66, "åpenbaring": 66,
+                // USFM English / Standard codes
+                "gen": 1, "exod": 2, "exo": 2, "lev": 3, "num": 4, "deut": 5, "deu": 5,
+                "jos": 6, "josh": 6, "jdg": 7, "judg": 7, "rut": 8, "ruth": 8,
+                "1sa": 9, "1sam": 9, "2sa": 10, "2sam": 10, "1ki": 11, "1kng": 11, "2ki": 12, "2kng": 12,
+                "1ch": 13, "1chr": 13, "2ch": 14, "2chr": 14, "ezr": 15, "ezra": 15, "neh": 16, "est": 17, "esth": 17,
+                "job": 18, "psa": 19, "psalm": 19, "pro": 20, "prov": 20, "ecc": 21, "eccl": 21, "sng": 22, "song": 22,
+                "isa": 23, "jer": 24, "lam": 25, "ezk": 26, "ezek": 26, "dan": 27, "hos": 28, "jol": 29, "joel": 29,
+                "amo": 30, "amos": 30, "oba": 31, "obad": 31, "jon": 32, "jonah": 32, "mic": 33, "nah": 34, "hab": 35,
+                "zep": 36, "zeph": 36, "hag": 37, "zch": 38, "zech": 38, "mal": 39,
+                "mat": 40, "matt": 40, "mrk": 41, "mark": 41, "luk": 42, "luke": 42, "jhn": 43, "john": 43,
+                "act": 44, "acts": 44, "rom": 45, "1co": 46, "1cor": 46, "2co": 47, "2cor": 47,
+                "gal": 48, "eph": 49, "php": 50, "phil": 50, "col": 51, "1th": 52, "1thes": 52, "2th": 53, "2thes": 53,
+                "1ti": 54, "1tim": 54, "2ti": 55, "2tim": 55, "tit": 56, "titus": 56, "phm": 57, "philem": 57,
+                "heb": 58, "jas": 59, "1pe": 60, "1pet": 60, "2pe": 61, "2pet": 61,
+                "1jo": 62, "1john": 62, "2jo": 63, "2john": 63, "3jo": 64, "3john": 64, "jud": 65, "jude": 65, "rev": 66
             };
 
             // Check direct mapping and normalized lookup match
