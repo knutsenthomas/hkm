@@ -2477,29 +2477,20 @@
                 position: fixed !important;
                 bottom: 0 !important;
                 left: 0 !important;
-                right: 0 !important;
                 transform: translateZ(0) !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                border-radius: 20px 20px 0 0 !important;
+                border-radius: 0 !important;
                 border: none !important;
                 border-top: 1px solid var(--border-color) !important;
-                padding: 10px 16px max(12px, calc(8px + env(safe-area-inset-bottom, 0px))) !important;
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12) !important;
+                padding: 12px 24px !important;
+                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1) !important;
                 z-index: 2000 !important;
                 display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                box-sizing: border-box !important;
-                gap: 8px !important;
-                opacity: 1 !important;
-            }
-            .floating-nav-main-row {
-                display: flex !important;
-                align-items: center !important;
                 justify-content: space-between !important;
-                width: 100% !important;
-                gap: 8px !important;
+                box-sizing: border-box !important;
+                gap: 0 !important;
+                opacity: 1 !important;
             }
             .floating-bible-nav:hover {
                 transform: translateZ(0) !important;
@@ -3555,24 +3546,22 @@
 
             <!-- Central Reading Area Bottom Floating Navigation -->
             <div class="floating-bible-nav" id="floating-bible-nav">
-                <div class="floating-nav-main-row">
-                    <button class="floating-nav-btn" id="floating-prev-btn" title="Capítulo anterior">
-                        <span class="material-symbols-outlined">chevron_left</span>
-                    </button>
-                    <div class="floating-nav-info" id="floating-nav-info-pill" title="Elegir libro y capítulo">
-                        <span id="floating-nav-book">JUAN</span>
-                        <span id="floating-nav-chapter">1</span>
-                    </div>
-                    <button class="floating-nav-btn" id="floating-next-btn" title="Siguiente capítulo">
-                        <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
-                    <button class="floating-nav-btn" id="floating-reading-mode-btn" title="Activar modo lectura">
-                        <span class="material-symbols-outlined">chrome_reader_mode</span>
-                    </button>
-                    <button class="floating-nav-btn" id="floating-settings-btn" title="Configuración y herramientas">
-                        <span class="material-symbols-outlined">tune</span>
-                    </button>
+                <button class="floating-nav-btn" id="floating-prev-btn" title="Capítulo anterior">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="floating-nav-info" id="floating-nav-info-pill" title="Elegir libro y capítulo">
+                    <span id="floating-nav-book">JUAN</span>
+                    <span id="floating-nav-chapter">1</span>
                 </div>
+                <button class="floating-nav-btn" id="floating-next-btn" title="Siguiente capítulo">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+                <button class="floating-nav-btn" id="floating-reading-mode-btn" title="Activar modo lectura">
+                    <span class="material-symbols-outlined">chrome_reader_mode</span>
+                </button>
+                <button class="floating-nav-btn" id="floating-settings-btn" title="Configuración y herramientas">
+                    <span class="material-symbols-outlined">tune</span>
+                </button>
                 
                 <!-- Backdrop Overlay for Floating Sheets & Popovers -->
                 <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover').forEach(el => el.classList.remove('active')); this.classList.remove('active');"></div>
