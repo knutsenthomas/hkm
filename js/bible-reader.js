@@ -3619,10 +3619,10 @@ class BibleReader {
                 if (e && e.cancelable) e.preventDefault();
                 currentDeltaY = deltaY;
                 element.style.transform = `translateY(${deltaY}px)`;
-                element.style.opacity = `${Math.max(0.2, 1 - deltaY / 280)}`;
+                element.style.opacity = '1';
                 const backdrop = getBackdrop();
                 if (backdrop) {
-                    backdrop.style.opacity = `${Math.max(0, 1 - deltaY / 220)}`;
+                    backdrop.style.opacity = `${Math.max(0, 1 - deltaY / 300)}`;
                 }
             } else if (deltaY < -10 && element.style.transform) {
                 element.style.transform = 'translateY(0)';
@@ -3635,13 +3635,13 @@ class BibleReader {
         const onEnd = () => {
             if (!isDragging) return;
             isDragging = false;
-            element.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+            element.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
             const backdrop = getBackdrop();
             if (backdrop) backdrop.style.transition = 'opacity 0.28s ease';
 
             if (currentDeltaY > 55) {
                 element.style.transform = 'translateY(100%)';
-                element.style.opacity = '0';
+                element.style.opacity = '1';
                 if (backdrop) backdrop.style.opacity = '0';
                 setTimeout(() => {
                     element.style.transform = '';
