@@ -2454,12 +2454,21 @@ class MinSideManager {
                 const email = firebase.auth().currentUser?.email;
 
                 // 1. Fetch user enrollments
-                if (email) {
+                if (email || uid) {
                     try {
-                        const enrollSnap = await firebase.firestore().collection('courseEnrollments')
-                            .where('email', 'in', [email, email.toLowerCase()])
-                            .get();
-                        enrollSnap.forEach(d => enrollments.push(d.data()));
+                        const targetEmails = Array.from(new Set([email, email?.toLowerCase()].filter(Boolean)));
+                        if (targetEmails.length > 0) {
+                            const enrollSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('email', 'in', targetEmails)
+                                .get();
+                            enrollSnap.forEach(d => enrollments.push(d.data()));
+                        }
+                        if (uid) {
+                            const enrollUserSnap = await firebase.firestore().collection('courseEnrollments')
+                                .where('userId', '==', uid)
+                                .get();
+                            enrollUserSnap.forEach(d => enrollments.push(d.data()));
+                        }
                     } catch (e) {
                         console.error("Error fetching course enrollments for dashboard:", e);
                     }
@@ -4732,12 +4741,21 @@ class MinSideManager {
 
         // Fetch enrollments for current user to authorize lessons access
         let enrollments = [];
-        if (this.currentUser?.email) {
+        if (this.currentUser?.email || this.currentUser?.uid) {
             try {
-                const eSnap = await firebase.firestore().collection('courseEnrollments')
-                    .where('email', 'in', [this.currentUser.email, this.currentUser.email.toLowerCase()])
-                    .get();
-                eSnap.forEach(d => enrollments.push(d.data()));
+                const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
+                if (targetEmails.length > 0) {
+                    const eSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('email', 'in', targetEmails)
+                        .get();
+                    eSnap.forEach(d => enrollments.push(d.data()));
+                }
+                if (this.currentUser?.uid) {
+                    const eUserSnap = await firebase.firestore().collection('courseEnrollments')
+                        .where('userId', '==', this.currentUser.uid)
+                        .get();
+                    eUserSnap.forEach(d => enrollments.push(d.data()));
+                }
             } catch (e) {
                 console.error("Error fetching course enrollments:", e);
             }
@@ -4935,10 +4953,19 @@ class MinSideManager {
         // 2. Fetch Enrollments to verify access
         let enrollments = [];
         try {
-            const eSnap = await firebase.firestore().collection('courseEnrollments')
-                .where('email', 'in', [this.currentUser.email, this.currentUser.email.toLowerCase()])
-                .get();
-            eSnap.forEach(d => enrollments.push(d.data()));
+            const targetEmails = Array.from(new Set([this.currentUser?.email, this.currentUser?.email?.toLowerCase()].filter(Boolean)));
+            if (targetEmails.length > 0) {
+                const eSnap = await firebase.firestore().collection('courseEnrollments')
+                    .where('email', 'in', targetEmails)
+                    .get();
+                eSnap.forEach(d => enrollments.push(d.data()));
+            }
+            if (this.currentUser?.uid) {
+                const eUserSnap = await firebase.firestore().collection('courseEnrollments')
+                    .where('userId', '==', this.currentUser.uid)
+                    .get();
+                eUserSnap.forEach(d => enrollments.push(d.data()));
+            }
         } catch (e) {
             console.error("Error fetching course enrollments:", e);
         }
