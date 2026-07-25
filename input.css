@@ -3504,6 +3504,54 @@ body {
 
 /* Scroll to Top Button */
 .scroll-to-top {
+
+/* ══════════════════════════════════════════════════════════════════
+   DARK MODE STYLES FOR LEGAL & INFORMATION PAGES
+   ══════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] .legal-page-body {
+    background-color: #0b1329 !important;
+    background: #0b1329 !important;
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .legal-text-container {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .legal-text-container h1,
+html[data-theme="dark"] .legal-text-container h2,
+html[data-theme="dark"] .legal-text-container h3,
+html[data-theme="dark"] .legal-text-container h4 {
+    color: var(--hkm-terracotta, #d17d39) !important;
+}
+
+html[data-theme="dark"] .legal-text-container p,
+html[data-theme="dark"] .legal-text-container li,
+html[data-theme="dark"] .legal-text-container span,
+html[data-theme="dark"] .legal-text-container strong {
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .legal-text-container p[style*="color: #718096"],
+html[data-theme="dark"] .legal-text-container p[style*="color:#718096"] {
+    color: #94a3b8 !important;
+}
+
+/* Conformance Box in Accessibility Page */
+html[data-theme="dark"] .conformance-status,
+html[data-theme="dark"] [style*="background-color: #f0fff4"],
+html[data-theme="dark"] [style*="background-color:#f0fff4"] {
+    background-color: rgba(34, 197, 94, 0.12) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #4ade80 !important;
+}
+
+html[data-theme="dark"] .conformance-status p,
+html[data-theme="dark"] .conformance-status strong {
+    color: #4ade80 !important;
+}
     position: fixed;
     bottom: 30px;
     left: 30px;
