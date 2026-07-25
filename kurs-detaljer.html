@@ -1738,16 +1738,19 @@
                 if (!loggedIn) {
                     videoContainer.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; text-align:center; padding:32px 24px; position:relative; z-index:10;">
-                            <div style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1px.5 solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 4px 16px rgba(209, 125, 57, 0.3);">
+                            <div style="width:56px; height:56px; border-radius:50%; background:rgba(209, 125, 57, 0.2); border:1.5px solid var(--hkm-terracotta); display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 4px 16px rgba(209, 125, 57, 0.3);">
                                 <i class="fas fa-lock" style="font-size:24px; color:var(--hkm-terracotta);"></i>
                             </div>
-                            <h3 style="font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; color: white;">Logg inn for tilgang</h3>
+                            <h3 style="font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; color: white;">Påmelding & Betaling påkrevd</h3>
                             <p style="color: #cbd5e1; max-width: 520px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; hyphens: none;">
-                                Du må være registrert og innlogget for å få tilgang til kurset <strong style="color: white; display: inline-block;">${currentCourse?.title || ''}</strong> (${priceBadgeText}).
+                                Dette er et betalt kurs (<strong style="color: white;">${priceBadgeText}</strong>). Du må være registrert, påmeldt og ha kjøpt tilgang til <strong style="color: white; display: inline-block;">${currentCourse?.title || 'kurset'}</strong> for å se leksjonene.
                             </p>
                             <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-                                <a href="/minside/login.html?redirect=${redirectParam}" class="btn-terracotta" id="auth-btn" style="text-decoration:none; padding:12px 28px; border-radius:10px; font-size: 0.98rem;">
-                                    <i class="fas fa-sign-in-alt"></i> Logg inn / Registrer deg nå
+                                <button type="button" onclick="window.triggerEnrollmentModal()" class="btn-terracotta" style="padding:12px 28px; border-radius:10px; border:none; cursor:pointer; font-size: 0.98rem; text-decoration:none;">
+                                    <i class="fas fa-shopping-cart"></i> Meld deg på & Kjøp tilgang (${priceBadgeText})
+                                </button>
+                                <a href="/minside/login.html?redirect=${redirectParam}" style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.3); text-decoration:none; padding:12px 22px; border-radius:10px; font-size: 0.92rem; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-sign-in-alt"></i> Har du konto? Logg inn
                                 </a>
                             </div>
                         </div>
