@@ -1428,34 +1428,22 @@
         </div>
     </div>
 
-    <!-- HKM Course Hero (Stunning 2-Column Brand Layout) -->
-    <section class="kurs-hero" id="kurs-hero-section" style="background: linear-gradient(135deg, #1B4965 0%, #0b2536 50%, #081b27 100%); padding: 140px 24px 100px; position: relative; overflow: hidden;">
-        <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 24px 24px; opacity: 0.6; pointer-events: none;"></div>
-        <div class="container" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; text-align: left; position: relative; z-index: 2;">
-            <div>
-                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(209, 125, 57, 0.18); border: 1.5px solid rgba(209, 125, 57, 0.4); color: #fb923c; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 18px; border-radius: 9999px; margin-bottom: 24px;">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span> SEERKURS MED AKTIVERING
-                </div>
-                <h1 id="hero-course-title" style="font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 850; color: #ffffff; margin: 0 0 20px 0; line-height: 1.15; letter-spacing: -0.02em;">
-                    Seerkurs med <span style="background: linear-gradient(135deg, #fb923c 0%, #d17d39 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">aktivering</span>
-                </h1>
-                <p id="hero-course-desc" style="font-size: 1.15rem; color: #cbd5e1; margin: 0 0 36px 0; line-height: 1.65; max-width: 580px;">
-                    Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden
-                </p>
-                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                    <button class="hero-btn-primary" onclick="if(allCourses && allCourses[0]) handleCourseCardClick(allCourses[0].id, false); return false;" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 800; padding: 16px 36px; border-radius: 14px; font-size: 1.05rem; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(209, 125, 57, 0.35); transition: all 0.25s ease;">
-                        Start kurs nå <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
-                    </button>
-                    <a href="#kurs-grid-section" class="hero-btn-secondary" style="background: rgba(255,255,255,0.1); color: #ffffff; border: 1.5px solid rgba(255,255,255,0.25); padding: 16px 28px; border-radius: 14px; font-weight: 700; text-decoration: none; backdrop-filter: blur(12px); font-size: 1.05rem;">
-                        Se alle kurs
-                    </a>
-                </div>
-            </div>
-            <div style="position: relative;">
-                <div style="position: absolute; inset: -12px; background: radial-gradient(circle, rgba(209, 125, 57, 0.25) 0%, transparent 70%); filter: blur(24px); border-radius: 32px; z-index: 0;"></div>
-                <div style="position: relative; z-index: 1; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.15);">
-                    <img id="hero-course-img" src="https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080" alt="Seerkurs med aktivering" style="width: 100%; height: 420px; object-fit: cover; display: block;">
-                </div>
+    <!-- Full-Width Background Image Hero with Generous Height -->
+    <section id="kurs-hero-section" style="background: linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('https://images.unsplash.com/photo-1553729784-e91953dec042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzIzNjJ8MHwxfHNlYXJjaHwxM3x8QmlibGV8ZW58MHx8fHwxNzgzNjc3NTk3fDA&ixlib=rb-4.1.0&q=80&w=1080') no-repeat center center / cover !important; min-height: 620px !important; padding: 240px 24px 170px !important; text-align: center; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
+        <div class="container" style="max-width: 960px; margin: 0 auto; text-align: center; position: relative; z-index: 2;">
+            <h1 id="hero-course-title" style="font-size: clamp(2.75rem, 6vw, 4.25rem); font-weight: 850; color: #ffffff !important; margin: 0 auto 24px auto; line-height: 1.15; letter-spacing: -0.02em; max-width: 880px;">
+                Seerkurs med aktivering
+            </h1>
+            <p id="hero-course-desc" style="font-size: 1.35rem; color: #e2e8f0 !important; margin: 0 auto 44px auto; line-height: 1.65; max-width: 720px; text-align: center;">
+                Hvordan se i ånden og hvordan bruke bibelvers til å se i ånden
+            </p>
+            <div style="display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <button class="hero-btn-primary" onclick="if(allCourses && allCourses[0]) handleCourseCardClick(allCourses[0].id, false); return false;" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 800; padding: 18px 44px; border-radius: 16px; font-size: 1.125rem; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(209, 125, 57, 0.45); transition: all 0.25s ease;">
+                    Start kurs nå <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+                </button>
+                <a href="#kurs-grid-section" class="hero-btn-secondary" style="background: rgba(255,255,255,0.15); color: #ffffff !important; border: 1.5px solid rgba(255,255,255,0.35); padding: 18px 36px; border-radius: 16px; font-weight: 700; text-decoration: none; backdrop-filter: blur(12px); font-size: 1.1rem;">
+                    Se alle kurs
+                </a>
             </div>
         </div>
     </section>
@@ -2174,7 +2162,6 @@
                             const mainCourse = allCourses[0];
                             const heroTitleEl = document.getElementById('hero-course-title');
                             const heroDescEl = document.getElementById('hero-course-desc');
-                            const heroImgEl = document.getElementById('hero-course-img');
 
                             if (heroTitleEl && mainCourse.title) {
                                 heroTitleEl.innerHTML = mainCourse.title;
@@ -2182,8 +2169,9 @@
                             if (heroDescEl && mainCourse.description) {
                                 heroDescEl.textContent = mainCourse.description;
                             }
-                            if (heroImgEl && mainCourse.imageUrl) {
-                                heroImgEl.src = mainCourse.imageUrl;
+                            const heroSecEl = document.getElementById('kurs-hero-section');
+                            if (heroSecEl && mainCourse.imageUrl) {
+                                heroSecEl.style.setProperty('background', `linear-gradient(rgba(11, 37, 54, 0.72), rgba(11, 37, 54, 0.82)), url('${mainCourse.imageUrl}') no-repeat center center / cover`, 'important');
                             }
                         }
 // sync-hero-marker
