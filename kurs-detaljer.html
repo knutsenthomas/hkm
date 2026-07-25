@@ -740,7 +740,31 @@
             .video-card iframe,
             .video-card video {
                 aspect-ratio: 16 / 9 !important;
-                height: 100% !important;
+                height: 100 !important;
+            }
+
+            .video-card-countdown-content {
+                padding: 16px 10px !important;
+                box-sizing: border-box !important;
+            }
+
+            .video-card-countdown-content h3 {
+                font-size: 1.15rem !important;
+                margin-bottom: 4px !important;
+                line-height: 1.25 !important;
+            }
+
+            .video-card-countdown-content p {
+                font-size: 0.8rem !important;
+                margin-bottom: 8px !important;
+                line-height: 1.3 !important;
+            }
+
+            .video-card-countdown-content .btn-terracotta {
+                padding: 7px 16px !important;
+                font-size: 0.82rem !important;
+                margin-top: 4px !important;
+                min-height: 38px !important;
             }
 
             .locked-overlay,
@@ -778,7 +802,7 @@
                 gap: 6px !important;
                 justify-content: center !important;
                 align-items: center !important;
-                margin: 10px 0 14px 0 !important;
+                margin: 8px 0 10px 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
@@ -809,30 +833,34 @@
                 flex-direction: row !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 8px !important;
-                padding: 8px 10px !important;
+                gap: 6px !important;
+                padding: 6px 8px !important;
                 margin-bottom: 16px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
+                overflow: hidden !important;
             }
 
             .lesson-nav-btn {
-                flex: 1 1 0% !important;
+                flex: 0 0 auto !important;
                 width: auto !important;
-                min-height: 44px !important;
-                padding: 8px 10px !important;
-                font-size: 0.82rem !important;
+                min-height: 38px !important;
+                padding: 6px 10px !important;
+                font-size: 0.76rem !important;
+                font-weight: 700 !important;
                 justify-content: center !important;
                 white-space: nowrap !important;
             }
 
             #lesson-step-indicator {
-                flex-shrink: 0 !important;
-                font-size: 0.84rem !important;
+                flex: 1 1 auto !important;
+                font-size: 0.76rem !important;
                 font-weight: 750 !important;
                 color: #475569 !important;
                 text-align: center !important;
-                padding: 0 4px !important;
+                padding: 0 2px !important;
+                white-space: nowrap !important;
+            }
                 order: 0 !important;
                 width: auto !important;
                 display: inline-block !important;
@@ -2053,7 +2081,7 @@
                     videoContainer.style.backgroundPosition = 'center';
                     
                     videoContainer.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:28px 24px; position:relative; z-index:2;">
+                        <div class="video-card-countdown-content" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:white; text-align:center; padding:28px 24px; position:relative; z-index:2;">
                             <div style="background: var(--hkm-terracotta); color: #ffffff; padding: 6px 16px; border-radius: 30px; font-size: 0.82rem; font-weight: 650; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4);">
                                 <i class="fas fa-clock" style="color: #ffffff; font-size: 0.85rem;"></i> Leksjonen starter om
                             </div>
