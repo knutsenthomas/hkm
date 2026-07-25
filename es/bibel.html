@@ -2197,16 +2197,20 @@
         .verse-crossref-sheet-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.45);
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 25000;
             display: flex;
             align-items: flex-end;
             justify-content: center;
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.25s ease;
         }
         .verse-crossref-sheet-overlay.active {
             opacity: 1;
+            pointer-events: auto;
         }
         .verse-crossref-sheet-card {
             background: var(--bg-card, #ffffff);
@@ -2265,7 +2269,9 @@
             left: 0 !important;
             right: 0 !important;
             bottom: 0 !important;
-            background: rgba(0, 0, 0, 0.55) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 35000 !important;
             display: none;
             align-items: center !important;
@@ -2361,11 +2367,6 @@
         }
 
         /* HKM Premium Verse Note Modal & Bottom Sheet Styling */
-        #verse-note-modal.color-wheel-modal-overlay {
-            background: rgba(15, 23, 42, 0.4) !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
 
         #verse-note-modal .color-wheel-card {
             max-width: 520px !important;
@@ -2505,11 +2506,7 @@
             color: var(--hkm-terracotta, #d17d39) !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
         }
-        #translation-selection-modal.color-wheel-modal-overlay {
-            background: rgba(15, 23, 42, 0.4) !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
+
 
         #translation-selection-modal .translation-modal-card {
             max-width: 480px !important;
