@@ -265,11 +265,59 @@
             background: #0f172a;
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.35);
             position: relative;
             aspect-ratio: 16 / 9;
             width: 100%;
+            margin-bottom: 16px;
+        }
+
+        /* Next / Prev Navigation Sub-bar */
+        .lesson-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 32px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 10px 16px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .lesson-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .lesson-nav-btn:hover:not(.disabled) {
+            background: var(--hkm-terracotta);
+            color: #ffffff;
+            border-color: var(--hkm-terracotta);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
+        }
+
+        .lesson-nav-btn.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #94a3b8;
         }
 
         .video-card iframe,
@@ -371,12 +419,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 16px;
         }
 
         .btn-terracotta {
-            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+            background: var(--hkm-terracotta);
             color: white;
             font-weight: 750;
             padding: 12px 28px;
@@ -404,7 +452,7 @@
         }
 
         .tab-btn {
-            padding: 12px 4px;
+            padding: 12px 6px;
             font-size: 1rem;
             font-weight: 700;
             color: #64748b;
@@ -412,13 +460,14 @@
             border: none;
             border-bottom: 3px solid transparent;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             margin-bottom: -2px;
         }
 
         .tab-btn.active {
             color: var(--hkm-navy);
-            border-bottom-color: var(--hkm-green-accent);
+            border-bottom-color: var(--hkm-terracotta);
+            font-weight: 800;
         }
 
         .tab-content-panel {
@@ -902,6 +951,17 @@
                 </div>
             </div>
 
+            <!-- Next / Prev Lesson Navigation Sub-bar -->
+            <div class="lesson-nav-bar" id="lesson-nav-bar">
+                <button type="button" class="lesson-nav-btn" id="prev-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex - 1)">
+                    <i class="fas fa-chevron-left"></i> Forrige leksjon
+                </button>
+                <span id="lesson-step-indicator" style="font-size: 0.88rem; font-weight: 700; color: #64748b;">Leksjon 1 av 1</span>
+                <button type="button" class="lesson-nav-btn" id="next-lesson-btn" onclick="if(!this.classList.contains('disabled')) window.selectLesson(currentLessonIndex + 1)">
+                    Neste leksjon <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
             <!-- Content Tabs Header -->
             <div class="content-tabs">
                 <button class="tab-btn active" onclick="window.switchTab('oversikt')">Oversikt</button>
@@ -944,13 +1004,21 @@
 
             <!-- Tab 3: Diskusjon -->
             <div class="tab-content-panel" id="tab-diskusjon">
-                <h2 class="overview-title">Spørsmål og Refleksjon</h2>
+                <h2 class="overview-title">Spørsmål, Refleksjon & Bønneønsker</h2>
                 <p class="overview-text">
-                    Still spørsmål til lærerne eller del dine egne refleksjoner med andre kursdeltakere.
+                    Del dine tanker, still spørsmål til lærerne eller be om bønn med andre kursdeltakere for denne leksjonen.
                 </p>
-                <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                    <textarea placeholder="Skriv din kommentar her..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-family: inherit; margin-bottom: 12px; min-height: 80px;"></textarea>
-                    <button class="btn-terracotta" style="padding: 8px 20px; font-size: 0.9rem;">Send kommentar</button>
+                <div style="background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-bottom: 24px;">
+                    <textarea id="discussion-comment-input" placeholder="Skriv din refleksjon eller ditt spørsmål her..." style="width: 100%; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 14px; font-family: inherit; margin-bottom: 14px; min-height: 90px; font-size: 0.95rem; outline: none; transition: border 0.2s;"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; color: #64748b;" id="comment-author-info">Innlogget som kursdeltaker</span>
+                        <button type="button" class="btn-terracotta" id="post-comment-btn" style="padding: 10px 24px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 8px;">
+                            <i class="fas fa-paper-plane"></i> Send refleksjon
+                        </button>
+                    </div>
+                </div>
+
+                <div id="discussion-comments-list" style="display: flex; flex-direction: column; gap: 14px;">
                 </div>
             </div>
         </main>
@@ -1179,6 +1247,25 @@
             window.selectLesson(currentLessonIndex);
         }
 
+        function getLessonTypeIcon(l) {
+            if (l.videoUrl && String(l.videoUrl).trim().length > 0) {
+                return '<i class="fas fa-play-circle" style="color:var(--hkm-terracotta); font-size:0.95rem; margin-right:6px;" title="Videoopptak"></i>';
+            }
+            if (l.zoomUrl && String(l.zoomUrl).trim().length > 0) {
+                return '<i class="fas fa-video" style="color:#0284c7; font-size:0.95rem; margin-right:6px;" title="Live Zoom"></i>';
+            }
+            const lDate = l.date || l.releaseDate;
+            if (lDate) {
+                try {
+                    const d = new Date(lDate);
+                    if (!isNaN(d.getTime()) && d.getTime() > Date.now()) {
+                        return '<i class="fas fa-clock" style="color:#f97316; font-size:0.95rem; margin-right:6px;" title="Kommende økt"></i>';
+                    }
+                } catch (e) {}
+            }
+            return '<i class="fas fa-file-alt" style="color:#64748b; font-size:0.85rem; margin-right:6px;" title="Leksjonsnotat"></i>';
+        }
+
         function renderSidebarModules(lessons) {
             const container = document.getElementById('modules-accordion-container');
             if (!lessons || !lessons.length) return;
@@ -1202,7 +1289,7 @@
                                     const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Leksjon ${overallIdx + 1}: ${rawTitle}`;
                                     return `
                                     <a href="javascript:void(0)" class="lesson-item ${overallIdx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${overallIdx})" id="nav-lesson-${overallIdx}" style="cursor: pointer;">
-                                        <span class="lesson-dot"></span>
+                                        ${getLessonTypeIcon(l)}
                                         <span>${displayTitle}</span>
                                     </a>
                                     `;
@@ -1225,7 +1312,7 @@
                                 const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Leksjon ${idx + 1}: ${rawTitle}`;
                                 return `
                                 <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}" style="cursor: pointer;">
-                                    <span class="lesson-dot"></span>
+                                    ${getLessonTypeIcon(l)}
                                     <span>${displayTitle}</span>
                                 </a>
                                 `;
@@ -1244,6 +1331,10 @@
                 currentCourse.lessons = defaultLessons;
             }
             
+            const total = currentCourse.lessons.length;
+            if (index < 0) index = 0;
+            if (index >= total) index = total - 1;
+            
             currentLessonIndex = index;
             const lesson = currentCourse.lessons[index] || currentCourse.lessons[0];
             if (!lesson) return;
@@ -1258,6 +1349,15 @@
             document.querySelectorAll('.lesson-item').forEach((el, idx) => {
                 el.classList.toggle('active', idx === index);
             });
+
+            // Update Next / Prev Lesson sub-bar
+            const prevBtn = document.getElementById('prev-lesson-btn');
+            const nextBtn = document.getElementById('next-lesson-btn');
+            const stepIndicator = document.getElementById('lesson-step-indicator');
+
+            if (prevBtn) prevBtn.classList.toggle('disabled', index <= 0);
+            if (nextBtn) nextBtn.classList.toggle('disabled', index >= total - 1);
+            if (stepIndicator) stepIndicator.textContent = `Leksjon ${index + 1} av ${total}`;
 
             const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
@@ -1324,6 +1424,11 @@
 
             const tabResGrid = document.getElementById('tab-ressurser-grid');
             if (tabResGrid) tabResGrid.innerHTML = renderResourcesHTML(rawResources);
+
+            // Update discussion comments for active lesson
+            if (typeof window.renderDiscussionComments === 'function') {
+                window.renderDiscussionComments(currentCourse?.id, index);
+            }
 
             const videoContainer = document.getElementById('video-card-container');
             const courseImg = (currentCourse && (currentCourse.imageUrl || currentCourse.image || currentCourse.thumbnail)) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80';
@@ -1488,6 +1593,89 @@
                 }
             }
         };
+
+        window.renderDiscussionComments = function(courseId, lessonIdx) {
+            const listEl = document.getElementById('discussion-comments-list');
+            const authorInfo = document.getElementById('comment-author-info');
+            if (!listEl) return;
+
+            const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+            const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
+            if (authorInfo) authorInfo.textContent = `Innlogget som: ${userName}`;
+
+            const storageKey = `hkm_comments_${courseId || 'default'}_${lessonIdx}`;
+            let comments = [];
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) comments = JSON.parse(stored);
+            } catch (e) {}
+
+            if (!comments || !comments.length) {
+                comments = [
+                    {
+                        author: 'Hilde Karin Knutsen',
+                        avatar: '/assets/Hilde Karin Knutsen-cVkzTBaQ.jpg',
+                        role: 'Hovedlærer',
+                        date: 'I dag',
+                        text: 'Velkommen til denne leksjonen! Legg gjerne igjen dine tanker eller spørsmål her.'
+                    }
+                ];
+            }
+
+            listEl.innerHTML = comments.map(c => `
+                <div style="background: white; padding: 16px 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <img src="${c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}" alt="${c.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid #e2e8f0;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <strong style="font-size: 0.95rem; color: #1e293b;">${c.author}</strong>
+                                ${c.role ? `<span style="background: rgba(209,125,57,0.12); color: #d17d39; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">${c.role}</span>` : ''}
+                            </div>
+                            <span style="font-size: 0.8rem; color: #94a3b8;">${c.date}</span>
+                        </div>
+                        <p style="font-size: 0.92rem; color: #475569; margin: 0; line-height: 1.5;">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const postBtn = document.getElementById('post-comment-btn');
+            if (postBtn) {
+                postBtn.addEventListener('click', () => {
+                    const input = document.getElementById('discussion-comment-input');
+                    if (!input) return;
+                    const text = input.value.trim();
+                    if (!text) return;
+
+                    const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                    const userName = (user && (user.displayName || user.email)) ? (user.displayName || user.email.split('@')[0]) : 'Kursdeltaker';
+                    const userPhoto = user && user.photoURL ? user.photoURL : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+
+                    const storageKey = `hkm_comments_${currentCourse?.id || 'default'}_${currentLessonIndex}`;
+                    let comments = [];
+                    try {
+                        const stored = localStorage.getItem(storageKey);
+                        if (stored) comments = JSON.parse(stored);
+                    } catch (e) {}
+
+                    comments.unshift({
+                        author: userName,
+                        avatar: userPhoto,
+                        role: 'Kursdeltaker',
+                        date: new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' }),
+                        text: text
+                    });
+
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify(comments));
+                    } catch (e) {}
+
+                    input.value = '';
+                    window.renderDiscussionComments(currentCourse?.id, currentLessonIndex);
+                });
+            }
+        });
     </script>
 </body>
 
