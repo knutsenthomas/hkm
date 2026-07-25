@@ -61,27 +61,18 @@
             padding: 0;
         }
 
-        
-        /* Overriding global cms-loading rule */
-        body.cms-loading > .platform-container,
-        body > .platform-container,
-        .platform-container {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+        /* Standard Subpage Hero Styling for Course Player */
+        .page-hero.subpage-hero.course-player-hero {
+            background: linear-gradient(135deg, #1B4965 0%, #0b2536 100%) !important;
+            padding-top: 140px !important;
+            padding-bottom: 40px !important;
+            min-height: auto !important;
         }
 
-        body.cms-loading > footer,
-        body.cms-loading > .footer {
-            display: block !important;
-            visibility: visible !important;
-        }
-
-        /* Platform Container below fixed HKM Header */
         .platform-container {
             display: flex;
             min-height: calc(100vh - 90px);
-            margin-top: 90px;
+            margin-top: 0;
         }
 
         @media (max-width: 1024px) {
@@ -462,49 +453,6 @@
             color: #1e293b;
         }
     </style>
-
-    <!-- Force Visibility Safety Script -->
-    <script>
-        (function() {
-            function forceShow() {
-                if (document.body) {
-                    document.body.classList.remove('cms-loading');
-                    var container = document.querySelector('.platform-container');
-                    if (container) {
-                        container.style.display = 'flex';
-                        container.style.visibility = 'visible';
-                        container.style.opacity = '1';
-                    }
-                }
-            }
-            document.addEventListener('DOMContentLoaded', forceShow);
-            setTimeout(forceShow, 100);
-            setTimeout(forceShow, 1000);
-        })();
-    </script>
-
-    
-
-    <style id="kurs-detaljer-override-style">
-        html body#body.cms-loading > #platform-container,
-        html body#body > #platform-container,
-        html #platform-container,
-        #platform-container {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        html body#body.cms-loading > #footer-section,
-        html body#body > #footer-section,
-        html #footer-section,
-        #footer-section {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-    </style>
-
 </head>
 
 <body id="body" class="header-always-scrolled">
@@ -632,6 +580,17 @@
                 </div>
             </div>
 
+    <!-- Standard HKM Subpage Hero Section (Prevents script.js TypeError) -->
+    <section class="page-hero subpage-hero course-player-hero">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <h1 id="hero-title" class="page-hero-title" style="margin-bottom: 12px;">Seerkurs med aktivering</h1>
+            <p id="hero-subtitle" class="page-hero-subtitle" style="color: #cbd5e1; font-size: 1.1rem; max-width: 700px; margin: 0 auto;">
+                Bli med på undervisning og praksis i å se i den åndelige verden.
+            </p>
+        </div>
+    </section>
+
+    <!-- Platform Container -->
     <div id="platform-container" class="platform-container">
         <!-- Left Sidebar: Course Modules & Lessons Navigation -->
         <aside class="sidebar-nav">
@@ -643,16 +602,16 @@
             <div id="modules-accordion-container">
                 <!-- Module 1 -->
                 <div class="module-group">
-                    <div class="module-header" onclick="toggleModule('mod-1')">
+                    <div class="module-header" onclick="window.toggleModule('mod-1')">
                         <span>Modul 1: Introduksjon</span>
                         <i class="fas fa-chevron-down" id="mod-1-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-1-list">
-                        <a class="lesson-item active" onclick="selectLesson(0)">
+                        <a class="lesson-item active" onclick="window.selectLesson(0)">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 1.1: Hvordan se i ånden</span>
                         </a>
-                        <a class="lesson-item" onclick="selectLesson(1)">
+                        <a class="lesson-item" onclick="window.selectLesson(1)">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 1.2: Høre Guds røst</span>
                         </a>
@@ -661,12 +620,12 @@
 
                 <!-- Module 2 -->
                 <div class="module-group">
-                    <div class="module-header" onclick="toggleModule('mod-2')">
+                    <div class="module-header" onclick="window.toggleModule('mod-2')">
                         <span>Modul 2: Praktisk Aktivering</span>
                         <i class="fas fa-chevron-down" id="mod-2-icon"></i>
                     </div>
                     <ul class="lesson-list" id="mod-2-list">
-                        <a class="lesson-item" onclick="selectLesson(2)">
+                        <a class="lesson-item" onclick="window.selectLesson(2)">
                             <span class="lesson-dot"></span>
                             <span>Leksjon 2.1: Møte med Jesus</span>
                         </a>
@@ -712,9 +671,9 @@
 
             <!-- Content Tabs Header -->
             <div class="content-tabs">
-                <button class="tab-btn active" onclick="switchTab('oversikt')">Oversikt</button>
-                <button class="tab-btn" onclick="switchTab('ressurser')">Ressurser</button>
-                <button class="tab-btn" onclick="switchTab('diskusjon')">Diskusjon</button>
+                <button class="tab-btn active" onclick="window.switchTab('oversikt')">Oversikt</button>
+                <button class="tab-btn" onclick="window.switchTab('ressurser')">Ressurser</button>
+                <button class="tab-btn" onclick="window.switchTab('diskusjon')">Diskusjon</button>
             </div>
 
             <!-- Tab 1: Oversikt -->
@@ -819,7 +778,6 @@
         let currentUser = null;
         let userHasAccess = false;
 
-        
         async function initPage() {
             if (document.body) {
                 document.body.classList.remove('cms-loading');
@@ -853,6 +811,153 @@
         } else {
             initPage();
         }
+
+        async function loadCourseData(targetId) {
+            try {
+                let courses = [];
+                try {
+                    const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                    if (snap.exists && snap.data()?.items) {
+                        courses = snap.data().items;
+                    }
+                } catch (e) {
+                    console.warn('Firestore collection_courses error:', e);
+                }
+
+                if (!courses.length) {
+                    try {
+                        const snap = await firebase.firestore().collection('courses').get();
+                        courses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    } catch (e) {
+                        console.warn('Firestore courses fallback error:', e);
+                    }
+                }
+
+                if (targetId) {
+                    currentCourse = courses.find(c => String(c.id) === String(targetId));
+                }
+                if (!currentCourse && courses.length > 0) {
+                    currentCourse = courses[0];
+                }
+
+                if (!currentCourse) return;
+
+                const heroTitle = document.getElementById('hero-title');
+                if (heroTitle) heroTitle.textContent = currentCourse.title || 'Kursdetaljer';
+
+                const sidebarTitle = document.getElementById('sidebar-course-title');
+                if (sidebarTitle) sidebarTitle.textContent = currentCourse.title || 'Kurs';
+
+                const bcCourse = document.getElementById('bc-course-title');
+                if (bcCourse) bcCourse.textContent = currentCourse.title || 'Kurs';
+
+                const lessons = currentCourse.lessons || [];
+                renderSidebarModules(lessons);
+                await checkAccessAndUpdateUI();
+
+            } catch (err) {
+                console.error('Error loading course details:', err);
+            }
+        }
+
+        async function checkAccessAndUpdateUI() {
+            if (!currentCourse) return;
+            const isFree = !currentCourse.price || currentCourse.price === 0;
+            let isEnrolled = false;
+
+            if (currentUser) {
+                try {
+                    const enrollSnap = await firebase.firestore().collection('enrollments')
+                        .where('userId', '==', currentUser.uid)
+                        .where('courseId', '==', currentCourse.id)
+                        .get();
+                    isEnrolled = !enrollSnap.empty;
+                } catch (e) {
+                    console.warn('Enrollment check error:', e);
+                }
+            }
+
+            userHasAccess = isFree || isEnrolled || (currentUser && (currentUser.email === 'post@hiskingdomministry.no' || currentUser.email === 'thomas@hiskingdomministry.no'));
+            window.selectLesson(currentLessonIndex);
+        }
+
+        function renderSidebarModules(lessons) {
+            const container = document.getElementById('modules-accordion-container');
+            if (!lessons || !lessons.length) return;
+
+            container.innerHTML = `
+                <div class="module-group">
+                    <div class="module-header" onclick="window.toggleModule('mod-1')">
+                        <span>Modul 1: Leksjoner</span>
+                        <i class="fas fa-chevron-down" id="mod-1-icon"></i>
+                    </div>
+                    <ul class="lesson-list" id="mod-1-list">
+                        ${lessons.map((l, idx) => `
+                            <a class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}">
+                                <span class="lesson-dot"></span>
+                                <span>Leksjon ${idx + 1}: ${l.title || 'Leksjon ' + (idx + 1)}</span>
+                            </a>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        window.selectLesson = function(index) {
+            if (!currentCourse || !currentCourse.lessons) return;
+            currentLessonIndex = index;
+            const lesson = currentCourse.lessons[index];
+            if (!lesson) return;
+
+            document.querySelectorAll('.lesson-item').forEach((el, idx) => {
+                el.classList.toggle('active', idx === index);
+            });
+
+            const bcLesson = document.getElementById('bc-lesson-title');
+            if (bcLesson) bcLesson.textContent = `Leksjon ${index + 1}`;
+
+            const overviewTitle = document.getElementById('lesson-overview-title');
+            if (overviewTitle) overviewTitle.textContent = `Oversikt over leksjonen: ${lesson.title}`;
+
+            const overviewText = document.getElementById('lesson-overview-text');
+            if (overviewText) overviewText.textContent = lesson.description || 'Ingen leksjonsbeskrivelse spesifisert.';
+
+            const videoContainer = document.getElementById('video-card-container');
+            const lockedOverlay = document.getElementById('locked-overlay');
+
+            if (userHasAccess) {
+                if (lockedOverlay) lockedOverlay.style.display = 'none';
+                if (lesson.videoUrl && (lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('vimeo'))) {
+                    let embedUrl = lesson.videoUrl;
+                    if (lesson.videoUrl.includes('youtube.com/watch?v=')) {
+                        embedUrl = lesson.videoUrl.replace('watch?v=', 'embed/');
+                    }
+                    videoContainer.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+                } else if (lesson.videoUrl) {
+                    videoContainer.innerHTML = `<video src="${lesson.videoUrl}" controls style="width:100%;height:100%;"></video>`;
+                } else {
+                    videoContainer.innerHTML = `
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:white;text-align:center;padding:20px;">
+                            <i class="fas fa-graduation-cap" style="font-size:48px;color:#d17d39;margin-bottom:12px;"></i>
+                            <h3>${lesson.title}</h3>
+                            <p style="color:#cbd5e1;max-width:500px;">${lesson.description || 'Les teksten nedenfor for denne leksjonen.'}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                if (lockedOverlay) lockedOverlay.style.display = 'flex';
+                const authBtn = document.getElementById('auth-btn');
+                if (authBtn) {
+                    if (!currentUser) {
+                        authBtn.href = '/minside/login.html';
+                        authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Logg inn for å se kurset';
+                    } else {
+                        authBtn.href = '/minside/index.html#course-player?courseId=' + currentCourse.id;
+                        authBtn.innerHTML = '<i class="fas fa-unlock"></i> Meld deg på for kr ' + (currentCourse.price || 0) + ',-';
+                    }
+                }
+            }
+        };
 
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
