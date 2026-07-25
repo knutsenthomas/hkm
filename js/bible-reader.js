@@ -2332,20 +2332,27 @@ class BibleReader {
         if (!this.dom.booksListGt || !this.dom.booksListNt) return;
 
         const isNewTestament = (bookId, index) => {
-            // Group standard 66 books: GT (0-38), NT (39-65)
             if (this.books.length === 66) {
                 return index >= 39;
             }
-            // Fallback heuristics
             const bookIdNum = parseInt(bookId, 10);
             return bookIdNum >= 40 || ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JO', '2JO', '3JO', 'JUD', 'REV'].includes(bookId);
         };
 
+        const genres = this.getGenreLabels();
+        const genreMap = {};
+        genres.forEach(g => { genreMap[g.key] = g.label; });
+
         const renderBookItem = (b, index) => {
             const isActive = b.id === this.selectedBookId ? 'active' : '';
+            const genreKey = this.getBookGenreKey(b, index);
+            const genreLabel = genreMap[genreKey] || '';
             return `
-                <div class="book-item ${isActive}" data-id="${b.id}">
-                    <span class="book-name">${b.name}</span>
+                <div class="book-item ${isActive}" data-id="${b.id}" data-genre="${genreKey}" data-name="${b.name.toLowerCase()}">
+                    <span class="book-name" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-right: 8px;">
+                        <span>${b.name}</span>
+                        ${genreLabel ? `<span class="sidebar-genre-badge" style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.06); opacity: 0.75;">${genreLabel}</span>` : ''}
+                    </span>
                     <span class="material-symbols-outlined icon">chevron_right</span>
                 </div>
             `;
@@ -2372,7 +2379,6 @@ class BibleReader {
                     container.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
                     await this.selectBook(item.dataset.id);
-                    // Automatically load the first chapter of this book so the screen isn't blank
                     if (this.chapters && this.chapters.length > 0) {
                         await this.selectChapter(this.chapters[0].id);
                     }
@@ -2389,8 +2395,9 @@ class BibleReader {
         const bookItems = document.querySelectorAll('.book-item');
         
         bookItems.forEach(item => {
-            const bookName = item.querySelector('.book-name').innerText.toLowerCase();
-            if (bookName.includes(cleanQuery)) {
+            const bookName = (item.dataset.name || item.querySelector('.book-name').innerText).toLowerCase();
+            const bookGenre = (item.dataset.genre || '').toLowerCase();
+            if (bookName.includes(cleanQuery) || bookGenre.includes(cleanQuery)) {
                 item.style.display = 'flex';
             } else {
                 item.style.display = 'none';
@@ -2473,7 +2480,6 @@ class BibleReader {
                 item.addEventListener('click', () => onChapterClick(item));
             });
         }
-
         const floatGrid = document.getElementById('floating-chapter-grid');
         if (floatGrid) {
             floatGrid.innerHTML = gridHtml;
@@ -2481,6 +2487,66 @@ class BibleReader {
                 item.addEventListener('click', () => onChapterClick(item));
             });
         }
+    }
+
+    getBookGenreKey(b, index) {
+        if (this.books && this.books.length === 66) {
+            if (index >= 0 && index <= 4) return 'mosebøkene';
+            if (index >= 5 && index <= 16) return 'historiske';
+            if (index >= 17 && index <= 21) return 'visdom';
+            if (index >= 22 && index <= 38) return 'profetene';
+            if (index >= 39 && index <= 42) return 'evangeliene';
+            if (index === 43) return 'historiske';
+            if (index >= 44 && index <= 64) return 'brevene';
+            if (index === 65) return 'apokalyptisk';
+        }
+        const id = String(b.id || '').toUpperCase();
+        if (['GEN', 'EXO', 'EXOD', 'LEV', 'NUM', 'DEU', 'DEUT', '1', '2', '3', '4', '5'].includes(id)) return 'mosebøkene';
+        if (['JOS', 'JOSH', 'JDG', 'JUDG', 'RUT', 'RUTH', '1SA', '1SAM', '2SA', '2SAM', '1KI', '1KNG', '2KI', '2KNG', '1CH', '1CHR', '2CH', '2CHR', 'EZR', 'EZRA', 'NEH', 'EST', 'ESTH'].includes(id)) return 'historiske';
+        if (['JOB', 'PSA', 'PSALM', 'PRO', 'PROV', 'ECC', 'ECCL', 'SNG', 'SONG'].includes(id)) return 'visdom';
+        if (['ISA', 'JER', 'LAM', 'EZK', 'EZEK', 'DAN', 'HOS', 'JOL', 'JOEL', 'AMO', 'AMOS', 'OBA', 'OBAD', 'JON', 'JONAH', 'MIC', 'NAH', 'HAB', 'ZEP', 'ZEPH', 'HAG', 'ZCH', 'ZECH', 'MAL'].includes(id)) return 'profetene';
+        if (['MAT', 'MRK', 'MARK', 'LUK', 'LUKE', 'JHN', 'JOHN'].includes(id)) return 'evangeliene';
+        if (['ACT', 'ACTS'].includes(id)) return 'historiske';
+        if (['ROM', '1CO', '1COR', '2CO', '2COR', 'GAL', 'EPH', 'PHP', 'PHIL', 'COL', '1TH', '1THES', '2TH', '2THES', '1TI', '1TIM', '2TI', '2TIM', 'TIT', 'TITUS', 'PHM', 'PHILEM', 'HEB', 'JAS', '1PE', '1PET', '2PE', '2PET', '1JO', '1JOHN', '2JO', '2JOHN', '3JO', '3JOHN', 'JUD', 'JUDE'].includes(id)) return 'brevene';
+        if (['REV'].includes(id)) return 'apokalyptisk';
+        return 'andre';
+    }
+
+    getGenreLabels() {
+        const lang = document.documentElement.lang || 'no';
+        if (lang === 'en') {
+            return [
+                { key: 'all', label: 'All' },
+                { key: 'mosebøkene', label: 'Pentateuch' },
+                { key: 'historiske', label: 'History' },
+                { key: 'visdom', label: 'Wisdom' },
+                { key: 'profetene', label: 'Prophets' },
+                { key: 'evangeliene', label: 'Gospels' },
+                { key: 'brevene', label: 'Epistles' },
+                { key: 'apokalyptisk', label: 'Revelation' }
+            ];
+        } else if (lang === 'es') {
+            return [
+                { key: 'all', label: 'Todos' },
+                { key: 'mosebøkene', label: 'Pentateuco' },
+                { key: 'historiske', label: 'Históricos' },
+                { key: 'visdom', label: 'Sabiduría' },
+                { key: 'profetene', label: 'Profetas' },
+                { key: 'evangeliene', label: 'Evangelios' },
+                { key: 'brevene', label: 'Epístolas' },
+                { key: 'apokalyptisk', label: 'Apocalipsis' }
+            ];
+        }
+        return [
+            { key: 'all', label: 'Alle' },
+            { key: 'mosebøkene', label: 'Mosebøkene' },
+            { key: 'historiske', label: 'Historiske' },
+            { key: 'visdom', label: 'Visdom' },
+            { key: 'profetene', label: 'Profetene' },
+            { key: 'evangeliene', label: 'Evangeliene' },
+            { key: 'brevene', label: 'Brevene' },
+            { key: 'apokalyptisk', label: 'Åpenbaringen' }
+        ];
     }
 
     async renderFloatingBooks() {
@@ -2501,6 +2567,11 @@ class BibleReader {
         
         const otTitle = isEn ? 'Old Testament' : (isEs ? 'Antiguo Testamento' : 'Det Gamle Testamente');
         const ntTitle = isEn ? 'New Testament' : (isEs ? 'Nuevo Testamento' : 'Det Nye Testamente');
+        const searchPlaceholder = isEn ? 'Search books or genres...' : (isEs ? 'Buscar libros o géneros...' : 'Søk bok eller sjanger...');
+
+        const genres = this.getGenreLabels();
+        const genreMap = {};
+        genres.forEach(g => { genreMap[g.key] = g.label; });
 
         const isNewTestament = (bookId, index) => {
             if (this.books.length === 66) return index >= 39;
@@ -2508,46 +2579,66 @@ class BibleReader {
             return bookIdNum >= 40 || ['MAT', 'MRK', 'LUK', 'JHN', 'ACT', 'ROM', '1CO', '2CO', 'GAL', 'EPH', 'PHP', 'COL', '1TH', '2TH', '1TI', '2TI', 'TIT', 'PHM', 'HEB', 'JAS', '1PE', '2PE', '1JO', '2JO', '3JO', 'JUD', 'REV'].includes(bookId);
         };
 
-        let html = '';
+        // Render Sticky Genre Filter & Search Controls
+        let html = `
+            <div class="book-genre-filter-container" style="position: sticky; top: 0; background: var(--bg-card, #ffffff); z-index: 20; padding: 4px 0 8px 0; margin-bottom: 8px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));">
+                <div style="position: relative; margin-bottom: 6px;">
+                    <input type="text" id="floating-book-search-input" placeholder="${searchPlaceholder}" style="width: 100%; padding: 6px 12px 6px 30px; font-size: 12px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border-color, rgba(0,0,0,0.15)); background: var(--bg-body, #faf9f6); color: var(--text-base, #1e293b); outline: none;">
+                    <span class="material-symbols-outlined" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text-muted, #94a3b8); pointer-events: none;">search</span>
+                </div>
+                <div class="genre-pills-bar" style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+                    ${genres.map(g => `
+                        <button type="button" class="genre-pill-btn ${g.key === 'all' ? 'active' : ''}" data-genre="${g.key}" style="padding: 3px 10px; font-size: 11px; font-weight: 700; border-radius: 99px; white-space: nowrap; cursor: pointer; border: 1px solid ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'var(--border-color, rgba(0,0,0,0.12))'}; background: ${g.key === 'all' ? 'var(--bible-primary, #d17d39)' : 'rgba(0,0,0,0.04)'}; color: ${g.key === 'all' ? '#ffffff' : 'var(--text-base, #334155)'}; transition: all 0.2s ease;">
+                            ${g.label}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+            <div id="floating-books-items-list" style="display: flex; flex-direction: column; gap: 4px;">
+        `;
+
         let hasAddedOT = false;
         let hasAddedNT = false;
 
         this.books.forEach((b, index) => {
             const isNT = isNewTestament(b.id, index);
+            const genreKey = this.getBookGenreKey(b, index);
+            const genreLabel = genreMap[genreKey] || '';
+
             if (!isNT && !hasAddedOT) {
-                html += `<div class="testament-header-pill" style="padding: 6px 12px; margin: 4px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${otTitle}</div>`;
+                html += `<div class="testament-header-pill ot-header-pill" style="padding: 6px 12px; margin: 4px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${otTitle}</div>`;
                 hasAddedOT = true;
             } else if (isNT && !hasAddedNT) {
-                html += `<div class="testament-header-pill" style="padding: 6px 12px; margin: 16px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${ntTitle}</div>`;
+                html += `<div class="testament-header-pill nt-header-pill" style="padding: 6px 12px; margin: 16px 0 8px 0; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bible-primary, #d17d39); background: rgba(209, 125, 57, 0.08); border-radius: 8px; border-left: 3px solid var(--bible-primary, #d17d39);">${ntTitle}</div>`;
                 hasAddedNT = true;
             }
 
             const isActive = b.id === this.selectedBookId ? 'active' : '';
             html += `
-                <div class="floating-book-item ${isActive}" data-id="${b.id}">
+                <div class="floating-book-item ${isActive}" data-id="${b.id}" data-genre="${genreKey}" data-name="${b.name.toLowerCase()}" data-testament="${isNT ? 'nt' : 'ot'}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         ${isActive ? '<span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">check_circle</span>' : ''}
                         <span>${b.name}</span>
+                        ${genreLabel ? `<span class="genre-badge" style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.06); opacity: 0.75; margin-left: 4px;">${genreLabel}</span>` : ''}
                     </span>
                     <span class="material-symbols-outlined" style="font-size: 16px; opacity: ${isActive ? '1' : '0.5'};">${isActive ? 'check' : 'chevron_right'}</span>
                 </div>
             `;
         });
 
+        html += `</div>`;
         container.innerHTML = html;
 
+        // Bind clicks on book items
         container.querySelectorAll('.floating-book-item').forEach(item => {
             item.addEventListener('click', async () => {
                 const bookId = item.dataset.id;
                 
-                // Highlight the selected book
                 container.querySelectorAll('.floating-book-item').forEach(el => el.classList.remove('active'));
                 item.classList.add('active');
 
-                // Load book chapters (which calls renderChapters dynamically)
                 await this.selectBook(bookId);
 
-                // Switch view back to chapters
                 const headerChapters = document.getElementById('floating-popover-header-chapters');
                 const headerBooks = document.getElementById('floating-popover-header-books');
                 const chapGrid = document.getElementById('floating-chapter-grid');
@@ -2558,6 +2649,68 @@ class BibleReader {
                 if (booksCont) booksCont.style.display = 'none';
             });
         });
+
+        // Filter Logic for Genre Pills & Search Input
+        const filterBookList = (selectedGenre, searchVal) => {
+            const cleanSearch = (searchVal || '').toLowerCase().trim();
+            const items = container.querySelectorAll('.floating-book-item');
+            
+            let visibleOTCount = 0;
+            let visibleNTCount = 0;
+
+            items.forEach(item => {
+                const itemGenre = item.dataset.genre;
+                const itemName = item.dataset.name;
+                const itemTestament = item.dataset.testament;
+
+                const matchesGenre = (selectedGenre === 'all' || itemGenre === selectedGenre);
+                const matchesSearch = (!cleanSearch || itemName.includes(cleanSearch) || itemGenre.includes(cleanSearch));
+
+                if (matchesGenre && matchesSearch) {
+                    item.style.display = 'flex';
+                    if (itemTestament === 'ot') visibleOTCount++;
+                    if (itemTestament === 'nt') visibleNTCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Toggle testament headers based on visible books
+            const otHeader = container.querySelector('.ot-header-pill');
+            const ntHeader = container.querySelector('.nt-header-pill');
+            if (otHeader) otHeader.style.display = visibleOTCount > 0 ? 'block' : 'none';
+            if (ntHeader) ntHeader.style.display = visibleNTCount > 0 ? 'block' : 'none';
+        };
+
+        // Bind Genre Pills
+        let currentSelectedGenre = 'all';
+        const searchInput = container.querySelector('#floating-book-search-input');
+
+        container.querySelectorAll('.genre-pill-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                container.querySelectorAll('.genre-pill-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(0,0,0,0.04)';
+                    b.style.color = 'var(--text-base, #334155)';
+                    b.style.borderColor = 'var(--border-color, rgba(0,0,0,0.12))';
+                });
+                btn.classList.add('active');
+                btn.style.background = 'var(--bible-primary, #d17d39)';
+                btn.style.color = '#ffffff';
+                btn.style.borderColor = 'var(--bible-primary, #d17d39)';
+
+                currentSelectedGenre = btn.dataset.genre;
+                filterBookList(currentSelectedGenre, searchInput ? searchInput.value : '');
+            });
+        });
+
+        // Bind Search Input
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                filterBookList(currentSelectedGenre, e.target.value);
+            });
+        }
 
         // Scroll active book into view smoothly
         const activeItem = container.querySelector('.floating-book-item.active');
