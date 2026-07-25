@@ -61,6 +61,22 @@
             padding: 0;
         }
 
+        
+        /* Overriding global cms-loading rule */
+        body.cms-loading > .platform-container,
+        body > .platform-container,
+        .platform-container {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        body.cms-loading > footer,
+        body.cms-loading > .footer {
+            display: block !important;
+            visibility: visible !important;
+        }
+
         /* Platform Container below fixed HKM Header */
         .platform-container {
             display: flex;
