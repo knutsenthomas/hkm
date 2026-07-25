@@ -1110,8 +1110,7 @@
 
         /* Icon strip for tools */
         .popover-icon-strip {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
+            display: flex !important;
             gap: 8px !important;
             width: 100% !important;
             box-sizing: border-box !important;
@@ -1119,6 +1118,7 @@
         }
 
         .popover-icon-btn {
+            flex: 1 !important;
             height: 42px !important;
             border-radius: 12px !important;
             border: 1px solid var(--border-color, rgba(0,0,0,0.12)) !important;
@@ -1129,11 +1129,16 @@
             justify-content: center !important;
             gap: 6px !important;
             cursor: pointer !important;
-            font-size: 12px !important;
+            font-size: 12.5px !important;
             font-weight: 600 !important;
+            white-space: nowrap !important;
             transition: all 0.2s ease !important;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
-            padding: 0 6px !important;
+            padding: 0 8px !important;
+        }
+
+        .popover-icon-btn span {
+            white-space: nowrap !important;
         }
 
         .popover-icon-btn:hover {
