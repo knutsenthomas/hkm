@@ -4741,20 +4741,140 @@ window.addEventListener('load', () => {
         const mobileProfileImg = document.getElementById('mobile-menu-profile-img');
         const mobileProfileIcon = mobileProfileLink ? mobileProfileLink.querySelector('.material-symbols-outlined') : null;
 
-        // Dynamically inject Dagens andakt shortcut button inside mega menu next to the mobile profile link if missing
-        let mobileDevBtn = document.getElementById('mobile-menu-today-devotional-btn');
-        if (!mobileDevBtn && mobileProfileLink) {
-            mobileDevBtn = document.createElement('a');
-            mobileDevBtn.id = 'mobile-menu-today-devotional-btn';
-            mobileDevBtn.className = 'w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50/50 text-gray-600 hover:text-primary-orange transition-all relative overflow-hidden hidden';
-            
-            const lang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'no';
-            const label = lang === 'en' ? "Today's Devotional" : (lang === 'es' ? 'Devocional de hoy' : 'Dagens andakt');
-            mobileDevBtn.setAttribute('aria-label', label);
-            mobileDevBtn.setAttribute('title', label);
-            mobileDevBtn.innerHTML = '<span class="material-symbols-outlined text-2xl" style="font-variation-settings: \'FILL\' 1;">auto_stories</span>';
-            mobileProfileLink.parentNode.insertBefore(mobileDevBtn, mobileProfileLink);
+        // Create global profile dropdown menu element if not exists
+        let profileDropdown = document.getElementById('global-profile-dropdown');
+        if (!profileDropdown) {
+            profileDropdown = document.createElement('div');
+            profileDropdown.id = 'global-profile-dropdown';
+            profileDropdown.className = 'hidden';
+            profileDropdown.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                z-index: 99999;
+                width: 270px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 16px;
+                box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+                padding: 16px;
+                font-family: inherit;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+            `;
+            profileDropdown.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 10px;">
+                    <img id="dropdown-user-avatar" src="" alt="Profilbilde" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--hkm-terracotta); background: #f1f5f9;">
+                    <div style="min-width: 0; flex: 1;">
+                        <div id="dropdown-user-name" style="font-weight: 750; font-size: 0.95rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Innlogget bruker</div>
+                        <div id="dropdown-user-email" style="font-size: 0.78rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+                    <a href="/minside/index.html" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-user-circle" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Min Side
+                    </a>
+                    <a href="/minside/index.html?tab=kurs" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-graduation-cap" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine kurs
+                    </a>
+                    <a href="/minside/index.html?tab=leseplaner" class="dropdown-link-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #334155; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-book-open" style="color: var(--hkm-terracotta); font-size: 1rem; width: 18px; text-align: center;"></i> Mine leseplaner
+                    </a>
+                    <a id="dropdown-admin-link" href="/admin/index.html" class="dropdown-link-item hidden" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #d17d39; font-size: 0.88rem; font-weight: 700; text-decoration: none; background: rgba(209, 125, 57, 0.08);">
+                        <i class="fas fa-user-shield" style="font-size: 1rem; width: 18px; text-align: center;"></i> Admin Panel
+                    </a>
+                </div>
+
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 8px;">
+                    <button id="dropdown-logout-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                        <i class="fas fa-sign-out-alt"></i> Logg ut
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(profileDropdown);
+
+            // Bind Logout button
+            const logoutBtn = profileDropdown.querySelector('#dropdown-logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    profileDropdown.classList.add('hidden');
+                    try {
+                        if (typeof firebase !== 'undefined' && firebase.auth) {
+                            await firebase.auth().signOut();
+                        } else if (window.firebaseService && typeof window.firebaseService.signOut === 'function') {
+                            await window.firebaseService.signOut();
+                        }
+                    } catch (err) {
+                        console.error('Logout error:', err);
+                    }
+                    localStorage.removeItem('hkm_public_user_cache');
+                    window.location.reload();
+                });
+            }
         }
+
+        const handleProfileClick = (e) => {
+            const user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+            if (!user || user.isAnonymous) {
+                // Not logged in -> go to login page!
+                window.location.href = '/minside/login.html';
+                return;
+            }
+
+            // User is logged in -> Toggle Dropdown Menu!
+            e.preventDefault();
+            e.stopPropagation();
+
+            const isHidden = profileDropdown.classList.contains('hidden');
+            if (isHidden) {
+                // Populate user details
+                const avatarImg = profileDropdown.querySelector('#dropdown-user-avatar');
+                const nameEl = profileDropdown.querySelector('#dropdown-user-name');
+                const emailEl = profileDropdown.querySelector('#dropdown-user-email');
+
+                if (nameEl) nameEl.textContent = user.displayName || user.email?.split('@')[0] || 'Bruker';
+                if (emailEl) emailEl.textContent = user.email || '';
+                if (avatarImg) avatarImg.src = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+
+                // Check admin link
+                const adminLink = profileDropdown.querySelector('#dropdown-admin-link');
+                if (adminLink) {
+                    if (window.currentUserRole === 'admin' || (user.email && user.email.includes('thomasknutsen87@gmail.com'))) {
+                        adminLink.classList.remove('hidden');
+                    } else {
+                        adminLink.classList.add('hidden');
+                    }
+                }
+
+                // Position dropdown under header element
+                const targetBtn = e.currentTarget || profileLink;
+                const rect = targetBtn ? targetBtn.getBoundingClientRect() : { bottom: 70, right: 20 };
+                profileDropdown.style.top = `${rect.bottom + 8}px`;
+                profileDropdown.style.right = `${Math.max(16, window.innerWidth - rect.right)}px`;
+
+                profileDropdown.classList.remove('hidden');
+            } else {
+                profileDropdown.classList.add('hidden');
+            }
+        };
+
+        if (profileLink) {
+            profileLink.addEventListener('click', handleProfileClick);
+        }
+        if (mobileProfileLink) {
+            mobileProfileLink.addEventListener('click', handleProfileClick);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (profileDropdown && !profileDropdown.classList.contains('hidden')) {
+                if (!profileDropdown.contains(e.target) && (!profileLink || !profileLink.contains(e.target)) && (!mobileProfileLink || !mobileProfileLink.contains(e.target))) {
+                    profileDropdown.classList.add('hidden');
+                }
+            }
+        });
 
         // Helper to update DOM states for both desktop and mobile profile elements
         const updateProfileDOM = (photoURL) => {
