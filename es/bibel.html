@@ -848,24 +848,33 @@
             box-sizing: border-box !important;
         }
 
-        .floating-book-item:hover {
+        .floating-book-item:hover:not(.active) {
             background: rgba(255, 255, 255, 0.08) !important;
             border-color: var(--bible-primary) !important;
             padding-left: 18px !important;
         }
 
-        .floating-book-item.active {
-            background: var(--bible-primary) !important;
+        .floating-book-item.active,
+        html[data-theme="light"] .floating-book-item.active {
+            background: var(--bible-primary, #d17d39) !important;
             color: #ffffff !important;
-            border-color: var(--bible-primary) !important;
+            border-color: var(--bible-primary, #d17d39) !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 14px rgba(209, 125, 57, 0.35) !important;
         }
 
-        html[data-theme="light"] .floating-book-item {
+        .floating-book-item.active *,
+        html[data-theme="light"] .floating-book-item.active * {
+            color: #ffffff !important;
+        }
+
+        html[data-theme="light"] .floating-book-item:not(.active) {
             background: rgba(0, 0, 0, 0.02) !important;
             border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            color: var(--text-base) !important;
         }
         
-        html[data-theme="light"] .floating-book-item:hover {
+        html[data-theme="light"] .floating-book-item:not(.active):hover {
             background: rgba(0, 0, 0, 0.05) !important;
         }
 
