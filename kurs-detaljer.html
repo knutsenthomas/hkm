@@ -2131,6 +2131,7 @@
             if (nextBtn) nextBtn.classList.toggle('disabled', index >= total - 1);
             if (stepIndicator) stepIndicator.textContent = `Leksjon ${index + 1} av ${total}`;
 
+            const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
                 const cleanDisplayTitle = (lesson.title || `Leksjon ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
                 courseHeading.innerHTML = `<strong>${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}:</strong> <span>${cleanDisplayTitle}</span>`;
