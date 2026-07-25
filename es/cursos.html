@@ -1792,7 +1792,7 @@
                     const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                     
                     if (hasAccess) {
-                        window.location.href = '/minside/index.html#course-player?courseId=' + course.id;
+                        window.location.href = '/kurs-detaljer.html?id=' + course.id;
                     } else {
                         openEnrollModal(course);
                     }
@@ -2084,7 +2084,7 @@
                     const hasAccess = currentUser && (isFree || isAdmin || userEnrollments.some(e => e.courseId === course.id && (e.status === 'paid' || e.status === 'success')));
                     
                     if (hasAccess) {
-                        window.location.href = '/minside/index.html#course-player?courseId=' + course.id;
+                        window.location.href = '/kurs-detaljer.html?id=' + course.id;
                     } else {
                         openEnrollModal(course);
                     }

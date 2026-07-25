@@ -2249,7 +2249,7 @@
                         container.style.gridTemplateColumns = '1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course.id}', false)" style="min-height: 400px; position: relative;">
+                            <div class="spotlight-card" onclick="window.location.href='/kurs-detaljer.html?id=${course.id}', false)" style="min-height: 400px; position: relative;">
                                 <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course.id}', '${safeTitle}')" title="Del kurs">
                                     <i class="fas fa-share-alt"></i>
                                 </button>
@@ -2291,7 +2291,7 @@
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                            <div class="spotlight-card" onclick="window.location.href='/kurs-detaljer.html?id=${course1.id}', false)" style="position: relative;">
                                 <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
                                     <i class="fas fa-share-alt"></i>
                                 </button>
@@ -2314,7 +2314,7 @@
                             </div>
 
                             <div class="featured-list-col">
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="height: 100%; display: flex; align-items: center; position: relative;">
+                                <div class="horizontal-course-card" onclick="window.location.href='/kurs-detaljer.html?id=${course2.id}', false)" style="height: 100%; display: flex; align-items: center; position: relative;">
                                     <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
                                         <i class="fas fa-share-alt"></i>
                                     </button>
@@ -2361,7 +2361,7 @@
                         container.style.gridTemplateColumns = '1.2fr 1fr';
                         
                         container.innerHTML = `
-                            <div class="spotlight-card" onclick="handleCourseCardClick('${course1.id}', false)" style="position: relative;">
+                            <div class="spotlight-card" onclick="window.location.href='/kurs-detaljer.html?id=${course1.id}', false)" style="position: relative;">
                                 <button class="spotlight-share-btn" onclick="openShareMenu(event, '${course1.id}', '${safeTitle1}')" title="Del kurs">
                                     <i class="fas fa-share-alt"></i>
                                 </button>
@@ -2384,7 +2384,7 @@
                             </div>
 
                             <div class="featured-list-col">
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course2.id}', false)" style="position: relative;">
+                                <div class="horizontal-course-card" onclick="window.location.href='/kurs-detaljer.html?id=${course2.id}', false)" style="position: relative;">
                                     <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course2.id}', '${safeTitle2}')" title="Del kurs">
                                         <i class="fas fa-share-alt"></i>
                                     </button>
@@ -2403,7 +2403,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="horizontal-course-card" onclick="handleCourseCardClick('${course3.id}', false)" style="position: relative;">
+                                <div class="horizontal-course-card" onclick="window.location.href='/kurs-detaljer.html?id=${course3.id}', false)" style="position: relative;">
                                     <button class="horizontal-share-btn" onclick="openShareMenu(event, '${course3.id}', '${safeTitle3}')" title="Del kurs">
                                         <i class="fas fa-share-alt"></i>
                                     </button>
@@ -2469,9 +2469,7 @@
                         const excerpt = (course.description || '').substring(0, 110) + ((course.description || '').length > 110 ? '...' : '');
                         const safeTitle = (course.title || '').replace(/'/g, "\\'");
 
-                        const cardAction = hasAccess 
-                            ? `window.location.href='/minside/index.html#course-player?courseId=${course.id}'` 
-                            : `openEnrollModal(${JSON.stringify(course).replace(/"/g, '&quot;')})`;
+                        const cardAction = `window.location.href='/kurs-detaljer.html?id=${course.id}'`;
 
                         return `
                 <div class="course-card" onclick="${cardAction}">
