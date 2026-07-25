@@ -1128,6 +1128,26 @@
             initPage();
         }
 
+        function getAllCourseLessons() {
+            if (!currentCourse) return defaultLessons;
+            let collected = [];
+            if (Array.isArray(currentCourse.modules) && currentCourse.modules.length > 0) {
+                currentCourse.modules.forEach(m => {
+                    if (Array.isArray(m.lessons)) {
+                        collected.push(...m.lessons);
+                    }
+                });
+            }
+            if (!collected.length && Array.isArray(currentCourse.lessons) && currentCourse.lessons.length > 0) {
+                collected = currentCourse.lessons;
+            }
+            if (!collected.length) {
+                collected = defaultLessons;
+            }
+            currentCourse.lessons = collected;
+            return collected;
+        }
+
         async function loadCourseData(targetId) {
             try {
                 let courses = [];
@@ -1171,11 +1191,7 @@
                 const coverImgEl = document.getElementById('course-cover-img');
                 if (coverImgEl) coverImgEl.src = courseImg;
 
-                if (!currentCourse.lessons || !currentCourse.lessons.length) {
-                    currentCourse.lessons = defaultLessons;
-                }
-
-                const lessons = currentCourse.lessons;
+                const lessons = getAllCourseLessons();
                 renderSidebarModules(lessons);
                 await checkAccessAndUpdateUI();
 
@@ -1319,7 +1335,7 @@
                                 const rawTitle = l.title || `Leksjon ${idx + 1}`;
                                 const displayTitle = /^leksjon/i.test(rawTitle) ? rawTitle : `Leksjon ${idx + 1}: ${rawTitle}`;
                                 return `
-                                <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson-${idx}" style="cursor: pointer;">
+                                <a href="javascript:void(0)" class="lesson-item ${idx === currentLessonIndex ? 'active' : ''}" onclick="window.selectLesson(${idx})" id="nav-lesson(${idx})" style="cursor: pointer;">
                                     ${getLessonTypeIcon(l)}
                                     <span>${displayTitle}</span>
                                 </a>
@@ -1335,16 +1351,14 @@
 
         window.selectLesson = function(index) {
             if (!currentCourse) return;
-            if (!currentCourse.lessons || !currentCourse.lessons.length) {
-                currentCourse.lessons = defaultLessons;
-            }
+            const lessons = getAllCourseLessons();
+            const total = lessons.length;
             
-            const total = currentCourse.lessons.length;
             if (index < 0) index = 0;
             if (index >= total) index = total - 1;
             
             currentLessonIndex = index;
-            const lesson = currentCourse.lessons[index] || currentCourse.lessons[0];
+            const lesson = lessons[index] || lessons[0];
             if (!lesson) return;
 
             if (history.replaceState && currentCourse && currentCourse.id) {
