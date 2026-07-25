@@ -2128,52 +2128,125 @@
                 }
                 listenToAuth();
 
-                async function checkUserCourseEnrollment(courseId) {
+                async function checkUserCourseEnrollment(courseId, courseObj) {
+                    if (!courseId && courseObj) courseId = courseObj.id;
                     if (!courseId) return false;
-                    if (localStorage.getItem(`hkm_enrolled_${courseId}`) === 'true') return true;
                     
+                    const strId = String(courseId).toLowerCase();
+                    
+                    // 1. Check LocalStorage flags
+                    try {
+                        if (localStorage.getItem(`hkm_enrolled_${courseId}`) === 'true' || 
+                            localStorage.getItem(`hkm_enrolled_${strId}`) === 'true') {
+                            return true;
+                        }
+                        const enrolledListStr = localStorage.getItem('hkm_enrolled_courses') || localStorage.getItem('hkm_user_enrolled_courses');
+                        if (enrolledListStr) {
+                            const list = JSON.parse(enrolledListStr);
+                            if (Array.isArray(list) && (list.includes(String(courseId)) || list.includes(strId) || list.includes('seerkurs-aktivering'))) {
+                                return true;
+                            }
+                        }
+                    } catch (e) {}
+
+                    // 2. Check User Object / Role Cache
                     const userJson = localStorage.getItem('hkm_public_user_cache');
                     let userObj = null;
                     if (userJson) {
                         try { userObj = JSON.parse(userJson); } catch(e){}
                     }
-                    if (userObj && (userObj.role === 'admin' || userObj.isAdmin)) return true;
-
-                    if (userEnrollments && Array.isArray(userEnrollments)) {
-                        const isEnrolledInArray = userEnrollments.some(e => String(e.courseId) === String(courseId) || String(e.id) === String(courseId));
-                        if (isEnrolledInArray) return true;
-                    }
+                    if (userObj && (userObj.role === 'admin' || userObj.isAdmin || userObj.role === 'superadmin')) return true;
 
                     if (currentUserRole === 'admin' || currentUserRole === 'superadmin') return true;
 
-                    const user = currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
-                    const uid = user ? user.uid : (userObj ? userObj.uid : null);
-                    if (!uid) return false;
+                    // 3. Check Active Firebase User
+                    const activeUser = currentUser || (typeof firebaseService !== 'undefined' && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                    if (!activeUser && !userObj) return false;
 
-                    try {
-                        if (typeof firebase !== 'undefined' && firebase.firestore) {
-                            const db = firebase.firestore();
-                            const enrollSnap = await db.collection('user_enrollments')
-                                .where('userId', '==', uid)
-                                .where('courseId', '==', courseId)
-                                .limit(1).get();
-                            if (!enrollSnap.empty) {
-                                localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
-                                return true;
-                            }
-                            const userDoc = await db.collection('users').doc(uid).get();
-                            if (userDoc.exists) {
-                                const data = userDoc.data();
-                                if (data.role === 'admin' || data.isAdmin) return true;
-                                if (data.enrolledCourses && Array.isArray(data.enrolledCourses) && data.enrolledCourses.includes(courseId)) {
-                                    localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
-                                    return true;
+                    const uid = activeUser ? activeUser.uid : (userObj ? userObj.uid : null);
+                    const email = activeUser ? (activeUser.email || '').toLowerCase() : (userObj ? (userObj.email || '').toLowerCase() : '');
+
+                    if (uid || email) {
+                        try {
+                            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                                const db = firebase.firestore();
+
+                                // Check users collection for admin or enrolledCourses
+                                if (uid) {
+                                    const userDoc = await db.collection('users').doc(uid).get();
+                                    if (userDoc.exists) {
+                                        const uData = userDoc.data();
+                                        if (uData && (uData.role === 'admin' || uData.isAdmin || uData.role === 'superadmin')) {
+                                            return true;
+                                        }
+                                        if (uData && Array.isArray(uData.enrolledCourses)) {
+                                            const enrolledLC = uData.enrolledCourses.map(c => String(c).toLowerCase());
+                                            if (enrolledLC.includes(strId) || enrolledLC.includes('seerkurs-aktivering') || enrolledLC.includes(String(courseId))) {
+                                                localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Check user_enrollments collection by userId
+                                if (uid) {
+                                    const snapUid = await db.collection('user_enrollments')
+                                        .where('userId', '==', uid)
+                                        .get();
+                                    if (!snapUid.empty) {
+                                        let found = false;
+                                        snapUid.forEach(doc => {
+                                            const d = doc.data();
+                                            const dCId = String(d.courseId || '').toLowerCase();
+                                            if (dCId === strId || dCId === 'seerkurs-aktivering' || dCId === String(courseId).toLowerCase() || dCId === 'all') {
+                                                found = true;
+                                            }
+                                        });
+                                        if (found) {
+                                            localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
+                                            return true;
+                                        }
+                                    }
+                                }
+
+                                // Check user_enrollments collection by email
+                                if (email) {
+                                    const snapEmail = await db.collection('user_enrollments')
+                                        .where('email', '==', email)
+                                        .get();
+                                    if (!snapEmail.empty) {
+                                        let found = false;
+                                        snapEmail.forEach(doc => {
+                                            const d = doc.data();
+                                            const dCId = String(d.courseId || '').toLowerCase();
+                                            if (dCId === strId || dCId === 'seerkurs-aktivering' || dCId === String(courseId).toLowerCase() || dCId === 'all') {
+                                                found = true;
+                                            }
+                                        });
+                                        if (found) {
+                                            localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
+                                            return true;
+                                        }
+                                    }
+                                }
+
+                                // Check legacy courseEnrollments collection by email
+                                if (email) {
+                                    const snapLegacy = await db.collection('courseEnrollments')
+                                        .where('email', '==', email)
+                                        .get();
+                                    if (!snapLegacy.empty) {
+                                        localStorage.setItem(`hkm_enrolled_${courseId}`, 'true');
+                                        return true;
+                                    }
                                 }
                             }
+                        } catch (e) {
+                            console.warn('Error verifying enrollment:', e);
                         }
-                    } catch (e) {
-                        console.warn('Error checking enrollment:', e);
                     }
+
                     return false;
                 }
 
@@ -2192,7 +2265,7 @@
                     if (isFree) {
                         hasAccess = true;
                     } else {
-                        hasAccess = await checkUserCourseEnrollment(course.id);
+                        hasAccess = await checkUserCourseEnrollment(course.id, course);
                     }
 
                     if (hasAccess) {
