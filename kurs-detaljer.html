@@ -860,6 +860,12 @@
                 border: none !important;
             }
 
+            .overview-title {
+                font-size: 1.15rem !important;
+                font-weight: 800 !important;
+                margin: 0 0 12px 0 !important;
+            }
+
             /* Instructor Card */
             .instructor-card {
                 flex-direction: column !important;
@@ -1762,7 +1768,10 @@
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
-            if (overviewTitle) overviewTitle.textContent = `Om leksjonen: ${lesson.title}`;
+            if (overviewTitle) {
+                const cleanTitle = (lesson.title || '').replace(/^leksjon\s+\d+:\s*/i, '').trim();
+                overviewTitle.textContent = cleanTitle || 'Om leksjonen';
+            }
 
             const overviewText = document.getElementById('lesson-overview-text');
             if (overviewText) {
