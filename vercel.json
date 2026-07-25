@@ -21,6 +21,7 @@
     { "source": "/butikk.html", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/__/auth/:path*", "destination": "https://his-kingdom-ministry.firebaseapp.com/__/auth/:path*" },
     { "source": "/api/bible/:path*", "destination": "/api/bible" },
     { "source": "/kurs", "destination": "/api/share-preview?type=course&lang=no" },
     { "source": "/kurs.html", "destination": "/api/share-preview?type=course&lang=no" },
