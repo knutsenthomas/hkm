@@ -8501,9 +8501,7 @@ class BibleReader {
         let playerBar = document.getElementById('hkm-audio-player-bar');
         if (!playerBar) {
             const activeLang = document.documentElement.lang || 'no';
-            const labelVoice = activeLang === 'es' ? 'Voz' : (activeLang === 'en' ? 'Voice' : 'Stemme');
-            const labelMale = activeLang === 'es' ? 'Hombre' : (activeLang === 'en' ? 'Male' : 'Mann (Onyx)');
-            const labelFemale = activeLang === 'es' ? 'Mujer' : (activeLang === 'en' ? 'Female' : 'Kvinne (Nova)');
+            const labelVoice = activeLang === 'es' ? 'Voz AI' : (activeLang === 'en' ? 'AI Voice' : 'AI-stemme');
 
             playerBar = document.createElement('div');
             playerBar.id = 'hkm-audio-player-bar';
@@ -8521,8 +8519,12 @@ class BibleReader {
                     ${this.t('playing_verse')}...
                 </div>
                 <select class="audio-voice-select" id="audio-voice-select" title="${labelVoice}">
-                    <option value="onyx">${labelMale}</option>
-                    <option value="nova">${labelFemale}</option>
+                    <option value="onyx">ChatGPT Onyx (Mann - Dyp & Rolig)</option>
+                    <option value="nova">ChatGPT Nova (Kvinne - Varm & Klar)</option>
+                    <option value="echo">ChatGPT Echo (Mann - Tydelig)</option>
+                    <option value="alloy">ChatGPT Alloy (Nøytral)</option>
+                    <option value="fable">ChatGPT Fable (Forteller)</option>
+                    <option value="shimmer">ChatGPT Shimmer (Kvinne - Lys)</option>
                 </select>
                 <select class="audio-speed-select" id="audio-speed-select" title="Hastighet">
                     <option value="0.8">0.8x</option>

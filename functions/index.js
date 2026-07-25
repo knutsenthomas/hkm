@@ -7816,7 +7816,7 @@ exports.getBibleChapterAudio = onCall({
     for (let i = 0; i < chunks.length; i++) {
       console.log(`Genererer OpenAI del ${i + 1}/${chunks.length}...`);
       const response = await openai.audio.speech.create({
-        model: "tts-1",
+        model: "tts-1-hd",
         voice: cleanVoice,
         input: chunks[i],
       });
