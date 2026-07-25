@@ -1030,23 +1030,34 @@
                 }
             }
 
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized || typeof firebase === 'undefined' || !firebase.auth) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+
             const handleUser = async (user) => {
-                currentUser = user || (firebaseService && firebaseService.currentUser) || null;
-                if (currentUser || isUserLoggedIn()) {
+                const activeUser = user || (firebaseService && firebaseService.currentUser) || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+                currentUser = activeUser;
+                if (activeUser || isUserLoggedIn()) {
                     userHasAccess = true;
                     const profileBtn = document.getElementById('header-profile-link');
                     if (profileBtn) profileBtn.classList.remove('hidden');
+                } else {
+                    userHasAccess = false;
                 }
                 await checkAccessAndUpdateUI();
             };
 
-            if (firebaseService && typeof firebaseService.onAuthChange === 'function') {
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(handleUser);
+            } else if (firebaseService && typeof firebaseService.onAuthChange === 'function') {
                 firebaseService.onAuthChange(handleUser);
             }
 
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().onAuthStateChanged(handleUser);
-            }
+            // Immediately evaluate current auth state
+            const initialUser = typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : (firebaseService ? firebaseService.currentUser : null);
+            await handleUser(initialUser);
 
             await loadCourseData(courseId);
         }
