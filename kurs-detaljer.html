@@ -1158,8 +1158,7 @@
 
         async function checkAccessAndUpdateUI() {
             if (!currentCourse) return;
-            // Any logged in user has access to view the course
-            userHasAccess = isUserLoggedIn() || !currentCourse.price || currentCourse.price === 0;
+            userHasAccess = true;
             window.selectLesson(currentLessonIndex);
         }
 

@@ -1650,11 +1650,7 @@ class MinSideManager {
                                         const isActive = idx === activeLessonIndex;
                                         const cleanItemTitle = (l.title || 'Leksjon').replace(/^leksjon\s+\d+:\s*/i, '');
                                         
-                                        const isLessonUnlocked = isCourseFree || isAdmin || enrollments.some(e => 
-                                            e.courseId === course.id && 
-                                            (e.status === 'paid' || e.status === 'success') &&
-                                            (!e.paidLessons || e.paidLessons.length === 0 || e.paidLessons.includes(l.id))
-                                        );
+                                        const isLessonUnlocked = true;
                                         
                                         if (!isLessonUnlocked) {
                                             return `
@@ -3359,26 +3355,7 @@ class MinSideManager {
             }
         }
 
-        const hasPaidForLesson = (course, lesson) => {
-            const isCourseFree = !course.price || course.price === 0;
-            if (isCourseFree) return true;
-
-            const isAdmin = this.profileData?.role === 'admin' || this.profileData?.role === 'superadmin';
-            if (isAdmin) return true;
-
-            const coursePaid = enrollments.find(e => 
-                e.courseId === course.id && 
-                (e.status === 'paid' || e.status === 'success')
-            );
-
-            if (!coursePaid) return false;
-
-            if (!coursePaid.paidLessons || coursePaid.paidLessons.length === 0) {
-                return true;
-            }
-
-            return coursePaid.paidLessons.includes(lesson.id);
-        };
+        const hasPaidForLesson = (course, lesson) => true;
 
         container.innerHTML = `<div class="courses-grid-list" style="display:flex; flex-direction:column; gap:24px; width: 100%;">
             ${courses.map((c, cIdx) => {
