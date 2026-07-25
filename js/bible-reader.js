@@ -1468,10 +1468,17 @@ class BibleReader {
             });
         }
 
-        // Custom color picker support for rightmost swatch button
-        const customPickerInput = document.getElementById('bible-custom-color-picker');
+        // Interactive Canvas Color Wheel Modal Controller
+        const colorWheelModal = document.getElementById('color-wheel-modal');
+        const colorWheelCanvas = document.getElementById('color-wheel-canvas');
+        const colorWheelHandle = document.getElementById('color-wheel-picker-handle');
+        const colorWheelPreview = document.getElementById('color-wheel-preview');
+        const colorWheelHex = document.getElementById('color-wheel-hex');
+        const colorWheelClose = document.getElementById('color-wheel-close');
+        const colorWheelApply = document.getElementById('color-wheel-apply-btn');
         const customSwatchBtn = document.getElementById('custom-color-swatch-btn');
-        const savedCustomColor = localStorage.getItem('hkm_custom_verse_color');
+        
+        let currentColorHex = localStorage.getItem('hkm_custom_verse_color') || '#d17d39';
 
         const updateCustomBtnStyle = (hexColor) => {
             if (customSwatchBtn && hexColor) {
@@ -1480,9 +1487,144 @@ class BibleReader {
             }
         };
 
-        if (savedCustomColor) {
-            updateCustomBtnStyle(savedCustomColor);
-            if (customPickerInput) customPickerInput.value = savedCustomColor;
+        if (currentColorHex) {
+            updateCustomBtnStyle(currentColorHex);
+        }
+
+        // Draw 360-degree Radial HSL Color Wheel on Canvas
+        const drawColorWheel = () => {
+            if (!colorWheelCanvas) return;
+            const ctx = colorWheelCanvas.getContext('2d');
+            const width = colorWheelCanvas.width;
+            const height = colorWheelCanvas.height;
+            const radius = width / 2;
+            const toRad = Math.PI / 180;
+            
+            ctx.clearRect(0, 0, width, height);
+
+            for (let angle = 0; angle < 360; angle += 1) {
+                const startAngle = (angle - 1) * toRad;
+                const endAngle = (angle + 1) * toRad;
+                
+                ctx.beginPath();
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                const grad = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(1, `hsl(${angle}, 100%, 50%)`);
+                
+                ctx.fillStyle = grad;
+                ctx.fill();
+            }
+        };
+
+        const pickColorFromCanvas = (x, y) => {
+            if (!colorWheelCanvas) return;
+            const ctx = colorWheelCanvas.getContext('2d', { willReadFrequently: true });
+            const rect = colorWheelCanvas.getBoundingClientRect();
+            
+            let canvasX = x - rect.left;
+            let canvasY = y - rect.top;
+            
+            const radius = colorWheelCanvas.width / 2;
+            const dx = canvasX - radius;
+            const dy = canvasY - radius;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > radius) {
+                const angle = Math.atan2(dy, dx);
+                canvasX = radius + Math.cos(angle) * (radius - 1);
+                canvasY = radius + Math.sin(angle) * (radius - 1);
+            }
+
+            const pixel = ctx.getImageData(Math.floor(canvasX), Math.floor(canvasY), 1, 1).data;
+            if (pixel[3] > 0) {
+                const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase()}`;
+                currentColorHex = hex;
+                if (colorWheelPreview) colorWheelPreview.style.background = hex;
+                if (colorWheelHex) colorWheelHex.textContent = hex;
+                if (colorWheelHandle) {
+                    colorWheelHandle.style.left = `${canvasX}px`;
+                    colorWheelHandle.style.top = `${canvasY}px`;
+                    colorWheelHandle.style.display = 'block';
+                }
+            }
+        };
+
+        const openColorWheelModal = () => {
+            if (!colorWheelModal) return;
+            colorWheelModal.style.display = 'flex';
+            drawColorWheel();
+            if (colorWheelPreview) colorWheelPreview.style.background = currentColorHex;
+            if (colorWheelHex) colorWheelHex.textContent = currentColorHex.toUpperCase();
+        };
+
+        const closeColorWheelModal = () => {
+            if (colorWheelModal) colorWheelModal.style.display = 'none';
+        };
+
+        if (colorWheelCanvas) {
+            let isDragging = false;
+            const startDrag = (e) => {
+                isDragging = true;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                pickColorFromCanvas(clientX, clientY);
+            };
+            const moveDrag = (e) => {
+                if (!isDragging) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                pickColorFromCanvas(clientX, clientY);
+            };
+            const endDrag = () => { isDragging = false; };
+
+            colorWheelCanvas.addEventListener('mousedown', startDrag);
+            colorWheelCanvas.addEventListener('mousemove', moveDrag);
+            window.addEventListener('mouseup', endDrag);
+
+            colorWheelCanvas.addEventListener('touchstart', startDrag, { passive: true });
+            colorWheelCanvas.addEventListener('touchmove', moveDrag, { passive: true });
+            window.addEventListener('touchend', endDrag);
+        }
+
+        // Quick Swatches inside Color Wheel
+        document.querySelectorAll('.cw-quick-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const hex = btn.getAttribute('data-hex');
+                if (hex) {
+                    currentColorHex = hex;
+                    if (colorWheelPreview) colorWheelPreview.style.background = hex;
+                    if (colorWheelHex) colorWheelHex.textContent = hex.toUpperCase();
+                }
+            });
+        });
+
+        if (colorWheelClose) {
+            colorWheelClose.addEventListener('click', closeColorWheelModal);
+        }
+
+        if (colorWheelModal) {
+            colorWheelModal.addEventListener('click', (e) => {
+                if (e.target === colorWheelModal) closeColorWheelModal();
+            });
+        }
+
+        if (colorWheelApply) {
+            colorWheelApply.addEventListener('click', () => {
+                localStorage.setItem('hkm_custom_verse_color', currentColorHex);
+                updateCustomBtnStyle(currentColorHex);
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    this.selectedVerses.forEach(v => {
+                        v.paragraph.setAttribute('data-highlight-color', 'custom');
+                        v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
+                    });
+                }
+                closeColorWheelModal();
+            });
         }
 
         // Color swatch listeners for bottom action sheet
@@ -1491,14 +1633,11 @@ class BibleReader {
                 e.stopPropagation();
                 const color = swatch.getAttribute('data-color');
                 if (color === 'custom' || color === 'multi') {
-                    if (customPickerInput) {
-                        customPickerInput.click();
-                    }
-                    const activeColor = customPickerInput ? customPickerInput.value : (savedCustomColor || '#a855f7');
+                    openColorWheelModal();
                     if (this.selectedVerses && this.selectedVerses.length > 0) {
                         this.selectedVerses.forEach(v => {
                             v.paragraph.setAttribute('data-highlight-color', 'custom');
-                            v.paragraph.style.setProperty('--custom-dotted-color', activeColor);
+                            v.paragraph.style.setProperty('--custom-dotted-color', currentColorHex);
                         });
                     }
                     return;
@@ -1510,22 +1649,6 @@ class BibleReader {
                 }
             });
         });
-
-        if (customPickerInput) {
-            const handleColorChange = (e) => {
-                const hexColor = e.target.value;
-                localStorage.setItem('hkm_custom_verse_color', hexColor);
-                updateCustomBtnStyle(hexColor);
-                if (this.selectedVerses && this.selectedVerses.length > 0) {
-                    this.selectedVerses.forEach(v => {
-                        v.paragraph.setAttribute('data-highlight-color', 'custom');
-                        v.paragraph.style.setProperty('--custom-dotted-color', hexColor);
-                    });
-                }
-            };
-            customPickerInput.addEventListener('input', handleColorChange);
-            customPickerInput.addEventListener('change', handleColorChange);
-        }
 
         // Prevent touch/pointer drag events inside bottom action sheet from closing it or triggering chapter swipe
         if (this.dom.verseToolbar) {

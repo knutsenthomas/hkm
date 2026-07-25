@@ -1901,6 +1901,103 @@
             line-height: 1.3;
         }
 
+        /* Color Wheel Modal */
+        .color-wheel-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .color-wheel-card {
+            background: var(--bg-card, #ffffff);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        html[data-theme="dark"] .color-wheel-card {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .color-wheel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .color-wheel-header h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--text-base);
+        }
+
+        .color-wheel-close-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .color-wheel-close-btn:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .cw-quick-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .cw-quick-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .color-wheel-apply-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--hkm-terracotta, #d17d39);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
+        }
+
+        .color-wheel-apply-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.4);
+        }
+
         .sheet-scrollable-row {
             display: flex;
             align-items: center;
@@ -2928,7 +3025,6 @@
                         <button class="color-swatch-circle" data-color="cyan" style="background: #38bdf8;" title="Blå"></button>
                         <div class="color-swatch-wrapper" style="position: relative; display: inline-flex; flex-shrink: 0;">
                             <button class="color-swatch-circle" id="custom-color-swatch-btn" data-color="custom" style="background: linear-gradient(135deg, #facc15, #4ade80, #38bdf8, #f472b6);" title="Velg egendefinert farge"></button>
-                            <input type="color" id="bible-custom-color-picker" style="position: absolute; top:0; left:0; width: 40px; height: 40px; opacity: 0; cursor: pointer; border: none; padding: 0;" value="#a855f7">
                         </div>
 
                         <div class="sheet-divider-v"></div>
@@ -2967,6 +3063,41 @@
                         <button id="toolbar-btn-clear" class="sheet-action-btn" title="Lukk" style="min-width: 40px; height: 58px; background: transparent; border: none; color: #94a3b8; padding: 0;">
                             <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Wheel Modal -->
+            <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;">
+                <div class="color-wheel-card">
+                    <div class="color-wheel-header">
+                        <h3>Velg farge</h3>
+                        <button id="color-wheel-close" class="color-wheel-close-btn" title="Lukk">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="color-wheel-body">
+                        <div class="wheel-canvas-container" style="position: relative; width: 220px; height: 220px; margin: 0 auto;">
+                            <canvas id="color-wheel-canvas" width="220" height="220" style="border-radius: 50%; cursor: crosshair; touch-action: none; box-shadow: 0 4px 16px rgba(0,0,0,0.15);"></canvas>
+                            <div id="color-wheel-picker-handle" style="position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); pointer-events: none; transform: translate(-50%, -50%); display: none;"></div>
+                        </div>
+                        
+                        <div class="color-wheel-preview-row" style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px;">
+                            <div id="color-wheel-preview" style="width: 36px; height: 36px; border-radius: 50%; background: #d17d39; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
+                            <span id="color-wheel-hex" style="font-weight: 700; font-family: monospace; font-size: 14px; color: var(--text-base);">#D17D39</span>
+                        </div>
+
+                        <div class="color-wheel-quick-swatches" style="display: flex; justify-content: center; gap: 8px; margin-top: 14px;">
+                            <button class="cw-quick-btn" data-hex="#d17d39" style="background: #d17d39;" title="Terrakotta"></button>
+                            <button class="cw-quick-btn" data-hex="#ec4899" style="background: #ec4899;" title="Rosa"></button>
+                            <button class="cw-quick-btn" data-hex="#8b5cf6" style="background: #8b5cf6;" title="Lilla"></button>
+                            <button class="cw-quick-btn" data-hex="#f59e0b" style="background: #f59e0b;" title="Ravgul"></button>
+                            <button class="cw-quick-btn" data-hex="#10b981" style="background: #10b981;" title="Smaragd"></button>
+                            <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Himmelblå"></button>
+                        </div>
+                    </div>
+                    <div class="color-wheel-footer" style="margin-top: 16px;">
+                        <button id="color-wheel-apply-btn" class="color-wheel-apply-btn">Bruk farge</button>
                     </div>
                 </div>
             </div>
