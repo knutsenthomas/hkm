@@ -55,6 +55,155 @@
             --hkm-bg-light: #f8fafc;
         }
 
+        /* ══════════════════════════════════════════════════════════════════
+           DARK MODE STYLES FOR KURS-DETALJER.HTML
+           ══════════════════════════════════════════════════════════════════ */
+        html[data-theme="dark"],
+        html[data-theme="dark"] body,
+        body.dark-theme,
+        body.dark-mode {
+            background-color: #0b1329 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .platform-container,
+        html[data-theme="dark"] .main-panel {
+            background-color: #0b1329 !important;
+        }
+
+        /* Left Sidebar (Course Modules & Lessons) in Dark Mode */
+        html[data-theme="dark"] .sidebar-nav {
+            background-color: #0f172a !important;
+            border-right-color: #1e293b !important;
+            color: #f8fafc !important;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        html[data-theme="dark"] .sidebar-header {
+            background: #0f172a !important;
+            border-bottom-color: #1e293b !important;
+        }
+
+        html[data-theme="dark"] .sidebar-title {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .module-group {
+            border-bottom-color: #1e293b !important;
+        }
+
+        html[data-theme="dark"] .module-header {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .module-header:hover {
+            background: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-list {
+            background: #0f172a !important;
+        }
+
+        html[data-theme="dark"] .lesson-item {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .lesson-item:hover {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-item.active {
+            background: rgba(209, 125, 57, 0.16) !important;
+            color: #ffffff !important;
+            border-left-color: var(--hkm-terracotta) !important;
+        }
+
+        /* Navigation Sub-bar under Video in Dark Mode */
+        html[data-theme="dark"] .lesson-nav-bar {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-btn {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-btn:hover {
+            background: #334155 !important;
+            color: var(--hkm-terracotta) !important;
+        }
+
+        html[data-theme="dark"] .lesson-nav-info {
+            color: #94a3b8 !important;
+        }
+
+        /* Breadcrumb & Headings in Dark Mode */
+        html[data-theme="dark"] .breadcrumb-trail,
+        html[data-theme="dark"] .breadcrumb-trail a {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .progress-label {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] .progress-bar-bg {
+            background: #334155 !important;
+        }
+
+        html[data-theme="dark"] .lesson-details-tabs {
+            border-bottom-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .tab-btn {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .tab-btn.active {
+            color: var(--hkm-terracotta) !important;
+            border-bottom-color: var(--hkm-terracotta) !important;
+        }
+
+        /* Teacher Card & Tab Contents in Dark Mode */
+        html[data-theme="dark"] .teacher-card,
+        html[data-theme="dark"] .resource-card,
+        html[data-theme="dark"] .discussion-comment-item,
+        html[data-theme="dark"] .comment-box,
+        html[data-theme="dark"] [style*="background: #ffffff"],
+        html[data-theme="dark"] [style*="background:#ffffff"] {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .teacher-card h3,
+        html[data-theme="dark"] .teacher-card h4,
+        html[data-theme="dark"] h2,
+        html[data-theme="dark"] h3,
+        html[data-theme="dark"] h4 {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .teacher-card p,
+        html[data-theme="dark"] p {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] textarea,
+        html[data-theme="dark"] input {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--hkm-bg-light);
