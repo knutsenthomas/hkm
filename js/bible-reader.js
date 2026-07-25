@@ -1734,13 +1734,22 @@ class BibleReader {
             swatch.addEventListener('touchend', applySwatchColor);
         });
 
-        // Prevent touch/pointer drag events inside bottom action sheet from closing it or triggering chapter swipe
+        // Swipe down to dismiss for bottom action sheet
         if (this.dom.verseToolbar) {
-            ['touchstart', 'touchmove', 'touchend', 'pointerdown', 'pointermove', 'pointerup'].forEach(evtType => {
-                this.dom.verseToolbar.addEventListener(evtType, (e) => {
-                    if (e.target.closest('.color-swatch-circle, button, a')) return;
-                    e.stopPropagation();
-                }, { passive: true });
+            this.setupBottomSheetSwipeDown(this.dom.verseToolbar, () => {
+                this.clearSelection();
+            });
+        }
+
+        // Swipe down to dismiss for verse note modal
+        const verseNoteCard = document.querySelector('#verse-note-modal .color-wheel-card');
+        if (verseNoteCard) {
+            const verseNoteModal = document.getElementById('verse-note-modal');
+            this.setupBottomSheetSwipeDown(verseNoteCard, () => {
+                if (verseNoteModal) {
+                    verseNoteModal.classList.remove('active');
+                    verseNoteModal.style.display = 'none';
+                }
             });
         }
 
@@ -3225,7 +3234,6 @@ class BibleReader {
             // Remove highlight by deleting the overlapping bookmark
             this.bookmarks = this.bookmarks.filter(b => b.id !== overlappingBookmark.id);
         } else {
-            // Add highlight
             this.bookmarks.push({
                 id: Date.now().toString(),
                 ref: fullRef,
@@ -3240,6 +3248,63 @@ class BibleReader {
         this.safeSetLocalStorage('hkm_bible_bookmarks', JSON.stringify(this.bookmarks));
         this.renderBookmarksList();
         this.restoreHighlights();
+    }
+
+    setupBottomSheetSwipeDown(element, closeCallback) {
+        if (!element) return;
+        let startY = 0;
+        let currentDeltaY = 0;
+        let isDragging = false;
+
+        const onTouchStart = (e) => {
+            if (e.target.closest('.color-swatch-circle, button, a, input, textarea')) return;
+            const touch = e.touches[0];
+            startY = touch.clientY;
+            currentDeltaY = 0;
+            isDragging = true;
+            element.style.transition = 'none';
+        };
+
+        const onTouchMove = (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const deltaY = touch.clientY - startY;
+            
+            if (deltaY > 0) {
+                if (e.cancelable) e.preventDefault();
+                currentDeltaY = deltaY;
+                element.style.transform = `translateY(${deltaY}px)`;
+                element.style.opacity = `${Math.max(0.3, 1 - deltaY / 250)}`;
+            }
+        };
+
+        const onTouchEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            element.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
+            
+            if (currentDeltaY > 50) {
+                element.style.transform = 'translateY(100%)';
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.style.transform = '';
+                    element.style.opacity = '';
+                    element.style.transition = '';
+                    if (typeof closeCallback === 'function') closeCallback();
+                }, 240);
+            } else {
+                element.style.transform = 'translateY(0)';
+                element.style.opacity = '1';
+                setTimeout(() => {
+                    element.style.transition = '';
+                }, 240);
+            }
+            currentDeltaY = 0;
+        };
+
+        element.addEventListener('touchstart', onTouchStart, { passive: false });
+        element.addEventListener('touchmove', onTouchMove, { passive: false });
+        element.addEventListener('touchend', onTouchEnd);
     }
 
     saveVerseHighlight(verseNum, color, customHex = null) {
