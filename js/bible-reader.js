@@ -8558,7 +8558,12 @@ class BibleReader {
                     <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
                 </button>
             `;
-            document.body.appendChild(playerBar);
+            const floatingNav = document.getElementById('floating-bible-nav');
+            if (floatingNav) {
+                floatingNav.insertBefore(playerBar, floatingNav.firstChild);
+            } else {
+                document.body.appendChild(playerBar);
+            }
 
             // Bind player bar events
             document.getElementById('audio-play-pause-toggle').addEventListener('click', () => this.toggleAudioPause());

@@ -3567,22 +3567,24 @@
 
             <!-- Central Reading Area Bottom Floating Navigation -->
             <div class="floating-bible-nav" id="floating-bible-nav">
-                <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
-                    <span class="material-symbols-outlined">chevron_left</span>
-                </button>
-                <div class="floating-nav-info" id="floating-nav-info-pill" title="Velg bok og kapittel">
-                    <span id="floating-nav-book">JOHANNES</span>
-                    <span id="floating-nav-chapter">1</span>
+                <div class="floating-nav-main-row">
+                    <button class="floating-nav-btn" id="floating-prev-btn" title="Forrige kapittel">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <div class="floating-nav-info" id="floating-nav-info-pill" title="Velg bok og kapittel">
+                        <span id="floating-nav-book">JOHANNES</span>
+                        <span id="floating-nav-chapter">1</span>
+                    </div>
+                    <button class="floating-nav-btn" id="floating-next-btn" title="Neste kapittel">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                    <button class="floating-nav-btn" id="floating-reading-mode-btn" title="Aktiver lesemodus">
+                        <span class="material-symbols-outlined">chrome_reader_mode</span>
+                    </button>
+                    <button class="floating-nav-btn" id="floating-settings-btn" title="Innstillinger & verktøy">
+                        <span class="material-symbols-outlined">tune</span>
+                    </button>
                 </div>
-                <button class="floating-nav-btn" id="floating-next-btn" title="Neste kapittel">
-                    <span class="material-symbols-outlined">chevron_right</span>
-                </button>
-                <button class="floating-nav-btn" id="floating-reading-mode-btn" title="Aktiver lesemodus">
-                    <span class="material-symbols-outlined">chrome_reader_mode</span>
-                </button>
-                <button class="floating-nav-btn" id="floating-settings-btn" title="Innstillinger & verktøy">
-                    <span class="material-symbols-outlined">tune</span>
-                </button>
                 
                 <!-- Backdrop Overlay for Floating Sheets & Popovers -->
                 <div id="hkm-sheet-backdrop-overlay" class="sheet-overlay-backdrop" onclick="document.querySelectorAll('.floating-settings-popover, .floating-chapter-popover').forEach(el => el.classList.remove('active')); this.classList.remove('active');"></div>
