@@ -8405,7 +8405,20 @@ class BibleReader {
                 console.log("Playing ChatGPT AI audio:", audioUrl);
                 this.bibleAudio = new Audio(audioUrl);
                 this.bibleAudio.playbackRate = this.audioSpeed || 1.0;
-                this.bibleAudio.onended = () => this.stopAudioPlayback();
+                this.bibleAudio.onended = async () => {
+                    console.log("[BibleAudio] Chapter finished. Auto-advancing to next chapter for continuous reading...");
+                    if (this.dom && this.dom.readingPane) {
+                        this.dom.readingPane.querySelectorAll('.audio-playing-highlight').forEach(el => el.classList.remove('audio-playing-highlight'));
+                    }
+                    if (this.audioIsPlaying) {
+                        await this.nextChapter();
+                        setTimeout(() => {
+                            if (this.audioIsPlaying) {
+                                this.playAudioForCurrentChapter();
+                            }
+                        }, 400);
+                    }
+                };
                 this.bibleAudio.onerror = (err) => {
                     console.error("[BibleAudio] Audio playback error:", err);
                     alert("Feil under avspilling av ChatGPT AI-lydfilen.");
