@@ -2555,7 +2555,7 @@ class ContentManager {
             pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
                 || (sectionLink?.getAttribute('href') || '').trim(),
             feedUrl: (typeof feedContent.feedUrl === 'string' ? feedContent.feedUrl.trim() : ''),
-            feedSource: typeof feedContent.feedSource === 'string' ? feedContent.feedSource.trim() : 'rss',
+            feedSource: typeof feedContent.feedSource === 'string' && feedContent.feedSource.trim() !== 'meta' ? feedContent.feedSource.trim() : 'juicer',
             juicerFeedId: typeof feedContent.juicerFeedId === 'string' ? feedContent.juicerFeedId.trim() : 'hiskingdomministry777'
         };
     }
@@ -2847,7 +2847,7 @@ class ContentManager {
             if (imageEl) {
                 const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
                 const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
-                const effectiveImage = liveImage || fallbackSrc;
+                const effectiveImage = liveImage || (config.useLiveFeed ? '' : fallbackSrc);
 
                 if (effectiveImage) {
                     if (imageEl.getAttribute('src') !== effectiveImage) {
