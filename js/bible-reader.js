@@ -1049,11 +1049,13 @@ class BibleReader {
         const pane = this.dom.readingPane ? this.dom.readingPane.closest('.bible-content-pane') : null;
         if (pane) {
             pane.addEventListener('touchstart', (e) => {
+                if (this.dom.verseToolbar && this.dom.verseToolbar.contains(e.target)) return;
                 touchstartX = e.changedTouches[0].screenX;
                 touchstartY = e.changedTouches[0].screenY;
             }, { passive: true });
 
             pane.addEventListener('touchend', (e) => {
+                if (this.dom.verseToolbar && this.dom.verseToolbar.contains(e.target)) return;
                 touchendX = e.changedTouches[0].screenX;
                 touchendY = e.changedTouches[0].screenY;
                 
@@ -1479,6 +1481,15 @@ class BibleReader {
             });
         });
 
+        // Prevent touch/pointer drag events inside bottom action sheet from closing it or triggering chapter swipe
+        if (this.dom.verseToolbar) {
+            ['touchstart', 'touchmove', 'touchend', 'pointerdown', 'pointermove', 'pointerup'].forEach(evtType => {
+                this.dom.verseToolbar.addEventListener(evtType, (e) => {
+                    e.stopPropagation();
+                }, { passive: true });
+            });
+        }
+
         // Hide toolbar, clear highlight, and show/hide floating nav on scroll in content pane
         const mainContentPane = document.querySelector('.bible-content-pane');
         const floatingNav = document.getElementById('floating-bible-nav');
@@ -1490,10 +1501,7 @@ class BibleReader {
                 const scrollDiff = Math.abs(scrollTop - lastScrollTop);
                 
                 if (scrollDiff > 10) {
-                    if (this.dom.verseToolbar) {
-                        this.dom.verseToolbar.style.display = 'none';
-                    }
-                    // Clear highlighted verse if the user scrolls manually
+                    // Clear highlighted search verse if the user scrolls manually
                     if (this.highlightedVerseElement && !this.isProgrammaticScrolling) {
                         this.highlightedVerseElement.classList.remove('verse-temp-highlight');
                         this.highlightedVerseElement = null;
