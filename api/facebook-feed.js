@@ -89,6 +89,34 @@ function resolveFacebookPostImage(post) {
     );
 }
 
+function getFallbackImageByContent(text) {
+    if (!text || typeof text !== 'string') return '/img/fb_fallback_bible.jpg';
+    const norm = text.toLowerCase();
+    
+    // Bazaar / summer bazaar / gifts
+    if (/basar|bazaar|sommerbasar|gave|butikk|design|kjøp|vipps/i.test(norm)) {
+        return '/img/fb_fallback_bazaar.jpg';
+    }
+    // Worship / music / podcast
+    if (/lovsang|worship|lovsynge|podcast|spotify|youtube|episode|sang|musikk|lytt/i.test(norm)) {
+        return '/img/fb_fallback_worship.jpg';
+    }
+    // Bible / study / reading / teaching
+    if (/bibel|bible|tidslinje|leseplan|undervisning|studie|skrift|ordet/i.test(norm)) {
+        return '/img/fb_fallback_bible.jpg';
+    }
+    // Church / prophetic / gathering
+    if (/kirke|church|dallas|walls|shake|prophetic|samling|møte|fellesskap/i.test(norm)) {
+        return '/img/fb_fallback_church.jpg';
+    }
+    // Prayer / faith
+    if (/bønn|pray|gud|jesus|lord|tro|hjerte|faith|åndelig/i.test(norm)) {
+        return '/img/fb_fallback_prayer.jpg';
+    }
+    
+    return '/img/fb_fallback_bible.jpg';
+}
+
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
     const message = typeof post.message === "string" ? post.message.trim() : "";
     const lines = message.split(/\n+/).map((line) => line.trim()).filter(Boolean);
@@ -109,9 +137,40 @@ function normalizeFacebookPost(post, index, fallbackPageUrl) {
         link: (typeof post.permalink_url === "string" && post.permalink_url.trim())
             ? post.permalink_url.trim()
             : fallbackPageUrl,
-        image: resolveFacebookPostImage(post),
+        image: resolveFacebookPostImage(post) || getFallbackImageByContent(message + " " + title),
         source: 'Facebook'
     };
+}
+
+async function fetchOpenGraphImage(url) {
+    if (!url || typeof url !== 'string') return '';
+    const isFetchable = /spotify|youtube|youtu\.be|wix|hiskingdomministry/i.test(url);
+    if (!isFetchable) return '';
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
+            },
+            timeout: 2500
+        });
+        if (!response.ok) return '';
+        const html = await response.text();
+        const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                             html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+                             html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+                             
+        if (ogImageMatch && ogImageMatch[1]) {
+            let imgUrl = ogImageMatch[1].trim();
+            if (imgUrl.startsWith('//')) {
+                imgUrl = 'https:' + imgUrl;
+            }
+            return imgUrl.replace(/&amp;/g, '&');
+        }
+    } catch (e) {
+        console.warn(`[OG Scraper] Failed to fetch OG image from ${url}:`, e.message);
+    }
+    return '';
 }
 
 export default async function handler(req, res) {
@@ -196,9 +255,17 @@ export default async function handler(req, res) {
         }
 
         const rawItems = Array.isArray(payload.data) ? payload.data : [];
-        const items = rawItems
-            .map((post, idx) => normalizeFacebookPost(post, idx, pageUrl))
-            .filter(item => item && (item.link || item.title || item.excerpt));
+        const items = await Promise.all(rawItems.map(async (post, idx) => {
+            const item = normalizeFacebookPost(post, idx, pageUrl);
+            if (item && !item.image && item.link) {
+                const ogImage = await fetchOpenGraphImage(item.link);
+                if (ogImage) {
+                    item.image = ogImage;
+                }
+            }
+            return item;
+        }));
+        const filteredItems = items.filter(item => item && (item.link || item.title || item.excerpt));
 
         // Cache-Control header: Cache at the Edge for 10 minutes, serve stale up to 5 mins while revalidating
         res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=300');
@@ -206,8 +273,8 @@ export default async function handler(req, res) {
             ok: true,
             pageUrl: pageUrl,
             resolvedPageId: pageId,
-            count: items.length,
-            items
+            count: filteredItems.length,
+            items: filteredItems
         });
     } catch (err) {
         console.error('[Facebook API Proxy] Internal Server Error:', err);
