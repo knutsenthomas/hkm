@@ -8049,13 +8049,14 @@ body.dark-mode .audio-voice-select option {
 /* Mobile responsive adjustments for sticky audio player bar to prevent overflow */
 @media (max-width: 640px) {
     .hkm-audio-player-bar {
-        padding: 8px 14px;
-        gap: 8px;
-        width: calc(100% - 24px);
-        border-radius: 28px;
+        padding: 6px 10px;
+        gap: 6px;
+        width: 100%;
+        border-radius: 16px;
     }
     .hkm-audio-player-bar.active {
-        bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+        padding: 6px 10px;
+        margin-bottom: 6px;
     }
     .audio-info-display {
         font-size: 11px;
