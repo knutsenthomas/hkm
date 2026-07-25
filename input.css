@@ -7909,6 +7909,7 @@ body.dark-mode .hkm-audio-player-bar {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
     pointer-events: auto;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 .audio-controls-group {
@@ -8048,8 +8049,10 @@ body.dark-mode .audio-voice-select option {
         padding: 8px 14px;
         gap: 8px;
         width: calc(100% - 24px);
-        bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px)));
         border-radius: 28px;
+    }
+    .hkm-audio-player-bar.active {
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
     }
     .audio-info-display {
         font-size: 11px;
