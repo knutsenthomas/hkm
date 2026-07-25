@@ -23371,7 +23371,7 @@ class AdminManager {
                 if (coursePriceSuffixInput) coursePriceSuffixInput.value = course.priceSuffix || '';
                 document.getElementById('course-image').value = course.imageUrl || '';
 
-                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id, l.resource, l.resourceUrl, l.description));
+                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl, l.price, l.date, l.zoomUrl, l.id, l.resource, l.resourceUrl, l.description, l.resources));
             } catch (err) { console.error(err); }
         } else {
             title.textContent = 'Nytt kurs';
@@ -23417,7 +23417,7 @@ class AdminManager {
         if (modal) modal.style.display = 'none';
     }
 
-    _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '', resource = '', resourceUrl = '', description = '') {
+    _addLessonRow(lessonTitle = '', videoUrl = '', price = '', date = '', zoomUrl = '', lessonId = '', resource = '', resourceUrl = '', description = '', resources = null) {
         const container = document.getElementById('lessons-container');
         if (!container) return;
         const index = container.children.length + 1;
@@ -23427,6 +23427,16 @@ class AdminManager {
         // Preserve or generate unique ID for this lesson
         const id = lessonId || `lesson_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         row.dataset.id = id;
+
+        // Prepare existing resources array
+        let initialResources = [];
+        if (Array.isArray(resources) && resources.length > 0) {
+            initialResources = resources.map(r => typeof r === 'string' ? { title: r, url: '#' } : { title: r.title || r.name || '', url: r.url || r.link || '' });
+        } else if (resource || resourceUrl) {
+            initialResources = [{ title: resource || '', url: resourceUrl || '' }];
+        } else {
+            initialResources = [{ title: '', url: '' }];
+        }
 
         row.style.cssText = 'display:flex;flex-direction:column;gap:10px;background:#f8fafc;padding:16px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;position:relative;';
         row.innerHTML = `
@@ -23452,18 +23462,18 @@ class AdminManager {
                 <input type="url" placeholder="Videoopptak URL (f.eks. Vimeo)" value="${videoUrl}"
                     style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-video admin-input">
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <input type="text" placeholder="Ressurs-navn (f.eks. Arbeidsark PDF)" value="${resource}"
-                    style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource admin-input">
-                <div style="display:flex;gap:8px;">
-                    <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${resourceUrl}"
-                        style="flex:1;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.85rem;" class="lesson-resource-url admin-input">
-                    <button type="button" class="lesson-upload-btn" style="padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;line-height:1;" title="Last opp fil fra mobil/PC">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;transform:none !important;line-height:1;">cloud_upload</span>
+
+            <!-- Multi-resource upload section -->
+            <div style="display:flex;flex-direction:column;gap:8px;background:#ffffff;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <label style="font-weight:600;font-size:0.85rem;color:#1e293b;">Ressurser & Vedlegg (filopplasting til kurssiden)</label>
+                    <button type="button" class="add-resource-row-btn" style="background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size:1rem;color:#1B4965;">add</span> Legg til ressurs / fil
                     </button>
-                    <input type="file" class="lesson-file-input" style="display:none;">
                 </div>
+                <div class="lesson-resources-container" style="display:flex;flex-direction:column;gap:8px;"></div>
             </div>
+
             <div style="display:flex;flex-direction:column;gap:4px;">
                 <label style="font-weight:600;font-size:0.85rem;color:#1e293b;margin-bottom:2px;">Beskrivelse / Tekstinnhold</label>
                 <div class="rte-wrapper">
@@ -23487,40 +23497,74 @@ class AdminManager {
         `;
         container.appendChild(row);
 
-        // Wire up file upload listeners
-        const uploadBtn = row.querySelector('.lesson-upload-btn');
-        const fileInput = row.querySelector('.lesson-file-input');
-        const urlInput = row.querySelector('.lesson-resource-url');
+        // Populate resource rows
+        const resourcesContainer = row.querySelector('.lesson-resources-container');
+        const addResourceBtn = row.querySelector('.add-resource-row-btn');
 
-        if (uploadBtn && fileInput && urlInput) {
-            uploadBtn.addEventListener('click', () => fileInput.click());
+        const appendResourceRow = (rTitle = '', rUrl = '') => {
+            const rRow = document.createElement('div');
+            rRow.className = 'lesson-resource-row';
+            rRow.style.cssText = 'display:grid;grid-template-columns:1fr 1.2fr auto;gap:8px;align-items:center;';
+            rRow.innerHTML = `
+                <input type="text" placeholder="Ressurs-navn (f.eks. Arbeidsark PDF)" value="${rTitle}"
+                    style="padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;" class="resource-item-name admin-input">
+                <div style="display:flex;gap:6px;">
+                    <input type="url" placeholder="Ressurs URL (Lenke til fil/nettside)" value="${rUrl}"
+                        style="flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.85rem;" class="resource-item-url admin-input">
+                    <button type="button" class="resource-upload-btn" style="padding:8px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #e2e8f0;background:white;line-height:1;" title="Last opp fil fra mobil/PC">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;line-height:1;">cloud_upload</span>
+                    </button>
+                    <input type="file" class="resource-file-input" style="display:none;">
+                </div>
+                <button type="button" class="resource-remove-btn" style="background:#fee2e2;color:#ef4444;border:none;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" title="Fjern denne ressursen">✕</button>
+            `;
+            resourcesContainer.appendChild(rRow);
 
-            fileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
+            const uploadBtn = rRow.querySelector('.resource-upload-btn');
+            const fileInput = rRow.querySelector('.resource-file-input');
+            const urlInput = rRow.querySelector('.resource-item-url');
+            const nameInput = rRow.querySelector('.resource-item-name');
+            const removeBtn = rRow.querySelector('.resource-remove-btn');
 
-                uploadBtn.disabled = true;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem; animation: spin 1.5s linear infinite; display: inline-block;">sync</span>';
+            removeBtn.addEventListener('click', () => rRow.remove());
 
-                try {
-                    const url = await firebaseService.uploadFile(
-                        file,
-                        `course_resources/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
-                        ['image/', 'application/', 'text/', 'audio/', 'video/'],
-                        50, // 50MB max
-                        null,
-                        { timeoutMs: 180000 } // 3 min timeout
-                    );
-                    urlInput.value = url;
-                } catch (err) {
-                    console.error('Resource file upload error:', err);
-                    alert('Feil ved filopplasting: ' + err.message);
-                } finally {
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;">cloud_upload</span>';
-                    fileInput.value = '';
-                }
-            });
+            if (uploadBtn && fileInput && urlInput) {
+                uploadBtn.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    uploadBtn.disabled = true;
+                    uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem; animation: spin 1.5s linear infinite; display: inline-block;">sync</span>';
+
+                    try {
+                        const uploadedUrl = await firebaseService.uploadFile(
+                            file,
+                            `course_resources/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`,
+                            ['image/', 'application/', 'text/', 'audio/', 'video/'],
+                            50,
+                            null,
+                            { timeoutMs: 180000 }
+                        );
+                        urlInput.value = uploadedUrl;
+                        if (!nameInput.value.trim()) {
+                            nameInput.value = file.name;
+                        }
+                    } catch (err) {
+                        console.error('Resource file upload error:', err);
+                        alert('Feil ved filopplasting: ' + err.message);
+                    } finally {
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.1rem;color:#1B4965;">cloud_upload</span>';
+                        fileInput.value = '';
+                    }
+                });
+            }
+        };
+
+        initialResources.forEach(r => appendResourceRow(r.title, r.url));
+        if (addResourceBtn) {
+            addResourceBtn.addEventListener('click', () => appendResourceRow('', ''));
         }
 
         // Wire up rich text editor toolbar
@@ -23571,7 +23615,6 @@ class AdminManager {
     }
 
     async _saveCourse() {
-        const btn = document.getElementById('save-course-btn');
         const status = document.getElementById('course-save-status');
         const editCourseKey = document.getElementById('course-id').value;
 
@@ -23583,9 +23626,20 @@ class AdminManager {
             const p = parseInt(row.querySelector('.lesson-price')?.value) || 0;
             const d = row.querySelector('.lesson-date')?.value || '';
             const z = row.querySelector('.lesson-zoom')?.value?.trim() || '';
-            const r = row.querySelector('.lesson-resource')?.value?.trim() || '';
-            const ru = row.querySelector('.lesson-resource-url')?.value?.trim() || '';
             const desc = row.querySelector('.lesson-description')?.innerHTML?.trim() || '';
+
+            const resourceRows = row.querySelectorAll('.lesson-resource-row');
+            const resourcesList = [];
+            resourceRows.forEach(rRow => {
+                const rName = rRow.querySelector('.resource-item-name')?.value?.trim() || '';
+                const rUrl = rRow.querySelector('.resource-item-url')?.value?.trim() || '';
+                if (rName || rUrl) {
+                    resourcesList.push({ title: rName || 'Dokument', url: rUrl });
+                }
+            });
+
+            const firstRes = resourcesList[0] || { title: '', url: '' };
+
             if (t) {
                 lessons.push({
                     id,
