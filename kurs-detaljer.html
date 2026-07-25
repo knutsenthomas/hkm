@@ -952,7 +952,7 @@
         <main class="main-panel">
             <!-- Top Breadcrumb & Progress Bar -->
             <div class="panel-top-bar">
-                <h2 id="course-lesson-heading" style="font-size: 1.25rem; font-weight: 500; color: var(--hkm-navy); margin: 0; letter-spacing: -0.01em;">Seerkurs med aktivering – Leksjon 1.1</h2>
+                <h2 id="course-lesson-heading" style="font-size: 1.25rem; margin: 0; letter-spacing: -0.01em;"><span style="font-weight: 400; color: #475569;">Seerkurs med aktivering – Leksjon 1:</span> <strong style="font-weight: 750; color: var(--hkm-navy);">Hvordan se i ånden</strong></h2>
 
                 <div class="progress-wrapper">
                     <span class="progress-label">70% Fullført</span>
@@ -1486,7 +1486,7 @@
             const courseHeading = document.getElementById('course-lesson-heading');
             if (courseHeading && currentCourse) {
                 const cleanDisplayTitle = (lesson.title || `Leksjon ${index + 1}`).replace(/^leksjon\s+\d+:\s*/i, '');
-                courseHeading.textContent = `${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}: ${cleanDisplayTitle}`;
+                courseHeading.innerHTML = `<span style="font-weight: 400; color: #475569;">${currentCourse.title || 'Kurs'} – Leksjon ${index + 1}:</span> <strong style="font-weight: 750; color: var(--hkm-navy);">${cleanDisplayTitle}</strong>`;
             }
 
             const overviewTitle = document.getElementById('lesson-overview-title');
