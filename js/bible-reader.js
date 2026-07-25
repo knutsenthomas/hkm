@@ -4523,8 +4523,23 @@ class BibleReader {
                     });
                 }
             });
+        // Match Bible Structure guide
+        try {
+            const bibleStructureKeywords = ['bibel', 'testament', 'oppbygning', 'sjanger', 'lese', 'leseguide', 'mosebok', 'evangelie', 'profet', 'brev', 'structure', 'genre', 'books'];
+            if (bibleStructureKeywords.some(k => term.includes(k))) {
+                const lang = document.documentElement.lang || 'no';
+                const link = lang === 'en' ? '/en/ressurser/bibeloppbygning' : (lang === 'es' ? '/es/ressurser/bibeloppbygning' : '/ressurser/bibeloppbygning');
+                const title = lang === 'en' ? 'Structure of the Bible & Genres' : (lang === 'es' ? 'Estructura de la Biblia y Géneros' : 'Bibelens oppbygning og sjangre');
+                results.push({
+                    title: title,
+                    type: 'Ressurs / Guide',
+                    icon: 'auto_stories',
+                    link: link,
+                    thumbnail: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+                });
+            }
         } catch (e) {
-            console.error("Error matching timelines in searchLocalResources:", e);
+            console.error("Error matching bible structure resource:", e);
         }
 
         return results;

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!-- Theme Initializer -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('hkm_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const hour = new Date().getHours();
+                const isNight = hour >= 22 || hour < 6;
+                const systemTheme = isNight || window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', systemTheme);
+            }
+        })();
+    </script>
+    <link rel="canonical" href="https://www.hiskingdomministry.no/es/ressurser/bibeloppbygning">
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/ressurser/bibeloppbygning">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/ressurser/bibeloppbygning">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/ressurser/bibeloppbygning">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/ressurser/bibeloppbygning">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estructura de la Biblia (AT y NT) y Guía de Lectura | His Kingdom Ministry</title>
+    <meta name="description" content="Aprende cómo está estructurada la Biblia en 66 libros repartidos entre el Antiguo Testamento (AT) y el Nuevo Testamento (NT), géneros literarios y estrategias de lectura.">
+    <meta name="keywords" content="Estructura de la Biblia, Antiguo Testamento, Nuevo Testamento, AT, NT, evangelios, pentateuco, profetas, epístolas, guía de lectura bíblica">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/es/ressurser/bibeloppbygning">
+    <meta property="og:title" content="Estructura de la Biblia (AT y NT) y Guía de Lectura | His Kingdom Ministry">
+    <meta property="og:description" content="Una guía completa de los 66 libros de la Biblia, géneros literarios del AT y NT, y estrategias efectivas para leer las Escrituras.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/es/ressurser/bibeloppbygning">
+    <meta property="twitter:title" content="Estructura de la Biblia (AT y NT) y Guía de Lectura">
+    <meta property="twitter:description" content="Guía completa de los 66 libros de la Biblia, géneros y planes de lectura.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../style.css?v=2026.06.21.10.01">
+    <link rel="stylesheet" href="../../input.css">
+    <link rel="preload" href="../../css/search-v2.css?v=1.0.3" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="../../css/search-v2.css?v=1.0.3"></noscript>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": "Estructura de la Biblia (AT y NT) y Guía de Lectura",
+        "description": "Una guía completa de los 66 libros de la Biblia divididos en Antiguo Testamento y Nuevo Testamento, géneros literarios y planes de lectura.",
+        "url": "https://www.hiskingdomministry.no/es/ressurser/bibeloppbygning",
+        "inLanguage": "es",
+        "educationalLevel": "Principiante a Avanzado",
+        "learningResourceType": "Guía / Recurso",
+        "publisher": {
+            "@type": "Organization",
+            "name": "His Kingdom Ministry",
+            "url": "https://www.hiskingdomministry.no"
+        }
+    }
+    </script>
+
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(209, 125, 57, 0.12) 0%, rgba(27, 73, 101, 0.15) 100%);
+        }
+        html[data-theme="dark"] .hero-gradient {
+            background: linear-gradient(135deg, rgba(209, 125, 57, 0.22) 0%, rgba(15, 23, 42, 0.95) 100%);
+        }
+        .section-card {
+            background: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+            border-radius: 20px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+            border-color: rgba(209, 125, 57, 0.3);
+        }
+        html[data-theme="dark"] .section-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .badge-pill {
+            background: rgba(209, 125, 57, 0.12);
+            color: #d17d39;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        html[data-theme="dark"] .badge-pill {
+            background: rgba(209, 125, 57, 0.25);
+            color: #f39c12;
+        }
+        .tab-btn-pill {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted, #64748b);
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn-pill.active {
+            background: #d17d39;
+            color: #ffffff;
+            border-color: #d17d39;
+            box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3);
+        }
+        .book-chip {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-base, #334155);
+            display: inline-block;
+            margin: 3px 2px;
+        }
+        html[data-theme="dark"] .book-chip {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+
+<body class="cms-loading header-dark-start bg-[#faf9f6] text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="header-content" id="header-container">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div class="w-[45px] h-[45px] flex items-center justify-center rounded-lg overflow-hidden shrink-0 logo-icon">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <div class="header-actions">
+                <div class="header-actions-dock">
+                    <button id="global-search-opener" class="w-9 h-9 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Buscar en el sitio">
+                        <span class="material-symbols-outlined text-xl" style="position: relative; top: 0px; left: 9px;">search</span>
+                    </button>
+                    
+                    <div class="header-actions-expandable">
+                        <a href="/es/bibel" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Leer la Biblia" title="Leer la Biblia">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </a>
+                        <a href="/es/leseplaner" class="hidden md:flex w-9 h-9 items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all" aria-label="Planes de lectura" title="Planes de lectura">
+                            <span class="material-symbols-outlined text-xl">calendar_today</span>
+                        </a>
+                        
+                        <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+
+                        <div class="lang-switcher relative group">
+                            <button class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full text-white hover:bg-white/15 transition-all lang-btn" aria-label="Seleccionar idioma">
+                                <span class="material-symbols-outlined text-lg">language</span>
+                                <span>ES</span>
+                            </button>
+                            <div class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden border border-gray-100">
+                                <a href="/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
+                                <a href="/en/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇺🇸 English</a>
+                                <a href="/es/ressurser/bibeloppbygning" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇪🇸 Español</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/minside/index.html" class="w-11 h-11 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all relative overflow-hidden hidden" aria-label="Mi Cuenta" title="Mi Cuenta">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-28 pb-16 px-4 max-w-6xl mx-auto w-full">
+
+        <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6" aria-label="Breadcrumb">
+            <a href="/es/" class="hover:text-amber-700 transition-colors">Inicio</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <a href="/es/media" class="hover:text-amber-700 transition-colors">Recursos</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <span class="font-semibold text-slate-800 dark:text-slate-200">Estructura de la Biblia</span>
+        </nav>
+
+        <!-- Hero Header -->
+        <div class="hero-gradient p-8 md:p-12 rounded-3xl mb-10 border border-amber-500/20 relative overflow-hidden">
+            <div class="max-w-3xl relative z-10">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="badge-pill">
+                        <span class="material-symbols-outlined text-base">auto_stories</span>
+                        66 Libros
+                    </span>
+                    <span class="badge-pill">
+                        <span class="material-symbols-outlined text-base">history_edu</span>
+                        Escrita en 1.000+ Años
+                    </span>
+                    <span class="badge-pill">
+                        <span class="material-symbols-outlined text-base">menu_book</span>
+                        AT (39) y NT (27)
+                    </span>
+                </div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
+                    Estructura de la Biblia y Géneros
+                </h1>
+                <p class="text-base md:text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
+                    La Biblia es en la práctica una pequeña biblioteca escrita por más de 40 autores a lo largo de más de 1.000 años. Para facilitar la navegación, se divide en el Antiguo Testamento (AT) y el Nuevo Testamento (NT), agrupados en distintos géneros literarios.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-4">
+                    <a href="/es/bibel" class="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-all">
+                        <span class="material-symbols-outlined">menu_book</span>
+                        Abrir Biblia en Línea
+                    </a>
+                    <a href="#leseguide" onclick="switchSection('leseguide')" class="inline-flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:scale-[1.02] transition-all">
+                        <span class="material-symbols-outlined">explore</span>
+                        Ver Guía de Lectura
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex flex-wrap gap-2">
+                <button class="tab-btn-pill active" onclick="switchSection('gt', event)">
+                    <span class="material-symbols-outlined text-base align-sub">history</span> Antiguo Testamento (39)
+                </button>
+                <button class="tab-btn-pill" onclick="switchSection('nt', event)">
+                    <span class="material-symbols-outlined text-base align-sub">auto_awesome</span> Nuevo Testamento (27)
+                </button>
+                <button class="tab-btn-pill" onclick="switchSection('leseguide', event)">
+                    <span class="material-symbols-outlined text-base align-sub">lightbulb</span> Guía de Lectura
+                </button>
+            </div>
+            <div class="relative w-full md:w-64">
+                <input type="text" id="genre-search" onkeyup="filterGenres()" placeholder="Buscar libro o género..." class="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-all">
+                <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-lg">search</span>
+            </div>
+        </div>
+
+        <!-- SECTION 1: ANTIGUO TESTAMENTO (AT) -->
+        <section id="section-gt" class="space-y-6">
+            <div class="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-600 text-3xl">menu_book</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Antiguo Testamento (39 libros)</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Escrito en hebreo (y algo de arameo). Trata sobre la creación, la historia de Israel, leyes y profecías.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Ley / Pentateuco -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 1</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">5 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">La Ley (Pentateuco / Torá)</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> La creación, los patriarcas (Abraham, Isaac, Jacob), el Éxodo de Egipto, los Diez Mandamientos y la alianza con Israel.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBROS INCLUIDOS:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Génesis</span>
+                            <span class="book-chip">Éxodo</span>
+                            <span class="book-chip">Levítico</span>
+                            <span class="book-chip">Números</span>
+                            <span class="book-chip">Deuteronomio</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=GEN&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Pentateuco</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Libros Históricos -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 2</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">12 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Libros Históricos</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Conquista de la Tierra Prometida, edad de oro del reino (David y Salomón), división del reino, exilio en Babilonia y retorno.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBROS INCLUIDOS:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Josué</span>
+                            <span class="book-chip">Jueces</span>
+                            <span class="book-chip">Rut</span>
+                            <span class="book-chip">1 y 2 Samuel</span>
+                            <span class="book-chip">1 y 2 Reyes</span>
+                            <span class="book-chip">1 y 2 Crónicas</span>
+                            <span class="book-chip">Esdras</span>
+                            <span class="book-chip">Nehemías</span>
+                            <span class="book-chip">Ester</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=JOS&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Libros Históricos</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Sabiduría y Poesía -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 3</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">5 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Sabiduría y Poesía</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Oraciones, alabanzas, reflexiones sobre el sufrimiento y la justicia, y sabiduría práctica.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBROS INCLUIDOS:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Job</span>
+                            <span class="book-chip">Salmos</span>
+                            <span class="book-chip">Proverbios</span>
+                            <span class="book-chip">Eclesiastés</span>
+                            <span class="book-chip">Cantar de los Cantares</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=PSA&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Salmos y Sabiduría</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Profetas -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 4</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">17 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Los Profetas</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Advertencias sobre juicio por la injusticia, llamados al arrepentimiento y promesas del Mesías venidero.
+                    </p>
+                    <div class="space-y-3 mb-4">
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 mb-1">PROFETAS MAYORES:</div>
+                            <div class="flex flex-wrap">
+                                <span class="book-chip">Isaías</span>
+                                <span class="book-chip">Jeremías</span>
+                                <span class="book-chip">Lamentaciones</span>
+                                <span class="book-chip">Ezequiel</span>
+                                <span class="book-chip">Daniel</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 mb-1">PROFETAS MENORES:</div>
+                            <div class="flex flex-wrap">
+                                <span class="book-chip">Oseas</span>
+                                <span class="book-chip">Joel</span>
+                                <span class="book-chip">Amós</span>
+                                <span class="book-chip">Abdías</span>
+                                <span class="book-chip">Jonás</span>
+                                <span class="book-chip">Miqueas</span>
+                                <span class="book-chip">Nahúm</span>
+                                <span class="book-chip">Habacuc</span>
+                                <span class="book-chip">Sofonías</span>
+                                <span class="book-chip">Hageo</span>
+                                <span class="book-chip">Zacarías</span>
+                                <span class="book-chip">Malaquías</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=ISA&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Profetas</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: NUEVO TESTAMENTO (NT) -->
+        <section id="section-nt" class="space-y-6 hidden">
+            <div class="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-600 text-3xl">auto_awesome</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Nuevo Testamento (27 libros)</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Escrito en griego. Trata sobre la vida, enseñanzas, muerte y resurrección de Jesús, la iglesia primitiva y la esperanza cristiana.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Evangelios -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 1</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">4 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Los Evangelios</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Narraciones sobre la vida, enseñanzas, muerte y resurrección de Jesús. Mateo, Marcos y Lucas son los Evangelios sinópticos, mientras que Juan ofrece una perspectiva teológica profunda.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBROS INCLUIDOS:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Mateo</span>
+                            <span class="book-chip">Marcos</span>
+                            <span class="book-chip">Lucas</span>
+                            <span class="book-chip">Juan</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=MAT&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Evangelios</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Historia de la Iglesia -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 2</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">1 Libro</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Historia de la Iglesia</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Continuación del Evangelio de Lucas. Narra el surgimiento y expansión de la iglesia cristiana en el Imperio Romano.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBRO INCLUIDO:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Hechos de los Apóstoles</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=ACT&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Hechos</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Epístolas -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 3</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">21 Libros</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Las Epístolas (Cartas)</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Enseñanza sobre la fe cristiana, guía para iglesias locales y ánimo personal.
+                    </p>
+                    <div class="space-y-3 mb-4">
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 mb-1">CARTAS DE PABLO:</div>
+                            <div class="flex flex-wrap">
+                                <span class="book-chip">Romanos</span>
+                                <span class="book-chip">1 y 2 Corintios</span>
+                                <span class="book-chip">Gálatas</span>
+                                <span class="book-chip">Efesios</span>
+                                <span class="book-chip">Filipenses</span>
+                                <span class="book-chip">Colosenses</span>
+                                <span class="book-chip">1 y 2 Tesalonicenses</span>
+                                <span class="book-chip">1 y 2 Timoteo</span>
+                                <span class="book-chip">Tito</span>
+                                <span class="book-chip">Filemón</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 mb-1">CARTAS GENERALES:</div>
+                            <div class="flex flex-wrap">
+                                <span class="book-chip">Hebreos</span>
+                                <span class="book-chip">Santiago</span>
+                                <span class="book-chip">1 y 2 Pedro</span>
+                                <span class="book-chip">1, 2, 3 Juan</span>
+                                <span class="book-chip">Judas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=ROM&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Epístolas</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <!-- Apocalíptica -->
+                <div class="section-card p-6 genre-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Género 4</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-lg">1 Libro</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Literatura Apocalíptica</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                        <strong>Contenido:</strong> Visiones simbólicas y de consuelo para cristianos perseguidos, asegurando la victoria final de Dios sobre el mal.
+                    </p>
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-slate-500 mb-2">LIBRO INCLUIDO:</div>
+                        <div class="flex flex-wrap">
+                            <span class="book-chip">Apocalipsis</span>
+                        </div>
+                    </div>
+                    <a href="/es/bibel?book=REV&chapter=1" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors">
+                        <span>Leer Apocalipsis</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: GUÍA DE LECTURA -->
+        <section id="section-leseguide" class="space-y-8 hidden">
+            <div class="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-600 text-3xl">lightbulb</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">¿Cómo leer la Biblia?</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Si abres la Biblia en la página 1 e intentas leer de portada a portada, la mayoría se detiene en Levítico. Aquí tienes estrategias comprobadas para comenzar.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estrategia 1 -->
+            <div class="section-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-600 font-bold text-lg">1</div>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Comienza con lo esencial (Para principiantes)</h3>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between">
+                            <span>Evangelio de Marcos</span>
+                            <span class="material-symbols-outlined text-amber-600 text-sm">bolt</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">El evangelio más corto y dinámico. Muestra de forma rápida quién fue Jesús.</p>
+                    </div>
+                    <div class="p-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between">
+                            <span>Evangelio de Juan</span>
+                            <span class="material-symbols-outlined text-amber-600 text-sm">favorite</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">Ideal para entender la profundidad teológica de las palabras de Jesús.</p>
+                    </div>
+                    <div class="p-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between">
+                            <span>Hechos de los Apóstoles</span>
+                            <span class="material-symbols-outlined text-amber-600 text-sm">groups</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">Historia emocionante de cómo comenzó y creció la primera iglesia.</p>
+                    </div>
+                    <div class="p-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between">
+                            <span>Salmos / Proverbios</span>
+                            <span class="material-symbols-outlined text-amber-600 text-sm">auto_stories</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">Lee un capítulo al día para consuelo espiritual y sabiduría práctica.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consejos de Interpretación -->
+            <div class="p-6 bg-slate-900 text-white rounded-2xl border border-amber-500/30 flex items-start gap-4">
+                <span class="material-symbols-outlined text-amber-400 text-3xl shrink-0">info</span>
+                <div>
+                    <h4 class="text-lg font-bold text-amber-400 mb-1">Consejo de Interpretación</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Pregúntate siempre qué <strong>género</strong> estás leyendo. La poesía (Salmos) no debe interpretarse igual que relatos históricos (Reyes) o refranes prácticos (Proverbios).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        function switchSection(secId, evt) {
+            document.querySelectorAll('section[id^="section-"]').forEach(s => s.classList.add('hidden'));
+            const targetSec = document.getElementById('section-' + secId);
+            if (targetSec) targetSec.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn-pill').forEach(b => b.classList.remove('active'));
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active');
+            } else {
+                const btn = Array.from(document.querySelectorAll('.tab-btn-pill')).find(b => b.getAttribute('onclick').includes("'" + secId + "'"));
+                if (btn) btn.classList.add('active');
+            }
+        }
+
+        function filterGenres() {
+            const query = document.getElementById('genre-search').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.genre-card');
+            
+            if (!query) {
+                cards.forEach(c => c.style.display = 'block');
+                return;
+            }
+
+            document.getElementById('section-gt').classList.remove('hidden');
+            document.getElementById('section-nt').classList.remove('hidden');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    <script type="module" src="../../script.js?v=2026.06.21.10.01"></script>
+    <script type="module" src="../../js/cookie-consent.js"></script>
+</body>
+
+</html>
