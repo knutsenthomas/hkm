@@ -1005,20 +1005,21 @@ class BibleReader {
                 }
             });
         }
-        const fontFamilySelectMobile = document.getElementById('settings-font-family-mobile');
-        if (fontFamilySelectMobile) {
-            fontFamilySelectMobile.addEventListener('change', (e) => {
-                this.settings.fontFamily = e.target.value;
-                this.applySettings();
+        // Segmented Control Event Handlers (Font & Layout)
+        document.querySelectorAll('.hkm-segmented-control').forEach(ctrl => {
+            const settingName = ctrl.getAttribute('data-setting');
+            if (!settingName) return;
+            ctrl.querySelectorAll('.segment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = btn.getAttribute('data-value');
+                    if (val) {
+                        this.settings[settingName] = val;
+                        this.applySettings();
+                    }
+                });
             });
-        }
-        const layoutSelectMobile = document.getElementById('settings-layout-mobile');
-        if (layoutSelectMobile) {
-            layoutSelectMobile.addEventListener('change', (e) => {
-                this.settings.layout = e.target.value;
-                this.applySettings();
-            });
-        }
+        });
 
         // Prev/Next Chapter Navigation
         if (this.dom.prevChapterBtn) {
@@ -2078,13 +2079,15 @@ class BibleReader {
             }
         }
 
+        // Update segmented control active states
+        document.querySelectorAll('.hkm-segmented-control[data-setting="fontFamily"] .segment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-value') === this.settings.fontFamily);
+        });
+        document.querySelectorAll('.hkm-segmented-control[data-setting="layout"] .segment-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-value') === this.settings.layout);
+        });
         if (this.dom.fontFamilySelect) this.dom.fontFamilySelect.value = this.settings.fontFamily;
-        const fontFamilySelectMobile = document.getElementById('settings-font-family-mobile');
-        if (fontFamilySelectMobile) fontFamilySelectMobile.value = this.settings.fontFamily;
-
         if (this.dom.layoutSelect) this.dom.layoutSelect.value = this.settings.layout;
-        const layoutSelectMobile = document.getElementById('settings-layout-mobile');
-        if (layoutSelectMobile) layoutSelectMobile.value = this.settings.layout;
 
         // Theme classes
         document.body.classList.remove('bible-theme-light', 'bible-theme-cream', 'bible-theme-dark');

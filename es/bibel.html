@@ -2141,7 +2141,57 @@
             box-shadow: 0 8px 24px rgba(209, 125, 57, 0.45) !important;
         }
 
-        /* HKM Custom Translation Selection Modal */
+        /* HKM Segmented Controls */
+        .hkm-segmented-control {
+            display: inline-flex !important;
+            background: var(--bg-base, rgba(0, 0, 0, 0.05)) !important;
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08)) !important;
+            border-radius: 10px !important;
+            padding: 3px !important;
+            gap: 3px !important;
+            box-sizing: border-box !important;
+        }
+
+        html[data-theme="dark"] .hkm-segmented-control {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .hkm-segmented-control .segment-btn {
+            border: none !important;
+            background: transparent !important;
+            color: var(--text-muted, #64748b) !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            padding: 5px 12px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            outline: none !important;
+            white-space: nowrap !important;
+            min-height: 28px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+        }
+
+        .hkm-segmented-control .segment-btn:hover {
+            color: var(--text-base) !important;
+        }
+
+        .hkm-segmented-control .segment-btn.active {
+            background: var(--bg-card, #ffffff) !important;
+            color: var(--hkm-terracotta, #d17d39) !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html[data-theme="dark"] .hkm-segmented-control .segment-btn.active {
+            background: #1e293b !important;
+            color: var(--hkm-terracotta, #d17d39) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        }
         #translation-selection-modal.color-wheel-modal-overlay {
             background: rgba(15, 23, 42, 0.4) !important;
             backdrop-filter: blur(12px) !important;
@@ -3086,12 +3136,18 @@
                         </div>
                         <!-- Font Family -->
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tipografía</span>
-                            <div class="select-wrapper">
-                                <select id="settings-font-family-mobile" style="padding: 0 24px 0 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); height: 32px; outline: none; cursor: pointer;">
-                                    <option value="serif">Serif (Clásica)</option>
-                                    <option value="sans">Sans-Serif (Moderna)</option>
-                                </select>
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Fuente</span>
+                            <div class="hkm-segmented-control" data-setting="fontFamily">
+                                <button type="button" class="segment-btn" data-value="serif">Serif</button>
+                                <button type="button" class="segment-btn" data-value="sans">Sans-Serif</button>
+                            </div>
+                        </div>
+                        <!-- Visning Mode (Layout) Mobile -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Vista</span>
+                            <div class="hkm-segmented-control" data-setting="layout">
+                                <button type="button" class="segment-btn" data-value="paragraph">Párrafo</button>
+                                <button type="button" class="segment-btn" data-value="verse">Versículo</button>
                             </div>
                         </div>
                         <!-- Theme Selection -->
@@ -3179,12 +3235,19 @@
 
                         <!-- Font Family -->
                         <div class="settings-row">
-                            <span class="settings-label">Tipografía</span>
-                            <div class="select-wrapper">
-                                <select id="settings-font-family" style="padding: 4px 24px 4px 8px; font-size: 12px;">
-                                    <option value="serif">Serif (Clásica)</option>
-                                    <option value="sans">Sans-Serif (Moderna)</option>
-                                </select>
+                            <span class="settings-label">Fuente</span>
+                            <div class="hkm-segmented-control" data-setting="fontFamily">
+                                <button type="button" class="segment-btn" data-value="serif">Serif</button>
+                                <button type="button" class="segment-btn" data-value="sans">Sans-Serif</button>
+                            </div>
+                        </div>
+
+                        <!-- Visning Mode (Layout) -->
+                        <div class="settings-row">
+                            <span class="settings-label">Vista</span>
+                            <div class="hkm-segmented-control" data-setting="layout">
+                                <button type="button" class="segment-btn" data-value="paragraph">Párrafo</button>
+                                <button type="button" class="segment-btn" data-value="verse">Versículo</button>
                             </div>
                         </div>
 
