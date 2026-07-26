@@ -3041,8 +3041,8 @@ class BibleReader {
             height: 100vh;
             height: 100dvh;
             background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 999999;
             display: flex;
             align-items: center;
@@ -3050,15 +3050,18 @@ class BibleReader {
             padding: 16px;
             box-sizing: border-box;
             opacity: 0;
-            transition: opacity 0.25s ease-out;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         `;
 
         if (!intro) {
             modal.innerHTML = `
-                <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 20px; width: 100%; max-width: 500px; padding: 32px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
-                    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 12px; color: var(--text-base);">${bookName}</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14.5px;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
-                    <button id="btn-close-empty-intro" style="padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 10px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
+                <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 32px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+                    <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
+                    </div>
+                    <h2 style="font-size: 22px; font-weight: 800; margin: 0 0 8px 0; color: var(--text-base);">${bookName}</h2>
+                    <p style="color: var(--text-muted, #64748b); margin: 0 0 24px 0; font-size: 14.5px; line-height: 1.5;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
+                    <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; transition: transform 0.15s ease;">
                         ${labelClose}
                     </button>
                 </div>
@@ -3082,67 +3085,84 @@ class BibleReader {
         }
 
         const keyVersesHtml = (intro.keyVerses || []).map(v => `
-            <div style="border-left: 4px solid #d17d39; padding-left: 14px; margin-top: 10px; background: rgba(209,125,57,0.04); padding: 10px 14px; border-radius: 0 8px 8px 0;">
-                <p style="margin: 0; font-size: 14.5px; font-style: italic; color: var(--text-base); line-height: 1.55;">"${v.text}"</p>
-                <span style="font-size: 12.5px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 4px;">— ${v.ref}</span>
+            <div style="border-left: 4px solid #D17D39; padding: 14px 18px; margin-top: 12px; background: rgba(209,125,57,0.04); border-radius: 0 12px 12px 0;">
+                <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6; font-family: var(--font-serif, Georgia, serif);">"${v.text}"</p>
+                <span style="font-size: 13px; font-weight: 700; color: #D17D39; font-style: normal; display: inline-block; margin-top: 6px;">— ${v.ref}</span>
             </div>
         `).join('');
 
         const summaryParagraphsHtml = (intro.summary || []).map(p => `
-            <p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.65; color: var(--text-base);">${p}</p>
+            <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.7; color: var(--text-base);">${p}</p>
         `).join('');
 
         const howToReadHtml = intro.howToRead ? `
-            <div style="margin: 20px 0; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(209,125,57,0.25);">
-                <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                    <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">tips_and_updates</span>
-                    <span>${labelHowToRead}</span>
-                </span>
-                <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
+            <div style="margin: 24px 0; background: linear-gradient(135deg, rgba(209,125,57,0.07) 0%, rgba(27,73,101,0.05) 100%); border-radius: 16px; padding: 20px 24px; border: 1px solid rgba(209,125,57,0.22);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #D17D39;">tips_and_updates</span>
+                    <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39;">${labelHowToRead}</span>
+                </div>
+                <p style="margin: 0; font-size: 14.5px; line-height: 1.65; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
             </div>
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 20px; width: 100%; max-width: 660px; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; box-shadow: 0 24px 48px rgba(0,0,0,0.25); transform: scale(0.96); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
-                <!-- Modal Header -->
-                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 42px; height: 42px; border-radius: 12px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(27,73,101,0.25);">
-                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
+            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 680px; max-height: 88vh; max-height: 88dvh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
+                <!-- Header Bar -->
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #1B4965 0%, #2A5C7D 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 16px rgba(27,73,101,0.25);">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">auto_stories</span>
                         </div>
                         <div>
-                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39; display: block;">${labelIntro}</span>
-                            <h3 style="margin: 0; font-size: 20px; font-weight: 900; color: var(--text-base); line-height: 1.2;">${intro.title}</h3>
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
+                            <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: 'Inter', sans-serif;">${intro.title}</h3>
                         </div>
                     </div>
-                    <button id="btn-close-book-intro-x" title="Lukk" style="background: rgba(0,0,0,0.05); border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    <button id="btn-close-book-intro-x" title="Lukk" style="background: rgba(0,0,0,0.05); border: none; font-size: 20px; color: var(--text-muted, #64748b); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;">
+                        <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
                     </button>
                 </div>
 
-                <!-- Modal Body (Scrollable) -->
-                <div style="padding: 24px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
-                    <!-- Metadata Badges -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-                        <div style="background: rgba(27, 73, 101, 0.1); color: #1B4965; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
-                            <strong>${labelAuthor}:</strong> ${intro.author}
-                        </div>
-                        <div style="background: rgba(209, 125, 57, 0.1); color: #d17d39; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
-                            <strong>${labelDate}:</strong> ${intro.date}
-                        </div>
-                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
-                            <strong>${labelGenre}:</strong> ${intro.genre}
+                <!-- Scrollable Body -->
+                <div style="padding: 24px 28px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+                    
+                    <!-- Unified Hero Metadata Card -->
+                    <div style="background: linear-gradient(135deg, rgba(27,73,101,0.04) 0%, rgba(209,125,57,0.04) 100%); border: 1px solid rgba(27,73,101,0.08); border-radius: 18px; padding: 18px 20px; margin-bottom: 24px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                            <!-- Author Chip -->
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">edit_note</span>
+                                <span style="color: var(--text-muted, #64748b);">${labelAuthor}:</span>
+                                <strong style="color: var(--text-base); font-weight: 700;">${intro.author}</strong>
+                            </div>
+
+                            <!-- Date Chip -->
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #D17D39;">event</span>
+                                <span style="color: var(--text-muted, #64748b);">${labelDate}:</span>
+                                <strong style="color: var(--text-base); font-weight: 700;">${intro.date}</strong>
+                            </div>
+
+                            <!-- Genre Chip -->
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #059669;">category</span>
+                                <span style="color: var(--text-muted, #64748b);">${labelGenre}:</span>
+                                <strong style="color: var(--text-base); font-weight: 700;">${intro.genre}</strong>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Main Theme Card -->
-                    <div style="margin-bottom: 20px; background: rgba(27, 73, 101, 0.04); border-radius: 12px; padding: 14px 18px; border-left: 4px solid #1B4965;">
-                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #1B4965; display: block; margin-bottom: 4px;">${labelTheme}</span>
-                        <span style="font-size: 15px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</span>
+                    <!-- Sleek Hovedtema Card -->
+                    <div style="margin-bottom: 24px; background: linear-gradient(90deg, rgba(27,73,101,0.06) 0%, rgba(209,125,57,0.04) 100%); border-radius: 16px; padding: 18px 22px; border-left: 4px solid #1B4965; border-top: 1px solid rgba(27,73,101,0.06); border-right: 1px solid rgba(27,73,101,0.06); border-bottom: 1px solid rgba(27,73,101,0.06);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #1B4965;">lightbulb</span>
+                            <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #1B4965;">${labelTheme}</span>
+                        </div>
+                        <div style="font-size: 16px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</div>
                     </div>
 
-                    <!-- Detailed Summary -->
-                    <div class="hkm-book-intro-body" style="margin-bottom: 18px;">
+                    <!-- Detailed Summary Paragraphs -->
+                    <div class="hkm-book-intro-body" style="margin-bottom: 20px;">
                         ${summaryParagraphsHtml}
                     </div>
 
@@ -3151,18 +3171,21 @@ class BibleReader {
 
                     <!-- Key Verses -->
                     ${keyVersesHtml ? `
-                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 18px; margin-top: 18px;">
-                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 8px;">${labelKeyVerses}</span>
+                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 20px; margin-top: 24px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39;">format_quote</span>
+                                <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted, #64748b);">${labelKeyVerses}</span>
+                            </div>
                             ${keyVersesHtml}
                         </div>
                     ` : ''}
                 </div>
 
-                <!-- Modal Footer -->
-                <div style="padding: 14px 24px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
-                    <button id="btn-close-book-intro-footer" style="padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 10px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 3px 10px rgba(27,73,101,0.25); transition: transform 0.15s ease;">
+                <!-- Footer Bar -->
+                <div style="padding: 16px 28px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(27,73,101,0.25); transition: all 0.2s ease;">
                         <span>${labelClose}</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
                     </button>
                 </div>
             </div>
@@ -3178,7 +3201,7 @@ class BibleReader {
 
         const closeModal = () => {
             modal.style.opacity = '0';
-            if (card) card.style.transform = 'scale(0.96)';
+            if (card) card.style.transform = 'scale(0.95)';
             setTimeout(() => modal.remove(), 250);
         };
 
