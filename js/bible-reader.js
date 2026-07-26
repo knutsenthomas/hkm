@@ -209,6 +209,30 @@ class BibleReader {
         return null;
     }
 
+    async getFirestoreAsync(timeoutMs = 15000) {
+        let db = this.getFirestore();
+        if (db) return db;
+
+        if (window.firebaseService && typeof window.firebaseService.waitForInitialization === 'function') {
+            try {
+                await window.firebaseService.waitForInitialization(timeoutMs);
+                db = this.getFirestore();
+                if (db) return db;
+            } catch (e) {
+                console.warn("[BibleReader] waitForInitialization failed in getFirestoreAsync:", e);
+            }
+        }
+
+        const startTime = Date.now();
+        while (Date.now() - startTime < 5000) {
+            await new Promise(r => setTimeout(r, 200));
+            db = this.getFirestore();
+            if (db) return db;
+        }
+
+        return null;
+    }
+
     getServerTimestamp() {
         if (window.firebase && typeof firebase.firestore === 'function' && firebase.firestore.FieldValue) {
             try {
@@ -5868,7 +5892,13 @@ class BibleReader {
         // Inject styles dynamically
         this.injectReadingPlanStyles();
 
-        const db = this.getFirestore();
+        // Set placeholder title/badge while loading to avoid static MATTEUS 1 HTML fallback
+        if (this.dom.currentBookBadge) this.dom.currentBookBadge.innerText = 'LESEPLAN';
+        if (this.dom.currentChapterNumber) this.dom.currentChapterNumber.innerText = '';
+        if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = 'Laster leseplan...';
+        if (this.dom.readingPane) this.dom.readingPane.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;"><span class="material-symbols-outlined spin" style="font-size: 36px;">progress_activity</span><p style="margin-top: 12px; font-size: 15px; font-weight: 500;">Laster leseplan og dagens andakt...</p></div>';
+
+        const db = await this.getFirestoreAsync();
         if (!db) {
             console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
             return;
@@ -5908,7 +5938,7 @@ class BibleReader {
             this.activePlanId = this.activePlanData.id;
 
             // Determine active day
-            let activeDayNum = this.activePlanDay;
+            let activeDayNum = dayNumber ? parseInt(dayNumber, 10) : (this.activePlanDay ? parseInt(this.activePlanDay, 10) : 1);
             
             // Check user progress if logged in
             if (this.currentUser) {
@@ -8039,6 +8069,7 @@ class BibleReader {
     }
 
     async openDevotionalWizard(planId, dayNumber, startStep = 1) {
+        const targetDay = parseInt(dayNumber, 10) || 1;
         let globalPlan = this.activePlanData;
         let dayConfig = null;
 
@@ -8047,12 +8078,12 @@ class BibleReader {
                 globalPlan = window.contentManager.getLocalizedContentItem(globalPlan);
             }
             if (globalPlan.days) {
-                dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber) || globalPlan.days[0];
+                dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
             }
         }
 
         if (!dayConfig) {
-            const db = this.getFirestore();
+            const db = await this.getFirestoreAsync();
             if (db) {
                 let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
                 if (!globalPlanSnap.exists) {
@@ -8076,7 +8107,7 @@ class BibleReader {
                         globalPlan = raw;
                     }
                     if (globalPlan.days) {
-                        dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber) || globalPlan.days[0];
+                        dayConfig = globalPlan.days.find(d => parseInt(d.dayNumber, 10) === targetDay) || globalPlan.days[0];
                     }
                 }
             }
