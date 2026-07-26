@@ -6097,6 +6097,8 @@ class BibleReader {
         } finally {
             this._isInitializingPlan = false;
             document.documentElement.classList.remove('hkm-rp-loading');
+            const placeholder = document.getElementById('reading-plan-loading-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
             // Reveal UI now that the reading plan loading attempt is complete
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
