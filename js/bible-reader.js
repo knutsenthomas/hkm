@@ -3047,6 +3047,12 @@ class BibleReader {
             box-sizing: border-box !important;
         `;
 
+        const closeModal = () => {
+            document.body.style.overflow = '';
+            modal.remove();
+        };
+        document.body.style.overflow = 'hidden';
+
         if (!intro) {
             modal.innerHTML = `
                 <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 24px; text-align: center; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.35); margin: auto;">
@@ -3063,8 +3069,8 @@ class BibleReader {
             `;
             document.body.appendChild(modal);
             const closeBtn = modal.querySelector('#btn-close-empty-intro');
-            if (closeBtn) closeBtn.onclick = () => modal.remove();
-            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            if (closeBtn) closeBtn.onclick = () => closeModal();
+            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
             return;
         }
 
@@ -3162,10 +3168,10 @@ class BibleReader {
 
         const closeBtnX = modal.querySelector('#btn-close-book-intro-x');
         const closeBtnFooter = modal.querySelector('#btn-close-book-intro-footer');
-        if (closeBtnX) closeBtnX.onclick = () => modal.remove();
-        if (closeBtnFooter) closeBtnFooter.onclick = () => modal.remove();
+        if (closeBtnX) closeBtnX.onclick = () => closeModal();
+        if (closeBtnFooter) closeBtnFooter.onclick = () => closeModal();
         modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
+            if (e.target === modal) closeModal();
         };
     }
 
@@ -6491,8 +6497,10 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            /* Hide page footer when reading plan is active to prevent page scrolling */
-            body:has(#bible-sidebar.reading-plan-active) footer.footer {
+            /* Hide page footer when reading plan is active or book intro overlay is open to prevent page scrolling */
+            body:has(#bible-sidebar.reading-plan-active) footer.footer,
+            body:has(.hkm-book-intro-overlay) footer.footer,
+            body:has(.hkm-modal-overlay) footer.footer {
                 display: none !important;
             }
 
