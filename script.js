@@ -4810,7 +4810,7 @@ window.addEventListener('load', () => {
                     e.stopPropagation();
                     profileDropdown.classList.add('hidden');
                     try {
-                        if (typeof firebase !== 'undefined' && firebase.auth) {
+                        if (typeof firebase !== 'undefined' && typeof firebase.auth === 'function') {
                             await firebase.auth().signOut();
                         } else if (window.firebaseService && typeof window.firebaseService.signOut === 'function') {
                             await window.firebaseService.signOut();
@@ -4825,7 +4825,7 @@ window.addEventListener('load', () => {
         }
 
         const handleProfileClick = (e) => {
-            const user = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth().currentUser : null;
+            const user = (typeof firebase !== 'undefined' && typeof firebase.auth === 'function') ? firebase.auth().currentUser : null;
             if (!user || user.isAnonymous) {
                 // Not logged in -> go to login page!
                 window.location.href = '/minside/login.html';
@@ -5022,12 +5022,13 @@ window.addEventListener('load', () => {
 
         let count = 0;
         // Wait for firebaseService and firebase auth to load
-        while ((!window.firebaseService || !window.firebaseService.isInitialized || typeof firebase === 'undefined') && count < 100) {
+        while ((typeof firebase === 'undefined' || typeof firebase.auth !== 'function') && count < 60) {
             await new Promise(r => setTimeout(r, 50));
             count++;
         }
 
-        firebase.auth().onAuthStateChanged(async (user) => {
+        if (typeof firebase !== 'undefined' && typeof firebase.auth === 'function') {
+            firebase.auth().onAuthStateChanged(async (user) => {
             if (!user || user.isAnonymous) {
                 hideProfileDOM();
                 localStorage.removeItem('hkm_public_user_cache');
@@ -5067,6 +5068,7 @@ window.addEventListener('load', () => {
             updateProfileDOM(photoURL);
             updateDevotionalShortcut(user);
         });
+        }
     }
 
     if (document.readyState === 'loading') {

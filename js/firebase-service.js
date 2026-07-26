@@ -267,27 +267,36 @@ class FirebaseService {
                 this._activeConfig = { ...config };
             }
 
-            this.db = firebase.firestore();
-
-            // Enable offline persistence for faster subsequent loads (bypassed on Safari/iOS to prevent IndexedDB hangs)
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            if (!isSafari) {
-                try {
-                    this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-                        if (err.code === 'failed-precondition') {
-                            console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
-                        } else if (err.code === 'unimplemented') {
-                            console.warn("[FirebaseService] Persistence not supported by browser");
-                        }
-                    });
-                } catch (persistenceError) {
-                    console.warn("[FirebaseService] enablePersistence threw synchronous error:", persistenceError);
+            if (typeof firebase.firestore === 'function') {
+                this.db = firebase.firestore();
+                // Enable offline persistence for faster subsequent loads (bypassed on Safari/iOS to prevent IndexedDB hangs)
+                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                if (!isSafari && this.db) {
+                    try {
+                        this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                            if (err.code === 'failed-precondition') {
+                                console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
+                            } else if (err.code === 'unimplemented') {
+                                console.warn("[FirebaseService] Persistence not supported by browser");
+                            }
+                        });
+                    } catch (persistenceError) {
+                        console.warn("[FirebaseService] enablePersistence threw synchronous error:", persistenceError);
+                    }
+                } else {
+                    console.log("[FirebaseService] Offline persistence disabled on Safari to prevent IndexedDB lockups.");
                 }
             } else {
-                console.log("[FirebaseService] Offline persistence disabled on Safari to prevent IndexedDB lockups.");
+                console.warn("[FirebaseService] firebase.firestore is not a function yet.");
+                this.db = null;
             }
 
-            this.auth = firebase.auth();
+            if (typeof firebase.auth === 'function') {
+                this.auth = firebase.auth();
+            } else {
+                console.warn("[FirebaseService] firebase.auth is not a function yet.");
+                this.auth = null;
+            }
             this.storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
             // Improve Firestore reliability in local/dev environments where WebChannel can hang.
