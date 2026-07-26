@@ -5627,10 +5627,10 @@ class BibleReader {
                 /* YouVersion-specific classes */
                 .hkm-yv-wrapper { display: flex !important; flex-direction: column !important; height: 100% !important; width: 100% !important; background: #ffffff !important; box-sizing: border-box !important; position: relative !important; overflow: hidden !important; }
                 .hkm-yv-header { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 16px 20px !important; border-bottom: 1px solid #f1f5f9 !important; background: #ffffff !important; flex-shrink: 0 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important; }
-                .hkm-yv-header-btn-close { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important; transition: background-color 0.2s !important; }
+                .hkm-yv-header-btn-close { width: 36px !important; height: 36px !important; aspect-ratio: 1 / 1 !important; background: none !important; border: none !important; padding: 0 !important; cursor: pointer !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important; transition: background-color 0.2s !important; flex-shrink: 0 !important; box-sizing: border-box !important; }
                 .hkm-yv-header-btn-close:hover { background: #f1f5f9 !important; }
                 .hkm-yv-header-title { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 !important; margin: 0 16px !important; min-width: 0 !important; }
-                .hkm-yv-header-avatar { width: 28px !important; height: 28px !important; border-radius: 50% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 13px !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important; }
+                .hkm-yv-header-avatar { width: 28px !important; height: 28px !important; aspect-ratio: 1 / 1 !important; border-radius: 50% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 13px !important; flex-shrink: 0 !important; box-sizing: border-box !important; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important; }
                 .hkm-yv-header-text { font-size: 15px !important; font-weight: 700 !important; color: #1B4965 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
                 .hkm-yv-header-text-full { display: inline-block !important; max-width: 600px !important; }
                 .hkm-yv-header-text-short { display: none !important; }
@@ -5652,7 +5652,7 @@ class BibleReader {
                 .hkm-yv-body.font-size-xlarge .hkm-devotional-text-serif p { font-size: 24px !important; }
                 
                 .hkm-yv-footer { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 16px 24px !important; border-top: 1px solid #f1f5f9 !important; background: #ffffff !important; flex-shrink: 0 !important; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.02) !important; }
-                .hkm-yv-nav-circle-btn { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #f1f5f9 !important; border: none !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+                .hkm-yv-nav-circle-btn { width: 44px !important; height: 44px !important; aspect-ratio: 1 / 1 !important; border-radius: 50% !important; background: #f1f5f9 !important; border: none !important; color: #475569 !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; flex-shrink: 0 !important; box-sizing: border-box !important; padding: 0 !important; }
                 .hkm-yv-nav-circle-btn:hover { background: #e2e8f0 !important; color: #0f172a !important; }
                 .hkm-yv-nav-circle-btn.active { background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: #ffffff !important; box-shadow: 0 4px 10px rgba(209, 125, 57, 0.25) !important; }
                 .hkm-yv-nav-circle-btn.active:hover { filter: brightness(1.08) !important; }
@@ -7024,15 +7024,18 @@ class BibleReader {
                 background: #ffffff;
                 border: 1.5px solid var(--border-color, #e2e8f0);
                 color: #475569;
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                width: 38px !important;
+                height: 38px !important;
+                aspect-ratio: 1 / 1 !important;
+                border-radius: 50% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                flex-shrink: 0;
+                flex-shrink: 0 !important;
+                box-sizing: border-box !important;
+                padding: 0 !important;
             }
             .bible-theme-dark .hkm-rp-btn-nav-minimal {
                 background: #1e1e1e;
@@ -7956,9 +7959,9 @@ class BibleReader {
         const progressPct = Math.round((userPlan.completedDays?.length || 0) / totalDays * 100);
 
         // 2. Generate Checkboxes
-        const uncompletedCircle = `<div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-color); flex-shrink: 0; box-sizing: border-box; background: transparent;"></div>`;
+        const uncompletedCircle = `<div style="width: 24px; height: 24px; aspect-ratio: 1 / 1; border-radius: 50%; border: 2px solid var(--border-color); flex-shrink: 0; box-sizing: border-box; background: transparent;"></div>`;
         const completedCircle = `
-            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #10b981; background: #10b981; display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-sizing: border-box;">
+            <div style="width: 24px; height: 24px; aspect-ratio: 1 / 1; border-radius: 50%; border: 2px solid #10b981; background: #10b981; display: flex; align-items: center; justify-content: center; color: #ffffff; flex-shrink: 0; box-sizing: border-box;">
                 <span class="material-symbols-outlined" style="font-size: 14px; font-weight: 900; line-height: 1; display: block;">check</span>
             </div>
         `;

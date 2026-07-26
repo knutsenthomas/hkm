@@ -1948,7 +1948,7 @@
                                         </div>
                                     </div>
                                     ${versesText ? `
-                                    <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0;">
+                                    <a href="/bibel.html?ref=${encodeURIComponent(versesText)}&plan=${plan.id}&day=${day.dayNumber}" class="hkm-rp-start-day-link" title="${lang === 'en' ? 'Read today' : (lang === 'es' ? 'Leer hoy' : 'Les i dag')}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(209, 125, 57, 0.08); border: 1px solid rgba(209, 125, 57, 0.15); color: var(--primary-orange); transition: all 0.2s ease; cursor: pointer; text-decoration: none; flex-shrink: 0; box-sizing: border-box;">
                                         <span class="material-symbols-outlined" style="font-size: 20px; font-weight: 700;">arrow_forward</span>
                                     </a>
                                     ` : `<span class="material-symbols-outlined prayer-icon-right">${headerIcon}</span>`}
