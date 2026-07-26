@@ -1,6 +1,7 @@
 // js/bible-reader.js
 import { firebaseService } from './firebase-service.js';
 import { biblicalCharacters } from './bibelske-personer-data.js';
+import { getBibleBookIntroduction } from './bible-book-introductions.js';
 
 const BIBLE_PROJECT_VIDEOS = {
     // Law/Pentateuch
@@ -3008,6 +3009,196 @@ class BibleReader {
         }
     }
 
+    renderBookIntroCard(bookId) {
+        const intro = typeof getBibleBookIntroduction === 'function' 
+            ? getBibleBookIntroduction(bookId) 
+            : (window.getBibleBookIntroduction ? window.getBibleBookIntroduction(bookId) : null);
+        if (!intro) return '';
+
+        const lang = document.documentElement.lang || 'no';
+        const labelIntro = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
+        const labelAuthor = lang === 'en' ? 'Author' : (lang === 'es' ? 'Autor' : 'Forfatter');
+        const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
+        const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
+        const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
+        const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
+        const labelCollapse = lang === 'en' ? 'Hide introduction' : (lang === 'es' ? 'Ocultar introducción' : 'Skjul introduksjon');
+
+        const keyVersesHtml = (intro.keyVerses || []).map(v => `
+            <div style="border-left: 3px solid #d17d39; padding-left: 12px; margin-top: 8px;">
+                <p style="margin: 0; font-size: 13.5px; font-style: italic; color: var(--text-base); line-height: 1.5;">"${v.text}"</p>
+                <span style="font-size: 11.5px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 2px;">— ${v.ref}</span>
+            </div>
+        `).join('');
+
+        const summaryParagraphsHtml = (intro.summary || []).map(p => `
+            <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.6; color: var(--text-base);">${p}</p>
+        `).join('');
+
+        return `
+            <div id="hkm-book-intro-card" style="margin-bottom: 24px; border-radius: 16px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); box-shadow: 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; transition: all 0.3s ease;">
+                <div style="background: linear-gradient(135deg, rgba(27,73,101,0.06) 0%, rgba(209,125,57,0.06) 100%); padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">auto_stories</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39;">${labelIntro}</span>
+                            <h2 style="margin: 0; font-size: 17px; font-weight: 800; color: var(--text-base);">${intro.title}</h2>
+                        </div>
+                    </div>
+                    <button id="hkm-book-intro-toggle-btn" style="background: var(--bg-body, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+                        <span class="toggle-text">${labelCollapse}</span>
+                        <span class="material-symbols-outlined toggle-icon" style="font-size: 16px; transition: transform 0.3s ease;">expand_less</span>
+                    </button>
+                </div>
+                
+                <div id="hkm-book-intro-content" style="padding: 20px; display: block;">
+                    <!-- Metadata Badges -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+                        <div style="background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            <strong>${labelAuthor}:</strong> ${intro.author}
+                        </div>
+                        <div style="background: rgba(209, 125, 57, 0.08); color: #d17d39; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            <strong>${labelDate}:</strong> ${intro.date}
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            <strong>${labelGenre}:</strong> ${intro.genre}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px; background: rgba(27, 73, 101, 0.04); border-radius: 10px; padding: 12px 14px; border-left: 4px solid #1B4965;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #1B4965; display: block; margin-bottom: 2px;">${labelTheme}</span>
+                        <span style="font-size: 13.5px; font-weight: 700; color: var(--text-base); line-height: 1.4;">${intro.theme}</span>
+                    </div>
+
+                    <div class="hkm-book-intro-body" style="margin-bottom: 16px;">
+                        ${summaryParagraphsHtml}
+                    </div>
+
+                    ${keyVersesHtml ? `
+                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); padding-top: 14px; margin-top: 14px;">
+                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 6px;">${labelKeyVerses}</span>
+                            ${keyVersesHtml}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    attachBookIntroToggleListener() {
+        const toggleBtn = document.getElementById('hkm-book-intro-toggle-btn');
+        const content = document.getElementById('hkm-book-intro-content');
+        if (!toggleBtn || !content) return;
+
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = content.style.display === 'none';
+            const lang = document.documentElement.lang || 'no';
+            const labelCollapse = lang === 'en' ? 'Hide introduction' : (lang === 'es' ? 'Ocultar introducción' : 'Skjul introduksjon');
+            const labelExpand = lang === 'en' ? 'Read full book introduction' : (lang === 'es' ? 'Leer introducción completa' : 'Les bokintroduksjon');
+            
+            content.style.display = isHidden ? 'block' : 'none';
+            const textSpan = toggleBtn.querySelector('.toggle-text');
+            const iconSpan = toggleBtn.querySelector('.toggle-icon');
+            if (textSpan) textSpan.textContent = isHidden ? labelCollapse : labelExpand;
+            if (iconSpan) iconSpan.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        });
+    }
+
+    openBookIntroModal(bookId) {
+        const intro = typeof getBibleBookIntroduction === 'function'
+            ? getBibleBookIntroduction(bookId)
+            : (window.getBibleBookIntroduction ? window.getBibleBookIntroduction(bookId) : null);
+        if (!intro) return;
+
+        let modal = document.getElementById('hkm-book-intro-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'hkm-book-intro-modal';
+            modal.className = 'search-overlay';
+            modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;';
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        const keyVersesHtml = (intro.keyVerses || []).map(v => `
+            <div style="border-left: 3px solid #d17d39; padding-left: 12px; margin-top: 10px;">
+                <p style="margin: 0; font-size: 14px; font-style: italic; color: var(--text-base); line-height: 1.5;">"${v.text}"</p>
+                <span style="font-size: 12px; font-weight: 700; color: #d17d39; display: inline-block; margin-top: 2px;">— ${v.ref}</span>
+            </div>
+        `).join('');
+
+        const summaryParagraphsHtml = (intro.summary || []).map(p => `
+            <p style="margin: 0 0 12px 0; font-size: 14.5px; line-height: 1.65; color: var(--text-base);">${p}</p>
+        `).join('');
+
+        const lang = document.documentElement.lang || 'no';
+        const labelIntro = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
+        const labelAuthor = lang === 'en' ? 'Author' : (lang === 'es' ? 'Autor' : 'Forfatter');
+        const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
+        const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
+        const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
+        const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
+
+        modal.innerHTML = `
+            <div class="search-modal" style="background: var(--bg-card, #ffffff); border-radius: 20px; width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid var(--border-color, #e2e8f0); padding: 0; position: relative; font-family: 'Inter', sans-serif;">
+                <div style="position: sticky; top: 0; background: var(--bg-card, #ffffff); border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39;">${labelIntro}</span>
+                            <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${intro.title}</h3>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('hkm-book-intro-modal').style.display='none'; document.getElementById('hkm-book-intro-modal').classList.remove('active');" style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-base);">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
+                <div style="padding: 24px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                        <div style="background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                            <strong>${labelAuthor}:</strong> ${intro.author}
+                        </div>
+                        <div style="background: rgba(209, 125, 57, 0.08); color: #d17d39; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                            <strong>${labelDate}:</strong> ${intro.date}
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                            <strong>${labelGenre}:</strong> ${intro.genre}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px; background: rgba(27, 73, 101, 0.04); border-radius: 12px; padding: 14px 16px; border-left: 4px solid #1B4965;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #1B4965; display: block; margin-bottom: 2px;">${labelTheme}</span>
+                        <span style="font-size: 14px; font-weight: 700; color: var(--text-base); line-height: 1.4;">${intro.theme}</span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        ${summaryParagraphsHtml}
+                    </div>
+
+                    ${keyVersesHtml ? `
+                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); padding-top: 16px;">
+                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 8px;">${labelKeyVerses}</span>
+                            ${keyVersesHtml}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('active'));
+    }
+
     renderActiveChapter() {
         if (!this.activeChapterData) return;
         this.dom.readingPane = this.dom.readingPane || document.getElementById('bible-reading-pane');
@@ -3041,15 +3232,22 @@ class BibleReader {
             console.warn("[BibleReader] Error rendering title header:", titleErr);
         }
 
-        // Render verses HTML - CRITICAL
-        this.dom.readingPane.innerHTML = this.activeChapterData.content || '';
+        // Render verses HTML & Book Intro Card - CRITICAL
+        let introCardHtml = '';
+        const chapterNumStr = this.selectedChapterId ? String(this.selectedChapterId.split('_')[1]) : '1';
+        if (chapterNumStr === '1') {
+            introCardHtml = this.renderBookIntroCard(this.selectedBookId);
+        }
+
+        this.dom.readingPane.innerHTML = introCardHtml + (this.activeChapterData.content || '');
+        this.attachBookIntroToggleListener();
 
         // Safe secondary steps
         try { this.loadChapterVerseCrossReferences(); } catch (e) { console.warn(e); }
         try { this.restoreHighlights(); } catch (e) { console.warn(e); }
         try { this.applyReadingPlanHighlights(); } catch (e) { console.warn(e); }
 
-        // Inject Audio Play Button & Cross References Button dynamically in side-by-side bar
+        // Inject Audio Play Button, Cross References & Book Intro Button dynamically in side-by-side bar
         try {
             this.dom.btnLookupChapter = this.dom.btnLookupChapter || document.getElementById('btn-lookup-chapter');
             if (this.dom.btnLookupChapter) {
@@ -3076,6 +3274,24 @@ class BibleReader {
                 } else {
                     const labelSpan = playAudioBtn.querySelector('span:not(.material-symbols-outlined)');
                     if (labelSpan) labelSpan.textContent = this.t('play_audio');
+                }
+
+                let bookIntroBtn = document.getElementById('btn-book-intro-dynamic');
+                if (!bookIntroBtn) {
+                    bookIntroBtn = document.createElement('button');
+                    bookIntroBtn.id = 'btn-book-intro-dynamic';
+                    bookIntroBtn.className = 'nav-btn';
+                    bookIntroBtn.style.cssText = 'font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base); font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease; margin: 0;';
+                    const lang = document.documentElement.lang || 'no';
+                    const labelIntroBtn = lang === 'en' ? 'Book Intro' : (lang === 'es' ? 'Intro Libro' : 'Bokintroduksjon');
+                    bookIntroBtn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">auto_stories</span>
+                        <span>${labelIntroBtn}</span>
+                    `;
+                    bookIntroBtn.addEventListener('click', () => {
+                        this.openBookIntroModal(this.selectedBookId);
+                    });
+                    actionBar.appendChild(bookIntroBtn);
                 }
 
                 let crossrefBtn = document.getElementById('btn-crossref-chapter-dynamic');
@@ -5003,15 +5219,43 @@ class BibleReader {
             console.error("Error fetching general resources:", e);
         }
 
+        let bookIntroSidebarCardHtml = '';
+        const bookIntroObj = typeof getBibleBookIntroduction === 'function' ? getBibleBookIntroduction(this.selectedBookId) : null;
+        if (bookIntroObj) {
+            const labelIntroHeader = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
+            const labelReadIntro = lang === 'en' ? 'Read full introduction' : (lang === 'es' ? 'Leer introducción completa' : 'Les bokintroduksjon');
+            bookIntroSidebarCardHtml = `
+                <div class="hkm-resources-section" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 0;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #1B4965;">auto_stories</span>
+                        <span>${labelIntroHeader}</span>
+                    </h3>
+                    <div class="hkm-rp-sidebar-card no-stripe" style="margin: 0; padding: 16px; box-shadow: none; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 6px 0; font-size: 14.5px; font-weight: 800; color: var(--text-base);">${bookIntroObj.title}</h4>
+                        <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">${bookIntroObj.theme}</p>
+                        <button class="hkm-btn-secondary" id="btn-sidebar-read-book-intro" style="width: 100%; height: 36px !important; font-size: 12px !important; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-color: #1B4965 !important; color: #1B4965 !important; border-radius: 8px !important;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">menu_book</span>
+                            <span>${labelReadIntro}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         // Combine everything
         relatedList.innerHTML = `
             <div class="hkm-resources-tab-container" style="padding: 4px 0;">
+                ${bookIntroSidebarCardHtml}
                 ${bpVideoHtml}
                 ${planResourcesHtml}
                 ${crossRefsHtml}
                 ${generalResourcesHtml}
             </div>
         `;
+
+        document.getElementById('btn-sidebar-read-book-intro')?.addEventListener('click', () => {
+            this.openBookIntroModal(this.selectedBookId);
+        });
 
         // Bind events to cross references in sidebar
         const sidebarCrossRefItems = relatedList.querySelectorAll('.cross-ref-item-sidebar');
