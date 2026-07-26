@@ -2041,16 +2041,16 @@
                                                             : `Du ligger ${daysBehind} dager bak planen.`);
 
                                                     const btnText = lang === 'en'
-                                                        ? `Update to today's devotion (Day ${expectedDay})`
+                                                        ? `Jump to Day ${expectedDay}`
                                                         : (lang === 'es'
-                                                            ? `Actualizar al devocional de hoy (Día ${expectedDay})`
-                                                            : `Oppdater til dagens andakt (Dag ${expectedDay})`);
+                                                            ? `Ir al Día ${expectedDay}`
+                                                            : `Hopp til Dag ${expectedDay}`);
 
                                                     syncContainer.innerHTML = `
-                                                        <span style="font-size: 12px; color: #b45309; font-weight: 600; text-align: center;">${labelText}</span>
-                                                        <button class="btn-start-plan" id="sync-day-btn" style="background: #c8682a; border: none; font-size: 0.9rem; padding: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                                        <span style="font-size: 13px; color: #b45309; font-weight: 700; text-align: center;">${labelText}</span>
+                                                        <button class="btn-start-plan" id="sync-day-btn" style="background: #c8682a; border: none; font-size: 13px; font-weight: 700; padding: 12px 16px; min-height: 44px; border-radius: 12px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">
                                                             <span class="material-symbols-outlined" style="font-size: 18px;">sync</span>
-                                                            ${btnText}
+                                                            <span>${btnText}</span>
                                                         </button>
                                                     `;
 
