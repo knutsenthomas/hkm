@@ -3029,64 +3029,50 @@ class BibleReader {
         if (modal) modal.remove();
 
         modal = document.createElement('div');
-        modal.id = 'hkm-book-intro-modal';
         modal.className = 'hkm-modal-overlay';
         modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
-            box-sizing: border-box;
-            opacity: 0;
-            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            z-index: 35000 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 16px !important;
+            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
+            box-sizing: border-box !important;
         `;
 
         if (!intro) {
             modal.innerHTML = `
-                <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 32px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+                <div class="color-wheel-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 32px; text-align: center; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.35);">
                     <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                         <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
                     </div>
                     <h2 style="font-size: 22px; font-weight: 800; margin: 0 0 8px 0; color: var(--text-base);">${bookName}</h2>
                     <p style="color: var(--text-muted, #64748b); margin: 0 0 24px 0; font-size: 14.5px; line-height: 1.5;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
-                    <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; transition: transform 0.15s ease;">
+                    <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
                         ${labelClose}
                     </button>
                 </div>
             `;
             document.body.appendChild(modal);
-            requestAnimationFrame(() => modal.style.opacity = '1');
             const closeBtn = modal.querySelector('#btn-close-empty-intro');
-            if (closeBtn) {
-                closeBtn.onclick = () => {
-                    modal.style.opacity = '0';
-                    setTimeout(() => modal.remove(), 250);
-                };
-            }
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    modal.style.opacity = '0';
-                    setTimeout(() => modal.remove(), 250);
-                }
-            };
+            if (closeBtn) closeBtn.onclick = () => modal.remove();
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
             return;
         }
 
         const keyVersesHtml = (intro.keyVerses || []).map(v => `
-            <div style="border-left: 4px solid #D17D39; padding: 14px 18px; margin-top: 12px; background: rgba(209,125,57,0.04); border-radius: 0 12px 12px 0;">
+            <div style="border-left: 4px solid #D17D39; padding: 14px 18px; margin-top: 12px; background: rgba(209,125,57,0.05); border-radius: 0 12px 12px 0;">
                 <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6; font-family: var(--font-serif, Georgia, serif);">"${v.text}"</p>
                 <span style="font-size: 13px; font-weight: 700; color: #D17D39; font-style: normal; display: inline-block; margin-top: 6px;">— ${v.ref}</span>
             </div>
@@ -3097,7 +3083,7 @@ class BibleReader {
         `).join('');
 
         const howToReadHtml = intro.howToRead ? `
-            <div style="margin: 24px 0; background: linear-gradient(135deg, rgba(209,125,57,0.07) 0%, rgba(27,73,101,0.05) 100%); border-radius: 16px; padding: 20px 24px; border: 1px solid rgba(209,125,57,0.22);">
+            <div style="margin: 24px 0; background: rgba(209,125,57,0.06); border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(209,125,57,0.2);">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #D17D39;">tips_and_updates</span>
                     <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39;">${labelHowToRead}</span>
@@ -3107,45 +3093,45 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 680px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
+            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); border-radius: 24px; width: 100%; max-width: 640px; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35); overflow: hidden; margin: auto;">
                 <!-- Header Bar -->
-                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-card, #ffffff);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #1B4965 0%, #2A5C7D 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 16px rgba(27,73,101,0.25);">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">auto_stories</span>
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
                         </div>
                         <div>
-                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
-                            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: 'Inter', sans-serif;">${intro.title}</h3>
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2;">${intro.title}</h3>
                         </div>
                     </div>
-                    <button id="btn-close-book-intro-x" title="Lukk" style="background: rgba(0,0,0,0.05); border: none; font-size: 20px; color: var(--text-muted, #64748b); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;">
+                    <button id="btn-close-book-intro-x" title="Lukk" style="background: transparent; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none;">
                         <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
                     </button>
                 </div>
 
-                <!-- Scrollable Body with generous bottom padding so text is never cut off -->
-                <div style="padding: 20px 20px 48px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+                <!-- Scrollable Body -->
+                <div style="padding: 20px 20px 48px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
                     
-                    <!-- Unified Hero Metadata Card -->
-                    <div style="background: linear-gradient(135deg, rgba(27,73,101,0.04) 0%, rgba(209,125,57,0.04) 100%); border: 1px solid rgba(27,73,101,0.08); border-radius: 18px; padding: 16px 18px; margin-bottom: 20px;">
+                    <!-- Unified Metadata Cards -->
+                    <div style="background: rgba(27,73,101,0.04); border: 1px solid rgba(27,73,101,0.08); border-radius: 16px; padding: 14px 16px; margin-bottom: 20px;">
                         <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
                             <!-- Author Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">edit_note</span>
                                 <span style="color: var(--text-muted, #64748b);">${labelAuthor}:</span>
                                 <strong style="color: var(--text-base); font-weight: 700;">${intro.author}</strong>
                             </div>
 
                             <!-- Date Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #D17D39;">event</span>
                                 <span style="color: var(--text-muted, #64748b);">${labelDate}:</span>
                                 <strong style="color: var(--text-base); font-weight: 700;">${intro.date}</strong>
                             </div>
 
                             <!-- Genre Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #059669;">category</span>
                                 <span style="color: var(--text-muted, #64748b);">${labelGenre}:</span>
                                 <strong style="color: var(--text-base); font-weight: 700;">${intro.genre}</strong>
@@ -3154,12 +3140,12 @@ class BibleReader {
                     </div>
 
                     <!-- Sleek Hovedtema Card -->
-                    <div style="margin-bottom: 20px; background: linear-gradient(90deg, rgba(27,73,101,0.06) 0%, rgba(209,125,57,0.04) 100%); border-radius: 16px; padding: 16px 20px; border-left: 4px solid #1B4965; border-top: 1px solid rgba(27,73,101,0.06); border-right: 1px solid rgba(27,73,101,0.06); border-bottom: 1px solid rgba(27,73,101,0.06);">
+                    <div style="margin-bottom: 20px; background: rgba(27,73,101,0.04); border-radius: 14px; padding: 16px 18px; border-left: 4px solid #1B4965;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #1B4965;">lightbulb</span>
                             <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #1B4965;">${labelTheme}</span>
                         </div>
-                        <div style="font-size: 15.5px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</div>
+                        <div style="font-size: 15px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</div>
                     </div>
 
                     <!-- Detailed Summary Paragraphs -->
@@ -3167,24 +3153,12 @@ class BibleReader {
                         ${summaryParagraphsHtml}
                     </div>
 
-                    <!-- How to Read Section -->
                     ${howToReadHtml}
-
-                    <!-- Key Verses -->
-                    ${keyVersesHtml ? `
-                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 20px; margin-top: 24px; margin-bottom: 16px;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39;">format_quote</span>
-                                <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted, #64748b);">${labelKeyVerses}</span>
-                            </div>
-                            ${keyVersesHtml}
-                        </div>
-                    ` : ''}
                 </div>
 
                 <!-- Pinned Footer Bar -->
-                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
-                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(27,73,101,0.25); transition: all 0.2s ease;">
+                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-card, #ffffff); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">
                         <span>${labelClose}</span>
                         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
                     </button>
@@ -3194,23 +3168,13 @@ class BibleReader {
 
         document.body.appendChild(modal);
 
-        const card = modal.querySelector('.hkm-book-intro-card');
-        requestAnimationFrame(() => {
-            modal.style.opacity = '1';
-            if (card) card.style.transform = 'scale(1)';
-        });
-
-        const closeModal = () => {
-            modal.style.opacity = '0';
-            if (card) card.style.transform = 'scale(0.95)';
-            setTimeout(() => modal.remove(), 250);
+        const closeBtnX = modal.querySelector('#btn-close-book-intro-x');
+        const closeBtnFooter = modal.querySelector('#btn-close-book-intro-footer');
+        if (closeBtnX) closeBtnX.onclick = () => modal.remove();
+        if (closeBtnFooter) closeBtnFooter.onclick = () => modal.remove();
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
         };
-
-        modal.querySelector('#btn-close-book-intro-x')?.addEventListener('click', closeModal);
-        modal.querySelector('#btn-close-book-intro-footer')?.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
     }
 
     renderBookIntroPage(bookId) {
@@ -3327,111 +3291,7 @@ class BibleReader {
         });
     }
 
-    openBookIntroModal(bookId) {
-        const intro = typeof getBibleBookIntroduction === 'function'
-            ? getBibleBookIntroduction(bookId)
-            : (window.getBibleBookIntroduction ? window.getBibleBookIntroduction(bookId) : null);
-        if (!intro) return;
 
-        let modal = document.getElementById('hkm-book-intro-modal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'hkm-book-intro-modal';
-            modal.className = 'search-overlay';
-            modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;';
-            document.body.appendChild(modal);
-
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    modal.classList.remove('active');
-                }
-            });
-        }
-
-        const keyVersesHtml = (intro.keyVerses || []).map(v => `
-            <div style="border-left: 3px solid #d17d39; padding-left: 12px; margin-top: 10px;">
-                <p style="margin: 0; font-size: 14px; font-style: italic; color: var(--text-base); line-height: 1.5;">"${v.text}"</p>
-                <span style="font-size: 12px; font-weight: 700; color: #d17d39; display: inline-block; margin-top: 2px;">— ${v.ref}</span>
-            </div>
-        `).join('');
-
-        const summaryParagraphsHtml = (intro.summary || []).map(p => `
-            <p style="margin: 0 0 12px 0; font-size: 14.5px; line-height: 1.65; color: var(--text-base);">${p}</p>
-        `).join('');
-
-        const lang = document.documentElement.lang || 'no';
-        const labelIntro = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
-        const labelAuthor = lang === 'en' ? 'Author' : (lang === 'es' ? 'Autor' : 'Forfatter');
-        const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
-        const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
-        const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
-        const labelHowToRead = lang === 'en' ? 'How to Read This Book' : (lang === 'es' ? 'Cómo leer este libro' : 'Hvordan lese boken best');
-        const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
-
-        const howToReadHtml = intro.howToRead ? `
-            <div style="margin-top: 20px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 12px; padding: 16px 18px; border: 1px solid rgba(209,125,57,0.25);">
-                <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #d17d39; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                    <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">tips_and_updates</span>
-                    <span>${labelHowToRead}</span>
-                </span>
-                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
-            </div>
-        ` : '';
-
-        modal.innerHTML = `
-            <div class="search-modal" style="background: var(--bg-card, #ffffff); border-radius: 20px; width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid var(--border-color, #e2e8f0); padding: 0; position: relative; font-family: 'Inter', sans-serif;">
-                <div style="position: sticky; top: 0; background: var(--bg-card, #ffffff); border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
-                        </div>
-                        <div>
-                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39;">${labelIntro}</span>
-                            <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${intro.title}</h3>
-                        </div>
-                    </div>
-                    <button onclick="document.getElementById('hkm-book-intro-modal').style.display='none'; document.getElementById('hkm-book-intro-modal').classList.remove('active');" style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-base);">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-                    </button>
-                </div>
-                <div style="padding: 24px;">
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-                        <div style="background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
-                            <strong>${labelAuthor}:</strong> ${intro.author}
-                        </div>
-                        <div style="background: rgba(209, 125, 57, 0.08); color: #d17d39; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
-                            <strong>${labelDate}:</strong> ${intro.date}
-                        </div>
-                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;">
-                            <strong>${labelGenre}:</strong> ${intro.genre}
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px; background: rgba(27, 73, 101, 0.04); border-radius: 12px; padding: 14px 16px; border-left: 4px solid #1B4965;">
-                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #1B4965; display: block; margin-bottom: 2px;">${labelTheme}</span>
-                        <span style="font-size: 14px; font-weight: 700; color: var(--text-base); line-height: 1.4;">${intro.theme}</span>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        ${summaryParagraphsHtml}
-                    </div>
-
-                    ${howToReadHtml}
-
-                    ${keyVersesHtml ? `
-                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); padding-top: 16px;">
-                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 8px;">${labelKeyVerses}</span>
-                            ${keyVersesHtml}
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => modal.classList.add('active'));
-    }
 
     renderActiveChapter() {
         if (!this.activeChapterData) return;
