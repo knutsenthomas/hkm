@@ -8124,6 +8124,13 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
+        modal.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; padding: 24px; text-align: center;">
+                <span class="material-symbols-outlined spin" style="font-size: 48px; color: #d17d39;">progress_activity</span>
+                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin: 0; font-family: system-ui, -apple-system, sans-serif;">${globalPlan ? globalPlan.title : 'Laster andakt...'}</h3>
+                <p style="color: #64748b; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; margin: 0;">Henter Guds ord for dag ${targetDay}...</p>
+            </div>
+        `;
         
         document.body.appendChild(modal);
 
@@ -8135,7 +8142,13 @@ class BibleReader {
             scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
         }
 
-        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, startStep, scriptureHtml);
+        try {
+            this.renderDevotionalStep(modal, globalPlan, targetDay, dayConfig, startStep, scriptureHtml);
+        } catch (renderErr) {
+            console.error("[BibleReader] Error in renderDevotionalStep:", renderErr);
+            modal.remove();
+            alert("Kunne ikke vise andakten. Prøv igjen.");
+        }
     }
 
     async fetchAndFilterVersesText(versesText) {
@@ -8143,6 +8156,14 @@ class BibleReader {
             throw new Error("No verses specified");
         }
         const input = versesText.trim();
+
+        if (!this.books || !this.books.length) {
+            try {
+                await this.loadBooks();
+            } catch (e) {
+                console.warn("[BibleReader] loadBooks failed in fetchAndFilterVersesText:", e);
+            }
+        }
 
         // Helper to parse single passage
         const parseSinglePassage = (passageStr) => {
@@ -8249,19 +8270,28 @@ class BibleReader {
                 return `<p style="color: #94a3b8; font-style: italic;">${parsed.raw || input}</p>`;
             }
 
+            const bibleId = this.selectedBibleId || 'DNB';
+
             if (parsed.type === 'chap_range') {
-                let combinedHtml = '';
+                const chapterPromises = [];
                 for (let c = parsed.startChap; c <= parsed.endChap; c++) {
                     const chapterId = `${matchedBook.id}_${c}`;
-                    try {
-                        const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
-                        const payload = await res.json();
-                        if (payload.data && payload.data.content) {
-                            combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${c === parsed.startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${c}</h4>`;
-                            combinedHtml += payload.data.content;
-                        }
-                    } catch (err) {
-                        console.warn(`Failed to load chapter ${chapterId}:`, err);
+                    chapterPromises.push(
+                        fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`)
+                            .then(res => res.json())
+                            .then(payload => ({
+                                chapNum: c,
+                                content: payload.data && payload.data.content ? payload.data.content : null
+                            }))
+                            .catch(err => ({ chapNum: c, content: null }))
+                    );
+                }
+                const results = await Promise.all(chapterPromises);
+                let combinedHtml = '';
+                for (const r of results) {
+                    if (r.content) {
+                        combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${r.chapNum === parsed.startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${r.chapNum}</h4>`;
+                        combinedHtml += r.content;
                     }
                 }
                 return combinedHtml || `<p style="color: #94a3b8;">${matchedBook.name} ${parsed.startChap}-${parsed.endChap}</p>`;
@@ -8269,7 +8299,7 @@ class BibleReader {
 
             const chapNum = parsed.startChap || 1;
             const chapterId = `${matchedBook.id}_${chapNum}`;
-            const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+            const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
             const payload = await res.json();
 
             if (!payload.data || !payload.data.content) {
@@ -8307,14 +8337,9 @@ class BibleReader {
             return payload.data.content;
         };
 
-        let resultHtml = '';
-        for (const part of parts) {
-            const parsed = parseSinglePassage(part);
-            const passageHtml = await fetchPassageHtml(parsed);
-            resultHtml += passageHtml;
-        }
-
-        return resultHtml || `<p style="text-align: center; color: #64748b;">${input}</p>`;
+        const passagePromises = parts.map(part => fetchPassageHtml(parseSinglePassage(part)));
+        const htmlResults = await Promise.all(passagePromises);
+        return htmlResults.join('<hr style="margin: 32px 0; border: none; border-top: 1px dashed #cbd5e1;" />') || `<p style="text-align: center; color: #64748b;">${input}</p>`;
     }
 
     formatMarkdownText(text) {
