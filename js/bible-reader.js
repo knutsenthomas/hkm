@@ -3052,9 +3052,9 @@ class BibleReader {
             -webkit-backdrop-filter: blur(6px) !important;
             z-index: 35000 !important;
             display: flex !important;
-            align-items: ${isMobileScreen ? 'flex-end' : 'center'} !important;
+            align-items: flex-end !important;
             justify-content: center !important;
-            padding: ${isMobileScreen ? '0' : '24px'} !important;
+            padding: 0 !important;
             box-sizing: border-box !important;
         `;
 
@@ -3156,19 +3156,22 @@ class BibleReader {
         ` : `
             background: var(--bg-card, #ffffff);
             border: 1px solid var(--border-color, rgba(0,0,0,0.12));
+            border-bottom: none;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             box-sizing: border-box;
-            width: 90% !important;
-            max-width: 500px !important;
-            border-radius: 24px !important;
+            width: 100% !important;
+            max-width: 580px !important;
+            border-radius: 24px 24px 0 0 !important;
             padding-top: 20px !important;
             max-height: 82vh !important;
             max-height: 82dvh !important;
             margin: 0 auto !important;
+            margin-top: auto !important;
+            margin-bottom: 0 !important;
             box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
-            animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
         `;
 
         modal.innerHTML = `
@@ -6654,13 +6657,16 @@ class BibleReader {
             .hkm-modal-overlay,
             .verse-crossref-sheet-overlay,
             .color-wheel-modal-overlay,
-            #verse-crossref-modal {
+            #verse-crossref-modal,
+            #hkm-book-intro-modal {
                 background: rgba(15, 23, 42, 0.55) !important;
                 backdrop-filter: blur(6px) !important;
                 -webkit-backdrop-filter: blur(6px) !important;
                 display: flex !important;
-                align-items: center !important;
+                align-items: flex-end !important;
                 justify-content: center !important;
+                padding: 0 !important;
+                margin: 0 !important;
                 z-index: 35000 !important;
             }
 
@@ -6668,7 +6674,8 @@ class BibleReader {
                 .hkm-modal-overlay,
                 .verse-crossref-sheet-overlay,
                 .color-wheel-modal-overlay,
-                #verse-crossref-modal {
+                #verse-crossref-modal,
+                #hkm-book-intro-modal {
                     align-items: flex-end !important;
                     justify-content: center !important;
                     padding: 0 !important;
@@ -6679,12 +6686,14 @@ class BibleReader {
                 .color-wheel-card {
                     border-radius: 28px 28px 0 0 !important;
                     padding-top: 16px !important;
+                    padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
                     max-height: 85vh !important;
                     max-height: 85dvh !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0 !important;
                     margin-top: auto !important;
+                    margin-bottom: 0 !important;
                     box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
                     border-bottom: none !important;
                     animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -6695,36 +6704,44 @@ class BibleReader {
                 .hkm-modal-overlay,
                 .verse-crossref-sheet-overlay,
                 .color-wheel-modal-overlay,
-                #verse-crossref-modal {
-                    align-items: center !important;
+                #verse-crossref-modal,
+                #hkm-book-intro-modal {
+                    align-items: flex-end !important;
                     justify-content: center !important;
-                    padding: 24px !important;
+                    padding: 0 !important;
                 }
                 .hkm-book-intro-sheet-card,
                 .verse-crossref-sheet-card,
                 .translation-modal-card {
-                    border-radius: 24px !important;
+                    border-radius: 24px 24px 0 0 !important;
                     padding: 20px 24px !important;
-                    width: 90% !important;
-                    max-width: 520px !important;
+                    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+                    width: 100% !important;
+                    max-width: 580px !important;
                     max-height: 82vh !important;
                     max-height: 82dvh !important;
-                    margin: auto !important;
-                    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.35) !important;
+                    margin: 0 auto !important;
+                    margin-top: auto !important;
+                    margin-bottom: 0 !important;
+                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                    animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    border-bottom: none !important;
+                    animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .color-wheel-card {
-                    border-radius: 24px !important;
-                    width: 90% !important;
-                    max-width: 320px !important;
-                    margin: auto !important;
-                    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.35) !important;
+                    border-radius: 24px 24px 0 0 !important;
+                    width: 100% !important;
+                    max-width: 360px !important;
+                    margin: 0 auto !important;
+                    margin-top: auto !important;
+                    margin-bottom: 0 !important;
+                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                    animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    border-bottom: none !important;
+                    animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .sheet-handle-bar {
-                    display: none !important;
+                    display: block !important;
                 }
             }
 
