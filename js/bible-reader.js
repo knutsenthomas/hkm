@@ -3062,13 +3062,19 @@ class BibleReader {
             document.body.style.overflow = '';
             const card = modal.querySelector('.hkm-book-intro-sheet-card');
             if (card) {
-                card.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
-                card.style.transform = 'translateY(100%)';
-                modal.style.transition = 'background-color 0.25s ease, opacity 0.25s ease';
+                if (isMobileScreen) {
+                    card.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+                    card.style.transform = 'translateY(100%)';
+                } else {
+                    card.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                    card.style.transform = 'scale(0.94)';
+                    card.style.opacity = '0';
+                }
+                modal.style.transition = 'opacity 0.2s ease';
                 modal.style.opacity = '0';
                 setTimeout(() => {
                     modal.remove();
-                }, 250);
+                }, 220);
             } else {
                 modal.remove();
             }
@@ -3131,7 +3137,7 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding-top: 16px !important; max-height: 80dvh !important; max-height: 80vh !important; margin-top: auto !important; border-radius: 28px 28px 0 0 !important; width: 100% !important;">
+            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
                 <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.22)); border-radius: 99px; margin: 0 auto 12px !important; cursor: pointer; flex-shrink: 0;"></div>
@@ -3210,16 +3216,25 @@ class BibleReader {
 
         const card = modal.querySelector('.hkm-book-intro-sheet-card');
         if (card) {
-            card.style.transform = 'translateY(100%)';
-            card.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
-            modal.style.transition = 'background-color 0.28s ease';
-            requestAnimationFrame(() => {
-                card.style.transform = 'translateY(0)';
-            });
-            this.setupBottomSheetSwipeDown(card, () => {
-                document.body.style.overflow = '';
-                modal.remove();
-            });
+            if (isMobileScreen) {
+                card.style.transform = 'translateY(100%)';
+                card.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                requestAnimationFrame(() => {
+                    card.style.transform = 'translateY(0)';
+                });
+                this.setupBottomSheetSwipeDown(card, () => {
+                    document.body.style.overflow = '';
+                    modal.remove();
+                });
+            } else {
+                card.style.transform = 'scale(0.94)';
+                card.style.opacity = '0';
+                card.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease';
+                requestAnimationFrame(() => {
+                    card.style.transform = 'scale(1)';
+                    card.style.opacity = '1';
+                });
+            }
         }
     }
 
@@ -6606,15 +6621,21 @@ class BibleReader {
                 .hkm-modal-overlay.hkm-book-intro-overlay {
                     align-items: center !important;
                     justify-content: center !important;
-                    padding: 20px !important;
+                    padding: 24px !important;
                 }
                 .hkm-book-intro-sheet-card {
                     border-radius: 24px !important;
-                    max-width: 620px !important;
-                    max-height: 90vh !important;
-                    max-height: 90dvh !important;
+                    padding-top: 20px !important;
+                    width: 90% !important;
+                    max-width: 640px !important;
+                    max-height: 85vh !important;
+                    max-height: 85dvh !important;
                     margin: auto !important;
-                    box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35) !important;
+                    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3) !important;
+                    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+                }
+                .sheet-handle-bar {
+                    display: none !important;
                 }
             }
 
