@@ -441,9 +441,31 @@ class BibleReader {
             this.injectReadingPlanStyles();
             if (this.dom.sidebar) {
                 this.dom.sidebar.classList.add('reading-plan-active');
-                if (window.innerWidth <= 1024) {
-                    this.dom.sidebar.classList.add('active');
+
+                // Instantly hide static Bible book list and headers so "Bibelbøker" never flashes
+                const booksListWrapper = this.dom.sidebar.querySelector('.books-list-wrapper');
+                if (booksListWrapper) booksListWrapper.style.display = 'none';
+
+                const sidebarHeader = this.dom.sidebar.querySelector('.sidebar-header');
+                if (sidebarHeader) sidebarHeader.style.display = 'none';
+
+                const mobileControls = document.getElementById('sidebar-mobile-controls');
+                if (mobileControls) mobileControls.style.display = 'none';
+
+                let planSidebar = document.getElementById('reading-plan-sidebar-content');
+                if (!planSidebar) {
+                    planSidebar = document.createElement('div');
+                    planSidebar.id = 'reading-plan-sidebar-content';
+                    planSidebar.style.cssText = 'padding: 0; overflow: hidden; height: calc(100% - 60px);';
+                    this.dom.sidebar.appendChild(planSidebar);
                 }
+                planSidebar.style.display = 'block';
+                planSidebar.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px; color: var(--text-muted);">
+                        <div class="spinner" style="margin-bottom: 16px; width: 28px; height: 28px; border: 3px solid var(--border-color); border-top-color: var(--bible-primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="font-size: 14px; font-weight: 600; margin: 0;">Laster leseplan...</p>
+                    </div>
+                `;
             }
         }
         
