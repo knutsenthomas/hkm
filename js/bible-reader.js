@@ -2830,14 +2830,12 @@ class BibleReader {
             else el.classList.remove('active');
         });
 
-        // Handle Intro page route
+        // Handle Intro page route: loads chapter 1 in main pane and opens Book Intro Modal Dialog Box
         if (chapNumPart === 'intro' || chapterId === 'intro') {
             const targetBookId = bookPartId || this.selectedBookId;
             this.selectedBookId = targetBookId;
-            this.selectedChapterId = `${targetBookId}_intro`;
-            this.renderBookIntroPage(targetBookId);
-            this.updateNavigationButtons();
-            this.updateRelatedResources();
+            await this.selectChapter(`${targetBookId}_1`);
+            this.openBookIntroModal(targetBookId);
             return;
         }
 
@@ -3008,33 +3006,14 @@ class BibleReader {
         }
     }
 
-    renderBookIntroPage(bookId) {
-        this.selectedChapterId = `${bookId}_intro`;
+    openBookIntroModal(bookId) {
+        bookId = bookId || this.selectedBookId;
         const intro = typeof getBibleBookIntroduction === 'function' 
             ? getBibleBookIntroduction(bookId) 
             : (window.getBibleBookIntroduction ? window.getBibleBookIntroduction(bookId) : null);
         
         const currentBook = this.books ? this.books.find(b => b.id === bookId) : null;
         const bookName = currentBook ? currentBook.name : (intro ? intro.title : bookId);
-        
-        // Update header title elements
-        try {
-            this.dom.currentBookBadge = this.dom.currentBookBadge || document.getElementById('current-book-badge');
-            this.dom.currentChapterNumber = this.dom.currentChapterNumber || document.getElementById('current-chapter-number');
-            this.dom.currentReferenceTitle = this.dom.currentReferenceTitle || document.getElementById('current-reference-title');
-
-            if (this.dom.currentBookBadge) this.dom.currentBookBadge.innerText = bookName.toUpperCase();
-            if (this.dom.currentChapterNumber) {
-                const lang = document.documentElement.lang || 'no';
-                const labelIntroTitle = lang === 'en' ? 'Intro' : (lang === 'es' ? 'Intro' : 'Intro');
-                this.dom.currentChapterNumber.innerText = labelIntroTitle;
-                this.dom.currentChapterNumber.style.fontSize = '32px';
-                this.dom.currentChapterNumber.style.fontFamily = "'Inter', sans-serif";
-                this.dom.currentChapterNumber.style.fontWeight = '800';
-                this.dom.currentChapterNumber.style.margin = '4px 0 8px 0';
-            }
-            if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = `${bookName} - Bokintroduksjon`;
-        } catch (e) {}
 
         const lang = document.documentElement.lang || 'no';
         const labelIntro = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
@@ -3044,114 +3023,174 @@ class BibleReader {
         const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
         const labelHowToRead = lang === 'en' ? 'How to Read This Book' : (lang === 'es' ? 'Cómo leer este libro' : 'Hvordan lese boken best');
         const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
-        const labelStartReading = lang === 'en' ? 'Start Reading Chapter 1' : (lang === 'es' ? 'Comenzar a leer el capítulo 1' : 'Start lesing – Kapittel 1');
+        const labelClose = lang === 'en' ? 'Close & Read' : (lang === 'es' ? 'Cerrar y leer' : 'Lukk og les');
+
+        let modal = document.getElementById('hkm-book-intro-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-book-intro-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.25s ease-out;
+        `;
 
         if (!intro) {
-            this.dom.readingPane.innerHTML = `
-                <div style="max-width: 720px; margin: 40px auto; padding: 32px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); text-align: center;">
-                    <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 12px;">${bookName}</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 24px;">Det er ingen egen skriftlig introduksjon for denne boken ennå.</p>
-                    <button class="hkm-btn-primary" id="btn-start-chap1-page" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 15px; border-radius: 12px; font-weight: 700; background: #1B4965; color: #ffffff; cursor: pointer; border: none;">
-                        <span>${labelStartReading}</span>
-                        <span class="material-symbols-outlined">arrow_forward</span>
+            modal.innerHTML = `
+                <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 20px; width: 100%; max-width: 500px; padding: 32px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+                    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 12px; color: var(--text-base);">${bookName}</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14.5px;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
+                    <button id="btn-close-empty-intro" style="padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 10px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
+                        ${labelClose}
                     </button>
                 </div>
             `;
-            document.getElementById('btn-start-chap1-page')?.addEventListener('click', () => this.selectChapter(`${bookId}_1`));
+            document.body.appendChild(modal);
+            requestAnimationFrame(() => modal.style.opacity = '1');
+            const closeBtn = modal.querySelector('#btn-close-empty-intro');
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    modal.style.opacity = '0';
+                    setTimeout(() => modal.remove(), 250);
+                };
+            }
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.opacity = '0';
+                    setTimeout(() => modal.remove(), 250);
+                }
+            };
             return;
         }
 
         const keyVersesHtml = (intro.keyVerses || []).map(v => `
-            <div style="border-left: 4px solid #d17d39; padding-left: 16px; margin-top: 14px; background: rgba(209,125,57,0.03); padding: 12px 16px; border-radius: 0 10px 10px 0;">
-                <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6;">"${v.text}"</p>
-                <span style="font-size: 13px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 4px;">— ${v.ref}</span>
+            <div style="border-left: 4px solid #d17d39; padding-left: 14px; margin-top: 10px; background: rgba(209,125,57,0.04); padding: 10px 14px; border-radius: 0 8px 8px 0;">
+                <p style="margin: 0; font-size: 14.5px; font-style: italic; color: var(--text-base); line-height: 1.55;">"${v.text}"</p>
+                <span style="font-size: 12.5px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 4px;">— ${v.ref}</span>
             </div>
         `).join('');
 
         const summaryParagraphsHtml = (intro.summary || []).map(p => `
-            <p style="margin: 0 0 16px 0; font-size: 15.5px; line-height: 1.7; color: var(--text-base);">${p}</p>
+            <p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.65; color: var(--text-base);">${p}</p>
         `).join('');
 
         const howToReadHtml = intro.howToRead ? `
-            <div style="margin-top: 28px; margin-bottom: 28px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 16px; padding: 22px 26px; border: 1px solid rgba(209,125,57,0.25);">
-                <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">tips_and_updates</span>
+            <div style="margin: 20px 0; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(209,125,57,0.25);">
+                <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">tips_and_updates</span>
                     <span>${labelHowToRead}</span>
                 </span>
-                <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
+                <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
             </div>
         ` : '';
 
-        this.dom.readingPane.innerHTML = `
-            <div id="hkm-book-intro-page" style="max-width: 780px; margin: 10px auto 60px auto; padding: 0 12px; font-family: 'Inter', sans-serif;">
-                <!-- Header Hero Card -->
-                <div style="border-radius: 20px; background: linear-gradient(135deg, rgba(27,73,101,0.09) 0%, rgba(209,125,57,0.09) 100%); padding: 28px 32px; border: 1px solid var(--border-color, rgba(0,0,0,0.08)); box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 28px;">
-                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
-                        <div style="width: 48px; height: 48px; border-radius: 14px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 14px rgba(27,73,101,0.25);">
-                            <span class="material-symbols-outlined" style="font-size: 26px;">auto_stories</span>
+        modal.innerHTML = `
+            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 20px; width: 100%; max-width: 660px; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; box-shadow: 0 24px 48px rgba(0,0,0,0.25); transform: scale(0.96); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
+                <!-- Modal Header -->
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 42px; height: 42px; border-radius: 12px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(27,73,101,0.25);">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
                         </div>
                         <div>
-                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39;">${labelIntro}</span>
-                            <h1 style="margin: 0; font-size: 26px; font-weight: 900; color: var(--text-base); line-height: 1.2;">${intro.title}</h1>
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39; display: block;">${labelIntro}</span>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 900; color: var(--text-base); line-height: 1.2;">${intro.title}</h3>
                         </div>
                     </div>
+                    <button id="btn-close-book-intro-x" title="Lukk" style="background: rgba(0,0,0,0.05); border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                    </button>
+                </div>
 
+                <!-- Modal Body (Scrollable) -->
+                <div style="padding: 24px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
                     <!-- Metadata Badges -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px;">
-                        <div style="background: rgba(27, 73, 101, 0.12); color: #1B4965; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                        <div style="background: rgba(27, 73, 101, 0.1); color: #1B4965; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
                             <strong>${labelAuthor}:</strong> ${intro.author}
                         </div>
-                        <div style="background: rgba(209, 125, 57, 0.12); color: #d17d39; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                        <div style="background: rgba(209, 125, 57, 0.1); color: #d17d39; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
                             <strong>${labelDate}:</strong> ${intro.date}
                         </div>
-                        <div style="background: rgba(0, 0, 0, 0.06); color: var(--text-base); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700;">
                             <strong>${labelGenre}:</strong> ${intro.genre}
                         </div>
                     </div>
-                </div>
 
-                <!-- Main Theme Card -->
-                <div style="margin-bottom: 28px; background: rgba(27, 73, 101, 0.04); border-radius: 14px; padding: 18px 22px; border-left: 5px solid #1B4965;">
-                    <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #1B4965; display: block; margin-bottom: 4px;">${labelTheme}</span>
-                    <span style="font-size: 16px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</span>
-                </div>
-
-                <!-- Detailed Summary -->
-                <div class="hkm-book-intro-body" style="margin-bottom: 28px;">
-                    ${summaryParagraphsHtml}
-                </div>
-
-                <!-- How to Read Section -->
-                ${howToReadHtml}
-
-                <!-- Key Verses -->
-                ${keyVersesHtml ? `
-                    <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 24px; margin-top: 24px; margin-bottom: 36px;">
-                        <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 12px;">${labelKeyVerses}</span>
-                        ${keyVersesHtml}
+                    <!-- Main Theme Card -->
+                    <div style="margin-bottom: 20px; background: rgba(27, 73, 101, 0.04); border-radius: 12px; padding: 14px 18px; border-left: 4px solid #1B4965;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #1B4965; display: block; margin-bottom: 4px;">${labelTheme}</span>
+                        <span style="font-size: 15px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</span>
                     </div>
-                ` : ''}
 
-                <!-- Start Reading CTA Button -->
-                <div style="text-align: center; margin-top: 40px; padding: 28px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Klar til å begynne å lese?</p>
-                    <button class="hkm-btn-primary" id="btn-start-chap1-page" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 32px; font-size: 16px; border-radius: 12px; font-weight: 800; background: #1B4965; color: #ffffff; cursor: pointer; border: none; box-shadow: 0 4px 14px rgba(27,73,101,0.3); transition: transform 0.2s ease;">
-                        <span>${labelStartReading}</span>
-                        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_forward</span>
+                    <!-- Detailed Summary -->
+                    <div class="hkm-book-intro-body" style="margin-bottom: 18px;">
+                        ${summaryParagraphsHtml}
+                    </div>
+
+                    <!-- How to Read Section -->
+                    ${howToReadHtml}
+
+                    <!-- Key Verses -->
+                    ${keyVersesHtml ? `
+                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 18px; margin-top: 18px;">
+                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 8px;">${labelKeyVerses}</span>
+                            ${keyVersesHtml}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Modal Footer -->
+                <div style="padding: 14px 24px; border-top: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                    <button id="btn-close-book-intro-footer" style="padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 10px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 3px 10px rgba(27,73,101,0.25); transition: transform 0.15s ease;">
+                        <span>${labelClose}</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px;">check</span>
                     </button>
                 </div>
             </div>
         `;
 
-        document.getElementById('btn-start-chap1-page')?.addEventListener('click', () => {
-            this.selectChapter(`${bookId}_1`);
+        document.body.appendChild(modal);
+
+        const card = modal.querySelector('.hkm-book-intro-card');
+        requestAnimationFrame(() => {
+            modal.style.opacity = '1';
+            if (card) card.style.transform = 'scale(1)';
         });
 
-        // Scroll reading pane to top
-        if (this.dom.readingPane) {
-            this.dom.readingPane.scrollTop = 0;
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const closeModal = () => {
+            modal.style.opacity = '0';
+            if (card) card.style.transform = 'scale(0.96)';
+            setTimeout(() => modal.remove(), 250);
+        };
+
+        modal.querySelector('#btn-close-book-intro-x')?.addEventListener('click', closeModal);
+        modal.querySelector('#btn-close-book-intro-footer')?.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
+
+    renderBookIntroPage(bookId) {
+        this.openBookIntroModal(bookId);
     }
 
     renderBookIntroCard(bookId) {
