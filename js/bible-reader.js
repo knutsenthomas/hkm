@@ -209,27 +209,15 @@ class BibleReader {
         return null;
     }
 
-    async getFirestoreAsync(timeoutMs = 15000) {
+    async getFirestoreAsync(timeoutMs = 10000) {
         let db = this.getFirestore();
         if (db) return db;
-
-        if (window.firebaseService && typeof window.firebaseService.waitForInitialization === 'function') {
-            try {
-                await window.firebaseService.waitForInitialization(timeoutMs);
-                db = this.getFirestore();
-                if (db) return db;
-            } catch (e) {
-                console.warn("[BibleReader] waitForInitialization failed in getFirestoreAsync:", e);
-            }
-        }
-
-        const startTime = Date.now();
-        while (Date.now() - startTime < 5000) {
-            await new Promise(r => setTimeout(r, 200));
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+            await new Promise(r => setTimeout(r, 100));
             db = this.getFirestore();
             if (db) return db;
         }
-
         return null;
     }
 
@@ -473,94 +461,103 @@ class BibleReader {
             this.loadNotes();
             this.loadReadingPlan();
             
+            // Wait for lazy-loaded Firebase to initialize and set up listener
             if (window.firebaseService) {
                 window.firebaseService.waitForInitialization(30000).then(initialized => {
                     if (initialized) {
                         setupAuthObserver();
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const planParam = urlParams.get('plan');
+                        const dayParam = urlParams.get('day');
+                        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
+                            this.initReadingPlanMode(planParam, dayParam);
+                        }
                     }
                 });
             }
         }
         
-        try {
-            await this.loadTranslations();
-            
-            // Handle deep-linking from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
-            const bookParam = urlParams.get('book') || urlParams.get('b'); // e.g. "ISA", "GEN", "JOB", "MAT"
-            const chapterParam = urlParams.get('chapter') || urlParams.get('c') || '1';
-            const genreParam = urlParams.get('genre') || urlParams.get('g');
-            const transParam = urlParams.get('trans'); // e.g. "DNB"
-            const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
-            const planParam = urlParams.get('plan');
-            const dayParam = urlParams.get('day');
+        await this.loadTranslations();
+        
+        // Handle deep-linking from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
+        const bookParam = urlParams.get('book') || urlParams.get('b'); // e.g. "ISA", "GEN", "JOB", "MAT"
+        const chapterParam = urlParams.get('chapter') || urlParams.get('c') || '1';
+        const genreParam = urlParams.get('genre') || urlParams.get('g');
+        const transParam = urlParams.get('trans'); // e.g. "DNB"
+        const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
+        const planParam = urlParams.get('plan');
+        const dayParam = urlParams.get('day');
 
-            if (transParam) {
-                this.selectedBibleId = transParam;
-                if (this.dom.translationSelect) this.dom.translationSelect.value = transParam;
-                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-                if (mobileTransSelect) mobileTransSelect.value = transParam;
+        if (transParam) {
+            this.selectedBibleId = transParam;
+            if (this.dom.translationSelect) this.dom.translationSelect.value = transParam;
+            const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+            if (mobileTransSelect) mobileTransSelect.value = transParam;
+        }
+
+        await this.loadBooks();
+
+        if (planParam) {
+            await this.initReadingPlanMode(planParam, dayParam);
+        } else {
+            // Hide Leseplan tab button by default
+            const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+            if (rpTabBtn) {
+                rpTabBtn.style.display = 'none';
             }
 
-            await this.loadBooks();
+            let targetBook = bookParam;
+            if (genreParam) {
+                const cleanGenre = genreParam.toLowerCase().trim();
+                if (cleanGenre.includes('mose') || cleanGenre.includes('pentateuch')) targetBook = 'GEN';
+                else if (cleanGenre.includes('hist')) targetBook = 'JOS';
+                else if (cleanGenre.includes('visdom') || cleanGenre.includes('wisdom') || cleanGenre.includes('poesi')) targetBook = 'JOB';
+                else if (cleanGenre.includes('profet') || cleanGenre.includes('prophet')) targetBook = 'ISA';
+                else if (cleanGenre.includes('evangel') || cleanGenre.includes('gospel')) targetBook = 'MAT';
+                else if (cleanGenre.includes('brev') || cleanGenre.includes('epistle')) targetBook = 'ROM';
+                else if (cleanGenre.includes('åpenbaring') || cleanGenre.includes('revelation') || cleanGenre.includes('apokalyptisk')) targetBook = 'REV';
+            }
 
-            if (planParam) {
-                await this.initReadingPlanMode(planParam, dayParam);
+            if (refParam) {
+                await this.parseAndNavigateToReference(refParam);
+            } else if (targetBook) {
+                const targetRef = `${targetBook}_${chapterParam}`;
+                await this.parseAndNavigateToReference(targetRef);
             } else {
-                // Hide Leseplan tab button by default
-                const rpTabBtn = document.getElementById('tab-btn-reading-plan');
-                if (rpTabBtn) {
-                    rpTabBtn.style.display = 'none';
-                }
-
-                let targetBook = bookParam;
-                if (genreParam) {
-                    const cleanGenre = genreParam.toLowerCase().trim();
-                    if (cleanGenre.includes('mose') || cleanGenre.includes('pentateuch')) targetBook = 'GEN';
-                    else if (cleanGenre.includes('hist')) targetBook = 'JOS';
-                    else if (cleanGenre.includes('visdom') || cleanGenre.includes('wisdom') || cleanGenre.includes('poesi')) targetBook = 'JOB';
-                    else if (cleanGenre.includes('profet') || cleanGenre.includes('prophet')) targetBook = 'ISA';
-                    else if (cleanGenre.includes('evangel') || cleanGenre.includes('gospel')) targetBook = 'MAT';
-                    else if (cleanGenre.includes('brev') || cleanGenre.includes('epistle')) targetBook = 'ROM';
-                    else if (cleanGenre.includes('åpenbaring') || cleanGenre.includes('revelation') || cleanGenre.includes('apokalyptisk')) targetBook = 'REV';
-                }
-
-                if (refParam) {
-                    await this.parseAndNavigateToReference(refParam);
-                } else if (targetBook) {
-                    const targetRef = `${targetBook}_${chapterParam}`;
-                    await this.parseAndNavigateToReference(targetRef);
+                // Restore last read book and chapter from localStorage if available
+                const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
+                const lastChapter = this.safeGetLocalStorage('hkm_bible_last_chapter');
+                if (lastBook && lastChapter) {
+                    await this.selectBook(lastBook);
+                    await this.selectChapter(lastChapter);
                 } else {
-                    // Restore last read book and chapter from localStorage if available
-                    const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
-                    const lastChapter = this.safeGetLocalStorage('hkm_bible_last_chapter');
-                    if (lastBook && lastChapter) {
-                        await this.selectBook(lastBook);
-                        await this.selectChapter(lastChapter);
-                    } else {
-                        // Load default (John 1 or first book)
-                        const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
-                        if (defaultBook) {
-                            await this.selectBook(defaultBook.id);
-                            await this.selectChapter(`${defaultBook.id}_1`);
-                        }
+                    // Load default (John 1 or first book)
+                    const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
+                    if (defaultBook) {
+                        await this.selectBook(defaultBook.id);
+                        await this.selectChapter(`${defaultBook.id}_1`);
                     }
                 }
             }
+        }
 
-            if (lexParam) {
-                setTimeout(() => {
-                    this.lookupWord(lexParam);
-                }, 500);
-            }
-        } catch (initErr) {
-            console.error("[BibleReader] Error during init:", initErr);
-        } finally {
+        if (lexParam) {
+            setTimeout(() => {
+                this.lookupWord(lexParam);
+            }, 500);
+        }
+        
+        // Remove loading state once reader initialization (including deep-link / reading plan setup) is complete
+        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
+            console.log("[BibleReader] Delaying UI reveal because reading plan data is still loading...");
+        } else {
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
+            } else {
+                document.body.classList.remove('cms-loading');
             }
-            if (document.body) document.body.classList.remove('cms-loading');
         }
     }
 
@@ -5872,9 +5869,6 @@ class BibleReader {
     }
 
     async initReadingPlanMode(planId, dayNumFromUrl) {
-        if (this.isInitializingPlan) return;
-        this.isInitializingPlan = true;
-
         this.activePlanMode = true;
         this.activePlanId = planId;
         this.activePlanDay = parseInt(dayNumFromUrl, 10) || this.activePlanDay || null;
@@ -5886,85 +5880,42 @@ class BibleReader {
         // Inject styles dynamically
         this.injectReadingPlanStyles();
 
-        // Set placeholder title/badge while loading to avoid static MATTEUS 1 HTML fallback
-        if (this.dom.currentBookBadge) this.dom.currentBookBadge.innerText = 'LESEPLAN';
-        if (this.dom.currentChapterNumber) this.dom.currentChapterNumber.innerText = '';
-        if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = 'Laster leseplan...';
-        if (this.dom.readingPane) this.dom.readingPane.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;"><span class="material-symbols-outlined spin" style="font-size: 36px;">progress_activity</span><p style="margin-top: 12px; font-size: 15px; font-weight: 500;">Laster leseplan og dagens andakt...</p></div>';
+        const db = await this.getFirestoreAsync(10000);
+        if (!db) {
+            console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
+            return;
+        }
 
         try {
+            // Fetch global plan data
             let rawPlan = null;
-
-            // 1. Fast REST / Service fetch
-            if (window.firebaseService && typeof window.firebaseService.getDoc === 'function') {
-                try {
-                    const data = await window.firebaseService.getDoc('reading_plans', planId);
-                    if (data) {
-                        rawPlan = { id: planId, ...data };
-                    }
-                } catch (serviceErr) {
-                    console.warn("[BibleReader] firebaseService.getDoc failed:", serviceErr);
+            try {
+                const planDoc = await db.collection('reading_plans').doc(planId).get();
+                if (planDoc.exists) {
+                    rawPlan = { id: planDoc.id, ...planDoc.data() };
                 }
+            } catch (docErr) {
+                console.warn("[BibleReader] Direct planDoc fetch error:", docErr);
             }
 
-            // 2. Direct Firestore SDK fetch if service didn't return
-            const db = this.getFirestore();
-            if (!rawPlan && db) {
-                try {
-                    const planDoc = await db.collection('reading_plans').doc(planId).get();
-                    if (planDoc.exists) {
-                        rawPlan = { id: planDoc.id, ...planDoc.data() };
-                    }
-                } catch (sdkErr) {
-                    console.warn("[BibleReader] SDK doc.get failed:", sdkErr);
-                }
-            }
-
-            // 3. Collection search fallback (handles case sensitivity e.g. P0goQTHeFCsRjwHrxl9m vs P0goQTHeFCsRjwHrxI9m, slugs, or title matches)
             if (!rawPlan) {
-                let allItems = [];
-                if (window.firebaseService && typeof window.firebaseService.getCollection === 'function') {
-                    try {
-                        allItems = await window.firebaseService.getCollection('reading_plans');
-                    } catch (e) {
-                        console.warn("[BibleReader] firebaseService.getCollection failed:", e);
-                    }
-                }
-                if ((!allItems || !allItems.length) && db) {
-                    try {
-                        const snap = await db.collection('reading_plans').get();
-                        snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
-                    } catch (e) {
-                        console.warn("[BibleReader] SDK collection snap failed:", e);
-                    }
-                }
-                if (allItems && allItems.length) {
-                    const cleanTarget = planId.toLowerCase().trim();
-                    const matched = allItems.find(p => 
-                        p.id.toLowerCase() === cleanTarget ||
-                        (p.slug && p.slug.toLowerCase() === cleanTarget) ||
-                        (p.title && p.title.toLowerCase().includes(cleanTarget))
-                    );
-                    if (matched) {
-                        rawPlan = matched;
-                    }
+                // Fallback search by slug, case-insensitive ID or title match
+                try {
+                    const snap = await db.collection('reading_plans').get();
+                    const target = planId.toLowerCase().trim();
+                    snap.forEach(d => {
+                        const data = d.data();
+                        if (d.id.toLowerCase() === target || (data.slug && data.slug.toLowerCase() === target) || (data.title && data.title.toLowerCase().includes(target))) {
+                            rawPlan = { id: d.id, ...data };
+                        }
+                    });
+                } catch (snapErr) {
+                    console.warn("[BibleReader] Fallback plan search failed:", snapErr);
                 }
             }
 
             if (!rawPlan) {
                 console.error("[BibleReader] Plan does not exist:", planId);
-                if (this.dom.readingPane) {
-                    this.dom.readingPane.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: #64748b;">
-                            <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
-                            <h3 style="margin-top: 12px; font-size: 18px; font-weight: 700; color: var(--text-base);">Kunne ikke laste leseplanen</h3>
-                            <p style="margin-top: 8px; font-size: 14px; color: var(--text-muted);">Vi fant ikke leseplanen "${planId}". Den kan være flyttet eller slettet.</p>
-                            <button class="hkm-btn-secondary" onclick="window.bibleReader.exitReadingPlanMode()" style="margin-top: 16px; height: 36px; padding: 0 16px; border-radius: 99px;">
-                                Gå til Bibelen
-                            </button>
-                        </div>
-                    `;
-                }
                 return;
             }
 
@@ -5976,10 +5927,10 @@ class BibleReader {
             this.activePlanId = this.activePlanData.id;
 
             // Determine active day
-            let activeDayNum = dayNumber ? parseInt(dayNumber, 10) : (this.activePlanDay ? parseInt(this.activePlanDay, 10) : 1);
+            let activeDayNum = this.activePlanDay;
             
             // Check user progress if logged in
-            if (this.currentUser && db) {
+            if (this.currentUser) {
                 const userPlanDoc = await db.collection('users')
                     .doc(this.currentUser.uid)
                     .collection('reading_plans')
@@ -6089,13 +6040,16 @@ class BibleReader {
             }
             this.activePlanDay = activeDayNum;
             
-            // Render reading plan UI and load verses directly into reading pane
-            await this.setupReadingPlanUI(false);
+            // Render reading plan UI
+            await this.setupReadingPlanUI(true);
             this.updateUrlParams();
+            // Auto-open devotional wizard on mobile
+            if (window.innerWidth <= 1024) {
+                await this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
+            }
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         } finally {
-            this.isInitializingPlan = false;
             // Reveal UI now that the reading plan loading attempt is complete
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
@@ -6113,13 +6067,53 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            /* Reading plan workspace container styles */
-            #reading-plan-header-panel {
-                width: 100%;
-                box-sizing: border-box;
+            /* Hide page footer when reading plan is active to prevent page scrolling */
+            body:has(#bible-sidebar.reading-plan-active) footer.footer {
+                display: none !important;
             }
 
+            /* Desktop/Tablet landscape: Full screen reading plan */
+            @media (min-width: 1025px) {
+                #bible-sidebar.reading-plan-active {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    left: 0 !important;
+                    position: relative !important;
+                    flex: 1 !important;
+                    border-right: none !important;
+                }
+                #bible-sidebar.reading-plan-active + .bible-reading-area {
+                    display: none !important;
+                }
+                #bible-sidebar.reading-plan-active ~ #bible-nav-right {
+                    display: none !important;
+                }
+            }
+
+            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
             @media (max-width: 1024px) {
+                #bible-sidebar {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: -100% !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    height: 100dvh !important;
+                    z-index: 999999 !important;
+                    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                }
+                #bible-sidebar.active {
+                    left: 0 !important;
+                }
+                #bible-sidebar.reading-plan-active {
+                    left: -100% !important;
+                }
+                #bible-sidebar.reading-plan-active.active {
+                    left: 0 !important;
+                }
+                #bible-sidebar.reading-plan-active.active + .bible-reading-area {
+                    display: none !important;
+                }
                 .reading-plan-active #sidebar-mobile-controls {
                     display: none !important;
                 }
@@ -7056,7 +7050,7 @@ class BibleReader {
     async setupReadingPlanUI(openSidebarOnMobile = false) {
         const globalPlan = this.activePlanData;        const userPlan = this.userPlanProgress;
         const currentDayNum = this.activePlanDay;
-        const dayConfig = globalPlan.days.find(d => d.dayNumber === currentDayNum) || globalPlan.days[0];
+        const dayConfig = (globalPlan.days || []).find(d => parseInt(d.dayNumber, 10) === parseInt(currentDayNum, 10)) || (globalPlan.days ? globalPlan.days[0] : null);
 
         const isPrayerApp = globalPlan.title && (
             globalPlan.title.toLowerCase().includes('bønn') ||
@@ -7164,12 +7158,15 @@ class BibleReader {
                 this.dom.navRight.classList.add('active');
             }
         }
-        // 4. Render center reading plan header panel
-        this.renderCenterReadingPlanHeader(globalPlan, userPlan, currentDayNum, dayConfig);
+        // Hide old top header panel in central column (Deprecated/Removed)
+        const planHeader = document.getElementById('reading-plan-header-panel');
+        if (planHeader) {
+            planHeader.style.display = 'none';
+        }
 
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
-            await this.showDayVerses(dayConfig.verses, false);
+            await this.showDayVerses(dayConfig.verses, openSidebarOnMobile);
             this.applyReadingPlanHighlights();
         }
     }
@@ -7244,102 +7241,6 @@ class BibleReader {
             if (titleSpan) titleSpan.innerText = 'Dagens andakt';
             if (sidebarHeader) sidebarHeader.style.display = 'none';
         }
-    }
-
-    renderCenterReadingPlanHeader(globalPlan, userPlan, currentDayNum, dayConfig) {
-        const contentPane = document.querySelector('.bible-content-pane');
-        if (!contentPane) return;
-
-        let planHeader = document.getElementById('reading-plan-header-panel');
-        if (!planHeader) {
-            planHeader = document.createElement('div');
-            planHeader.id = 'reading-plan-header-panel';
-            contentPane.insertBefore(planHeader, contentPane.firstChild);
-        }
-        planHeader.style.display = 'block';
-
-        const totalDays = globalPlan.durationDays || (globalPlan.days ? globalPlan.days.length : 1);
-        const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
-        const lang = document.documentElement.lang || 'no';
-
-        let dayItemsHtml = '';
-        for (let d = 1; d <= totalDays; d++) {
-            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d);
-            const isActive = d === currentDayNum;
-            const completedClass = isCompleted ? 'completed' : '';
-            const activeClass = isActive ? 'active' : '';
-
-            dayItemsHtml += `
-                <button type="button" class="hkm-rp-day-strip-bubble-v3 ${completedClass} ${activeClass}" 
-                        onclick="window.bibleReader.selectReadingPlanDay(${d})"
-                        style="box-sizing: border-box; flex-shrink: 0;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
-                        <span class="day-num">${d}</span>
-                        ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 11px; font-weight: 900; color: #10b981; line-height: 1;">check</span>' : ''}
-                    </div>
-                </button>
-            `;
-        }
-
-        const progressPct = Math.round(((userPlan.completedDays?.length || 0) / totalDays) * 100);
-        const prayerText = dayConfig ? (dayConfig.prayerFocus || 'Reflekter over Guds ord i dag.') : '';
-
-        planHeader.innerHTML = `
-            <div class="hkm-rp-top-workspace" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                <!-- Header Row -->
-                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; gap: 12px;">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #fff; display: flex; align-items: center; justify-content: center; shrink: 0; box-shadow: 0 4px 12px rgba(209,125,57,0.25);">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">menu_book</span>
-                        </div>
-                        <div>
-                            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: system-ui, -apple-system, sans-serif;">${globalPlan.title}</h2>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <span>${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}</span>
-                                <span>•</span>
-                                <span style="color: #10b981; font-weight: 700;">${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="hkm-btn-secondary" onclick="window.bibleReader.exitReadingPlanMode()" style="height: 32px; padding: 0 14px; font-size: 12px; font-weight: 600; border-radius: 99px; border: 1px solid var(--border-color, #e2e8f0); background: var(--bg-base, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-                        <span>${lang === 'en' ? 'Exit plan' : (lang === 'es' ? 'Salir' : 'Avslutt leseplan')}</span>
-                    </button>
-                </div>
-
-                <!-- Day Selector Bubbles -->
-                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
-                    ${dayItemsHtml}
-                </div>
-
-                <!-- Prayer Focus Box -->
-                ${prayerText ? `
-                <div style="background: rgba(209, 125, 57, 0.06); border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 14px 16px; margin-bottom: 16px;">
-                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39; margin-bottom: 4px; font-family: system-ui, -apple-system, sans-serif;">
-                        ${lang === 'en' ? 'Prayer Focus & Reflection' : (lang === 'es' ? 'Enfoque de oración' : 'Dagens bønnefokus & refleksjon')}
-                    </div>
-                    <div style="font-size: 14px; line-height: 1.5; color: var(--text-base); font-style: italic;">
-                        "${prayerText}"
-                    </div>
-                </div>
-                ` : ''}
-
-                <!-- Action Buttons -->
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                    <button type="button" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
-                            style="flex: 1; min-width: 200px; height: 44px; font-size: 14px; font-weight: 700; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25); transition: transform 0.2s;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">play_arrow</span>
-                        <span>${lang === 'en' ? 'Start Devotional Wizard' : (lang === 'es' ? 'Iniciar devocional' : 'Start andakt (Veiviser)')}</span>
-                    </button>
-
-                    <button type="button" onclick="window.bibleReader.toggleActivePlanDayCompletion(this)" 
-                            style="height: 44px; padding: 0 20px; font-size: 13px; font-weight: 700; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid ${isCurrentDayCompleted ? '#10b981' : 'var(--border-color)'}; color: ${isCurrentDayCompleted ? '#10b981' : 'var(--text-base)'}; background: var(--bg-base); cursor: pointer; transition: all 0.2s;">
-                        <span class="material-symbols-outlined" style="font-size: 18px; color: ${isCurrentDayCompleted ? '#10b981' : 'var(--text-muted)'};">${isCurrentDayCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
-                        <span>${isCurrentDayCompleted ? (lang === 'en' ? 'Completed' : (lang === 'es' ? 'Completado' : 'Fullført ✓')) : (lang === 'en' ? 'Mark completed' : (lang === 'es' ? 'Marcar completado' : 'Markér som fullført'))}</span>
-                    </button>
-                </div>
-            </div>
-        `;
     }
 
     renderLeftSidebarReadingPlan(container, globalPlan, userPlan, currentDayNum, dayConfig) {
@@ -8171,15 +8072,16 @@ class BibleReader {
         }
 
         if (!dayConfig) {
-            const db = await this.getFirestoreAsync();
+            const db = await this.getFirestoreAsync(10000);
             if (db) {
                 let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
                 if (!globalPlanSnap.exists) {
                     try {
                         const snap = await db.collection('reading_plans').get();
+                        const target = planId.toLowerCase().trim();
                         snap.forEach(d => {
                             const data = d.data();
-                            if (d.id === planId || data.slug === planId || (data.title && data.title.toLowerCase().includes(planId.toLowerCase()))) {
+                            if (d.id.toLowerCase() === target || (data.slug && data.slug.toLowerCase() === target) || (data.title && data.title.toLowerCase().includes(target))) {
                                 globalPlanSnap = { exists: true, id: d.id, data: () => data };
                             }
                         });
@@ -8188,7 +8090,7 @@ class BibleReader {
                     }
                 }
                 if (globalPlanSnap && globalPlanSnap.exists) {
-                    let raw = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
+                    const raw = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
                     if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
                         globalPlan = window.contentManager.getLocalizedContentItem(raw);
                     } else {
@@ -8212,13 +8114,6 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
         modal.className = 'hkm-devotional-overlay';
-        modal.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; padding: 24px; text-align: center;">
-                <span class="material-symbols-outlined spin" style="font-size: 48px; color: #d17d39;">progress_activity</span>
-                <h3 style="font-size: 18px; font-weight: 700; color: #1B4965; margin: 0; font-family: system-ui, -apple-system, sans-serif;">${globalPlan ? globalPlan.title : 'Laster andakt...'}</h3>
-                <p style="color: #64748b; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; margin: 0;">Henter Guds ord for dag ${targetDay}...</p>
-            </div>
-        `;
         
         document.body.appendChild(modal);
 
@@ -8230,13 +8125,7 @@ class BibleReader {
             scriptureHtml = `<p style="text-align: center; color: #ef4444;">Kunne ikke hente bibelteksten for: <strong>${dayConfig.verses}</strong></p>`;
         }
 
-        try {
-            this.renderDevotionalStep(modal, globalPlan, targetDay, dayConfig, startStep, scriptureHtml);
-        } catch (renderErr) {
-            console.error("[BibleReader] Error in renderDevotionalStep:", renderErr);
-            modal.remove();
-            alert("Kunne ikke vise andakten. Prøv igjen.");
-        }
+        this.renderDevotionalStep(modal, globalPlan, dayNumber, dayConfig, startStep, scriptureHtml);
     }
 
     async fetchAndFilterVersesText(versesText) {
@@ -8244,14 +8133,6 @@ class BibleReader {
             throw new Error("No verses specified");
         }
         const input = versesText.trim();
-
-        if (!this.books || !this.books.length) {
-            try {
-                await this.loadBooks();
-            } catch (e) {
-                console.warn("[BibleReader] loadBooks failed in fetchAndFilterVersesText:", e);
-            }
-        }
 
         // Helper to parse single passage
         const parseSinglePassage = (passageStr) => {
@@ -8358,28 +8239,19 @@ class BibleReader {
                 return `<p style="color: #94a3b8; font-style: italic;">${parsed.raw || input}</p>`;
             }
 
-            const bibleId = this.selectedBibleId || 'DNB';
-
             if (parsed.type === 'chap_range') {
-                const chapterPromises = [];
+                let combinedHtml = '';
                 for (let c = parsed.startChap; c <= parsed.endChap; c++) {
                     const chapterId = `${matchedBook.id}_${c}`;
-                    chapterPromises.push(
-                        fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`)
-                            .then(res => res.json())
-                            .then(payload => ({
-                                chapNum: c,
-                                content: payload.data && payload.data.content ? payload.data.content : null
-                            }))
-                            .catch(err => ({ chapNum: c, content: null }))
-                    );
-                }
-                const results = await Promise.all(chapterPromises);
-                let combinedHtml = '';
-                for (const r of results) {
-                    if (r.content) {
-                        combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${r.chapNum === parsed.startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${r.chapNum}</h4>`;
-                        combinedHtml += r.content;
+                    try {
+                        const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+                        const payload = await res.json();
+                        if (payload.data && payload.data.content) {
+                            combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${c === parsed.startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${c}</h4>`;
+                            combinedHtml += payload.data.content;
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to load chapter ${chapterId}:`, err);
                     }
                 }
                 return combinedHtml || `<p style="color: #94a3b8;">${matchedBook.name} ${parsed.startChap}-${parsed.endChap}</p>`;
@@ -8387,7 +8259,7 @@ class BibleReader {
 
             const chapNum = parsed.startChap || 1;
             const chapterId = `${matchedBook.id}_${chapNum}`;
-            const res = await fetch(`/api/bible/bibles/${bibleId}/chapters/${chapterId}`);
+            const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
             const payload = await res.json();
 
             if (!payload.data || !payload.data.content) {
@@ -8425,9 +8297,14 @@ class BibleReader {
             return payload.data.content;
         };
 
-        const passagePromises = parts.map(part => fetchPassageHtml(parseSinglePassage(part)));
-        const htmlResults = await Promise.all(passagePromises);
-        return htmlResults.join('<hr style="margin: 32px 0; border: none; border-top: 1px dashed #cbd5e1;" />') || `<p style="text-align: center; color: #64748b;">${input}</p>`;
+        let resultHtml = '';
+        for (const part of parts) {
+            const parsed = parseSinglePassage(part);
+            const passageHtml = await fetchPassageHtml(parsed);
+            resultHtml += passageHtml;
+        }
+
+        return resultHtml || `<p style="text-align: center; color: #64748b;">${input}</p>`;
     }
 
     formatMarkdownText(text) {
