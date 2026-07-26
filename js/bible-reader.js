@@ -10031,12 +10031,60 @@ class BibleReader {
                         animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     }
 
+                .verse-image-modal-actions {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+
+                .verse-image-modal-actions button {
+                    flex: 1 1 0px !important;
+                    min-width: 0 !important;
+                    padding: 10px 10px !important;
+                    font-size: 12.5px !important;
+                    justify-content: center !important;
+                    text-align: center !important;
+                    white-space: nowrap !important;
+                    box-sizing: border-box !important;
+                }
+
+                @media (max-width: 768px) {
+                    #verse-image-modal.color-wheel-modal-overlay,
+                    #verse-share-choice-modal.color-wheel-modal-overlay {
+                        align-items: flex-end !important;
+                        padding: 0 !important;
+                    }
+
+                    .verse-image-card,
+                    .verse-share-choice-card {
+                        width: 100vw !important;
+                        max-width: 100vw !important;
+                        max-height: 88dvh !important;
+                        border-radius: 24px 24px 0 0 !important;
+                        padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 12px)) 16px !important;
+                        animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    }
+
                     #verse-card-canvas {
                         max-height: 200px !important;
                     }
 
-                    .verse-image-card button {
+                    .verse-image-modal-actions {
+                        gap: 6px !important;
+                    }
+
+                    .verse-image-modal-actions button {
+                        padding: 8px 4px !important;
+                        font-size: 11.5px !important;
                         min-height: 44px !important;
+                        gap: 4px !important;
+                    }
+
+                    .verse-image-modal-actions button .material-symbols-outlined {
+                        font-size: 16px !important;
                     }
                 }
             `;
@@ -10091,7 +10139,7 @@ class BibleReader {
                         </div>
                     </div>
 
-                    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                    <div class="verse-image-modal-actions" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06));">
                         <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 16px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
                             <span>${isEn ? 'Copy Text' : (isEs ? 'Copiar Texto' : 'Kopier tekst')}</span>
