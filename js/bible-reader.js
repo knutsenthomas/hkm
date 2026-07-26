@@ -778,9 +778,15 @@ class BibleReader {
             
             const toggleBackdrop = (show) => {
                 const backdrop = document.getElementById('hkm-sheet-backdrop-overlay');
-                if (!backdrop) return;
-                if (show) backdrop.classList.add('active');
-                else backdrop.classList.remove('active');
+                if (backdrop) {
+                    if (show) backdrop.classList.add('active');
+                    else backdrop.classList.remove('active');
+                }
+                const mainFooter = document.querySelector('footer.footer');
+                if (mainFooter) {
+                    if (show) mainFooter.style.setProperty('display', 'none', 'important');
+                    else mainFooter.style.removeProperty('display');
+                }
             };
 
             // 4. Set up click listener for the floating settings button to toggle popover
@@ -884,6 +890,7 @@ class BibleReader {
             document.addEventListener('click', () => {
                 popover?.classList.remove('active');
                 document.getElementById('floating-chapter-popover')?.classList.remove('active');
+                toggleBackdrop(false);
             });
         }
     }

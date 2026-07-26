@@ -820,7 +820,9 @@
             left: 50%;
             transform: translateX(-50%) scale(0.95);
             transform-origin: bottom center;
-            width: 320px;
+            width: 380px;
+            max-width: 90vw;
+            max-height: calc(80vh - 80px);
             background: var(--bg-card) !important;
             border: 1px solid var(--border-color) !important;
             border-radius: 20px;
@@ -832,6 +834,15 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .floating-chapter-popover #floating-books-container,
+        .floating-chapter-popover #floating-chapter-grid {
+            max-height: calc(80vh - 140px) !important;
+            overflow-y: auto !important;
+            overscroll-behavior: contain !important;
+            -webkit-overflow-scrolling: touch !important;
         }
 
         .floating-chapter-popover.active {
@@ -4250,7 +4261,7 @@
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/cookie-consent.js"></script>
     <script type="module" src="js/bible-book-introductions.js?v=2026.07.26.1000"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.07.26.1090"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.07.26.1100"></script>
     <script type="module" src="js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">
