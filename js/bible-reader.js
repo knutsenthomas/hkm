@@ -561,16 +561,10 @@ class BibleReader {
             }, 500);
         }
         
-        // Remove loading state once reader initialization (including deep-link / reading plan setup) is complete
-        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
-            console.log("[BibleReader] Delaying UI reveal because reading plan data is still loading...");
-        } else {
-            if (typeof window.revealPublicUI === 'function') {
-                window.revealPublicUI('bible-reader-ready');
-            } else {
-                document.body.classList.remove('cms-loading');
-            }
+        if (typeof window.revealPublicUI === 'function') {
+            window.revealPublicUI('bible-reader-ready');
         }
+        document.body.classList.remove('cms-loading');
     }
 
     setupDOMElements() {
@@ -5898,13 +5892,12 @@ class BibleReader {
         if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = 'Laster leseplan...';
         if (this.dom.readingPane) this.dom.readingPane.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;"><span class="material-symbols-outlined spin" style="font-size: 36px;">progress_activity</span><p style="margin-top: 12px; font-size: 15px; font-weight: 500;">Laster leseplan og dagens andakt...</p></div>';
 
-        const db = await this.getFirestoreAsync();
-        if (!db) {
-            console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
-            return;
-        }
-
         try {
+            const db = await this.getFirestoreAsync();
+            if (!db) {
+                console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
+                return;
+            }
             // Fetch global plan data
             let rawPlan = null;
             const planDoc = await db.collection('reading_plans').doc(planId).get();
