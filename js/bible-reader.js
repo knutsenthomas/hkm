@@ -473,17 +473,10 @@ class BibleReader {
             this.loadNotes();
             this.loadReadingPlan();
             
-            // Wait for lazy-loaded Firebase to initialize and set up listener
             if (window.firebaseService) {
                 window.firebaseService.waitForInitialization(30000).then(initialized => {
                     if (initialized) {
                         setupAuthObserver();
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const planParam = urlParams.get('plan');
-                        const dayParam = urlParams.get('day');
-                        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
-                            this.initReadingPlanMode(planParam, dayParam);
-                        }
                     }
                 });
             }
@@ -5879,6 +5872,9 @@ class BibleReader {
     }
 
     async initReadingPlanMode(planId, dayNumFromUrl) {
+        if (this.isInitializingPlan) return;
+        this.isInitializingPlan = true;
+
         this.activePlanMode = true;
         this.activePlanId = planId;
         this.activePlanDay = parseInt(dayNumFromUrl, 10) || this.activePlanDay || null;
@@ -6099,6 +6095,7 @@ class BibleReader {
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         } finally {
+            this.isInitializingPlan = false;
             // Reveal UI now that the reading plan loading attempt is complete
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
