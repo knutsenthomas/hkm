@@ -485,13 +485,15 @@ class BibleReader {
                     if (!firebase.apps.length && window.firebaseConfig) {
                         firebase.initializeApp(window.firebaseConfig);
                     }
-                    firebase.auth().onAuthStateChanged(user => {
+                    firebase.auth().onAuthStateChanged(async user => {
                         this.currentUser = user;
                         this.loadNotes();
-                        this.loadReadingPlan();
+                        await this.loadReadingPlan();
                         if (this.activePlanMode && this.activePlanId) {
                             if (!this._isInitializingPlan && (!this.activePlanData || !this.activePlanData.id)) {
                                 this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+                            } else if (this.activePlanMode) {
+                                this.renderLeftSidebarReadingPlan();
                             }
                         }
                     });
@@ -7460,7 +7462,7 @@ class BibleReader {
                                     </p>
                                 </div>
                             </div>
-                            <a href="/minside/login.html" class="hkm-btn-secondary" style="height: 34px !important; font-size: 12px !important; padding: 0 16px !important; align-self: flex-start; text-decoration: none !important; border-radius: 6px !important; border-color: #d17d39 !important; color: #d17d39 !important; display: inline-flex; align-items: center; justify-content: center;">
+                            <a href="/minside/login.html?redirect=${encodeURIComponent(window.location.href)}" class="hkm-btn-secondary" style="height: 34px !important; font-size: 12px !important; padding: 0 16px !important; align-self: flex-start; text-decoration: none !important; border-radius: 6px !important; border-color: #d17d39 !important; color: #d17d39 !important; display: inline-flex; align-items: center; justify-content: center;">
                                 ${lang === 'en' ? 'Log In' : (lang === 'es' ? 'Iniciar sesión' : 'Logg inn her')}
                             </a>
                         </div>
