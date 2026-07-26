@@ -6622,26 +6622,34 @@ class BibleReader {
             /* Hide page footer when reading plan is active or book intro overlay is open to prevent page scrolling */
             body:has(#bible-sidebar.reading-plan-active) footer.footer,
             body:has(.hkm-book-intro-overlay) footer.footer,
-            body:has(.hkm-modal-overlay) footer.footer {
+            body:has(.hkm-modal-overlay) footer.footer,
+            body:has(.verse-crossref-sheet-overlay.active) footer.footer {
                 display: none !important;
             }
 
-            .hkm-modal-overlay.hkm-book-intro-overlay {
+            .hkm-modal-overlay,
+            .verse-crossref-sheet-overlay,
+            .color-wheel-modal-overlay {
                 background: rgba(15, 23, 42, 0.55) !important;
                 backdrop-filter: blur(6px) !important;
                 -webkit-backdrop-filter: blur(6px) !important;
             }
+
             @media (max-width: 768px) {
-                .hkm-modal-overlay.hkm-book-intro-overlay {
+                .hkm-modal-overlay,
+                .verse-crossref-sheet-overlay,
+                .color-wheel-modal-overlay {
                     align-items: flex-end !important;
                     justify-content: center !important;
                     padding: 0 !important;
                 }
-                .hkm-book-intro-sheet-card {
+                .hkm-book-intro-sheet-card,
+                .verse-crossref-sheet-card,
+                .translation-modal-card {
                     border-radius: 28px 28px 0 0 !important;
                     padding-top: 16px !important;
-                    max-height: 80vh !important;
-                    max-height: 80dvh !important;
+                    max-height: 85vh !important;
+                    max-height: 85dvh !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0 !important;
@@ -6650,19 +6658,33 @@ class BibleReader {
                     border-bottom: none !important;
                 }
             }
+
             @media (min-width: 769px) {
-                .hkm-modal-overlay.hkm-book-intro-overlay {
+                .hkm-modal-overlay,
+                .verse-crossref-sheet-overlay,
+                .color-wheel-modal-overlay {
                     align-items: center !important;
                     justify-content: center !important;
                     padding: 24px !important;
                 }
-                .hkm-book-intro-sheet-card {
+                .hkm-book-intro-sheet-card,
+                .verse-crossref-sheet-card,
+                .translation-modal-card {
                     border-radius: 24px !important;
-                    padding-top: 20px !important;
+                    padding: 20px 24px !important;
                     width: 90% !important;
                     max-width: 500px !important;
                     max-height: 82vh !important;
                     max-height: 82dvh !important;
+                    margin: auto !important;
+                    box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
+                    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+                    transform: none !important;
+                }
+                .color-wheel-card {
+                    border-radius: 24px !important;
+                    width: 90% !important;
+                    max-width: 320px !important;
                     margin: auto !important;
                     box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
