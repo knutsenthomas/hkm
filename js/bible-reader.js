@@ -3029,7 +3029,7 @@ class BibleReader {
         if (modal) modal.remove();
 
         modal = document.createElement('div');
-        modal.className = 'hkm-modal-overlay';
+        modal.className = 'hkm-modal-overlay hkm-book-intro-overlay';
         modal.style.cssText = `
             position: fixed !important;
             top: 0 !important;
@@ -3039,27 +3039,24 @@ class BibleReader {
             width: 100vw !important;
             height: 100vh !important;
             height: 100dvh !important;
-            background: rgba(15, 23, 42, 0.6) !important;
+            background: rgba(15, 23, 42, 0.5) !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             z-index: 35000 !important;
             display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 16px !important;
-            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
             box-sizing: border-box !important;
         `;
 
         if (!intro) {
             modal.innerHTML = `
-                <div class="color-wheel-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 32px; text-align: center; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.35);">
+                <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 24px; text-align: center; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.35); margin: auto;">
+                    <div style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 16px; cursor: pointer;"></div>
                     <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                         <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
                     </div>
                     <h2 style="font-size: 22px; font-weight: 800; margin: 0 0 8px 0; color: var(--text-base);">${bookName}</h2>
                     <p style="color: var(--text-muted, #64748b); margin: 0 0 24px 0; font-size: 14.5px; line-height: 1.5;">Det er ingen skriftlig introduksjon for denne boken ennå.</p>
-                    <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
+                    <button id="btn-close-empty-intro" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 9999px; background: #1B4965; color: #ffffff; border: none; cursor: pointer;">
                         ${labelClose}
                     </button>
                 </div>
@@ -3079,11 +3076,11 @@ class BibleReader {
         `).join('');
 
         const summaryParagraphsHtml = (intro.summary || []).map(p => `
-            <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.7; color: var(--text-base);">${p}</p>
+            <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.7; color: var(--text-base); font-family: var(--font-serif, Georgia, serif);">${p}</p>
         `).join('');
 
         const howToReadHtml = intro.howToRead ? `
-            <div style="margin: 24px 0; background: rgba(209,125,57,0.06); border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(209,125,57,0.2);">
+            <div style="margin: 20px 0 10px 0; background: rgba(209,125,57,0.06); border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(209,125,57,0.2);">
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                     <span class="material-symbols-outlined" style="font-size: 20px; color: #D17D39;">tips_and_updates</span>
                     <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39;">${labelHowToRead}</span>
@@ -3093,27 +3090,26 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); border-radius: 24px; width: 100%; max-width: 640px; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35); overflow: hidden; margin: auto;">
+            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+                
+                <!-- Drag Handle Bar (Top of sheet) -->
+                <div style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 10px auto 4px; cursor: pointer; flex-shrink: 0;"></div>
+
                 <!-- Header Bar -->
-                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-card, #ffffff);">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
-                        </div>
-                        <div>
-                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
-                            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2;">${intro.title}</h3>
-                        </div>
+                <div style="padding: 10px 20px 14px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-card, #ffffff);">
+                    <div>
+                        <span style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: var(--font-heading, inherit);">${intro.title}</h3>
                     </div>
-                    <button id="btn-close-book-intro-x" title="Lukk" style="background: transparent; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none;">
-                        <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
+                    <button id="btn-close-book-intro-x" title="Lukk" style="background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
 
-                <!-- Scrollable Body -->
-                <div style="padding: 20px 20px 48px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
+                <!-- Scrollable Body Content -->
+                <div style="padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
                     
-                    <!-- Unified Metadata Rows -->
+                    <!-- Metadata Rows -->
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
                         <!-- Author Row -->
                         <div style="display: flex; align-items: center; gap: 10px; background: rgba(27,73,101,0.04); border: 1px solid rgba(27,73,101,0.08); border-radius: 12px; padding: 10px 14px; font-size: 13.5px;">
@@ -3154,11 +3150,11 @@ class BibleReader {
                     ${howToReadHtml}
                 </div>
 
-                <!-- Pinned Footer Bar -->
-                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-card, #ffffff); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
-                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">
+                <!-- Floating Bottom Action Button (Pill style like reference screenshot) -->
+                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card, #ffffff);">
+                    <button id="btn-close-book-intro-footer" style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); color: var(--text-base, #334155); border-radius: 9999px; padding: 10px 24px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39;">auto_stories</span>
                         <span>${labelClose}</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
                     </button>
                 </div>
             </div>
@@ -6500,6 +6496,40 @@ class BibleReader {
             /* Hide page footer when reading plan is active to prevent page scrolling */
             body:has(#bible-sidebar.reading-plan-active) footer.footer {
                 display: none !important;
+            }
+
+            /* Book Intro Modal: Responsive Bottom Sheet on Mobile & Centered Card on Desktop */
+            @media (max-width: 768px) {
+                .hkm-modal-overlay.hkm-book-intro-overlay {
+                    align-items: flex-end !important;
+                    justify-content: center !important;
+                    padding: 0 !important;
+                }
+                .hkm-book-intro-sheet-card {
+                    border-radius: 28px 28px 0 0 !important;
+                    max-height: 85vh !important;
+                    max-height: 85dvh !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
+                    border-bottom: none !important;
+                }
+            }
+            @media (min-width: 769px) {
+                .hkm-modal-overlay.hkm-book-intro-overlay {
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 20px !important;
+                }
+                .hkm-book-intro-sheet-card {
+                    border-radius: 24px !important;
+                    max-width: 620px !important;
+                    max-height: 85vh !important;
+                    max-height: 85dvh !important;
+                    margin: auto !important;
+                    box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35) !important;
+                }
             }
 
             /* Desktop/Tablet landscape: Full screen reading plan */
