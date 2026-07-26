@@ -21,6 +21,14 @@
         (function() {
             if (new URLSearchParams(window.location.search).has('plan')) {
                 document.documentElement.classList.add('hkm-rp-loading');
+                document.addEventListener('DOMContentLoaded', function() {
+                    var badge = document.getElementById('current-book-badge');
+                    var chNum = document.getElementById('current-chapter-number');
+                    var pane = document.getElementById('bible-reading-pane');
+                    if (badge) badge.innerText = '';
+                    if (chNum) chNum.innerText = '';
+                    if (pane) pane.innerHTML = '';
+                });
             }
         })();
     </script>
@@ -4241,7 +4249,7 @@
     <!-- JavaScript -->
     <script type="module" src="script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module" src="js/bible-reader.js?v=2026.07.26.0940"></script>
+    <script type="module" src="js/bible-reader.js?v=2026.07.26.0945"></script>
     <script type="module" src="js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">

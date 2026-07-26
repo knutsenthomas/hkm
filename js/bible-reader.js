@@ -439,6 +439,15 @@ class BibleReader {
             this.activePlanId = earlyPlan;
             this.activePlanDay = parseInt(earlyParams.get('day'), 10) || null;
             this.injectReadingPlanStyles();
+
+            // Clear static "Johannes 1" headers and reading pane so default Bible text never flashes
+            const badge = document.getElementById('current-book-badge');
+            const chNum = document.getElementById('current-chapter-number');
+            const pane = document.getElementById('bible-reading-pane');
+            if (badge) badge.innerText = '';
+            if (chNum) chNum.innerText = '';
+            if (pane) pane.innerHTML = '';
+
             if (this.dom.sidebar) {
                 this.dom.sidebar.classList.add('reading-plan-active');
 
@@ -537,11 +546,11 @@ class BibleReader {
             if (mobileTransSelect) mobileTransSelect.value = transParam;
         }
 
-        await this.loadBooks();
-
         if (planParam) {
             await this.initReadingPlanMode(planParam, dayParam);
+            this.loadBooks();
         } else {
+            await this.loadBooks();
             // Hide Leseplan tab button by default
             const rpTabBtn = document.getElementById('tab-btn-reading-plan');
             if (rpTabBtn) {
