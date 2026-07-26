@@ -489,82 +489,86 @@ class BibleReader {
             }
         }
         
-        await this.loadTranslations();
-        
-        // Handle deep-linking from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
-        const bookParam = urlParams.get('book') || urlParams.get('b'); // e.g. "ISA", "GEN", "JOB", "MAT"
-        const chapterParam = urlParams.get('chapter') || urlParams.get('c') || '1';
-        const genreParam = urlParams.get('genre') || urlParams.get('g');
-        const transParam = urlParams.get('trans'); // e.g. "DNB"
-        const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
-        const planParam = urlParams.get('plan');
-        const dayParam = urlParams.get('day');
+        try {
+            await this.loadTranslations();
+            
+            // Handle deep-linking from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref'); // e.g. "Joh_3" or "Sal_23_1"
+            const bookParam = urlParams.get('book') || urlParams.get('b'); // e.g. "ISA", "GEN", "JOB", "MAT"
+            const chapterParam = urlParams.get('chapter') || urlParams.get('c') || '1';
+            const genreParam = urlParams.get('genre') || urlParams.get('g');
+            const transParam = urlParams.get('trans'); // e.g. "DNB"
+            const lexParam = urlParams.get('lex') || urlParams.get('dict'); // e.g. "nåde"
+            const planParam = urlParams.get('plan');
+            const dayParam = urlParams.get('day');
 
-        if (transParam) {
-            this.selectedBibleId = transParam;
-            if (this.dom.translationSelect) this.dom.translationSelect.value = transParam;
-            const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
-            if (mobileTransSelect) mobileTransSelect.value = transParam;
-        }
-
-        await this.loadBooks();
-
-        if (planParam) {
-            await this.initReadingPlanMode(planParam, dayParam);
-        } else {
-            // Hide Leseplan tab button by default
-            const rpTabBtn = document.getElementById('tab-btn-reading-plan');
-            if (rpTabBtn) {
-                rpTabBtn.style.display = 'none';
+            if (transParam) {
+                this.selectedBibleId = transParam;
+                if (this.dom.translationSelect) this.dom.translationSelect.value = transParam;
+                const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
+                if (mobileTransSelect) mobileTransSelect.value = transParam;
             }
 
-            let targetBook = bookParam;
-            if (genreParam) {
-                const cleanGenre = genreParam.toLowerCase().trim();
-                if (cleanGenre.includes('mose') || cleanGenre.includes('pentateuch')) targetBook = 'GEN';
-                else if (cleanGenre.includes('hist')) targetBook = 'JOS';
-                else if (cleanGenre.includes('visdom') || cleanGenre.includes('wisdom') || cleanGenre.includes('poesi')) targetBook = 'JOB';
-                else if (cleanGenre.includes('profet') || cleanGenre.includes('prophet')) targetBook = 'ISA';
-                else if (cleanGenre.includes('evangel') || cleanGenre.includes('gospel')) targetBook = 'MAT';
-                else if (cleanGenre.includes('brev') || cleanGenre.includes('epistle')) targetBook = 'ROM';
-                else if (cleanGenre.includes('åpenbaring') || cleanGenre.includes('revelation') || cleanGenre.includes('apokalyptisk')) targetBook = 'REV';
-            }
+            await this.loadBooks();
 
-            if (refParam) {
-                await this.parseAndNavigateToReference(refParam);
-            } else if (targetBook) {
-                const targetRef = `${targetBook}_${chapterParam}`;
-                await this.parseAndNavigateToReference(targetRef);
+            if (planParam) {
+                await this.initReadingPlanMode(planParam, dayParam);
             } else {
-                // Restore last read book and chapter from localStorage if available
-                const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
-                const lastChapter = this.safeGetLocalStorage('hkm_bible_last_chapter');
-                if (lastBook && lastChapter) {
-                    await this.selectBook(lastBook);
-                    await this.selectChapter(lastChapter);
+                // Hide Leseplan tab button by default
+                const rpTabBtn = document.getElementById('tab-btn-reading-plan');
+                if (rpTabBtn) {
+                    rpTabBtn.style.display = 'none';
+                }
+
+                let targetBook = bookParam;
+                if (genreParam) {
+                    const cleanGenre = genreParam.toLowerCase().trim();
+                    if (cleanGenre.includes('mose') || cleanGenre.includes('pentateuch')) targetBook = 'GEN';
+                    else if (cleanGenre.includes('hist')) targetBook = 'JOS';
+                    else if (cleanGenre.includes('visdom') || cleanGenre.includes('wisdom') || cleanGenre.includes('poesi')) targetBook = 'JOB';
+                    else if (cleanGenre.includes('profet') || cleanGenre.includes('prophet')) targetBook = 'ISA';
+                    else if (cleanGenre.includes('evangel') || cleanGenre.includes('gospel')) targetBook = 'MAT';
+                    else if (cleanGenre.includes('brev') || cleanGenre.includes('epistle')) targetBook = 'ROM';
+                    else if (cleanGenre.includes('åpenbaring') || cleanGenre.includes('revelation') || cleanGenre.includes('apokalyptisk')) targetBook = 'REV';
+                }
+
+                if (refParam) {
+                    await this.parseAndNavigateToReference(refParam);
+                } else if (targetBook) {
+                    const targetRef = `${targetBook}_${chapterParam}`;
+                    await this.parseAndNavigateToReference(targetRef);
                 } else {
-                    // Load default (John 1 or first book)
-                    const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
-                    if (defaultBook) {
-                        await this.selectBook(defaultBook.id);
-                        await this.selectChapter(`${defaultBook.id}_1`);
+                    // Restore last read book and chapter from localStorage if available
+                    const lastBook = this.safeGetLocalStorage('hkm_bible_last_book');
+                    const lastChapter = this.safeGetLocalStorage('hkm_bible_last_chapter');
+                    if (lastBook && lastChapter) {
+                        await this.selectBook(lastBook);
+                        await this.selectChapter(lastChapter);
+                    } else {
+                        // Load default (John 1 or first book)
+                        const defaultBook = this.books.find(b => b.id === '43') || this.books[0]; // John
+                        if (defaultBook) {
+                            await this.selectBook(defaultBook.id);
+                            await this.selectChapter(`${defaultBook.id}_1`);
+                        }
                     }
                 }
             }
-        }
 
-        if (lexParam) {
-            setTimeout(() => {
-                this.lookupWord(lexParam);
-            }, 500);
+            if (lexParam) {
+                setTimeout(() => {
+                    this.lookupWord(lexParam);
+                }, 500);
+            }
+        } catch (initErr) {
+            console.error("[BibleReader] Error during init:", initErr);
+        } finally {
+            if (typeof window.revealPublicUI === 'function') {
+                window.revealPublicUI('bible-reader-ready');
+            }
+            if (document.body) document.body.classList.remove('cms-loading');
         }
-        
-        if (typeof window.revealPublicUI === 'function') {
-            window.revealPublicUI('bible-reader-ready');
-        }
-        document.body.classList.remove('cms-loading');
     }
 
     setupDOMElements() {
