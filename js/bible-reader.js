@@ -6088,10 +6088,16 @@ class BibleReader {
                 #bible-sidebar.reading-plan-active ~ #bible-nav-right {
                     display: none !important;
                 }
+                .hkm-rp-sidebar-title {
+                    max-width: 600px !important;
+                }
             }
 
             /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
             @media (max-width: 1024px) {
+                .hkm-rp-sidebar-title {
+                    max-width: 220px !important;
+                }
                 #bible-sidebar {
                     position: fixed !important;
                     top: 0 !important;
@@ -7251,17 +7257,7 @@ class BibleReader {
             globalPlan.title.toLowerCase().includes('oración')
         );
 
-        let displayTitle = globalPlan.title || '';
-        const titleLower = displayTitle.toLowerCase();
-        if (titleLower.includes('johannesevangeliet') || titleLower.includes('gospel of john') || titleLower.includes('evangelio de juan')) {
-            displayTitle = lang === 'no' ? 'Johannes' : (lang === 'es' ? 'Juan' : 'John');
-        } else if (titleLower.includes('matteusevangeliet') || titleLower.includes('gospel of matthew') || titleLower.includes('evangelio de mateo')) {
-            displayTitle = lang === 'no' ? 'Matteus' : (lang === 'es' ? 'Mateo' : 'Matthew');
-        } else if (titleLower.includes('markusevangeliet') || titleLower.includes('gospel of mark') || titleLower.includes('evangelio de marcos')) {
-            displayTitle = lang === 'no' ? 'Markus' : (lang === 'es' ? 'Marcos' : 'Mark');
-        } else if (titleLower.includes('lukasevangeliet') || titleLower.includes('gospel of luke') || titleLower.includes('evangelio de lucas')) {
-            displayTitle = lang === 'no' ? 'Lukas' : (lang === 'es' ? 'Lucas' : 'Luke');
-        }
+        const displayTitle = globalPlan.title || '';
 
         const totalDays = globalPlan.durationDays || globalPlan.days.length;
         const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
@@ -7356,7 +7352,7 @@ class BibleReader {
                             <button class="hkm-rp-back-btn" onclick="window.bibleReader.exitReadingPlanMode()" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-base); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'">
                                 <span class="material-symbols-outlined" style="font-size: 24px; font-weight: 700;">arrow_back</span>
                             </button>
-                            <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
+                            <h2 class="hkm-rp-sidebar-title" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayTitle}</h2>
                         </div>
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <button class="hkm-rp-action-btn" style="background: none; border: none; padding: 8px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--highlight-bg)'" onmouseout="this.style.backgroundColor='transparent'" onclick="window.bibleReader.toggleLeftSidebarMode()">
