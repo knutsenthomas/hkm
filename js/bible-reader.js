@@ -431,6 +431,22 @@ class BibleReader {
         this.setupSwipeGestures();
         this.setupModalHistoryNavigation();
         
+        // Immediately activate reading plan workspace if plan URL param is present to prevent Bible view flash
+        const earlyParams = new URLSearchParams(window.location.search);
+        const earlyPlan = earlyParams.get('plan');
+        if (earlyPlan) {
+            this.activePlanMode = true;
+            this.activePlanId = earlyPlan;
+            this.activePlanDay = parseInt(earlyParams.get('day'), 10) || null;
+            this.injectReadingPlanStyles();
+            if (this.dom.sidebar) {
+                this.dom.sidebar.classList.add('reading-plan-active');
+                if (window.innerWidth <= 1024) {
+                    this.dom.sidebar.classList.add('active');
+                }
+            }
+        }
+        
         // Listen to Firebase auth state for synchronizing notes (supports lazy-loaded Firebase SDK)
         const setupAuthObserver = () => {
             if (window.firebase && typeof firebase.auth === 'function') {
