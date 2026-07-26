@@ -6044,13 +6044,9 @@ class BibleReader {
             }
             this.activePlanDay = activeDayNum;
             
-            // Render reading plan UI
-            await this.setupReadingPlanUI(true);
+            // Render reading plan UI and load verses directly into reading pane
+            await this.setupReadingPlanUI(false);
             this.updateUrlParams();
-            // Auto-open devotional wizard on mobile
-            if (window.innerWidth <= 1024) {
-                await this.openDevotionalWizard(this.activePlanId, this.activePlanDay);
-            }
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         } finally {
@@ -6071,53 +6067,13 @@ class BibleReader {
             document.head.appendChild(style);
         }
         style.innerHTML = `
-            /* Hide page footer when reading plan is active to prevent page scrolling */
-            body:has(#bible-sidebar.reading-plan-active) footer.footer {
-                display: none !important;
+            /* Reading plan workspace container styles */
+            #reading-plan-header-panel {
+                width: 100%;
+                box-sizing: border-box;
             }
 
-            /* Desktop/Tablet landscape: Full screen reading plan */
-            @media (min-width: 1025px) {
-                #bible-sidebar.reading-plan-active {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    left: 0 !important;
-                    position: relative !important;
-                    flex: 1 !important;
-                    border-right: none !important;
-                }
-                #bible-sidebar.reading-plan-active + .bible-reading-area {
-                    display: none !important;
-                }
-                #bible-sidebar.reading-plan-active ~ #bible-nav-right {
-                    display: none !important;
-                }
-            }
-
-            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
             @media (max-width: 1024px) {
-                #bible-sidebar {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: -100% !important;
-                    width: 100% !important;
-                    height: 100% !important;
-                    height: 100dvh !important;
-                    z-index: 999999 !important;
-                    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                }
-                #bible-sidebar.active {
-                    left: 0 !important;
-                }
-                #bible-sidebar.reading-plan-active {
-                    left: -100% !important;
-                }
-                #bible-sidebar.reading-plan-active.active {
-                    left: 0 !important;
-                }
-                #bible-sidebar.reading-plan-active.active + .bible-reading-area {
-                    display: none !important;
-                }
                 .reading-plan-active #sidebar-mobile-controls {
                     display: none !important;
                 }
@@ -7162,15 +7118,12 @@ class BibleReader {
                 this.dom.navRight.classList.add('active');
             }
         }
-        // Hide old top header panel in central column (Deprecated/Removed)
-        const planHeader = document.getElementById('reading-plan-header-panel');
-        if (planHeader) {
-            planHeader.style.display = 'none';
-        }
+        // 4. Render center reading plan header panel
+        this.renderCenterReadingPlanHeader(globalPlan, userPlan, currentDayNum, dayConfig);
 
         // 5. Load day's verses in the center reading pane
         if (dayConfig && dayConfig.verses) {
-            await this.showDayVerses(dayConfig.verses, openSidebarOnMobile);
+            await this.showDayVerses(dayConfig.verses, false);
             this.applyReadingPlanHighlights();
         }
     }
@@ -7245,6 +7198,102 @@ class BibleReader {
             if (titleSpan) titleSpan.innerText = 'Dagens andakt';
             if (sidebarHeader) sidebarHeader.style.display = 'none';
         }
+    }
+
+    renderCenterReadingPlanHeader(globalPlan, userPlan, currentDayNum, dayConfig) {
+        const contentPane = document.querySelector('.bible-content-pane');
+        if (!contentPane) return;
+
+        let planHeader = document.getElementById('reading-plan-header-panel');
+        if (!planHeader) {
+            planHeader = document.createElement('div');
+            planHeader.id = 'reading-plan-header-panel';
+            contentPane.insertBefore(planHeader, contentPane.firstChild);
+        }
+        planHeader.style.display = 'block';
+
+        const totalDays = globalPlan.durationDays || (globalPlan.days ? globalPlan.days.length : 1);
+        const isCurrentDayCompleted = userPlan.completedDays && userPlan.completedDays.includes(currentDayNum);
+        const lang = document.documentElement.lang || 'no';
+
+        let dayItemsHtml = '';
+        for (let d = 1; d <= totalDays; d++) {
+            const isCompleted = userPlan.completedDays && userPlan.completedDays.includes(d);
+            const isActive = d === currentDayNum;
+            const completedClass = isCompleted ? 'completed' : '';
+            const activeClass = isActive ? 'active' : '';
+
+            dayItemsHtml += `
+                <button type="button" class="hkm-rp-day-strip-bubble-v3 ${completedClass} ${activeClass}" 
+                        onclick="window.bibleReader.selectReadingPlanDay(${d})"
+                        style="box-sizing: border-box; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
+                        <span class="day-num">${d}</span>
+                        ${isCompleted ? '<span class="material-symbols-outlined" style="font-size: 11px; font-weight: 900; color: #10b981; line-height: 1;">check</span>' : ''}
+                    </div>
+                </button>
+            `;
+        }
+
+        const progressPct = Math.round(((userPlan.completedDays?.length || 0) / totalDays) * 100);
+        const prayerText = dayConfig ? (dayConfig.prayerFocus || 'Reflekter over Guds ord i dag.') : '';
+
+        planHeader.innerHTML = `
+            <div class="hkm-rp-top-workspace" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                <!-- Header Row -->
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #fff; display: flex; align-items: center; justify-content: center; shrink: 0; box-shadow: 0 4px 12px rgba(209,125,57,0.25);">
+                            <span class="material-symbols-outlined" style="font-size: 24px;">menu_book</span>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: system-ui, -apple-system, sans-serif;">${globalPlan.title}</h2>
+                            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span>${lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag')} ${currentDayNum} av ${totalDays}</span>
+                                <span>•</span>
+                                <span style="color: #10b981; font-weight: 700;">${progressPct}% ${lang === 'en' ? 'completed' : (lang === 'es' ? 'completado' : 'fullført')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="hkm-btn-secondary" onclick="window.bibleReader.exitReadingPlanMode()" style="height: 32px; padding: 0 14px; font-size: 12px; font-weight: 600; border-radius: 99px; border: 1px solid var(--border-color, #e2e8f0); background: var(--bg-base, #f8fafc); color: var(--text-muted, #64748b); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                        <span>${lang === 'en' ? 'Exit plan' : (lang === 'es' ? 'Salir' : 'Avslutt leseplan')}</span>
+                    </button>
+                </div>
+
+                <!-- Day Selector Bubbles -->
+                <div class="hkm-rp-day-strip-v3" style="display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px 2px; margin-bottom: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                    ${dayItemsHtml}
+                </div>
+
+                <!-- Prayer Focus Box -->
+                ${prayerText ? `
+                <div style="background: rgba(209, 125, 57, 0.06); border-left: 4px solid #d17d39; border-radius: 0 12px 12px 0; padding: 14px 16px; margin-bottom: 16px;">
+                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #d17d39; margin-bottom: 4px; font-family: system-ui, -apple-system, sans-serif;">
+                        ${lang === 'en' ? 'Prayer Focus & Reflection' : (lang === 'es' ? 'Enfoque de oración' : 'Dagens bønnefokus & refleksjon')}
+                    </div>
+                    <div style="font-size: 14px; line-height: 1.5; color: var(--text-base); font-style: italic;">
+                        "${prayerText}"
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Action Buttons -->
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" onclick="window.bibleReader.openDevotionalWizard('${globalPlan.id}', ${currentDayNum}, 1)" 
+                            style="flex: 1; min-width: 200px; height: 44px; font-size: 14px; font-weight: 700; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25); transition: transform 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">play_arrow</span>
+                        <span>${lang === 'en' ? 'Start Devotional Wizard' : (lang === 'es' ? 'Iniciar devocional' : 'Start andakt (Veiviser)')}</span>
+                    </button>
+
+                    <button type="button" onclick="window.bibleReader.toggleActivePlanDayCompletion(this)" 
+                            style="height: 44px; padding: 0 20px; font-size: 13px; font-weight: 700; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid ${isCurrentDayCompleted ? '#10b981' : 'var(--border-color)'}; color: ${isCurrentDayCompleted ? '#10b981' : 'var(--text-base)'}; background: var(--bg-base); cursor: pointer; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: ${isCurrentDayCompleted ? '#10b981' : 'var(--text-muted)'};">${isCurrentDayCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
+                        <span>${isCurrentDayCompleted ? (lang === 'en' ? 'Completed' : (lang === 'es' ? 'Completado' : 'Fullført ✓')) : (lang === 'en' ? 'Mark completed' : (lang === 'es' ? 'Marcar completado' : 'Markér som fullført'))}</span>
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
     renderLeftSidebarReadingPlan(container, globalPlan, userPlan, currentDayNum, dayConfig) {
