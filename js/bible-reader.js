@@ -3037,6 +3037,7 @@ class BibleReader {
 
         modal = document.createElement('div');
         modal.className = 'hkm-modal-overlay hkm-book-intro-overlay';
+        const isMobileScreen = window.innerWidth <= 768;
         modal.style.cssText = `
             position: fixed !important;
             top: 0 !important;
@@ -3051,6 +3052,9 @@ class BibleReader {
             -webkit-backdrop-filter: none !important;
             z-index: 35000 !important;
             display: flex !important;
+            align-items: ${isMobileScreen ? 'flex-end' : 'center'} !important;
+            justify-content: center !important;
+            padding: ${isMobileScreen ? '0' : '20px'} !important;
             box-sizing: border-box !important;
         `;
 
@@ -3127,7 +3131,7 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding-top: 16px !important;">
+            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding-top: 16px !important; max-height: 80dvh !important; max-height: 80vh !important; margin-top: auto !important; border-radius: 28px 28px 0 0 !important; width: 100% !important;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
                 <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.22)); border-radius: 99px; margin: 0 auto 12px !important; cursor: pointer; flex-shrink: 0;"></div>
@@ -6584,11 +6588,12 @@ class BibleReader {
                 .hkm-book-intro-sheet-card {
                     border-radius: 28px 28px 0 0 !important;
                     padding-top: 16px !important;
-                    max-height: 92vh !important;
-                    max-height: 92dvh !important;
+                    max-height: 80vh !important;
+                    max-height: 80dvh !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0 !important;
+                    margin-top: auto !important;
                     box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
                     border-bottom: none !important;
                 }
