@@ -681,6 +681,7 @@ class BibleReader {
             toolbarBtnRange: document.getElementById('toolbar-btn-range'),
             toolbarBtnLookup: document.getElementById('toolbar-btn-lookup'),
             toolbarBtnShare: document.getElementById('toolbar-btn-share'),
+            toolbarBtnImage: document.getElementById('toolbar-btn-image'),
             toolbarBtnDownload: document.getElementById('toolbar-btn-download'),
             toolbarBtnSaveUser: document.getElementById('toolbar-btn-save-user'),
             toolbarBtnClear: document.getElementById('toolbar-btn-clear'),
@@ -1495,38 +1496,20 @@ class BibleReader {
             });
         }
 
+        if (this.dom.toolbarBtnImage) {
+            this.dom.toolbarBtnImage.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.selectedVerses && this.selectedVerses.length > 0) {
+                    this.openVerseImageModal();
+                }
+            });
+        }
+
         if (this.dom.toolbarBtnShare) {
             this.dom.toolbarBtnShare.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
-                    const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
-                    const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
-                    const refRange = this.getSelectedVersesReference();
-                    
-                    const combinedText = sorted.map(v => {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = v.paragraph.innerHTML;
-                        tempDiv.querySelectorAll('sup').forEach(s => s.remove());
-                        return tempDiv.innerText.trim();
-                    }).join(' ');
-
-                    const shareText = `«${combinedText}»\n— ${refRange} ${translation ? `(${translation})` : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
-
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'Bibelvers fra HKM',
-                            text: shareText
-                        }).catch(err => console.log(err));
-                    } else {
-                        navigator.clipboard.writeText(shareText).then(() => {
-                            if (typeof window.showToast === 'function') {
-                                window.showToast('Bibelversene er kopiert til utklippstavlen!', 'success');
-                            } else {
-                                alert('Kopiert til utklippstavlen!');
-                            }
-                        });
-                    }
-                    this.clearSelection();
+                    this.openVerseShareChoiceModal();
                 }
             });
         }
@@ -9958,6 +9941,530 @@ class BibleReader {
         } else {
             infoDisplay.textContent = (this.t('playing_verse') || 'Spiller av') + '...';
         }
+    }
+    // ==========================================
+    // VERSE IMAGE GENERATOR & SHARING SYSTEM
+    // ==========================================
+    ensureVerseModalsInDOM() {
+        const isEn = window.location.pathname.includes('/en/');
+        const isEs = window.location.pathname.includes('/es/');
+
+        // 1. Verse Image Generator Modal
+        if (!document.getElementById('verse-image-modal')) {
+            const modalHtml = `
+            <div id="verse-image-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
+                <div class="color-wheel-card" style="max-width: 540px; padding: 24px; border-radius: 24px;" onclick="event.stopPropagation();">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">image</span>
+                            <h3 id="verse-image-modal-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${isEn ? 'Create Verse Image' : (isEs ? 'Crear Imagen de Versículo' : 'Skap vers-bilde')}</h3>
+                        </div>
+                        <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-image-modal'); if(m){ m.classList.remove('active'); setTimeout(() => m.style.display='none', 250); }">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                        <div style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.04); border-radius: 16px; padding: 12px; box-sizing: border-box;">
+                            <canvas id="verse-card-canvas" style="max-width: 100%; height: auto; max-height: 360px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.25); object-fit: contain;"></canvas>
+                        </div>
+
+                        <div style="width: 100%;">
+                            <label style="display: block; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--text-muted, #64748b);">${isEn ? 'Style & Color Theme:' : (isEs ? 'Estilo y Tema de Color:' : 'Stil & Fargetema:')}</label>
+                            <div class="verse-image-theme-chips" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                                <button class="theme-chip-btn active" data-theme="emerald" style="background: linear-gradient(135deg, #022c22, #0f5132); color: #ffffff; border: 2px solid var(--hkm-terracotta, #d17d39); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Emerald' : (isEs ? 'Esmeralda' : 'Smaragd')}</button>
+                                <button class="theme-chip-btn" data-theme="royal" style="background: linear-gradient(135deg, #1e1b4b, #581c87); color: #fbbf24; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Royal' : (isEs ? 'Real' : 'Kongelig')}</button>
+                                <button class="theme-chip-btn" data-theme="midnight" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #38bdf8; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Midnight' : (isEs ? 'Medianoche' : 'Midnatt')}</button>
+                                <button class="theme-chip-btn" data-theme="sunset" style="background: linear-gradient(135deg, #4c0519, #b45309); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Sunset' : (isEs ? 'Amanecer' : 'Solnedgang')}</button>
+                                <button class="theme-chip-btn" data-theme="aurora" style="background: linear-gradient(135deg, #030712, #065f46); color: #6ee7b7; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Aurora' : (isEs ? 'Aurora' : 'Aurora')}</button>
+                                <button class="theme-chip-btn" data-theme="light" style="background: linear-gradient(135deg, #fdfbf7, #e2d9cc); color: #1e293b; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Light Elegance' : (isEs ? 'Luz Elegante' : 'Lys Eleganse')}</button>
+                            </div>
+                        </div>
+
+                        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                            <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Format:' : (isEs ? 'Formato:' : 'Format:')}</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button id="format-btn-square" class="format-chip-btn active" data-format="square" style="background: var(--hkm-terracotta, #d17d39); color: white; border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Square (1:1)' : (isEs ? 'Cuadrado (1:1)' : 'Kvadrat (1:1)')}</button>
+                                <button id="format-btn-story" class="format-chip-btn" data-format="story" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Story (9:16)' : (isEs ? 'Historia (9:16)' : 'Story (9:16)')}</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+                            <span>${isEn ? 'Copy Text' : (isEs ? 'Copiar Texto' : 'Kopier tekst')}</span>
+                        </button>
+                        <button id="verse-image-download-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: 1px solid var(--border-color, rgba(0,0,0,0.15)); border-radius: 9999px; padding: 10px 18px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                            <span>${isEn ? 'Download' : (isEs ? 'Descargar' : 'Last ned')}</span>
+                        </button>
+                        <button id="verse-image-share-btn" style="background: linear-gradient(135deg, var(--hkm-terracotta, #d17d39), #b45309); color: white; border: none; border-radius: 9999px; padding: 10px 22px; font-weight: 800; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209,125,57,0.35);">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
+                            <span>${isEn ? 'Share Image' : (isEs ? 'Compartir Imagen' : 'Del bilde')}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // 2. Share Choice Modal
+        if (!document.getElementById('verse-share-choice-modal')) {
+            const choiceHtml = `
+            <div id="verse-share-choice-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
+                <div class="color-wheel-card" style="max-width: 420px; padding: 24px; border-radius: 24px;" onclick="event.stopPropagation();">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">share</span>
+                            <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share Bible Verse' : (isEs ? 'Compartir Versículo' : 'Del bibelvers')}</h3>
+                        </div>
+                        <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-share-choice-modal'); if(m){ m.classList.remove('active'); setTimeout(() => m.style.display='none', 250); }">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+                        <button id="share-choice-btn-image" style="background: linear-gradient(135deg, rgba(209,125,57,0.12), rgba(209,125,57,0.04)); border: 1.5px solid var(--hkm-terracotta, #d17d39); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; text-align: left; cursor: pointer; transition: transform 0.15s ease;">
+                            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--hkm-terracotta, #d17d39); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 26px;">image</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 4px; font-size: 15px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Image' : (isEs ? 'Compartir como Imagen' : 'Del som Bilde')}</h4>
+                                <p style="margin: 0; font-size: 12.5px; color: var(--text-muted, #64748b);">${isEn ? 'Generate a beautiful image card with verse' : (isEs ? 'Genera una hermosa tarjeta de imagen con el versículo' : 'Generer et vakkert bildekort med vers og bakgrunn')}</p>
+                            </div>
+                        </button>
+
+                        <button id="share-choice-btn-text" style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, rgba(0,0,0,0.12)); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; text-align: left; cursor: pointer; transition: transform 0.15s ease;">
+                            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--bg-card, #e2e8f0); color: var(--text-base, #334155); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 26px;">notes</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 4px; font-size: 15px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Text' : (isEs ? 'Compartir como Texto' : 'Del som Tekst')}</h4>
+                                <p style="margin: 0; font-size: 12.5px; color: var(--text-muted, #64748b);">${isEn ? 'Send plain text directly or copy to clipboard' : (isEs ? 'Enviar texto o copiar al portapapeles' : 'Send råtekst direkte eller kopier til utklippstavlen')}</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', choiceHtml);
+        }
+    }
+
+    openVerseImageModal(customData = null) {
+        this.ensureVerseModalsInDOM();
+
+        let verseText = '';
+        let reference = '';
+        let translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
+
+        if (customData) {
+            verseText = customData.text || '';
+            reference = customData.reference || '';
+            if (customData.translation) translation = customData.translation;
+        } else if (this.selectedVerses && this.selectedVerses.length > 0) {
+            const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+            reference = this.getSelectedVersesReference();
+            verseText = sorted.map(v => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = v.paragraph.innerHTML;
+                tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                return tempDiv.innerText.trim();
+            }).join(' ');
+        } else {
+            return;
+        }
+
+        const modal = document.getElementById('verse-image-modal');
+        const canvas = document.getElementById('verse-card-canvas');
+        if (!modal || !canvas) return;
+
+        let activeTheme = 'emerald';
+        let activeFormat = 'square';
+
+        const updateCanvas = () => {
+            this.renderVerseImageCanvas(canvas, {
+                verseText,
+                reference,
+                translation,
+                theme: activeTheme,
+                format: activeFormat
+            });
+        };
+
+        // Theme Chip Click Listeners
+        const themeChips = modal.querySelectorAll('.theme-chip-btn');
+        themeChips.forEach(btn => {
+            btn.onclick = () => {
+                themeChips.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.border = '1px solid rgba(255,255,255,0.15)';
+                });
+                btn.classList.add('active');
+                btn.style.border = '2px solid var(--hkm-terracotta, #d17d39)';
+                activeTheme = btn.dataset.theme;
+                updateCanvas();
+            };
+        });
+
+        // Format Chip Click Listeners
+        const formatBtnSquare = modal.querySelector('#format-btn-square');
+        const formatBtnStory = modal.querySelector('#format-btn-story');
+        if (formatBtnSquare && formatBtnStory) {
+            formatBtnSquare.onclick = () => {
+                formatBtnSquare.style.background = 'var(--hkm-terracotta, #d17d39)';
+                formatBtnSquare.style.color = 'white';
+                formatBtnStory.style.background = 'var(--bg-surface, #f1f5f9)';
+                formatBtnStory.style.color = 'var(--text-base, #475569)';
+                activeFormat = 'square';
+                updateCanvas();
+            };
+            formatBtnStory.onclick = () => {
+                formatBtnStory.style.background = 'var(--hkm-terracotta, #d17d39)';
+                formatBtnStory.style.color = 'white';
+                formatBtnSquare.style.background = 'var(--bg-surface, #f1f5f9)';
+                formatBtnSquare.style.color = 'var(--text-base, #475569)';
+                activeFormat = 'story';
+                updateCanvas();
+            };
+        }
+
+        // Action Buttons Wiring
+        const shareBtn = modal.querySelector('#verse-image-share-btn');
+        if (shareBtn) {
+            shareBtn.onclick = () => {
+                this.shareVerseImage(canvas, reference);
+            };
+        }
+
+        const downloadBtn = modal.querySelector('#verse-image-download-btn');
+        if (downloadBtn) {
+            downloadBtn.onclick = () => {
+                canvas.toBlob((blob) => {
+                    if (!blob) return;
+                    const fileName = `bibelvers-${reference.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    if (typeof this.showToast === 'function') {
+                        this.showToast(window.location.pathname.includes('/en/') ? 'Image downloaded!' : 'Bilde lastet ned!');
+                    }
+                }, 'image/png');
+            };
+        }
+
+        const copyBtn = modal.querySelector('#verse-image-copy-btn');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                const shareText = `«${verseText}»\n— ${reference} ${translation ? '(' + translation + ')' : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
+                navigator.clipboard.writeText(shareText).then(() => {
+                    if (typeof this.showToast === 'function') {
+                        this.showToast(window.location.pathname.includes('/en/') ? 'Verse text copied!' : 'Verstekst kopiert til utklippstavlen!');
+                    }
+                });
+            };
+        }
+
+        // Initial Canvas Render
+        updateCanvas();
+
+        // Display Modal
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('active'), 10);
+    }
+
+    openVerseShareChoiceModal() {
+        this.ensureVerseModalsInDOM();
+        const choiceModal = document.getElementById('verse-share-choice-modal');
+        if (!choiceModal) return;
+
+        const btnImage = choiceModal.querySelector('#share-choice-btn-image');
+        const btnText = choiceModal.querySelector('#share-choice-btn-text');
+
+        if (btnImage) {
+            btnImage.onclick = () => {
+                choiceModal.classList.remove('active');
+                setTimeout(() => choiceModal.style.display = 'none', 200);
+                this.openVerseImageModal();
+            };
+        }
+
+        if (btnText) {
+            btnText.onclick = () => {
+                choiceModal.classList.remove('active');
+                setTimeout(() => choiceModal.style.display = 'none', 200);
+                this.shareSelectedVersesAsText();
+            };
+        }
+
+        choiceModal.style.display = 'flex';
+        setTimeout(() => choiceModal.classList.add('active'), 10);
+    }
+
+    shareSelectedVersesAsText() {
+        if (this.selectedVerses && this.selectedVerses.length > 0) {
+            const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
+            const translation = this.bibles.find(t => t.id === this.selectedBibleId)?.abbreviation || '';
+            const refRange = this.getSelectedVersesReference();
+            
+            const combinedText = sorted.map(v => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = v.paragraph.innerHTML;
+                tempDiv.querySelectorAll('sup').forEach(s => s.remove());
+                return tempDiv.innerText.trim();
+            }).join(' ');
+
+            const shareText = `«${combinedText}»\n— ${refRange} ${translation ? `(${translation})` : ''}\n\nLest via Mandal Regnskapskontor / HKM`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bibelvers fra HKM',
+                    text: shareText
+                }).catch(err => console.log(err));
+            } else {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    if (typeof this.showToast === 'function') {
+                        this.showToast('Bibelversene er kopiert til utklippstavlen!');
+                    }
+                });
+            }
+            this.clearSelection();
+        }
+    }
+
+    renderVerseImageCanvas(canvas, { verseText, reference, translation, theme = 'emerald', format = 'square' }) {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const isStory = format === 'story';
+        const width = 1080;
+        const height = isStory ? 1920 : 1080;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const themes = {
+            emerald: {
+                bgGradient: ['#022c22', '#064e3b', '#0f5132'],
+                cardBg: 'rgba(255, 255, 255, 0.06)',
+                cardBorder: 'rgba(250, 204, 21, 0.35)',
+                quoteColor: 'rgba(250, 204, 21, 0.22)',
+                textColor: '#ffffff',
+                refColor: '#facc15',
+                brandColor: 'rgba(255, 255, 255, 0.75)'
+            },
+            royal: {
+                bgGradient: ['#1e1b4b', '#3b0764', '#581c87'],
+                cardBg: 'rgba(255, 255, 255, 0.07)',
+                cardBorder: 'rgba(251, 191, 36, 0.35)',
+                quoteColor: 'rgba(251, 191, 36, 0.22)',
+                textColor: '#ffffff',
+                refColor: '#fbbf24',
+                brandColor: 'rgba(255, 255, 255, 0.75)'
+            },
+            midnight: {
+                bgGradient: ['#0f172a', '#1e293b', '#020617'],
+                cardBg: 'rgba(255, 255, 255, 0.05)',
+                cardBorder: 'rgba(56, 189, 248, 0.35)',
+                quoteColor: 'rgba(56, 189, 248, 0.22)',
+                textColor: '#f8fafc',
+                refColor: '#38bdf8',
+                brandColor: '#94a3b8'
+            },
+            sunset: {
+                bgGradient: ['#4c0519', '#881337', '#b45309'],
+                cardBg: 'rgba(255, 255, 255, 0.07)',
+                cardBorder: 'rgba(254, 240, 138, 0.35)',
+                quoteColor: 'rgba(254, 240, 138, 0.22)',
+                textColor: '#fff1f2',
+                refColor: '#fef08a',
+                brandColor: 'rgba(255, 241, 242, 0.75)'
+            },
+            aurora: {
+                bgGradient: ['#030712', '#065f46', '#1e1b4b'],
+                cardBg: 'rgba(255, 255, 255, 0.06)',
+                cardBorder: 'rgba(110, 231, 183, 0.35)',
+                quoteColor: 'rgba(110, 231, 183, 0.22)',
+                textColor: '#ecfdf5',
+                refColor: '#6ee7b7',
+                brandColor: 'rgba(236, 253, 245, 0.75)'
+            },
+            light: {
+                bgGradient: ['#fdfbf7', '#f5f0e6', '#e2d9cc'],
+                cardBg: 'rgba(255, 255, 255, 0.85)',
+                cardBorder: 'rgba(209, 125, 57, 0.35)',
+                quoteColor: 'rgba(209, 125, 57, 0.18)',
+                textColor: '#1e293b',
+                refColor: '#b45309',
+                brandColor: '#64748b'
+            }
+        };
+
+        const t = themes[theme] || themes.emerald;
+
+        // 1. Draw Background
+        const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+        bgGrad.addColorStop(0, t.bgGradient[0]);
+        bgGrad.addColorStop(0.5, t.bgGradient[1]);
+        bgGrad.addColorStop(1, t.bgGradient[2]);
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        // Radial ambient glow
+        const lightGrad = ctx.createRadialGradient(width/2, height/2, 40, width/2, height/2, width*0.65);
+        lightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
+        lightGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = lightGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        // 2. Wrap text & Calculate sizes
+        const marginX = 90;
+        const cardWidth = width - (marginX * 2);
+        
+        const cleanText = verseText.trim();
+        const textLen = cleanText.length;
+
+        let fontSize = 44;
+        let lineHeight = 66;
+
+        if (textLen > 320) {
+            fontSize = 30;
+            lineHeight = 48;
+        } else if (textLen > 180) {
+            fontSize = 36;
+            lineHeight = 56;
+        } else if (textLen < 80) {
+            fontSize = 52;
+            lineHeight = 76;
+        }
+
+        ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
+
+        const maxTextWidth = cardWidth - 140;
+        const words = cleanText.split(' ');
+        let lines = [];
+        let currentLine = '';
+
+        for (let i = 0; i < words.length; i++) {
+            let testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+            let metrics = ctx.measureText(testLine);
+            if (metrics.width > maxTextWidth && i > 0) {
+                lines.push(currentLine);
+                currentLine = words[i];
+            } else {
+                currentLine = testLine;
+            }
+        }
+        if (currentLine) lines.push(currentLine);
+
+        const textContentHeight = lines.length * lineHeight;
+        const cardHeight = Math.max(380, textContentHeight + 220);
+        const cardY = (height - cardHeight) / 2;
+
+        // 3. Draw Glass Card
+        ctx.save();
+        ctx.beginPath();
+        const r = 36;
+        ctx.moveTo(marginX + r, cardY);
+        ctx.arcTo(marginX + cardWidth, cardY, marginX + cardWidth, cardY + cardHeight, r);
+        ctx.arcTo(marginX + cardWidth, cardY + cardHeight, marginX, cardY + cardHeight, r);
+        ctx.arcTo(marginX, cardY + cardHeight, marginX, cardY, r);
+        ctx.arcTo(marginX, cardY, marginX + cardWidth, cardY, r);
+        ctx.closePath();
+
+        ctx.fillStyle = t.cardBg;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = t.cardBorder;
+        ctx.stroke();
+        ctx.restore();
+
+        // 4. Large Decorative Quote Mark
+        ctx.save();
+        ctx.font = 'bold 150px "Georgia", serif';
+        ctx.fillStyle = t.quoteColor;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('«', marginX + 40, cardY + 20);
+        ctx.restore();
+
+        // 5. Draw Wrapped Verse Text
+        ctx.save();
+        ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
+        ctx.fillStyle = t.textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        let textStartY = cardY + 80;
+        for (let j = 0; j < lines.length; j++) {
+            ctx.fillText(lines[j], width / 2, textStartY + (j * lineHeight));
+        }
+        ctx.restore();
+
+        // 6. Draw Divider Line & Reference
+        const dividerY = textStartY + (lines.length * lineHeight) + 26;
+        ctx.save();
+        ctx.strokeStyle = t.cardBorder;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(width / 2 - 50, dividerY);
+        ctx.lineTo(width / 2 + 50, dividerY);
+        ctx.stroke();
+        ctx.restore();
+
+        const fullRef = `${reference.toUpperCase()} ${translation ? '(' + translation + ')' : ''}`;
+        ctx.save();
+        ctx.font = 'bold 28px "Outfit", "Inter", sans-serif';
+        ctx.fillStyle = t.refColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(fullRef, width / 2, dividerY + 18);
+        ctx.restore();
+
+        // 7. Draw Footer Branding ("HIS KINGDOM MINISTRY  •  hkm.no")
+        ctx.save();
+        const footerY = isStory ? height - 120 : height - 60;
+        ctx.font = '700 22px "Outfit", "Inter", sans-serif';
+        ctx.fillStyle = t.brandColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('HIS KINGDOM MINISTRY  •  hkm.no', width / 2, footerY);
+        ctx.restore();
+    }
+
+    shareVerseImage(canvas, reference) {
+        if (!canvas) return;
+        canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const fileName = `bibelvers-${reference.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+            const file = new File([blob], fileName, { type: 'image/png' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'Bibelvers - HKM',
+                        text: `${reference} — His Kingdom Ministry`,
+                        files: [file]
+                    });
+                    return;
+                } catch(e) {
+                    console.log('Share canceled or error:', e);
+                }
+            }
+
+            // Fallback download
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            if (typeof this.showToast === 'function') {
+                this.showToast(window.location.pathname.includes('/en/') ? 'Image downloaded!' : 'Bilde lastet ned!');
+            }
+        }, 'image/png');
     }
 }
 
