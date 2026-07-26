@@ -9946,234 +9946,225 @@ class BibleReader {
     // VERSE IMAGE GENERATOR & SHARING SYSTEM
     // ==========================================
     ensureVerseModalsInDOM() {
-        const isEn = window.location.pathname.includes('/en/');
-        const isEs = window.location.pathname.includes('/es/');
+        const isEn = document.documentElement.lang === 'en';
+        const isEs = document.documentElement.lang === 'es';
 
-        // Inject dedicated responsive modal styles if not already present
-        if (!document.getElementById('hkm-verse-image-modal-styles')) {
-            const style = document.createElement('style');
-            style.id = 'hkm-verse-image-modal-styles';
-            style.textContent = `
+        let style = document.getElementById('hkm-verse-image-modal-styles');
+        if (style) style.remove();
+
+        style = document.createElement('style');
+        style.id = 'hkm-verse-image-modal-styles';
+        style.textContent = `
+            #verse-image-modal.color-wheel-modal-overlay,
+            #verse-share-choice-modal.color-wheel-modal-overlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(15, 23, 42, 0.65) !important;
+                backdrop-filter: blur(8px) !important;
+                -webkit-backdrop-filter: blur(8px) !important;
+                z-index: 45000 !important;
+                display: none;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            #verse-image-modal.color-wheel-modal-overlay.active,
+            #verse-share-choice-modal.color-wheel-modal-overlay.active {
+                display: flex !important;
+            }
+
+            .verse-image-card {
+                background: var(--bg-card, #ffffff) !important;
+                border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                border-radius: 24px !important;
+                padding: 20px 24px !important;
+                width: 100% !important;
+                max-width: 540px !important;
+                max-height: 88dvh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+                box-sizing: border-box !important;
+            }
+
+            .verse-share-choice-card {
+                background: var(--bg-card, #ffffff) !important;
+                border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                border-radius: 24px !important;
+                padding: 20px 24px !important;
+                width: 100% !important;
+                max-width: 420px !important;
+                max-height: 88dvh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+                box-sizing: border-box !important;
+            }
+
+            #verse-card-canvas {
+                max-width: 100%;
+                height: auto;
+                max-height: 320px;
+                border-radius: 12px;
+                box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+                object-fit: contain;
+            }
+
+            .color-wheel-close-btn {
+                width: 36px !important;
+                height: 36px !important;
+                min-width: 36px !important;
+                max-width: 36px !important;
+                min-height: 36px !important;
+                max-height: 36px !important;
+                border-radius: 50% !important;
+                aspect-ratio: 1 / 1 !important;
+                padding: 0 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            .verse-image-modal-actions {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+            }
+
+            .verse-image-modal-actions button {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                padding: 10px 4px !important;
+                font-size: 12px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                box-sizing: border-box !important;
+            }
+
+            @media (max-width: 768px) {
                 #verse-image-modal.color-wheel-modal-overlay,
                 #verse-share-choice-modal.color-wheel-modal-overlay {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    bottom: 0 !important;
-                    background: rgba(15, 23, 42, 0.65) !important;
-                    backdrop-filter: blur(8px) !important;
-                    -webkit-backdrop-filter: blur(8px) !important;
-                    z-index: 45000 !important;
-                    display: none;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    padding: 16px !important;
-                    box-sizing: border-box !important;
+                    align-items: flex-end !important;
+                    padding: 0 !important;
                 }
 
-                #verse-image-modal.color-wheel-modal-overlay.active,
-                #verse-share-choice-modal.color-wheel-modal-overlay.active {
-                    display: flex !important;
-                }
-
-                .verse-image-card {
-                    background: var(--bg-card, #ffffff) !important;
-                    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-                    border-radius: 24px !important;
-                    padding: 20px 24px !important;
-                    width: 100% !important;
-                    max-width: 540px !important;
-                    max-height: 88dvh !important;
-                    overflow-y: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
-                    box-sizing: border-box !important;
-                }
-
+                .verse-image-card,
                 .verse-share-choice-card {
-                    background: var(--bg-card, #ffffff) !important;
-                    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-                    border-radius: 24px !important;
-                    padding: 20px 24px !important;
-                    width: 100% !important;
-                    max-width: 420px !important;
+                    width: 100vw !important;
+                    max-width: 100vw !important;
                     max-height: 88dvh !important;
-                    overflow-y: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
-                    box-sizing: border-box !important;
+                    border-radius: 24px 24px 0 0 !important;
+                    padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 12px)) 16px !important;
+                    animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
 
                 #verse-card-canvas {
-                    max-width: 100%;
-                    height: auto;
-                    max-height: 320px;
-                    border-radius: 12px;
-                    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-                    object-fit: contain;
-                }
-
-                @media (max-width: 768px) {
-                    #verse-image-modal.color-wheel-modal-overlay,
-                    #verse-share-choice-modal.color-wheel-modal-overlay {
-                        align-items: flex-end !important;
-                        padding: 0 !important;
-                    }
-
-                    .verse-image-card,
-                    .verse-share-choice-card {
-                        width: 100vw !important;
-                        max-width: 100vw !important;
-                        max-height: 88dvh !important;
-                        border-radius: 24px 24px 0 0 !important;
-                        padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 12px)) 16px !important;
-                        animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                    }
-
-                .color-wheel-close-btn {
-                    width: 36px !important;
-                    height: 36px !important;
-                    min-width: 36px !important;
-                    max-width: 36px !important;
-                    min-height: 36px !important;
-                    max-height: 36px !important;
-                    border-radius: 50% !important;
-                    aspect-ratio: 1 / 1 !important;
-                    padding: 0 !important;
-                    display: inline-flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    flex-shrink: 0 !important;
-                    box-sizing: border-box !important;
+                    max-height: 200px !important;
                 }
 
                 .verse-image-modal-actions {
-                    display: flex !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    gap: 8px !important;
+                    display: grid !important;
+                    grid-template-columns: repeat(3, 1fr) !important;
+                    gap: 6px !important;
                     width: 100% !important;
-                    box-sizing: border-box !important;
                 }
 
                 .verse-image-modal-actions button {
-                    flex: 1 1 0px !important;
-                    min-width: 0 !important;
-                    padding: 10px 10px !important;
-                    font-size: 12.5px !important;
-                    justify-content: center !important;
-                    text-align: center !important;
-                    white-space: nowrap !important;
-                    box-sizing: border-box !important;
+                    padding: 8px 2px !important;
+                    font-size: 11px !important;
+                    min-height: 44px !important;
+                    gap: 3px !important;
                 }
 
-                @media (max-width: 768px) {
-                    #verse-image-modal.color-wheel-modal-overlay,
-                    #verse-share-choice-modal.color-wheel-modal-overlay {
-                        align-items: flex-end !important;
-                        padding: 0 !important;
-                    }
-
-                    .verse-image-card,
-                    .verse-share-choice-card {
-                        width: 100vw !important;
-                        max-width: 100vw !important;
-                        max-height: 88dvh !important;
-                        border-radius: 24px 24px 0 0 !important;
-                        padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 12px)) 16px !important;
-                        animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                    }
-
-                    #verse-card-canvas {
-                        max-height: 200px !important;
-                    }
-
-                    .verse-image-modal-actions {
-                        gap: 6px !important;
-                    }
-
-                    .verse-image-modal-actions button {
-                        padding: 8px 4px !important;
-                        font-size: 11.5px !important;
-                        min-height: 44px !important;
-                        gap: 4px !important;
-                    }
-
-                    .verse-image-modal-actions button .material-symbols-outlined {
-                        font-size: 16px !important;
-                    }
+                .verse-image-modal-actions button .material-symbols-outlined {
+                    font-size: 15px !important;
                 }
-            `;
-            document.head.appendChild(style);
-        }
+            }
+        `;
+        document.head.appendChild(style);
 
         // 1. Verse Image Generator Modal
-        if (!document.getElementById('verse-image-modal')) {
-            const modalHtml = `
-            <div id="verse-image-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
-                <div class="verse-image-card" onclick="event.stopPropagation();">
-                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">image</span>
-                            <h3 id="verse-image-modal-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${isEn ? 'Create Verse Image' : (isEs ? 'Crear Imagen de Versículo' : 'Skap vers-bilde')}</h3>
-                        </div>
-                        <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-image-modal'); if(m){ m.classList.remove('active'); setTimeout(() => m.style.display='none', 250); }">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
+        const oldModal = document.getElementById('verse-image-modal');
+        if (oldModal) oldModal.remove();
+
+        const modalHtml = `
+        <div id="verse-image-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
+            <div class="verse-image-card" onclick="event.stopPropagation();">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">image</span>
+                        <h3 id="verse-image-modal-title" style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">${isEn ? 'Create Verse Image' : (isEs ? 'Crear Imagen de Versículo' : 'Skap vers-bilde')}</h3>
+                    </div>
+                    <button class="color-wheel-close-btn" title="Lukk" onclick="const m=document.getElementById('verse-image-modal'); if(m){ m.classList.remove('active'); setTimeout(() => m.style.display='none', 250); }">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px; align-items: center;">
+                    <div style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.04); border-radius: 16px; padding: 10px; box-sizing: border-box;">
+                        <canvas id="verse-card-canvas"></canvas>
                     </div>
 
-                    <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px; align-items: center;">
-                        <div style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.04); border-radius: 16px; padding: 10px; box-sizing: border-box;">
-                            <canvas id="verse-card-canvas"></canvas>
-                        </div>
-
-                        <div style="width: 100%;">
-                            <label style="display: block; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--text-muted, #64748b);">${isEn ? 'Style & Background:' : (isEs ? 'Estilo y Fondo:' : 'Stil & Bakgrunn:')}</label>
-                            <div class="verse-image-theme-chips" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-                                <!-- Color Gradients -->
-                                <button class="theme-chip-btn active" data-theme="emerald" style="background: linear-gradient(135deg, #022c22, #0f5132); color: #ffffff; border: 2px solid var(--hkm-terracotta, #d17d39); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌿 ${isEn ? 'Emerald' : (isEs ? 'Esmeralda' : 'Smaragd')}</button>
-                                <button class="theme-chip-btn" data-theme="royal" style="background: linear-gradient(135deg, #1e1b4b, #581c87); color: #fbbf24; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">👑 ${isEn ? 'Royal' : (isEs ? 'Real' : 'Kongelig')}</button>
-                                <button class="theme-chip-btn" data-theme="midnight" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #38bdf8; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌌 ${isEn ? 'Midnight' : (isEs ? 'Medianoche' : 'Midnatt')}</button>
-                                <button class="theme-chip-btn" data-theme="sunset" style="background: linear-gradient(135deg, #4c0519, #b45309); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌅 ${isEn ? 'Sunset' : (isEs ? 'Amanecer' : 'Solnedgang')}</button>
-                                <button class="theme-chip-btn" data-theme="aurora" style="background: linear-gradient(135deg, #030712, #065f46); color: #6ee7b7; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Aurora' : (isEs ? 'Aurora' : 'Aurora')}</button>
-                                <button class="theme-chip-btn" data-theme="light" style="background: linear-gradient(135deg, #fdfbf7, #e2d9cc); color: #1e293b; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🕊️ ${isEn ? 'Light Elegance' : (isEs ? 'Luz Elegante' : 'Lys Eleganse')}</button>
-                                
-                                <!-- Real Photo Backgrounds -->
-                                <button class="theme-chip-btn" data-theme="photo_mountains" style="background: url('/img/verse_bg_mountains.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🏔️ ${isEn ? 'Mountains' : (isEs ? 'Montañas' : 'Fjell')}</button>
-                                <button class="theme-chip-btn" data-theme="photo_stars" style="background: url('/img/verse_bg_starry_sky.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Starry Sky' : (isEs ? 'Cielo Estrellado' : 'Stjerner')}</button>
-                                <button class="theme-chip-btn" data-theme="photo_ocean" style="background: url('/img/verse_bg_sunset_ocean.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌊 ${isEn ? 'Ocean Sunset' : (isEs ? 'Atardecer Mar' : 'Hav')}</button>
-                                <button class="theme-chip-btn" data-theme="photo_sunburst" style="background: url('/img/verse_bg_sunburst_rays.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌤️ ${isEn ? 'Sunbeams' : (isEs ? 'Rayos de Sol' : 'Solstråler')}</button>
-                            </div>
-                        </div>
-
-                        <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                            <label style="font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Format:' : (isEs ? 'Formato:' : 'Format:')}</label>
-                            <div style="display: flex; gap: 8px;">
-                                <button id="format-btn-square" class="format-chip-btn active" data-format="square" style="background: var(--hkm-terracotta, #d17d39); color: white; border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Square (1:1)' : (isEs ? 'Cuadrado (1:1)' : 'Kvadrat (1:1)')}</button>
-                                <button id="format-btn-story" class="format-chip-btn" data-format="story" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Story (9:16)' : (isEs ? 'Historia (9:16)' : 'Story (9:16)')}</button>
-                            </div>
+                    <div style="width: 100%;">
+                        <label style="display: block; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--text-muted, #64748b);">${isEn ? 'Style & Background:' : (isEs ? 'Estilo y Fondo:' : 'Stil & Bakgrunn:')}</label>
+                        <div class="verse-image-theme-chips" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                            <!-- Color Gradients -->
+                            <button class="theme-chip-btn active" data-theme="emerald" style="background: linear-gradient(135deg, #022c22, #0f5132); color: #ffffff; border: 2px solid var(--hkm-terracotta, #d17d39); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌿 ${isEn ? 'Emerald' : (isEs ? 'Esmeralda' : 'Smaragd')}</button>
+                            <button class="theme-chip-btn" data-theme="royal" style="background: linear-gradient(135deg, #1e1b4b, #581c87); color: #fbbf24; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">👑 ${isEn ? 'Royal' : (isEs ? 'Real' : 'Kongelig')}</button>
+                            <button class="theme-chip-btn" data-theme="midnight" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #38bdf8; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌌 ${isEn ? 'Midnight' : (isEs ? 'Medianoche' : 'Midnatt')}</button>
+                            <button class="theme-chip-btn" data-theme="sunset" style="background: linear-gradient(135deg, #4c0519, #b45309); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌅 ${isEn ? 'Sunset' : (isEs ? 'Amanecer' : 'Solnedgang')}</button>
+                            <button class="theme-chip-btn" data-theme="aurora" style="background: linear-gradient(135deg, #030712, #065f46); color: #6ee7b7; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Aurora' : (isEs ? 'Aurora' : 'Aurora')}</button>
+                            <button class="theme-chip-btn" data-theme="light" style="background: linear-gradient(135deg, #fdfbf7, #e2d9cc); color: #1e293b; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🕊️ ${isEn ? 'Light Elegance' : (isEs ? 'Luz Elegante' : 'Lys Eleganse')}</button>
+                            
+                            <!-- Real Photo Backgrounds -->
+                            <button class="theme-chip-btn" data-theme="photo_mountains" style="background: url('/img/verse_bg_mountains.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🏔️ ${isEn ? 'Mountains' : (isEs ? 'Montañas' : 'Fjell')}</button>
+                            <button class="theme-chip-btn" data-theme="photo_stars" style="background: url('/img/verse_bg_starry_sky.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Starry Sky' : (isEs ? 'Cielo Estrellado' : 'Stjerner')}</button>
+                            <button class="theme-chip-btn" data-theme="photo_ocean" style="background: url('/img/verse_bg_sunset_ocean.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌊 ${isEn ? 'Ocean Sunset' : (isEs ? 'Atardecer Mar' : 'Hav')}</button>
+                            <button class="theme-chip-btn" data-theme="photo_sunburst" style="background: url('/img/verse_bg_sunburst_rays.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌤️ ${isEn ? 'Sunbeams' : (isEs ? 'Rayos de Sol' : 'Solstråler')}</button>
                         </div>
                     </div>
 
-                    <div class="verse-image-modal-actions" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06));">
-                        <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 16px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                            <span>${isEn ? 'Copy Text' : (isEs ? 'Copiar Texto' : 'Kopier tekst')}</span>
-                        </button>
-                        <button id="verse-image-download-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: 1px solid var(--border-color, rgba(0,0,0,0.15)); border-radius: 9999px; padding: 10px 16px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                            <span>${isEn ? 'Download' : (isEs ? 'Descargar' : 'Last ned')}</span>
-                        </button>
-                        <button id="verse-image-share-btn" style="background: linear-gradient(135deg, var(--hkm-terracotta, #d17d39), #b45309); color: white; border: none; border-radius: 9999px; padding: 10px 20px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209,125,57,0.35);">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
-                            <span>${isEn ? 'Share Image' : (isEs ? 'Compartir Imagen' : 'Del bilde')}</span>
-                        </button>
+                    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                        <label style="font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Format:' : (isEs ? 'Formato:' : 'Format:')}</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="format-btn-square" class="format-chip-btn active" data-format="square" style="background: var(--hkm-terracotta, #d17d39); color: white; border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Square (1:1)' : (isEs ? 'Cuadrado (1:1)' : 'Kvadrat (1:1)')}</button>
+                            <button id="format-btn-story" class="format-chip-btn" data-format="story" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Story (9:16)' : (isEs ? 'Historia (9:16)' : 'Story (9:16)')}</button>
+                        </div>
                     </div>
                 </div>
-            </div>`;
+
+                <div class="verse-image-modal-actions" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; width: 100% !important; box-sizing: border-box !important;">
+                    <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 4px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; min-width: 0; box-sizing: border-box;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; flex-shrink: 0;">content_copy</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${isEn ? 'Copy' : (isEs ? 'Copiar' : 'Kopier')}</span>
+                    </button>
+                    <button id="verse-image-download-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: 1px solid var(--border-color, rgba(0,0,0,0.15)); border-radius: 9999px; padding: 10px 4px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; min-width: 0; box-sizing: border-box;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; flex-shrink: 0;">download</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${isEn ? 'Download' : (isEs ? 'Descargar' : 'Last ned')}</span>
+                    </button>
+                    <button id="verse-image-share-btn" style="background: linear-gradient(135deg, var(--hkm-terracotta, #d17d39), #b45309); color: white; border: none; border-radius: 9999px; padding: 10px 4px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 14px rgba(209,125,57,0.35); width: 100%; min-width: 0; box-sizing: border-box;">
+                        <span class="material-symbols-outlined" style="font-size: 16px; flex-shrink: 0;">share</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${isEn ? 'Share' : (isEs ? 'Compartir' : 'Del bilde')}</span>
+                    </button>
+                </div>
+            </div>
+        </div>`;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
 
         // 2. Share Choice Modal
         if (!document.getElementById('verse-share-choice-modal')) {
