@@ -2462,9 +2462,7 @@ class BibleReader {
                     container.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
                     await this.selectBook(item.dataset.id);
-                    if (this.chapters && this.chapters.length > 0) {
-                        await this.selectChapter(this.chapters[0].id);
-                    }
+                    await this.selectChapter(`${item.dataset.id}_intro`);
                 });
             });
         };
@@ -2527,7 +2525,10 @@ class BibleReader {
     }
 
     renderChapters() {
-        const gridHtml = this.chapters.map(c => {
+        const isIntroActive = this.selectedChapterId === `${this.selectedBookId}_intro` ? 'active' : '';
+        const introItemHtml = `<div class="chapter-item ${isIntroActive}" data-id="${this.selectedBookId}_intro" style="font-weight: 700; background: rgba(27,73,101,0.08); color: #1B4965;">Intro</div>`;
+
+        const gridHtml = introItemHtml + this.chapters.map(c => {
             const isActive = c.id === this.selectedChapterId ? 'active' : '';
             return `<div class="chapter-item ${isActive}" data-id="${c.id}">${c.number}</div>`;
         }).join('');
@@ -2811,8 +2812,8 @@ class BibleReader {
         this.clearSelection();
         this.selectedChapterId = chapterId;
 
-        // Synchronize selectedBookId if chapterId contains BOOKID_CHAPTERNUM
-        const [bookPartId] = chapterId.includes('_') ? chapterId.split('_') : [null];
+        // Synchronize selectedBookId if chapterId contains BOOKID_CHAPTERNUM or BOOKID_intro
+        const [bookPartId, chapNumPart] = chapterId.includes('_') ? chapterId.split('_') : [null, chapterId];
         if (bookPartId && this.selectedBookId !== bookPartId) {
             this.selectedBookId = bookPartId;
         }
@@ -2823,24 +2824,22 @@ class BibleReader {
             this.safeSetLocalStorage('hkm_bible_last_book', this.selectedBookId);
         }
 
-        // Update URL search parameters without reloading
-        try {
-            const url = new URL(window.location.href);
-            const currentBook = this.books ? this.books.find(b => b.id === this.selectedBookId) : null;
-            const chapterNum = chapterId.split('_')[1];
-            if (currentBook && chapterNum && !url.searchParams.get('plan')) {
-                url.searchParams.set('ref', `${currentBook.name} ${chapterNum}`);
-                window.history.replaceState({}, '', url.toString());
-            }
-        } catch (urlErr) {
-            console.warn("[BibleReader] Failed to update URL parameters:", urlErr);
-        }
-        
         // Highlight in grid
         document.querySelectorAll('.chapter-grid .chapter-item, #floating-chapter-grid .chapter-item').forEach(el => {
             if (el.dataset.id === chapterId) el.classList.add('active');
             else el.classList.remove('active');
         });
+
+        // Handle Intro page route
+        if (chapNumPart === 'intro' || chapterId === 'intro') {
+            const targetBookId = bookPartId || this.selectedBookId;
+            this.selectedBookId = targetBookId;
+            this.selectedChapterId = `${targetBookId}_intro`;
+            this.renderBookIntroPage(targetBookId);
+            this.updateNavigationButtons();
+            this.updateRelatedResources();
+            return;
+        }
 
         // Show loading spinner
         this.dom.readingPane = this.dom.readingPane || document.getElementById('bible-reading-pane');
@@ -3007,6 +3006,144 @@ class BibleReader {
                 </div>
             `;
         }
+    }
+
+    renderBookIntroPage(bookId) {
+        this.selectedChapterId = `${bookId}_intro`;
+        const intro = typeof getBibleBookIntroduction === 'function' 
+            ? getBibleBookIntroduction(bookId) 
+            : (window.getBibleBookIntroduction ? window.getBibleBookIntroduction(bookId) : null);
+        
+        const currentBook = this.books ? this.books.find(b => b.id === bookId) : null;
+        const bookName = currentBook ? currentBook.name : (intro ? intro.title : bookId);
+        
+        // Update header title elements
+        try {
+            this.dom.currentBookBadge = this.dom.currentBookBadge || document.getElementById('current-book-badge');
+            this.dom.currentChapterNumber = this.dom.currentChapterNumber || document.getElementById('current-chapter-number');
+            this.dom.currentReferenceTitle = this.dom.currentReferenceTitle || document.getElementById('current-reference-title');
+
+            if (this.dom.currentBookBadge) this.dom.currentBookBadge.innerText = bookName.toUpperCase();
+            if (this.dom.currentChapterNumber) this.dom.currentChapterNumber.innerText = 'Intro';
+            if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = `${bookName} - Bokintroduksjon`;
+        } catch (e) {}
+
+        const lang = document.documentElement.lang || 'no';
+        const labelIntro = lang === 'en' ? 'Book Introduction' : (lang === 'es' ? 'Introducción al libro' : 'Bokintroduksjon');
+        const labelAuthor = lang === 'en' ? 'Author' : (lang === 'es' ? 'Autor' : 'Forfatter');
+        const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
+        const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
+        const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
+        const labelHowToRead = lang === 'en' ? 'How to Read This Book' : (lang === 'es' ? 'Cómo leer este libro' : 'Hvordan lese boken best');
+        const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
+        const labelStartReading = lang === 'en' ? 'Start Reading Chapter 1' : (lang === 'es' ? 'Comenzar a leer el capítulo 1' : 'Start lesing – Kapittel 1');
+
+        if (!intro) {
+            this.dom.readingPane.innerHTML = `
+                <div style="max-width: 720px; margin: 40px auto; padding: 32px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); text-align: center;">
+                    <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 12px;">${bookName}</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Det er ingen egen skriftlig introduksjon for denne boken ennå.</p>
+                    <button class="hkm-btn-primary" id="btn-start-chap1-page" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 15px; border-radius: 12px; font-weight: 700; background: #1B4965; color: #ffffff; cursor: pointer; border: none;">
+                        <span>${labelStartReading}</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-start-chap1-page')?.addEventListener('click', () => this.selectChapter(`${bookId}_1`));
+            return;
+        }
+
+        const keyVersesHtml = (intro.keyVerses || []).map(v => `
+            <div style="border-left: 4px solid #d17d39; padding-left: 16px; margin-top: 14px; background: rgba(209,125,57,0.03); padding: 12px 16px; border-radius: 0 10px 10px 0;">
+                <p style="margin: 0; font-size: 15px; font-style: italic; color: var(--text-base); line-height: 1.6;">"${v.text}"</p>
+                <span style="font-size: 13px; font-weight: 700; color: #d17d39; font-style: normal; display: inline-block; margin-top: 4px;">— ${v.ref}</span>
+            </div>
+        `).join('');
+
+        const summaryParagraphsHtml = (intro.summary || []).map(p => `
+            <p style="margin: 0 0 16px 0; font-size: 15.5px; line-height: 1.7; color: var(--text-base);">${p}</p>
+        `).join('');
+
+        const howToReadHtml = intro.howToRead ? `
+            <div style="margin-top: 28px; margin-bottom: 28px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 16px; padding: 22px 26px; border: 1px solid rgba(209,125,57,0.25);">
+                <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #d17d39; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">tips_and_updates</span>
+                    <span>${labelHowToRead}</span>
+                </span>
+                <p style="margin: 0; font-size: 15px; line-height: 1.65; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
+            </div>
+        ` : '';
+
+        this.dom.readingPane.innerHTML = `
+            <div id="hkm-book-intro-page" style="max-width: 780px; margin: 10px auto 60px auto; padding: 0 12px; font-family: 'Inter', sans-serif;">
+                <!-- Header Hero Card -->
+                <div style="border-radius: 20px; background: linear-gradient(135deg, rgba(27,73,101,0.09) 0%, rgba(209,125,57,0.09) 100%); padding: 28px 32px; border: 1px solid var(--border-color, rgba(0,0,0,0.08)); box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 28px;">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                        <div style="width: 48px; height: 48px; border-radius: 14px; background: #1B4965; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 14px rgba(27,73,101,0.25);">
+                            <span class="material-symbols-outlined" style="font-size: 26px;">auto_stories</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #d17d39;">${labelIntro}</span>
+                            <h1 style="margin: 0; font-size: 26px; font-weight: 900; color: var(--text-base); line-height: 1.2;">${intro.title}</h1>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Badges -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px;">
+                        <div style="background: rgba(27, 73, 101, 0.12); color: #1B4965; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                            <strong>${labelAuthor}:</strong> ${intro.author}
+                        </div>
+                        <div style="background: rgba(209, 125, 57, 0.12); color: #d17d39; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                            <strong>${labelDate}:</strong> ${intro.date}
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.06); color: var(--text-base); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                            <strong>${labelGenre}:</strong> ${intro.genre}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Theme Card -->
+                <div style="margin-bottom: 28px; background: rgba(27, 73, 101, 0.04); border-radius: 14px; padding: 18px 22px; border-left: 5px solid #1B4965;">
+                    <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #1B4965; display: block; margin-bottom: 4px;">${labelTheme}</span>
+                    <span style="font-size: 16px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</span>
+                </div>
+
+                <!-- Detailed Summary -->
+                <div class="hkm-book-intro-body" style="margin-bottom: 28px;">
+                    ${summaryParagraphsHtml}
+                </div>
+
+                <!-- How to Read Section -->
+                ${howToReadHtml}
+
+                <!-- Key Verses -->
+                ${keyVersesHtml ? `
+                    <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 24px; margin-top: 24px; margin-bottom: 36px;">
+                        <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 12px;">${labelKeyVerses}</span>
+                        ${keyVersesHtml}
+                    </div>
+                ` : ''}
+
+                <!-- Start Reading CTA Button -->
+                <div style="text-align: center; margin-top: 40px; padding: 28px; background: var(--bg-card, #ffffff); border-radius: 20px; border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Klar til å begynne å lese?</p>
+                    <button class="hkm-btn-primary" id="btn-start-chap1-page" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 32px; font-size: 16px; border-radius: 12px; font-weight: 800; background: #1B4965; color: #ffffff; cursor: pointer; border: none; box-shadow: 0 4px 14px rgba(27,73,101,0.3); transition: transform 0.2s ease;">
+                        <span>${labelStartReading}</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('btn-start-chap1-page')?.addEventListener('click', () => {
+            this.selectChapter(`${bookId}_1`);
+        });
+
+        // Scroll reading pane to top
+        if (this.dom.readingPane) {
+            this.dom.readingPane.scrollTop = 0;
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     renderBookIntroCard(bookId) {
@@ -3258,15 +3395,8 @@ class BibleReader {
             console.warn("[BibleReader] Error rendering title header:", titleErr);
         }
 
-        // Render verses HTML & Book Intro Card - CRITICAL
-        let introCardHtml = '';
-        const chapterNumStr = this.selectedChapterId ? String(this.selectedChapterId.split('_')[1]) : '1';
-        if (chapterNumStr === '1') {
-            introCardHtml = this.renderBookIntroCard(this.selectedBookId);
-        }
-
-        this.dom.readingPane.innerHTML = introCardHtml + (this.activeChapterData.content || '');
-        this.attachBookIntroToggleListener();
+        // Render pure verses HTML without prepended intro card
+        this.dom.readingPane.innerHTML = this.activeChapterData.content || '';
 
         // Safe secondary steps
         try { this.loadChapterVerseCrossReferences(); } catch (e) { console.warn(e); }
@@ -3315,7 +3445,7 @@ class BibleReader {
                         <span>${labelIntroBtn}</span>
                     `;
                     bookIntroBtn.addEventListener('click', () => {
-                        this.openBookIntroModal(this.selectedBookId);
+                        this.selectChapter(`${this.selectedBookId}_intro`);
                     });
                     actionBar.appendChild(bookIntroBtn);
                 }
@@ -3458,7 +3588,32 @@ class BibleReader {
     }
 
     async navigateChapter(direction) {
+        if (this.selectedChapterId && this.selectedChapterId.endsWith('_intro')) {
+            if (direction === 1) {
+                // Moving forward from Intro -> Chapter 1 of current book
+                await this.selectChapter(`${this.selectedBookId}_1`);
+                return;
+            } else {
+                // Moving backward from Intro -> Go to previous book's last chapter
+                const currentBookIndex = this.books.findIndex(b => b.id === this.selectedBookId);
+                if (currentBookIndex > 0) {
+                    const prevBook = this.books[currentBookIndex - 1];
+                    await this.selectBook(prevBook.id);
+                    const lastChapNum = this.chapters ? this.chapters.length : '1';
+                    await this.selectChapter(`${prevBook.id}_${lastChapNum}`);
+                }
+                return;
+            }
+        }
+
         const chapterNum = parseInt(this.selectedChapterId.split('_')[1], 10);
+        
+        if (direction === -1 && chapterNum === 1) {
+            // Moving backward from Chapter 1 -> Go to current book's intro page
+            await this.selectChapter(`${this.selectedBookId}_intro`);
+            return;
+        }
+
         const nextChapterNum = chapterNum + direction;
 
         if (nextChapterNum >= 1 && nextChapterNum <= this.chapters.length) {
@@ -3474,9 +3629,14 @@ class BibleReader {
                 const nextBook = this.books[nextBookIndex];
                 await this.selectBook(nextBook.id);
                 
-                const targetChapNum = direction === 1 ? '1' : String(this.chapters.length);
-                const nextChapterId = `${nextBook.id}_${targetChapNum}`;
-                await this.selectChapter(nextChapterId);
+                if (direction === 1) {
+                    // Moving forward to next book -> Open next book's intro page!
+                    await this.selectChapter(`${nextBook.id}_intro`);
+                } else {
+                    const targetChapNum = String(this.chapters.length);
+                    const nextChapterId = `${nextBook.id}_${targetChapNum}`;
+                    await this.selectChapter(nextChapterId);
+                }
             }
         }
     }
