@@ -10031,6 +10031,23 @@ class BibleReader {
                         animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                     }
 
+                .color-wheel-close-btn {
+                    width: 36px !important;
+                    height: 36px !important;
+                    min-width: 36px !important;
+                    max-width: 36px !important;
+                    min-height: 36px !important;
+                    max-height: 36px !important;
+                    border-radius: 50% !important;
+                    aspect-ratio: 1 / 1 !important;
+                    padding: 0 !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-shrink: 0 !important;
+                    box-sizing: border-box !important;
+                }
+
                 .verse-image-modal-actions {
                     display: flex !important;
                     justify-content: center !important;
