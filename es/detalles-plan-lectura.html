@@ -1442,13 +1442,32 @@
             }
 
             try {
-                const planData = await service.getDoc('reading_plans', planId);
+                let planData = await service.getDoc('reading_plans', planId);
+                let realPlanId = planId;
+
+                if (!planData) {
+                    try {
+                        const allPlans = await service.getCollection('reading_plans');
+                        const found = allPlans.find(p => 
+                            p.id.toLowerCase() === planId.toLowerCase() ||
+                            p.slug === planId ||
+                            (p.title && p.title.toLowerCase().includes(planId.toLowerCase()))
+                        );
+                        if (found) {
+                            planData = found;
+                            realPlanId = found.id;
+                        }
+                    } catch (collErr) {
+                        console.warn("Fallback collection search failed:", collErr);
+                    }
+                }
+
                 if (!planData) {
                     showErrorState();
                     return;
                 }
 
-                let plan = { id: planId, ...planData };
+                let plan = { id: realPlanId, ...planData };
                 if (window.contentManager) {
                     plan = window.contentManager.getLocalizedContentItem(plan);
                 }

@@ -92,6 +92,7 @@ async function listPlans() {
 
     for (const doc of snap.docs) {
       const data = doc.data();
+      console.log(`DOC ID: "${doc.id}" | TITLE: "${data.title}" | SLUG: "${data.slug}"`);
       const days = data.days || [];
       totalDaysChecked += days.length;
       let planErrors = [];

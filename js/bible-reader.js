@@ -5897,33 +5897,78 @@ class BibleReader {
         if (this.dom.readingPane) this.dom.readingPane.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;"><span class="material-symbols-outlined spin" style="font-size: 36px;">progress_activity</span><p style="margin-top: 12px; font-size: 15px; font-weight: 500;">Laster leseplan og dagens andakt...</p></div>';
 
         try {
-            const db = await this.getFirestoreAsync();
-            if (!db) {
-                console.warn("[BibleReader] Firestore is not available, unable to load plan in detail.");
-                return;
-            }
-            // Fetch global plan data
             let rawPlan = null;
-            const planDoc = await db.collection('reading_plans').doc(planId).get();
-            if (planDoc.exists) {
-                rawPlan = { id: planDoc.id, ...planDoc.data() };
-            } else {
-                // Fallback search by slug or title match
+
+            // 1. Fast REST / Service fetch
+            if (window.firebaseService && typeof window.firebaseService.getDoc === 'function') {
                 try {
-                    const snap = await db.collection('reading_plans').get();
-                    snap.forEach(d => {
-                        const data = d.data();
-                        if (d.id === planId || data.slug === planId || (data.title && data.title.toLowerCase().includes(planId.toLowerCase()))) {
-                            rawPlan = { id: d.id, ...data };
-                        }
-                    });
-                } catch (snapErr) {
-                    console.warn("[BibleReader] Fallback plan search failed:", snapErr);
+                    const data = await window.firebaseService.getDoc('reading_plans', planId);
+                    if (data) {
+                        rawPlan = { id: planId, ...data };
+                    }
+                } catch (serviceErr) {
+                    console.warn("[BibleReader] firebaseService.getDoc failed:", serviceErr);
+                }
+            }
+
+            // 2. Direct Firestore SDK fetch if service didn't return
+            const db = this.getFirestore();
+            if (!rawPlan && db) {
+                try {
+                    const planDoc = await db.collection('reading_plans').doc(planId).get();
+                    if (planDoc.exists) {
+                        rawPlan = { id: planDoc.id, ...planDoc.data() };
+                    }
+                } catch (sdkErr) {
+                    console.warn("[BibleReader] SDK doc.get failed:", sdkErr);
+                }
+            }
+
+            // 3. Collection search fallback (handles case sensitivity e.g. P0goQTHeFCsRjwHrxl9m vs P0goQTHeFCsRjwHrxI9m, slugs, or title matches)
+            if (!rawPlan) {
+                let allItems = [];
+                if (window.firebaseService && typeof window.firebaseService.getCollection === 'function') {
+                    try {
+                        allItems = await window.firebaseService.getCollection('reading_plans');
+                    } catch (e) {
+                        console.warn("[BibleReader] firebaseService.getCollection failed:", e);
+                    }
+                }
+                if ((!allItems || !allItems.length) && db) {
+                    try {
+                        const snap = await db.collection('reading_plans').get();
+                        snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
+                    } catch (e) {
+                        console.warn("[BibleReader] SDK collection snap failed:", e);
+                    }
+                }
+                if (allItems && allItems.length) {
+                    const cleanTarget = planId.toLowerCase().trim();
+                    const matched = allItems.find(p => 
+                        p.id.toLowerCase() === cleanTarget ||
+                        (p.slug && p.slug.toLowerCase() === cleanTarget) ||
+                        (p.title && p.title.toLowerCase().includes(cleanTarget))
+                    );
+                    if (matched) {
+                        rawPlan = matched;
+                    }
                 }
             }
 
             if (!rawPlan) {
                 console.error("[BibleReader] Plan does not exist:", planId);
+                if (this.dom.readingPane) {
+                    this.dom.readingPane.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #64748b;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444;">error</span>
+                            <h3 style="margin-top: 12px; font-size: 18px; font-weight: 700; color: var(--text-base);">Kunne ikke laste leseplanen</h3>
+                            <p style="margin-top: 8px; font-size: 14px; color: var(--text-muted);">Vi fant ikke leseplanen "${planId}". Den kan være flyttet eller slettet.</p>
+                            <button class="hkm-btn-secondary" onclick="window.bibleReader.exitReadingPlanMode()" style="margin-top: 16px; height: 36px; padding: 0 16px; border-radius: 99px;">
+                                Gå til Bibelen
+                            </button>
+                        </div>
+                    `;
+                }
                 return;
             }
 
@@ -5938,7 +5983,7 @@ class BibleReader {
             let activeDayNum = dayNumber ? parseInt(dayNumber, 10) : (this.activePlanDay ? parseInt(this.activePlanDay, 10) : 1);
             
             // Check user progress if logged in
-            if (this.currentUser) {
+            if (this.currentUser && db) {
                 const userPlanDoc = await db.collection('users')
                     .doc(this.currentUser.uid)
                     .collection('reading_plans')
