@@ -6640,28 +6640,43 @@ class BibleReader {
                 }
             }
 
+            @keyframes modalScaleIn {
+                from {
+                    transform: scale(0.94);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
             .hkm-modal-overlay,
             .verse-crossref-sheet-overlay,
-            .color-wheel-modal-overlay {
+            .color-wheel-modal-overlay,
+            #verse-crossref-modal {
                 background: rgba(15, 23, 42, 0.55) !important;
                 backdrop-filter: blur(6px) !important;
                 -webkit-backdrop-filter: blur(6px) !important;
                 display: flex !important;
-                align-items: flex-end !important;
+                align-items: center !important;
                 justify-content: center !important;
+                z-index: 35000 !important;
             }
 
             @media (max-width: 768px) {
                 .hkm-modal-overlay,
                 .verse-crossref-sheet-overlay,
-                .color-wheel-modal-overlay {
+                .color-wheel-modal-overlay,
+                #verse-crossref-modal {
                     align-items: flex-end !important;
                     justify-content: center !important;
                     padding: 0 !important;
                 }
                 .hkm-book-intro-sheet-card,
                 .verse-crossref-sheet-card,
-                .translation-modal-card {
+                .translation-modal-card,
+                .color-wheel-card {
                     border-radius: 28px 28px 0 0 !important;
                     padding-top: 16px !important;
                     max-height: 85vh !important;
@@ -6679,10 +6694,11 @@ class BibleReader {
             @media (min-width: 769px) {
                 .hkm-modal-overlay,
                 .verse-crossref-sheet-overlay,
-                .color-wheel-modal-overlay {
-                    align-items: flex-end !important;
+                .color-wheel-modal-overlay,
+                #verse-crossref-modal {
+                    align-items: center !important;
                     justify-content: center !important;
-                    padding-bottom: 24px !important;
+                    padding: 24px !important;
                 }
                 .hkm-book-intro-sheet-card,
                 .verse-crossref-sheet-card,
@@ -6690,22 +6706,22 @@ class BibleReader {
                     border-radius: 24px !important;
                     padding: 20px 24px !important;
                     width: 90% !important;
-                    max-width: 500px !important;
+                    max-width: 520px !important;
                     max-height: 82vh !important;
                     max-height: 82dvh !important;
-                    margin: 0 auto !important;
-                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
+                    margin: auto !important;
+                    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .color-wheel-card {
                     border-radius: 24px !important;
                     width: 90% !important;
                     max-width: 320px !important;
-                    margin: 0 auto !important;
-                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
+                    margin: auto !important;
+                    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .sheet-handle-bar {
                     display: none !important;
