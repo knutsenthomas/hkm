@@ -3152,6 +3152,7 @@ class BibleReader {
             max-height: 85dvh !important;
             margin-top: auto !important;
             box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
+            animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
         ` : `
             background: var(--bg-card, #ffffff);
             border: 1px solid var(--border-color, rgba(0,0,0,0.12));
@@ -3165,8 +3166,9 @@ class BibleReader {
             padding-top: 20px !important;
             max-height: 82vh !important;
             max-height: 82dvh !important;
-            margin: auto !important;
-            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
+            margin: 0 auto !important;
+            box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
+            animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         `;
 
         modal.innerHTML = `
@@ -6618,7 +6620,6 @@ class BibleReader {
             style.id = 'hkm-rp-workspace-styles';
             document.head.appendChild(style);
         }
-        style.innerHTML = `
             /* Hide page footer when reading plan is active or book intro overlay is open to prevent page scrolling */
             body:has(#bible-sidebar.reading-plan-active) footer.footer,
             body:has(.hkm-book-intro-overlay) footer.footer,
@@ -6627,12 +6628,26 @@ class BibleReader {
                 display: none !important;
             }
 
+            @keyframes slideUpSheet {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
             .hkm-modal-overlay,
             .verse-crossref-sheet-overlay,
             .color-wheel-modal-overlay {
                 background: rgba(15, 23, 42, 0.55) !important;
                 backdrop-filter: blur(6px) !important;
                 -webkit-backdrop-filter: blur(6px) !important;
+                display: flex !important;
+                align-items: flex-end !important;
+                justify-content: center !important;
             }
 
             @media (max-width: 768px) {
@@ -6656,6 +6671,7 @@ class BibleReader {
                     margin-top: auto !important;
                     box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
                     border-bottom: none !important;
+                    animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
             }
 
@@ -6663,9 +6679,9 @@ class BibleReader {
                 .hkm-modal-overlay,
                 .verse-crossref-sheet-overlay,
                 .color-wheel-modal-overlay {
-                    align-items: center !important;
+                    align-items: flex-end !important;
                     justify-content: center !important;
-                    padding: 24px !important;
+                    padding-bottom: 24px !important;
                 }
                 .hkm-book-intro-sheet-card,
                 .verse-crossref-sheet-card,
@@ -6676,18 +6692,19 @@ class BibleReader {
                     max-width: 500px !important;
                     max-height: 82vh !important;
                     max-height: 82dvh !important;
-                    margin: auto !important;
-                    box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
+                    margin: 0 auto !important;
+                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
-                    transform: none !important;
+                    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .color-wheel-card {
                     border-radius: 24px !important;
                     width: 90% !important;
                     max-width: 320px !important;
-                    margin: auto !important;
-                    box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
+                    margin: 0 auto !important;
+                    box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.35) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
+                    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
                 }
                 .sheet-handle-bar {
                     display: none !important;
