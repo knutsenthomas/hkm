@@ -8113,137 +8113,177 @@ class BibleReader {
         }
         const input = versesText.trim();
 
-        let bookQuery = '';
-        let startChap = 1;
-        let endChap = 1;
-        let startVerse = null;
-        let endVerse = null;
-        let isChapRange = false;
-        let isVerseRange = false;
+        // Helper to parse single passage
+        const parseSinglePassage = (passageStr) => {
+            let clean = passageStr.replace(/\(.*?\)/g, '').trim();
 
-        // Check Format 1: Chapter range (e.g. "Ester 1-3", "Ester 4-7", "1. Mosebok 1-3")
-        const chapRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)\s*-\s*(\d+)$/i;
-        let match = input.match(chapRangeRegex);
+            // Cross-book range e.g. "1. Mosebok 40 til 2. Mosebok 2"
+            const tilMatch = clean.match(/^(.+?)\s+(?:til|to|a)\s+(.+)$/i);
+            if (tilMatch) {
+                return {
+                    type: 'cross_book_range',
+                    startRef: parseSinglePassage(tilMatch[1]),
+                    endRef: parseSinglePassage(tilMatch[2]),
+                    raw: passageStr
+                };
+            }
 
-        if (match) {
-            const prefix = match[1] || '';
-            const name = match[2].trim();
-            bookQuery = prefix ? `${prefix} ${name}` : name;
-            startChap = parseInt(match[3], 10);
-            endChap = parseInt(match[4], 10);
-            isChapRange = true;
-        } else {
-            // Check Format 2: Verse range (e.g. "Rut 2:1-10", "Johannes 3:16-21")
-            const verseRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)[\:\.]\s*(\d+)(?:\s*-\s*(\d+))?$/i;
-            match = input.match(verseRangeRegex);
+            // Format 1: Chapter range: "Ester 1-3", "Ester 4-7", "1. Mosebok 1-3"
+            const chapRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)\s*-\s*(\d+)$/i;
+            let match = clean.match(chapRangeRegex);
             if (match) {
                 const prefix = match[1] || '';
                 const name = match[2].trim();
-                bookQuery = prefix ? `${prefix} ${name}` : name;
-                startChap = parseInt(match[3], 10);
-                endChap = startChap;
-                startVerse = parseInt(match[4], 10);
-                endVerse = match[5] ? parseInt(match[5], 10) : startVerse;
-                isVerseRange = true;
-            } else {
-                // Check Format 3: Single chapter (e.g. "Rut 1", "Ester 4")
-                const singleChapRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)$/i;
-                match = input.match(singleChapRegex);
-                if (match) {
-                    const prefix = match[1] || '';
-                    const name = match[2].trim();
-                    bookQuery = prefix ? `${prefix} ${name}` : name;
-                    startChap = parseInt(match[3], 10);
-                    endChap = startChap;
-                } else {
-                    throw new Error("Invalid reference format");
+                return {
+                    type: 'chap_range',
+                    bookQuery: prefix ? `${prefix} ${name}` : name,
+                    startChap: parseInt(match[3], 10),
+                    endChap: parseInt(match[4], 10),
+                    raw: passageStr
+                };
+            }
+
+            // Format 2: Verse range: "Rut 2:1-10", "Johannes 3:16-21"
+            const verseRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)[\:\.]\s*(\d+)(?:\s*-\s*(\d+))?$/i;
+            match = clean.match(verseRangeRegex);
+            if (match) {
+                const prefix = match[1] || '';
+                const name = match[2].trim();
+                return {
+                    type: 'verse_range',
+                    bookQuery: prefix ? `${prefix} ${name}` : name,
+                    startChap: parseInt(match[3], 10),
+                    endChap: parseInt(match[3], 10),
+                    startVerse: parseInt(match[4], 10),
+                    endVerse: match[5] ? parseInt(match[5], 10) : parseInt(match[4], 10),
+                    raw: passageStr
+                };
+            }
+
+            // Format 3: Single chapter: "Rut 1", "Ester 4"
+            const singleChapRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)$/i;
+            match = clean.match(singleChapRegex);
+            if (match) {
+                const prefix = match[1] || '';
+                const name = match[2].trim();
+                return {
+                    type: 'single_chap',
+                    bookQuery: prefix ? `${prefix} ${name}` : name,
+                    startChap: parseInt(match[3], 10),
+                    endChap: parseInt(match[3], 10),
+                    raw: passageStr
+                };
+            }
+
+            return { type: 'unknown', bookQuery: clean, raw: passageStr };
+        };
+
+        // Split multi-passage references e.g. "Hosea 10-13 & Åpenbaringen 7"
+        const parts = input.split(/\s+&\s+|\s+og\s+|\s+and\s+|\s+y\s+/i);
+
+        const fetchPassageHtml = async (parsed) => {
+            if (parsed.type === 'cross_book_range') {
+                const html1 = await fetchPassageHtml(parsed.startRef);
+                const html2 = await fetchPassageHtml(parsed.endRef);
+                return html1 + html2;
+            }
+
+            const q = (parsed.bookQuery || '').toLowerCase().trim();
+            let matchedBook = null;
+
+            if (this.books && Array.isArray(this.books)) {
+                matchedBook = this.books.find(b => {
+                    const bName = b.name.toLowerCase();
+                    const bId = String(b.id).toLowerCase();
+                    return bName === q || bName.startsWith(q) || bName.includes(q) || bId === q;
+                });
+            }
+
+            if (!matchedBook && typeof norwegianBookToId !== 'undefined') {
+                const id = norwegianBookToId[q];
+                if (id && this.books) {
+                    matchedBook = this.books.find(b => String(b.id) === String(id));
                 }
             }
-        }
 
-        const q = bookQuery.toLowerCase().trim();
-        let matchedBook = null;
-
-        if (this.books && Array.isArray(this.books)) {
-            matchedBook = this.books.find(b => {
-                const bName = b.name.toLowerCase();
-                const bId = String(b.id).toLowerCase();
-                return bName === q || bName.startsWith(q) || bName.includes(q) || bId === q;
-            });
-        }
-
-        if (!matchedBook && typeof norwegianBookToId !== 'undefined') {
-            const id = norwegianBookToId[q];
-            if (id && this.books) {
-                matchedBook = this.books.find(b => String(b.id) === String(id));
+            if (!matchedBook) {
+                // Fallback: try search by first word
+                const firstWord = q.split(' ')[0];
+                if (this.books) {
+                    matchedBook = this.books.find(b => b.name.toLowerCase().startsWith(firstWord));
+                }
             }
-        }
 
-        if (!matchedBook) {
-            throw new Error(`Book not found: ${bookQuery}`);
-        }
+            if (!matchedBook) {
+                return `<p style="color: #94a3b8; font-style: italic;">${parsed.raw || input}</p>`;
+            }
 
-        if (isChapRange) {
-            let combinedHtml = '';
-            for (let c = startChap; c <= endChap; c++) {
-                const chapterId = `${matchedBook.id}_${c}`;
-                try {
-                    const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
-                    const payload = await res.json();
-                    if (payload.data && payload.data.content) {
-                        combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${c === startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${c}</h4>`;
-                        combinedHtml += payload.data.content;
+            if (parsed.type === 'chap_range') {
+                let combinedHtml = '';
+                for (let c = parsed.startChap; c <= parsed.endChap; c++) {
+                    const chapterId = `${matchedBook.id}_${c}`;
+                    try {
+                        const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+                        const payload = await res.json();
+                        if (payload.data && payload.data.content) {
+                            combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${c === parsed.startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${c}</h4>`;
+                            combinedHtml += payload.data.content;
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to load chapter ${chapterId}:`, err);
                     }
-                } catch (err) {
-                    console.warn(`Failed to load chapter ${chapterId}:`, err);
                 }
+                return combinedHtml || `<p style="color: #94a3b8;">${matchedBook.name} ${parsed.startChap}-${parsed.endChap}</p>`;
             }
-            if (combinedHtml) return combinedHtml;
-            throw new Error("Failed to load chapters for range");
-        }
 
-        // Single chapter or verse range
-        const chapterId = `${matchedBook.id}_${startChap}`;
-        const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
-        const payload = await res.json();
-        
-        if (!payload.data || !payload.data.content) {
-            throw new Error("Failed to load chapter content");
-        }
+            const chapNum = parsed.startChap || 1;
+            const chapterId = `${matchedBook.id}_${chapNum}`;
+            const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+            const payload = await res.json();
 
-        if (!isVerseRange || !startVerse) {
-            return payload.data.content;
-        }
+            if (!payload.data || !payload.data.content) {
+                return `<p style="color: #94a3b8;">${matchedBook.name} ${chapNum}</p>`;
+            }
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(payload.data.content, 'text/html');
-        const paragraphs = doc.querySelectorAll('p');
+            if (parsed.type === 'verse_range' && parsed.startVerse) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(payload.data.content, 'text/html');
+                const paragraphs = doc.querySelectorAll('p');
 
-        let filteredHtml = '';
-        let foundAny = false;
+                let filteredHtml = '';
+                let foundAny = false;
 
-        for (const p of paragraphs) {
-            const sups = p.querySelectorAll('sup.v');
-            if (sups.length > 0) {
-                let keepParagraph = false;
-                for (const sup of sups) {
-                    const vNum = parseInt(sup.innerText.trim(), 10);
-                    if (vNum >= startVerse && vNum <= endVerse) {
-                        keepParagraph = true;
-                        foundAny = true;
+                for (const p of paragraphs) {
+                    const sups = p.querySelectorAll('sup.v');
+                    if (sups.length > 0) {
+                        let keepParagraph = false;
+                        for (const sup of sups) {
+                            const vNum = parseInt(sup.innerText.trim(), 10);
+                            if (vNum >= parsed.startVerse && vNum <= parsed.endVerse) {
+                                keepParagraph = true;
+                                foundAny = true;
+                            }
+                        }
+                        if (keepParagraph) {
+                            filteredHtml += p.outerHTML;
+                        }
                     }
                 }
-                if (keepParagraph) {
-                    filteredHtml += p.outerHTML;
-                }
+
+                if (foundAny) return filteredHtml;
             }
-        }
 
-        if (!foundAny) {
             return payload.data.content;
+        };
+
+        let resultHtml = '';
+        for (const part of parts) {
+            const parsed = parseSinglePassage(part);
+            const passageHtml = await fetchPassageHtml(parsed);
+            resultHtml += passageHtml;
         }
 
-        return filteredHtml;
+        return resultHtml || `<p style="text-align: center; color: #64748b;">${input}</p>`;
     }
 
     formatMarkdownText(text) {

@@ -482,7 +482,8 @@
             gap: 8px;
             text-decoration: none;
             box-sizing: border-box;
-            white-space: nowrap;
+            white-space: normal;
+            text-align: center;
         }
 
         .btn-start-plan:hover {
@@ -2034,7 +2035,8 @@
                                                 ? (lang === 'en' ? 'Open prayer' : (lang === 'es' ? 'Abrir oración' : 'Åpne dagens bønn'))
                                                 : (lang === 'en' ? 'Continue' : (lang === 'es' ? 'Continuar' : 'Fortsett'));
                                             const dayLabel = lang === 'en' ? 'Day' : (lang === 'es' ? 'Día' : 'Dag');
-                                            startBtn.style.whiteSpace = 'nowrap';
+                                            startBtn.style.whiteSpace = 'normal';
+                                            startBtn.style.textAlign = 'center';
                                             startBtn.style.fontSize = '0.95rem';
                                             startBtn.innerHTML = `${btnText} (${dayLabel} ${currentDay}) <span class="material-symbols-outlined text-lg">arrow_forward</span>`;
                                             startBtn.onclick = () => {
