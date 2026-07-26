@@ -3108,13 +3108,12 @@ class BibleReader {
             <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
-                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 10px auto 4px; cursor: pointer; flex-shrink: 0;"></div>
+                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 12px auto 6px; cursor: pointer; flex-shrink: 0;"></div>
 
-                <!-- Header Bar -->
-                <div class="hkm-book-intro-header" style="padding: 12px 50px 14px 50px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); text-align: center;">
-                    <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 4px;">${labelIntro}</span>
-                    <h3 style="margin: 0; font-size: 26px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: var(--font-heading, inherit);">${intro.title}</h3>
-                    <button id="btn-close-book-intro-x" title="Lukk" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease;">
+                <!-- Header Bar (Left title, right circular close button, clean flex layout) -->
+                <div class="hkm-book-intro-header" style="padding: 10px 20px 14px 20px; display: flex; align-items: center; justify-content: space-between; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); gap: 12px;">
+                    <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: var(--font-heading, inherit); text-align: left; flex: 1;">${intro.title}</h3>
+                    <button id="btn-close-book-intro-x" title="Lukk" style="background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease; flex-shrink: 0;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
