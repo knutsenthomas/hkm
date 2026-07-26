@@ -10149,6 +10149,14 @@ class BibleReader {
                             <button id="format-btn-story" class="format-chip-btn" data-format="story" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Story (9:16)' : (isEs ? 'Historia (9:16)' : 'Story (9:16)')}</button>
                         </div>
                     </div>
+
+                    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                        <label style="font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Frame:' : (isEs ? 'Marco:' : 'Ramme:')}</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="frame-btn-with" class="frame-chip-btn active" data-frame="with" style="background: var(--hkm-terracotta, #d17d39); color: white; border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'With frame' : (isEs ? 'Con marco' : 'Med ramme')}</button>
+                            <button id="frame-btn-none" class="frame-chip-btn" data-frame="none" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'No frame' : (isEs ? 'Sin marco' : 'Uten ramme')}</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="verse-image-modal-actions" style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; width: 100% !important; box-sizing: border-box !important;">
@@ -10241,6 +10249,7 @@ class BibleReader {
 
         let activeTheme = 'emerald';
         let activeFormat = 'square';
+        let activeFrame = 'with';
 
         const updateCanvas = () => {
             this.renderVerseImageCanvas(canvas, {
@@ -10248,7 +10257,8 @@ class BibleReader {
                 reference,
                 translation,
                 theme: activeTheme,
-                format: activeFormat
+                format: activeFormat,
+                showFrame: activeFrame === 'with'
             });
         };
 
@@ -10285,6 +10295,28 @@ class BibleReader {
                 formatBtnSquare.style.background = 'var(--bg-surface, #f1f5f9)';
                 formatBtnSquare.style.color = 'var(--text-base, #475569)';
                 activeFormat = 'story';
+                updateCanvas();
+            };
+        }
+
+        // Frame Chip Click Listeners
+        const frameBtnWith = modal.querySelector('#frame-btn-with');
+        const frameBtnNone = modal.querySelector('#frame-btn-none');
+        if (frameBtnWith && frameBtnNone) {
+            frameBtnWith.onclick = () => {
+                frameBtnWith.style.background = 'var(--hkm-terracotta, #d17d39)';
+                frameBtnWith.style.color = 'white';
+                frameBtnNone.style.background = 'var(--bg-surface, #f1f5f9)';
+                frameBtnNone.style.color = 'var(--text-base, #475569)';
+                activeFrame = 'with';
+                updateCanvas();
+            };
+            frameBtnNone.onclick = () => {
+                frameBtnNone.style.background = 'var(--hkm-terracotta, #d17d39)';
+                frameBtnNone.style.color = 'white';
+                frameBtnWith.style.background = 'var(--bg-surface, #f1f5f9)';
+                frameBtnWith.style.color = 'var(--text-base, #475569)';
+                activeFrame = 'none';
                 updateCanvas();
             };
         }
@@ -10395,7 +10427,7 @@ class BibleReader {
         }
     }
 
-    renderVerseImageCanvas(canvas, { verseText, reference, translation, theme = 'emerald', format = 'square' }) {
+    renderVerseImageCanvas(canvas, { verseText, reference, translation, theme = 'emerald', format = 'square', showFrame = true }) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const isStory = format === 'story';
@@ -10528,7 +10560,7 @@ class BibleReader {
 
             ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
 
-            const maxTextWidth = cardWidth - 140;
+            const maxTextWidth = cardWidth - (showFrame ? 140 : 80);
             const words = cleanText.split(' ');
             let lines = [];
             let currentLine = '';
@@ -10549,31 +10581,38 @@ class BibleReader {
             const cardHeight = Math.max(380, textContentHeight + 220);
             const cardY = (height - cardHeight) / 2;
 
-            // 3. Draw Glass Card
-            ctx.save();
-            ctx.beginPath();
-            const r = 36;
-            ctx.moveTo(marginX + r, cardY);
-            ctx.arcTo(marginX + cardWidth, cardY, marginX + cardWidth, cardY + cardHeight, r);
-            ctx.arcTo(marginX + cardWidth, cardY + cardHeight, marginX, cardY + cardHeight, r);
-            ctx.arcTo(marginX, cardY + cardHeight, marginX, cardY, r);
-            ctx.arcTo(marginX, cardY, marginX + cardWidth, cardY, r);
-            ctx.closePath();
+            // 3. Draw Glass Card (only when showFrame is true)
+            if (showFrame) {
+                ctx.save();
+                ctx.beginPath();
+                const r = 36;
+                ctx.moveTo(marginX + r, cardY);
+                ctx.arcTo(marginX + cardWidth, cardY, marginX + cardWidth, cardY + cardHeight, r);
+                ctx.arcTo(marginX + cardWidth, cardY + cardHeight, marginX, cardY + cardHeight, r);
+                ctx.arcTo(marginX, cardY + cardHeight, marginX, cardY, r);
+                ctx.arcTo(marginX, cardY, marginX + cardWidth, cardY, r);
+                ctx.closePath();
 
-            ctx.fillStyle = t.cardBg;
-            ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = t.cardBorder;
-            ctx.stroke();
-            ctx.restore();
+                ctx.fillStyle = t.cardBg;
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = t.cardBorder;
+                ctx.stroke();
+                ctx.restore();
+            }
 
             // 4. Large Decorative Quote Mark
             ctx.save();
+            if (!showFrame) {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetY = 3;
+            }
             ctx.font = 'bold 150px "Georgia", serif';
-            ctx.fillStyle = t.quoteColor;
+            ctx.fillStyle = showFrame ? t.quoteColor : (t.textColor === '#1e293b' ? 'rgba(209,125,57,0.3)' : 'rgba(255,255,255,0.4)');
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillText('«', marginX + 40, cardY + 20);
+            ctx.fillText('«', marginX + (showFrame ? 40 : 20), cardY + 20);
             ctx.restore();
 
             // 5. Draw Wrapped Verse Text
@@ -10582,6 +10621,12 @@ class BibleReader {
             ctx.fillStyle = t.textColor;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
+
+            if (!showFrame) {
+                ctx.shadowColor = t.textColor === '#1e293b' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = t.textColor === '#1e293b' ? 8 : 16;
+                ctx.shadowOffsetY = 3;
+            }
 
             let textStartY = cardY + 80;
             for (let j = 0; j < lines.length; j++) {
@@ -10592,7 +10637,11 @@ class BibleReader {
             // 6. Draw Divider Line & Reference
             const dividerY = textStartY + (lines.length * lineHeight) + 26;
             ctx.save();
-            ctx.strokeStyle = t.cardBorder;
+            if (!showFrame) {
+                ctx.shadowColor = t.textColor === '#1e293b' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = 10;
+            }
+            ctx.strokeStyle = t.refColor;
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(width / 2 - 50, dividerY);
@@ -10606,6 +10655,11 @@ class BibleReader {
             ctx.fillStyle = t.refColor;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
+            if (!showFrame) {
+                ctx.shadowColor = t.textColor === '#1e293b' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 2;
+            }
             ctx.fillText(fullRef, width / 2, dividerY + 18);
             ctx.restore();
 
@@ -10616,6 +10670,11 @@ class BibleReader {
             ctx.fillStyle = t.brandColor;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            if (!showFrame) {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetY = 2;
+            }
             ctx.fillText('HIS KINGDOM MINISTRY  •  hkm.no', width / 2, footerY);
             ctx.restore();
         };
