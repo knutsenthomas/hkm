@@ -546,11 +546,11 @@ class BibleReader {
             if (mobileTransSelect) mobileTransSelect.value = transParam;
         }
 
+        await this.loadBooks();
+
         if (planParam) {
             await this.initReadingPlanMode(planParam, dayParam);
-            this.loadBooks();
         } else {
-            await this.loadBooks();
             // Hide Leseplan tab button by default
             const rpTabBtn = document.getElementById('tab-btn-reading-plan');
             if (rpTabBtn) {
@@ -3259,6 +3259,10 @@ class BibleReader {
         this.touchMoved = false;
 
         try {
+            if (!this.books || !this.books.length) {
+                await this.loadBooks();
+            }
+
             // Split by conjunctions to get the first reference (e.g. "Salomos ordspråk 5-8 & Filipperne 4" -> "Salomos ordspråk 5-8")
             const parts = query.split(/\s+&\s+|\s+og\s+|\s+and\s+|\s+y\s+|,/i);
             let firstRef = parts[0].trim();
