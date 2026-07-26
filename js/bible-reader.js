@@ -6583,8 +6583,8 @@ class BibleReader {
                 }
                 .hkm-book-intro-sheet-card {
                     border-radius: 28px 28px 0 0 !important;
-                    max-height: 85vh !important;
-                    max-height: 85dvh !important;
+                    max-height: 92vh !important;
+                    max-height: 92dvh !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0 !important;
@@ -6601,8 +6601,8 @@ class BibleReader {
                 .hkm-book-intro-sheet-card {
                     border-radius: 24px !important;
                     max-width: 620px !important;
-                    max-height: 85vh !important;
-                    max-height: 85dvh !important;
+                    max-height: 90vh !important;
+                    max-height: 90dvh !important;
                     margin: auto !important;
                     box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35) !important;
                 }
