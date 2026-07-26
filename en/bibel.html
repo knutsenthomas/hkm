@@ -16,6 +16,27 @@
             }
         })();
     </script>
+    <!-- Immediate Reading Plan Loading Shield -->
+    <script>
+        (function() {
+            if (new URLSearchParams(window.location.search).has('plan')) {
+                document.documentElement.classList.add('hkm-rp-loading');
+            }
+        })();
+    </script>
+    <style>
+        html.hkm-rp-loading .books-list-wrapper,
+        html.hkm-rp-loading .sidebar-header,
+        html.hkm-rp-loading #sidebar-mobile-controls,
+        html.hkm-rp-loading .bible-reading-area,
+        html.hkm-rp-loading .top-bar-nav {
+            display: none !important;
+        }
+        html.hkm-rp-loading #bible-sidebar {
+            display: block !important;
+            width: 100% !important;
+        }
+    </style>
     <link rel="canonical" href="https://www.hiskingdomministry.no/en/bibel">
     <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/bibel">
     <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/bibel">
@@ -4138,7 +4159,7 @@
     <!-- JavaScript -->
     <script type="module" src="../script.js?v=2026.06.21.10.01"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
-    <script type="module" src="../js/bible-reader.js?v=2026.07.26.0936"></script>
+    <script type="module" src="../js/bible-reader.js?v=2026.07.26.0938"></script>
     <script type="module" src="../js/i18n.js"></script>
     <!-- Global Search Modal -->
     <div id="site-search-modal" class="search-overlay">

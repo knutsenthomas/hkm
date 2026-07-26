@@ -6096,6 +6096,7 @@ class BibleReader {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         } finally {
             this._isInitializingPlan = false;
+            document.documentElement.classList.remove('hkm-rp-loading');
             // Reveal UI now that the reading plan loading attempt is complete
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
