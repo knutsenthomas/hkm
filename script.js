@@ -304,6 +304,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ? headerActions.getBoundingClientRect().right
             : null;
 
+        if (open) {
+            megaMenu.style.display = 'flex';
+        } else {
+            megaMenu.style.display = 'none';
+        }
+
         megaMenu.classList.toggle('invisible', !open);
         megaMenu.classList.toggle('opacity-0', !open);
         megaMenu.classList.toggle('visible', open);
