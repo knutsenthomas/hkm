@@ -3047,7 +3047,8 @@ class BibleReader {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
+            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
             box-sizing: border-box;
             opacity: 0;
             transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3106,16 +3107,16 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 680px; max-height: 88vh; max-height: 88dvh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
+            <div class="hkm-book-intro-card" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 680px; max-height: 86vh; max-height: 86dvh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden;">
                 <!-- Header Bar -->
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #1B4965 0%, #2A5C7D 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 16px rgba(27,73,101,0.25);">
+                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #1B4965 0%, #2A5C7D 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 16px rgba(27,73,101,0.25);">
                             <span class="material-symbols-outlined" style="font-size: 24px;">auto_stories</span>
                         </div>
                         <div>
                             <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
-                            <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: 'Inter', sans-serif;">${intro.title}</h3>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: 'Inter', sans-serif;">${intro.title}</h3>
                         </div>
                     </div>
                     <button id="btn-close-book-intro-x" title="Lukk" style="background: rgba(0,0,0,0.05); border: none; font-size: 20px; color: var(--text-muted, #64748b); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; outline: none;">
@@ -3123,12 +3124,12 @@ class BibleReader {
                     </button>
                 </div>
 
-                <!-- Scrollable Body -->
-                <div style="padding: 24px 28px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+                <!-- Scrollable Body with generous bottom padding so text is never cut off -->
+                <div style="padding: 20px 20px 48px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
                     
                     <!-- Unified Hero Metadata Card -->
-                    <div style="background: linear-gradient(135deg, rgba(27,73,101,0.04) 0%, rgba(209,125,57,0.04) 100%); border: 1px solid rgba(27,73,101,0.08); border-radius: 18px; padding: 18px 20px; margin-bottom: 24px;">
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                    <div style="background: linear-gradient(135deg, rgba(27,73,101,0.04) 0%, rgba(209,125,57,0.04) 100%); border: 1px solid rgba(27,73,101,0.08); border-radius: 18px; padding: 16px 18px; margin-bottom: 20px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
                             <!-- Author Chip -->
                             <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">edit_note</span>
@@ -3153,12 +3154,12 @@ class BibleReader {
                     </div>
 
                     <!-- Sleek Hovedtema Card -->
-                    <div style="margin-bottom: 24px; background: linear-gradient(90deg, rgba(27,73,101,0.06) 0%, rgba(209,125,57,0.04) 100%); border-radius: 16px; padding: 18px 22px; border-left: 4px solid #1B4965; border-top: 1px solid rgba(27,73,101,0.06); border-right: 1px solid rgba(27,73,101,0.06); border-bottom: 1px solid rgba(27,73,101,0.06);">
+                    <div style="margin-bottom: 20px; background: linear-gradient(90deg, rgba(27,73,101,0.06) 0%, rgba(209,125,57,0.04) 100%); border-radius: 16px; padding: 16px 20px; border-left: 4px solid #1B4965; border-top: 1px solid rgba(27,73,101,0.06); border-right: 1px solid rgba(27,73,101,0.06); border-bottom: 1px solid rgba(27,73,101,0.06);">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px; color: #1B4965;">lightbulb</span>
                             <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #1B4965;">${labelTheme}</span>
                         </div>
-                        <div style="font-size: 16px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</div>
+                        <div style="font-size: 15.5px; font-weight: 700; color: var(--text-base); line-height: 1.45;">${intro.theme}</div>
                     </div>
 
                     <!-- Detailed Summary Paragraphs -->
@@ -3171,7 +3172,7 @@ class BibleReader {
 
                     <!-- Key Verses -->
                     ${keyVersesHtml ? `
-                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 20px; margin-top: 24px;">
+                        <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.08)); padding-top: 20px; margin-top: 24px; margin-bottom: 16px;">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39;">format_quote</span>
                                 <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted, #64748b);">${labelKeyVerses}</span>
@@ -3181,9 +3182,9 @@ class BibleReader {
                     ` : ''}
                 </div>
 
-                <!-- Footer Bar -->
-                <div style="padding: 16px 28px; border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc);">
-                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(27,73,101,0.25); transition: all 0.2s ease;">
+                <!-- Pinned Footer Bar -->
+                <div style="padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)); border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg-surface, #f8fafc); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <button id="btn-close-book-intro-footer" style="min-height: 44px; padding: 10px 24px; font-size: 14px; font-weight: 700; border-radius: 12px; background: #1B4965; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(27,73,101,0.25); transition: all 0.2s ease;">
                         <span>${labelClose}</span>
                         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
                     </button>
