@@ -3047,14 +3047,14 @@ class BibleReader {
             width: 100vw !important;
             height: 100vh !important;
             height: 100dvh !important;
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            background: rgba(15, 23, 42, 0.55) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
             z-index: 35000 !important;
             display: flex !important;
             align-items: ${isMobileScreen ? 'flex-end' : 'center'} !important;
             justify-content: center !important;
-            padding: ${isMobileScreen ? '0' : '20px'} !important;
+            padding: ${isMobileScreen ? '0' : '24px'} !important;
             box-sizing: border-box !important;
         `;
 
@@ -6594,9 +6594,9 @@ class BibleReader {
             }
 
             .hkm-modal-overlay.hkm-book-intro-overlay {
-                background: transparent !important;
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
+                background: rgba(15, 23, 42, 0.55) !important;
+                backdrop-filter: blur(6px) !important;
+                -webkit-backdrop-filter: blur(6px) !important;
             }
             @media (max-width: 768px) {
                 .hkm-modal-overlay.hkm-book-intro-overlay {
