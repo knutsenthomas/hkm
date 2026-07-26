@@ -3127,13 +3127,13 @@ class BibleReader {
         ` : '';
 
         modal.innerHTML = `
-            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; padding-top: 16px !important;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
-                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.2)); border-radius: 99px; margin: 14px auto 6px !important; cursor: pointer; flex-shrink: 0;"></div>
+                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.22)); border-radius: 99px; margin: 0 auto 12px !important; cursor: pointer; flex-shrink: 0;"></div>
 
                 <!-- Header Bar (Left title, right circular close button, clean flex layout) -->
-                <div class="hkm-book-intro-header" style="padding: 10px 20px 14px 20px; display: flex; align-items: center; justify-content: space-between; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); gap: 12px;">
+                <div class="hkm-book-intro-header" style="padding: 4px 20px 14px 20px; display: flex; align-items: center; justify-content: space-between; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); gap: 12px;">
                     <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: var(--font-heading, inherit); text-align: left; flex: 1;">${intro.title}</h3>
                     <button id="btn-close-book-intro-x" title="Lukk" style="background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease; flex-shrink: 0;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
@@ -6583,6 +6583,7 @@ class BibleReader {
                 }
                 .hkm-book-intro-sheet-card {
                     border-radius: 28px 28px 0 0 !important;
+                    padding-top: 16px !important;
                     max-height: 92vh !important;
                     max-height: 92dvh !important;
                     width: 100% !important;
