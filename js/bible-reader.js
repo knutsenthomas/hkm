@@ -3056,7 +3056,18 @@ class BibleReader {
 
         const closeModal = () => {
             document.body.style.overflow = '';
-            modal.remove();
+            const card = modal.querySelector('.hkm-book-intro-sheet-card');
+            if (card) {
+                card.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+                card.style.transform = 'translateY(100%)';
+                modal.style.transition = 'background-color 0.25s ease';
+                modal.style.backgroundColor = 'rgba(15, 23, 42, 0)';
+                setTimeout(() => {
+                    modal.remove();
+                }, 250);
+            } else {
+                modal.remove();
+            }
         };
         document.body.style.overflow = 'hidden';
 
@@ -3079,7 +3090,18 @@ class BibleReader {
             if (closeBtn) closeBtn.onclick = () => closeModal();
             modal.onclick = (e) => { if (e.target === modal) closeModal(); };
             const card = modal.querySelector('.hkm-book-intro-sheet-card');
-            if (card) this.setupBottomSheetSwipeDown(card, () => closeModal());
+            if (card) {
+                card.style.transform = 'translateY(100%)';
+                card.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+                modal.style.transition = 'background-color 0.28s ease';
+                requestAnimationFrame(() => {
+                    card.style.transform = 'translateY(0)';
+                });
+                this.setupBottomSheetSwipeDown(card, () => {
+                    document.body.style.overflow = '';
+                    modal.remove();
+                });
+            }
             return;
         }
 
@@ -3184,7 +3206,16 @@ class BibleReader {
 
         const card = modal.querySelector('.hkm-book-intro-sheet-card');
         if (card) {
-            this.setupBottomSheetSwipeDown(card, () => closeModal());
+            card.style.transform = 'translateY(100%)';
+            card.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
+            modal.style.transition = 'background-color 0.28s ease';
+            requestAnimationFrame(() => {
+                card.style.transform = 'translateY(0)';
+            });
+            this.setupBottomSheetSwipeDown(card, () => {
+                document.body.style.overflow = '';
+                modal.remove();
+            });
         }
     }
 
@@ -4296,13 +4327,24 @@ class BibleReader {
                 element.style.opacity = '1';
                 const backdrop = getBackdrop();
                 if (backdrop) {
-                    backdrop.style.opacity = `${Math.max(0, 1 - deltaY / 300)}`;
+                    const fadeRatio = Math.max(0, 1 - deltaY / 300);
+                    if (backdrop === element.parentElement || backdrop.contains(element)) {
+                        backdrop.style.backgroundColor = `rgba(15, 23, 42, ${0.5 * fadeRatio})`;
+                    } else {
+                        backdrop.style.opacity = `${fadeRatio}`;
+                    }
                 }
             } else if (deltaY < -10 && element.style.transform) {
                 element.style.transform = 'translateY(0)';
                 element.style.opacity = '1';
                 const backdrop = getBackdrop();
-                if (backdrop) backdrop.style.opacity = '1';
+                if (backdrop) {
+                    if (backdrop === element.parentElement || backdrop.contains(element)) {
+                        backdrop.style.backgroundColor = 'rgba(15, 23, 42, 0.5)';
+                    } else {
+                        backdrop.style.opacity = '1';
+                    }
+                }
             }
         };
 
@@ -4311,17 +4353,24 @@ class BibleReader {
             isDragging = false;
             element.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)';
             const backdrop = getBackdrop();
-            if (backdrop) backdrop.style.transition = 'opacity 0.28s ease';
+            if (backdrop) backdrop.style.transition = 'background-color 0.28s ease, opacity 0.28s ease';
 
             if (currentDeltaY > 55) {
                 element.style.transform = 'translateY(100%)';
                 element.style.opacity = '1';
-                if (backdrop) backdrop.style.opacity = '0';
+                if (backdrop) {
+                    if (backdrop === element.parentElement || backdrop.contains(element)) {
+                        backdrop.style.backgroundColor = 'rgba(15, 23, 42, 0)';
+                    } else {
+                        backdrop.style.opacity = '0';
+                    }
+                }
                 setTimeout(() => {
                     element.style.transform = '';
                     element.style.opacity = '';
                     element.style.transition = '';
                     if (backdrop) {
+                        backdrop.style.backgroundColor = '';
                         backdrop.style.opacity = '';
                         backdrop.style.transition = '';
                     }
@@ -4330,7 +4379,13 @@ class BibleReader {
             } else {
                 element.style.transform = 'translateY(0)';
                 element.style.opacity = '1';
-                if (backdrop) backdrop.style.opacity = '1';
+                if (backdrop) {
+                    if (backdrop === element.parentElement || backdrop.contains(element)) {
+                        backdrop.style.backgroundColor = 'rgba(15, 23, 42, 0.5)';
+                    } else {
+                        backdrop.style.opacity = '1';
+                    }
+                }
                 setTimeout(() => {
                     element.style.transition = '';
                     if (backdrop) backdrop.style.transition = '';
