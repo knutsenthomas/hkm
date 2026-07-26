@@ -3136,8 +3136,41 @@ class BibleReader {
             </div>
         ` : '';
 
+        const cardStyles = isMobileScreen ? `
+            background: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, rgba(0,0,0,0.1));
+            border-bottom: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 28px 28px 0 0 !important;
+            padding-top: 16px !important;
+            max-height: 85vh !important;
+            max-height: 85dvh !important;
+            margin-top: auto !important;
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25) !important;
+        ` : `
+            background: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, rgba(0,0,0,0.12));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+            width: 90% !important;
+            max-width: 500px !important;
+            border-radius: 24px !important;
+            padding-top: 20px !important;
+            max-height: 82vh !important;
+            max-height: 82dvh !important;
+            margin: auto !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
+        `;
+
         modal.innerHTML = `
-            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+            <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="${cardStyles}">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
                 <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.22)); border-radius: 99px; margin: 0 auto 12px !important; cursor: pointer; flex-shrink: 0;"></div>
@@ -6627,11 +6660,11 @@ class BibleReader {
                     border-radius: 24px !important;
                     padding-top: 20px !important;
                     width: 90% !important;
-                    max-width: 640px !important;
-                    max-height: 85vh !important;
-                    max-height: 85dvh !important;
+                    max-width: 500px !important;
+                    max-height: 82vh !important;
+                    max-height: 82dvh !important;
                     margin: auto !important;
-                    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.3) !important;
+                    box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4) !important;
                     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12)) !important;
                 }
                 .sheet-handle-bar {
