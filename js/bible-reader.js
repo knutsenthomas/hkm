@@ -5646,11 +5646,11 @@ class BibleReader {
                 .hkm-yv-header-title { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 !important; margin: 0 16px !important; min-width: 0 !important; }
                 .hkm-yv-header-avatar { width: 28px !important; height: 28px !important; border-radius: 50% !important; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 13px !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important; }
                 .hkm-yv-header-text { font-size: 15px !important; font-weight: 700 !important; color: #1B4965 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
-                .hkm-yv-header-text-full { display: inline-block !important; }
+                .hkm-yv-header-text-full { display: inline-block !important; max-width: 600px !important; }
                 .hkm-yv-header-text-short { display: none !important; }
-                @media (max-width: 768px) {
+                @media (max-width: 1024px) {
                     .hkm-yv-header-text-full { display: none !important; }
-                    .hkm-yv-header-text-short { display: inline-block !important; }
+                    .hkm-yv-header-text-short { display: inline-block !important; max-width: 220px !important; }
                 }
                 .hkm-yv-header-actions { display: flex !important; align-items: center !important; gap: 4px !important; }
                 .hkm-yv-action-btn { background: none !important; border: none !important; padding: 8px !important; cursor: pointer !important; color: #64748b !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important; transition: all 0.2s !important; }
@@ -9179,22 +9179,22 @@ class BibleReader {
             plan.title.toLowerCase().includes('oración')
         );
 
-        let fullTitleText = plan.title || '';
-        if (fullTitleText.includes(':')) {
-            fullTitleText = fullTitleText.split(':')[0].trim();
+        const fullTitleText = plan.title || '';
+        let shortTitleText = fullTitleText;
+        if (shortTitleText.includes(':')) {
+            shortTitleText = shortTitleText.split(':')[0].trim();
         }
-        if (fullTitleText.includes('-')) {
-            fullTitleText = fullTitleText.split('-')[0].trim();
+        if (shortTitleText.includes('-')) {
+            shortTitleText = shortTitleText.split('-')[0].trim();
         }
-        if (fullTitleText.includes('–')) {
-            fullTitleText = fullTitleText.split('–')[0].trim();
+        if (shortTitleText.includes('–')) {
+            shortTitleText = shortTitleText.split('–')[0].trim();
         }
-        if (fullTitleText.includes('|')) {
-            fullTitleText = fullTitleText.split('|')[0].trim();
+        if (shortTitleText.includes('|')) {
+            shortTitleText = shortTitleText.split('|')[0].trim();
         }
 
         // Abbreviate common long plan titles to fit nicely in mobile headers
-        let shortTitleText = fullTitleText;
         if (lang === 'en') {
             shortTitleText = shortTitleText
                 .replace(/Gospel of John/gi, 'John')
@@ -9232,12 +9232,9 @@ class BibleReader {
                 .replace(/Femte/gi, '5.');
         }
 
-        // Truncate fallback if title remains too long
-        if (shortTitleText.length > 20) {
-            shortTitleText = shortTitleText.substring(0, 17) + '...';
-        }
-        if (fullTitleText.length > 40) {
-            fullTitleText = fullTitleText.substring(0, 37) + '...';
+        // Truncate fallback for mobile if shortTitleText remains too long
+        if (shortTitleText.length > 22) {
+            shortTitleText = shortTitleText.substring(0, 19) + '...';
         }
         // Step Label mapping
         let stepLabel = 'ANDAKT';
