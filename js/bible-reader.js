@@ -3096,12 +3096,10 @@ class BibleReader {
                 <div style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 10px auto 4px; cursor: pointer; flex-shrink: 0;"></div>
 
                 <!-- Header Bar -->
-                <div style="padding: 10px 20px 14px 20px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-card, #ffffff);">
-                    <div>
-                        <span style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 2px;">${labelIntro}</span>
-                        <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-base); line-height: 1.2; font-family: var(--font-heading, inherit);">${intro.title}</h3>
-                    </div>
-                    <button id="btn-close-book-intro-x" title="Lukk" style="background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease;">
+                <div style="padding: 12px 50px 14px 50px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); text-align: center;">
+                    <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 4px;">${labelIntro}</span>
+                    <h3 style="margin: 0; font-size: 26px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: var(--font-heading, inherit);">${intro.title}</h3>
+                    <button id="btn-close-book-intro-x" title="Lukk" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease;">
                         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                     </button>
                 </div>
