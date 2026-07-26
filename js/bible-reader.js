@@ -3113,29 +3113,27 @@ class BibleReader {
                 <!-- Scrollable Body -->
                 <div style="padding: 20px 20px 48px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
                     
-                    <!-- Unified Metadata Cards -->
-                    <div style="background: rgba(27,73,101,0.04); border: 1px solid rgba(27,73,101,0.08); border-radius: 16px; padding: 14px 16px; margin-bottom: 20px;">
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-                            <!-- Author Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #1B4965;">edit_note</span>
-                                <span style="color: var(--text-muted, #64748b);">${labelAuthor}:</span>
-                                <strong style="color: var(--text-base); font-weight: 700;">${intro.author}</strong>
-                            </div>
+                    <!-- Unified Metadata Rows -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+                        <!-- Author Row -->
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(27,73,101,0.04); border: 1px solid rgba(27,73,101,0.08); border-radius: 12px; padding: 10px 14px; font-size: 13.5px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #1B4965; flex-shrink: 0;">edit_note</span>
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelAuthor}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.author}</strong>
+                        </div>
 
-                            <!-- Date Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #D17D39;">event</span>
-                                <span style="color: var(--text-muted, #64748b);">${labelDate}:</span>
-                                <strong style="color: var(--text-base); font-weight: 700;">${intro.date}</strong>
-                            </div>
+                        <!-- Date Row -->
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(209,125,57,0.04); border: 1px solid rgba(209,125,57,0.1); border-radius: 12px; padding: 10px 14px; font-size: 13.5px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #D17D39; flex-shrink: 0;">event</span>
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelDate}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.date}</strong>
+                        </div>
 
-                            <!-- Genre Chip -->
-                            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 99px; padding: 6px 14px; font-size: 13px;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #059669;">category</span>
-                                <span style="color: var(--text-muted, #64748b);">${labelGenre}:</span>
-                                <strong style="color: var(--text-base); font-weight: 700;">${intro.genre}</strong>
-                            </div>
+                        <!-- Genre Row -->
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.1); border-radius: 12px; padding: 10px 14px; font-size: 13.5px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #059669; flex-shrink: 0;">category</span>
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelGenre}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.genre}</strong>
                         </div>
                     </div>
 
@@ -3237,16 +3235,19 @@ class BibleReader {
                 </div>
                 
                 <div id="hkm-book-intro-content" style="padding: 20px; display: block;">
-                    <!-- Metadata Badges -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-                        <div style="background: rgba(27, 73, 101, 0.08); color: #1B4965; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                            <strong>${labelAuthor}:</strong> ${intro.author}
+                    <!-- Metadata Rows -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(27, 73, 101, 0.06); color: #1B4965; padding: 8px 12px; border-radius: 8px; font-size: 12.5px;">
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelAuthor}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.author}</strong>
                         </div>
-                        <div style="background: rgba(209, 125, 57, 0.08); color: #d17d39; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                            <strong>${labelDate}:</strong> ${intro.date}
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(209, 125, 57, 0.06); color: #d17d39; padding: 8px 12px; border-radius: 8px; font-size: 12.5px;">
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelDate}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.date}</strong>
                         </div>
-                        <div style="background: rgba(0, 0, 0, 0.05); color: var(--text-base); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                            <strong>${labelGenre}:</strong> ${intro.genre}
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(5, 150, 105, 0.06); color: #059669; padding: 8px 12px; border-radius: 8px; font-size: 12.5px;">
+                            <span style="color: var(--text-muted, #64748b); font-weight: 600; white-space: nowrap; flex-shrink: 0;">${labelGenre}:</span>
+                            <strong style="color: var(--text-base); font-weight: 700;">${intro.genre}</strong>
                         </div>
                     </div>
 
