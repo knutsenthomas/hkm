@@ -3021,6 +3021,7 @@ class BibleReader {
         const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
         const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
         const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
+        const labelHowToRead = lang === 'en' ? 'How to Read This Book' : (lang === 'es' ? 'Cómo leer este libro' : 'Hvordan lese boken best');
         const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
         const labelCollapse = lang === 'en' ? 'Hide introduction' : (lang === 'es' ? 'Ocultar introducción' : 'Skjul introduksjon');
 
@@ -3034,6 +3035,16 @@ class BibleReader {
         const summaryParagraphsHtml = (intro.summary || []).map(p => `
             <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.6; color: var(--text-base);">${p}</p>
         `).join('');
+
+        const howToReadHtml = intro.howToRead ? `
+            <div style="margin-top: 16px; margin-bottom: 16px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 12px; padding: 14px 16px; border: 1px solid rgba(209,125,57,0.25);">
+                <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #d17d39; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">tips_and_updates</span>
+                    <span>${labelHowToRead}</span>
+                </span>
+                <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
+            </div>
+        ` : '';
 
         return `
             <div id="hkm-book-intro-card" style="margin-bottom: 24px; border-radius: 16px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); box-shadow: 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; transition: all 0.3s ease;">
@@ -3075,6 +3086,8 @@ class BibleReader {
                     <div class="hkm-book-intro-body" style="margin-bottom: 16px;">
                         ${summaryParagraphsHtml}
                     </div>
+
+                    ${howToReadHtml}
 
                     ${keyVersesHtml ? `
                         <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); padding-top: 14px; margin-top: 14px;">
@@ -3145,7 +3158,18 @@ class BibleReader {
         const labelDate = lang === 'en' ? 'Date' : (lang === 'es' ? 'Fecha' : 'Datering');
         const labelGenre = lang === 'en' ? 'Genre' : (lang === 'es' ? 'Género' : 'Sjanger');
         const labelTheme = lang === 'en' ? 'Main Theme' : (lang === 'es' ? 'Tema principal' : 'Hovedtema');
+        const labelHowToRead = lang === 'en' ? 'How to Read This Book' : (lang === 'es' ? 'Cómo leer este libro' : 'Hvordan lese boken best');
         const labelKeyVerses = lang === 'en' ? 'Key Verses' : (lang === 'es' ? 'Versículos clave' : 'Sentrale vers');
+
+        const howToReadHtml = intro.howToRead ? `
+            <div style="margin-top: 20px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(209,125,57,0.08) 0%, rgba(27,73,101,0.06) 100%); border-radius: 12px; padding: 16px 18px; border: 1px solid rgba(209,125,57,0.25);">
+                <span style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #d17d39; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #d17d39;">tips_and_updates</span>
+                    <span>${labelHowToRead}</span>
+                </span>
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-base); font-weight: 500;">${intro.howToRead}</p>
+            </div>
+        ` : '';
 
         modal.innerHTML = `
             <div class="search-modal" style="background: var(--bg-card, #ffffff); border-radius: 20px; width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid var(--border-color, #e2e8f0); padding: 0; position: relative; font-family: 'Inter', sans-serif;">
@@ -3184,6 +3208,8 @@ class BibleReader {
                     <div style="margin-bottom: 20px;">
                         ${summaryParagraphsHtml}
                     </div>
+
+                    ${howToReadHtml}
 
                     ${keyVersesHtml ? `
                         <div style="border-top: 1px solid var(--border-color, rgba(0,0,0,0.06)); padding-top: 16px;">

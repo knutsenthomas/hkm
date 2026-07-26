@@ -1,6 +1,6 @@
 // ============================================================================
 // HKM Bibel - Bokintroduksjoner (All 66 Books of the Bible)
-// High-quality theological & historical introductions for every book of the Bible
+// High-quality theological, historical & practical reading introductions for every book
 // ============================================================================
 
 const BIBLE_BOOK_INTRODUCTIONS = {
@@ -15,6 +15,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken deles inn i to hoveddeler: Urhistorien (kapittel 1–11) som skildrer skapelsen, syndefallet, syndfloden og Babels tårn, samt Patriarkhistorien (kapittel 12–50) som følger Abrahams, Isaks, Jakobs og Josefs tro og Guds utvelgelse av et eget folk.",
       "Gjennom alt dette åpenbares Guds trofasthet mot sine løfter, selv når mennesket svikter. Josefs historiske avslutning viser hvordan Gud snur det onde til det gode for å berge liv."
     ],
+    "howToRead": "Les boken med et øye for Guds pakt og løfter. Legg merke til hvordan Gud velger ut enkeltpersoner (Abraham, Isak, Jakob, Josef) og fører sin frelsesplan videre selv gjennom menneskelige feiltrinn. Se etter hvordan Josefs liv peker frem mot Jesus (som ble forrådt av sine brødre, men reddet mange).",
     "keyVerses": [
       {
         "ref": "1 Mos 1,1",
@@ -37,6 +38,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Ved Sinai fjellet inngår Gud en nasjonal pakt med Israel, gir dem De ti bud og lovene som skal forme deres liv som et hellig folk. Boken avsluttes med reisingen av Tabernaklet, hvor Guds herlighet fyller helligdommen.",
       "Exodus er et mektig bilde på kristen frelse — frigjøring fra syndens trelldom til et liv i fellesskap med Gud."
     ],
+    "howToRead": "Les boken som et bilde på din egen frelse: Påskelammet og blod på dørstolpene peker direkte mot Jesu blod på korset, og overgangen gjennom Rødehavet er et bilde på dåpen. Legg merke til at Gud frir dem ut FØR Han gir dem loven — frelse kommer av nåde, ikke ved lovgjerninger.",
     "keyVerses": [
       {
         "ref": "2 Mos 3,14",
@@ -59,6 +61,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Soning gjennom blodoffer understreker syndens alvor og behovet for renselse. Boken gir også moralske retningslinjer for rettferdighet og kjærlighet til sin neste ('Du skal elske din neste som deg selv').",
       "For kristne peker Tredje Mosebok direkte frem mot Jesu Kristi fullkomne offer på korset, som en gang for alle ordnet soningen for menneskehetens synd."
     ],
+    "howToRead": "Les boken med 'Hebreerbrevets briller'. Hvert eneste offer, prestens drakter og soningsdagen peker frem mot at Jesus er både vår fullkomne Øversteprest og det lytefrie offerlammet. Spør deg selv: Hvor alvorlig tar jeg Guds hellighet i min egen hverdag?",
     "keyVerses": [
       {
         "ref": "3 Mos 19,2",
@@ -90,7 +93,8 @@ const BIBLE_BOOK_INTRODUCTIONS = {
         "ref": "4 Mos 14,18",
         "text": "Herren er langmodig og rik på miskunnhet, han tilgir misgjerning og overtredelse."
       }
-    ]
+    ],
+    "howToRead": "Les boken som en advarsel og oppmuntring for ditt eget troens liv. Legg merke til hvor lett det er å falle i 'knurring' og misnøye når omstendighetene blir vanskelige, og stol på at Gud forsørger deg i dine 'ørkenperioder'. Legg spesiell merke til kobberslangen i kapittel 21 som Jesus sammenligner med seg selv på korset (Joh 3,14)."
   },
   "DEU": {
     "title": "Femte Mosebok (Deuteronomium)",
@@ -103,6 +107,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Kjernen i boken er 'Shema' (5 Mos 6,4-5): kallelsen til å elske Herren sin Gud av hele sitt hjerte, sin sjel og sin makt. Boken stiller folket overfor valget mellom liv og velsignelse ved lydighet, eller død og forbannelse ved ulydighet.",
       "Jesus siterte hyppig fra Femte Mosebok, blant annet under sin fristelse i ørkenen."
     ],
+    "howToRead": "Les talene som om Moses snakker direkte til deg i dag om å velge livet og elsker Gud helhjertet. Merk deg at Jesus brukte vers fra nettopp denne boken for å slå tilbake Djevelen i ørkenen. La vers som 5 Mos 6,4-7 prege hvordan du lærer Guds Ord videre i din egen familie.",
     "keyVerses": [
       {
         "ref": "5 Mos 6,4-5",
@@ -125,6 +130,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken demonstrerer at Gud oppfyller sine løfter til Abraham. Seier oppnås ikke ved militær overlegenhet, men ved uforbeholden tillit til Gud og lydighet mot Hans ord (Jerikos fall).",
       "Boken avsluttes med Josvas berømte formaning: 'Velg i dag hvem dere vil tjene... Men jeg og mitt hus, vi vil tjene Herren.'"
     ],
+    "howToRead": "Les Josva med fokus på mot, tillit og lydighet. Se hvordan Jerikos mur falt ikke ved sverd, men ved bønnsom lydighet og lovsang. Bruk kapittel 1 som din personlige oppmuntring til å gå inn i de utfordringene Gud kaller deg til.",
     "keyVerses": [
       {
         "ref": "Jos 1,9",
@@ -147,6 +153,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken følger en mønstergyldig sirkel: Israel faller fra Gud -> blir undertrykt av fiender -> roper til Gud i nød -> Gud oppreiser en dommer (f.eks. Debora, Gideon, Simson) som redder dem -> fred i en periode -> nytt frafall.",
       "Dommerne understreker menneskets desperate behov for en rettferdig og evig konge som kan forvandle hjertet."
     ],
+    "howToRead": "Les boken som et speil på hva som skjer når samfunnet forkaster Guds autoritet og 'alle gjør det som er rett i egne øyne'. Legg merke til at selv om dommerne var ufullkomne og mangelfulle, brukte Gud dem nådefullt når folket ropte i nød.",
     "keyVerses": [
       {
         "ref": "Dom 21,25",
@@ -165,6 +172,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Gjennom sin gudfryktighet møter Rut den rike og godhjertede Boas, som fungerer som deres 'løser' (goel). De gifter seg og får sønnen Obed, som blir bestefar til kong David.",
       "Rut viser hvordan Guds nåde strekker seg utover Israels grenser, og plasserer en hedensk kvinne i stamtavlen til Jesus Kristus."
     ],
+    "howToRead": "Les hele boken i én sammenhengende økt (det tar kun ca. 15 minutter!). Se etter hvordan Boas som 'løser' fremstiller et bilde på Jesus Kristus, vår evige Løser som kjøper oss fri og bringer oss inn i Guds familie.",
     "keyVerses": [
       {
         "ref": "Rut 1,16",
@@ -187,6 +195,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Sauls ulydighet fører til at Gud forkaster ham som konge, mens David blir salvet i det skjulte. Boken skildrer Davids tro (kampen mot Goliat), hans flukt fra den sjalu Saul og Guds beskyttelse.",
       "Boken lærer oss at Gud ser på hjertet, ikke på det ytre utseendet."
     ],
+    "howToRead": "Sammenlign kong Sauls hovmod og sjalusi mot hyrdegutten Davids tro og ydmykhet. Når du leser om David og Goliat, husk at seieren var Herrens, og spør deg selv: Hvilke 'kjemper' møter jeg i mitt eget liv der jeg må stole på at Gud kjemper for meg?",
     "keyVerses": [
       {
         "ref": "1 Sam 16,7",
@@ -209,6 +218,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Gud inngår en evig pakt med David (2 Sam 7) og lover at hans trone skal bestå til evig tid — et løfte som oppfylles i Jesus Kristus. Men boken skildrer også ærlig Davids alvorlige synd med Batseba og drapet på Uria, samt de tragiske følgene dette fikk for hans familie og rike.",
       "Til tross for Davids feiltrinn viser boken hans dype anger og Guds tilgivelse."
     ],
+    "howToRead": "Studer Davids liv med et balansert blikk: Hans brennende kjærlighet til Gud og paktens ark (2 Sam 6 og 7), men også advarselen i kapittel 11 der passivitet førte til synd. Les Salme 51 parallelt med 2 Sam 12 for å se Davids ekte hjertesanger.",
     "keyVerses": [
       {
         "ref": "2 Sam 7,16",
@@ -231,6 +241,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Etter Salomos død og hans uheldige ekteskap med fremmede kvinner som førte til avgudsdyrkelse, blir riket splittet i Nordriket (Israel) og Sørriket (Juda). Boken evaluerer hver konge etter om de var trofaste mot Gud eller ikke.",
       "Siste del av boken fokuserer på profeten Elja og hans modige kamp mot Ba'al-dyrkelsen under den onde kong Akab."
     ],
+    "howToRead": "Legg merke til Salomos bønner om visdom i starten, og advarselen i at han mot slutten av livet lot sitt hjerte vendes bort av avgudsdyrkelse. Les profeten Eljas modige oppgjør på Karmel-fjellet (kap. 18) for å styrke ditt eget mot til å stå usvakkelig for Gud.",
     "keyVerses": [
       {
         "ref": "1 Kong 8,23",
@@ -253,6 +264,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Nordriket (Israel) opplever kun onde konger og blir til slutt utslettet og bortført av Assyria i 722 f.Kr. Sørriket (Juda) har noen gode reformkonger som Hiskia og Josjia, men faller til slutt på grunn av avgudsdyrkelse og blir lagt i ruiner av Babylon i 586 f.Kr.",
       "Boken viser at Guds dom over synd er uunngåelig, men at Guds Ord og løfter aldri slår feil."
     ],
+    "howToRead": "Les undergjerningene til Elisja som peker frem på Jesu mektige undre i evangeliene. Studer kong Hiskia og kong Josjia som forbilder på menn som ryddet opp i avgudsdyrkelsen og gjenreiste lesningen av Guds Ord i landet.",
     "keyVerses": [
       {
         "ref": "2 Kong 17,13",
@@ -275,6 +287,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Første del (kap. 1–9) inneholder omfattende slektstavler fra Adam til eksilet. Hoveddelen fokuserer på kong David, med særlig vekt på hans forberedelser til tempelbyggingen, organiseringen av levittene og lovsangen.",
       "Krønikebøkene fremhever det positive ved Davids styre for å gi håp om den kommende Messias."
     ],
+    "howToRead": "Ikke hopp over slektstavlene i kapittel 1–9! De beviser at hver enkelt familie og person var dyrebar for Gud i Hans evige frelseslinje. Les kapittel 16 og 29 for å la deg inspirere av Davids dype lovsang og gi-glede til Guds hus.",
     "keyVerses": [
       {
         "ref": "1 Krøn 16,34",
@@ -297,6 +310,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken fokuserer utelukkende på Judas konger og fremhever vekkelsene under konger som Asa, Jehosjafat, Hiskia og Josjia. Et gjennomgående tema er at søken etter Gud fører til velsignelse, mens overgivelse til avguder fører til nederlag.",
       "Boken avsluttes med det håpsfulle dekretet fra perserkongen Kyros om at jødene får vende tilbake til Jerusalem for å gjenreise tempelet."
     ],
+    "howToRead": "Bruk 2 Krøn 7,14 som en nøkkelbønn for vekkelse i ditt eget liv og land. Legg merke til at hver gang folket og kongen ydmyket seg og søkte Guds ansikt, grep Gud inn med seier og tilgivelse.",
     "keyVerses": [
       {
         "ref": "2 Krøn 7,14",
@@ -319,6 +333,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Den andre bølgen ble ledet av Esra, en skriftlærd som underviste folket i Mose lov og kjempet for å gjenreise folkets moral og åndelige renhet.",
       "Boken viser hvordan Gud beveger hedenske kongers hjerter for å oppfylle sine løfter om sitt folks gjenreising."
     ],
+    "howToRead": "Sett Esra i sammenheng med Nehemja og Haggai. Legg merke til Esras personlige disiplin (Esra 7,10): Han gransket Ordet, levde etter det og underviste andre. Gjør dette til ditt eget livsmotto!",
     "keyVerses": [
       {
         "ref": "Esra 7,10",
@@ -341,6 +356,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Under Nehemjas organisatoriske og modige lederskap gjenreises murene på kun 52 dager, til tross for trusler og sabotasje fra fiender. Sammen med Esra arrangerer han en stor åndelig fornyelse der folket lytter til Guds Ord.",
       "Boken er et klassisk studium i bønnsomt og handlingskraftig lederskap."
     ],
+    "howToRead": "Les Nehemja som en håndbok i bønn, visjon og praktisk gjennomføring. Legg merke til hvordan Nehemja ber 'skudd-bønner' i hverdagen mens han snakker med kongen, samtidig som han jobbet iherdig med hendene.",
     "keyVerses": [
       {
         "ref": "Neh 8,10",
@@ -363,6 +379,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Oppmuntret av sin onkel Mordekai utviser Ester enormt mot ved å gå ubuden til kongen og risikere sitt liv med ordene: 'Går jeg til grunne, så går jeg til grunne.'",
       "Selv om Guds navn merkelig nok ikke nevnes eksplisitt én eneste gang i boken, lyser Hans usynlige forsyn og beskyttelse gjennom hvert eneste kapittel. Høytiden Purim feires den dag i dag til minne om denne redningen."
     ],
+    "howToRead": "Når du leser Ester, se etter Guds 'usynlige finger' i bakgrunnen. Spør deg selv: Hvilke situasjoner i mitt liv har Gud plassert meg i 'for en tid som denne'?",
     "keyVerses": [
       {
         "ref": "Est 4,14",
@@ -381,6 +398,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Gjennom lange og intense dialoger med sine tre venner (som hevder at Job må ha syndet) og den yngre Elihu, fastholder Job sin uskyld, selv om han roper ut sin smerte og uforståelighet.",
       "Til slutt taler Gud selv ut av stormen. Han gir ikke en intellektuell forklaring på lidelsen, men åpenbarer sin uendelige visdom og skapermakt. Job bøyer seg i tillit, og Gud oppreiser ham med dobbelt velsignelse."
     ],
+    "howToRead": "Les boken langsomt og la den gi deg rom for ærlige spørsmål når du opplever smerte eller uforståelighet. Merk deg at Guds svar i kapittel 38–41 viser at vi ikke alltid skal forstå alt, men at vi trygt kan stole på Skaperens suverene kjærlighet.",
     "keyVerses": [
       {
         "ref": "Job 19,25-26",
@@ -403,6 +421,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Her finner vi lovsalmer, klagesalmer, visdomssalmer, kongesalmer og profetiske messianske salmer som direkte forutsier Jesu lidelse og opphøyelse (f.eks. Salme 22 og 110).",
       "Salmene lærer troende til alle tider hvordan vi kan komme ærlig frem for Gud med alt i livet."
     ],
+    "howToRead": "Les 1 til 3 salmer hver dag som en del av din personlige stille stund. Gjør ordene til din egen personlige bønn til Gud. Når salmisten jubler, jubler du; når han klager, be om Guds trøst i din egen situasjon.",
     "keyVerses": [
       {
         "ref": "Sal 23,1",
@@ -425,6 +444,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken kontrasterer den vise mot daren, den flittige mot den late, og den rettferdige mot den ugudelige. Den advarer mot fristelser og oppfordrer til edruelighet, ærlighet og godhet.",
       "Ordspråkene viser at troen på Gud angår alle praktiske detaljer i vårt daglige liv."
     ],
+    "howToRead": "Et flott tips er å lese ett kapittel i Ordspråkene hver dag tilsvarende dagens dato (siden boken har 31 kapitler!). Plukk ut ett vers hver dag som du tenker over i løpet av arbeidsdagen.",
     "keyVerses": [
       {
         "ref": "Ordspr 3,5-6",
@@ -447,6 +467,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken fører leseren gjennom en ærlig eksistensiell granskning for til slutt å konkludere med at ekte mening og glede kun finnes når man inkluderer Gud i regnestykket.",
       "Konklusjonen er klar: 'Frykt Gud og hold hans bud! Det gjelder alle mennesker.'"
     ],
+    "howToRead": "Forstå at Forkynneren viser livets tomhet NÅR Gud utelates ('under solen'). Les boken for å skrelle bort falske illusjoner om at penger eller karriere kan fylle tomrommet i hjertet ditt.",
     "keyVerses": [
       {
         "ref": "Fork 3,1",
@@ -469,6 +490,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken bekrefter at romantisk kjærlighet og seksualitet i ekteskapet er vakre gaver skapt av Gud. Poesien bruker rike bilder fra naturen for å skildre skjønnhet, lengsel og hengivenhet.",
       "Gjennom historien har Høysangen også blitt lest som et bilde på Guds dype kjærlighet til sitt folk, og Kristi kjærlighet til sin kirke."
     ],
+    "howToRead": "Les poesien med ærefrykt for at Gud skapte romantikk og kjærlighet ren og vakker. Les den gjerne sammen med din ektefelle som en feiring av troskap og kjærlighet.",
     "keyVerses": [
       {
         "ref": "Høy 8,6-7",
@@ -487,6 +509,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Jesaja skildrer Messias' jomfrufødsel (Jes 7,14), Hans evige titler (Jes 9,6), og Hans stedfortredende lidelse og død for våre synder i det berømte kapittel 53.",
       "Boken avsluttes med løftet om nye himler og en ny jord."
     ],
+    "howToRead": "Les Jesaja med et våkent øye for alle profetiene om Jesus. Les spesielt kapittel 53 under langfredag og nattverd for å meditere over hva Kristi lidelser betyr for din frelse og helbredelse.",
     "keyVerses": [
       {
         "ref": "Jes 9,6",
@@ -509,6 +532,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Til tross for forfølgelse, fengsling og forakt stod Jeremia trofast i sitt kall. Han opplevde med egne øyne Jerusalems og tempelets ødeleggelse i 586 f.Kr.",
       "Midt i ruinene brakte Jeremia det fantastiske løftet om at Gud en dag vil opprette en 'Ny Pakt' der Han vil skrive sin lov i menneskenes hjerter."
     ],
+    "howToRead": "Legg merke til Jeremias mot og trofasthet selv når INGEN hørte på ham. La det oppmuntre deg til å stå trofast for Guds sannhet selv når du føler deg alene i tiden.",
     "keyVerses": [
       {
         "ref": "Jer 29,11",
@@ -531,6 +555,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken gir rom for dyptgående sorg, tårer og smerte over syndens ødeleggende konsekvenser. Men mitt i den mørkeste sorgen bryter et av Bibelens skjønneste håpsbudskap igjennom:",
       "'Herrens miskunn er det at det ikke er ute med oss... Den er ny hver morgen, stor er din trofasthet!'"
     ],
+    "howToRead": "Bruk Klagesangene når du går gjennom dyp sorg eller kriser. Boken viser at Bibelen gir rom for ærlig gråt og fortvilelse fremfor Gud, og at Guds barmhjertighet er ny hver eneste morgen.",
     "keyVerses": [
       {
         "ref": "Klag 3,22-23",
@@ -549,6 +574,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Esekiel ser Guds herlighet forlate Jerusalem på grunn av folkets avgudsdyrkelse, men profeterer også om en framtidig gjenreisning. Det berømte synet av dalen med de tørre bena (kap. 37) viser hvordan Guds Ånd vil gi nytt liv til sitt folk.",
       "Boken avsluttes med et syn av det nye tempel og byen hvis navn er 'Herren er der' (Jahve Shammah)."
     ],
+    "howToRead": "Ikke bli skremt av de merkelige synene i starten! Se etter det store teologiske bildet: Guds herlighet er ikke bundet til en bygning, og Guds Ånd kan blåse liv i de mest 'tørre knokler' i ditt liv og din menighet (kap. 37).",
     "keyVerses": [
       {
         "ref": "Esek 36,26",
@@ -571,6 +597,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Andre del (kap. 7–12) inneholder Daniels profetiske syner om fremtidige verdensriker og gudsrikets endelige seier. Her introduseres Menneskesønnen som mottar et evig rike.",
       "Boken trøster troende med at Uansett hvor mektige jordiske riker fremstår, er Gud den suverene Konge som har full kontroll over historien."
     ],
+    "howToRead": "Les kapittel 1–6 som inspirasjon for å leve som en urokkelig troende i et sekulært samfunn. Les kapittel 7–12 med visshet om at Gud har kontroll på historien og at Menneskesønnen til slutt seirer.",
     "keyVerses": [
       {
         "ref": "Dan 2,44",
@@ -593,6 +620,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Israel hadde drevet åndelig hor ved å dyrke Ba'al, men Gud nekter å gi dem opp. Boken demonstrerer Guds sårede, men urokkelige og gjenopprettende kjærlighet.",
       "Hoseas viser at Guds nåde vil seire over dommen."
     ],
+    "howToRead": "Se for deg hvor vondt det var for Hoseas å elske sin utroe kone — og forstå hvor dyp Guds kjærlighet er til deg, selv når du feiler. Gud søker alltid gjenreisning!",
     "keyVerses": [
       {
         "ref": "Hos 6,6",
@@ -615,6 +643,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Joel kaller folket til ekte anger og faste: 'Riv deres hjerter i stykker, ikke klærne!' Gud lover deretter å gjenopprette alt gresshoppene har spist.",
       "Mest kjent er Joels profeti om at Gud i de siste dager vil utøse sin Ånd over alt kjød — en profeti som ble oppfylt på pinsedag (Apg 2)."
     ],
+    "howToRead": "Les Joels bok for å forstå betydningen av oppriktig omvendelse og faste. Takke Gud for at du i dag får leve i tiden etter at Den Hellige Ånd er utøst over alle troende!",
     "keyVerses": [
       {
         "ref": "Joel 2,28-29",
@@ -637,6 +666,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Amos fordømte på det sterkeste de rikes utnyttelse av de fattige, korrupsjonen i domstolene og overfladisk religiøsitet som manglet sann rettferdighet i hverdagen.",
       "Gud krever rettferd og sannhet: 'La rett rulle fram som vann og rettferdighet som en utømmelig strøm!'"
     ],
+    "howToRead": "La Amos utfordre ditt eget syn på penger, rettferdighet og medmennesker. Gud har behag i praktisk kjærlighet og omsorg for de svakeste, ikke bare fine sanger på søndager.",
     "keyVerses": [
       {
         "ref": "Amos 5,24",
@@ -659,6 +689,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Edom hadde hovmodet seg i sine utilgjengelige fjellfestninger og skadefro frydet seg og hjulpet babylonerne da deres brorfolk Israel ble ødelagt.",
       "Boken advarer mot stolthet og skadefryd, og lover at Herrens rike til slutt skal seire."
     ],
+    "howToRead": "Les hele boken på under 3 minutter! Merk deg advarselen mot stolthet og skadefryd når andre har det vondt. Gud beskytter sine barn.",
     "keyVerses": [
       {
         "ref": "Obad 1,15",
@@ -677,6 +708,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Jona rømmer i motsatt retning på et skip, kastes i havet under en storm, svelges av en stor fisk og blir reddet. Da han til slutt forkynner i Ninive, vender hele byen om — noe som gjør Jona sint fordi han heller ville se dem ødelagt.",
       "Boken viser Guds enorme barmhjertighet mot alle folkeslag og korrigerer snever nasjonalisme. Jesus brukte 'Jonas tegn' som et bilde på sin oppstandelse."
     ],
+    "howToRead": "Les Jona som en speiling av våre egne fordommer. Har du noen 'Ninive' i ditt liv — mennesker eller grupper du heller vil se dømt enn frelst? La Gud forvandle ditt hjerte til å elske alle mennesker.",
     "keyVerses": [
       {
         "ref": "Jona 4,2",
@@ -699,6 +731,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Mika oppsummerer hva Gud krever av et menneske i et av Bibelens mest berømte vers: 'Å gjøre rett, vise trofast kjærlighet og vandre ydmykt med din Gud.'",
       "Mika inneholder også den fantastiske messianske profetien om at Herskeren over Israel skal fødes i den lille byen Betlehem."
     ],
+    "howToRead": "Prent inn Mika 6,8 i ditt hjerte som din daglige rettesnor: Gjør rett, elsk barmhjertighet og vandre ydmykt med din Gud!",
     "keyVerses": [
       {
         "ref": "Mika 6,8",
@@ -721,6 +754,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Nahum forkynner den uunngåelige ødeleggelsen av det assyriske verdensriket. Boken viser at Gud er langmodig, men at Han til slutt vil stille tyranniske og blodtørstige riker til ansvar.",
       "For de undertrykte er Guds dom over tyranni et godt budskap om frigjøring."
     ],
+    "howToRead": "Les Nahum for å få trøst i at ondskap og undertrykkelse i verden aldri får siste ordet. Gud er et trygt vern for dem som tar sin tilflukt til Ham (Nah 1,7).",
     "keyVerses": [
       {
         "ref": "Nah 1,7",
@@ -743,6 +777,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Da Gud svarer at Han vil bruke de ennå verre babylonerne til å straffe Juda, blir Habakkuk sjokkert og stiller et nytt spørsmål. Gud svarer at ondskapen vil få sin dom, og gir den fundamentale sannheten: 'Den rettferdige skal leve ved sin tro.'",
       "Boken avsluttes med en av Bibelens skjønneste tillitserklæringer der Habakkuk jubler i Herren selv om alt slår feil i avlingen."
     ],
+    "howToRead": "Følg Habakkuks reise fra tvil ('Hvor lenge, Herre?') til urokkelig tillit i kapittel 3. Bruk Habakkuk 3,17-18 som en erklæring om at du vil juble i Gud uansett hva som skjer med økonomien eller helsen.",
     "keyVerses": [
       {
         "ref": "Hab 2,4",
@@ -765,6 +800,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Men dommen har et rensende formål: å fjerne stolthet og etterlate en ydmyk og fattig levning som søker Herrens navn.",
       "Boken avsluttes med et fantastisk bilde av Gud som jubler og synger av glede over sitt forløste folk."
     ],
+    "howToRead": "Når du leser om dommen i starten, hold ut til kapittel 3! Det fantastiske bildet av at Gud selv fryder seg og synger av glede over deg (Sef 3,17) er verdt hele lesningen.",
     "keyVerses": [
       {
         "ref": "Sef 3,17",
@@ -783,6 +819,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Haggai utfordret dem til å tenke over sine veier og sette Guds rike først. Folket og lederne (Serubabel og Josva) lyttet til profeten og gjenopptok tempelbyggingen.",
       "Gud lover at det nye tempelets herlighet skal bli større enn det forriges."
     ],
+    "howToRead": "Les Haggai og still deg selv spørsmålet: Hva setter jeg først i mitt eget liv? Husk Jesu ord i Matt 6,33: 'Søk først Guds rike og hans rettferdighet, så skal dere få alt dette i tillegg.'",
     "keyVerses": [
       {
         "ref": "Hag 1,7-8",
@@ -805,6 +842,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Sakarja inneholder flest messianske profetier blant de små profeter — blant annet at Messias skal komme ridende på et esel (Sak 9,9), selges for 30 sølvpenger (Sak 11,12) og gjennomboes (Sak 12,10).",
       "Boken peker frem mot Guds endelige seier og at Herren skal være Konge over hele jorden."
     ],
+    "howToRead": "Merk deg alle profetiene som ble oppfylt under Jesu palmesøndag og korsfestelse. Husk at alt Guds verk skjer 'ikke ved makt og ikke ved kraft, men ved min Ånd' (Sak 4,6).",
     "keyVerses": [
       {
         "ref": "Sak 4,6",
@@ -827,6 +865,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Malaki bruker en dialogform der Gud anklager folket, folket stiller spørsmål, og Gud svarer. Gud oppfordrer til trofasthet i tienden og renhet i troen.",
       "Boken avsluttes med et løfte om at profeten Elja (Døperen Johannes) skal komme for å rydde vei for Herren før den store dagen — etterfulgt av 400 års profetisk taushet fram til Nytestamentet."
     ],
+    "howToRead": "Les Malaki som en oppfordring til å gi Gud det aller beste i ditt liv, ikke bare smuler og overskudd. Se hvordan siste vers peker rett mot Døperen Johannes og starten på evangeliene.",
     "keyVerses": [
       {
         "ref": "Mal 3,10",
@@ -849,6 +888,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Boken er strukturert rundt fem store taler av Jesus, inkludert den berømte Bergprekenen (kap. 5–7). Matteus fremhever Jesus som den nye Moses som gir den sanne forståelsen av Guds lov.",
       "Evangeliet avsluttes med Jesu oppstandelse og Den store misjonsbefalingen til alle troende."
     ],
+    "howToRead": "Les Bergprekenen (kapittel 5, 6 og 7) langsomt og grundig. La Jesu radikale undervisning om kjærlighet, tilgivelse, bønn og fravær av bekymring forvandle måten du lever på i hverdagen.",
     "keyVerses": [
       {
         "ref": "Matt 16,16",
@@ -871,6 +911,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Markus viser at Jesu sanne kongedømme åpenbares på korset. Jesus kom ikke for å la seg tjene, men for å tjene og gi sitt liv som løsepenge for mange.",
       "Evangeliet utfordrer enhver disippel til å ta opp sitt kors og følge Jesus."
     ],
+    "howToRead": "Les hele Markus i én økt om du kan (tar ca. 1 til 1.5 time)! Legg merke til tempoet og intensiteten i Jesu gjerninger, og mediter over hva det betyr å tjene andre slik Jesus gjorde.",
     "keyVerses": [
       {
         "ref": "Mark 10,45",
@@ -893,6 +934,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Lukasevangeliet fremhever Jesu medfølelse med de utstøtte, fattige, kvinner og syndere. Det inneholder uforlignelige lignelser som Den barmhjertige samaritan og Den tapte sønn (kap. 15).",
       "Lukas understreker bønnelivet, Den Hellige Ånds rolle og gleden over frelsen som gjelder alle folkeslag."
     ],
+    "howToRead": "Les Lukasevangeliet med fokus på Jesu varme og medfølelse. Legg spesiell merke til kapittel 15 (lignelsene om det tapte fåret, mynten og sønnen) for å forstå Guds enorme glede når et menneske vender om.",
     "keyVerses": [
       {
         "ref": "Luk 19,10",
@@ -915,6 +957,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Johannes bygger evangeliet rundt syv utvalgte undergjerninger ('tegn') og sju berømte 'Jeg Er'-utsagn fra Jesus (f.eks. 'Jeg er verdens lys', 'Jeg er veien, sannheten og livet').",
       "Bokens eksplisitte formål uttrykkes i Joh 20,31: 'Disse er skrevet for at dere skal tro at Jesus er Messias, Guds Sønn, og for at dere ved troen skal ha liv i hans navn.'"
     ],
+    "howToRead": "Johannesevangeliet er det absolutt beste stedet å starte for nye troende! Les et kapittel om dagen og mediter over de syv 'Jeg Er'-utsagnene til Jesus. Be om at Den Hellige Ånd må åpenbare Jesu guddommelighet for deg.",
     "keyVerses": [
       {
         "ref": "Joh 3,16",
@@ -937,6 +980,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Fortellingen følger evangeliets eksplosive spredning fra Jerusalem, gjennom Judea og Samaria, og helt til verdens ende (Romerrikets hovedstad Rom).",
       "Vi følger særlig apostelen Peters tjeneste blant jødene og apostelen Pauls tre store misjonsreiser blant hedningene."
     ],
+    "howToRead": "Les Apostlenes gjerninger som mønsterbildet på kirken i funksjon! Legg merke til bønnens sentrale plass (Apg 2,42; 4,31) og hvordan Den Hellige Ånd aktivt leder og utruster disiplene med frimodighet.",
     "keyVerses": [
       {
         "ref": "Apg 1,8",
@@ -959,6 +1003,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Brevet viser at alle mennesker (både jøder og hedninger) har syndet og mangler Guds ære, men at vi blir rettferdiggjort uforskyldt av Hans nåde ved troen på Jesus Kristus (kap. 1–5). Kapittel 8 feirer det seierrike livet i Ånden og Guds uatskillelige kjærlighet.",
       "Siste del (kap. 12–16) gir praktiske anvisninger for hvordan troende skal leve som levende offer i hverdagen."
     ],
+    "howToRead": "Les Romerbrevet kapittel for kapittel for å forstå evangeliets fundament. Mediter særlig over kapittel 8 som er et av Bibelens absolutt mektigste kapitler om seier i Ånden og Guds kjærlighet.",
     "keyVerses": [
       {
         "ref": "Rom 1,16",
@@ -981,6 +1026,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus minner dem om at korsets budskap er Guds visdom og kraft. Han underviser om menigheten som Kristi legeme, retningslinjer for nattverden og åndsgavene.",
       "Kapittel 13 er det berømte 'Kjærlighetskapittelet', mens kapittel 15 gir Bibelens grundigste undervisning om Jesu og de troendes oppstandelse."
     ],
+    "howToRead": "Les boken som praktiske retningslinjer for menighetsliv og relasjoner. Les kapittel 12 og 14 for å forstå hvordan åndelige gaver skal fungere til oppbyggelse, og la kapittel 13 kalibrere din motive bak alt du gjør.",
     "keyVerses": [
       {
         "ref": "1 Kor 13,13",
@@ -1003,6 +1049,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus åpenbarer at Guds kraft fullendes i menneskelig svakhet ('en torn i kjødet'). Han underviser om trøst i lidelser, forsoningens tjeneste og gleden ved å gi med et glad hjerte.",
       "Brevet minner oss om at vi bærer evangeliets skatt i skrøpelige leirkar."
     ],
+    "howToRead": "Les dette brevet når du føler deg svak, sliten eller misforstått. Forstå at Guds kraft skinner sterkest gjennom våre sprekker og leirkar (2 Kor 4,7 og 12,9).",
     "keyVerses": [
       {
         "ref": "2 Kor 12,9",
@@ -1025,6 +1072,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus slår fast at et menneske blir rettferdiggjort utelukkende ved troen på Jesus Kristus, ikke ved lovgjerninger. Lovtrelldom ødelegger evangeliet.",
       "Brevet oppfordrer troende til å ta vare på sin frihet i Kristus og vandre i Ånden slik at Åndens frukt (kjærlighet, glede, fred osv.) vokser fram."
     ],
+    "howToRead": "Les Galaterbrevet for å forankre ditt hjerte i at frelsen er 100% Guds uforskyldte nåde. Merk deg kapittel 5,22-23 om Åndens frukt, og be om at disse egenskapene skal prege ditt liv.",
     "keyVerses": [
       {
         "ref": "Gal 2,20",
@@ -1047,6 +1095,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Første del (kap. 1–3) slår fast at vi er frelst av nåde ved tro som en Guds gave, og at Gud har samlet jøder og hedninger til ett legeme i menigheten. Andre del (kap. 4–6) viser hvordan vi skal leve verdig vårt kall i ekteskap, familie og arbeid.",
       "Brevet avsluttes med kallelsen til å iføre seg Guds fulle rustning i den åndelige kampen."
     ],
+    "howToRead": "Les Efeserne 1 til 3 for å oppdage din sanne identitet og rikdom i Kristus! Les deretter kapittel 4 til 6 for å se hvordan denne identiteten skal utleves i praksis og bønnekamp.",
     "keyVerses": [
       {
         "ref": "Ef 2,8-9",
@@ -1069,6 +1118,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus oppfordrer menigheten til å ha det samme ydmyke sinnelag som Kristus Jesus, som ga avkall på sitt eget og fornedret seg til døden på korset (kap. 2).",
       "Brevet lærer oss at sann glede ikke avhenger av ytre omstendigheter, men av fellesskapet med Kristus."
     ],
+    "howToRead": "Les dette brevet når du trenger en oppmuntring! Merk deg hvor ofte ordene 'glede' og 'fryd' forekommer, og lær deg hemmeligheten ved å være fornøyd under alle forhold (Fil 4,11-13).",
     "keyVerses": [
       {
         "ref": "Fil 4,4",
@@ -1091,6 +1141,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus løfter frem Kristi absolutte høyhet og guddommelighet: I Ham bor hele guddommens fylde legemlig, og Han er hode for alt og alle. Vi trenger ingenting i tillegg til Kristus.",
       "Brevet oppfordrer troende til å søke det som er der oppe, der Kristus sitter ved Guds høyre hånd."
     ],
+    "howToRead": "Les kapittel 1,15-20 og mediter over Jesu fantastiske majestet som Skaper og Oppettholder av alt. Husk at i Kristus har du alt du trenger for liv og gudsfrykt.",
     "keyVerses": [
       {
         "ref": "Kol 1,15-16",
@@ -1113,6 +1164,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus roser deres tro, kjærlighet og utholdende håp. Hvert eneste kapittel i brevet avsluttes med en henvisning til Jesu Kristi gjenkomst.",
       "Paulus gir trøst angående de hensovede troende og forklarer opprykkelsen da Herren selv skal stige ned fra himmelen med et rop."
     ],
+    "howToRead": "Les brevet for å styrke ditt eget håp om Jesu gjenkomst. La løftet om at vi en dag skal være sammen med Herren for alltid (1 Tess 4,17) fylle deg med trøst og frimodighet.",
     "keyVerses": [
       {
         "ref": "1 Tess 4,16-17",
@@ -1135,6 +1187,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus klargjør at før Kristi gjenkomst må det skje et stort frafall og 'lovløshetens kvinne/mann' må åpenbares.",
       "Han formaner menigheten til å stå fast og fortsette å arbeide trofast i hverdagen: 'Den som ikke vil arbeide, skal heller ikke spise.'"
     ],
+    "howToRead": "Les brevet for å bevare en sunn balanse: Lev hver dag med et forventningsfullt blikk mot Jesu gjenkomst, men uforstyrret og trofast i ditt daglige arbeid og samfunnsansvar.",
     "keyVerses": [
       {
         "ref": "2 Tess 3,3",
@@ -1157,6 +1210,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus gir instruksjoner for hvordan man skal oppføre seg i Guds hus. Brevet fastsetter kvalifikasjoner for tilsynsmenn (eldste) og diakoner, advarer mot falsk lære og pengjærighet.",
       "Timoteus oppfordres til å stride troens gode strid og ta vare på den betrodde arven."
     ],
+    "howToRead": "Les brevet som en veiledning for menighetsstruktur og kristent lederskap. Merk deg rådene om sunn lære, kjærlighet fra et rent hjerte og advarselen mot å elske penger (1 Tim 6,10).",
     "keyVerses": [
       {
         "ref": "1 Tim 6,12",
@@ -1179,6 +1233,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus ber Timoteus om ikke å skamme seg over Herrens vitnesbyrd, men bære lidelser for evangeliet som en god Kristi stridsmann. Paulus slår fast at hele Skriften er innblåst av Gud.",
       "Paulus ser tilbake på sitt liv med de uforglemmelige ordene: 'Jeg har stridd den gode strid, fullført løpet, bevart troen.'"
     ],
+    "howToRead": "Les dette brevet med dyp alvorlighet og takknemlighet for Paulus' utrettelige innsats. La hans siste avskjedsord utfordre deg til å bevare troen urokkelig og fullføre ditt eget løp i livet.",
     "keyVerses": [
       {
         "ref": "2 Tim 4,7-8",
@@ -1201,6 +1256,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Brevet understreker sammenhengen mellom sunn teologisk lære og et hellig liv i praksis. Guds frelsende nåde oppdrar oss til å fornekte ugudelighet og leve edruelig og rettferdig.",
       "Det fremheves at troende skal være ivrige til å gjøre gode gjerninger som et resultat av frelsen."
     ],
+    "howToRead": "Legg merke til balansen i Titus: Frelse skjer utelukkende av Guds barmhjertighet (Tit 3,5), men denne frelsen fører NØDVENDIGVIS til et ivrig ønske om å gjøre gode gjerninger for medmennesker.",
     "keyVerses": [
       {
         "ref": "Tit 2,11-12",
@@ -1223,6 +1279,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Paulus sender Onesimus tilbake til Filemon, men ber ham ta imot ham ikke lenger som en slave, men som en elsket bror i Kristus. Paulus tilbyr seg selv å betale alt Onesimus måtte skylde.",
       "Brevet er et mesterstykke i kristen forsoning og viser hvordan evangeliet forvandler alle sosiale relasjoner."
     ],
+    "howToRead": "Les hele brevet på 2 minutter! Se hvordan Paulus reflekterer Kristi forsoningstjeneste: Akkurat som Paulus ba Filemon tilgi Onesimus og sikte gjelden til hans konto, har Jesus betalt vår syndegjeld til Gud.",
     "keyVerses": [
       {
         "ref": "Filem 1,16",
@@ -1241,6 +1298,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Forfatteren viser systematisk at Jesus Kristus er overlegen alt i GT: over englene, Moses, Josva og det levittiske presteskap. Jesus er vår evige Øversteprest etter Melkisedeks orden, og Hans offer på korset er fullkomment og endelig.",
       "Kapittel 11 er Bibelens berømte 'Troens kapittel' som lister opp troens helter og oppfordrer oss til å holde blikket festet på Jesus."
     ],
+    "howToRead": "Les Hebreerbrevet for å få en dyp forståelse av at Jesus har oppfylt hele det gamle testamentets offervesen. Les kapittel 11 og 12 for å få ny styrke til å holde blikket festet på Jesus og løpe utholdende i troens løp.",
     "keyVerses": [
       {
         "ref": "Heb 12,1-2",
@@ -1263,6 +1321,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Jakob understreker at ekte tro ikke bare er teoretiske ord, men må vise seg i gjerninger: 'Troen uten gjerninger er død.' Jakob gir advarer mot partiskhet, ubehersket tungebruk, verdenssinn og hovmod.",
       "Brevet oppmuntrer til bønneliv og helbredelse i menigheten."
     ],
+    "howToRead": "Les Jakobs brev med vilje til handling! Spør deg selv etter hvert kapittel: Hva ber dette verset meg om å ENDRE i min tale, min omgang med penger eller min behandling av andre?",
     "keyVerses": [
       {
         "ref": "Jak 1,22",
@@ -1285,6 +1344,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Peter minner dem om at de har et levende håp gjennom Jesu oppstandelse og er et 'utvalgt folk, et kongelig presteskap, en hellig nasjon'. Han oppfordrer dem til å stå faste under lidelser ved å følge Jesu eksempel.",
       "Brevet gir dyp trøst i at prøvelser lutrer troen til ære for Gud."
     ],
+    "howToRead": "Les dette brevet når du møter motgang eller usaklig kritikk fordi du er en kristen. La Peters påminnelse om at du er en 'fremmed og utlending' på jorden gi deg et hevet hode og ro i hjertet.",
     "keyVerses": [
       {
         "ref": "1 Pet 1,3",
@@ -1307,6 +1367,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Peter understreker at profetordet i Skriften er pålitelig fordi menn talte drevet av Den Hellige Ånd. Han forklarer at Guds drøying med gjenkomsten skyldes Hans tålmodighet fordi Han vil at alle skal nå til omvendelse.",
       "Brevet avsluttes med kallelsen: 'Voks i nåde og i kunnskap om vår Herre og frelser Jesus Kristus!'"
     ],
+    "howToRead": "Les brevet for å bygge opp din tillit til Guds Ords pålitelighet (2 Pet 1,19-21) og for å bevare et rent og hellig liv mens vi venter på de nye himler og den nye jord.",
     "keyVerses": [
       {
         "ref": "2 Pet 3,9",
@@ -1329,6 +1390,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Johannes oppstiller tre kjennetegn på et ekte gjenfødt liv: å vandre i lyset (lydighet mot Guds bud), å elske sine søsken i troen, og å bekjenne at Jesus er kommet i kjødet.",
       "Boken slår fast den uforglemmelige sannheten: 'Gud er kjærlighet.'"
     ],
+    "howToRead": "Les Første Johannesbrev for å få fullstendig visshet om din frelse i Jesus! Bruk testen i kapittel 3 og 4: Dersom du elsker dine medkristne og bekjenner Jesus, bor Gud i deg.",
     "keyVerses": [
       {
         "ref": "1 Joh 4,8",
@@ -1351,6 +1413,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Johannes understreker balansen mellom sannhet og kjærlighet: Sann kjærlighet betyr å holde Guds bud, mens sann tro krever avvisning av de som fornekter at Jesus kom i kjødet.",
       "Brevet advarer mot å gi husrom eller støtte til de som spreder vranglære."
     ],
+    "howToRead": "Les dette brevet for å huske at kjærlighet og sannhet aldri må skilles. Ekte kjærlighet står opp for evangeliets sannhet.",
     "keyVerses": [
       {
         "ref": "2 Joh 1,6",
@@ -1369,6 +1432,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Brevet kontrasterer den trofaste Gajus og Demetrius mot den maktglade Diotrefes, som nektet å ta imot brødrene og kastet folk ut av menigheten.",
       "Brevet oppfordrer til å være medarbeidere for sannheten."
     ],
+    "howToRead": "Les brevet for å lære gleden ved å støtte og ta imot kristne arbeidere og misjonærer i ditt hjem og din menighet.",
     "keyVerses": [
       {
         "ref": "3 Joh 1,4",
@@ -1387,6 +1451,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Judas henter eksempler fra GT om Guds dom over ulydighet (Sodoma, Kora osv.). Han oppfordrer de troende til å bygge seg selv opp på sin høyhellige tro og be i Den Hellige Ånd.",
       "Brevet avsluttes med en av Bibelens mest fantastiske doksologier (lovprisninger)."
     ],
+    "howToRead": "Les Judas for å ta vare på troens renhet. Mediter over sluttauditets mektige løfte (vers 24-25) om at Gud har makt til å bevare deg fra å falle!",
     "keyVerses": [
       {
         "ref": "Jud 1,3",
@@ -1409,6 +1474,7 @@ const BIBLE_BOOK_INTRODUCTIONS = {
       "Deretter tas Johannes opp i himmelen der han ser Guds trone og Lammet som har seiret. Gjennom dramatiske syner med segl, basuner og skåler avdekkes den åndelige kampen mellom Gud og draken (Satan).",
       "Boken kulminerer i den endelige ødeleggelsen av det onde, den siste dom, og opprettelsen av en ny himmel og en ny jord der Gud bor midt iblant sitt folk i det nye Jerusalem — hvor død, sorg og smerte skal være borte."
     ],
+    "howToRead": "Ikke forvil deg i frykt over symbolene! Se det store bildet: Kongenes Konge seirer fullstendig over Satan og det onde. Les kapittel 21 og 22 for å fylles med ustoppelig håp for evigheten der Gud tørker bort hver tåre.",
     "keyVerses": [
       {
         "ref": "Åp 21,4",
