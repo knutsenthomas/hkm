@@ -9949,11 +9949,105 @@ class BibleReader {
         const isEn = window.location.pathname.includes('/en/');
         const isEs = window.location.pathname.includes('/es/');
 
+        // Inject dedicated responsive modal styles if not already present
+        if (!document.getElementById('hkm-verse-image-modal-styles')) {
+            const style = document.createElement('style');
+            style.id = 'hkm-verse-image-modal-styles';
+            style.textContent = `
+                #verse-image-modal.color-wheel-modal-overlay,
+                #verse-share-choice-modal.color-wheel-modal-overlay {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    background: rgba(15, 23, 42, 0.65) !important;
+                    backdrop-filter: blur(8px) !important;
+                    -webkit-backdrop-filter: blur(8px) !important;
+                    z-index: 45000 !important;
+                    display: none;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 16px !important;
+                    box-sizing: border-box !important;
+                }
+
+                #verse-image-modal.color-wheel-modal-overlay.active,
+                #verse-share-choice-modal.color-wheel-modal-overlay.active {
+                    display: flex !important;
+                }
+
+                .verse-image-card {
+                    background: var(--bg-card, #ffffff) !important;
+                    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                    border-radius: 24px !important;
+                    padding: 20px 24px !important;
+                    width: 100% !important;
+                    max-width: 540px !important;
+                    max-height: 88dvh !important;
+                    overflow-y: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+                    box-sizing: border-box !important;
+                }
+
+                .verse-share-choice-card {
+                    background: var(--bg-card, #ffffff) !important;
+                    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+                    border-radius: 24px !important;
+                    padding: 20px 24px !important;
+                    width: 100% !important;
+                    max-width: 420px !important;
+                    max-height: 88dvh !important;
+                    overflow-y: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+                    box-sizing: border-box !important;
+                }
+
+                #verse-card-canvas {
+                    max-width: 100%;
+                    height: auto;
+                    max-height: 320px;
+                    border-radius: 12px;
+                    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+                    object-fit: contain;
+                }
+
+                @media (max-width: 768px) {
+                    #verse-image-modal.color-wheel-modal-overlay,
+                    #verse-share-choice-modal.color-wheel-modal-overlay {
+                        align-items: flex-end !important;
+                        padding: 0 !important;
+                    }
+
+                    .verse-image-card,
+                    .verse-share-choice-card {
+                        width: 100vw !important;
+                        max-width: 100vw !important;
+                        max-height: 88dvh !important;
+                        border-radius: 24px 24px 0 0 !important;
+                        padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 12px)) 16px !important;
+                        animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    }
+
+                    #verse-card-canvas {
+                        max-height: 200px !important;
+                    }
+
+                    .verse-image-card button {
+                        min-height: 44px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         // 1. Verse Image Generator Modal
         if (!document.getElementById('verse-image-modal')) {
             const modalHtml = `
             <div id="verse-image-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
-                <div class="color-wheel-card" style="max-width: 540px; padding: 24px; border-radius: 24px;" onclick="event.stopPropagation();">
+                <div class="verse-image-card" onclick="event.stopPropagation();">
                     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">image</span>
@@ -9964,25 +10058,32 @@ class BibleReader {
                         </button>
                     </div>
 
-                    <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
-                        <div style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.04); border-radius: 16px; padding: 12px; box-sizing: border-box;">
-                            <canvas id="verse-card-canvas" style="max-width: 100%; height: auto; max-height: 360px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.25); object-fit: contain;"></canvas>
+                    <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px; align-items: center;">
+                        <div style="width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.04); border-radius: 16px; padding: 10px; box-sizing: border-box;">
+                            <canvas id="verse-card-canvas"></canvas>
                         </div>
 
                         <div style="width: 100%;">
-                            <label style="display: block; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--text-muted, #64748b);">${isEn ? 'Style & Color Theme:' : (isEs ? 'Estilo y Tema de Color:' : 'Stil & Fargetema:')}</label>
-                            <div class="verse-image-theme-chips" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                <button class="theme-chip-btn active" data-theme="emerald" style="background: linear-gradient(135deg, #022c22, #0f5132); color: #ffffff; border: 2px solid var(--hkm-terracotta, #d17d39); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Emerald' : (isEs ? 'Esmeralda' : 'Smaragd')}</button>
-                                <button class="theme-chip-btn" data-theme="royal" style="background: linear-gradient(135deg, #1e1b4b, #581c87); color: #fbbf24; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Royal' : (isEs ? 'Real' : 'Kongelig')}</button>
-                                <button class="theme-chip-btn" data-theme="midnight" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #38bdf8; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Midnight' : (isEs ? 'Medianoche' : 'Midnatt')}</button>
-                                <button class="theme-chip-btn" data-theme="sunset" style="background: linear-gradient(135deg, #4c0519, #b45309); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Sunset' : (isEs ? 'Amanecer' : 'Solnedgang')}</button>
-                                <button class="theme-chip-btn" data-theme="aurora" style="background: linear-gradient(135deg, #030712, #065f46); color: #6ee7b7; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Aurora' : (isEs ? 'Aurora' : 'Aurora')}</button>
-                                <button class="theme-chip-btn" data-theme="light" style="background: linear-gradient(135deg, #fdfbf7, #e2d9cc); color: #1e293b; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Light Elegance' : (isEs ? 'Luz Elegante' : 'Lys Eleganse')}</button>
+                            <label style="display: block; font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--text-muted, #64748b);">${isEn ? 'Style & Background:' : (isEs ? 'Estilo y Fondo:' : 'Stil & Bakgrunn:')}</label>
+                            <div class="verse-image-theme-chips" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                <!-- Color Gradients -->
+                                <button class="theme-chip-btn active" data-theme="emerald" style="background: linear-gradient(135deg, #022c22, #0f5132); color: #ffffff; border: 2px solid var(--hkm-terracotta, #d17d39); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌿 ${isEn ? 'Emerald' : (isEs ? 'Esmeralda' : 'Smaragd')}</button>
+                                <button class="theme-chip-btn" data-theme="royal" style="background: linear-gradient(135deg, #1e1b4b, #581c87); color: #fbbf24; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">👑 ${isEn ? 'Royal' : (isEs ? 'Real' : 'Kongelig')}</button>
+                                <button class="theme-chip-btn" data-theme="midnight" style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #38bdf8; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌌 ${isEn ? 'Midnight' : (isEs ? 'Medianoche' : 'Midnatt')}</button>
+                                <button class="theme-chip-btn" data-theme="sunset" style="background: linear-gradient(135deg, #4c0519, #b45309); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌅 ${isEn ? 'Sunset' : (isEs ? 'Amanecer' : 'Solnedgang')}</button>
+                                <button class="theme-chip-btn" data-theme="aurora" style="background: linear-gradient(135deg, #030712, #065f46); color: #6ee7b7; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Aurora' : (isEs ? 'Aurora' : 'Aurora')}</button>
+                                <button class="theme-chip-btn" data-theme="light" style="background: linear-gradient(135deg, #fdfbf7, #e2d9cc); color: #1e293b; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🕊️ ${isEn ? 'Light Elegance' : (isEs ? 'Luz Elegante' : 'Lys Eleganse')}</button>
+                                
+                                <!-- Real Photo Backgrounds -->
+                                <button class="theme-chip-btn" data-theme="photo_mountains" style="background: url('/img/verse_bg_mountains.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🏔️ ${isEn ? 'Mountains' : (isEs ? 'Montañas' : 'Fjell')}</button>
+                                <button class="theme-chip-btn" data-theme="photo_stars" style="background: url('/img/verse_bg_starry_sky.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">✨ ${isEn ? 'Starry Sky' : (isEs ? 'Cielo Estrellado' : 'Stjerner')}</button>
+                                <button class="theme-chip-btn" data-theme="photo_ocean" style="background: url('/img/verse_bg_sunset_ocean.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌊 ${isEn ? 'Ocean Sunset' : (isEs ? 'Atardecer Mar' : 'Hav')}</button>
+                                <button class="theme-chip-btn" data-theme="photo_sunburst" style="background: url('/img/verse_bg_sunburst_rays.jpg') center/cover; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">🌤️ ${isEn ? 'Sunbeams' : (isEs ? 'Rayos de Sol' : 'Solstråler')}</button>
                             </div>
                         </div>
 
                         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                            <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Format:' : (isEs ? 'Formato:' : 'Format:')}</label>
+                            <label style="font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b);">${isEn ? 'Format:' : (isEs ? 'Formato:' : 'Format:')}</label>
                             <div style="display: flex; gap: 8px;">
                                 <button id="format-btn-square" class="format-chip-btn active" data-format="square" style="background: var(--hkm-terracotta, #d17d39); color: white; border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Square (1:1)' : (isEs ? 'Cuadrado (1:1)' : 'Kvadrat (1:1)')}</button>
                                 <button id="format-btn-story" class="format-chip-btn" data-format="story" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">${isEn ? 'Story (9:16)' : (isEs ? 'Historia (9:16)' : 'Story (9:16)')}</button>
@@ -9990,16 +10091,16 @@ class BibleReader {
                         </div>
                     </div>
 
-                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
-                        <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 18px; font-weight: 600; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button id="verse-image-copy-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: none; border-radius: 9999px; padding: 10px 16px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
                             <span>${isEn ? 'Copy Text' : (isEs ? 'Copiar Texto' : 'Kopier tekst')}</span>
                         </button>
-                        <button id="verse-image-download-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: 1px solid var(--border-color, rgba(0,0,0,0.15)); border-radius: 9999px; padding: 10px 18px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <button id="verse-image-download-btn" style="background: var(--bg-surface, #f1f5f9); color: var(--text-base, #475569); border: 1px solid var(--border-color, rgba(0,0,0,0.15)); border-radius: 9999px; padding: 10px 16px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
                             <span>${isEn ? 'Download' : (isEs ? 'Descargar' : 'Last ned')}</span>
                         </button>
-                        <button id="verse-image-share-btn" style="background: linear-gradient(135deg, var(--hkm-terracotta, #d17d39), #b45309); color: white; border: none; border-radius: 9999px; padding: 10px 22px; font-weight: 800; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209,125,57,0.35);">
+                        <button id="verse-image-share-btn" style="background: linear-gradient(135deg, var(--hkm-terracotta, #d17d39), #b45309); color: white; border: none; border-radius: 9999px; padding: 10px 20px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(209,125,57,0.35);">
                             <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
                             <span>${isEn ? 'Share Image' : (isEs ? 'Compartir Imagen' : 'Del bilde')}</span>
                         </button>
@@ -10013,7 +10114,7 @@ class BibleReader {
         if (!document.getElementById('verse-share-choice-modal')) {
             const choiceHtml = `
             <div id="verse-share-choice-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); setTimeout(() => this.style.display='none', 250); }">
-                <div class="color-wheel-card" style="max-width: 420px; padding: 24px; border-radius: 24px;" onclick="event.stopPropagation();">
+                <div class="verse-share-choice-card" onclick="event.stopPropagation();">
                     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 26px;">share</span>
@@ -10024,24 +10125,24 @@ class BibleReader {
                         </button>
                     </div>
 
-                    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+                    <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 12px;">
                         <button id="share-choice-btn-image" style="background: linear-gradient(135deg, rgba(209,125,57,0.12), rgba(209,125,57,0.04)); border: 1.5px solid var(--hkm-terracotta, #d17d39); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; text-align: left; cursor: pointer; transition: transform 0.15s ease;">
-                            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--hkm-terracotta, #d17d39); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <span class="material-symbols-outlined" style="font-size: 26px;">image</span>
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--hkm-terracotta, #d17d39); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 24px;">image</span>
                             </div>
                             <div>
-                                <h4 style="margin: 0 0 4px; font-size: 15px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Image' : (isEs ? 'Compartir como Imagen' : 'Del som Bilde')}</h4>
-                                <p style="margin: 0; font-size: 12.5px; color: var(--text-muted, #64748b);">${isEn ? 'Generate a beautiful image card with verse' : (isEs ? 'Genera una hermosa tarjeta de imagen con el versículo' : 'Generer et vakkert bildekort med vers og bakgrunn')}</p>
+                                <h4 style="margin: 0 0 4px; font-size: 14.5px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Image' : (isEs ? 'Compartir como Imagen' : 'Del som Bilde')}</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-muted, #64748b);">${isEn ? 'Generate a beautiful image card with verse' : (isEs ? 'Genera una hermosa tarjeta de imagen con el versículo' : 'Generer et vakkert bildekort med vers og bakgrunn')}</p>
                             </div>
                         </button>
 
                         <button id="share-choice-btn-text" style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, rgba(0,0,0,0.12)); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; text-align: left; cursor: pointer; transition: transform 0.15s ease;">
-                            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--bg-card, #e2e8f0); color: var(--text-base, #334155); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <span class="material-symbols-outlined" style="font-size: 26px;">notes</span>
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--bg-card, #e2e8f0); color: var(--text-base, #334155); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span class="material-symbols-outlined" style="font-size: 24px;">notes</span>
                             </div>
                             <div>
-                                <h4 style="margin: 0 0 4px; font-size: 15px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Text' : (isEs ? 'Compartir como Texto' : 'Del som Tekst')}</h4>
-                                <p style="margin: 0; font-size: 12.5px; color: var(--text-muted, #64748b);">${isEn ? 'Send plain text directly or copy to clipboard' : (isEs ? 'Enviar texto o copiar al portapapeles' : 'Send råtekst direkte eller kopier til utklippstavlen')}</p>
+                                <h4 style="margin: 0 0 4px; font-size: 14.5px; font-weight: 800; color: var(--text-base);">${isEn ? 'Share as Text' : (isEs ? 'Compartir como Texto' : 'Del som Tekst')}</h4>
+                                <p style="margin: 0; font-size: 12px; color: var(--text-muted, #64748b);">${isEn ? 'Send plain text directly or copy to clipboard' : (isEs ? 'Enviar texto o copiar al portapapeles' : 'Send råtekst direkte eller kopier til utklippstavlen')}</p>
                             </div>
                         </button>
                     </div>
@@ -10299,139 +10400,231 @@ class BibleReader {
                 textColor: '#1e293b',
                 refColor: '#b45309',
                 brandColor: '#64748b'
+            },
+            photo_mountains: {
+                isPhoto: true,
+                photoUrl: '/img/verse_bg_mountains.jpg',
+                cardBg: 'rgba(15, 23, 42, 0.55)',
+                cardBorder: 'rgba(250, 204, 21, 0.4)',
+                quoteColor: 'rgba(250, 204, 21, 0.25)',
+                textColor: '#ffffff',
+                refColor: '#facc15',
+                brandColor: 'rgba(255, 255, 255, 0.85)'
+            },
+            photo_stars: {
+                isPhoto: true,
+                photoUrl: '/img/verse_bg_starry_sky.jpg',
+                cardBg: 'rgba(15, 23, 42, 0.55)',
+                cardBorder: 'rgba(56, 189, 248, 0.4)',
+                quoteColor: 'rgba(56, 189, 248, 0.25)',
+                textColor: '#ffffff',
+                refColor: '#38bdf8',
+                brandColor: 'rgba(255, 255, 255, 0.85)'
+            },
+            photo_ocean: {
+                isPhoto: true,
+                photoUrl: '/img/verse_bg_sunset_ocean.jpg',
+                cardBg: 'rgba(30, 10, 20, 0.55)',
+                cardBorder: 'rgba(254, 240, 138, 0.4)',
+                quoteColor: 'rgba(254, 240, 138, 0.25)',
+                textColor: '#ffffff',
+                refColor: '#fef08a',
+                brandColor: 'rgba(255, 255, 255, 0.85)'
+            },
+            photo_sunburst: {
+                isPhoto: true,
+                photoUrl: '/img/verse_bg_sunburst_rays.jpg',
+                cardBg: 'rgba(15, 23, 42, 0.55)',
+                cardBorder: 'rgba(250, 204, 21, 0.4)',
+                quoteColor: 'rgba(250, 204, 21, 0.25)',
+                textColor: '#ffffff',
+                refColor: '#facc15',
+                brandColor: 'rgba(255, 255, 255, 0.85)'
             }
         };
 
         const t = themes[theme] || themes.emerald;
 
-        // 1. Draw Background
-        const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-        bgGrad.addColorStop(0, t.bgGradient[0]);
-        bgGrad.addColorStop(0.5, t.bgGradient[1]);
-        bgGrad.addColorStop(1, t.bgGradient[2]);
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, width, height);
+        const drawCardAndText = () => {
+            // 2. Wrap text & Calculate sizes
+            const marginX = 90;
+            const cardWidth = width - (marginX * 2);
+            
+            const cleanText = verseText.trim();
+            const textLen = cleanText.length;
 
-        // Radial ambient glow
-        const lightGrad = ctx.createRadialGradient(width/2, height/2, 40, width/2, height/2, width*0.65);
-        lightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
-        lightGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = lightGrad;
-        ctx.fillRect(0, 0, width, height);
+            let fontSize = 44;
+            let lineHeight = 66;
 
-        // 2. Wrap text & Calculate sizes
-        const marginX = 90;
-        const cardWidth = width - (marginX * 2);
-        
-        const cleanText = verseText.trim();
-        const textLen = cleanText.length;
-
-        let fontSize = 44;
-        let lineHeight = 66;
-
-        if (textLen > 320) {
-            fontSize = 30;
-            lineHeight = 48;
-        } else if (textLen > 180) {
-            fontSize = 36;
-            lineHeight = 56;
-        } else if (textLen < 80) {
-            fontSize = 52;
-            lineHeight = 76;
-        }
-
-        ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
-
-        const maxTextWidth = cardWidth - 140;
-        const words = cleanText.split(' ');
-        let lines = [];
-        let currentLine = '';
-
-        for (let i = 0; i < words.length; i++) {
-            let testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
-            let metrics = ctx.measureText(testLine);
-            if (metrics.width > maxTextWidth && i > 0) {
-                lines.push(currentLine);
-                currentLine = words[i];
-            } else {
-                currentLine = testLine;
+            if (textLen > 320) {
+                fontSize = 30;
+                lineHeight = 48;
+            } else if (textLen > 180) {
+                fontSize = 36;
+                lineHeight = 56;
+            } else if (textLen < 80) {
+                fontSize = 52;
+                lineHeight = 76;
             }
+
+            ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
+
+            const maxTextWidth = cardWidth - 140;
+            const words = cleanText.split(' ');
+            let lines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < words.length; i++) {
+                let testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+                let metrics = ctx.measureText(testLine);
+                if (metrics.width > maxTextWidth && i > 0) {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+
+            const textContentHeight = lines.length * lineHeight;
+            const cardHeight = Math.max(380, textContentHeight + 220);
+            const cardY = (height - cardHeight) / 2;
+
+            // 3. Draw Glass Card
+            ctx.save();
+            ctx.beginPath();
+            const r = 36;
+            ctx.moveTo(marginX + r, cardY);
+            ctx.arcTo(marginX + cardWidth, cardY, marginX + cardWidth, cardY + cardHeight, r);
+            ctx.arcTo(marginX + cardWidth, cardY + cardHeight, marginX, cardY + cardHeight, r);
+            ctx.arcTo(marginX, cardY + cardHeight, marginX, cardY, r);
+            ctx.arcTo(marginX, cardY, marginX + cardWidth, cardY, r);
+            ctx.closePath();
+
+            ctx.fillStyle = t.cardBg;
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = t.cardBorder;
+            ctx.stroke();
+            ctx.restore();
+
+            // 4. Large Decorative Quote Mark
+            ctx.save();
+            ctx.font = 'bold 150px "Georgia", serif';
+            ctx.fillStyle = t.quoteColor;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('«', marginX + 40, cardY + 20);
+            ctx.restore();
+
+            // 5. Draw Wrapped Verse Text
+            ctx.save();
+            ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
+            ctx.fillStyle = t.textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            let textStartY = cardY + 80;
+            for (let j = 0; j < lines.length; j++) {
+                ctx.fillText(lines[j], width / 2, textStartY + (j * lineHeight));
+            }
+            ctx.restore();
+
+            // 6. Draw Divider Line & Reference
+            const dividerY = textStartY + (lines.length * lineHeight) + 26;
+            ctx.save();
+            ctx.strokeStyle = t.cardBorder;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(width / 2 - 50, dividerY);
+            ctx.lineTo(width / 2 + 50, dividerY);
+            ctx.stroke();
+            ctx.restore();
+
+            const fullRef = `${reference.toUpperCase()} ${translation ? '(' + translation + ')' : ''}`;
+            ctx.save();
+            ctx.font = 'bold 28px "Outfit", "Inter", sans-serif';
+            ctx.fillStyle = t.refColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillText(fullRef, width / 2, dividerY + 18);
+            ctx.restore();
+
+            // 7. Draw Footer Branding ("HIS KINGDOM MINISTRY  •  hkm.no")
+            ctx.save();
+            const footerY = isStory ? height - 120 : height - 60;
+            ctx.font = '700 22px "Outfit", "Inter", sans-serif';
+            ctx.fillStyle = t.brandColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('HIS KINGDOM MINISTRY  •  hkm.no', width / 2, footerY);
+            ctx.restore();
+        };
+
+        // 1. Draw Background (Photo vs Gradient)
+        if (t.isPhoto && t.photoUrl) {
+            if (!this.verseImageCache) this.verseImageCache = {};
+            const cachedImg = this.verseImageCache[t.photoUrl];
+
+            const drawPhotoBackground = (img) => {
+                const imgRatio = img.width / img.height;
+                const canvasRatio = width / height;
+                let dw = width, dh = height, dx = 0, dy = 0;
+
+                if (imgRatio > canvasRatio) {
+                    dh = height;
+                    dw = height * imgRatio;
+                    dx = (width - dw) / 2;
+                } else {
+                    dw = width;
+                    dh = width / imgRatio;
+                    dy = (height - dh) / 2;
+                }
+
+                ctx.drawImage(img, dx, dy, dw, dh);
+
+                // Dark vignette overlay for optimal text contrast
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
+                ctx.fillRect(0, 0, width, height);
+
+                drawCardAndText();
+            };
+
+            if (cachedImg && cachedImg.complete) {
+                drawPhotoBackground(cachedImg);
+            } else {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = t.photoUrl;
+                img.onload = () => {
+                    this.verseImageCache[t.photoUrl] = img;
+                    drawPhotoBackground(img);
+                };
+                // Fallback gradient while loading image
+                const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+                bgGrad.addColorStop(0, '#0f172a');
+                bgGrad.addColorStop(1, '#020617');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, width, height);
+                drawCardAndText();
+            }
+        } else {
+            const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+            bgGrad.addColorStop(0, t.bgGradient[0]);
+            bgGrad.addColorStop(0.5, t.bgGradient[1]);
+            bgGrad.addColorStop(1, t.bgGradient[2]);
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Radial ambient glow
+            const lightGrad = ctx.createRadialGradient(width/2, height/2, 40, width/2, height/2, width*0.65);
+            lightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
+            lightGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = lightGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            drawCardAndText();
         }
-        if (currentLine) lines.push(currentLine);
-
-        const textContentHeight = lines.length * lineHeight;
-        const cardHeight = Math.max(380, textContentHeight + 220);
-        const cardY = (height - cardHeight) / 2;
-
-        // 3. Draw Glass Card
-        ctx.save();
-        ctx.beginPath();
-        const r = 36;
-        ctx.moveTo(marginX + r, cardY);
-        ctx.arcTo(marginX + cardWidth, cardY, marginX + cardWidth, cardY + cardHeight, r);
-        ctx.arcTo(marginX + cardWidth, cardY + cardHeight, marginX, cardY + cardHeight, r);
-        ctx.arcTo(marginX, cardY + cardHeight, marginX, cardY, r);
-        ctx.arcTo(marginX, cardY, marginX + cardWidth, cardY, r);
-        ctx.closePath();
-
-        ctx.fillStyle = t.cardBg;
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = t.cardBorder;
-        ctx.stroke();
-        ctx.restore();
-
-        // 4. Large Decorative Quote Mark
-        ctx.save();
-        ctx.font = 'bold 150px "Georgia", serif';
-        ctx.fillStyle = t.quoteColor;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText('«', marginX + 40, cardY + 20);
-        ctx.restore();
-
-        // 5. Draw Wrapped Verse Text
-        ctx.save();
-        ctx.font = `italic ${fontSize}px "Georgia", "Times New Roman", serif`;
-        ctx.fillStyle = t.textColor;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-
-        let textStartY = cardY + 80;
-        for (let j = 0; j < lines.length; j++) {
-            ctx.fillText(lines[j], width / 2, textStartY + (j * lineHeight));
-        }
-        ctx.restore();
-
-        // 6. Draw Divider Line & Reference
-        const dividerY = textStartY + (lines.length * lineHeight) + 26;
-        ctx.save();
-        ctx.strokeStyle = t.cardBorder;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(width / 2 - 50, dividerY);
-        ctx.lineTo(width / 2 + 50, dividerY);
-        ctx.stroke();
-        ctx.restore();
-
-        const fullRef = `${reference.toUpperCase()} ${translation ? '(' + translation + ')' : ''}`;
-        ctx.save();
-        ctx.font = 'bold 28px "Outfit", "Inter", sans-serif';
-        ctx.fillStyle = t.refColor;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(fullRef, width / 2, dividerY + 18);
-        ctx.restore();
-
-        // 7. Draw Footer Branding ("HIS KINGDOM MINISTRY  •  hkm.no")
-        ctx.save();
-        const footerY = isStory ? height - 120 : height - 60;
-        ctx.font = '700 22px "Outfit", "Inter", sans-serif';
-        ctx.fillStyle = t.brandColor;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('HIS KINGDOM MINISTRY  •  hkm.no', width / 2, footerY);
-        ctx.restore();
     }
 
     shareVerseImage(canvas, reference) {
