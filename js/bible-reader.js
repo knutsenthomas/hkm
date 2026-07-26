@@ -3024,7 +3024,15 @@ class BibleReader {
             this.dom.currentReferenceTitle = this.dom.currentReferenceTitle || document.getElementById('current-reference-title');
 
             if (this.dom.currentBookBadge) this.dom.currentBookBadge.innerText = bookName.toUpperCase();
-            if (this.dom.currentChapterNumber) this.dom.currentChapterNumber.innerText = 'Intro';
+            if (this.dom.currentChapterNumber) {
+                const lang = document.documentElement.lang || 'no';
+                const labelIntroTitle = lang === 'en' ? 'Intro' : (lang === 'es' ? 'Intro' : 'Intro');
+                this.dom.currentChapterNumber.innerText = labelIntroTitle;
+                this.dom.currentChapterNumber.style.fontSize = '32px';
+                this.dom.currentChapterNumber.style.fontFamily = "'Inter', sans-serif";
+                this.dom.currentChapterNumber.style.fontWeight = '800';
+                this.dom.currentChapterNumber.style.margin = '4px 0 8px 0';
+            }
             if (this.dom.currentReferenceTitle) this.dom.currentReferenceTitle.innerText = `${bookName} - Bokintroduksjon`;
         } catch (e) {}
 
@@ -3382,6 +3390,10 @@ class BibleReader {
             }
             if (this.dom.currentChapterNumber) {
                 this.dom.currentChapterNumber.innerText = chapterNum;
+                this.dom.currentChapterNumber.style.fontSize = '';
+                this.dom.currentChapterNumber.style.fontFamily = '';
+                this.dom.currentChapterNumber.style.fontWeight = '';
+                this.dom.currentChapterNumber.style.margin = '';
             }
             if (this.dom.currentReferenceTitle) {
                 this.dom.currentReferenceTitle.innerText = `${currentBook ? currentBook.name : ''} ${chapterNum}`;
