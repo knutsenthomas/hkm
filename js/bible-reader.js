@@ -481,7 +481,9 @@ class BibleReader {
                         this.loadNotes();
                         this.loadReadingPlan();
                         if (this.activePlanMode && this.activePlanId) {
-                            this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+                            if (!this._isInitializingPlan && (!this.activePlanData || !this.activePlanData.id)) {
+                                this.initReadingPlanMode(this.activePlanId, this.activePlanDay);
+                            }
                         }
                     });
                     return true;
@@ -507,7 +509,7 @@ class BibleReader {
                         const urlParams = new URLSearchParams(window.location.search);
                         const planParam = urlParams.get('plan');
                         const dayParam = urlParams.get('day');
-                        if (planParam && (!this.activePlanData || !this.activePlanData.id)) {
+                        if (planParam && (!this.activePlanData || !this.activePlanData.id) && !this._isInitializingPlan) {
                             this.initReadingPlanMode(planParam, dayParam);
                         }
                     }
@@ -5907,6 +5909,11 @@ class BibleReader {
     }
 
     async initReadingPlanMode(planId, dayNumFromUrl) {
+        if (this._isInitializingPlan) {
+            console.log("[BibleReader] Already initializing plan mode for", planId);
+            return;
+        }
+        this._isInitializingPlan = true;
         this.activePlanMode = true;
         this.activePlanId = planId;
         this.activePlanDay = parseInt(dayNumFromUrl, 10) || this.activePlanDay || null;
@@ -6088,6 +6095,7 @@ class BibleReader {
         } catch (e) {
             console.error("[BibleReader] Error in initReadingPlanMode:", e);
         } finally {
+            this._isInitializingPlan = false;
             // Reveal UI now that the reading plan loading attempt is complete
             if (typeof window.revealPublicUI === 'function') {
                 window.revealPublicUI('bible-reader-ready');
@@ -7110,6 +7118,9 @@ class BibleReader {
         }
         if (this.dom.sidebar) {
             this.dom.sidebar.classList.add('reading-plan-active');
+            if (openSidebarOnMobile && window.innerWidth <= 1024) {
+                this.dom.sidebar.classList.add('active');
+            }
         }
 
         // 1. Hide books list and search in left sidebar

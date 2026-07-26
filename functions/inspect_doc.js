@@ -44,11 +44,11 @@ global.document = {
 
 async function inspectDoc() {
   try {
-    const doc = await db.collection('reading_plans').doc('P0goQTHeFCsRjwHrxI9m').get();
+    const doc = await db.collection('reading_plans').doc('od4PFBPUn3ve0RmpS6LE').get();
     if (!doc.exists) {
       console.log("Document not found");
     } else {
-      console.log(JSON.stringify(doc.data(), null, 2));
+      console.log(JSON.stringify({ title: doc.data().title, days: doc.data().days }, null, 2));
     }
   } catch (err) {
     console.error("Error fetching doc:", err);
