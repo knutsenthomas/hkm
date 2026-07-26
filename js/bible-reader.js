@@ -3063,7 +3063,7 @@ class BibleReader {
         if (!intro) {
             modal.innerHTML = `
                 <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; width: 100%; max-width: 480px; padding: 24px; text-align: center; box-shadow: 0 24px 60px -12px rgba(0,0,0,0.35); margin: auto;">
-                    <div style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 16px; cursor: pointer;"></div>
+                    <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 0 auto 16px; cursor: pointer;"></div>
                     <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(27, 73, 101, 0.08); color: #1B4965; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                         <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
                     </div>
@@ -3078,6 +3078,8 @@ class BibleReader {
             const closeBtn = modal.querySelector('#btn-close-empty-intro');
             if (closeBtn) closeBtn.onclick = () => closeModal();
             modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+            const card = modal.querySelector('.hkm-book-intro-sheet-card');
+            if (card) this.setupBottomSheetSwipeDown(card, () => closeModal());
             return;
         }
 
@@ -3106,10 +3108,10 @@ class BibleReader {
             <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
-                <div style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 10px auto 4px; cursor: pointer; flex-shrink: 0;"></div>
+                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.18)); border-radius: 99px; margin: 10px auto 4px; cursor: pointer; flex-shrink: 0;"></div>
 
                 <!-- Header Bar -->
-                <div style="padding: 12px 50px 14px 50px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); text-align: center;">
+                <div class="hkm-book-intro-header" style="padding: 12px 50px 14px 50px; border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.06)); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); text-align: center;">
                     <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #D17D39; display: block; margin-bottom: 4px;">${labelIntro}</span>
                     <h3 style="margin: 0; font-size: 26px; font-weight: 800; color: var(--text-base); line-height: 1.25; font-family: var(--font-heading, inherit);">${intro.title}</h3>
                     <button id="btn-close-book-intro-x" title="Lukk" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--bg-surface, #f1f5f9); border: none; color: var(--text-base, #334155); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.2s ease;">
@@ -3118,7 +3120,7 @@ class BibleReader {
                 </div>
 
                 <!-- Scrollable Body Content -->
-                <div style="padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
+                <div class="hkm-book-intro-scroll-body sheet-scroll-body" style="padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; background: var(--bg-card, #ffffff);">
                     
                     <!-- Metadata Rows -->
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
@@ -3180,6 +3182,11 @@ class BibleReader {
         modal.onclick = (e) => {
             if (e.target === modal) closeModal();
         };
+
+        const card = modal.querySelector('.hkm-book-intro-sheet-card');
+        if (card) {
+            this.setupBottomSheetSwipeDown(card, () => closeModal());
+        }
     }
 
     renderBookIntroPage(bookId) {
@@ -4250,18 +4257,20 @@ class BibleReader {
         let isDragging = false;
 
         const getBackdrop = () => {
-            return element.closest('.color-wheel-modal-overlay') || document.getElementById('hkm-sheet-backdrop-overlay');
+            return element.closest('.color-wheel-modal-overlay, .hkm-book-intro-overlay, .hkm-modal-overlay, .hkm-devotional-overlay') || document.getElementById('hkm-sheet-backdrop-overlay');
         };
 
         const onStart = (clientY, target) => {
-            const isHeader = target && target.closest('.sheet-handle-bar, .popover-sheet-header, .color-wheel-header, #floating-popover-header-chapters, #floating-popover-header-books');
-            const isScrollBody = target && target.closest('#floating-books-container, #floating-chapter-grid, .verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, .dict-body');
+            const isHeader = target && target.closest('.sheet-handle-bar, .popover-sheet-header, .color-wheel-header, #floating-popover-header-chapters, #floating-popover-header-books, .hkm-book-intro-header, .hkm-devotional-header');
+            const isScrollBody = target && target.closest('#floating-books-container, #floating-chapter-grid, .verse-crossref-sheet-body, .sheet-scroll-body, .color-wheel-body, .dict-body, .hkm-book-intro-scroll-body');
 
-            // If touched inside a scrollable list body and NOT on the top handle bar/header,
-            // do not activate sheet dragging. Let touch handle list scrolling exclusively.
+            // If touched inside a scrollable list body and NOT on the top handle bar/header:
             if (isScrollBody && !isHeader) {
-                isDragging = false;
-                return false;
+                // If container is scrolled down, let touch handle list scrolling exclusively
+                if (isScrollBody.scrollTop > 0) {
+                    isDragging = false;
+                    return false;
+                }
             }
 
             if (!isHeader && target && target.closest('.color-swatch-circle, button, a, input, textarea, select')) {
