@@ -5876,12 +5876,36 @@ class BibleReader {
 
         try {
             // Fetch global plan data
+            let rawPlan = null;
             const planDoc = await db.collection('reading_plans').doc(planId).get();
-            if (!planDoc.exists) {
+            if (planDoc.exists) {
+                rawPlan = { id: planDoc.id, ...planDoc.data() };
+            } else {
+                // Fallback search by slug or title match
+                try {
+                    const snap = await db.collection('reading_plans').get();
+                    snap.forEach(d => {
+                        const data = d.data();
+                        if (d.id === planId || data.slug === planId || (data.title && data.title.toLowerCase().includes(planId.toLowerCase()))) {
+                            rawPlan = { id: d.id, ...data };
+                        }
+                    });
+                } catch (snapErr) {
+                    console.warn("[BibleReader] Fallback plan search failed:", snapErr);
+                }
+            }
+
+            if (!rawPlan) {
                 console.error("[BibleReader] Plan does not exist:", planId);
                 return;
             }
-            this.activePlanData = { id: planDoc.id, ...planDoc.data() };
+
+            if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+                this.activePlanData = window.contentManager.getLocalizedContentItem(rawPlan);
+            } else {
+                this.activePlanData = rawPlan;
+            }
+            this.activePlanId = this.activePlanData.id;
 
             // Determine active day
             let activeDayNum = this.activePlanDay;
@@ -8018,20 +8042,42 @@ class BibleReader {
         let globalPlan = this.activePlanData;
         let dayConfig = null;
 
-        if (globalPlan && globalPlan.id === planId) {
-            dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
+        if (globalPlan) {
+            if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+                globalPlan = window.contentManager.getLocalizedContentItem(globalPlan);
+            }
+            if (globalPlan.days) {
+                dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber) || globalPlan.days[0];
+            }
         }
 
         if (!dayConfig) {
             const db = this.getFirestore();
             if (db) {
-                const globalPlanSnap = await db.collection('reading_plans')
-                    .doc(planId)
-                    .get();
-
-                if (globalPlanSnap.exists) {
-                    globalPlan = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
-                    dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber);
+                let globalPlanSnap = await db.collection('reading_plans').doc(planId).get();
+                if (!globalPlanSnap.exists) {
+                    try {
+                        const snap = await db.collection('reading_plans').get();
+                        snap.forEach(d => {
+                            const data = d.data();
+                            if (d.id === planId || data.slug === planId || (data.title && data.title.toLowerCase().includes(planId.toLowerCase()))) {
+                                globalPlanSnap = { exists: true, id: d.id, data: () => data };
+                            }
+                        });
+                    } catch (err) {
+                        console.warn("[BibleReader] Fallback global plan snap search failed:", err);
+                    }
+                }
+                if (globalPlanSnap && globalPlanSnap.exists) {
+                    let raw = { id: globalPlanSnap.id, ...globalPlanSnap.data() };
+                    if (window.contentManager && typeof window.contentManager.getLocalizedContentItem === 'function') {
+                        globalPlan = window.contentManager.getLocalizedContentItem(raw);
+                    } else {
+                        globalPlan = raw;
+                    }
+                    if (globalPlan.days) {
+                        dayConfig = globalPlan.days.find(d => d.dayNumber === dayNumber) || globalPlan.days[0];
+                    }
                 }
             }
         }
@@ -8062,40 +8108,111 @@ class BibleReader {
     }
 
     async fetchAndFilterVersesText(versesText) {
-        const input = versesText.trim().toLowerCase();
-        const regex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)(?:\s*[\:\.\s]\s*(\d+)(?:\-(\d+))?)?$/i;
-        const match = input.match(regex);
+        if (!versesText || typeof versesText !== 'string') {
+            throw new Error("No verses specified");
+        }
+        const input = versesText.trim();
 
-        if (!match) {
-            throw new Error("Invalid reference format");
+        let bookQuery = '';
+        let startChap = 1;
+        let endChap = 1;
+        let startVerse = null;
+        let endVerse = null;
+        let isChapRange = false;
+        let isVerseRange = false;
+
+        // Check Format 1: Chapter range (e.g. "Ester 1-3", "Ester 4-7", "1. Mosebok 1-3")
+        const chapRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)\s*-\s*(\d+)$/i;
+        let match = input.match(chapRangeRegex);
+
+        if (match) {
+            const prefix = match[1] || '';
+            const name = match[2].trim();
+            bookQuery = prefix ? `${prefix} ${name}` : name;
+            startChap = parseInt(match[3], 10);
+            endChap = parseInt(match[4], 10);
+            isChapRange = true;
+        } else {
+            // Check Format 2: Verse range (e.g. "Rut 2:1-10", "Johannes 3:16-21")
+            const verseRangeRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)[\:\.]\s*(\d+)(?:\s*-\s*(\d+))?$/i;
+            match = input.match(verseRangeRegex);
+            if (match) {
+                const prefix = match[1] || '';
+                const name = match[2].trim();
+                bookQuery = prefix ? `${prefix} ${name}` : name;
+                startChap = parseInt(match[3], 10);
+                endChap = startChap;
+                startVerse = parseInt(match[4], 10);
+                endVerse = match[5] ? parseInt(match[5], 10) : startVerse;
+                isVerseRange = true;
+            } else {
+                // Check Format 3: Single chapter (e.g. "Rut 1", "Ester 4")
+                const singleChapRegex = /^(\d+)?\s*\.?\s*([a-zæøå\s]+)\s*(\d+)$/i;
+                match = input.match(singleChapRegex);
+                if (match) {
+                    const prefix = match[1] || '';
+                    const name = match[2].trim();
+                    bookQuery = prefix ? `${prefix} ${name}` : name;
+                    startChap = parseInt(match[3], 10);
+                    endChap = startChap;
+                } else {
+                    throw new Error("Invalid reference format");
+                }
+            }
         }
 
-        const prefixNum = match[1] || '';
-        const bookNameQuery = match[2].trim();
-        const chapterNum = match[3];
-        const startVerse = match[4] ? parseInt(match[4], 10) : null;
-        const endVerse = match[5] ? parseInt(match[5], 10) : (startVerse || null);
+        const q = bookQuery.toLowerCase().trim();
+        let matchedBook = null;
 
-        let fullBookSearchName = prefixNum ? `${prefixNum} ${bookNameQuery}` : bookNameQuery;
-        if (fullBookSearchName === 'apg') {
-            fullBookSearchName = 'apostlenes';
+        if (this.books && Array.isArray(this.books)) {
+            matchedBook = this.books.find(b => {
+                const bName = b.name.toLowerCase();
+                const bId = String(b.id).toLowerCase();
+                return bName === q || bName.startsWith(q) || bName.includes(q) || bId === q;
+            });
         }
 
-        const matchedBook = this.books.find(b => {
-            const bName = b.name.toLowerCase();
-            return bName === fullBookSearchName || bName.startsWith(fullBookSearchName) || bName.includes(fullBookSearchName);
-        });
+        if (!matchedBook && typeof norwegianBookToId !== 'undefined') {
+            const id = norwegianBookToId[q];
+            if (id && this.books) {
+                matchedBook = this.books.find(b => String(b.id) === String(id));
+            }
+        }
 
         if (!matchedBook) {
-            throw new Error(`Book not found: ${fullBookSearchName}`);
+            throw new Error(`Book not found: ${bookQuery}`);
         }
 
-        const chapterId = `${matchedBook.id}_${chapterNum}`;
+        if (isChapRange) {
+            let combinedHtml = '';
+            for (let c = startChap; c <= endChap; c++) {
+                const chapterId = `${matchedBook.id}_${c}`;
+                try {
+                    const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
+                    const payload = await res.json();
+                    if (payload.data && payload.data.content) {
+                        combinedHtml += `<h4 style="font-size: 1.15em; font-weight: 700; color: #1B4965; margin-top: ${c === startChap ? '0' : '24px'}; margin-bottom: 12px; font-family: system-ui, -apple-system, sans-serif;">${matchedBook.name} ${c}</h4>`;
+                        combinedHtml += payload.data.content;
+                    }
+                } catch (err) {
+                    console.warn(`Failed to load chapter ${chapterId}:`, err);
+                }
+            }
+            if (combinedHtml) return combinedHtml;
+            throw new Error("Failed to load chapters for range");
+        }
+
+        // Single chapter or verse range
+        const chapterId = `${matchedBook.id}_${startChap}`;
         const res = await fetch(`/api/bible/bibles/${this.selectedBibleId}/chapters/${chapterId}`);
         const payload = await res.json();
         
         if (!payload.data || !payload.data.content) {
             throw new Error("Failed to load chapter content");
+        }
+
+        if (!isVerseRange || !startVerse) {
+            return payload.data.content;
         }
 
         const parser = new DOMParser();
@@ -8111,7 +8228,7 @@ class BibleReader {
                 let keepParagraph = false;
                 for (const sup of sups) {
                     const vNum = parseInt(sup.innerText.trim(), 10);
-                    if (!startVerse || (vNum >= startVerse && vNum <= endVerse)) {
+                    if (vNum >= startVerse && vNum <= endVerse) {
                         keepParagraph = true;
                         foundAny = true;
                     }
@@ -8119,12 +8236,10 @@ class BibleReader {
                 if (keepParagraph) {
                     filteredHtml += p.outerHTML;
                 }
-            } else if (!startVerse) {
-                filteredHtml += p.outerHTML;
             }
         }
 
-        if (!foundAny && startVerse) {
+        if (!foundAny) {
             return payload.data.content;
         }
 
