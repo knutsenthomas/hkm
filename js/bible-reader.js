@@ -3130,7 +3130,7 @@ class BibleReader {
             <div class="hkm-book-intro-sheet-card" onclick="event.stopPropagation();" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.1)); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
                 
                 <!-- Drag Handle Bar (Top of sheet) -->
-                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.2)); border-radius: 99px; margin: 18px auto 10px; cursor: pointer; flex-shrink: 0;"></div>
+                <div class="sheet-handle-bar" style="width: 44px; height: 5px; background: var(--border-color, rgba(0,0,0,0.2)); border-radius: 99px; margin: 14px auto 6px !important; cursor: pointer; flex-shrink: 0;"></div>
 
                 <!-- Header Bar (Left title, right circular close button, clean flex layout) -->
                 <div class="hkm-book-intro-header" style="padding: 10px 20px 14px 20px; display: flex; align-items: center; justify-content: space-between; position: relative; flex-shrink: 0; background: var(--bg-card, #ffffff); gap: 12px;">
