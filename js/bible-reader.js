@@ -5295,7 +5295,7 @@ class BibleReader {
                         <div class="relative h-36 overflow-hidden group cursor-pointer" onclick="window.open('https://www.youtube.com/watch?v=${bpVideo.id}', '_blank')">
                             <img src="https://img.youtube.com/vi/${bpVideo.id}/0.jpg" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" class="group-hover:scale-105" />
                             <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: all 0.3s;" class="group-hover:bg-black/40">
-                                <div style="width: 40px; height: 40px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s;" class="group-hover:scale-110">
+                                <div style="width: 40px; height: 40px; aspect-ratio: 1 / 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s; flex-shrink: 0; box-sizing: border-box;" class="group-hover:scale-110">
                                     <span class="material-symbols-outlined" style="color: #d17d39; font-variation-settings: 'FILL' 1; font-size: 24px;">play_arrow</span>
                                 </div>
                             </div>
@@ -6071,7 +6071,7 @@ class BibleReader {
         modal.innerHTML = `
             <div style="background:#ffffff; border-radius:20px; max-width:450px; width:100%; padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid #e2e8f0; text-align:left;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                    <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                    <div style="background:#fffbeb; border-radius:50%; width:40px; height:40px; aspect-ratio: 1 / 1; display:flex; align-items:center; justify-content:center; flex-shrink: 0; box-sizing: border-box;">
                         <span class="material-symbols-outlined" style="color:#d97706; font-size:24px;">restore</span>
                     </div>
                     <h3 style="font-size:18px; font-weight:700; color:#1b4965; margin:0;">${t_title}</h3>
@@ -8313,7 +8313,7 @@ class BibleReader {
                         <div class="relative h-28 overflow-hidden group cursor-pointer" onclick="window.open('https://www.youtube.com/watch?v=${bpVideo.id}', '_blank')">
                             <img src="https://img.youtube.com/vi/${bpVideo.id}/0.jpg" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" class="group-hover:scale-105" />
                             <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; transition: all 0.3s;" class="group-hover:bg-black/40">
-                                <div style="width: 32px; height: 32px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;" class="group-hover:scale-110">
+                                <div style="width: 32px; height: 32px; aspect-ratio: 1 / 1; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; flex-shrink: 0; box-sizing: border-box;" class="group-hover:scale-110">
                                     <span class="material-symbols-outlined" style="color: #d17d39; font-variation-settings: 'FILL' 1; font-size: 18px;">play_arrow</span>
                                 </div>
                             </div>
