@@ -3047,7 +3047,7 @@ class BibleReader {
             width: 100vw !important;
             height: 100vh !important;
             height: 100dvh !important;
-            background: rgba(15, 23, 42, 0.5) !important;
+            background: transparent !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             z-index: 35000 !important;
@@ -3064,8 +3064,8 @@ class BibleReader {
             if (card) {
                 card.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
                 card.style.transform = 'translateY(100%)';
-                modal.style.transition = 'background-color 0.25s ease';
-                modal.style.backgroundColor = 'rgba(15, 23, 42, 0)';
+                modal.style.transition = 'background-color 0.25s ease, opacity 0.25s ease';
+                modal.style.opacity = '0';
                 setTimeout(() => {
                     modal.remove();
                 }, 250);
@@ -6578,7 +6578,11 @@ class BibleReader {
                 display: none !important;
             }
 
-            /* Book Intro Modal: Responsive Bottom Sheet on Mobile & Centered Card on Desktop */
+            .hkm-modal-overlay.hkm-book-intro-overlay {
+                background: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
             @media (max-width: 768px) {
                 .hkm-modal-overlay.hkm-book-intro-overlay {
                     align-items: flex-end !important;
