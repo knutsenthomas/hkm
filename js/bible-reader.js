@@ -6620,6 +6620,7 @@ class BibleReader {
             style.id = 'hkm-rp-workspace-styles';
             document.head.appendChild(style);
         }
+        style.innerHTML = `
             /* Hide page footer when reading plan is active or book intro overlay is open to prevent page scrolling */
             body:has(#bible-sidebar.reading-plan-active) footer.footer,
             body:has(.hkm-book-intro-overlay) footer.footer,
