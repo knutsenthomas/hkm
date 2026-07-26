@@ -5634,7 +5634,7 @@ class BibleReader {
                 .hkm-yv-header-text { font-size: 15px !important; font-weight: 700 !important; color: #1B4965 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
                 .hkm-yv-header-text-full { display: inline-block !important; max-width: 600px !important; }
                 .hkm-yv-header-text-short { display: none !important; }
-                @media (max-width: 1024px) {
+                @media (max-width: 767px) {
                     .hkm-yv-header-text-full { display: none !important; }
                     .hkm-yv-header-text-short { display: inline-block !important; max-width: 220px !important; }
                 }
@@ -6749,8 +6749,7 @@ class BibleReader {
                 }
             }
 
-            /* Mobile/Tablet portrait: Full screen reading plan when active drawer is open */
-            @media (max-width: 1024px) {
+            @media (max-width: 767px) {
                 .hkm-rp-sidebar-title {
                     max-width: 220px !important;
                 }
