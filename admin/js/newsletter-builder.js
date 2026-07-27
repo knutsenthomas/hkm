@@ -354,6 +354,12 @@ class NewsletterBuilder {
                 const subjectInput = document.getElementById('newsletter-subject');
                 if (subjectInput) subjectInput.value = data.subject || '';
                 
+                if (data.headerHtml) {
+                    try {
+                        localStorage.setItem('hkm_builder_autosave_header_html', data.headerHtml);
+                    } catch(e) {}
+                }
+                
                 this.toggleMode('builder');
                 this.renderCanvas();
                 showToast(`Kladden "${this.currentDraftName}" ble gjenopprettet.`, "info");
@@ -1459,9 +1465,14 @@ class NewsletterBuilder {
         try {
             const currentHtml = container.innerHTML;
             const currentSubject = document.getElementById('newsletter-subject')?.value || '';
+            const headerNode = document.querySelector('.canvas-header');
+
             if (currentHtml && currentHtml !== '<p><br></p>') {
                 localStorage.setItem('hkm_builder_autosave_html', currentHtml);
                 localStorage.setItem('hkm_builder_autosave_subject', currentSubject);
+            }
+            if (headerNode) {
+                localStorage.setItem('hkm_builder_autosave_header_html', headerNode.outerHTML);
             }
         } catch (e) {}
 
@@ -5106,6 +5117,22 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
+        // Restore header from localStorage if available
+        try {
+            const autosavedHeader = localStorage.getItem('hkm_builder_autosave_header_html');
+            if (autosavedHeader && autosavedHeader.trim().length > 10) {
+                const headerNode = document.querySelector('.canvas-header');
+                if (headerNode) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = autosavedHeader;
+                    const newHeader = tempDiv.querySelector('.canvas-header');
+                    if (newHeader) {
+                        headerNode.parentNode.replaceChild(newHeader, headerNode);
+                    }
+                }
+            }
+        } catch(e) {}
+
         // Auto-initialize from localStorage or default HKM template if empty
         if (this.blocks.length === 0) {
             const autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
@@ -6722,9 +6749,11 @@ ${cleanCanvasHtml}
             async (name) => {
                 try {
                     this.syncUnifiedBlocks();
+                    const headerNode = document.querySelector('.canvas-header');
                     const data = {
                         name,
                         blocks: this.blocks,
+                        headerHtml: headerNode ? headerNode.outerHTML : '',
                         subject: document.getElementById('newsletter-subject')?.value || '',
                         createdAt: new Date().toISOString(),
                         isDraft: true
