@@ -3389,53 +3389,6 @@ class NewsletterBuilder {
 
     attachBlockQuickToolbar(node) {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
-        if (!node) return;
-
-        const toolbar = document.createElement('div');
-        toolbar.id = 'block-quick-toolbar';
-        toolbar.className = 'block-quick-toolbar';
-        toolbar.setAttribute('contenteditable', 'false');
-        toolbar.innerHTML = `
-            <button type="button" class="quick-tb-btn" id="qtb-move-up" title="Flytt opp (↑)">
-                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
-            </button>
-            <button type="button" class="quick-tb-btn" id="qtb-move-down" title="Flytt ned (↓)">
-                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
-            </button>
-            <div class="qtb-divider"></div>
-            <button type="button" class="quick-tb-btn" id="qtb-duplicate" title="Dupliser element">
-                <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
-            </button>
-            <button type="button" class="quick-tb-btn danger" id="qtb-delete" title="Slett element">
-                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-            </button>
-        `;
-
-        if (getComputedStyle(node).position === 'static') {
-            node.style.position = 'relative';
-        }
-        node.appendChild(toolbar);
-
-        toolbar.querySelector('#qtb-move-up')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.moveActiveBlock(-1);
-        });
-        toolbar.querySelector('#qtb-move-down')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.moveActiveBlock(1);
-        });
-        toolbar.querySelector('#qtb-duplicate')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.duplicateActiveBlock();
-        });
-        toolbar.querySelector('#qtb-delete')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.deleteActiveBlock();
-        });
     }
 
     selectBlock(node) {

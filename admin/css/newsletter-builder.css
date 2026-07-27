@@ -6211,14 +6211,21 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     background: #004ecc !important;
 }
 
-/* Block Selected outline styling */
-.blocks-container > * {
-    transition: outline 0.15s ease-in-out;
+/* Block Selected outline styling - clean & borderless */
+.blocks-container > *,
+#blocks-container > *,
+#blocks-container p,
+#blocks-container h1,
+#blocks-container h2,
+#blocks-container h3,
+#blocks-container div {
+    outline: none !important;
+    box-shadow: none !important;
 }
-.blocks-container > *.selected-block-active {
-    outline: 2px solid #3b82f6 !important;
-    outline-offset: 4px !important;
-    border-radius: 4px !important;
+.blocks-container > *.selected-block-active,
+#blocks-container > *.selected-block-active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Side-by-side row layout inside property inspector */
