@@ -4220,11 +4220,28 @@ class NewsletterBuilder {
                         </select>
                     </div>
                 </div>
-            </div>
-            
-            <div class="inspector-footer">
-                <button type="button" class="inspector-footer-btn cancel" id="text-inspector-cancel">Avbryt</button>
-                <button type="button" class="inspector-footer-btn apply" id="text-inspector-apply">Bruk</button>
+
+                <div class="inspector-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 10px; display: block;">Plassering &amp; Handlinger</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
+                            <span>Flytt opp</span>
+                        </button>
+                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
+                            <span>Flytt ned</span>
+                        </button>
+                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
+                            <span>Dupliser</span>
+                        </button>
+                        <button type="button" id="btn-block-delete" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600; color: #ef4444; border-color: #fca5a5;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -4398,8 +4415,10 @@ class NewsletterBuilder {
             });
         }
 
-        document.getElementById('text-inspector-cancel').addEventListener('click', () => this.deselectBlock());
-        document.getElementById('text-inspector-apply').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('btn-block-move-up')?.addEventListener('click', () => this.moveActiveBlock(-1));
+        document.getElementById('btn-block-move-down')?.addEventListener('click', () => this.moveActiveBlock(1));
+        document.getElementById('btn-block-duplicate')?.addEventListener('click', () => this.duplicateActiveBlock());
+        document.getElementById('btn-block-delete')?.addEventListener('click', () => this.deleteActiveBlock());
 
         const btnPers = document.getElementById('text-inspector-personalize');
         if (btnPers) {
@@ -4560,11 +4579,27 @@ class NewsletterBuilder {
                         </button>
                     </div>
                 </div>
-            </div>
-            
-            <div class="inspector-footer">
-                <button type="button" class="inspector-footer-btn cancel" id="img-inspector-cancel">Avbryt</button>
-                <button type="button" class="inspector-footer-btn apply" id="img-inspector-apply">Bruk</button>
+                <div class="inspector-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 10px; display: block;">Plassering &amp; Handlinger</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-img-move-up" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
+                            <span>Flytt opp</span>
+                        </button>
+                        <button type="button" id="btn-img-move-down" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
+                            <span>Flytt ned</span>
+                        </button>
+                        <button type="button" id="btn-img-duplicate" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
+                            <span>Dupliser</span>
+                        </button>
+                        <button type="button" id="btn-img-delete" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600; color: #ef4444; border-color: #fca5a5;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -4755,8 +4790,10 @@ class NewsletterBuilder {
             });
         });
 
-        document.getElementById('img-inspector-cancel').addEventListener('click', () => this.deselectBlock());
-        document.getElementById('img-inspector-apply').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('btn-img-move-up')?.addEventListener('click', () => this.moveActiveBlock(-1));
+        document.getElementById('btn-img-move-down')?.addEventListener('click', () => this.moveActiveBlock(1));
+        document.getElementById('btn-img-duplicate')?.addEventListener('click', () => this.duplicateActiveBlock());
+        document.getElementById('btn-img-delete')?.addEventListener('click', () => this.deleteActiveBlock());
     }
 
     showButtonInspector(btn, node) {
@@ -4850,11 +4887,27 @@ class NewsletterBuilder {
                         <option value="999px" ${currentRadius === '999px' || currentRadius.includes('px') && parseInt(currentRadius) > 20 ? 'selected' : ''}>Runde (999px)</option>
                     </select>
                 </div>
-            </div>
-            
-            <div class="inspector-footer">
-                <button type="button" class="inspector-footer-btn cancel" id="btn-inspector-cancel">Avbryt</button>
-                <button type="button" class="inspector-footer-btn apply" id="btn-inspector-apply">Bruk</button>
+                <div class="inspector-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 10px; display: block;">Plassering &amp; Handlinger</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" id="btn-btn-move-up" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_upward</span>
+                            <span>Flytt opp</span>
+                        </button>
+                        <button type="button" id="btn-btn-move-down" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">arrow_downward</span>
+                            <span>Flytt ned</span>
+                        </button>
+                        <button type="button" id="btn-btn-duplicate" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">content_copy</span>
+                            <span>Dupliser</span>
+                        </button>
+                        <button type="button" id="btn-btn-delete" class="btn-secondary-outline" style="width: 100%; height: 36px; justify-content: center; font-size: 13px; font-weight: 600; color: #ef4444; border-color: #fca5a5;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -4945,8 +4998,10 @@ class NewsletterBuilder {
             });
         });
 
-        document.getElementById('btn-inspector-cancel').addEventListener('click', () => this.deselectBlock());
-        document.getElementById('btn-inspector-apply').addEventListener('click', () => this.deselectBlock());
+        document.getElementById('btn-btn-move-up')?.addEventListener('click', () => this.moveActiveBlock(-1));
+        document.getElementById('btn-btn-move-down')?.addEventListener('click', () => this.moveActiveBlock(1));
+        document.getElementById('btn-btn-duplicate')?.addEventListener('click', () => this.duplicateActiveBlock());
+        document.getElementById('btn-btn-delete')?.addEventListener('click', () => this.deleteActiveBlock());
     }
 
     toggleRecipientsDrawer() {
