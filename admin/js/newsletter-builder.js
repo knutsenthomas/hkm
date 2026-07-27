@@ -5104,6 +5104,8 @@ class NewsletterBuilder {
         const rightToolbarCell = document.querySelector('.toolbar-right-cell');
         const saveDraftBtn = document.getElementById('save-draft-btn');
         const previewBtn = document.getElementById('preview-btn');
+        const mainWorkspace = document.getElementById('builder-main-workspace');
+        const workspaceCenter = document.getElementById('builder-workspace-center');
 
         if (!drawer) return;
 
@@ -5123,8 +5125,58 @@ class NewsletterBuilder {
                 rightToolbarCell.style.setProperty('opacity', '1', 'important');
             }
 
+            // Fix layout so the right summary sidebar never overflows the viewport
+            if (mainWorkspace) {
+                mainWorkspace.style.setProperty('display', 'flex', 'important');
+                mainWorkspace.style.setProperty('flex', '1 1 0%', 'important');
+                mainWorkspace.style.setProperty('min-width', '0', 'important');
+                mainWorkspace.style.setProperty('max-width', '100%', 'important');
+                mainWorkspace.style.setProperty('overflow', 'hidden', 'important');
+                mainWorkspace.style.setProperty('height', '100%', 'important');
+            }
+            if (workspaceCenter) {
+                workspaceCenter.style.setProperty('flex', '1 1 0%', 'important');
+                workspaceCenter.style.setProperty('min-width', '0', 'important');
+                workspaceCenter.style.setProperty('max-width', '100%', 'important');
+                workspaceCenter.style.setProperty('width', '100%', 'important');
+                workspaceCenter.style.setProperty('overflow-x', 'hidden', 'important');
+                workspaceCenter.style.setProperty('overflow-y', 'auto', 'important');
+                workspaceCenter.style.setProperty('padding', '24px 24px 80px 24px', 'important');
+                workspaceCenter.style.setProperty('box-sizing', 'border-box', 'important');
+                workspaceCenter.style.setProperty('background', '#f8fafc', 'important');
+            }
             drawer.style.setProperty('display', 'block', 'important');
+            drawer.style.setProperty('width', '100%', 'important');
+            drawer.style.setProperty('box-sizing', 'border-box', 'important');
             drawer.classList.add('open');
+
+            // Apply grid layout to recipient-flow after a tick so DOM is settled
+            requestAnimationFrame(() => {
+                const recipientFlow = document.querySelector('.recipient-flow');
+                const mainSelection = document.querySelector('.main-selection');
+                const selectionSidebar = document.querySelector('.selection-sidebar');
+                if (recipientFlow) {
+                    recipientFlow.style.setProperty('display', 'grid', 'important');
+                    recipientFlow.style.setProperty('grid-template-columns', 'minmax(0, 1fr) 240px', 'important');
+                    recipientFlow.style.setProperty('gap', '20px', 'important');
+                    recipientFlow.style.setProperty('width', '100%', 'important');
+                    recipientFlow.style.setProperty('box-sizing', 'border-box', 'important');
+                    recipientFlow.style.setProperty('overflow', 'hidden', 'important');
+                }
+                if (mainSelection) {
+                    mainSelection.style.setProperty('min-width', '0', 'important');
+                    mainSelection.style.setProperty('overflow', 'hidden', 'important');
+                    mainSelection.style.setProperty('box-sizing', 'border-box', 'important');
+                }
+                if (selectionSidebar) {
+                    selectionSidebar.style.setProperty('width', '240px', 'important');
+                    selectionSidebar.style.setProperty('min-width', '0', 'important');
+                    selectionSidebar.style.setProperty('max-width', '240px', 'important');
+                    selectionSidebar.style.setProperty('box-sizing', 'border-box', 'important');
+                    selectionSidebar.style.setProperty('overflow', 'hidden', 'important');
+                }
+            });
+
             this.closeToolsUi();
             this.updateRecipientSummary();
         } else {
@@ -5138,6 +5190,22 @@ class NewsletterBuilder {
             if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
             if (previewBtn) previewBtn.style.removeProperty('display');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
+            // Reset workspace layout back to normal
+            if (mainWorkspace) {
+                mainWorkspace.style.removeProperty('overflow');
+                mainWorkspace.style.removeProperty('max-width');
+            }
+            if (workspaceCenter) {
+                workspaceCenter.style.removeProperty('flex');
+                workspaceCenter.style.removeProperty('min-width');
+                workspaceCenter.style.removeProperty('max-width');
+                workspaceCenter.style.removeProperty('width');
+                workspaceCenter.style.removeProperty('overflow-x');
+                workspaceCenter.style.removeProperty('overflow-y');
+                workspaceCenter.style.removeProperty('padding');
+                workspaceCenter.style.removeProperty('box-sizing');
+                workspaceCenter.style.removeProperty('background');
+            }
         }
         document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
 
