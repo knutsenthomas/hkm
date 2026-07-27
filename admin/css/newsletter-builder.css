@@ -142,7 +142,7 @@
 }
 }
 
-/* 2. Sub-Header Toolbar (Perfect Vertical & Horizontal Alignment) */
+/* 2. Sub-Header Toolbar (Robust 3 Equal Flex Columns) */
 #newsletter-builder-layout .builder-toolbar-header {
     height: 56px !important;
     min-height: 56px !important;
@@ -166,14 +166,15 @@
 #newsletter-builder-layout .toolbar-left-cell {
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-start !important;
     height: 100% !important;
-    flex: 0 0 auto !important;
-    min-width: 180px !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
 }
 
 #newsletter-builder-layout .toolbar-left-cell h3 {
     margin: 0 !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
     line-height: 1 !important;
@@ -188,12 +189,8 @@
     align-items: center !important;
     justify-content: center !important;
     height: 100% !important;
-    flex: 0 0 auto !important;
-    position: absolute !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    top: 0 !important;
-    bottom: 0 !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
 }
 
 #newsletter-builder-layout .toolbar-right-cell,
@@ -203,8 +200,8 @@
     justify-content: flex-end !important;
     height: 100% !important;
     gap: 12px !important;
-    flex-shrink: 0 !important;
-    margin-left: auto !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
 }
 
 #newsletter-builder-layout .canvas-top-subject-bar {
