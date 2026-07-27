@@ -453,6 +453,36 @@ class NewsletterBuilder {
                     this.syncUnifiedBlocks();
                 }
             });
+            container.addEventListener('paste', (e) => {
+                e.preventDefault();
+                let pastedHtml = e.clipboardData ? e.clipboardData.getData('text/html') : '';
+                let pastedText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+
+                if (pastedHtml) {
+                    try {
+                        const doc = new DOMParser().parseFromString(pastedHtml, 'text/html');
+                        const elements = doc.body.querySelectorAll('*');
+                        elements.forEach(el => {
+                            el.style.backgroundColor = '';
+                            el.style.background = '';
+                            el.style.color = '';
+                            el.removeAttribute('bgcolor');
+                        });
+                        doc.body.style.backgroundColor = '';
+                        doc.body.style.background = '';
+                        doc.body.style.color = '';
+
+                        const cleanHtml = doc.body.innerHTML;
+                        document.execCommand('insertHTML', false, cleanHtml);
+                    } catch (err) {
+                        document.execCommand('insertText', false, pastedText);
+                    }
+                } else if (pastedText) {
+                    document.execCommand('insertText', false, pastedText);
+                }
+                this.cleanPastedFormatting();
+                this.syncUnifiedBlocks();
+            });
             container.addEventListener('click', (e) => {
                 // Determine active block clicked (Wix-style property panel selector)
                 const blockNode = this.getCurrentBlock(e.target);
@@ -1319,6 +1349,7 @@ class NewsletterBuilder {
                     break;
                 case 'removeFormat':
                     this.exec('removeFormat');
+                    this.cleanPastedFormatting();
                     break;
                 case 'justifyLeft':
                     this.exec('justifyLeft');
@@ -1349,8 +1380,8 @@ class NewsletterBuilder {
                     if (textInput) textInput.click();
                     break;
                 case 'highlightColor':
-                    const hlInput = toolbar.querySelector('[data-color-input="highlight"]');
-                    if (hlInput) hlInput.click();
+                    const highlightInput = toolbar.querySelector('[data-color-input="highlight"]');
+                    if (highlightInput) highlightInput.click();
                     break;
                 case 'lineHeight':
                     const currentLineHeight = this.getCurrentLineHeight() || '1.5';
