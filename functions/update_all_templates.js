@@ -44,7 +44,7 @@ const templates = {
         {{title}} - Dag {{day}}
       </h3>
       <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
-        📖 Bibeltekst: {{passage}}
+        Bibeltekst: {{passage}}
       </p>
     </section>
 

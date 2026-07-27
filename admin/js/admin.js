@@ -27563,7 +27563,7 @@ class AdminManager {
                                         \${planTitle} - Dag \${currentDayNum}
                                     </h3>
                                     <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
-                                        📖 Bibeltekst: \${verses}
+                                        Bibeltekst: \${verses}
                                     </p>
                                 </section>
 

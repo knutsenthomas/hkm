@@ -8059,7 +8059,7 @@ exports.scheduledReadingNotifications = onSchedule({
                 \${planTitle} - Dag \${currentDayNum}
               </h3>
               <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
-                📖 Bibeltekst: \${verses}
+                Bibeltekst: \${verses}
               </p>
             </section>
 
@@ -8085,7 +8085,7 @@ exports.scheduledReadingNotifications = onSchedule({
 
         // A. Send Push-varsel hvis aktivert
         if (wantPush && userData.fcmTokens && userData.fcmTokens.length > 0) {
-          const pushTitle = `📖 Dagens bibellesing: Dag ${currentDayNum}`;
+          const pushTitle = `Dagens bibellesing: Dag ${currentDayNum}`;
           const pushBody = `Dagens tekst er ${verses} fra leseplanen "${planTitle}". Klikk her for å åpne.`;
 
           console.log(`Sender push-varsel til bruker ${userId} for plan ${planId}...`);
@@ -8147,7 +8147,7 @@ exports.scheduledReadingNotifications = onSchedule({
         {{title}} - Dag {{day}}
       </h3>
       <p style="margin: 0; color: #56423b; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;">
-        📖 Bibeltekst: {{passage}}
+        Bibeltekst: {{passage}}
       </p>
     </section>
 
@@ -8285,7 +8285,7 @@ exports.scheduledReadingNotifications = onSchedule({
 
         // C. Lagre i user_notifications for historikk på Min Side
         try {
-          const notifTitle = `📖 Leseplan: Dag ${currentDayNum}`;
+          const notifTitle = `Leseplan: Dag ${currentDayNum}`;
           const notifBody = `Dagens tekst er ${verses} fra leseplanen "${planTitle}".`;
           await db.collection("user_notifications").add({
             userId: userId,
