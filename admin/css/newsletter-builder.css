@@ -3081,22 +3081,22 @@ body.builder-active .builder-workspace > .canvas-container {
 
 /* Recipients Drawer Refined (Wix Style) */
 .recipients-drawer {
-    width: 0;
-    overflow: hidden;
-    background: #f8fafc;
-    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: absolute;
-    right: 0;
-    top: 72px;
-    /* Start below workspace header */
-    height: calc(100vh - 72px);
-    z-index: 200;
+    display: none !important;
+    position: fixed !important;
+    top: 56px !important;
+    left: 240px !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    background: #ffffff !important;
+    z-index: 99999 !important;
+    overflow-y: auto !important;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 .recipients-drawer.open {
-    width: 100%;
-    /* Cover work area */
-    border-left: 1px solid var(--border-color);
+    display: block !important;
 }
 
 .recipients-drawer .sidebar-header {
