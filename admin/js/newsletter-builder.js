@@ -3684,14 +3684,10 @@ class NewsletterBuilder {
         const issueColorHex = (issueEl && issueEl.style.color) ? issueEl.style.color : '#64748b';
         const headerBgHex = (headerNode && headerNode.style.backgroundColor) ? headerNode.style.backgroundColor : '#ffffff';
 
+        const mainTitleEl = document.getElementById('main-properties-title');
+        if (mainTitleEl) mainTitleEl.textContent = 'Rediger E-posthode';
+
         inspectorView.innerHTML = `
-            <div class="properties-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
-                <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0;">Rediger E-posthode</h3>
-                <button type="button" class="btn-close-properties" id="hdr-close-inspector" title="Lukk">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            
             <div class="inspector-body" style="display: flex; flex-direction: column; gap: 16px;">
                 <!-- Logo URL Input -->
                 <div class="inspector-group">
@@ -3715,7 +3711,7 @@ class NewsletterBuilder {
                     <input type="text" id="hdr-inspector-issue" value="${issueText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
                 </div>
 
-                <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 8px; margin-bottom: 2px; border-top: 1px solid #f1f5f9; padding-top: 12px;">Stil & Utseende</div>
+                <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 8px; margin-bottom: 2px; border-top: 1px solid #f1f5f9; padding-top: 12px;">Stil &amp; Utseende</div>
 
                 <!-- Title Color -->
                 <div class="inspector-group">
@@ -3763,9 +3759,11 @@ class NewsletterBuilder {
         `;
 
         // Wire up close inspector button
-        document.getElementById('hdr-close-inspector')?.addEventListener('click', () => {
+        document.getElementById('close-properties-btn')?.addEventListener('click', () => {
             if (inspectorView) inspectorView.style.display = 'none';
             if (defaultView) defaultView.style.display = 'block';
+            const mtEl = document.getElementById('main-properties-title');
+            if (mtEl) mtEl.textContent = 'Egenskaper';
         });
 
         // Wire up text inputs
