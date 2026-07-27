@@ -5099,6 +5099,9 @@ class NewsletterBuilder {
         const leftSidebar = document.getElementById('elements-panel') || document.querySelector('.builder-elements-panel');
         const rightInspector = document.querySelector('.builder-properties-panel');
         const leftToolbarTitle = document.getElementById('sidebar-title');
+        const centerToolbarCell = document.querySelector('.toolbar-center-cell');
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        const previewBtn = document.getElementById('preview-btn');
 
         if (!drawer) return;
 
@@ -5106,6 +5109,9 @@ class NewsletterBuilder {
             if (canvasContainer) canvasContainer.style.setProperty('display', 'none', 'important');
             if (leftSidebar) leftSidebar.style.setProperty('display', 'none', 'important');
             if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
+            if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'none', 'important');
+            if (saveDraftBtn) saveDraftBtn.style.setProperty('display', 'none', 'important');
+            if (previewBtn) previewBtn.style.setProperty('display', 'none', 'important');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Mottakere & Utsendelse';
 
             drawer.style.setProperty('display', 'block', 'important');
@@ -5118,6 +5124,9 @@ class NewsletterBuilder {
             if (canvasContainer) canvasContainer.style.setProperty('display', 'block', 'important');
             if (leftSidebar) leftSidebar.style.setProperty('display', 'flex', 'important');
             if (rightInspector) rightInspector.style.setProperty('display', 'block', 'important');
+            if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'flex', 'important');
+            if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
+            if (previewBtn) previewBtn.style.removeProperty('display');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
         }
         document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
