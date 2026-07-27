@@ -644,7 +644,13 @@ class NewsletterBuilder {
 
                 const headerBlock = e.target.closest('.canvas-header');
                 if (headerBlock) {
-                    this.showHeaderInspector();
+                    const textNode = e.target.closest('.canvas-brand-name, .canvas-brand-issue');
+                    if (textNode) {
+                        this.selectedBlock = textNode;
+                        this.showTextInspector(textNode);
+                    } else {
+                        this.showHeaderInspector();
+                    }
                 }
             });
 
@@ -676,7 +682,14 @@ class NewsletterBuilder {
                 const header = document.querySelector('.canvas-header');
 
                 if (header && header.contains(anchorNode)) {
-                    this.showHeaderInspector();
+                    let targetEl = anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : anchorNode;
+                    const textNode = targetEl ? targetEl.closest('.canvas-brand-name, .canvas-brand-issue') : null;
+                    if (textNode) {
+                        this.selectedBlock = textNode;
+                        this.showTextInspector(textNode);
+                    } else {
+                        this.showHeaderInspector();
+                    }
                 } else if (container && container.contains(anchorNode)) {
                     const blockNode = this.getCurrentBlock(anchorNode);
                     if (blockNode && blockNode !== this.activeBlockNode) {
