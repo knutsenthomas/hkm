@@ -423,9 +423,14 @@ class BibleReader {
     }
 
     async init() {
-        // Ensure translation-selection-modal is completely removed from DOM
+        // Ensure translation-selection-modal and all leftover modal overlays are hidden/removed on init
         const oldModal = document.getElementById('translation-selection-modal');
         if (oldModal) oldModal.remove();
+
+        document.querySelectorAll('.color-wheel-modal-overlay').forEach(m => {
+            m.classList.remove('active');
+            m.style.display = 'none';
+        });
 
         if (firebaseService) {
             firebaseService.tryAutoInit();
@@ -8728,8 +8733,8 @@ class BibleReader {
         let modal = document.getElementById('hkm-devotional-modal');
         if (modal) modal.remove();
 
-        // Close and hide any leftover modal overlays
-        document.querySelectorAll('.color-wheel-modal-overlay').forEach(m => {
+        // Close and hide all leftover modal overlays (note modal, color wheel modal, etc.)
+        document.querySelectorAll('.color-wheel-modal-overlay, #verse-note-modal, #color-wheel-modal').forEach(m => {
             m.classList.remove('active');
             m.style.display = 'none';
         });

@@ -4244,10 +4244,10 @@
         </div>
     </div>
     <!-- Color Wheel Modal -->
-    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none !important;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card" onclick="event.stopPropagation();">
             <div class="color-wheel-header">
-                <h3>Elegir color</h3>
+                <h3>Seleccionar color</h3>
                 <button id="color-wheel-close" class="color-wheel-close-btn" title="Cerrar" onclick="const m=document.getElementById('color-wheel-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
                     <span class="material-symbols-outlined">close</span>
                 </button>
@@ -4269,7 +4269,7 @@
                     <button class="cw-quick-btn" data-hex="#8b5cf6" style="background: #8b5cf6;" title="Púrpura"></button>
                     <button class="cw-quick-btn" data-hex="#f59e0b" style="background: #f59e0b;" title="Ámbar"></button>
                     <button class="cw-quick-btn" data-hex="#10b981" style="background: #10b981;" title="Esmeralda"></button>
-                    <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Azul cielo"></button>
+                    <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Celeste"></button>
                 </div>
             </div>
             <div class="color-wheel-footer" style="margin-top: 14px;">
@@ -4279,7 +4279,7 @@
     </div>
 
     <!-- Verse Note Modal -->
-    <div id="verse-note-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+    <div id="verse-note-modal" class="color-wheel-modal-overlay" style="display: none !important;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card" onclick="event.stopPropagation();">
             <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
                 <div style="display: flex; align-items: center; gap: 10px;">

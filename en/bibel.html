@@ -4239,7 +4239,7 @@
         </div>
     </div>
     <!-- Color Wheel Modal -->
-    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+    <div id="color-wheel-modal" class="color-wheel-modal-overlay" style="display: none !important;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card" onclick="event.stopPropagation();">
             <div class="color-wheel-header">
                 <h3>Select Color</h3>
@@ -4264,7 +4264,7 @@
                     <button class="cw-quick-btn" data-hex="#8b5cf6" style="background: #8b5cf6;" title="Purple"></button>
                     <button class="cw-quick-btn" data-hex="#f59e0b" style="background: #f59e0b;" title="Amber"></button>
                     <button class="cw-quick-btn" data-hex="#10b981" style="background: #10b981;" title="Emerald"></button>
-                    <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Sky Blue"></button>
+                    <button class="cw-quick-btn" data-hex="#0ea5e9" style="background: #0ea5e9;" title="Sky"></button>
                 </div>
             </div>
             <div class="color-wheel-footer" style="margin-top: 14px;">
@@ -4274,7 +4274,7 @@
     </div>
 
     <!-- Verse Note Modal -->
-    <div id="verse-note-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
+    <div id="verse-note-modal" class="color-wheel-modal-overlay" style="display: none !important;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
         <div class="color-wheel-card" onclick="event.stopPropagation();">
             <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
