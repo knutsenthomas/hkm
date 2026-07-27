@@ -8454,8 +8454,6 @@ class BibleReader {
                 transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 1.2s ease-out;
             `;
 
-            container.appendChild(particle);
-
             requestAnimationFrame(() => {
                 const angle = Math.random() * Math.PI * 2;
                 const distance = Math.random() * 260 + 60;
@@ -8473,7 +8471,7 @@ class BibleReader {
     async showPlanCompletionScreen(plan) {
         if (!plan) return;
 
-        // Trigger particles celebration across screen
+        // Trigger celebration particles across screen
         this.createCelebrationParticles(null);
         setTimeout(() => this.createCelebrationParticles(null), 350);
 
@@ -8483,7 +8481,7 @@ class BibleReader {
         modal = document.createElement('div');
         modal.id = 'hkm-plan-completion-modal';
         modal.className = 'hkm-devotional-overlay';
-        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overflow-y: auto;';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overflow-y: auto;';
 
         const totalDays = plan.durationDays || (plan.days ? plan.days.length : 1);
         const userPlan = this.userPlanProgress || {};
@@ -8498,72 +8496,162 @@ class BibleReader {
                          isEs ? `¡Felicitaciones! ¡Has completado ${planTitle}!` :
                          `Gratulerer! Du har fullført ${planTitle}!`;
 
-        const subtitleText = isEn ? `Great job! You have completed all ${totalDays} days of scripture reading and reflection.` :
+        const subtitleText = isEn ? `Great job! You have completed all ${totalDays} days of daily scripture reading and reflection.` :
                             isEs ? `¡Buen trabajo! Has completado los ${totalDays} días de lectura bíblica y reflexión.` :
                             `Godt jobbet! Du har gjennomført alle ${totalDays} dagene med bibellesing og refleksjon.`;
 
         const todayStr = new Date().toLocaleDateString(isEn ? 'en-US' : isEs ? 'es-ES' : 'nb-NO', { day: 'numeric', month: 'short', year: 'numeric' });
 
         modal.innerHTML = `
-            <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; max-width: 540px; width: 100%; padding: 32px 24px; box-shadow: 0 24px 60px rgba(0,0,0,0.3); text-align: center; position: relative; box-sizing: border-box; margin: auto;">
+            <style>
+                @keyframes hkmModalPop {
+                    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                    to { opacity: 1; transform: scale(1) translateY(0); }
+                }
+                @keyframes hkmGlowPulse {
+                    0%, 100% { transform: scale(1); opacity: 0.5; }
+                    50% { transform: scale(1.08); opacity: 0.8; }
+                }
+                .hkm-recommended-card {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    padding: 14px 16px;
+                    background: var(--bg-surface, #f8fafc);
+                    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+                    border-radius: 16px;
+                    text-align: left;
+                    transition: all 0.25s ease;
+                }
+                .hkm-recommended-card:hover {
+                    transform: translateY(-2px);
+                    background: var(--bg-card, #ffffff);
+                    border-color: rgba(209, 125, 57, 0.3);
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+                }
+                .hkm-completion-btn-primary {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    width: 100%;
+                    height: 48px;
+                    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+                    color: #ffffff !important;
+                    font-weight: 700;
+                    font-size: 15px;
+                    border-radius: 14px;
+                    text-decoration: none;
+                    border: none;
+                    cursor: pointer;
+                    box-shadow: 0 6px 18px rgba(209, 125, 57, 0.35);
+                    transition: all 0.2s ease;
+                }
+                .hkm-completion-btn-primary:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 8px 22px rgba(209, 125, 57, 0.45);
+                    filter: brightness(1.05);
+                }
+                .hkm-completion-btn-secondary {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    width: 100%;
+                    height: 44px;
+                    background: var(--bg-surface, #f1f5f9);
+                    color: var(--text-base, #334155) !important;
+                    font-weight: 600;
+                    font-size: 14px;
+                    border-radius: 14px;
+                    text-decoration: none;
+                    border: 1px solid var(--border-subtle, rgba(0,0,0,0.06));
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                .hkm-completion-btn-secondary:hover {
+                    background: var(--bg-card, #ffffff);
+                    border-color: var(--border-color, rgba(0,0,0,0.12));
+                    transform: translateY(-1px);
+                }
+            </style>
+            
+            <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; max-width: 520px; width: 100%; padding: 32px 24px; box-shadow: 0 24px 60px rgba(0,0,0,0.3); text-align: center; position: relative; box-sizing: border-box; margin: auto; animation: hkmModalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);">
                 
                 <button id="completion-modal-close" style="position: absolute; top: 16px; right: 16px; background: var(--bg-surface, #f1f5f9); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted, #64748b); transition: all 0.2s;" title="Lukk">
                     <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
                 </button>
 
-                <!-- Celebration Trophy Badge -->
-                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d17d39 100%); margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4); border: 3.5px solid #ffffff;">
-                    <span class="material-symbols-outlined" style="font-size: 42px; color: #ffffff;">emoji_events</span>
+                <!-- Layered Glowing Trophy Badge -->
+                <div style="position: relative; width: 84px; height: 84px; margin: 0 auto 20px;">
+                    <div style="position: absolute; inset: -6px; border-radius: 50%; background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(209, 125, 57, 0.2)); filter: blur(10px); animation: hkmGlowPulse 3s infinite ease-in-out;"></div>
+                    <div style="position: relative; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d17d39 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(209, 125, 57, 0.35); border: 4px solid var(--bg-card, #ffffff);">
+                        <span class="material-symbols-outlined" style="font-size: 44px; color: #ffffff;">emoji_events</span>
+                        <span style="position: absolute; bottom: -2px; right: -2px; background: #10b981; color: #ffffff; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9999px; border: 2.5px solid var(--bg-card, #ffffff); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">100%</span>
+                    </div>
                 </div>
 
-                <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 800; color: var(--text-base, #0f172a); line-height: 1.25;">
+                <!-- Title without hyphenation breaks -->
+                <h2 style="margin: 0 0 10px; font-size: 21px; font-weight: 800; color: var(--text-base, #0f172a); line-height: 1.35; word-break: normal; overflow-wrap: break-word; word-wrap: break-word; hyphens: none;">
                     ${titleText} 🎉
                 </h2>
 
-                <p style="margin: 0 0 22px; font-size: 14.5px; color: var(--text-muted, #64748b); line-height: 1.5;">
+                <p style="margin: 0 0 24px; font-size: 14px; color: var(--text-muted, #64748b); line-height: 1.55;">
                     ${subtitleText}
                 </p>
 
-                <!-- Stats Summary -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; background: var(--bg-surface, #f8fafc); padding: 14px 12px; border-radius: 16px; border: 1px solid var(--border-subtle, rgba(0,0,0,0.05));">
-                    <div>
-                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Days' : isEs ? 'Días' : 'Dager'}</div>
-                        <div style="font-size: 17px; font-weight: 800; color: var(--hkm-terracotta, #d17d39); margin-top: 2px;">${totalDays}/${totalDays}</div>
+                <!-- Stats Summary Dashboard -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px;">
+                    <div style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); border-radius: 16px; padding: 14px 8px; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--hkm-terracotta, #d17d39);">calendar_month</span>
+                            ${isEn ? 'Days' : isEs ? 'Días' : 'Dager'}
+                        </div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-base, #0f172a); margin-top: 4px;">${totalDays}/${totalDays}</div>
                     </div>
-                    <div>
-                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Notes' : isEs ? 'Notas' : 'Notater'}</div>
-                        <div style="font-size: 17px; font-weight: 800; color: var(--hkm-terracotta, #d17d39); margin-top: 2px;">${reflectionsCount}</div>
+
+                    <div style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); border-radius: 16px; padding: 14px 8px; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--hkm-terracotta, #d17d39);">edit_note</span>
+                            ${isEn ? 'Notes' : isEs ? 'Notas' : 'Notater'}
+                        </div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-base, #0f172a); margin-top: 4px;">${reflectionsCount}</div>
                     </div>
-                    <div>
-                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Completed' : isEs ? 'Completado' : 'Fullført'}</div>
-                        <div style="font-size: 13.5px; font-weight: 700; color: var(--text-base, #0f172a); margin-top: 4px;">${todayStr}</div>
+
+                    <div style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); border-radius: 16px; padding: 14px 8px; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px; color: #10b981;">verified</span>
+                            ${isEn ? 'Completed' : isEs ? 'Completado' : 'Fullført'}
+                        </div>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-base, #0f172a); margin-top: 6px;">${todayStr}</div>
                     </div>
                 </div>
 
                 <!-- Next Recommended Plans Section -->
-                <div style="text-align: left; margin-bottom: 24px;">
+                <div style="text-align: left; margin-bottom: 28px;">
                     <h3 style="font-size: 15px; font-weight: 750; color: var(--text-base, #0f172a); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 20px;">explore</span>
                         ${isEn ? 'Recommended Next Reading Plans' : isEs ? 'Próximos planes recomendados' : 'Anbefalte leseplaner for deg'}
                     </h3>
-                    <p style="font-size: 12.5px; color: var(--text-muted, #64748b); margin: 0 0 12px;">
+                    <p style="font-size: 13px; color: var(--text-muted, #64748b); margin: 0 0 14px;">
                         ${isEn ? 'Keep up the habit! Choose your next reading plan:' : isEs ? '¡Mantén el hábito! Elige tu próximo plan de lectura:' : 'Fortsett den gode vanen! Velg din neste leseplan:'}
                     </p>
 
                     <div id="completion-recommended-plans-list" style="display: flex; flex-direction: column; gap: 10px;">
-                        <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 12.5px;">Henter anbefalte leseplaner...</div>
+                        <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px;">Henter anbefalte leseplaner...</div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="/leseplaner.html" class="hkm-btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 700; font-size: 14.5px; border-radius: 9999px; text-decoration: none; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); transition: transform 0.2s;">
-                        <span class="material-symbols-outlined" style="font-size: 19px;">auto_stories</span>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="/leseplaner.html" class="hkm-completion-btn-primary">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">auto_stories</span>
                         ${isEn ? 'Explore All Reading Plans' : isEs ? 'Explorar todos los planes' : 'Utforsk alle leseplaner'}
                     </a>
 
-                    <a href="/minside/index.html?tab=leseplaner" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px; background: var(--bg-surface, #f1f5f9); color: var(--text-base, #334155); font-weight: 600; font-size: 13.5px; border-radius: 9999px; text-decoration: none; border: none; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+                    <a href="/minside/index.html?tab=leseplaner" class="hkm-completion-btn-secondary">
+                        <span class="material-symbols-outlined" style="font-size: 19px;">person</span>
                         ${isEn ? 'View My Reflections on My Page' : isEs ? 'Ver mis reflexiones en Mi Página' : 'Se mine refleksjoner på Min Side'}
                     </a>
                 </div>
@@ -8597,7 +8685,7 @@ class BibleReader {
             if (db) {
                 const snap = await db.collection('reading_plans').limit(10).get();
                 snap.forEach(d => {
-                    if (d.id !== currentPlanId && d.id.toLowerCase() !== String(currentPlanId).toLowerCase()) {
+                    if (d.id !== currentPlanId && String(d.id).toLowerCase() !== String(currentPlanId).toLowerCase()) {
                         plans.push({ id: d.id, ...d.data() });
                     }
                 });
@@ -8633,15 +8721,20 @@ class BibleReader {
             const pDesc = p.description || (isEn ? 'Explore daily scripture reading.' : 'Utforsk daglig bibellesing og refleksjon.');
             
             return `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); border-radius: 16px; text-align: left; transition: all 0.2s;">
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                            <span style="font-weight: 750; font-size: 13.5px; color: var(--text-base, #0f172a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pTitle}</span>
-                            <span style="font-size: 10.5px; font-weight: 700; background: rgba(209, 125, 57, 0.12); color: var(--hkm-terracotta, #d17d39); padding: 2px 7px; border-radius: 9999px; flex-shrink: 0;">${pDays} ${isEn ? 'days' : isEs ? 'días' : 'dager'}</span>
+                <div class="hkm-recommended-card">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); color: var(--hkm-terracotta, #d17d39); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
                         </div>
-                        <div style="font-size: 12px; color: var(--text-muted, #64748b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pDesc}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                                <span style="font-weight: 750; font-size: 14px; color: var(--text-base, #0f172a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: normal; hyphens: none;">${pTitle}</span>
+                                <span style="font-size: 10.5px; font-weight: 700; background: rgba(209, 125, 57, 0.12); color: var(--hkm-terracotta, #d17d39); padding: 2px 8px; border-radius: 9999px; flex-shrink: 0;">${pDays} ${isEn ? 'days' : isEs ? 'días' : 'dager'}</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted, #64748b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pDesc}</div>
+                        </div>
                     </div>
-                    <button class="btn-start-recommended-plan" data-plan-id="${p.id}" style="background: var(--hkm-terracotta, #d17d39); color: #ffffff; border: none; padding: 7px 13px; border-radius: 9999px; font-weight: 700; font-size: 12px; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;">
+                    <button class="btn-start-recommended-plan" data-plan-id="${p.id}" style="background: var(--hkm-terracotta, #d17d39); color: #ffffff; border: none; padding: 8px 16px; border-radius: 9999px; font-weight: 700; font-size: 12.5px; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(209, 125, 57, 0.25);">
                         ${isEn ? 'Start' : isEs ? 'Iniciar' : 'Start'}
                     </button>
                 </div>
