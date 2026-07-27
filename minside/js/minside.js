@@ -3788,12 +3788,18 @@ class MinSideManager {
 
         container.innerHTML = `
         <div class="ms-full-width ms-notifications-container">
-            <div class="ms-section-header-row">
-                <h2 class="ms-section-title">${t('notifications.title')}</h2>
-                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important;">
-                    <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
-                    <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
-                </button>
+            <div class="ms-section-header-row" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+                <h2 class="ms-section-title" style="margin: 0;">${t('notifications.title')}</h2>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important;">
+                        <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
+                        <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
+                    </button>
+                    <button class="btn btn-ghost btn-sm" id="delete-all-notifs-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.08) !important;">
+                        <span class="material-symbols-outlined" style="font-size: 16px !important; color: #ef4444 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">delete_sweep</span>
+                        <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${isNo ? 'Slett alle' : (isEs ? 'Eliminar todos' : 'Delete all')}</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Filter tabs -->
@@ -3935,23 +3941,29 @@ class MinSideManager {
 
             // Bind delete click
             inner.querySelectorAll('.btn-delete-notif').forEach(btn => {
-                btn?.addEventListener('click', async (e) => {
+                btn?.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const notifId = btn.dataset.id;
                     const confirmMsg = isNo 
                         ? 'Vil du slette denne meldingen permanent?' 
                         : (isEs ? '¿Eliminar este mensaje permanentemente?' : 'Delete this message permanently?');
                     
-                    if (confirm(confirmMsg)) {
-                        try {
-                            await firebase.firestore().collection('user_notifications').doc(notifId).delete();
-                            this._notify(isNo ? 'Melding slettet' : (isEs ? 'Mensaje de alerta eliminado' : 'Message deleted'), 'success');
-                            this.renderNotifications(container);
-                        } catch (err) {
-                            console.error('Error deleting notification:', err);
-                            this._notify(isNo ? 'Kunne ikke slette melding' : (isEs ? 'Error al eliminar' : 'Failed to delete message'), 'warning');
+                    this.showCustomConfirm({
+                        title: isNo ? 'Slett melding' : (isEs ? 'Eliminar mensaje' : 'Delete message'),
+                        message: confirmMsg,
+                        confirmText: isNo ? 'Slett' : (isEs ? 'Eliminar' : 'Delete'),
+                        isDanger: true,
+                        onConfirm: async () => {
+                            try {
+                                await firebase.firestore().collection('user_notifications').doc(notifId).delete();
+                                this._notify(isNo ? 'Melding slettet' : (isEs ? 'Mensaje eliminado' : 'Message deleted'), 'success');
+                                this.renderNotifications(container);
+                            } catch (err) {
+                                console.error('Error deleting notification:', err);
+                                this._notify(isNo ? 'Kunne ikke slette melding' : (isEs ? 'Error al eliminar' : 'Failed to delete message'), 'warning');
+                            }
                         }
-                    }
+                    });
                 });
             });
         };
@@ -4028,6 +4040,52 @@ class MinSideManager {
                 } catch (err) {
                     console.error('Error marking all as read:', err);
                 }
+            });
+
+            // Delete all notifications button (mass delete)
+            document.getElementById('delete-all-notifs-btn')?.addEventListener('click', () => {
+                let confirmTitle = isNo ? 'Slett alle varsler' : (isEs ? 'Eliminar todas las notificaciones' : 'Delete all notifications');
+                let confirmMsg = isNo ? 'Vil du slette alle varsler permanent? Dette kan ikke angres.' : (isEs ? '¿Eliminar todas las notificaciones permanentemente?' : 'Permanently delete all notifications?');
+
+                if (activeFilter === 'archived') {
+                    confirmTitle = isNo ? 'Slett alle arkiverte varsler' : 'Delete all archived notifications';
+                    confirmMsg = isNo ? 'Vil du slette alle arkiverte varsler permanent?' : 'Permanently delete all archived notifications?';
+                } else if (activeFilter === 'unread') {
+                    confirmTitle = isNo ? 'Slett alle uleste varsler' : 'Delete all unread notifications';
+                    confirmMsg = isNo ? 'Vil du slette alle uleste varsler permanent?' : 'Permanently delete all unread notifications?';
+                }
+
+                this.showCustomConfirm({
+                    title: confirmTitle,
+                    message: confirmMsg,
+                    confirmText: isNo ? 'Slett alle' : (isEs ? 'Eliminar todos' : 'Delete all'),
+                    isDanger: true,
+                    onConfirm: async () => {
+                        try {
+                            let query = firebase.firestore().collection('user_notifications').where('userId', '==', uid);
+                            if (activeFilter === 'archived') {
+                                query = query.where('archived', '==', true);
+                            } else if (activeFilter === 'unread') {
+                                query = query.where('read', '==', false).where('archived', '==', false);
+                            }
+                            const snap = await query.get();
+                            if (!snap.empty) {
+                                const docs = snap.docs;
+                                for (let i = 0; i < docs.length; i += 400) {
+                                    const chunk = docs.slice(i, i + 400);
+                                    const batch = firebase.firestore().batch();
+                                    chunk.forEach(d => batch.delete(d.ref));
+                                    await batch.commit();
+                                }
+                            }
+                            this._notify(isNo ? 'Meldinger slettet' : (isEs ? 'Notificaciones eliminadas' : 'Notifications deleted'), 'success');
+                            this.renderNotifications(container);
+                        } catch (err) {
+                            console.error('Error mass deleting notifications:', err);
+                            this._notify(isNo ? 'Kunne ikke masseslette meldinger' : 'Failed to delete notifications', 'warning');
+                        }
+                    }
+                });
             });
 
         } catch (err) {
@@ -8638,13 +8696,20 @@ class MinSideManager {
         container.querySelectorAll('.note-btn-delete').forEach(btn => {
             btn?.addEventListener('click', () => {
                 const id = btn.dataset.id;
-                if (!confirm(t('notes.deleteConfirm'))) return;
-                firebase.firestore().collection('personal_notes').doc(id).delete()
-                    .then(() => {
-                        personalNotes = personalNotes.filter(n => n.id !== id);
-                        this._renderNotesUI(container, personalNotes, hkmNotes);
-                    })
-                    .catch(e => alert(t('notes.error') + ': ' + e.message));
+                this.showCustomConfirm({
+                    title: t('notes.deleteConfirmTitle') || 'Slett notat',
+                    message: t('notes.deleteConfirm') || 'Vil du slette dette notatet permanent?',
+                    confirmText: 'Slett',
+                    isDanger: true,
+                    onConfirm: () => {
+                        firebase.firestore().collection('personal_notes').doc(id).delete()
+                            .then(() => {
+                                personalNotes = personalNotes.filter(n => n.id !== id);
+                                this._renderNotesUI(container, personalNotes, hkmNotes);
+                            })
+                            .catch(e => this._notify(t('notes.error') + ': ' + e.message, 'warning'));
+                    }
+                });
             });
         });
     }
@@ -8682,6 +8747,55 @@ class MinSideManager {
         });
     }
 
+
+    // ══════════════════════════════════════════════════════════
+    // CUSTOM CONFIRM DIALOG MODAL (Design System Compliant)
+    // ══════════════════════════════════════════════════════════
+    showCustomConfirm({ title, message, confirmText, cancelText, isDanger = true, onConfirm }) {
+        const existing = document.getElementById('hkm-custom-confirm-modal');
+        if (existing) existing.remove();
+
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+
+        const defaultCancel = cancelText || (isNo ? 'Avbryt' : (isEs ? 'Cancelar' : 'Cancel'));
+        const defaultConfirm = confirmText || (isNo ? 'Slett' : (isEs ? 'Eliminar' : 'Delete'));
+        const defaultTitle = title || (isNo ? 'Bekreft handling' : (isEs ? 'Confirmar acción' : 'Confirm action'));
+
+        const modal = document.createElement('div');
+        modal.id = 'hkm-custom-confirm-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+        <div class="hkm-modal-container" style="max-width: 420px !important; padding: 24px !important; border-radius: 24px !important; text-align: center !important;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: ${isDanger ? 'rgba(239, 68, 68, 0.12)' : 'rgba(209, 125, 57, 0.12)'}; color: ${isDanger ? '#ef4444' : '#d17d39'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <span class="material-symbols-outlined" style="font-size: 28px !important;">${isDanger ? 'delete_forever' : 'help'}</span>
+            </div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--text-main, #0f172a); margin-bottom: 8px;">${this._escapeHtml(defaultTitle)}</div>
+            <p style="font-size: 14px; color: var(--text-muted, #64748b); margin: 0 0 24px 0; line-height: 1.5;">${this._escapeHtml(message)}</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" id="hkm-confirm-cancel-btn" class="btn btn-ghost" style="flex: 1; min-height: 44px; border-radius: 12px; font-weight: 600;">${this._escapeHtml(defaultCancel)}</button>
+                <button type="button" id="hkm-confirm-ok-btn" class="btn ${isDanger ? 'btn-danger' : 'btn-primary'}" style="flex: 1; min-height: 44px; border-radius: 12px; font-weight: 700; ${isDanger ? 'background: #ef4444; color: white; border: none;' : ''}">${this._escapeHtml(defaultConfirm)}</button>
+            </div>
+        </div>`;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        const close = () => {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 250);
+        };
+
+        modal.querySelector('#hkm-confirm-cancel-btn')?.addEventListener('click', close);
+        modal?.addEventListener('click', e => { if (e.target === modal) close(); });
+
+        modal.querySelector('#hkm-confirm-ok-btn')?.addEventListener('click', async () => {
+            close();
+            if (typeof onConfirm === 'function') {
+                await onConfirm();
+            }
+        });
+    }
 
     // ══════════════════════════════════════════════════════════
     // NOTIFICATION MODAL
@@ -8722,25 +8836,37 @@ class MinSideManager {
         modal?.addEventListener('click', e => { if (e.target === modal) close(); });
 
         // Delete action
-        modal.querySelector('#delete-notif-modal')?.addEventListener('click', async () => {
-            if (!confirm(t('notifications.deleteConfirm'))) return;
-            const btn = modal.querySelector('#delete-notif-modal');
-            btn.disabled = true;
-            btn.textContent = t('notifications.deleting');
+        modal.querySelector('#delete-notif-modal')?.addEventListener('click', () => {
+            const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+            this.showCustomConfirm({
+                title: isNo ? 'Slett melding' : 'Delete message',
+                message: t('notifications.deleteConfirm') || (isNo ? 'Vil du slette denne meldingen permanent?' : 'Delete this message permanently?'),
+                confirmText: isNo ? 'Slett' : 'Delete',
+                isDanger: true,
+                onConfirm: async () => {
+                    const btn = modal.querySelector('#delete-notif-modal');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.textContent = t('notifications.deleting') || 'Sletter...';
+                    }
 
-            try {
-                if (notif.id) {
-                    await firebase.firestore().collection('user_notifications').doc(notif.id).delete();
+                    try {
+                        if (notif.id) {
+                            await firebase.firestore().collection('user_notifications').doc(notif.id).delete();
+                        }
+                        document.querySelectorAll(`.activity-item[data-id="${notif.id}"]`).forEach(el => el.remove());
+                        close();
+                        this._notify(isNo ? 'Melding slettet' : 'Message deleted', 'success');
+                    } catch (err) {
+                        console.error('Error deleting notification:', err);
+                        this._notify(t('notifications.deleteError') || 'Kunne ikke slette melding', 'warning');
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = `<span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}`;
+                        }
+                    }
                 }
-                // Remove from DOM
-                document.querySelectorAll(`.activity-item[data-id="${notif.id}"]`).forEach(el => el.remove());
-                close();
-            } catch (err) {
-                console.error('Error deleting notification:', err);
-                alert(t('notifications.deleteError') + ': ' + err.message);
-                btn.disabled = false;
-                btn.innerHTML = `<span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}`;
-            }
+            });
         });
 
         // Mark as read in Firestore
@@ -8785,10 +8911,17 @@ class MinSideManager {
             setTimeout(() => modal.remove(), 300);
         });
 
-        modal.querySelector('#confirm-delete-btn')?.addEventListener('click', async () => {
-            if (!confirm(t('deleteAccount.doubleConfirm'))) return;
-            await this.performAccountDeletion();
-            modal.remove();
+        modal.querySelector('#confirm-delete-btn')?.addEventListener('click', () => {
+            this.showCustomConfirm({
+                title: t('deleteAccount.modalTitle') || 'Slett konto',
+                message: t('deleteAccount.doubleConfirm') || 'Dette vil slette kontoen og alle dine data permanent. Er du helt sikker?',
+                confirmText: t('deleteAccount.deleteBtn') || 'Slett permanent',
+                isDanger: true,
+                onConfirm: async () => {
+                    await this.performAccountDeletion();
+                    modal.remove();
+                }
+            });
         });
 
         modal?.addEventListener('click', e => {
@@ -9013,16 +9146,23 @@ class MinSideManager {
         }
     }
 
-    async deletePrayer(prayerId) {
-        if (!confirm(t('prayer.confirmDelete'))) return;
-        try {
-            await firebase.firestore().collection('prayers').doc(prayerId).delete();
-            const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
-            if (viewContainer) this.loadPrayerWallFeed(viewContainer);
-        } catch (err) {
-            console.error("Delete prayer error:", err);
-            alert(t('prayer.errDelete') + err.message);
-        }
+    deletePrayer(prayerId) {
+        this.showCustomConfirm({
+            title: 'Slett bønneemne',
+            message: t('prayer.confirmDelete') || 'Vil du slette dette bønneemnet permanent?',
+            confirmText: 'Slett',
+            isDanger: true,
+            onConfirm: async () => {
+                try {
+                    await firebase.firestore().collection('prayers').doc(prayerId).delete();
+                    const viewContainer = document.getElementById('view-container') || document.getElementById('content-area');
+                    if (viewContainer) this.loadPrayerWallFeed(viewContainer);
+                } catch (err) {
+                    console.error("Delete prayer error:", err);
+                    this._notify(t('prayer.errDelete') + err.message, 'warning');
+                }
+            }
+        });
     }
 
     async editPrayer(prayerId) {
