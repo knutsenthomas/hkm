@@ -3745,7 +3745,10 @@ body.builder-active .newsletter-canvas {
     margin-bottom: 0 !important;
   }
 
-  /* Ensure sidebar is hidden by default on iPad/Tablet */
+}
+
+/* Ensure sidebar is hidden off-screen only on mobile (<768px) */
+@media (max-width: 768px) {
   body.admin-body .sidebar,
   body.minside-body .sidebar {
     left: 0 !important;
@@ -3758,6 +3761,17 @@ body.builder-active .newsletter-canvas {
     transform: translateX(0) !important;
     z-index: 15000 !important;
   }
+
+  body.admin-body .main-content,
+  body.minside-body .main-content,
+  body.admin-body .profile-header,
+  body.minside-body .profile-header {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 1100px) {
 
   body.crm-body .crm-header,
   body.minside-body .crm-header,
