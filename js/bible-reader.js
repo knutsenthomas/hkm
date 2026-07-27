@@ -1551,6 +1551,7 @@ class BibleReader {
         if (this.dom.toolbarBtnSaveUser) {
             this.dom.toolbarBtnSaveUser.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (document.getElementById('hkm-devotional-modal')) return;
                 if (this.selectedVerses && this.selectedVerses.length > 0) {
                     const sorted = [...this.selectedVerses].sort((a, b) => parseInt(a.verseNum, 10) - parseInt(b.verseNum, 10));
                     const refRange = this.getSelectedVersesReference();
@@ -1751,6 +1752,7 @@ class BibleReader {
 
         const openColorWheelModal = () => {
             if (!colorWheelModal) return;
+            if (document.getElementById('hkm-devotional-modal')) return;
             colorWheelModal.classList.add('active');
             colorWheelModal.style.display = 'flex';
             requestAnimationFrame(() => {
@@ -8725,6 +8727,14 @@ class BibleReader {
 
         let modal = document.getElementById('hkm-devotional-modal');
         if (modal) modal.remove();
+
+        // Close and hide any leftover modal overlays
+        document.querySelectorAll('.color-wheel-modal-overlay').forEach(m => {
+            m.classList.remove('active');
+            m.style.display = 'none';
+        });
+        const sheetBackdrop = document.getElementById('hkm-sheet-backdrop-overlay');
+        if (sheetBackdrop) sheetBackdrop.classList.remove('active');
 
         modal = document.createElement('div');
         modal.id = 'hkm-devotional-modal';
