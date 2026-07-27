@@ -235,12 +235,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Feedback UI ---
     const feedbackBox = document.getElementById('feedback-box');
     function showMessage(msg, type) {
+        if (!msg || !feedbackBox) {
+            hideMessage();
+            return;
+        }
         feedbackBox.textContent = msg;
         feedbackBox.className = `feedback-message ${type}`;
         feedbackBox.style.display = 'block';
     }
     function hideMessage() {
-        feedbackBox.style.display = 'none';
+        if (feedbackBox) feedbackBox.style.display = 'none';
     }
 
     async function waitForFirebaseReady(timeoutMs = 5000) {
@@ -291,19 +295,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.warn(`[HKM] Firestore read permission denied. Retrying in 200ms (attempt ${attempts}/${maxAttempts})...`);
                     await new Promise(resolve => setTimeout(resolve, 200));
                 } else {
-                    throw error;
+                    console.warn(`[HKM] ensureMemberProfile warning:`, error);
+                    return; // Gracefully handle profile read failure without crashing login flow
                 }
             }
         }
 
         if (userDoc && !userDoc.exists) {
-            await firebase.firestore().collection('users').doc(user.uid).set({
-                email: (user.email || '').toLowerCase().trim(),
-                displayName: user.displayName || '',
-                photoURL: user.photoURL || '',
-                role: 'medlem',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            try {
+                await firebase.firestore().collection('users').doc(user.uid).set({
+                    email: (user.email || '').toLowerCase().trim(),
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    role: 'medlem',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (setErr) {
+                console.warn("[HKM] ensureMemberProfile set profile warning:", setErr);
+            }
         }
     }
 
@@ -513,7 +522,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getErrorMessage(error) {
-        switch (error.code) {
+        if (!error) return t('error.unknown');
+        const code = error.code || '';
+        const msg = String(error.message || '');
+        if (code === 'permission-denied' || msg.toLowerCase().includes('permission')) {
+            return ''; // Suppress internal permission error messages from UI feedback box
+        }
+        switch (code) {
             case 'auth/user-not-found': return t('error.userNotFound');
             case 'auth/wrong-password': return t('error.wrongPassword');
             case 'auth/email-already-in-use': return t('error.emailInUse');
@@ -521,7 +536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'auth/popup-blocked': return t('auth.googlePopupBlocked');
             case 'auth/popup-closed-by-user': return t('auth.googlePopupClosed');
             case 'auth/unauthorized-domain': return t('auth.googleUnauthorizedDomain');
-            default: return error.message || t('error.unknown');
+            default: return msg || t('error.unknown');
         }
     }
 });
