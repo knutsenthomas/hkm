@@ -3117,10 +3117,11 @@ body.builder-active .builder-workspace > .canvas-container {
 /* Recipients View Full-Width Workspace Layout (Under header & flush against left dark sidebar) */
 body.builder-recipients-open #builder-workspace-center,
 body.builder-recipients-open .builder-workspace-center {
-    width: calc(100% - 190px) !important;
-    max-width: calc(100% - 190px) !important;
-    flex: 1 1 auto !important;
-    padding: 24px 32px 80px 32px !important;
+    flex: 1 1 0% !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 24px 24px 80px 24px !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -3159,25 +3160,26 @@ body.builder-recipients-open .recipient-page-header p {
 }
 
 body.builder-recipients-open .recipient-flow {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    gap: 24px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 260px !important;
+    gap: 20px !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 body.builder-recipients-open .main-selection {
-    flex: 1 1 0% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 body.builder-recipients-open .selection-sidebar {
-    flex: 0 0 300px !important;
-    width: 300px !important;
-    min-width: 300px !important;
+    width: 260px !important;
+    min-width: 0 !important;
+    max-width: 260px !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 .builder-workspace-center .recipients-drawer.open {
@@ -3368,9 +3370,12 @@ body.builder-recipients-open .builder-dark-sidebar {
 .links-card {
     background: white;
     border-radius: 12px;
-    padding: 24px;
+    padding: 20px;
     margin-bottom: 16px;
     border: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .summary-item {
