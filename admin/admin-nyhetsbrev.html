@@ -104,10 +104,10 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"></noscript>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=20260713_V1">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260727_V1">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260722_V14">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260716_V2">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260727_V1">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260727_V99">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -934,81 +934,101 @@
 
     <!-- Modus-svitsj: Builder -->
         <div id="newsletter-builder-layout" style="display: none;">
-            <!-- Top Control Bar -->
+            <!-- Top Dark HKM Brand App Bar -->
             <header class="builder-top-appbar">
                 <div class="top-appbar-left">
                     <button class="btn-topbar-back" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
                         <span class="material-symbols-outlined">arrow_back</span>
-                        <span>Tilbake til oversikt</span>
+                        <span>Tilbake</span>
                     </button>
                     <div class="topbar-divider"></div>
-                    <div class="canvas-top-subject-group">
-                        <span class="material-symbols-outlined subject-icon">edit_note</span>
-                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
-                        <div id="newsletter-autosave-status" class="autosave-pill">
-                            <span class="material-symbols-outlined">cloud_done</span>
-                            <span id="newsletter-autosave-text">Lagret</span>
-                        </div>
-                    </div>
+                    <span class="material-symbols-outlined top-appbar-icon">mail</span>
+                    <span class="top-appbar-title">HKM Studio Branded Builder</span>
                 </div>
-
-                <div class="top-appbar-center">
-                    <div class="device-switch-pill">
-                        <button class="device-pill-btn device-btn active" data-view="desktop">
-                            <span class="material-symbols-outlined">desktop_windows</span>
-                            <span>Desktop</span>
-                        </button>
-                        <button class="device-pill-btn device-btn" data-view="mobile">
-                            <span class="material-symbols-outlined">smartphone</span>
-                            <span>Mobil</span>
-                        </button>
-                    </div>
-                </div>
-
                 <div class="top-appbar-right">
-                    <button id="save-draft-btn" class="btn-secondary-flat">Lagre kladd</button>
-                    <button id="preview-btn" class="btn-secondary-flat">Forhåndsvis</button>
-                    <button id="continue-btn" class="btn-primary-action">
-                        <span>Neste: Mottakere</span>
-                        <span class="material-symbols-outlined">arrow_forward</span>
+                    <button class="top-appbar-action-btn" title="Varslinger">
+                        <span class="material-symbols-outlined">notifications</span>
                     </button>
+                    <div class="top-appbar-user-badge" id="admin-profile-trigger">
+                        <div class="top-appbar-avatar" id="admin-avatar">TK</div>
+                        <span class="top-appbar-username" id="admin-name">Thomas K.</span>
+                        <span class="material-symbols-outlined">expand_more</span>
+                    </div>
                 </div>
             </header>
 
-            <!-- Main Workspace Body -->
+            <!-- Main Workspace Body (3-Panel Architecture) -->
             <div class="builder-body-container">
-                <!-- 1. Single Left Elements Sidebar -->
+                <!-- 1. HKM Dark Left Navigation Sidebar -->
+                <aside class="builder-dark-sidebar">
+                    <div class="sidebar-top-create">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleMode('dashboard');">
+                            <span class="material-symbols-outlined">add</span>
+                            <span>Create New</span>
+                        </button>
+                    </div>
+                    <nav class="sidebar-nav-menu">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.toggleMode('dashboard');" class="nav-item">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-item active">
+                            <span class="material-symbols-outlined">send</span>
+                            <span>Campaigns</span>
+                        </a>
+                        <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
+                            <span class="material-symbols-outlined">article</span>
+                            <span>Templates</span>
+                        </a>
+                        <a href="/admin/admin-kommunikasjon.html" class="nav-item">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Subscribers</span>
+                        </a>
+                        <a href="/admin/admin-analytics.html" class="nav-item">
+                            <span class="material-symbols-outlined">bar_chart</span>
+                            <span>Analytics</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-bottom-settings">
+                        <a href="/admin/admin-logger.html" class="nav-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- 2. Elements Panel (Light Panel) -->
                 <aside class="builder-elements-panel" id="elements-panel">
                     <div class="elements-panel-header">
-                        <h3>Legg til elementer</h3>
+                        <h3>Elements</h3>
                     </div>
                     <div class="elements-search-container">
                         <span class="material-symbols-outlined search-icon">search</span>
-                        <input type="text" id="elements-search-input" placeholder="Søk elementer..." class="elements-search-input">
+                        <input type="text" id="elements-search-input" placeholder="Search..." class="elements-search-input">
                     </div>
 
                     <div class="elements-panel-body">
                         <!-- Basic Blocks Category -->
                         <div class="elements-category active">
                             <div class="category-header">
-                                <span>Basisblokker</span>
+                                <span>Basic Blocks</span>
                             </div>
                             <div class="basic-blocks-grid">
                                 <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
                                     <div class="block-card-icon-text">T</div>
-                                    <span class="block-card-label">Tekst</span>
+                                    <span class="block-card-label">Text</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="image" title="Sett inn bilde">
                                     <span class="material-symbols-outlined block-card-icon">image</span>
-                                    <span class="block-card-label">Bilde</span>
+                                    <span class="block-card-label">Image</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="button" title="Sett inn knapp">
                                     <span class="material-symbols-outlined block-card-icon">crop_7_5</span>
-                                    <span class="block-card-label">Knapp</span>
+                                    <span class="block-card-label">Button</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="divider" title="Sett inn skillelinje">
                                     <span class="material-symbols-outlined block-card-icon">horizontal_rule</span>
-                                    <span class="block-card-label">Skillelinje</span>
+                                    <span class="block-card-label">Divider</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="spacer" title="Sett inn avstandshøyde">
                                     <span class="material-symbols-outlined block-card-icon">height</span>
@@ -1016,7 +1036,7 @@
                                 </button>
                                 <button class="block-card-item element-card highlight-blue" data-type="product" title="Sett inn produkt fra nettbutikken">
                                     <span class="material-symbols-outlined block-card-icon" style="color: #3b82f6;">shopping_bag</span>
-                                    <span class="block-card-label" style="color: #3b82f6;">Produkt</span>
+                                    <span class="block-card-label" style="color: #3b82f6;">Product</span>
                                 </button>
                             </div>
                         </div>
@@ -1043,14 +1063,14 @@
 
                         <div class="elements-accordion-item">
                             <button class="accordion-header-btn" data-accordion="layout">
-                                <span>Oppsett & Kolonner</span>
+                                <span>Layout</span>
                                 <span class="material-symbols-outlined accordion-arrow">expand_more</span>
                             </button>
                             <div class="accordion-content" id="accordion-layout" style="display: none;">
                                 <div class="basic-blocks-grid">
                                     <button class="block-card-item element-card" data-type="columns">
                                         <span class="material-symbols-outlined block-card-icon">view_column</span>
-                                        <span class="block-card-label">Kolonner</span>
+                                        <span class="block-card-label">Columns</span>
                                     </button>
                                 </div>
                             </div>
@@ -1058,7 +1078,7 @@
 
                         <div class="elements-accordion-item">
                             <button class="accordion-header-btn" data-accordion="saved">
-                                <span>Lagrede Blokker</span>
+                                <span>Saved Blocks</span>
                                 <span class="material-symbols-outlined accordion-arrow">expand_more</span>
                             </button>
                             <div class="accordion-content" id="accordion-saved" style="display: none;">
@@ -1070,8 +1090,46 @@
                     </div>
                 </aside>
 
-                <!-- 2. Center Canvas Workspace -->
+                <!-- 3. Center Canvas Workspace -->
                 <main class="builder-workspace-center">
+                    <!-- Canvas Top Bar -->
+                    <header class="canvas-top-bar">
+                        <div class="canvas-top-subject-group">
+                            <span class="material-symbols-outlined subject-icon">edit_note</span>
+                            <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
+                            <div id="newsletter-autosave-status" class="autosave-pill">
+                                <span class="material-symbols-outlined">cloud_done</span>
+                                <span id="newsletter-autosave-text">Lagret</span>
+                            </div>
+                        </div>
+
+                        <div class="canvas-top-center">
+                            <div class="device-switch-pill">
+                                <button type="button" class="device-pill-btn device-btn active" data-view="desktop">
+                                    <span class="material-symbols-outlined">desktop_windows</span>
+                                    <span>Desktop</span>
+                                </button>
+                                <button type="button" class="device-pill-btn device-btn" data-view="mobile">
+                                    <span class="material-symbols-outlined">smartphone</span>
+                                    <span>Mobil</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="canvas-top-actions">
+                            <button id="save-draft-btn" class="btn-secondary-outline">Save Draft</button>
+                            <button id="preview-btn" class="btn-secondary-outline">Preview</button>
+                            <div class="btn-group-publish">
+                                <button id="continue-btn" class="btn-primary-publish">
+                                    <span>Publish</span>
+                                </button>
+                                <button id="publish-dropdown-btn" class="btn-primary-publish-arrow">
+                                    <span class="material-symbols-outlined">expand_more</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
                     <!-- Canvas Viewport -->
                     <div class="canvas-viewport" id="canvas-container">
                         <div class="canvas-paper-frame" id="newsletter-canvas">
@@ -1094,10 +1152,10 @@
                     </div>
                 </main>
 
-                <!-- 3. Right Properties Inspector Panel -->
+                <!-- 4. Right Properties Inspector Panel -->
                 <aside class="builder-properties-panel" id="sidebar-inspector-view">
                     <div class="properties-header">
-                        <h3>Egenskaper</h3>
+                        <h3>Properties</h3>
                         <button class="btn-close-properties" id="close-properties-btn">
                             <span class="material-symbols-outlined">close</span>
                         </button>
@@ -1114,7 +1172,7 @@
                             <div class="section-content">
                                 <!-- Font Selection -->
                                 <div class="prop-group">
-                                    <label>Skrifttype</label>
+                                    <label>Font</label>
                                     <select id="prop-font-select" class="prop-select">
                                         <option value="'Inter', sans-serif">Inter (Modern)</option>
                                         <option value="Arial, sans-serif">Arial (Standard)</option>
@@ -1125,7 +1183,7 @@
 
                                 <!-- Size Input -->
                                 <div class="prop-group">
-                                    <label>Tekststørrelse</label>
+                                    <label>Size</label>
                                     <div class="prop-number-stepper">
                                         <input type="number" id="prop-font-size-input" value="16" min="10" max="72" class="prop-number-input">
                                     </div>
@@ -1133,7 +1191,7 @@
 
                                 <!-- Color Picker -->
                                 <div class="prop-group">
-                                    <label>Tekstfarge</label>
+                                    <label>Color</label>
                                     <div class="prop-color-wrapper">
                                         <input type="text" id="prop-color-hex" value="#d17d39" class="prop-hex-input">
                                         <input type="color" id="prop-color-picker" value="#d17d39" class="prop-color-swatch">
@@ -1142,7 +1200,7 @@
 
                                 <!-- Alignment Group -->
                                 <div class="prop-group">
-                                    <label>Tekstjustering</label>
+                                    <label>Alignment</label>
                                     <div class="prop-align-btn-group">
                                         <button type="button" class="align-btn active" data-align="left" title="Venstrejuster">
                                             <span class="material-symbols-outlined">format_align_left</span>
@@ -1161,17 +1219,17 @@
 
                                 <!-- Padding Steppers -->
                                 <div class="prop-group">
-                                    <label>Polstring (Padding)</label>
+                                    <label>Padding</label>
                                     <div class="padding-steppers-grid">
                                         <div class="stepper-box">
-                                            <span class="stepper-label">Bredde</span>
+                                            <span class="stepper-label">Width</span>
                                             <div class="stepper-controls">
                                                 <button type="button" class="btn-step" data-step="width-minus">-</button>
                                                 <button type="button" class="btn-step" data-step="width-plus">+</button>
                                             </div>
                                         </div>
                                         <div class="stepper-box">
-                                            <span class="stepper-label">Topp</span>
+                                            <span class="stepper-label">Top</span>
                                             <div class="stepper-controls">
                                                 <button type="button" class="btn-step" data-step="top-minus">-</button>
                                                 <button type="button" class="btn-step" data-step="top-plus">+</button>

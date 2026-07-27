@@ -1,11 +1,11 @@
-/* --- EXECUTIVE UNIFIED BUILDER LAYOUT STYLES --- */
+/* --- PROFESSIONAL 3-PANEL DASHBOARD LAYOUT STYLES --- */
 
 #newsletter-builder-layout {
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
     width: 100vw !important;
-    background: #f8fafc !important;
+    background: #0f172a !important;
     overflow: hidden !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     position: fixed !important;
@@ -14,36 +14,36 @@
     z-index: 99999 !important;
 }
 
-/* Top Control Bar */
+/* 1. Top HKM Brand App Bar */
 .builder-top-appbar {
-    height: 56px !important;
-    min-height: 56px !important;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    background: #1B4965 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0 24px !important;
-    color: #1e293b !important;
+    padding: 0 20px !important;
+    color: #ffffff !important;
     box-sizing: border-box !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    width: 100% !important;
 }
 
 .top-appbar-left {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
 }
 
 .btn-topbar-back {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    background: #f1f5f9 !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 7px 14px !important;
-    color: #334155 !important;
+    gap: 6px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px !important;
+    padding: 5px 12px !important;
+    color: #ffffff !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
@@ -51,17 +51,292 @@
 }
 
 .btn-topbar-back:hover {
-    background: #e2e8f0 !important;
-    border-color: #94a3b8 !important;
-    color: #0f172a !important;
+    background: rgba(255, 255, 255, 0.22) !important;
     transform: translateX(-2px) !important;
 }
 
-.topbar-divider {
-    width: 1px !important;
-    height: 22px !important;
-    background: #e2e8f0 !important;
-    margin: 0 4px !important;
+.top-appbar-icon {
+    font-size: 22px !important;
+    color: #d17d39 !important;
+}
+
+.top-appbar-title {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.01em !important;
+}
+
+.top-appbar-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.top-appbar-action-btn {
+    background: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s !important;
+}
+
+.top-appbar-action-btn:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.top-appbar-user-badge {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: 8px !important;
+    transition: background 0.2s !important;
+}
+
+.top-appbar-user-badge:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.top-appbar-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background: #d17d39 !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.top-appbar-username {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+
+/* Main 3-Column Body Container */
+.builder-body-container {
+    display: flex !important;
+    flex: 1 !important;
+    height: calc(100vh - 52px) !important;
+    overflow: hidden !important;
+}
+
+/* 1. HKM Brand Dark Left Navigation Sidebar */
+.builder-dark-sidebar {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+    background: #14374d !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px 12px !important;
+    box-sizing: border-box !important;
+    gap: 16px !important;
+    height: 100% !important;
+}
+
+.btn-create-new {
+    width: 100% !important;
+    height: 38px !important;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(209, 125, 57, 0.3) !important;
+    transition: all 0.2s !important;
+}
+
+.btn-create-new:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(209, 125, 57, 0.4) !important;
+}
+
+.sidebar-nav-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    flex: 1 !important;
+}
+
+.sidebar-nav-menu .nav-item,
+.sidebar-bottom-settings .nav-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s !important;
+}
+
+.sidebar-nav-menu .nav-item:hover,
+.sidebar-bottom-settings .nav-item:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar-nav-menu .nav-item.active {
+    color: #ffffff !important;
+    background: rgba(209, 125, 57, 0.25) !important;
+    border-left: 3px solid #d17d39 !important;
+    font-weight: 700 !important;
+}
+
+.sidebar-nav-menu .nav-item.active .material-symbols-outlined {
+    color: #d17d39 !important;
+}
+
+.sidebar-nav-menu .nav-item .material-symbols-outlined,
+.sidebar-bottom-settings .nav-item .material-symbols-outlined {
+    font-size: 18px !important;
+}
+
+/* 2. Middle Elements Panel (Light Panel) */
+.builder-elements-panel {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+}
+
+.elements-panel-header h3 {
+    margin: 0 0 12px 0 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+
+.elements-search-container {
+    position: relative !important;
+    margin-bottom: 16px !important;
+}
+
+.elements-search-container .search-icon {
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    font-size: 18px !important;
+    color: #94a3b8 !important;
+}
+
+.elements-search-input {
+    width: 100% !important;
+    height: 36px !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 0 10px 0 34px !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+}
+
+.category-header {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 10px !important;
+}
+
+.basic-blocks-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+}
+
+.block-card-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.block-card-item:hover {
+    border-color: #d17d39 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.12) !important;
+}
+
+.block-card-icon-text {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #334155 !important;
+}
+
+.block-card-icon {
+    font-size: 20px !important;
+    color: #334155 !important;
+}
+
+.block-card-label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+/* 3. Center Canvas Workspace */
+.builder-workspace-center {
+    flex: 1 !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+.canvas-top-bar {
+    width: 100% !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
 }
 
 .canvas-top-subject-group {
@@ -70,42 +345,12 @@
     gap: 8px !important;
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
-    border-radius: 10px !important;
-    padding: 5px 12px !important;
-    width: 320px !important;
+    border-radius: 8px !important;
+    padding: 4px 10px !important;
+    width: 260px !important;
 }
 
-.subject-icon {
-    font-size: 18px !important;
-    color: #64748b !important;
-}
-
-.subject-input-modern {
-    border: none !important;
-    background: transparent !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: #1e293b !important;
-    outline: none !important;
-    width: 100% !important;
-}
-
-.subject-input-modern::placeholder {
-    color: #94a3b8 !important;
-    font-weight: 400 !important;
-}
-
-.autosave-pill {
-    display: inline-flex !items: center !important;
-    gap: 4px !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    color: #10b981 !important;
-    white-space: nowrap !important;
-}
-
-/* Center Device Switches */
-.top-appbar-center {
+.canvas-top-center {
     display: flex !important;
     align-items: center !important;
 }
@@ -114,95 +359,93 @@
     display: inline-flex !important;
     align-items: center !important;
     background: #f1f5f9 !important;
-    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
     padding: 3px !important;
     gap: 2px !important;
+    width: auto !important;
+    height: auto !important;
 }
 
-.device-pill-btn {
+.device-pill-btn,
+.device-btn {
     display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 6px !important;
-    padding: 6px 14px !important;
-    border-radius: 8px !important;
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
     border: none !important;
     background: transparent !important;
     font-size: 12px !important;
     font-weight: 600 !important;
     color: #64748b !important;
     cursor: pointer !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 30px !important;
+    box-shadow: none !important;
     transition: all 0.2s ease !important;
 }
 
-.device-pill-btn.active {
+.device-pill-btn.active,
+.device-btn.active {
     background: #ffffff !important;
     color: #1e293b !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
-.top-appbar-right {
+.canvas-top-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
 }
 
-.btn-secondary-flat {
+.btn-secondary-outline {
     background: #ffffff !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 7px 16px !important;
-    font-size: 13px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     color: #334155 !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
 }
 
-.btn-secondary-flat:hover {
-    border-color: #94a3b8 !important;
-    background: #f8fafc !important;
+.btn-group-publish {
+    display: inline-flex !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 6px rgba(209, 125, 57, 0.25) !important;
 }
 
-.btn-primary-action {
+.btn-primary-publish {
     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
     color: #ffffff !important;
     border: none !important;
-    border-radius: 8px !important;
-    padding: 8px 18px !important;
-    font-size: 13px !important;
+    padding: 7px 16px !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
     cursor: pointer !important;
-    box-shadow: 0 2px 8px rgba(209, 125, 57, 0.25) !important;
-    transition: all 0.2s ease !important;
 }
 
-.btn-primary-action:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.35) !important;
-}
-
-/* Main Body Layout */
-.builder-body-container {
+.btn-primary-publish-arrow {
+    background: #bd4f2a !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-left: 1px solid rgba(255,255,255,0.2) !important;
+    padding: 7px 8px !important;
+    cursor: pointer !important;
     display: flex !important;
+    align-items: center !important;
+}
+
+.canvas-viewport {
     flex: 1 !important;
-    height: calc(100vh - 56px) !important;
-    overflow: hidden !important;
-}
-
-/* 1. Single Left Elements Sidebar */
-.builder-elements-panel {
-    width: 300px !important;
-    min-width: 300px !important;
-    background: #ffffff !important;
-    border-right: 1px solid #e2e8f0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 20px !important;
-    box-sizing: border-box !important;
     overflow-y: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 30px 20px !important;
 }
 
 .elements-panel-header h3 {
