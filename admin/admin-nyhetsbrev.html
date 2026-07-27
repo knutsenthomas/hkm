@@ -1380,7 +1380,7 @@
                         <h2 class="subview-title">Abonnenter</h2>
                         <p class="subview-subtitle">Administrer e-postlisten for His Kingdom Ministry</p>
                     </div>
-                    <button class="btn-create-new" onclick="alert('Funksjon for å importere abonnenter åpnes.');" style="padding: 0 20px;">
+                    <button class="btn-create-new" onclick="if(window.builder) window.builder.showPromptModal('Oppgi e-postadresse for ny abonnent:', 'epost@domene.no', (email)=>{ if(typeof showToast==='function') showToast('Abonnent ' + email + ' ble lagt til!', 'success'); }, '', 'Vennligst oppgi en e-postadresse.', 'Legg til abonnent', 'Legg til');">
                         <span class="material-symbols-outlined">person_add</span>
                         <span>Legg til abonnent</span>
                     </button>

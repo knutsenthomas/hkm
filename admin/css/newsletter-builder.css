@@ -480,6 +480,14 @@
     transition: all 0.2s !important;
 }
 
+#newsletter-builder-layout .subview-header .btn-create-new,
+#newsletter-builder-layout .subview-panel .btn-create-new {
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0 18px !important;
+    flex-shrink: 0 !important;
+}
+
 #newsletter-builder-layout .btn-create-new:hover {
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 10px rgba(209, 125, 57, 0.35) !important;
