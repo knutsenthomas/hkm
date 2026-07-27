@@ -1156,13 +1156,9 @@
 
                 <!-- 2. Midtre E-postkanvas -->
                 <main class="builder-workspace-center">
-                    <div class="canvas-top-subject-bar">
-                        <span class="material-symbols-outlined subject-icon">edit_note</span>
-                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
-                        <div id="newsletter-autosave-status" class="autosave-pill">
-                            <span class="material-symbols-outlined">cloud_done</span>
-                            <span id="newsletter-autosave-text">Lagret</span>
-                        </div>
+                    <div id="newsletter-autosave-status" class="autosave-pill" style="display: none;">
+                        <span class="material-symbols-outlined">cloud_done</span>
+                        <span id="newsletter-autosave-text">Lagret</span>
                     </div>
                     <!-- Kanvasvisning -->
                     <div class="canvas-viewport" id="canvas-container">
@@ -1484,6 +1480,30 @@
                 </div>
                 <div class="recipient-flow">
                     <div class="main-selection">
+                        <!-- Emnefelt og Innholdsoppsett -->
+                        <div class="selection-card">
+                            <h3>E-postemne &amp; Forhåndsvisning</h3>
+                            <p style="font-size: 13px; color: #64748b; margin: 4px 0 16px 0;">Skriv inn overskriften og teksten som mottakerne ser i sin innboks.</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                                <div>
+                                    <label for="newsletter-subject" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">E-postemne (Subject)</label>
+                                    <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">edit_note</span>
+                                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." style="border: none; background: transparent; font-size: 14px; font-weight: 600; color: #1e293b; outline: none; width: 100%;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="newsletter-preheader" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Forhåndsvisningstekst (Preheader)</label>
+                                    <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
+                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">subtitles</span>
+                                        <input type="text" id="newsletter-preheader" placeholder="Ingress som vises ved siden av emnet i Gmail/Outlook..." style="border: none; background: transparent; font-size: 13px; color: #334155; outline: none; width: 100%;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="selection-card">
                             <h3>Hvem sender du denne e-posten til?</h3>
                             <div class="sender-options">
