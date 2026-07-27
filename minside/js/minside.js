@@ -7502,11 +7502,27 @@ class MinSideManager {
             console.error("Error loading started plans:", e);
         }
 
-        if (startedPlans.length === 0) {
+        const inProgressPlans = [];
+        const completedPlans = [];
+
+        startedPlans.forEach(p => {
+            const totalDays = p.durationDays || (p.days ? p.days.length : 1);
+            const completedDays = p.userPlan.completedDays || [];
+            const progressPct = totalDays > 0 ? Math.round((completedDays.length / totalDays) * 100) : 0;
+            const item = { ...p, totalDays, progressPct };
+
+            if (progressPct >= 100 || p.userPlan.completed === true) {
+                completedPlans.push(item);
+            } else {
+                inProgressPlans.push(item);
+            }
+        });
+
+        if (inProgressPlans.length === 0 && completedPlans.length === 0) {
             container.innerHTML = `
                 <div class="empty-state" style="padding: 40px 20px; text-align: center;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">auto_stories</span>
-                    <h3 style="font-size: 16px; font-weight: 700; color: #d17d39; margin: 0 0 8px 0;">Ingen påbegynte leseplaner</h3>
+                    <h3 style="font-size: 16px; font-weight: 700; color: #d17d39; margin: 0 0 8px 0;">Ingen leseplaner ennå</h3>
                     <p style="font-size: 14px; color: #64748b; margin: 0 0 20px 0;">Du har ikke startet noen leseplaner ennå.</p>
                     <a href="/leseplaner.html" class="btn btn-primary" style="background: #d17d39; border-color: #d17d39; display: inline-flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined">explore</span> Finn en leseplan
@@ -7516,39 +7532,80 @@ class MinSideManager {
             return;
         }
 
-        container.innerHTML = `
-            <div style="padding: 8px;">
-                <h3 style="font-size: 18px; font-weight: 700; color: #d17d39; margin-bottom: 20px;">Dine påbegynte leseplaner</h3>
-                <div class="courses-grid">
-                    ${startedPlans.map(p => {
-                        const totalDays = p.durationDays || p.days.length;
-                        const completedDays = p.userPlan.completedDays || [];
-                        const progressPct = Math.round((completedDays.length / totalDays) * 100);
-                        
-                        return `
-                        <div class="reading-plan-card-started">
-                            <div class="course-body">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(209, 125, 57, 0.1); color: #d17d39; font-weight: 700;">${totalDays} dager</span>
-                                    <span style="font-size: 12px; font-weight: 600; color: #d17d39;">${progressPct}% fullført</span>
+        let html = '<div style="padding: 8px;">';
+
+        // Section 1: Active In-Progress Plans
+        if (inProgressPlans.length > 0) {
+            html += `
+                <div style="margin-bottom: 36px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #d17d39; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 22px;">auto_stories</span>
+                        Dine påbegynte leseplaner
+                    </h3>
+                    <div class="courses-grid">
+                        ${inProgressPlans.map(p => `
+                            <div class="reading-plan-card-started">
+                                <div class="course-body">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(209, 125, 57, 0.1); color: #d17d39; font-weight: 700;">${p.totalDays} dager</span>
+                                        <span style="font-size: 12px; font-weight: 600; color: #d17d39;">${p.progressPct}% fullført</span>
+                                    </div>
+                                    <div class="course-title">${p.title}</div>
+                                    <div class="course-desc" style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
+                                    
+                                    <div class="progress-track">
+                                        <div class="progress-bar" style="width: ${p.progressPct}%;"></div>
+                                    </div>
                                 </div>
-                                <div class="course-title">${p.title}</div>
-                                <div class="course-desc" style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
-                                
-                                <div class="progress-track">
-                                    <div class="progress-bar" style="width: ${progressPct}%;"></div>
+                                <div class="card-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
+                                    <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #d17d39; border-color: #d17d39;">Velg plan</button>
                                 </div>
                             </div>
-                            <div class="card-actions">
-                                <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se dager</button>
-                                <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #d17d39; border-color: #d17d39;">Velg plan</button>
-                            </div>
-                        </div>
-                        `;
-                    }).join('')}
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
+
+        // Section 2: Completed Plans
+        if (completedPlans.length > 0) {
+            html += `
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #10b981; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 22px; color: #10b981;">emoji_events</span>
+                        Fullførte leseplaner 🎉
+                    </h3>
+                    <div class="courses-grid">
+                        ${completedPlans.map(p => `
+                            <div class="reading-plan-card-started" style="border-top: 4px solid #10b981; background: var(--bg-card, #ffffff);">
+                                <div class="course-body">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span class="course-badge" style="position: relative !important; top: auto !important; left: auto !important; margin: 0 !important; box-shadow: none !important; background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                            <span class="material-symbols-outlined" style="font-size: 14px;">verified</span> 100% Fullført
+                                        </span>
+                                        <span style="font-size: 12px; font-weight: 600; color: #64748b;">${p.totalDays} dager</span>
+                                    </div>
+                                    <div class="course-title" style="color: var(--text-base, #0f172a);">${p.title}</div>
+                                    <div class="course-desc" style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">${p.description || ''}</div>
+                                    
+                                    <div class="progress-track" style="background: rgba(16, 185, 129, 0.15);">
+                                        <div class="progress-bar" style="width: 100%; background: #10b981;"></div>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="window.minSideManager.previewPlanDetails('${p.id}')" style="flex: 1;">Se notater / dager</button>
+                                    <button class="btn btn-primary btn-sm" onclick="window.minSideManager.switchToPlan('${p.id}')" style="flex: 1; background: #10b981; border-color: #10b981;">Les på nytt</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     async switchToPlan(planId) {
