@@ -142,11 +142,11 @@
 }
 }
 
-/* 2. Sub-Header Toolbar */
+/* 2. Sub-Header Toolbar (Perfect Vertical & Horizontal Alignment) */
 #newsletter-builder-layout .builder-toolbar-header {
-    height: 54px !important;
-    min-height: 54px !important;
-    max-height: 54px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
     display: flex !important;
@@ -166,36 +166,45 @@
 #newsletter-builder-layout .toolbar-left-cell {
     display: flex !important;
     align-items: center !important;
+    height: 100% !important;
     flex: 0 0 auto !important;
     min-width: 180px !important;
 }
 
 #newsletter-builder-layout .toolbar-left-cell h3 {
     margin: 0 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
+    line-height: 1 !important;
+    letter-spacing: -0.01em !important;
     white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 #newsletter-builder-layout .toolbar-center-cell {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    height: 100% !important;
     flex: 0 0 auto !important;
     position: absolute !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
+    top: 0 !important;
+    bottom: 0 !important;
 }
 
 #newsletter-builder-layout .toolbar-right-cell,
 #newsletter-builder-layout .toolbar-right-actions {
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-end !important;
+    height: 100% !important;
     gap: 12px !important;
     flex-shrink: 0 !important;
     margin-left: auto !important;
-    justify-content: flex-end !important;
 }
 
 #newsletter-builder-layout .canvas-top-subject-bar {
