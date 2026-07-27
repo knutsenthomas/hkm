@@ -8402,11 +8402,14 @@ class BibleReader {
                 }
             } else {
                 userPlan.completed = true;
+                setTimeout(() => {
+                    this.showPlanCompletionScreen(globalPlan);
+                }, 800);
             }
             
             userPlan.lastActiveAt = this.getServerTimestamp();
             await this.saveProgress();
-                        setTimeout(() => {
+            setTimeout(() => {
                 this.setupReadingPlanUI(true);
                 this.loadReadingPlan(true);
             }, 1200);
@@ -8422,52 +8425,238 @@ class BibleReader {
         if (!container) {
             container = document.createElement('div');
             container.id = 'particle-container';
-            container.style.cssText = 'position: fixed; inset: 0; pointer-events: none; z-index: 9999;';
+            container.style.cssText = 'position: fixed; inset: 0; pointer-events: none; z-index: 999999;';
             document.body.appendChild(container);
         }
 
-        const rect = button.getBoundingClientRect();
-        const colors = ['#ffffff', '#ffdbce', '#d17d39', '#ffd700', '#1B4965'];
-        const count = 40;
+        const rect = button && typeof button.getBoundingClientRect === 'function' 
+            ? button.getBoundingClientRect() 
+            : { left: window.innerWidth / 2, top: window.innerHeight / 3, width: 0, height: 0 };
+        const colors = ['#ffffff', '#ffdbce', '#d17d39', '#ffd700', '#1B4965', '#10b981'];
+        const count = 45;
         
         for (let i = 0; i < count; i++) {
             const particle = document.createElement('div');
-            const size = Math.random() * 6 + 4;
+            const size = Math.random() * 8 + 4;
             
             particle.style.cssText = `
                 position: fixed;
                 background: ${colors[Math.floor(Math.random() * colors.length)]};
                 width: ${size}px;
                 height: ${size}px;
-                border-radius: 50%;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
                 pointer-events: none;
-                z-index: 9999;
+                z-index: 999999;
                 left: ${rect.left + rect.width / 2}px;
                 top: ${rect.top + rect.height / 2}px;
                 opacity: 1;
                 transform: translate(0, 0) scale(1);
-                transition: transform 0.8s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.8s ease-out;
+                transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 1.2s ease-out;
             `;
-            
+
             container.appendChild(particle);
-            
-            // Random destination
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 150 + 50;
-            const tx = Math.cos(angle) * distance;
-            const ty = Math.sin(angle) * distance;
-            
-            // Trigger transition on next frame
+
             requestAnimationFrame(() => {
-                particle.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 260 + 60;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance - 80;
+
+                particle.style.transform = `translate(${x}px, ${y}px) scale(0.2) rotate(${Math.random() * 360}deg)`;
                 particle.style.opacity = '0';
             });
-            
-            // Clean up
-            setTimeout(() => {
-                particle.remove();
-            }, 800);
+
+            setTimeout(() => particle.remove(), 1250);
         }
+    }
+
+    async showPlanCompletionScreen(plan) {
+        if (!plan) return;
+
+        // Trigger particles celebration across screen
+        this.createCelebrationParticles(null);
+        setTimeout(() => this.createCelebrationParticles(null), 350);
+
+        let modal = document.getElementById('hkm-plan-completion-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-plan-completion-modal';
+        modal.className = 'hkm-devotional-overlay';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overflow-y: auto;';
+
+        const totalDays = plan.durationDays || (plan.days ? plan.days.length : 1);
+        const userPlan = this.userPlanProgress || {};
+        const reflectionsCount = Object.keys(userPlan.reflections || {}).length;
+        const lang = document.documentElement.lang || 'no';
+
+        const isEn = lang === 'en';
+        const isEs = lang === 'es';
+
+        const planTitle = plan.title || (isEn ? 'Reading Plan' : 'Leseplan');
+        const titleText = isEn ? `Congratulations! You completed ${planTitle}!` :
+                         isEs ? `¡Felicitaciones! ¡Has completado ${planTitle}!` :
+                         `Gratulerer! Du har fullført ${planTitle}!`;
+
+        const subtitleText = isEn ? `Great job! You have completed all ${totalDays} days of scripture reading and reflection.` :
+                            isEs ? `¡Buen trabajo! Has completado los ${totalDays} días de lectura bíblica y reflexión.` :
+                            `Godt jobbet! Du har gjennomført alle ${totalDays} dagene med bibellesing og refleksjon.`;
+
+        const todayStr = new Date().toLocaleDateString(isEn ? 'en-US' : isEs ? 'es-ES' : 'nb-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        modal.innerHTML = `
+            <div style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 24px; max-width: 540px; width: 100%; padding: 32px 24px; box-shadow: 0 24px 60px rgba(0,0,0,0.3); text-align: center; position: relative; box-sizing: border-box; margin: auto;">
+                
+                <button id="completion-modal-close" style="position: absolute; top: 16px; right: 16px; background: var(--bg-surface, #f1f5f9); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted, #64748b); transition: all 0.2s;" title="Lukk">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                </button>
+
+                <!-- Celebration Trophy Badge -->
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d17d39 100%); margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4); border: 3.5px solid #ffffff;">
+                    <span class="material-symbols-outlined" style="font-size: 42px; color: #ffffff;">emoji_events</span>
+                </div>
+
+                <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 800; color: var(--text-base, #0f172a); line-height: 1.25;">
+                    ${titleText} 🎉
+                </h2>
+
+                <p style="margin: 0 0 22px; font-size: 14.5px; color: var(--text-muted, #64748b); line-height: 1.5;">
+                    ${subtitleText}
+                </p>
+
+                <!-- Stats Summary -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; background: var(--bg-surface, #f8fafc); padding: 14px 12px; border-radius: 16px; border: 1px solid var(--border-subtle, rgba(0,0,0,0.05));">
+                    <div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Days' : isEs ? 'Días' : 'Dager'}</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--hkm-terracotta, #d17d39); margin-top: 2px;">${totalDays}/${totalDays}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Notes' : isEs ? 'Notas' : 'Notater'}</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--hkm-terracotta, #d17d39); margin-top: 2px;">${reflectionsCount}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">${isEn ? 'Completed' : isEs ? 'Completado' : 'Fullført'}</div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: var(--text-base, #0f172a); margin-top: 4px;">${todayStr}</div>
+                    </div>
+                </div>
+
+                <!-- Next Recommended Plans Section -->
+                <div style="text-align: left; margin-bottom: 24px;">
+                    <h3 style="font-size: 15px; font-weight: 750; color: var(--text-base, #0f172a); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 20px;">explore</span>
+                        ${isEn ? 'Recommended Next Reading Plans' : isEs ? 'Próximos planes recomendados' : 'Anbefalte leseplaner for deg'}
+                    </h3>
+                    <p style="font-size: 12.5px; color: var(--text-muted, #64748b); margin: 0 0 12px;">
+                        ${isEn ? 'Keep up the habit! Choose your next reading plan:' : isEs ? '¡Mantén el hábito! Elige tu próximo plan de lectura:' : 'Fortsett den gode vanen! Velg din neste leseplan:'}
+                    </p>
+
+                    <div id="completion-recommended-plans-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 12.5px;">Henter anbefalte leseplaner...</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="/leseplaner.html" class="hkm-btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-weight: 700; font-size: 14.5px; border-radius: 9999px; text-decoration: none; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3); transition: transform 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 19px;">auto_stories</span>
+                        ${isEn ? 'Explore All Reading Plans' : isEs ? 'Explorar todos los planes' : 'Utforsk alle leseplaner'}
+                    </a>
+
+                    <a href="/minside/index.html?tab=leseplaner" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px; background: var(--bg-surface, #f1f5f9); color: var(--text-base, #334155); font-weight: 600; font-size: 13.5px; border-radius: 9999px; text-decoration: none; border: none; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+                        ${isEn ? 'View My Reflections on My Page' : isEs ? 'Ver mis reflexiones en Mi Página' : 'Se mine refleksjoner på Min Side'}
+                    </a>
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Bind close button
+        const closeBtn = modal.querySelector('#completion-modal-close');
+        if (closeBtn) {
+            closeBtn.onclick = () => modal.remove();
+        }
+
+        // Asynchronously load recommended plans
+        this.loadCompletionRecommendedPlans(plan.id, modal);
+    }
+
+    async loadCompletionRecommendedPlans(currentPlanId, modal) {
+        const listContainer = modal.querySelector('#completion-recommended-plans-list');
+        if (!listContainer) return;
+
+        const lang = document.documentElement.lang || 'no';
+        const isEn = lang === 'en';
+        const isEs = lang === 'es';
+
+        let plans = [];
+        try {
+            const db = this.getFirestore();
+            if (db) {
+                const snap = await db.collection('reading_plans').limit(10).get();
+                snap.forEach(d => {
+                    if (d.id !== currentPlanId && d.id.toLowerCase() !== String(currentPlanId).toLowerCase()) {
+                        plans.push({ id: d.id, ...d.data() });
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn("[BibleReader] Failed to fetch recommended plans from Firestore:", err);
+        }
+
+        // Fallback static plans if offline or less than 2 fetched
+        if (plans.length === 0) {
+            plans = [
+                {
+                    id: 'johannesevangeliet',
+                    title: isEn ? 'Gospel of John in 21 Days' : isEs ? 'Evangelio de Juan en 21 Días' : 'Johannesevangeliet på 21 dager',
+                    durationDays: 21,
+                    description: isEn ? 'Discover Jesus, the light of the world, through John.' : isEs ? 'Descubre a Jesús, la luz del mundo, a través de Juan.' : 'Oppdag Jesus, verdens lys, gjennom Johannesevangeliet.'
+                },
+                {
+                    id: 'salmene-30-dager',
+                    title: isEn ? 'Psalms for 30 Days' : isEs ? 'Salmos durante 30 Días' : 'Salmene for 30 dager',
+                    durationDays: 30,
+                    description: isEn ? 'Daily encouragement, praise, and prayer through Psalms.' : isEs ? 'Aliento diario y oración a través de Salmos.' : 'Daglig oppmuntring, lovsang og bønn gjennom salmer.'
+                }
+            ];
+        }
+
+        // Take top 2 recommended plans
+        const recommendations = plans.slice(0, 2);
+
+        listContainer.innerHTML = recommendations.map(p => {
+            const pTitle = p.title || (isEn ? 'Reading Plan' : 'Leseplan');
+            const pDays = p.durationDays || (p.days ? p.days.length : 21);
+            const pDesc = p.description || (isEn ? 'Explore daily scripture reading.' : 'Utforsk daglig bibellesing og refleksjon.');
+            
+            return `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); border-radius: 16px; text-align: left; transition: all 0.2s;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                            <span style="font-weight: 750; font-size: 13.5px; color: var(--text-base, #0f172a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pTitle}</span>
+                            <span style="font-size: 10.5px; font-weight: 700; background: rgba(209, 125, 57, 0.12); color: var(--hkm-terracotta, #d17d39); padding: 2px 7px; border-radius: 9999px; flex-shrink: 0;">${pDays} ${isEn ? 'days' : isEs ? 'días' : 'dager'}</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted, #64748b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pDesc}</div>
+                    </div>
+                    <button class="btn-start-recommended-plan" data-plan-id="${p.id}" style="background: var(--hkm-terracotta, #d17d39); color: #ffffff; border: none; padding: 7px 13px; border-radius: 9999px; font-weight: 700; font-size: 12px; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;">
+                        ${isEn ? 'Start' : isEs ? 'Iniciar' : 'Start'}
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        // Bind start buttons
+        listContainer.querySelectorAll('.btn-start-recommended-plan').forEach(btn => {
+            btn.onclick = () => {
+                const targetPlanId = btn.getAttribute('data-plan-id');
+                modal.remove();
+                const prefix = lang === 'no' ? '' : `/${lang}`;
+                window.location.href = `${prefix}/bibel.html?plan=${targetPlanId}&day=1`;
+            };
+        });
     }
 
     renderProgressTicks(totalDays, currentDayNum) {
@@ -9536,6 +9725,9 @@ class BibleReader {
         const totalDays = plan.durationDays || plan.days.length;
         if (userPlan.completedDays.length >= totalDays) {
             userPlan.completed = true;
+            setTimeout(() => {
+                this.showPlanCompletionScreen(plan);
+            }, 800);
         } else {
             let nextDay = dayNumber + 1;
             while (nextDay <= totalDays && userPlan.completedDays.includes(nextDay)) {
@@ -9545,6 +9737,9 @@ class BibleReader {
                 userPlan.currentDay = nextDay;
             } else {
                 userPlan.completed = true;
+                setTimeout(() => {
+                    this.showPlanCompletionScreen(plan);
+                }, 800);
             }
         }
         
