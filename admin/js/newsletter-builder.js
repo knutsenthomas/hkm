@@ -2158,16 +2158,16 @@ class NewsletterBuilder {
                 const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const image = p.imageUrl || '';
                 combinedHtml += `
-                    <div class="newsletter-product-card" contenteditable="false" style="position: relative; display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 16px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett produkt">×</button>
-                        <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9;">
-                            <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                    <div class="newsletter-product-card" contenteditable="false">
+                        <button class="card-delete-btn" title="Slett produkt">×</button>
+                        <div class="product-img-wrap">
+                            <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" alt="${escapeHtml(p.name)}" />
                         </div>
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
-                            <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.name)}</h4>
-                            <span style="font-size: 15px; font-weight: 700; color: #d17d39;">kr ${p.price || 'N/A'},-</span>
-                            <div style="margin-top: 6px;">
-                                <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2);">Se produkt</a>
+                        <div class="product-info">
+                            <h4 class="product-title">${escapeHtml(p.name)}</h4>
+                            <span class="product-price">kr ${p.price || 'N/A'},-</span>
+                            <div style="margin-top: 4px;">
+                                <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" class="product-cta-btn">Se produkt</a>
                             </div>
                         </div>
                     </div>
