@@ -7,15 +7,15 @@
     width: 100vw !important;
     background: #0f172a !important;
     overflow: hidden !important;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-/* Top Dark App Bar */
+/* Top HKM Brand App Bar */
 .builder-top-appbar {
     height: 52px !important;
     min-height: 52px !important;
-    background: #181c22 !important;
-    border-bottom: 1px solid #282e38 !important;
+    background: #1B4965 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -38,7 +38,7 @@
 .top-appbar-title {
     font-size: 14px !important;
     font-weight: 700 !important;
-    color: #f1f5f9 !important;
+    color: #ffffff !important;
     letter-spacing: -0.01em !important;
 }
 
@@ -51,7 +51,7 @@
 .top-appbar-action-btn {
     background: transparent !important;
     border: none !important;
-    color: #94a3b8 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
@@ -63,7 +63,7 @@
 
 .top-appbar-action-btn:hover {
     color: #ffffff !important;
-    background: rgba(255,255,255,0.08) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .top-appbar-user-badge {
@@ -77,7 +77,7 @@
 }
 
 .top-appbar-user-badge:hover {
-    background: rgba(255,255,255,0.08) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .top-appbar-avatar {
@@ -96,7 +96,7 @@
 .top-appbar-username {
     font-size: 13px !important;
     font-weight: 600 !important;
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
 }
 
 /* Main 3-Column Body Container */
@@ -107,12 +107,12 @@
     overflow: hidden !important;
 }
 
-/* 1. Dark Left Navigation Sidebar */
+/* 1. HKM Brand Dark Left Navigation Sidebar */
 .builder-dark-sidebar {
     width: 200px !important;
     min-width: 200px !important;
-    background: #181c22 !important;
-    border-right: 1px solid #282e38 !important;
+    background: #14374d !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 16px 12px !important;
@@ -123,23 +123,24 @@
 .btn-create-new {
     width: 100% !important;
     height: 38px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    border: none !important;
     border-radius: 8px !important;
     color: #ffffff !important;
     font-size: 13px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
     cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(209, 125, 57, 0.3) !important;
     transition: all 0.2s !important;
 }
 
 .btn-create-new:hover {
-    background: rgba(255,255,255,0.12) !important;
-    border-color: rgba(255,255,255,0.2) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(209, 125, 57, 0.4) !important;
 }
 
 .sidebar-nav-menu {
@@ -156,7 +157,7 @@
     gap: 10px !important;
     padding: 10px 12px !important;
     border-radius: 8px !important;
-    color: #94a3b8 !important;
+    color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none !important;
     font-size: 13px !important;
     font-weight: 500 !important;
@@ -165,14 +166,19 @@
 
 .sidebar-nav-menu .nav-item:hover,
 .sidebar-bottom-settings .nav-item:hover {
-    color: #f1f5f9 !important;
-    background: rgba(255,255,255,0.05) !important;
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .sidebar-nav-menu .nav-item.active {
+    color: #ffffff !important;
+    background: rgba(209, 125, 57, 0.25) !important;
+    border-left: 3px solid #d17d39 !important;
+    font-weight: 700 !important;
+}
+
+.sidebar-nav-menu .nav-item.active .material-symbols-outlined {
     color: #d17d39 !important;
-    background: rgba(209, 125, 57, 0.12) !important;
-    font-weight: 600 !important;
 }
 
 .sidebar-nav-menu .nav-item .material-symbols-outlined,
