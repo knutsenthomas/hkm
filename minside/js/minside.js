@@ -1546,7 +1546,7 @@ class MinSideManager {
     _normalizeNotificationDoc(docLike) {
         const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
         let rawTitle = typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert');
-        let rawType = typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default';
+        let rawType = typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'push';
         let rawLink = typeof raw.link === 'string' ? raw.link : '';
 
         // Clean leading book & activity emojis (📖, 📚, 📕, 📙, 📘, 📗, etc.)
@@ -1560,7 +1560,7 @@ class MinSideManager {
             title: cleanTitle,
             originalTitle: rawTitle,
             body: typeof raw.body === 'string' ? raw.body : '',
-            type: isReading ? 'reading' : rawType,
+            type: rawType === 'reading' ? 'push' : rawType, // Keep 'push' so it matches Push filter tab!
             isReading: isReading,
             link: rawLink,
             read: raw.read === true,
@@ -3733,26 +3733,31 @@ class MinSideManager {
                 return;
             }
 
-            const iconMap = {
-                push:    { icon: 'campaign',      toneClass: 'activity-icon-tone-push' },
-                message: { icon: 'mail',          toneClass: 'activity-icon-tone-message' },
-                reading: { icon: 'auto_stories',  toneClass: 'activity-icon-tone-push' },
-                default: { icon: 'notifications', toneClass: 'activity-icon-tone-default' },
+            const getNotifIcon = (n) => {
+                if (n.isReading || n.type === 'reading') {
+                    return { icon: 'auto_stories', toneClass: 'activity-icon-tone-push' };
+                }
+                if (n.type === 'message') {
+                    return { icon: 'mail', toneClass: 'activity-icon-tone-message' };
+                }
+                if (n.type === 'push') {
+                    return { icon: 'campaign', toneClass: 'activity-icon-tone-push' };
+                }
+                return { icon: 'notifications', toneClass: 'activity-icon-tone-default' };
             };
 
             const items = snap.docs.map(doc => this._normalizeNotificationDoc(doc));
 
             list.innerHTML = items.map(d => {
                 const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
-                const m = iconMap[d.type] || iconMap.default;
+                const m = getNotifIcon(d);
                 return `
                 <div class="activity-item ${!d.read ? 'unread' : ''}" data-id="${d.id}" style="cursor: pointer;">
                     <div class="activity-icon ${m.toneClass}">
                         <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
                     <div class="activity-content">
-                        <div class="activity-title" style="display:flex; align-items:center; gap:6px;">
-                            ${d.isReading ? `<span class="material-symbols-outlined" style="font-size:16px !important; color:#d17d39 !important; display:inline-flex !important; align-items:center !important; flex-shrink:0;">auto_stories</span>` : ''}
+                        <div class="activity-title">
                             <span>${this._escapeHtml(d.title)}</span>
                         </div>
                         ${d.body ? `<div class="activity-body">${this._escapeHtml(d.body)}</div>` : ''}
@@ -3846,7 +3851,20 @@ class MinSideManager {
 
         const inner = container.querySelector('#notifs-inner');
 
-        const renderList = (allItems) => {
+        const getNotifIcon = (n) => {
+                if (n.isReading || n.type === 'reading') {
+                    return { icon: 'auto_stories', cls: 'activity-icon-tone-push' };
+                }
+                if (n.type === 'message') {
+                    return { icon: 'mail', cls: 'activity-icon-tone-message' };
+                }
+                if (n.type === 'push') {
+                    return { icon: 'campaign', cls: 'activity-icon-tone-push' };
+                }
+                return { icon: 'notifications', cls: 'activity-icon-tone-default' };
+            };
+
+            const renderList = (allItems) => {
             let items = allItems;
             
             if (activeFilter === 'archived') {
@@ -3854,7 +3872,7 @@ class MinSideManager {
             } else {
                 items = allItems.filter(n => !n.archived);
                 if (activeFilter === 'unread')  items = items.filter(n => !n.read);
-                if (activeFilter === 'push')    items = items.filter(n => n.type === 'push');
+                if (activeFilter === 'push')    items = items.filter(n => n.type === 'push' || n.isReading);
                 if (activeFilter === 'message') items = items.filter(n => n.type === 'message');
             }
 
@@ -3872,7 +3890,7 @@ class MinSideManager {
 
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
-                const m = iconMap[n.type] || iconMap.default;
+                const m = getNotifIcon(n);
                 const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : m.cls;
                 
                 const archiveIcon = n.archived ? 'unarchive' : 'archive';
