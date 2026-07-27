@@ -918,7 +918,7 @@
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
-    padding: 16px 20px 80px 20px !important;
+    padding: 8px 20px 60px 20px !important;
     box-sizing: border-box !important;
     overflow-y: visible !important;
     transition: all 0.3s ease !important;
