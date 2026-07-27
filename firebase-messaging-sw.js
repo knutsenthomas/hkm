@@ -7,7 +7,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 // This config is public and safe to be in a service worker
 const firebaseConfig = {
     apiKey: "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE",
-    authDomain: "hiskingdomministry.no",
+    authDomain: "his-kingdom-ministry.firebaseapp.com",
     projectId: "his-kingdom-ministry",
     storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",
