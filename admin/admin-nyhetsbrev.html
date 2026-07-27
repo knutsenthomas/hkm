@@ -1003,43 +1003,45 @@
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
-                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleMode('dashboard');">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
                             <span class="material-symbols-outlined">add</span>
                             <span>Ny kampanje</span>
                         </button>
                     </div>
                     <nav class="sidebar-nav-menu">
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.toggleMode('dashboard');" class="nav-item">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span>Oversikt</span>
                         </a>
-                        <a href="/admin/admin-nyhetsbrev.html" class="nav-item active">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('builder');" class="nav-item active" data-view="builder">
                             <span class="material-symbols-outlined">send</span>
                             <span>Kampanjer</span>
                         </a>
-                        <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('templates');" class="nav-item" data-view="templates">
                             <span class="material-symbols-outlined">article</span>
                             <span>Maler</span>
                         </a>
-                        <a href="/admin/admin-kommunikasjon.html" class="nav-item">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('subscribers');" class="nav-item" data-view="subscribers">
                             <span class="material-symbols-outlined">group</span>
                             <span>Abonnenter</span>
                         </a>
-                        <a href="/admin/admin-analytics.html" class="nav-item">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('analytics');" class="nav-item" data-view="analytics">
                             <span class="material-symbols-outlined">bar_chart</span>
                             <span>Analyse</span>
                         </a>
                     </nav>
                     <div class="sidebar-bottom-settings">
-                        <a href="/admin/admin-logger.html" class="nav-item">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('settings');" class="nav-item" data-view="settings">
                             <span class="material-symbols-outlined">settings</span>
                             <span>Innstillinger</span>
                         </a>
                     </div>
                 </aside>
 
-                <!-- 2. Elementpanel (Lys profil) -->
-                <aside class="builder-elements-panel" id="elements-panel">
+                <!-- Builder Main Workspace Wrapper (Kanvas, Elementer og Egenskaper) -->
+                <div id="builder-main-workspace" style="display: flex; flex: 1; min-width: 0; height: 100%;">
+                    <!-- 2. Elementpanel (Lys profil) -->
+                    <aside class="builder-elements-panel" id="elements-panel">
                     <div class="elements-search-container">
                         <span class="material-symbols-outlined search-icon">search</span>
                         <input type="text" id="elements-search-input" placeholder="Søk etter elementer..." class="elements-search-input">
@@ -1250,6 +1252,187 @@
 
                     <div id="sidebar-inspector-view" class="properties-inspector-view" style="display: none;"></div>
                 </aside>
+            </div><!-- /builder-main-workspace -->
+
+            <!-- Subview 1: Oversikt (Overview) -->
+            <div id="view-overview-panel" class="subview-panel" style="display: none;">
+                <div class="subview-header">
+                    <h2 class="subview-title">Oversikt</h2>
+                    <p class="subview-subtitle">Nøkkeltall og oversikt over dine e-postkampanjer</p>
+                </div>
+                <div class="subview-grid-4">
+                    <div class="subview-card">
+                        <span class="material-symbols-outlined card-icon">group</span>
+                        <div class="card-num">1,248</div>
+                        <div class="card-label">Aktive abonnenter</div>
+                    </div>
+                    <div class="subview-card">
+                        <span class="material-symbols-outlined card-icon">mark_email_read</span>
+                        <div class="card-num">48.5%</div>
+                        <div class="card-label">Gjennomsnittlig åpningsrate</div>
+                    </div>
+                    <div class="subview-card">
+                        <span class="material-symbols-outlined card-icon">ads_click</span>
+                        <div class="card-num">12.3%</div>
+                        <div class="card-label">Klikkrate (CTR)</div>
+                    </div>
+                    <div class="subview-card">
+                        <span class="material-symbols-outlined card-icon">send</span>
+                        <div class="card-num">14</div>
+                        <div class="card-label">Sendte utsendelser i år</div>
+                    </div>
+                </div>
+                <div class="subview-section" style="margin-top: 32px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">Siste utkast og utsendelser</h3>
+                    <div id="overview-drafts-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="subview-list-item">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span class="material-symbols-outlined" style="color: #d17d39;">edit_note</span>
+                                <div>
+                                    <strong style="color: #1e293b; font-size: 14px;">HKM Studio Månedsbrev - Juli utgave</strong>
+                                    <div style="font-size: 12px; color: #64748b;">Sist endret: I dag, 14:20</div>
+                                </div>
+                            </div>
+                            <button class="btn-secondary-outline" onclick="if(window.builder) builder.switchSidebarView('builder');" style="padding: 6px 16px; border-radius: 8px; font-size: 13px;">Åpne i bygger</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subview 2: Maler (Templates Gallery) -->
+            <div id="view-templates-panel" class="subview-panel" style="display: none;">
+                <div class="subview-header">
+                    <h2 class="subview-title">Nyhetsbrev-maler</h2>
+                    <p class="subview-subtitle">Velg en ferdigbygd mal for His Kingdom Ministry for å komme raskt i gang</p>
+                </div>
+                <div class="templates-gallery-grid">
+                    <div class="template-card" onclick="if(window.builder) builder.loadTemplate('monthly');">
+                        <div class="template-preview-box" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39;">article</span>
+                        </div>
+                        <div class="template-info">
+                            <h4 style="font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">Månedsbrev Standard</h4>
+                            <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0;">Moderne oppsett med toppbanner, intro og knapper.</p>
+                            <button class="btn-create-new" style="width: 100%; height: 36px;">Bruk denne malen</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card" onclick="if(window.builder) builder.loadTemplate('event');">
+                        <div class="template-preview-box" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #16a34a;">event</span>
+                        </div>
+                        <div class="template-info">
+                            <h4 style="font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">Event & Invitasjon</h4>
+                            <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0;">Tilpasset for konsert, samlinger og påmelding.</p>
+                            <button class="btn-create-new" style="width: 100%; height: 36px;">Bruk denne malen</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card" onclick="if(window.builder) builder.loadTemplate('prayer');">
+                        <div class="template-preview-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #2563eb;">volunteer_activism</span>
+                        </div>
+                        <div class="template-info">
+                            <h4 style="font-weight: 700; color: #1e293b; margin: 0 0 4px 0;">Bønnebrev & Oppdatering</h4>
+                            <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0;">Ren og personlig tekstsentrert e-postmal.</p>
+                            <button class="btn-create-new" style="width: 100%; height: 36px;">Bruk denne malen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subview 3: Abonnenter (Subscribers) -->
+            <div id="view-subscribers-panel" class="subview-panel" style="display: none;">
+                <div class="subview-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 class="subview-title">Abonnenter</h2>
+                        <p class="subview-subtitle">Administrer e-postlisten for His Kingdom Ministry</p>
+                    </div>
+                    <button class="btn-create-new" onclick="alert('Funksjon for å importere abonnenter åpnes.');" style="padding: 0 20px;">
+                        <span class="material-symbols-outlined">person_add</span>
+                        <span>Legg til abonnent</span>
+                    </button>
+                </div>
+                <div class="subview-table-wrapper">
+                    <table class="subview-table">
+                        <thead>
+                            <tr>
+                                <th>Navn</th>
+                                <th>E-post</th>
+                                <th>Status</th>
+                                <th>Dato lagt til</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Thomas Knutsen</strong></td>
+                                <td>thomas@hiskingdomministry.no</td>
+                                <td><span class="badge-status-active">Aktiv</span></td>
+                                <td>24. juli 2026</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HKM Medlem</strong></td>
+                                <td>post@hiskingdomministry.no</td>
+                                <td><span class="badge-status-active">Aktiv</span></td>
+                                <td>15. juni 2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Subview 4: Analyse (Analytics) -->
+            <div id="view-analytics-panel" class="subview-panel" style="display: none;">
+                <div class="subview-header">
+                    <h2 class="subview-title">Kampanjeanalyse</h2>
+                    <p class="subview-subtitle">Innsikt og ytelsestall for dine nyhetsbrev</p>
+                </div>
+                <div class="subview-grid-4">
+                    <div class="subview-card">
+                        <div class="card-label">Åpningsrate (Open Rate)</div>
+                        <div class="card-num" style="color: #16a34a;">48.5%</div>
+                        <div style="font-size: 12px; color: #16a34a; margin-top: 4px;">↑ +4.2% fra forrige måned</div>
+                    </div>
+                    <div class="subview-card">
+                        <div class="card-label">Klikkfrekvens (CTR)</div>
+                        <div class="card-num" style="color: #2563eb;">12.3%</div>
+                        <div style="font-size: 12px; color: #2563eb; margin-top: 4px;">↑ +1.8% høyere enn snitt</div>
+                    </div>
+                    <div class="subview-card">
+                        <div class="card-label">Leveringsgrad</div>
+                        <div class="card-num" style="color: #d17d39;">99.8%</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Strenge DKIM/SPF innstillinger</div>
+                    </div>
+                    <div class="subview-card">
+                        <div class="card-label">Avmeldinger</div>
+                        <div class="card-num" style="color: #64748b;">0.1%</div>
+                        <div style="font-size: 12px; color: #16a34a; margin-top: 4px;">Meget lav avmeldingsrate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subview 5: Innstillinger (Settings) -->
+            <div id="view-settings-panel" class="subview-panel" style="display: none;">
+                <div class="subview-header">
+                    <h2 class="subview-title">Nyhetsbrev Innstillinger</h2>
+                    <p class="subview-subtitle">Konfigurer avsenderadresse, firmaadresse og standardinnstillinger</p>
+                </div>
+                <div style="max-width: 600px; background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 6px; display: block;">Avsendernavn</label>
+                        <input type="text" value="His Kingdom Ministry" class="elements-search-input" style="padding: 0 12px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 6px; display: block;">Avsender E-postadresse</label>
+                        <input type="email" value="post@hiskingdomministry.no" class="elements-search-input" style="padding: 0 12px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 6px; display: block;">Standard fotskrift / copyright</label>
+                        <input type="text" value="© 2026 His Kingdom Ministry. Alle rettigheter reservert." class="elements-search-input" style="padding: 0 12px;">
+                    </div>
+                    <button class="btn-create-new" style="height: 40px; margin-top: 10px;" onclick="showToast('Innstillingene er lagret.', 'success');">Lagre innstillinger</button>
+                </div>
+            </div>
             </div>
         </div>
 

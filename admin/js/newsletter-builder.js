@@ -6534,6 +6534,83 @@ class NewsletterBuilder {
         }
     }
 
+    switchSidebarView(viewName) {
+        console.log('[HKM Navigation] Switching sidebar view to:', viewName);
+
+        // 1. Update active class on left nav links
+        document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const activeLink = document.querySelector(`.sidebar-nav-menu [data-view="${viewName}"], .sidebar-bottom-settings [data-view="${viewName}"]`);
+        if (activeLink) activeLink.classList.add('active');
+
+        // 2. Hide all subview panels and builder workspace
+        const mainWorkspace = document.getElementById('builder-main-workspace');
+        const overviewPanel = document.getElementById('view-overview-panel');
+        const templatesPanel = document.getElementById('view-templates-panel');
+        const subscribersPanel = document.getElementById('view-subscribers-panel');
+        const analyticsPanel = document.getElementById('view-analytics-panel');
+        const settingsPanel = document.getElementById('view-settings-panel');
+
+        if (mainWorkspace) mainWorkspace.style.display = 'none';
+        if (overviewPanel) overviewPanel.style.display = 'none';
+        if (templatesPanel) templatesPanel.style.display = 'none';
+        if (subscribersPanel) subscribersPanel.style.display = 'none';
+        if (analyticsPanel) analyticsPanel.style.display = 'none';
+        if (settingsPanel) settingsPanel.style.display = 'none';
+
+        // 3. Show target view panel
+        if (viewName === 'builder' || viewName === 'campaigns') {
+            if (mainWorkspace) mainWorkspace.style.display = 'flex';
+        } else if (viewName === 'overview') {
+            if (overviewPanel) overviewPanel.style.display = 'block';
+        } else if (viewName === 'templates') {
+            if (templatesPanel) templatesPanel.style.display = 'block';
+        } else if (viewName === 'subscribers') {
+            if (subscribersPanel) subscribersPanel.style.display = 'block';
+        } else if (viewName === 'analytics') {
+            if (analyticsPanel) analyticsPanel.style.display = 'block';
+        } else if (viewName === 'settings') {
+            if (settingsPanel) settingsPanel.style.display = 'block';
+        }
+    }
+
+    loadTemplate(templateKey) {
+        const container = document.getElementById('blocks-container');
+        if (!container) return;
+
+        if (templateKey === 'event') {
+            container.innerHTML = `
+                <p><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80" alt="HKM Event" class="block-img" style="max-width:100%; height:auto; border-radius:12px; margin:16px 0; display:block;"></p>
+                <h2 class="block-h2" style="font-family:'Inter', sans-serif; font-weight:700; color:#1e293b; margin-top:20px;">Velkommen til HKM Konsert & Samling!</h2>
+                <p class="block-text" style="font-family:'Inter', sans-serif; font-size:15px; line-height:1.6; color:#334155;">Bli med på en uforglemmelig kveld med lovsang, fellesskap og inspirasjon. Meld deg på i dag!</p>
+                <div style="text-align:center; margin:24px 0;">
+                    <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display:inline-block; background-color:#16a34a; color:white; padding:12px 30px; border-radius:999px; text-decoration:none; font-weight:700;">Meld deg på her</a>
+                </div>
+            `;
+        } else if (templateKey === 'prayer') {
+            container.innerHTML = `
+                <h2 class="block-h2" style="font-family:'Georgia', serif; font-weight:700; color:#1e293b; margin-top:20px;">Månedens Bønneemner & Oppdatering</h2>
+                <p class="block-text" style="font-family:'Georgia', serif; font-size:16px; line-height:1.8; color:#334155;">Kjære venner, takk for at dere står sammen med oss i bønn. Her er våre tre viktigste fokusområder denne måneden...</p>
+                <div style="text-align:center; margin:24px 0;">
+                    <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display:inline-block; background-color:#2563eb; color:white; padding:12px 30px; border-radius:999px; text-decoration:none; font-weight:700;">Send ditt bønneemne</a>
+                </div>
+            `;
+        } else {
+            this.blocks = [];
+            try {
+                localStorage.removeItem('hkm_builder_autosave_html');
+            } catch (e) {}
+            this.renderCanvas();
+        }
+
+        this.syncUnifiedBlocks();
+        this.switchSidebarView('builder');
+        if (typeof showToast === 'function') {
+            showToast('Malen ble lastet inn i byggeren.', 'info');
+        }
+    }
+
     toggleMode(mode) {
         this.currentMode = mode;
         const dashboard = document.getElementById('newsletter-dashboard-wrapper') || document.getElementById('newsletter-dashboard-layout');
