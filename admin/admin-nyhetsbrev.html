@@ -933,7 +933,7 @@
     </main> <!-- Close newsletter-dashboard-wrapper -->
 
         <div id="newsletter-builder-layout" style="display: none;">
-            <!-- Top Dark Header Bar (Dark Navy Theme matching Screenshot 2) -->
+            <!-- Mørk Toppheader (Dark Navy Theme) -->
             <header class="builder-top-appbar">
                 <div class="top-appbar-left">
                     <button class="btn-topbar-back" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
@@ -941,7 +941,7 @@
                         <span>Tilbake til oversikt</span>
                     </button>
                     <div class="topbar-divider"></div>
-                    <span class="top-appbar-title">Builder</span>
+                    <span class="top-appbar-title">Bygger</span>
                 </div>
                 <div class="top-appbar-right">
                     <button class="top-appbar-action-btn" title="Varslinger">
@@ -956,10 +956,10 @@
                 </div>
             </header>
 
-            <!-- Builder Sub-Header / Toolbar (White bar matching Screenshot 2) -->
+            <!-- Verktøylinje / Sub-Header -->
             <div class="builder-toolbar-header">
                 <div class="toolbar-left-title">
-                    <h3>Elements</h3>
+                    <h3>Elementer</h3>
                 </div>
 
                 <div class="toolbar-center-controls">
@@ -975,7 +975,7 @@
                     <div class="device-switch-pill">
                         <button type="button" class="device-pill-btn device-btn active" data-view="desktop">
                             <span class="material-symbols-outlined">desktop_windows</span>
-                            <span>Desktop</span>
+                            <span>Skrivebord</span>
                         </button>
                         <button type="button" class="device-pill-btn device-btn" data-view="mobile">
                             <span class="material-symbols-outlined">smartphone</span>
@@ -985,11 +985,11 @@
                 </div>
 
                 <div class="toolbar-right-actions">
-                    <button id="save-draft-btn" class="btn-secondary-outline">Save Draft</button>
-                    <button id="preview-btn" class="btn-secondary-outline">Preview</button>
+                    <button id="save-draft-btn" class="btn-secondary-outline">Lagre utkast</button>
+                    <button id="preview-btn" class="btn-secondary-outline">Forhåndsvisning</button>
                     <div class="btn-group-publish">
                         <button id="continue-btn" class="btn-primary-publish">
-                            <span>Publish</span>
+                            <span>Publiser</span>
                         </button>
                         <button id="publish-dropdown-btn" class="btn-primary-publish-arrow">
                             <span class="material-symbols-outlined">expand_more</span>
@@ -998,91 +998,91 @@
                 </div>
             </div>
 
-            <!-- Main Workspace Body (Navigation Sidebar | Elements Panel | Canvas Workspace | Properties Inspector Panel) -->
+            <!-- Hovedområde (Navigasjonsmeny | Elementpanel | E-postkanvas | Egenskaper-inspektør) -->
             <div class="builder-body-container">
-                <!-- 1. HKM Clean Light Left Navigation Sidebar -->
+                <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
                         <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleMode('dashboard');">
                             <span class="material-symbols-outlined">add</span>
-                            <span>Create New</span>
+                            <span>Ny kampanje</span>
                         </button>
                     </div>
                     <nav class="sidebar-nav-menu">
                         <a href="javascript:void(0)" onclick="if(window.builder) builder.toggleMode('dashboard');" class="nav-item">
                             <span class="material-symbols-outlined">dashboard</span>
-                            <span>Dashboard</span>
+                            <span>Oversikt</span>
                         </a>
                         <a href="/admin/admin-nyhetsbrev.html" class="nav-item active">
                             <span class="material-symbols-outlined">send</span>
-                            <span>Campaigns</span>
+                            <span>Kampanjer</span>
                         </a>
                         <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
                             <span class="material-symbols-outlined">article</span>
-                            <span>Templates</span>
+                            <span>Maler</span>
                         </a>
                         <a href="/admin/admin-kommunikasjon.html" class="nav-item">
                             <span class="material-symbols-outlined">group</span>
-                            <span>Subscribers</span>
+                            <span>Abonnenter</span>
                         </a>
                         <a href="/admin/admin-analytics.html" class="nav-item">
                             <span class="material-symbols-outlined">bar_chart</span>
-                            <span>Analytics</span>
+                            <span>Analyse</span>
                         </a>
                     </nav>
                     <div class="sidebar-bottom-settings">
                         <a href="/admin/admin-logger.html" class="nav-item">
                             <span class="material-symbols-outlined">settings</span>
-                            <span>Settings</span>
+                            <span>Innstillinger</span>
                         </a>
                     </div>
                 </aside>
 
-                <!-- 2. Elements Panel (Light Left Panel) -->
+                <!-- 2. Elementpanel (Lys profil) -->
                 <aside class="builder-elements-panel" id="elements-panel">
                     <div class="elements-search-container">
                         <span class="material-symbols-outlined search-icon">search</span>
-                        <input type="text" id="elements-search-input" placeholder="Search..." class="elements-search-input">
+                        <input type="text" id="elements-search-input" placeholder="Søk etter elementer..." class="elements-search-input">
                     </div>
 
                     <div class="elements-panel-body">
-                        <!-- Basic Blocks Category -->
+                        <!-- Basisblokker -->
                         <div class="elements-category active">
                             <div class="category-header">
-                                <span>BASIC BLOCKS</span>
+                                <span>BASISBLOKKER</span>
                             </div>
                             <div class="basic-blocks-grid">
                                 <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
                                     <div class="block-card-icon-text">T</div>
-                                    <span class="block-card-label">Text</span>
+                                    <span class="block-card-label">Tekst</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="image" title="Sett inn bilde">
                                     <span class="material-symbols-outlined block-card-icon">image</span>
-                                    <span class="block-card-label">Image</span>
+                                    <span class="block-card-label">Bilde</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="button" title="Sett inn knapp">
                                     <span class="material-symbols-outlined block-card-icon">crop_7_5</span>
-                                    <span class="block-card-label">Button</span>
+                                    <span class="block-card-label">Knapp</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="divider" title="Sett inn skillelinje">
                                     <span class="material-symbols-outlined block-card-icon">horizontal_rule</span>
-                                    <span class="block-card-label">Divider</span>
+                                    <span class="block-card-label">Skillelinje</span>
                                 </button>
                                 <button class="block-card-item element-card" data-type="spacer" title="Sett inn avstandshøyde">
                                     <span class="material-symbols-outlined block-card-icon">height</span>
-                                    <span class="block-card-label">Spacer</span>
+                                    <span class="block-card-label">Avstand</span>
                                 </button>
                                 <button class="block-card-item element-card highlight-blue" data-type="product" title="Sett inn produkt fra nettbutikken">
                                     <span class="material-symbols-outlined block-card-icon" style="color: #3b82f6;">shopping_bag</span>
-                                    <span class="block-card-label" style="color: #3b82f6;">Product</span>
+                                    <span class="block-card-label" style="color: #3b82f6;">Produkt</span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Accordion Categories -->
+                        <!-- Trekkspill-kategorier -->
                         <div class="elements-accordion-item">
                             <button class="accordion-header-btn" data-accordion="media">
-                                <span>Media</span>
+                                <span>Medier</span>
                                 <span class="material-symbols-outlined accordion-arrow">expand_more</span>
                             </button>
                             <div class="accordion-content" id="accordion-media" style="display: none;">
@@ -1101,14 +1101,14 @@
 
                         <div class="elements-accordion-item">
                             <button class="accordion-header-btn" data-accordion="layout">
-                                <span>Layout</span>
+                                <span>Oppsett</span>
                                 <span class="material-symbols-outlined accordion-arrow">expand_more</span>
                             </button>
                             <div class="accordion-content" id="accordion-layout" style="display: none;">
                                 <div class="basic-blocks-grid">
                                     <button class="block-card-item element-card" data-type="columns">
                                         <span class="material-symbols-outlined block-card-icon">view_column</span>
-                                        <span class="block-card-label">Columns</span>
+                                        <span class="block-card-label">Kolonner</span>
                                     </button>
                                 </div>
                             </div>
@@ -1116,7 +1116,7 @@
 
                         <div class="elements-accordion-item">
                             <button class="accordion-header-btn" data-accordion="saved">
-                                <span>Saved Blocks</span>
+                                <span>Lagrede blokker</span>
                                 <span class="material-symbols-outlined accordion-arrow">expand_more</span>
                             </button>
                             <div class="accordion-content" id="accordion-saved" style="display: none;">
@@ -1128,16 +1128,16 @@
                     </div>
                 </aside>
 
-                <!-- 2. Center Canvas Workspace -->
+                <!-- 2. Midtre E-postkanvas -->
                 <main class="builder-workspace-center">
-                    <!-- Canvas Viewport -->
+                    <!-- Kanvasvisning -->
                     <div class="canvas-viewport" id="canvas-container">
                         <div class="canvas-paper-frame" id="newsletter-canvas">
                             <div class="canvas-header">
-                                <span class="premium-header-badge">PREMIUM HEADER</span>
+                                <span class="premium-header-badge">E-POSTHODE</span>
                                 <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="newsletter-logo">
-                                <h2 class="canvas-brand-name">HKM STUDIO MONTHLY</h2>
-                                <span class="canvas-brand-issue">October Issue</span>
+                                <h2 class="canvas-brand-name">HKM STUDIO MÅNEDSBREV</h2>
+                                <span class="canvas-brand-issue">Juli utgave</span>
                             </div>
 
                             <div id="blocks-container" class="blocks-container docs-rte-surface" contenteditable="true" placeholder="Skriv nyhetsbrevet ditt her...">
@@ -1152,55 +1152,55 @@
                     </div>
                 </main>
 
-                <!-- 3. Right Properties Inspector Panel (Matching Screenshot 3) -->
+                <!-- 3. Høyre Egenskaper-panel -->
                 <aside class="builder-properties-panel" id="sidebar-inspector-view">
                     <div class="properties-header">
-                        <h3>Properties</h3>
+                        <h3>Egenskaper</h3>
                         <button class="btn-close-properties" id="close-properties-btn">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
 
                     <div class="properties-body">
-                        <!-- Styling Section -->
+                        <!-- Stil og utseende -->
                         <div class="properties-section">
                             <div class="section-header-collapsible">
-                                <span>Styling</span>
+                                <span>Stil & Utseende</span>
                                 <span class="material-symbols-outlined collapse-icon">remove</span>
                             </div>
 
                             <div class="section-content">
-                                <!-- Font Selection -->
+                                <!-- Skrifttype -->
                                 <div class="prop-group">
-                                    <label>Font</label>
+                                    <label>Skrifttype</label>
                                     <select id="prop-font-select" class="prop-select">
-                                        <option value="'Inter', sans-serif">Text Block</option>
-                                        <option value="'Playfair Display', serif">Heading 1</option>
-                                        <option value="Arial, sans-serif">Heading 2</option>
-                                        <option value="Georgia, serif">Subheadline</option>
+                                        <option value="'Inter', sans-serif">Tekstblokk</option>
+                                        <option value="'Playfair Display', serif">Overskrift 1</option>
+                                        <option value="Arial, sans-serif">Overskrift 2</option>
+                                        <option value="Georgia, serif">Underoverskrift</option>
                                     </select>
                                 </div>
 
-                                <!-- Size Input -->
+                                <!-- Skriftstørrelse -->
                                 <div class="prop-group">
-                                    <label>Size</label>
+                                    <label>Skriftstørrelse</label>
                                     <div class="prop-number-stepper">
-                                        <input type="number" id="prop-font-size-input" value="12" min="10" max="72" class="prop-number-input">
+                                        <input type="number" id="prop-font-size-input" value="14" min="10" max="72" class="prop-number-input">
                                     </div>
                                 </div>
 
-                                <!-- Color Picker -->
+                                <!-- Farge -->
                                 <div class="prop-group">
-                                    <label>Color</label>
+                                    <label>Farge</label>
                                     <div class="prop-color-wrapper">
                                         <input type="text" id="prop-color-hex" value="#D68600" class="prop-hex-input">
                                         <input type="color" id="prop-color-picker" value="#D68600" class="prop-color-swatch">
                                     </div>
                                 </div>
 
-                                <!-- Alignment Group (5 icons matching Screenshot 3) -->
+                                <!-- Tekstjustering -->
                                 <div class="prop-group">
-                                    <label>Alignment</label>
+                                    <label>Tekstjustering</label>
                                     <div class="prop-align-btn-group">
                                         <button type="button" class="align-btn active" data-align="left" title="Venstrejuster">
                                             <span class="material-symbols-outlined">format_align_left</span>
@@ -1220,9 +1220,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Padding Steppers (Matching Screenshot 3) -->
+                                <!-- Polstring / Margin -->
                                 <div class="prop-group">
-                                    <label>Padding</label>
+                                    <label>Polstring / Margin</label>
                                     <div class="padding-steppers-grid">
                                         <div class="stepper-box">
                                             <div class="stepper-controls">
@@ -1230,7 +1230,7 @@
                                                 <input type="text" class="stepper-val-display" value="" readonly>
                                                 <button type="button" class="btn-step" data-step="width-plus">+</button>
                                             </div>
-                                            <span class="stepper-label">Width</span>
+                                            <span class="stepper-label">Bredde</span>
                                         </div>
                                         <div class="stepper-box">
                                             <div class="stepper-controls">
@@ -1238,7 +1238,7 @@
                                                 <input type="text" class="stepper-val-display" value="" readonly>
                                                 <button type="button" class="btn-step" data-step="top-plus">+</button>
                                             </div>
-                                            <span class="stepper-label">Top</span>
+                                            <span class="stepper-label">Topp</span>
                                         </div>
                                     </div>
                                 </div>
