@@ -458,25 +458,9 @@ class NewsletterBuilder {
                 let pastedHtml = e.clipboardData ? e.clipboardData.getData('text/html') : '';
                 let pastedText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
 
-                if (pastedHtml) {
-                    try {
-                        const doc = new DOMParser().parseFromString(pastedHtml, 'text/html');
-                        const elements = doc.body.querySelectorAll('*');
-                        elements.forEach(el => {
-                            el.style.backgroundColor = '';
-                            el.style.background = '';
-                            el.style.color = '';
-                            el.removeAttribute('bgcolor');
-                        });
-                        doc.body.style.backgroundColor = '';
-                        doc.body.style.background = '';
-                        doc.body.style.color = '';
-
-                        const cleanHtml = doc.body.innerHTML;
-                        document.execCommand('insertHTML', false, cleanHtml);
-                    } catch (err) {
-                        document.execCommand('insertText', false, pastedText);
-                    }
+                const cleanHtml = this.sanitizePastedHtml(pastedHtml, pastedText);
+                if (cleanHtml) {
+                    document.execCommand('insertHTML', false, cleanHtml);
                 } else if (pastedText) {
                     document.execCommand('insertText', false, pastedText);
                 }
@@ -1131,17 +1115,90 @@ class NewsletterBuilder {
         this.syncUnifiedBlocks();
     }
 
+    sanitizePastedHtml(html, fallbackText) {
+        if (!html) {
+            const escaped = (fallbackText || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return escaped.split(/\n\s*\n/).map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('');
+        }
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const junk = doc.querySelectorAll('script, style, meta, link, head, iframe, object, embed');
+            junk.forEach(node => node.remove());
+
+            const allEls = doc.body.querySelectorAll('*');
+            allEls.forEach(el => {
+                const tag = el.tagName.toLowerCase();
+                el.style.position = '';
+                el.style.top = '';
+                el.style.left = '';
+                el.style.float = '';
+                el.style.display = '';
+                el.style.backgroundColor = '';
+                el.style.background = '';
+                el.style.color = '';
+                el.style.lineHeight = '';
+                el.style.margin = '';
+                el.style.padding = '';
+                el.style.height = '';
+                el.style.fontFamily = '';
+                el.removeAttribute('bgcolor');
+                el.removeAttribute('align');
+                el.removeAttribute('width');
+                el.removeAttribute('height');
+
+                if (tag === 'font' || (tag === 'span' && !el.getAttribute('style') && !el.getAttribute('class'))) {
+                    const parent = el.parentNode;
+                    if (parent) {
+                        while (el.firstChild) {
+                            parent.insertBefore(el.firstChild, el);
+                        }
+                        parent.removeChild(el);
+                    }
+                }
+            });
+
+            return doc.body.innerHTML.trim();
+        } catch (e) {
+            return (fallbackText || '').split(/\n\s*\n/).map(para => `<p>${para}</p>`).join('');
+        }
+    }
+
     cleanPastedFormatting() {
         const container = document.getElementById('blocks-container');
         if (!container) return;
         const elements = container.querySelectorAll('*');
         elements.forEach(el => {
+            const tag = el.tagName.toLowerCase();
+            if (el.classList && (el.classList.contains('block-btn') || el.classList.contains('btn') || el.classList.contains('callout-box'))) {
+                return;
+            }
+            el.style.position = '';
+            el.style.top = '';
+            el.style.left = '';
+            el.style.float = '';
+            el.style.display = '';
             el.style.backgroundColor = '';
             el.style.background = '';
+            el.style.color = '';
+            el.style.lineHeight = '';
+            el.style.margin = '';
+            el.style.padding = '';
+            el.style.fontFamily = '';
             el.removeAttribute('bgcolor');
-            const col = (el.style.color || '').toLowerCase();
-            if (col.includes('rgb(30') || col.includes('rgb(40') || col.includes('rgb(25') || col.includes('rgb(10') || col.includes('rgb(15') || col.includes('#1') || col.includes('#2') || col.includes('#0')) {
-                el.style.color = '';
+            el.removeAttribute('align');
+            el.removeAttribute('width');
+            el.removeAttribute('height');
+
+            if (tag === 'span' && !el.getAttribute('style') && !el.getAttribute('class')) {
+                const parent = el.parentNode;
+                if (parent) {
+                    while (el.firstChild) {
+                        parent.insertBefore(el.firstChild, el);
+                    }
+                    parent.removeChild(el);
+                }
             }
         });
         this.syncUnifiedBlocks();
