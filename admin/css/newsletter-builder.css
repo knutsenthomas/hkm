@@ -3079,24 +3079,36 @@ body.builder-active .builder-workspace > .canvas-container {
     grid-template-columns: 1fr;
 }
 
-/* Recipients Drawer Refined (Wix Style) */
-.recipients-drawer {
-    display: none !important;
-    position: fixed !important;
-    top: 56px !important;
-    left: 240px !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: auto !important;
+/* Recipients View inside Center Workspace Frame */
+.builder-workspace-center .recipients-drawer {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 860px !important;
     height: auto !important;
-    background: #ffffff !important;
-    z-index: 99999 !important;
-    overflow-y: auto !important;
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1) !important;
+    background: transparent !important;
+    z-index: 10 !important;
+    overflow-y: visible !important;
+    box-shadow: none !important;
+    padding: 24px !important;
 }
 
-.recipients-drawer.open {
+.builder-workspace-center .recipients-drawer.open {
     display: block !important;
+}
+
+/* Ensure toolbar buttons on PC stay strictly on a single horizontal line */
+.toolbar-right-cell,
+.toolbar-right-cell .btn-group-publish,
+.toolbar-right-cell button,
+.btn-primary-publish,
+.btn-secondary-outline,
+.btn-label {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 .recipients-drawer .sidebar-header {

@@ -5095,9 +5095,11 @@ class NewsletterBuilder {
     toggleRecipientsDrawer() {
         this.isRecipientsDrawerOpen = !this.isRecipientsDrawerOpen;
         const drawer = document.getElementById('recipients-drawer');
+        const canvasContainer = document.getElementById('canvas-container');
         if (!drawer) return;
 
         if (this.isRecipientsDrawerOpen) {
+            if (canvasContainer) canvasContainer.style.setProperty('display', 'none', 'important');
             drawer.style.setProperty('display', 'block', 'important');
             drawer.classList.add('open');
             this.closeToolsUi();
@@ -5105,15 +5107,16 @@ class NewsletterBuilder {
         } else {
             drawer.style.setProperty('display', 'none', 'important');
             drawer.classList.remove('open');
+            if (canvasContainer) canvasContainer.style.setProperty('display', 'block', 'important');
         }
         document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
 
         const continueBtn = document.getElementById('continue-btn');
         if (continueBtn) {
             if (this.isRecipientsDrawerOpen) {
-                continueBtn.innerHTML = '<span class="btn-label">Tilbake til design</span><span class="material-symbols-outlined">arrow_back</span>';
+                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Tilbake til design</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_back</span>';
             } else {
-                continueBtn.innerHTML = '<span class="btn-label">Velg mottakere</span><span class="material-symbols-outlined">arrow_forward</span>';
+                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Velg mottakere</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
             }
         }
     }

@@ -1139,9 +1139,9 @@
                     </div>
                 </aside>
 
-                <!-- 2. Midtre E-postkanvas -->
-                <main class="builder-workspace-center">
-                    <!-- Kanvasvisning -->
+                <!-- 2. Midtre E-postkanvas & Mottakerside -->
+                <main class="builder-workspace-center" id="builder-workspace-center">
+                    <!-- Visning A: E-postkanvas -->
                     <div class="canvas-viewport" id="canvas-container">
                         <div class="canvas-paper-frame" id="newsletter-canvas">
                             <div class="canvas-header" id="canvas-header-block" title="Klikk for å redigere e-posthode">
@@ -1157,6 +1157,141 @@
                             <div class="canvas-footer" contenteditable="false">
                                 <p>© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
                                 <p><a href="https://www.hiskingdomministry.no/avmeld">Meld deg av nyhetsbrev</a></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visning B: Mottakere & Utsendelse (Byttes ut i samme senter-ramme!) -->
+                    <div id="recipients-drawer" class="recipients-drawer" style="display: none; width: 100%; max-width: 860px; margin: 0 auto; padding: 24px; background: transparent;">
+                        <div class="drawer-inner-content" style="padding: 0;">
+                            <div class="recipient-page-header" style="margin-bottom: 20px;">
+                                <h1 style="font-size: 24px; font-weight: 700; color: #1e293b; margin: 0 0 6px 0;">Mottakere for denne utsendelsen</h1>
+                                <p style="font-size: 13px; color: #64748b; margin: 0;">Velg hvem som skal motta e-posten din. Du kan kombinere abonnenter, segmenter og enkeltkontakter.</p>
+                            </div>
+                            <div class="recipient-flow">
+                                <div class="main-selection">
+                                    <!-- Emnefelt og Innholdsoppsett -->
+                                    <div class="selection-card">
+                                        <h3>E-postemne &amp; Forhåndsvisning</h3>
+                                        <p style="font-size: 13px; color: #64748b; margin: 4px 0 16px 0;">Skriv inn overskriften og teksten som mottakerne ser i sin innboks.</p>
+
+                                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                                            <div>
+                                                <label for="newsletter-subject" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">E-postemne (Subject)</label>
+                                                <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
+                                                    <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">edit_note</span>
+                                                    <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." style="border: none; background: transparent; font-size: 14px; font-weight: 600; color: #1e293b; outline: none; width: 100%;">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="newsletter-preheader" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Forhåndsvisningstekst (Preheader)</label>
+                                                <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
+                                                    <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">subtitles</span>
+                                                    <input type="text" id="newsletter-preheader" placeholder="Ingress som vises ved siden av emnet i Gmail/Outlook..." style="border: none; background: transparent; font-size: 13px; color: #334155; outline: none; width: 100%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="selection-card">
+                                        <h3>Hvem sender du denne e-posten til?</h3>
+                                        <div class="sender-options">
+                                            <label class="sender-opt">
+                                                <input type="radio" name="send-to" value="segments" checked>
+                                                <div class="opt-content">
+                                                    <span class="opt-title">Målgruppe (0)</span>
+                                                </div>
+                                            </label>
+                                            <label class="sender-opt">
+                                                <input type="radio" name="send-to" value="all">
+                                                <div class="opt-content">
+                                                    <span class="opt-title">Alle kontakter (0)</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="selection-card">
+                                        <h3>Velg målgrupper</h3>
+
+                                        <div class="target-group">
+                                            <div class="group-header">
+                                                <h4>Abonnenter</h4>
+                                                <p>Send til alle som har aktivt nyhetsbrev-abonnement.</p>
+                                            </div>
+                                            <label class="checkbox-item">
+                                                <input type="checkbox" id="select-subscribers">
+                                                <span>Legg til abonnenter (0)</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="target-group">
+                                            <h4>Segmenter</h4>
+                                            <button class="btn-link" id="add-segment-btn">
+                                                <span class="material-symbols-outlined">add</span> Legg til segmenter
+                                            </button>
+                                            <div id="segments-list" class="user-selection-list" style="display: none;">
+                                                <!-- Dynamic list -->
+                                            </div>
+                                        </div>
+
+                                        <div class="target-group">
+                                            <h4>Etiketter</h4>
+                                            <button class="btn-link" id="add-label-btn">
+                                                <span class="material-symbols-outlined">add</span> Legg til etikett
+                                            </button>
+                                            <div id="labels-list" class="user-selection-list" style="display: none;">
+                                                <!-- Dynamic list -->
+                                            </div>
+                                        </div>
+
+                                        <div class="target-group">
+                                            <h4>Kontakter</h4>
+                                            <button class="btn-link" id="add-manual-contacts-btn">
+                                                <span class="material-symbols-outlined">add</span> Legg til kontakt
+                                            </button>
+                                            <div id="user-selection-list" class="user-selection-list" style="display: none;">
+                                                <!-- Dynamic list -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="selection-sidebar">
+                                    <div class="summary-card">
+                                        <div class="summary-item main">
+                                            <span class="label">Anslått antall mottakere:</span>
+                                            <span class="value" id="estimated-count">0</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="label">Ekskluderte kontakter:</span>
+                                            <span class="value">0</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-card">
+                                        <div class="setting-toggle">
+                                            <div class="setting-info">
+                                                <span class="setting-label">Filtrer bort inaktive</span>
+                                                <p class="setting-desc">Filter bort kontakter som sjelden åpner e-post.</p>
+                                            </div>
+                                            <label class="switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="links-card">
+                                        <button id="send-test-btn" class="btn btn-outline btn-block" style="margin-bottom: 12px;">
+                                            <span class="material-symbols-outlined">mail</span> Send test-e-post
+                                        </button>
+                                        <button id="final-send-btn" class="btn btn-primary btn-block">
+                                            Gå til utsendelse
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1439,148 +1574,7 @@
             </div>
         </div>
 
-        <!-- Sidebar: Selection & Recipients (Hidden by default) -->
-        <aside class="builder-sidebar right recipients-drawer" id="recipients-drawer" style="display: none; position: fixed !important; top: 56px !important; left: 240px !important; right: 0 !important; bottom: 0 !important; width: auto !important; height: auto !important; background: #f8fafc !important; z-index: 999999 !important; overflow-y: auto !important; padding: 24px 32px !important;">
-            <div class="sidebar-header">
-                <button class="btn-back" onclick="builder.toggleRecipientsDrawer()">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </button>
-                <h2>Legg til mottakere</h2>
-            </div>
 
-            <div class="drawer-inner-content">
-                <div class="recipient-page-header">
-                    <h1>Mottakere for denne utsendelsen</h1>
-                    <p>Velg hvem som skal motta e-posten din. Du kan kombinere abonnenter, segmenter og enkeltkontakter.
-                    </p>
-                </div>
-                <div class="recipient-flow">
-                    <div class="main-selection">
-                        <!-- Emnefelt og Innholdsoppsett -->
-                        <div class="selection-card">
-                            <h3>E-postemne &amp; Forhåndsvisning</h3>
-                            <p style="font-size: 13px; color: #64748b; margin: 4px 0 16px 0;">Skriv inn overskriften og teksten som mottakerne ser i sin innboks.</p>
-
-                            <div style="display: flex; flex-direction: column; gap: 14px;">
-                                <div>
-                                    <label for="newsletter-subject" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">E-postemne (Subject)</label>
-                                    <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">edit_note</span>
-                                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." style="border: none; background: transparent; font-size: 14px; font-weight: 600; color: #1e293b; outline: none; width: 100%;">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="newsletter-preheader" style="display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Forhåndsvisningstekst (Preheader)</label>
-                                    <div style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 12px; height: 42px;">
-                                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">subtitles</span>
-                                        <input type="text" id="newsletter-preheader" placeholder="Ingress som vises ved siden av emnet i Gmail/Outlook..." style="border: none; background: transparent; font-size: 13px; color: #334155; outline: none; width: 100%;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="selection-card">
-                            <h3>Hvem sender du denne e-posten til?</h3>
-                            <div class="sender-options">
-                                <label class="sender-opt">
-                                    <input type="radio" name="send-to" value="segments" checked>
-                                    <div class="opt-content">
-                                        <span class="opt-title">Målgruppe (0)</span>
-                                    </div>
-                                </label>
-                                <label class="sender-opt">
-                                    <input type="radio" name="send-to" value="all">
-                                    <div class="opt-content">
-                                        <span class="opt-title">Alle kontakter (0)</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="selection-card">
-                            <h3>Velg målgrupper</h3>
-
-                            <div class="target-group">
-                                <div class="group-header">
-                                    <h4>Abonnenter</h4>
-                                    <p>Send til alle som har aktivt nyhetsbrev-abonnement.</p>
-                                </div>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="select-subscribers">
-                                    <span>Legg til abonnenter (0)</span>
-                                </label>
-                            </div>
-
-                            <div class="target-group">
-                                <h4>Segmenter</h4>
-                                <button class="btn-link" id="add-segment-btn">
-                                    <span class="material-symbols-outlined">add</span> Legg til segmenter
-                                </button>
-                                <div id="segments-list" class="user-selection-list" style="display: none;">
-                                    <!-- Dynamic list -->
-                                </div>
-                            </div>
-
-                            <div class="target-group">
-                                <h4>Etiketter</h4>
-                                <button class="btn-link" id="add-label-btn">
-                                    <span class="material-symbols-outlined">add</span> Legg til etikett
-                                </button>
-                                <div id="labels-list" class="user-selection-list" style="display: none;">
-                                    <!-- Dynamic list -->
-                                </div>
-                            </div>
-
-                            <div class="target-group">
-                                <h4>Kontakter</h4>
-                                <button class="btn-link" id="add-manual-contacts-btn">
-                                    <span class="material-symbols-outlined">add</span> Legg til kontakt
-                                </button>
-                                <div id="user-selection-list" class="user-selection-list" style="display: none;">
-                                    <!-- Dynamic list -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="selection-sidebar">
-                        <div class="summary-card">
-                            <div class="summary-item main">
-                                <span class="label">Anslått antall mottakere:</span>
-                                <span class="value" id="estimated-count">0</span>
-                            </div>
-                            <div class="summary-item">
-                                <span class="label">Ekskluderte kontakter:</span>
-                                <span class="value">0</span>
-                            </div>
-                        </div>
-
-                        <div class="settings-card">
-                            <div class="setting-toggle">
-                                <div class="setting-info">
-                                    <span class="setting-label">Filtrer bort inaktive</span>
-                                    <p class="setting-desc">Filter bort kontakter som sjelden åpner e-post.</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="links-card">
-                            <button id="send-test-btn" class="btn btn-outline btn-block" style="margin-bottom: 12px;">
-                                <span class="material-symbols-outlined">mail</span> Send test-e-post
-                            </button>
-                            <button id="final-send-btn" class="btn btn-primary btn-block">
-                                Gå til utsendelse
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
             </div> <!-- Close builder-main-layout -->
         </div> <!-- Close newsletter-builder-layout -->
 
