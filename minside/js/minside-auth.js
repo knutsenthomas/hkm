@@ -501,6 +501,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function routeByRole() {
+        try {
+            const currentUser = firebase.auth().currentUser;
+            if (currentUser) {
+                const cachedData = {
+                    uid: currentUser.uid,
+                    photoURL: currentUser.photoURL || ''
+                };
+                safeLocalStorageSet('hkm_public_user_cache', JSON.stringify(cachedData));
+            }
+        } catch (cacheErr) {
+            console.warn('[HKM] Failed to pre-cache profile photo:', cacheErr);
+        }
+
         const queryParams = new URLSearchParams(window.location.search);
         const redirectUrl = queryParams.get('redirect');
 

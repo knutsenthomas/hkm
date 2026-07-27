@@ -5042,17 +5042,20 @@ window.addEventListener('load', () => {
                 return;
             }
 
-            // User is logged in, resolve profile photo
-            let photoURL = user.photoURL;
+            // Immediately update DOM with current user photoURL to avoid delay
+            let photoURL = user.photoURL || '';
+            updateProfileDOM(photoURL);
 
             try {
-                const userDoc = await window.firebaseService.db.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    if (userData.photoURL) {
-                        photoURL = userData.photoURL;
-                    } else if (userData.profileImage) {
-                        photoURL = userData.profileImage;
+                if (window.firebaseService && window.firebaseService.db) {
+                    const userDoc = await window.firebaseService.db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        if (userData.photoURL) {
+                            photoURL = userData.photoURL;
+                        } else if (userData.profileImage) {
+                            photoURL = userData.profileImage;
+                        }
                     }
                 }
             } catch (docErr) {
