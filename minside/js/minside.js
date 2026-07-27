@@ -3246,6 +3246,61 @@ class MinSideManager {
             }
         });
 
+        // ── Auto-save helper for forms ──
+        const bindFormAutoSave = (formContainer, saveFn, delay = 600) => {
+            if (!formContainer) return;
+            let timer = null;
+            const trigger = () => {
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(async () => {
+                    try {
+                        await saveFn();
+                    } catch (err) {
+                        console.warn('Autosave error:', err);
+                    }
+                }, delay);
+            };
+
+            formContainer.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.dataset.autosaveBound) return;
+                el.dataset.autosaveBound = 'true';
+                if (el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT') {
+                    el.addEventListener('change', trigger);
+                } else {
+                    el.addEventListener('input', trigger);
+                }
+            });
+        };
+
+        // Wire automatic auto-save on input changes
+        if (contactCard) {
+            bindFormAutoSave(contactCard, async () => {
+                await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country']);
+                this.profileData = await this.getMergedProfile(this.currentUser);
+                this.updateHeader();
+            }, 600);
+        }
+
+        if (personalCard) {
+            bindFormAutoSave(personalCard, async () => {
+                await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
+            }, 600);
+        }
+
+        const prefsTab = document.getElementById('profile-tab-content-notifications');
+        if (prefsTab) {
+            bindFormAutoSave(prefsTab, async () => {
+                document.getElementById('save-prefs-btn')?.click();
+            }, 400);
+        }
+
+        const customNavTab = document.getElementById('profile-tab-content-custom-nav');
+        if (customNavTab) {
+            bindFormAutoSave(customNavTab, async () => {
+                document.getElementById('save-custom-nav-btn')?.click();
+            }, 300);
+        }
+
         this._wireFamilySearch();
         this._wireAddressAutocomplete();
 
@@ -3350,10 +3405,20 @@ class MinSideManager {
     }
 
     async _saveProfileFields(formEl, fields) {
-        if (!this.currentUser) return;
-        if (!formEl) return;
+        if (!this.currentUser || !formEl) return;
+        let badge = formEl.querySelector('.ms-autosave-badge');
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.className = 'ms-autosave-badge';
+            badge.style.cssText = 'font-size:12px; font-weight:600; color:#10B981; display:inline-flex; align-items:center; gap:4px; margin-top:8px; transition:opacity 0.3s; width:100%;';
+            formEl.appendChild(badge);
+        }
+        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">sync</span> Autolagrer...`;
+        badge.style.opacity = '1';
+
         const btn = formEl.querySelector('button[id^="save-"]');
-        if (btn) { btn.disabled = true; btn.textContent = t('common.saving'); }
+        if (btn) { btn.disabled = true; }
+
         try {
             const updates = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
             fields.forEach(f => {
@@ -3364,11 +3429,14 @@ class MinSideManager {
                 await this.currentUser.updateProfile({ displayName: updates.displayName });
             }
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
+
+            badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">check_circle</span> Endringer lagret i skyen`;
+            setTimeout(() => { if (badge) badge.style.opacity = '0'; }, 2500);
         } catch (e) {
             console.error('saveProfileFields:', e);
-            alert(t('common.saveError') + ': ' + e.message);
+            badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px; color:#ef4444;">error</span> Lagring feilet`;
         } finally {
-            if (btn) { btn.disabled = false; btn.textContent = t('common.saved'); }
+            if (btn) { btn.disabled = false; }
         }
     }
 

@@ -12938,7 +12938,7 @@ class AdminManager {
 
             let autosaveTimer = null;
             triggerAutosave = () => {
-                if (collectionId !== 'blog' && collectionId !== 'teaching') return;
+                if (!collectionId) return;
 
                 if (typeof updateLivePreview === 'function') updateLivePreview();
 
