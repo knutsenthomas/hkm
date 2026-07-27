@@ -899,6 +899,7 @@ class BibleReader {
     bindEvents() {
         const openTransModalHandler = (e) => {
             if (!e || e.isTrusted === false) return;
+            if (document.getElementById('hkm-devotional-modal')) return;
             const target = e.target;
             // Only trigger if directly clicking the translation button or its label
             if (target && (target.id === 'bible-translation-select' || target.id === 'bible-translation-select-mobile' || target.closest('#bible-translation-select') || target.closest('#bible-translation-select-mobile'))) {
@@ -2301,6 +2302,9 @@ class BibleReader {
     }
 
     async openTranslationModal() {
+        // Do not open translation modal if devotional modal is active
+        if (document.getElementById('hkm-devotional-modal')) return;
+
         const modal = document.getElementById('translation-selection-modal');
         const container = document.getElementById('translation-modal-options-list');
         if (!modal || !container) return;
@@ -2311,6 +2315,8 @@ class BibleReader {
 
         if (!this.bibles || this.bibles.length === 0) {
             console.warn("No bibles available for translation modal.");
+            modal.style.display = 'none';
+            modal.classList.remove('active');
             return;
         }
 
