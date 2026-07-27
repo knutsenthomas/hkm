@@ -1545,12 +1545,24 @@ class MinSideManager {
 
     _normalizeNotificationDoc(docLike) {
         const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        let rawTitle = typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert');
+        let rawType = typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default';
+        let rawLink = typeof raw.link === 'string' ? raw.link : '';
+
+        // Clean leading book & activity emojis (📖, 📚, 📕, 📙, 📘, 📗, etc.)
+        const cleanTitle = rawTitle.replace(/^[📖📚📕📙📘📗\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]\s*/u, '').trim();
+
+        // Check if this is a reading notification
+        const isReading = cleanTitle.includes('Leseplan') || cleanTitle.includes('bibellesing') || cleanTitle.includes('Bibeltekst') || rawType === 'reading' || (rawLink && rawLink.includes('plan='));
+
         return {
             id: docLike?.id || raw.id || '',
-            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert'),
+            title: cleanTitle,
+            originalTitle: rawTitle,
             body: typeof raw.body === 'string' ? raw.body : '',
-            type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
-            link: typeof raw.link === 'string' ? raw.link : '',
+            type: isReading ? 'reading' : rawType,
+            isReading: isReading,
+            link: rawLink,
             read: raw.read === true,
             archived: raw.archived === true,
             createdAt: raw.createdAt || null,
@@ -3722,8 +3734,9 @@ class MinSideManager {
             }
 
             const iconMap = {
-                push: { icon: 'campaign', toneClass: 'activity-icon-tone-push' },
-                message: { icon: 'mail', toneClass: 'activity-icon-tone-message' },
+                push:    { icon: 'campaign',      toneClass: 'activity-icon-tone-push' },
+                message: { icon: 'mail',          toneClass: 'activity-icon-tone-message' },
+                reading: { icon: 'auto_stories',  toneClass: 'activity-icon-tone-push' },
                 default: { icon: 'notifications', toneClass: 'activity-icon-tone-default' },
             };
 
@@ -3738,8 +3751,11 @@ class MinSideManager {
                         <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
                     <div class="activity-content">
-                        <div class="activity-title">${d.title}</div>
-                        ${d.body ? `<div class="activity-body">${d.body}</div>` : ''}
+                        <div class="activity-title" style="display:flex; align-items:center; gap:6px;">
+                            ${d.isReading ? `<span class="material-symbols-outlined" style="font-size:16px !important; color:#d17d39 !important; display:inline-flex !important; align-items:center !important; flex-shrink:0;">auto_stories</span>` : ''}
+                            <span>${this._escapeHtml(d.title)}</span>
+                        </div>
+                        ${d.body ? `<div class="activity-body">${this._escapeHtml(d.body)}</div>` : ''}
                         <div class="activity-time">${this._timeAgo(date)}</div>
                     </div>
                 </div>`;
