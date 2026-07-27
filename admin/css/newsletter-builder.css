@@ -297,7 +297,6 @@
     display: inline-flex !important;
     align-items: stretch !important;
     border-radius: 10px !important;
-    overflow: hidden !important;
     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
     box-shadow: 0 2px 8px rgba(209, 125, 57, 0.28) !important;
     border: none !important;
@@ -306,6 +305,60 @@
     margin: 0 !important;
     height: 36px !important;
     transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-menu {
+    position: absolute !important;
+    top: 44px !important;
+    right: 0 !important;
+    width: 270px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.06) !important;
+    padding: 6px !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    background: transparent !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-item:hover {
+    background: #f8fafc !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-item .material-symbols-outlined {
+    font-size: 20px !important;
+    color: #d17d39 !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-item strong {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+
+#newsletter-builder-layout .publish-dropdown-item small {
+    display: block !important;
+    font-size: 11px !important;
+    color: #64748b !important;
 }
 
 #newsletter-builder-layout .btn-group-publish:hover {

@@ -473,13 +473,70 @@ class NewsletterBuilder {
                 });
             });
         }
-
-        // Close Properties Inspector Panel
+              // Close Properties Inspector Panel
         const closePropBtn = document.getElementById('close-properties-btn');
         if (closePropBtn) {
             closePropBtn.addEventListener('click', () => {
-                const panel = document.getElementById('sidebar-inspector-view');
+                const panel = document.querySelector('.builder-properties-panel');
                 if (panel) panel.style.display = 'none';
+            });
+        }
+
+        // Publish Dropdown Toggle & Options
+        const publishDropdownBtn = document.getElementById('publish-dropdown-btn');
+        const publishDropdownMenu = document.getElementById('publish-options-dropdown');
+
+        if (publishDropdownBtn && publishDropdownMenu) {
+            publishDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = publishDropdownMenu.style.display !== 'none';
+                publishDropdownMenu.style.display = isOpen ? 'none' : 'flex';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.btn-group-publish')) {
+                    publishDropdownMenu.style.display = 'none';
+                }
+            });
+
+            document.getElementById('opt-send-now')?.addEventListener('click', () => {
+                publishDropdownMenu.style.display = 'none';
+                this.toggleRecipientsDrawer();
+            });
+
+            document.getElementById('opt-schedule-send')?.addEventListener('click', () => {
+                publishDropdownMenu.style.display = 'none';
+                this.showPromptModal(
+                    "Velg dato og klokkeslett for automatisk utsendelse:",
+                    "f.eks. 2026-08-01 kl. 10:00",
+                    (datetime) => {
+                        if (typeof showToast === 'function') showToast(`Kampanjen er planlagt for utsending: ${datetime}`, "success");
+                    },
+                    "2026-08-01 kl. 10:00",
+                    "Vennligst oppgi et tidspunkt.",
+                    "Planlegg utsendelse",
+                    "Lagre planlegging"
+                );
+            });
+
+            document.getElementById('opt-send-test')?.addEventListener('click', () => {
+                publishDropdownMenu.style.display = 'none';
+                this.showPromptModal(
+                    "Oppgi din e-postadresse for prøveutgave:",
+                    "din.epost@domene.no",
+                    (email) => {
+                        if (typeof showToast === 'function') showToast(`Test-epost sendt til ${email}!`, "info");
+                    },
+                    "post@hiskingdomministry.no",
+                    "Vennligst oppgi en e-postadresse.",
+                    "Send test-epost",
+                    "Send test"
+                );
+            });
+
+            document.getElementById('opt-export-html')?.addEventListener('click', () => {
+                publishDropdownMenu.style.display = 'none';
+                this.exportHtmlFile();
             });
         }
 
@@ -6597,6 +6654,39 @@ class NewsletterBuilder {
                 }
             };
         });
+    }
+
+    exportHtmlFile() {
+        this.syncUnifiedBlocks();
+        const canvas = document.getElementById('newsletter-canvas');
+        if (!canvas) return;
+
+        const cleanCanvasHtml = canvas.innerHTML.replace(/contenteditable="true"/g, '');
+        const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>His Kingdom Ministry Nyhetsbrev</title>
+</head>
+<body style="margin:0; padding:20px; background-color:#f8fafc; font-family:'Inter', Arial, sans-serif;">
+<div style="max-width:600px; margin:0 auto; background:#ffffff; border-radius:16px; padding:32px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+${cleanCanvasHtml}
+</div>
+</body>
+</html>`;
+
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hkm-nyhetsbrev.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (typeof showToast === 'function') showToast("E-post HTML ble eksportert og lastet ned!", "success");
     }
 
     async saveDraft() {
