@@ -1357,6 +1357,16 @@ class NewsletterBuilder {
             type: 'text',
             content: { text: container.innerHTML }
         }];
+
+        try {
+            const currentHtml = container.innerHTML;
+            const currentSubject = document.getElementById('newsletter-subject')?.value || '';
+            if (currentHtml && currentHtml !== '<p><br></p>') {
+                localStorage.setItem('hkm_builder_autosave_html', currentHtml);
+                localStorage.setItem('hkm_builder_autosave_subject', currentSubject);
+            }
+        } catch (e) {}
+
         this.triggerAutosave();
     }
 
@@ -4774,9 +4784,27 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
-        // Auto-initialize with a placeholder paragraph if empty
+        // Auto-initialize from localStorage or default HKM template if empty
         if (this.blocks.length === 0) {
-            container.innerHTML = '<p><br></p>';
+            const autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
+            const autosavedSubject = localStorage.getItem('hkm_builder_autosave_subject');
+
+            if (autosavedHtml && autosavedHtml.trim().length > 15) {
+                container.innerHTML = autosavedHtml;
+                if (autosavedSubject) {
+                    const subjectInput = document.getElementById('newsletter-subject');
+                    if (subjectInput && !subjectInput.value) subjectInput.value = autosavedSubject;
+                }
+            } else {
+                container.innerHTML = `
+                    <p><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=80" alt="HKM Månedsbrev" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
+                    <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; margin-top: 20px;">Kjære venn av His Kingdom Ministry</h2>
+                    <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg. Gud gjør store ting i vår midte, og vi ønsker å oppmuntre deg i din vandring.</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Les mer på nettsiden</a>
+                    </div>
+                `;
+            }
             this.syncUnifiedBlocks();
             return;
         }
