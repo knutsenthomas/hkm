@@ -254,46 +254,103 @@
 #newsletter-builder-layout .btn-secondary-outline {
     background: #ffffff !important;
     border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 7px 16px !important;
+    border-radius: 10px !important;
+    padding: 0 16px !important;
+    height: 36px !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     color: #334155 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
+    outline: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 #newsletter-builder-layout .btn-secondary-outline:hover {
     border-color: #94a3b8 !important;
     background: #f8fafc !important;
+    color: #0f172a !important;
 }
 
+#newsletter-builder-layout .btn-secondary-outline:focus,
+#newsletter-builder-layout .btn-secondary-outline:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* EXECUTIVE PUBLISH BUTTON (HKM Terracotta Brand Palette) */
 #newsletter-builder-layout .btn-group-publish {
     display: inline-flex !important;
-    border-radius: 8px !important;
+    align-items: stretch !important;
+    border-radius: 10px !important;
     overflow: hidden !important;
-    box-shadow: 0 2px 6px rgba(209, 125, 57, 0.25) !important;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    box-shadow: 0 2px 8px rgba(209, 125, 57, 0.28) !important;
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
+}
+
+#newsletter-builder-layout .btn-group-publish:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.4) !important;
+}
+
+#newsletter-builder-layout .btn-group-publish:active {
+    transform: translateY(0) !important;
 }
 
 #newsletter-builder-layout .btn-primary-publish {
-    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    background: transparent !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 18px !important;
+    padding: 0 16px !important;
     font-size: 13px !important;
     font-weight: 700 !important;
     cursor: pointer !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
 }
 
 #newsletter-builder-layout .btn-primary-publish-arrow {
-    background: #bd4f2a !important;
+    background: rgba(0, 0, 0, 0.12) !important;
     color: #ffffff !important;
     border: none !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-    padding: 8px 10px !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
+    padding: 0 10px !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+    transition: background 0.2s ease !important;
+}
+
+#newsletter-builder-layout .btn-primary-publish-arrow:hover {
+    background: rgba(0, 0, 0, 0.22) !important;
+}
+
+#newsletter-builder-layout .btn-primary-publish:focus,
+#newsletter-builder-layout .btn-primary-publish-arrow:focus,
+#newsletter-builder-layout .btn-primary-publish:active,
+#newsletter-builder-layout .btn-primary-publish-arrow:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
 }
 
 /* 3. Main Body Layout (Nav Sidebar | Elements | Canvas | Properties) */
