@@ -12,7 +12,7 @@ const _part2 = "AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
 
 window.firebaseConfig = {
     apiKey: _part1 + _part2,
-    authDomain: "his-kingdom-ministry.firebaseapp.com",
+    authDomain: "hiskingdomministry.no",
     projectId: "his-kingdom-ministry",
     storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",

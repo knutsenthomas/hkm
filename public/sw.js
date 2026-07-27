@@ -169,7 +169,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 // Initialize Firebase App in service worker
 firebase.initializeApp({
     apiKey: "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE",
-    authDomain: "his-kingdom-ministry.firebaseapp.com",
+    authDomain: "hiskingdomministry.no",
     projectId: "his-kingdom-ministry",
     messagingSenderId: "791237361706",
     appId: "1:791237361706:web:63516ba3d74436f23ac353"
