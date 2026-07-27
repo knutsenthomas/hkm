@@ -5097,9 +5097,11 @@ class NewsletterBuilder {
         const drawer = document.getElementById('recipients-drawer');
         const canvasContainer = document.getElementById('canvas-container');
         const leftSidebar = document.getElementById('elements-panel') || document.querySelector('.builder-elements-panel');
+        const darkSidebar = document.querySelector('.builder-dark-sidebar');
         const rightInspector = document.querySelector('.builder-properties-panel');
         const leftToolbarTitle = document.getElementById('sidebar-title');
         const centerToolbarCell = document.querySelector('.toolbar-center-cell');
+        const rightToolbarCell = document.querySelector('.toolbar-right-cell');
         const saveDraftBtn = document.getElementById('save-draft-btn');
         const previewBtn = document.getElementById('preview-btn');
 
@@ -5108,11 +5110,18 @@ class NewsletterBuilder {
         if (this.isRecipientsDrawerOpen) {
             if (canvasContainer) canvasContainer.style.setProperty('display', 'none', 'important');
             if (leftSidebar) leftSidebar.style.setProperty('display', 'none', 'important');
+            if (darkSidebar) darkSidebar.style.setProperty('display', 'none', 'important');
             if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'none', 'important');
             if (saveDraftBtn) saveDraftBtn.style.setProperty('display', 'none', 'important');
             if (previewBtn) previewBtn.style.setProperty('display', 'none', 'important');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Mottakere & Utsendelse';
+
+            if (rightToolbarCell) {
+                rightToolbarCell.style.setProperty('display', 'flex', 'important');
+                rightToolbarCell.style.setProperty('visibility', 'visible', 'important');
+                rightToolbarCell.style.setProperty('opacity', '1', 'important');
+            }
 
             drawer.style.setProperty('display', 'block', 'important');
             drawer.classList.add('open');
@@ -5123,6 +5132,7 @@ class NewsletterBuilder {
             drawer.classList.remove('open');
             if (canvasContainer) canvasContainer.style.setProperty('display', 'block', 'important');
             if (leftSidebar) leftSidebar.style.setProperty('display', 'flex', 'important');
+            if (darkSidebar) darkSidebar.style.setProperty('display', 'flex', 'important');
             if (rightInspector) rightInspector.style.setProperty('display', 'block', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'flex', 'important');
             if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');

@@ -3138,9 +3138,10 @@ body.builder-recipients-open .recipient-flow {
     display: block !important;
 }
 
-/* Hide left elements panel and right properties panel when recipients page is open */
+/* Hide left elements panel, dark sidebar, and right properties panel when recipients page is open */
 body.builder-recipients-open #elements-panel,
 body.builder-recipients-open .builder-elements-panel,
+body.builder-recipients-open .builder-dark-sidebar,
 body.builder-recipients-open .builder-properties-panel {
     display: none !important;
 }
