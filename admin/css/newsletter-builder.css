@@ -3114,30 +3114,30 @@ body.builder-active .builder-workspace > .canvas-container {
     position: relative !important;
 }
 
-/* Recipients View Full-Width Workspace Layout (Under header & flush against left dark sidebar) */
-body.builder-recipients-open #builder-workspace-center,
-body.builder-recipients-open .builder-workspace-center {
-    flex: 1 1 0% !important;
-    width: 0 !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    padding: 24px 24px 80px 24px !important;
-    box-sizing: border-box !important;
+/* Recipients View Overlay Layout (Positioned flush next to left 190px sidebar, under top header) */
+body.builder-recipients-open #recipients-drawer,
+body.builder-recipients-open .recipients-drawer {
+    position: absolute !important;
+    left: 190px !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: calc(100% - 190px) !important;
+    height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     background: #f8fafc !important;
-    position: relative !important;
-}
-
-body.builder-recipients-open #recipients-drawer,
-body.builder-recipients-open .recipients-drawer {
-    width: 100% !important;
-    max-width: 100% !important;
+    z-index: 100 !important;
+    padding: 28px 32px 80px 32px !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    position: relative !important;
+}
+
+body.builder-recipients-open .drawer-inner-content {
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
 }
 
 body.builder-recipients-open .recipient-page-header {
@@ -3161,29 +3161,27 @@ body.builder-recipients-open .recipient-page-header p {
 
 body.builder-recipients-open .recipient-flow {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 260px !important;
-    gap: 20px !important;
+    grid-template-columns: minmax(0, 1fr) 280px !important;
+    gap: 24px !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
+    align-items: start !important;
+    overflow: visible !important;
 }
 
 body.builder-recipients-open .main-selection {
     min-width: 0 !important;
+    width: 100% !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
 }
 
 body.builder-recipients-open .selection-sidebar {
-    width: 260px !important;
-    min-width: 0 !important;
-    max-width: 260px !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
-}
-
-.builder-workspace-center .recipients-drawer.open {
-    display: block !important;
+    position: sticky !important;
+    top: 24px !important;
 }
 
 /* Hide left elements panel and right properties panel when recipients page is open (Keep dark sidebar visible on far left) */
