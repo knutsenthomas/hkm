@@ -569,6 +569,11 @@ class NewsletterBuilder {
                     }
                     return;
                 }
+
+                const headerBlock = e.target.closest('.canvas-header');
+                if (headerBlock) {
+                    this.showHeaderInspector();
+                }
             });
 
             // Wix-style deselect listener when clicking outside
@@ -3533,6 +3538,102 @@ class NewsletterBuilder {
             this.exec('insertHTML', finalTag);
             this.syncUnifiedBlocks();
             closeModal();
+        });
+    }
+
+    showHeaderInspector() {
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!inspectorView) return;
+
+        if (defaultView) defaultView.style.display = 'none';
+        inspectorView.style.display = 'flex';
+
+        const headerNode = document.querySelector('.canvas-header');
+        if (!headerNode) return;
+
+        const badgeEl = headerNode.querySelector('.premium-header-badge');
+        const logoImg = headerNode.querySelector('.newsletter-logo');
+        const titleEl = headerNode.querySelector('.canvas-brand-name');
+        const issueEl = headerNode.querySelector('.canvas-brand-issue');
+
+        const badgeText = badgeEl ? badgeEl.innerText.trim() : 'E-POSTHODE';
+        const logoSrc = logoImg ? logoImg.src : '';
+        const titleText = titleEl ? titleEl.innerText.trim() : 'HKM STUDIO MÅNEDSBREV';
+        const issueText = issueEl ? issueEl.innerText.trim() : 'Juli utgave';
+
+        inspectorView.innerHTML = `
+            <div class="inspector-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Rediger E-posthode</h2>
+            </div>
+            
+            <div class="inspector-body" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Header Badge Input -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Top Badge (Merke)</label>
+                    <input type="text" id="hdr-inspector-badge" value="${badgeText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
+                </div>
+
+                <!-- Logo URL Input -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Logo Bilde (URL)</label>
+                    <input type="text" id="hdr-inspector-logo" value="${logoSrc.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px; margin-bottom: 8px;">
+                    <button type="button" id="hdr-btn-change-logo" class="btn-secondary-outline" style="width: 100%; height: 34px; justify-content: center; border-radius: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">upload</span>
+                        <span>Velg bilde fra arkiv</span>
+                    </button>
+                </div>
+
+                <!-- Brand Title Input -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Hovedtittel</label>
+                    <input type="text" id="hdr-inspector-title" value="${titleText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
+                </div>
+
+                <!-- Issue Subtitle Input -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Undertittel / Utgave</label>
+                    <input type="text" id="hdr-inspector-issue" value="${issueText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
+                </div>
+            </div>
+        `;
+
+        // Wire up live updates
+        document.getElementById('hdr-inspector-badge')?.addEventListener('input', (e) => {
+            if (badgeEl) badgeEl.innerText = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        document.getElementById('hdr-inspector-logo')?.addEventListener('input', (e) => {
+            if (logoImg) logoImg.src = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        document.getElementById('hdr-inspector-title')?.addEventListener('input', (e) => {
+            if (titleEl) titleEl.innerText = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        document.getElementById('hdr-inspector-issue')?.addEventListener('input', (e) => {
+            if (issueEl) issueEl.innerText = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+
+        // Logo image picker button integration
+        document.getElementById('hdr-btn-change-logo')?.addEventListener('click', () => {
+            if (typeof this.openImageManager === 'function') {
+                this.openImageManager((selectedUrl) => {
+                    if (logoImg) logoImg.src = selectedUrl;
+                    const input = document.getElementById('hdr-inspector-logo');
+                    if (input) input.value = selectedUrl;
+                    this.syncUnifiedBlocks();
+                });
+            } else {
+                const newUrl = prompt("Lim inn ny logo-URL:", logoSrc);
+                if (newUrl) {
+                    if (logoImg) logoImg.src = newUrl;
+                    const input = document.getElementById('hdr-inspector-logo');
+                    if (input) input.value = newUrl;
+                    this.syncUnifiedBlocks();
+                }
+            }
         });
     }
 

@@ -353,6 +353,26 @@
     border-color: transparent !important;
 }
 
+/* Editable Canvas Header Styles */
+#newsletter-builder-layout .canvas-header {
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+    position: relative !important;
+}
+
+#newsletter-builder-layout .canvas-header:hover {
+    background: rgba(209, 125, 57, 0.04) !important;
+}
+
+#newsletter-builder-layout .newsletter-logo {
+    transition: transform 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+#newsletter-builder-layout .newsletter-logo:hover {
+    transform: scale(1.04) !important;
+}
+
 /* 3. Main Body Layout (Nav Sidebar | Elements | Canvas | Properties) */
 #newsletter-builder-layout .builder-body-container {
     display: flex !important;
