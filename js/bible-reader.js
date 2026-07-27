@@ -898,6 +898,7 @@ class BibleReader {
 
     bindEvents() {
         const openTransModalHandler = (e) => {
+            if (e && e.isTrusted === false) return; // Prevent synthetic / programmatic triggers when loading plans
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -906,15 +907,11 @@ class BibleReader {
         };
 
         if (this.dom.translationSelect) {
-            this.dom.translationSelect.addEventListener('mousedown', openTransModalHandler);
-            this.dom.translationSelect.addEventListener('touchstart', openTransModalHandler);
             this.dom.translationSelect.addEventListener('click', openTransModalHandler);
         }
 
         const mobileTransSelect = document.getElementById('bible-translation-select-mobile');
         if (mobileTransSelect) {
-            mobileTransSelect.addEventListener('mousedown', openTransModalHandler);
-            mobileTransSelect.addEventListener('touchstart', openTransModalHandler);
             mobileTransSelect.addEventListener('click', openTransModalHandler);
         }
 
@@ -2305,6 +2302,15 @@ class BibleReader {
         const modal = document.getElementById('translation-selection-modal');
         const container = document.getElementById('translation-modal-options-list');
         if (!modal || !container) return;
+
+        if (!this.bibles || this.bibles.length === 0) {
+            this.loadTranslations().then(() => {
+                if (this.bibles && this.bibles.length > 0) {
+                    this.openTranslationModal();
+                }
+            });
+            return;
+        }
 
         container.innerHTML = (this.bibles || []).map(t => {
             const isSelected = t.id === this.selectedBibleId;
