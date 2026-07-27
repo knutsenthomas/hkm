@@ -423,6 +423,10 @@ class BibleReader {
     }
 
     async init() {
+        // Ensure translation-selection-modal is completely removed from DOM
+        const oldModal = document.getElementById('translation-selection-modal');
+        if (oldModal) oldModal.remove();
+
         if (firebaseService) {
             firebaseService.tryAutoInit();
         }

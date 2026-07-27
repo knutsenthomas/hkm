@@ -4336,25 +4336,7 @@
         </div>
     </div>
 
-    <!-- Translation Selection Modal -->
-    <div id="translation-selection-modal" class="color-wheel-modal-overlay" style="display: none;" onclick="if(event.target===this){ this.classList.remove('active'); this.style.display='none'; }">
-        <div class="color-wheel-card translation-modal-card" onclick="event.stopPropagation();">
-            <div class="color-wheel-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle, rgba(0,0,0,0.06)); padding-bottom: 14px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="material-symbols-outlined" style="color: var(--hkm-terracotta, #d17d39); font-size: 24px;">translate</span>
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--text-base);">Select Bible Translation</h3>
-                </div>
-                <button class="color-wheel-close-btn" title="Close" onclick="const m=document.getElementById('translation-selection-modal'); if(m){ m.classList.remove('active'); m.style.display='none'; }">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <div class="color-wheel-body" style="margin-top: 16px;">
-                <div id="translation-modal-options-list" class="translation-options-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <!-- Dynamically populated options -->
-                </div>
-            </div>
-        </div>
-    </div>
+
 
 </body>
 
