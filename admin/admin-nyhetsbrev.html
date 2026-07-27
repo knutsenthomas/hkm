@@ -1153,98 +1153,102 @@
                 </main>
 
                 <!-- 3. Høyre Egenskaper-panel -->
-                <aside class="builder-properties-panel" id="sidebar-inspector-view">
-                    <div class="properties-header">
-                        <h3>Egenskaper</h3>
-                        <button class="btn-close-properties" id="close-properties-btn">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
+                <aside class="builder-properties-panel">
+                    <div id="sidebar-default-view" class="properties-default-view">
+                        <div class="properties-header">
+                            <h3>Egenskaper</h3>
+                            <button class="btn-close-properties" id="close-properties-btn">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
 
-                    <div class="properties-body">
-                        <!-- Stil og utseende -->
-                        <div class="properties-section">
-                            <div class="section-header-collapsible">
-                                <span>Stil & Utseende</span>
-                                <span class="material-symbols-outlined collapse-icon">remove</span>
-                            </div>
-
-                            <div class="section-content">
-                                <!-- Skrifttype -->
-                                <div class="prop-group">
-                                    <label>Skrifttype</label>
-                                    <select id="prop-font-select" class="prop-select">
-                                        <option value="'Inter', sans-serif">Tekstblokk</option>
-                                        <option value="'Playfair Display', serif">Overskrift 1</option>
-                                        <option value="Arial, sans-serif">Overskrift 2</option>
-                                        <option value="Georgia, serif">Underoverskrift</option>
-                                    </select>
+                        <div class="properties-body">
+                            <!-- Stil og utseende -->
+                            <div class="properties-section">
+                                <div class="section-header-collapsible">
+                                    <span>Stil & Utseende</span>
+                                    <span class="material-symbols-outlined collapse-icon">remove</span>
                                 </div>
 
-                                <!-- Skriftstørrelse -->
-                                <div class="prop-group">
-                                    <label>Skriftstørrelse</label>
-                                    <div class="prop-number-stepper">
-                                        <input type="number" id="prop-font-size-input" value="14" min="10" max="72" class="prop-number-input">
+                                <div class="section-content">
+                                    <!-- Skrifttype -->
+                                    <div class="prop-group">
+                                        <label>Skrifttype</label>
+                                        <select id="prop-font-select" class="prop-select">
+                                            <option value="'Inter', sans-serif">Tekstblokk</option>
+                                            <option value="'Playfair Display', serif">Overskrift 1</option>
+                                            <option value="Arial, sans-serif">Overskrift 2</option>
+                                            <option value="Georgia, serif">Underoverskrift</option>
+                                        </select>
                                     </div>
-                                </div>
 
-                                <!-- Farge -->
-                                <div class="prop-group">
-                                    <label>Farge</label>
-                                    <div class="prop-color-wrapper">
-                                        <input type="text" id="prop-color-hex" value="#D68600" class="prop-hex-input">
-                                        <input type="color" id="prop-color-picker" value="#D68600" class="prop-color-swatch">
-                                    </div>
-                                </div>
-
-                                <!-- Tekstjustering -->
-                                <div class="prop-group">
-                                    <label>Tekstjustering</label>
-                                    <div class="prop-align-btn-group">
-                                        <button type="button" class="align-btn active" data-align="left" title="Venstrejuster">
-                                            <span class="material-symbols-outlined">format_align_left</span>
-                                        </button>
-                                        <button type="button" class="align-btn" data-align="center" title="Sentrer">
-                                            <span class="material-symbols-outlined">format_align_center</span>
-                                        </button>
-                                        <button type="button" class="align-btn" data-align="right" title="Høyrejuster">
-                                            <span class="material-symbols-outlined">format_align_right</span>
-                                        </button>
-                                        <button type="button" class="align-btn" data-align="justify" title="Blokkjuster">
-                                            <span class="material-symbols-outlined">format_align_justify</span>
-                                        </button>
-                                        <button type="button" class="align-btn" data-align="indent" title="Innrykk">
-                                            <span class="material-symbols-outlined">format_indent_increase</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Polstring / Margin -->
-                                <div class="prop-group">
-                                    <label>Polstring / Margin</label>
-                                    <div class="padding-steppers-grid">
-                                        <div class="stepper-box">
-                                            <div class="stepper-controls">
-                                                <button type="button" class="btn-step" data-step="width-minus">-</button>
-                                                <input type="text" class="stepper-val-display" value="" readonly>
-                                                <button type="button" class="btn-step" data-step="width-plus">+</button>
-                                            </div>
-                                            <span class="stepper-label">Bredde</span>
+                                    <!-- Skriftstørrelse -->
+                                    <div class="prop-group">
+                                        <label>Skriftstørrelse</label>
+                                        <div class="prop-number-stepper">
+                                            <input type="number" id="prop-font-size-input" value="14" min="10" max="72" class="prop-number-input">
                                         </div>
-                                        <div class="stepper-box">
-                                            <div class="stepper-controls">
-                                                <button type="button" class="btn-step" data-step="top-minus">-</button>
-                                                <input type="text" class="stepper-val-display" value="" readonly>
-                                                <button type="button" class="btn-step" data-step="top-plus">+</button>
+                                    </div>
+
+                                    <!-- Farge -->
+                                    <div class="prop-group">
+                                        <label>Farge</label>
+                                        <div class="prop-color-wrapper">
+                                            <input type="text" id="prop-color-hex" value="#D68600" class="prop-hex-input">
+                                            <input type="color" id="prop-color-picker" value="#D68600" class="prop-color-swatch">
+                                        </div>
+                                    </div>
+
+                                    <!-- Tekstjustering -->
+                                    <div class="prop-group">
+                                        <label>Tekstjustering</label>
+                                        <div class="prop-align-btn-group">
+                                            <button type="button" class="align-btn active" data-align="left" title="Venstrejuster">
+                                                <span class="material-symbols-outlined">format_align_left</span>
+                                            </button>
+                                            <button type="button" class="align-btn" data-align="center" title="Sentrer">
+                                                <span class="material-symbols-outlined">format_align_center</span>
+                                            </button>
+                                            <button type="button" class="align-btn" data-align="right" title="Høyrejuster">
+                                                <span class="material-symbols-outlined">format_align_right</span>
+                                            </button>
+                                            <button type="button" class="align-btn" data-align="justify" title="Blokkjuster">
+                                                <span class="material-symbols-outlined">format_align_justify</span>
+                                            </button>
+                                            <button type="button" class="align-btn" data-align="indent" title="Innrykk">
+                                                <span class="material-symbols-outlined">format_indent_increase</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Polstring / Margin -->
+                                    <div class="prop-group">
+                                        <label>Polstring / Margin</label>
+                                        <div class="padding-steppers-grid">
+                                            <div class="stepper-box">
+                                                <div class="stepper-controls">
+                                                    <button type="button" class="btn-step" data-step="width-minus">-</button>
+                                                    <input type="text" class="stepper-val-display" value="" readonly>
+                                                    <button type="button" class="btn-step" data-step="width-plus">+</button>
+                                                </div>
+                                                <span class="stepper-label">Bredde</span>
                                             </div>
-                                            <span class="stepper-label">Topp</span>
+                                            <div class="stepper-box">
+                                                <div class="stepper-controls">
+                                                    <button type="button" class="btn-step" data-step="top-minus">-</button>
+                                                    <input type="text" class="stepper-val-display" value="" readonly>
+                                                    <button type="button" class="btn-step" data-step="top-plus">+</button>
+                                                </div>
+                                                <span class="stepper-label">Topp</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div id="sidebar-inspector-view" class="properties-inspector-view" style="display: none;"></div>
                 </aside>
             </div>
         </div>

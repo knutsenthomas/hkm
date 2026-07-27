@@ -3529,9 +3529,9 @@ class NewsletterBuilder {
     showTextInspector(node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
-        if (!defaultView || !inspectorView) return;
+        if (!inspectorView) return;
 
-        defaultView.style.display = 'none';
+        if (defaultView) defaultView.style.display = 'none';
         inspectorView.style.display = 'flex';
 
         const computed = window.getComputedStyle(node);
@@ -3978,9 +3978,9 @@ class NewsletterBuilder {
     showImageInspector(img, node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
-        if (!defaultView || !inspectorView) return;
+        if (!inspectorView) return;
 
-        defaultView.style.display = 'none';
+        if (defaultView) defaultView.style.display = 'none';
         inspectorView.style.display = 'flex';
 
         const currentSrc = img.src || '';
@@ -4287,9 +4287,9 @@ class NewsletterBuilder {
     showButtonInspector(btn, node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
-        if (!defaultView || !inspectorView) return;
+        if (!inspectorView) return;
 
-        defaultView.style.display = 'none';
+        if (defaultView) defaultView.style.display = 'none';
         inspectorView.style.display = 'flex';
 
         const currentText = btn.innerText || 'Les mer';
