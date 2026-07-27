@@ -3138,12 +3138,15 @@ body.builder-recipients-open .recipient-flow {
     display: block !important;
 }
 
-/* Hide left elements panel, dark sidebar, and right properties panel when recipients page is open */
+/* Hide left elements panel and right properties panel when recipients page is open (Keep dark sidebar visible on far left) */
 body.builder-recipients-open #elements-panel,
 body.builder-recipients-open .builder-elements-panel,
-body.builder-recipients-open .builder-dark-sidebar,
 body.builder-recipients-open .builder-properties-panel {
     display: none !important;
+}
+
+body.builder-recipients-open .builder-dark-sidebar {
+    display: flex !important;
 }
 
 /* Ensure toolbar buttons on PC stay strictly on a single horizontal line */

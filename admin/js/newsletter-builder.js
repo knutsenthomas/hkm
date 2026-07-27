@@ -5110,7 +5110,7 @@ class NewsletterBuilder {
         if (this.isRecipientsDrawerOpen) {
             if (canvasContainer) canvasContainer.style.setProperty('display', 'none', 'important');
             if (leftSidebar) leftSidebar.style.setProperty('display', 'none', 'important');
-            if (darkSidebar) darkSidebar.style.setProperty('display', 'none', 'important');
+            if (darkSidebar) darkSidebar.style.setProperty('display', 'flex', 'important');
             if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'none', 'important');
             if (saveDraftBtn) saveDraftBtn.style.setProperty('display', 'none', 'important');
