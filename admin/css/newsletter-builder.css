@@ -2650,13 +2650,14 @@ input:checked+.slider:before {
     min-height: 72px !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
-    display: grid !important;
-    grid-template-columns: 1fr auto !important;
+    display: flex !important;
     align-items: center !important;
-    padding: 0 24px !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
     position: relative !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    gap: 12px !important;
 }
 
 .builder-unified-header .header-left {
@@ -2690,10 +2691,10 @@ input:checked+.slider:before {
 .builder-unified-header .header-left-group {
     display: flex !important;
     align-items: center !important;
-    gap: 16px !important;
-    flex: 1 !important;
+    gap: 12px !important;
+    flex: 0 1 auto !important;
     justify-content: flex-start !important;
-    min-width: 0 !important; /* Allow shrinking without breakage */
+    min-width: 0 !important;
 }
 
 .builder-unified-header .header-subject-container {
@@ -2703,15 +2704,15 @@ input:checked+.slider:before {
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 8px !important;
-    padding: 0 16px !important;
-    height: 40px !important;
+    padding: 0 12px !important;
+    height: 38px !important;
     flex: 1 !important;
-    min-width: 140px !important;
-    max-width: 280px !important;
-    width: auto !important; /* Allow dynamic scaling */
+    min-width: 120px !important;
+    max-width: 240px !important;
+    width: auto !important;
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
-    flex-shrink: 1 !important; /* Allow shrinking if needed */
+    flex-shrink: 1 !important;
 }
 
 .builder-unified-header .header-subject-container:focus-within {
@@ -2740,8 +2741,6 @@ input:checked+.slider:before {
     color: #94a3b8 !important;
 }
 
-
-
 .builder-unified-header .device-toggles-modern {
     display: inline-flex !important;
     align-items: center !important;
@@ -2750,10 +2749,12 @@ input:checked+.slider:before {
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 10px !important;
-    padding: 4px !important;
-    gap: 6px !important;
+    padding: 3px !important;
+    gap: 4px !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
 }
 
 .builder-unified-header .device-btn {
@@ -2770,7 +2771,7 @@ input:checked+.slider:before {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     padding: 0 !important;
     outline: none !important;
-    margin: 0 !important; /* SKUDDSIKKER SYMMETRI: Fjern alle marginer */
+    margin: 0 !important;
 }
 
 .builder-unified-header .device-btn span {
@@ -2786,7 +2787,6 @@ input:checked+.slider:before {
     transform: translateY(-0.5px) !important;
 }
 
-/* Spesial hover for forhåndsvisning-øye (oransje HKM-farge) */
 .builder-unified-header #preview-btn:hover {
     color: #d17d39 !important;
     background: rgba(209, 125, 57, 0.05) !important;
@@ -2807,10 +2807,10 @@ input:checked+.slider:before {
 .builder-unified-header .header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 16px !important;
-    flex: 1 !important;
+    gap: 10px !important;
+    flex: 0 0 auto !important;
     justify-content: flex-end !important;
-    flex-shrink: 0 !important; /* Prevent buttons from being pushed off the screen */
+    flex-shrink: 0 !important;
 }
 
 .builder-unified-header .header-action-btn {

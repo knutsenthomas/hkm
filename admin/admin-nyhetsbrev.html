@@ -1383,55 +1383,53 @@
                 <!-- Unified Sleek Control Header -->
                 <header class="builder-unified-header">
                     <div class="header-left-group">
-                        <div class="header-left">
-                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                                <span class="material-symbols-outlined">menu</span>
-                            </button>
-                        </div>
-                        
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+
                         <div class="header-subject-container">
                             <span class="material-symbols-outlined subject-icon">edit_note</span>
                             <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
                         </div>
 
-                        <!-- Premium Autolagring statusindikator -->
-                        <div id="newsletter-autosave-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-left: 12px; transition: opacity 0.3s ease; opacity: 0.8; flex-shrink: 0;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">cloud_done</span>
-                            <span id="newsletter-autosave-text">Lagret i skyen</span>
-                        </div>
-
-                        <!-- Device Toggles (flyttet mot venstre siden) -->
-                        <div class="device-toggles-modern" style="margin-left: 12px;">
-                            <button class="device-btn active" data-view="desktop" title="PC-visning">
-                                <span class="material-symbols-outlined">desktop_windows</span>
-                            </button>
-                            <button class="device-btn" data-view="mobile" title="Mobilvisning">
-                                <span class="material-symbols-outlined">smartphone</span>
-                            </button>
-                            <div class="toggle-divider" style="width: 1px; height: 16px; background: #e2e8f0; display: inline-block;"></div>
-                            <button class="device-btn" id="preview-btn" title="Forhåndsvisning">
-                                <span class="material-symbols-outlined">visibility</span>
-                            </button>
-                            <button class="device-btn" id="email-dark-mode-btn" title="Mørkt tema-simulator">
-                                <span class="material-symbols-outlined">dark_mode</span>
-                            </button>
+                        <!-- Autolagring statusindikator -->
+                        <div id="newsletter-autosave-status">
+                            <span class="material-symbols-outlined" style="font-size: 17px; color: #10b981;">cloud_done</span>
+                            <span id="newsletter-autosave-text">Lagret</span>
                         </div>
                     </div>
-                    
-                    <div class="header-actions">
 
-                        <button id="save-draft-btn" class="header-action-btn secondary-flat">
+                    <!-- Device & View Toggles (Center) -->
+                    <div class="device-toggles-modern">
+                        <button class="device-btn active" data-view="desktop" title="PC-visning">
+                            <span class="material-symbols-outlined">desktop_windows</span>
+                        </button>
+                        <button class="device-btn" data-view="mobile" title="Mobilvisning">
+                            <span class="material-symbols-outlined">smartphone</span>
+                        </button>
+                        <div class="toggle-divider" style="width: 1px; height: 16px; background: #e2e8f0; display: inline-block;"></div>
+                        <button class="device-btn" id="preview-btn" title="Forhåndsvisning">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        <button class="device-btn" id="email-dark-mode-btn" title="Mørkt tema-simulator">
+                            <span class="material-symbols-outlined">dark_mode</span>
+                        </button>
+                    </div>
+
+                    <!-- Header Actions (Right) -->
+                    <div class="header-actions">
+                        <button id="save-draft-btn" class="header-action-btn secondary-flat" title="Lagre kladd">
                             <span class="material-symbols-outlined">edit_document</span>
                             <span>Lagre kladd</span>
                         </button>
                         
-                        <button id="save-template-btn" class="header-action-btn secondary-flat">
+                        <button id="save-template-btn" class="header-action-btn secondary-flat" title="Lagre mal">
                             <span class="material-symbols-outlined">save</span>
                             <span>Lagre mal</span>
                         </button>
                         
-                        <button id="continue-btn" class="header-action-btn primary-action">
-                            <span>Velg mottakere</span>
+                        <button id="continue-btn" class="header-action-btn primary-action" title="Velg mottakere">
+                            <span>Mottakere</span>
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
                         
