@@ -1171,7 +1171,7 @@ class MinSideManager {
 
         document.getElementById('mobile-toggle')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (window.innerWidth > 1024) {
+            if (window.innerWidth > 768) {
                 document.body.classList.toggle('sidebar-collapsed');
             } else {
                 this.toggleSidebar(true);

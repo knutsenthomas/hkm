@@ -239,7 +239,9 @@ body {
 }
 
 .mobile-toggle-btn {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     color: var(--text-muted);
@@ -2260,6 +2262,91 @@ html[data-theme="dark"] .data-table tbody tr:hover {
     transform: scale(1.1);
 }
 
+/* Collapsed sidebar state (Desktop / Laptop) */
+body.sidebar-collapsed {
+    --sidebar-w: 72px !important;
+}
+
+body.sidebar-collapsed .sidebar {
+    width: 72px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+body.sidebar-collapsed .sidebar-logo-text,
+body.sidebar-collapsed .sidebar-group-title,
+body.sidebar-collapsed .nav-link span:not(.material-symbols-outlined),
+body.sidebar-collapsed .sidebar-footer,
+body.sidebar-collapsed .nav-badge {
+    display: none !important;
+}
+
+body.sidebar-collapsed .sidebar-logo {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body.sidebar-collapsed .nav-link {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+body.sidebar-collapsed .nav-link .material-symbols-outlined {
+    margin-right: 0;
+    font-size: 22px;
+}
+
+/* Laptop & Tablet Landscape: sleek, visible sidebar */
+@media (max-width: 1200px) {
+    :root {
+        --sidebar-w: 220px;
+    }
+}
+
+/* Mobile & Small Tablet: sidebar off-screen drawer below 768px */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-w: 0px !important;
+        --sidebar-width: 0px !important;
+    }
+
+    body.minside-body .sidebar {
+        left: -280px !important;
+        width: 280px !important;
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15) !important;
+        z-index: 13000 !important;
+        padding-bottom: 110px !important;
+    }
+
+    body.minside-body .sidebar.active {
+        left: 0 !important;
+        transform: translateX(0) !important;
+    }
+
+    .profile-header,
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .mobile-toggle-btn {
+        display: flex !important;
+    }
+
+    .ph-right .ph-badges {
+        display: none;
+    }
+
+    .main-content {
+        padding: 0;
+    }
+
+    #view-container {
+        padding: 20px 16px;
+    }
+}
+
 /* ══════════════════════════════════════════════════════════════════
    DELETE MODAL
    ══════════════════════════════════════════════════════════════════ */
@@ -4098,7 +4185,7 @@ html.prevent-fout:not(.fonts-loaded) .material-symbols-outlined {
     padding: 4px 0 !important;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
     /* Hide desktop header language picker, show mobile sidebar language picker */
     .header-lang-switcher {
         display: none !important;
