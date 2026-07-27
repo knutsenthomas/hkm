@@ -940,15 +940,17 @@ class FirebaseService {
             return await this.auth.signInWithPopup(provider);
         } catch (error) {
             const redirectFallbackCodes = new Set([
-                'auth/cancelled-popup-request',
-                'auth/operation-not-supported-in-this-environment',
-                'auth/popup-blocked',
-                'auth/popup-closed-by-user'
+                'auth/operation-not-supported-in-this-environment'
             ]);
 
             if (options.redirectFallback && redirectFallbackCodes.has(error?.code)) {
-                await this.auth.signInWithRedirect(provider);
-                return null;
+                try {
+                    await this.auth.signInWithRedirect(provider);
+                    return null;
+                } catch (redirectErr) {
+                    console.warn("[FirebaseService] signInWithRedirect fallback failed:", redirectErr);
+                    throw error;
+                }
             }
 
             throw error;
@@ -956,9 +958,14 @@ class FirebaseService {
     }
 
     async getGoogleRedirectResult() {
-        if (!this.isInitialized) throw new Error("Firebase not initialized");
-        await this.ensureAuthPersistence();
-        return this.auth.getRedirectResult();
+        if (!this.isInitialized) return null;
+        try {
+            await this.ensureAuthPersistence();
+            return await this.auth.getRedirectResult();
+        } catch (err) {
+            console.warn("[FirebaseService] getRedirectResult error handled safely:", err);
+            return null;
+        }
     }
 
     async logout() {

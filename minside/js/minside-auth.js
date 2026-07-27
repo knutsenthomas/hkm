@@ -263,7 +263,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function isGoogleRedirectError(error) {
-        return error && error.code && String(error.code).startsWith('auth/');
+        if (!error) return false;
+        const msg = String(error.message || '').toLowerCase();
+        const code = String(error.code || '').toLowerCase();
+        if (msg.includes('missing initial state') || msg.includes('sessionstorage') || code.includes('argument-error')) {
+            return false;
+        }
+        return code.startsWith('auth/');
     }
 
     async function ensureMemberProfile(user) {
