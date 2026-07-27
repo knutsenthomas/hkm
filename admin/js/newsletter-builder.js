@@ -3186,12 +3186,14 @@ class NewsletterBuilder {
 
     setView(view) {
         this.currentView = view;
-        document.querySelectorAll('.device-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.view === view);
+        document.querySelectorAll('.device-btn, .device-pill-btn').forEach(btn => {
+            if (btn) btn.classList.toggle('active', btn.dataset.view === view);
         });
 
-        const scaler = document.getElementById('canvas-scaler');
-        scaler.classList.toggle('mobile', view === 'mobile');
+        const scaler = document.getElementById('canvas-scaler') || document.getElementById('canvas-container');
+        if (scaler) {
+            scaler.classList.toggle('mobile', view === 'mobile');
+        }
     }
 
     getCurrentBlock(target) {

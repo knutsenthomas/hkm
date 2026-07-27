@@ -804,6 +804,16 @@
     padding: 30px 20px 120px 20px !important;
     box-sizing: border-box !important;
     overflow-y: visible !important;
+    transition: all 0.3s ease !important;
+}
+
+#newsletter-builder-layout .canvas-viewport.mobile #newsletter-canvas,
+#canvas-container.mobile #newsletter-canvas {
+    max-width: 375px !important;
+    margin: 0 auto !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
 }
 
 .builder-workspace-center {
