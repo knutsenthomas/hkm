@@ -4887,10 +4887,10 @@ window.addEventListener('load', () => {
 
         // Helper to update DOM states for both desktop and mobile profile elements
         const updateProfileDOM = (photoURL) => {
-            // Update Desktop header profile (hidden on mobile, flex on desktop)
+            // Update Desktop header profile
             if (profileLink) {
                 profileLink.classList.remove('hidden');
-                profileLink.classList.add('hidden', 'md:flex');
+                profileLink.classList.add('flex');
                 profileLink.href = '/minside/index.html';
                 if (photoURL && profileImg) {
                     profileImg.src = photoURL;
@@ -4904,6 +4904,7 @@ window.addEventListener('load', () => {
             // Update Mobile menu profile
             if (mobileProfileLink) {
                 mobileProfileLink.classList.remove('hidden');
+                mobileProfileLink.classList.add('flex');
                 mobileProfileLink.href = '/minside/index.html';
                 if (photoURL && mobileProfileImg) {
                     mobileProfileImg.src = photoURL;
@@ -4919,13 +4920,14 @@ window.addEventListener('load', () => {
         const hideProfileDOM = () => {
             if (profileLink) {
                 profileLink.classList.remove('hidden');
-                profileLink.classList.add('hidden', 'md:flex');
+                profileLink.classList.add('flex');
                 profileLink.href = '/minside/login.html';
                 if (profileImg) profileImg.classList.add('hidden');
                 if (profileIcon) profileIcon.classList.remove('hidden');
             }
             if (mobileProfileLink) {
                 mobileProfileLink.classList.remove('hidden');
+                mobileProfileLink.classList.add('flex');
                 mobileProfileLink.href = '/minside/login.html';
                 if (mobileProfileImg) mobileProfileImg.classList.add('hidden');
                 if (mobileProfileIcon) mobileProfileIcon.classList.remove('hidden');
