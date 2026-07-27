@@ -4987,20 +4987,12 @@ body.builder-active .builder-workspace > .main-header {
     }
 }
 
-@media (max-width: 1200px) {
-    #continue-btn span:not(.material-symbols-outlined) {
-        display: none !important; /* Hide main action button text on narrow widths */
-    }
-    /* Symmetrisk sirkulær oransje knapp på mobil/nettbrett */
-    .builder-unified-header #continue-btn {
-        padding: 0 !important;
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        border-radius: 50% !important;
-        justify-content: center !important;
-        margin: 0 !important; /* Fjern marginer */
-    }
+/* Ensure button text inside #continue-btn is always 100% visible */
+#continue-btn span,
+#continue-btn span:not(.material-symbols-outlined) {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    color: #ffffff !important;
 }
 
 @media (max-width: 1024px) {
