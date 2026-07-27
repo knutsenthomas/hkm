@@ -3108,29 +3108,31 @@ body.builder-active .builder-workspace > .canvas-container {
     overflow: hidden !important;
 }
 
-/* Recipients View Full-Width Workspace Layout (Under header) */
+/* Recipients View Full-Width Workspace Layout (Under header & right up against sidebar) */
 body.builder-recipients-open #builder-workspace-center,
 body.builder-recipients-open .builder-workspace-center {
     width: 100% !important;
     max-width: 100% !important;
-    flex: 1 1 100% !important;
-    padding: 32px 48px 80px 48px !important;
+    flex: 1 1 auto !important;
+    padding: 24px 32px 80px 32px !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
+    background: #f8fafc !important;
 }
 
 body.builder-recipients-open #recipients-drawer,
 body.builder-recipients-open .recipients-drawer {
     width: 100% !important;
-    max-width: 1280px !important;
-    margin: 0 auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     padding: 0 !important;
+    background: transparent !important;
 }
 
 body.builder-recipients-open .recipient-flow {
     display: grid !important;
     grid-template-columns: 1fr 360px !important;
-    gap: 32px !important;
+    gap: 24px !important;
     width: 100% !important;
 }
 
