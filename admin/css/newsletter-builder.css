@@ -14,22 +14,21 @@
     z-index: 99999 !important;
 }
 
-/* 1. Executive Top Header Bar (Clean White Theme) */
+/* 1. Dark Top Header Bar (Executive Dark Navy Theme - 52px height) */
 #newsletter-builder-layout .builder-top-appbar {
-    height: 56px !important;
-    min-height: 56px !important;
-    max-height: 56px !important;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    background: #0f172a !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0 24px !important;
-    color: #1e293b !important;
+    padding: 0 20px !important;
+    color: #ffffff !important;
     box-sizing: border-box !important;
     width: 100% !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
 }
 
 #newsletter-builder-layout .top-appbar-left {
@@ -42,36 +41,33 @@
     display: inline-flex !important;
     align-items: center !important;
     gap: 8px !important;
-    background: #f8fafc !important;
-    border: 1px solid #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
     border-radius: 8px !important;
     padding: 6px 14px !important;
-    color: #334155 !important;
+    color: #ffffff !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
 }
 
 #newsletter-builder-layout .btn-topbar-back:hover {
-    background: #f1f5f9 !important;
-    border-color: #94a3b8 !important;
-    color: #0f172a !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     transform: translateX(-2px) !important;
 }
 
 #newsletter-builder-layout .topbar-divider {
     width: 1px !important;
     height: 20px !important;
-    background: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     margin: 0 4px !important;
 }
 
 #newsletter-builder-layout .top-appbar-title {
     font-size: 14px !important;
-    font-weight: 700 !important;
-    color: #0f172a !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 #newsletter-builder-layout .top-appbar-right {
@@ -81,9 +77,9 @@
 }
 
 #newsletter-builder-layout .top-appbar-action-btn {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    color: #64748b !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
@@ -96,9 +92,8 @@
 }
 
 #newsletter-builder-layout .top-appbar-action-btn:hover {
-    background: #f1f5f9 !important;
-    color: #1e293b !important;
-    border-color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
 }
 
 #newsletter-builder-layout .notif-badge-dot {
@@ -116,16 +111,15 @@
     align-items: center !important;
     gap: 8px !important;
     cursor: pointer !important;
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 8px !important;
     padding: 4px 10px 4px 6px !important;
     transition: all 0.15s ease !important;
 }
 
 #newsletter-builder-layout .top-appbar-user-badge:hover {
-    background: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.18) !important;
 }
 
 #newsletter-builder-layout .top-appbar-avatar {
@@ -143,8 +137,8 @@
 
 #newsletter-builder-layout .top-appbar-username {
     font-size: 13px !important;
-    font-weight: 600 !important;
-    color: #334155 !important;
+    font-weight: 500 !important;
+    color: #ffffff !important;
 }
 }
 
