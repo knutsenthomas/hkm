@@ -5095,19 +5095,26 @@ class NewsletterBuilder {
     toggleRecipientsDrawer() {
         this.isRecipientsDrawerOpen = !this.isRecipientsDrawerOpen;
         const drawer = document.getElementById('recipients-drawer');
-        drawer.classList.toggle('open', this.isRecipientsDrawerOpen);
-        document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
+        if (!drawer) return;
 
         if (this.isRecipientsDrawerOpen) {
+            drawer.style.setProperty('display', 'block', 'important');
+            drawer.classList.add('open');
             this.closeToolsUi();
-        }
-
-        const continueBtn = document.getElementById('continue-btn');
-        if (this.isRecipientsDrawerOpen) {
-            continueBtn.innerHTML = '<span class="btn-label">Tilbake til design</span><span class="material-symbols-outlined">arrow_back</span>';
             this.updateRecipientSummary();
         } else {
-            continueBtn.innerHTML = '<span class="btn-label">Velg mottakere</span><span class="material-symbols-outlined">arrow_forward</span>';
+            drawer.style.setProperty('display', 'none', 'important');
+            drawer.classList.remove('open');
+        }
+        document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
+
+        const continueBtn = document.getElementById('continue-btn');
+        if (continueBtn) {
+            if (this.isRecipientsDrawerOpen) {
+                continueBtn.innerHTML = '<span class="btn-label">Tilbake til design</span><span class="material-symbols-outlined">arrow_back</span>';
+            } else {
+                continueBtn.innerHTML = '<span class="btn-label">Velg mottakere</span><span class="material-symbols-outlined">arrow_forward</span>';
+            }
         }
     }
 
