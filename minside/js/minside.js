@@ -2621,7 +2621,7 @@ class MinSideManager {
                         return `
                             <a href="${item.eventLink}" class="ov-event-card">
                                 <div class="ov-event-image">
-                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy" onerror="this.onerror=null; this.src='/img/fb_fallback_bazaar.jpg';">
                                     <div class="ov-event-date-badge">
                                         <span class="month">${monthUpper}</span>
                                         <span class="day">${day}</span>

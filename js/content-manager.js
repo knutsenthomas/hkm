@@ -2316,6 +2316,7 @@ class ContentManager {
 
                     const imageSrc = this._getEventImage(event);
                     const imageAlt = event.title || 'Arrangement';
+                    const fallbackSrc = this.getFallbackEventImage(event);
 
                     const rawDesc = event.seoDescription || event.excerpt || event.description || event.content || '';
                     const cleanExcerpt = typeof rawDesc === 'string' 
@@ -2331,7 +2332,7 @@ class ContentManager {
                         <a href="${detailsUrl}" class="event-card">
                             <div class="event-image">
                                 <div class="event-image-zoom">
-                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy">
+                                    <img src="${imageSrc}" alt="${imageAlt}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                                 </div>
                                 <div class="event-date">
                                     <span class="month">${monthUpper}</span>
@@ -3936,7 +3937,8 @@ class ContentManager {
 
             const eventKey = this.getEventKey(featuredEvent);
             const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
-            const imageSrc = this._getEventImage(featuredEvent) || 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=800&auto=format&fit=crop';
+            const imageSrc = this._getEventImage(featuredEvent) || this.getFallbackEventImage(featuredEvent);
+            const fallbackSrc = this.getFallbackEventImage(featuredEvent);
             const rawDesc = featuredEvent.seoDescription || featuredEvent.excerpt || featuredEvent.description || featuredEvent.content || '';
             const cleanExcerpt = typeof rawDesc === 'string' ? rawDesc.replace(/<[^>]*>?/gm, '').trim() : '';
             const limitExcerpt = cleanExcerpt.length > 150 ? cleanExcerpt.slice(0, 147) + '...' : cleanExcerpt;
@@ -3945,7 +3947,7 @@ class ContentManager {
                 <div class="flex flex-col bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 h-full">
                     <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 shrink-0">
                         <span class="absolute top-4 left-4 bg-[#CC712B] text-white text-[11px] font-extrabold px-3 py-1.5 rounded-md tracking-wider uppercase z-10 shadow-sm">${t.upcoming}</span>
-                        <img src="${imageSrc}" alt="${featuredEvent.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                        <img src="${imageSrc}" alt="${featuredEvent.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                     </div>
                     <div class="p-6 md:p-8 flex flex-col gap-3 flex-grow">
                         <div class="text-[12px] font-semibold text-slate-400 tracking-wider">${dateLabel}${timeLabel}</div>
@@ -4590,8 +4592,8 @@ class ContentManager {
                     pageHero.style.setProperty('background-repeat', 'no-repeat', 'important');
                 }
             };
-            tempImg.onerror = function () {
-                imgEl.src = '../img/placeholder-event.jpg';
+            tempImg.onerror = () => {
+                imgEl.src = this.getFallbackEventImage(event);
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
                 imgEl.classList.add('fade-in');
@@ -4860,12 +4862,13 @@ class ContentManager {
         sidebarContainer.innerHTML = others.map(event => {
             const key = this.getEventKey(event);
             const img = this._getEventImage(event);
+            const fallbackSrc = this.getFallbackEventImage(event);
             const date = this.parseEventDate(event.start || event.date);
             const dateStr = date ? date.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
 
             return `
                 <div class="recent-event-item">
-                    <img src="${img}" alt="${event.title}" class="recent-event-img" loading="lazy">
+                    <img src="${img}" alt="${event.title}" class="recent-event-img" loading="lazy" onerror="this.onerror=null; this.src='${fallbackSrc}';">
                     <div class="recent-event-info">
                         <h4><a href="${this.getLocalizedLink('arrangement-detaljer.html')}?id=${key}">${event.title}</a></h4>
                         <span class="recent-event-date">${dateStr}</span>
@@ -5444,7 +5447,7 @@ class ContentManager {
     }
 
     generateEventImage(title) {
-        // High-quality curated images from Unsplash for different event types
+        // High-quality curated images from Unsplash or local fallbacks for different event types
         const imageLibrary = {
             'prayer': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80',
             'worship': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80',
@@ -5460,13 +5463,12 @@ class ContentManager {
             'meeting': 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop&q=80',
             'gathering': 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&q=80',
             'community': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80',
+            'bazaar': '/img/fb_fallback_bazaar.jpg',
             'default': 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&h=600&fit=crop&q=80'
         };
 
         if (!title) return imageLibrary.default;
 
-        // Extract keywords from title (remove common Norwegian words)
-        const commonWords = ['og', 'i', 'på', 'til', 'med', 'for', 'en', 'et', 'den', 'det', 'er', 'som', 'av', 'om', 'dette', 'var'];
         const titleLower = title.toLowerCase();
 
         // Map Norwegian keywords to image categories
@@ -5492,6 +5494,11 @@ class ContentManager {
             'møte': 'meeting',
             'samling': 'gathering',
             'fellesskap': 'community',
+            'basar': 'bazaar',
+            'bazaar': 'bazaar',
+            'sommerbasar': 'bazaar',
+            'loppemarked': 'bazaar',
+            'marked': 'bazaar',
             'test': 'meeting'
         };
 
@@ -5505,9 +5512,31 @@ class ContentManager {
         return imageLibrary.default;
     }
 
+    getFallbackEventImage(event) {
+        const title = (event && (event.title || event.name || event.summary)) || '';
+        const norm = (title + ' ' + (event?.description || '')).toLowerCase();
+        if (/basar|bazaar|sommerbasar|loppemarked|marked|gave|butikk|kjøp|vipps/i.test(norm)) {
+            return '/img/fb_fallback_bazaar.jpg';
+        }
+        if (/lovsang|worship|lovsynge|podcast|spotify|youtube|episode|sang|musikk|lytt/i.test(norm)) {
+            return '/img/fb_fallback_worship.jpg';
+        }
+        if (/bibel|bible|tidslinje|leseplan|undervisning|studie|skrift|ordet/i.test(norm)) {
+            return '/img/fb_fallback_bible.jpg';
+        }
+        if (/kirke|church|dallas|walls|shake|prophetic|samling|møte|fellesskap/i.test(norm)) {
+            return '/img/fb_fallback_church.jpg';
+        }
+        if (/bønn|pray|gud|jesus|tro|faith/i.test(norm)) {
+            return '/img/fb_fallback_prayer.jpg';
+        }
+        return '/img/placeholder-event.jpg';
+    }
+
     _getEventImage(event) {
         if (!event) return this.generateEventImage('default');
         const img = event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+        if (!img) return this.getFallbackEventImage(event);
         return this.optimizeDynamicImageUrl(img, { width: 800, quality: 80 });
     }
 
