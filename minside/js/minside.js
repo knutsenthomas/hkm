@@ -3811,6 +3811,10 @@ class MinSideManager {
                         <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
                         <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
                     </button>
+                    <button class="btn btn-ghost btn-sm" id="delete-selected-notifs-btn" style="display: none !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.12) !important; font-weight: 700 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 16px !important; color: #ef4444 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">checklist_rtl</span>
+                        <span id="delete-selected-text">${isNo ? 'Slett valgte (0)' : (isEs ? 'Eliminar seleccionados (0)' : 'Delete selected (0)')}</span>
+                    </button>
                     <button class="btn btn-ghost btn-sm" id="delete-all-notifs-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important; color: #ef4444 !important; background: rgba(239, 68, 68, 0.08) !important;">
                         <span class="material-symbols-outlined" style="font-size: 16px !important; color: #ef4444 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">delete_sweep</span>
                         <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${isNo ? 'Slett alle' : (isEs ? 'Eliminar todos' : 'Delete all')}</span>
@@ -3819,13 +3823,22 @@ class MinSideManager {
             </div>
 
             <!-- Filter tabs -->
-            <div class="notif-filter-tabs" id="notif-filter-tabs">
+            <div class="notif-filter-tabs" id="notif-filter-tabs" style="margin-bottom: 12px;">
                 ${filters.map(f => `
                     <button class="notif-filter-btn${f.id === activeFilter ? ' active' : ''}" data-filter="${f.id}">
                         ${f.label}
                         ${f.id === 'unread' ? `<span class="notif-filter-badge" id="unread-count-badge" style="display:none">0</span>` : ''}
                     </button>
                 `).join('')}
+            </div>
+
+            <!-- Batch selection bar -->
+            <div id="notif-selection-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--card-bg); border: 1px solid var(--border-solid); border-radius: 16px; margin-bottom: 16px; transition: var(--transition); box-shadow: var(--shadow-sm);">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; user-select: none; margin: 0;">
+                    <input type="checkbox" id="select-all-notifs-cb" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-color);">
+                    <span>${isNo ? 'Velg alle meldinger' : (isEs ? 'Seleccionar todas' : 'Select all messages')}</span>
+                </label>
+                <span id="selection-count-text" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">0 ${isNo ? 'valgt' : 'selected'}</span>
             </div>
 
             <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
@@ -3851,8 +3864,11 @@ class MinSideManager {
                     <h3>${t('notifications.noNotifications')}</h3>
                     <p>${t('notifications.noNotificationsSub')}</p>
                 </div>`;
+                container.querySelector('#notif-selection-bar')?.style.setProperty('display', 'none', 'important');
                 return;
             }
+
+            container.querySelector('#notif-selection-bar')?.style.setProperty('display', 'flex', 'important');
 
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
@@ -3866,10 +3882,13 @@ class MinSideManager {
                 const deleteTitle = isNo ? 'Slett permanent' : (isEs ? 'Eliminar permanentemente' : 'Delete permanently');
 
                 return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer; display:flex; align-items:center; width:100%; position:relative;">
+                    <div class="notif-cb-wrap" style="display:flex; align-items:center; margin-right:12px; flex-shrink:0;" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="notif-item-cb" data-id="${n.id}" style="width:18px; height:18px; cursor:pointer; accent-color:var(--accent-color);">
+                    </div>
                     <div class="activity-icon ${iconCls}" style="flex-shrink:0;">
                         <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
-                    <div class="activity-content" style="flex:1; min-width:0; margin-right:12px;">
+                    <div class="activity-content" style="flex:1; min-width:0; margin-right:12px; margin-left:8px;">
                         <div class="activity-title" style="font-weight:700; color:var(--text-main); font-size:14px;">${this._escapeHtml(n.title)}</div>
                         ${n.body ? `<div class="activity-body" style="font-size:13px; color:var(--text-muted); margin-top:2px;">${this._escapeHtml(n.body)}</div>` : ''}
                         <div class="activity-time" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${this._timeAgo(date)}</div>
@@ -3890,10 +3909,46 @@ class MinSideManager {
                 </div>`;
             }).join('');
 
-            // Bind click to open detail modal (but NOT when clicking action buttons)
+            // Helper to update selection UI
+            const updateSelectionUI = () => {
+                const allCbs = Array.from(inner.querySelectorAll('.notif-item-cb'));
+                const checkedCbs = allCbs.filter(cb => cb.checked);
+                const deleteSelectedBtn = container.querySelector('#delete-selected-notifs-btn');
+                const deleteSelectedText = container.querySelector('#delete-selected-text');
+                const selectionCountText = container.querySelector('#selection-count-text');
+                const selectAllCb = container.querySelector('#select-all-notifs-cb');
+
+                const count = checkedCbs.length;
+                if (deleteSelectedText) {
+                    deleteSelectedText.textContent = `${isNo ? 'Slett valgte' : (isEs ? 'Eliminar seleccionados' : 'Delete selected')} (${count})`;
+                }
+                if (selectionCountText) {
+                    selectionCountText.textContent = `${count} ${isNo ? 'valgt' : 'selected'}`;
+                }
+                if (deleteSelectedBtn) {
+                    deleteSelectedBtn.style.setProperty('display', count > 0 ? 'inline-flex' : 'none', 'important');
+                }
+                if (selectAllCb) {
+                    selectAllCb.checked = allCbs.length > 0 && checkedCbs.length === allCbs.length;
+                    selectAllCb.indeterminate = checkedCbs.length > 0 && checkedCbs.length < allCbs.length;
+                }
+            };
+
+            // Bind checkbox events
+            inner.querySelectorAll('.notif-item-cb').forEach(cb => {
+                cb.addEventListener('change', updateSelectionUI);
+            });
+
+            container.querySelector('#select-all-notifs-cb')?.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                inner.querySelectorAll('.notif-item-cb').forEach(cb => cb.checked = isChecked);
+                updateSelectionUI();
+            });
+
+            // Bind click to open detail modal (but NOT when clicking checkboxes or action buttons)
             inner.querySelectorAll('.activity-item').forEach(el => {
                 el?.addEventListener('click', (e) => {
-                    if (e.target.closest('.notif-actions')) return;
+                    if (e.target.closest('.notif-actions') || e.target.closest('.notif-cb-wrap')) return;
                     
                     const notif = items.find(n => n.id === el.dataset.id);
                     if (notif) this.showNotificationModal(notif);
@@ -4056,6 +4111,45 @@ class MinSideManager {
                 } catch (err) {
                     console.error('Error marking all as read:', err);
                 }
+            });
+
+            // Delete selected notifications button
+            document.getElementById('delete-selected-notifs-btn')?.addEventListener('click', () => {
+                const checkedCbs = Array.from(inner.querySelectorAll('.notif-item-cb:checked'));
+                const selectedIds = checkedCbs.map(cb => cb.dataset.id).filter(Boolean);
+                if (selectedIds.length === 0) return;
+
+                const confirmTitle = isNo 
+                    ? `Slett ${selectedIds.length} valgte meldinger` 
+                    : (isEs ? `Eliminar ${selectedIds.length} mensajes seleccionados` : `Delete ${selectedIds.length} selected messages`);
+                const confirmMsg = isNo 
+                    ? `Er du sikker på at du vil slette de ${selectedIds.length} valgte meldingene permanent? Dette kan ikke angres.` 
+                    : (isEs ? `¿Eliminar permanentemente los ${selectedIds.length} mensajes seleccionados?` : `Permanently delete the ${selectedIds.length} selected messages?`);
+
+                this.showCustomConfirm({
+                    title: confirmTitle,
+                    message: confirmMsg,
+                    confirmText: isNo ? 'Slett valgte' : (isEs ? 'Eliminar seleccionados' : 'Delete selected'),
+                    isDanger: true,
+                    onConfirm: async () => {
+                        try {
+                            for (let i = 0; i < selectedIds.length; i += 400) {
+                                const chunk = selectedIds.slice(i, i + 400);
+                                const batch = firebase.firestore().batch();
+                                chunk.forEach(id => {
+                                    const ref = firebase.firestore().collection('user_notifications').doc(id);
+                                    batch.delete(ref);
+                                });
+                                await batch.commit();
+                            }
+                            this._notify(isNo ? `${selectedIds.length} meldinger slettet` : `${selectedIds.length} messages deleted`, 'success');
+                            this.renderNotifications(container);
+                        } catch (err) {
+                            console.error('Error deleting selected notifications:', err);
+                            this._notify(isNo ? 'Kunne ikke slette valgte meldinger' : 'Failed to delete selected messages', 'warning');
+                        }
+                    }
+                });
             });
 
             // Delete all notifications button (mass delete)
