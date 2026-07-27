@@ -3954,6 +3954,74 @@ class NewsletterBuilder {
         });
     }
 
+    attachBlockQuickToolbar(node) {
+        document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
+        if (!node) return;
+
+        const toolbar = document.createElement('div');
+        toolbar.id = 'block-quick-toolbar';
+        toolbar.className = 'block-quick-toolbar';
+        toolbar.setAttribute('contenteditable', 'false');
+        toolbar.innerHTML = `
+            <button type="button" class="quick-tb-btn" id="qtb-move-up" title="Flytt opp (↑)">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
+            </button>
+            <button type="button" class="quick-tb-btn" id="qtb-move-down" title="Flytt ned (↓)">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
+            </button>
+        `;
+
+        if (getComputedStyle(node).position === 'static') {
+            node.style.position = 'relative';
+        }
+        node.appendChild(toolbar);
+
+        toolbar.querySelector('#qtb-move-up')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveActiveBlock(-1);
+        });
+        toolbar.querySelector('#qtb-move-down')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveActiveBlock(1);
+        });
+    }
+
+    selectBlock(node) {
+        if (this.activeBlockNode === node) return;
+
+        console.log('[HKM Inspector] selectBlock triggered for element:', node);
+
+        // Clear previous active block highlight
+        this.deselectBlock();
+
+        this.activeBlockNode = node;
+        this.activeBlockNode.classList.add('selected-block-active');
+        this.attachBlockQuickToolbar(node);
+
+        // Hide floating top toolbar to make it look exactly like Wix
+        const topToolbar = document.getElementById('desktop-richtools');
+        if (topToolbar) {
+            topToolbar.style.setProperty('display', 'none', 'important');
+        }
+
+        // Determine block type
+        const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
+        const btn = node.querySelector('.block-btn') || (node.classList.contains('block-btn') ? node : null);
+        
+        if (img) {
+            console.log('[HKM Inspector] Loading IMAGE inspector');
+            this.showImageInspector(img, node);
+        } else if (btn) {
+            console.log('[HKM Inspector] Loading BUTTON inspector');
+            this.showButtonInspector(btn, node);
+        } else {
+            console.log('[HKM Inspector] Loading TEXT inspector');
+            this.showTextInspector(node);
+        }
+    }
+
     showTextInspector(node) {
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
@@ -3993,6 +4061,29 @@ class NewsletterBuilder {
             </div>
             
             <div class="inspector-body" id="inspector-tab-content" style="padding-top: 16px;">
+                <!-- Plassering i e-posten reorder bar -->
+                <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+                        <button type="button" id="btn-block-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                            <span>Opp</span>
+                        </button>
+                        <button type="button" id="btn-block-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                            <span>Ned</span>
+                        </button>
+                        <button type="button" id="btn-block-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                            <span>Kopier</span>
+                        </button>
+                        <button type="button" id="btn-block-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Format Dropdown inside Wix-style select wrapper -->
                 <div class="inspector-group">
                     <label class="inspector-group-label" style="font-weight: 500; font-size: 13px; color: #475569; margin-bottom: 4px;">Format</label>
@@ -4453,6 +4544,28 @@ class NewsletterBuilder {
             </div>
             
             <div class="inspector-body" id="inspector-tab-content">
+                <!-- Plassering i e-posten reorder bar -->
+                <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+                        <button type="button" id="btn-img-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                            <span>Opp</span>
+                        </button>
+                        <button type="button" id="btn-img-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                            <span>Ned</span>
+                        </button>
+                        <button type="button" id="btn-img-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                            <span>Kopier</span>
+                        </button>
+                        <button type="button" id="btn-img-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="inspector-group">
                     <label class="inspector-group-label">Bilde</label>
                     <div class="inspector-image-preview-wrap">
@@ -4777,6 +4890,28 @@ class NewsletterBuilder {
             </div>
             
             <div class="inspector-body" id="inspector-tab-content">
+                <!-- Plassering i e-posten reorder bar -->
+                <div class="inspector-group" style="margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <label class="inspector-group-label" style="font-weight: 700; font-size: 11px; color: #475569; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Plassering i e-posten</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+                        <button type="button" id="btn-btn-move-up" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt opp">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_upward</span>
+                            <span>Opp</span>
+                        </button>
+                        <button type="button" id="btn-btn-move-down" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Flytt ned">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">arrow_downward</span>
+                            <span>Ned</span>
+                        </button>
+                        <button type="button" id="btn-btn-duplicate" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600;" title="Kopier element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">content_copy</span>
+                            <span>Kopier</span>
+                        </button>
+                        <button type="button" id="btn-btn-delete" class="btn-secondary-outline" style="height: 36px; padding: 0 4px; justify-content: center; font-size: 12px; font-weight: 600; color: #ef4444; border-color: #fca5a5;" title="Slett element">
+                            <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 2px;">delete</span>
+                            <span>Slett</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="inspector-group">
                     <label class="inspector-group-label">Knappetekst</label>
                     <input type="text" class="inspector-input" id="btn-inspector-text" value="${currentText}">

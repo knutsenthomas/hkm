@@ -6357,18 +6357,20 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     pointer-events: none !important;
 }
 
-/* Floating Quick Actions Reorder Toolbar on Active Block */
+/* Discreet Side Reorder Handle on Active Block (Out of content area) */
 #newsletter-builder-layout .block-quick-toolbar {
     position: absolute !important;
-    top: -42px !important;
-    right: 8px !important;
+    left: -40px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     display: inline-flex !important;
-    align-items: center !important;
-    gap: 2px !important;
-    background: #0f172a !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 3px 5px !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
+    padding: 2px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
     z-index: 1000 !important;
     pointer-events: auto !important;
     user-select: none !important;
@@ -6377,9 +6379,9 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 #newsletter-builder-layout .block-quick-toolbar .quick-tb-btn {
     background: transparent !important;
     border: none !important;
-    color: #cbd5e1 !important;
-    width: 28px !important;
-    height: 28px !important;
+    color: #475569 !important;
+    width: 26px !important;
+    height: 26px !important;
     border-radius: 6px !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -6390,7 +6392,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 }
 
 #newsletter-builder-layout .block-quick-toolbar .quick-tb-btn:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: #005bff !important;
     color: #ffffff !important;
 }
 
@@ -6400,8 +6402,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 }
 
 #newsletter-builder-layout .block-quick-toolbar .qtb-divider {
-    width: 1px !important;
-    height: 16px !important;
-    background: rgba(255, 255, 255, 0.2) !important;
-    margin: 0 2px !important;
+    width: 16px !important;
+    height: 1px !important;
+    background: #e2e8f0 !important;
+    margin: 2px 0 !important;
 }
