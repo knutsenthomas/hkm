@@ -639,7 +639,29 @@
     color: #475569 !important;
 }
 
-/* 3. Center Canvas Workspace */
+/* 3. Center Canvas Workspace (Scrollable Area) */
+#newsletter-builder-layout .builder-workspace-center {
+    flex: 1 !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+#newsletter-builder-layout .canvas-viewport {
+    flex: 1 !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 30px 20px 120px 20px !important;
+    box-sizing: border-box !important;
+    overflow-y: visible !important;
+}
+
 .builder-workspace-center {
     flex: 1 !important;
     background: #f8fafc !important;
@@ -647,7 +669,7 @@
     flex-direction: column !important;
     min-width: 0 !important;
     height: 100% !important;
-    overflow: hidden !important;
+    overflow-y: auto !important;
 }
 
 .canvas-top-bar {
