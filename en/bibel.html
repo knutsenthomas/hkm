@@ -2411,7 +2411,15 @@
         }
 
         .color-wheel-modal-overlay.active {
-            display: flex !important;
+            display: flex;
+        }
+
+        .color-wheel-modal-overlay:not(.active),
+        body:has(#hkm-devotional-modal) .color-wheel-modal-overlay {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         .color-wheel-card {
