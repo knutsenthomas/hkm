@@ -181,8 +181,8 @@
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    flex: 1 !important;
-    justify-content: center !important;
+    flex: 0 1 auto !important;
+    margin: 0 auto !important;
     min-width: 0 !important;
 }
 
@@ -281,6 +281,7 @@
     align-items: center !important;
     gap: 12px !important;
     flex-shrink: 0 !important;
+    margin-left: auto !important;
     justify-content: flex-end !important;
 }
 
