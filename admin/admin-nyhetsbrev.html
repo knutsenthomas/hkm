@@ -933,29 +933,6 @@
     </main> <!-- Close newsletter-dashboard-wrapper -->
 
         <div id="newsletter-builder-layout" style="display: none;">
-            <!-- Mørk Toppheader (Dark Navy Theme) -->
-            <header class="builder-top-appbar">
-                <div class="top-appbar-left">
-                    <button class="btn-topbar-back" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                        <span>Tilbake til oversikt</span>
-                    </button>
-                    <div class="topbar-divider"></div>
-                    <span class="top-appbar-title">Bygger</span>
-                </div>
-                <div class="top-appbar-right">
-                    <button class="top-appbar-action-btn" title="Varslinger">
-                        <span class="material-symbols-outlined">notifications</span>
-                        <span class="notif-badge-dot"></span>
-                    </button>
-                    <div class="top-appbar-user-badge" id="admin-profile-trigger">
-                            <div class="top-appbar-avatar" id="admin-avatar">TK</div>
-                        <span class="top-appbar-username" id="admin-name">Thomas K.</span>
-                        <span class="material-symbols-outlined">expand_more</span>
-                    </div>
-                </div>
-            </header>
-
             <!-- Verktøylinje / Sub-Header -->
             <div class="builder-toolbar-header" style="height: 56px !important; min-height: 56px !important; max-height: 56px !important; background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: space-between !important; padding: 0 24px !important; box-sizing: border-box !important; width: 100% !important; position: relative !important; z-index: 90 !important; overflow: visible !important;">
                 <div class="toolbar-left-cell" style="display: flex !important; align-items: center !important; justify-content: flex-start !important; height: 100% !important; flex: 1 1 0% !important; min-width: 0 !important; gap: 10px !important;">
@@ -1031,6 +1008,10 @@
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
+                        <a href="javascript:void(0)" class="btn-back-dashboard-sidebar" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            <span>Tilbake til oversikt</span>
+                        </a>
                         <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
                             <span class="material-symbols-outlined">add</span>
                             <span>Ny kampanje</span>

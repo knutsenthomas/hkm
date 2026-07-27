@@ -497,9 +497,32 @@
 #newsletter-builder-layout .builder-body-container {
     display: flex !important;
     flex-direction: row !important;
+    width: 100% !important;
     flex: 1 !important;
-    height: calc(100vh - 100px) !important;
+    height: calc(100vh - 56px) !important;
     overflow: hidden !important;
+}
+
+#newsletter-builder-layout .btn-back-dashboard-sidebar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #475569 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 12px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+#newsletter-builder-layout .btn-back-dashboard-sidebar:hover {
+    color: #0f172a !important;
+    background: #e2e8f0 !important;
 }
 
 /* HKM Clean Light Left Navigation Sidebar */
