@@ -5096,10 +5096,18 @@ class NewsletterBuilder {
         this.isRecipientsDrawerOpen = !this.isRecipientsDrawerOpen;
         const drawer = document.getElementById('recipients-drawer');
         const canvasContainer = document.getElementById('canvas-container');
+        const leftSidebar = document.querySelector('.builder-sidebar.left');
+        const rightInspector = document.querySelector('.builder-properties-panel');
+        const leftToolbarTitle = document.getElementById('sidebar-title');
+
         if (!drawer) return;
 
         if (this.isRecipientsDrawerOpen) {
             if (canvasContainer) canvasContainer.style.setProperty('display', 'none', 'important');
+            if (leftSidebar) leftSidebar.style.setProperty('display', 'none', 'important');
+            if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
+            if (leftToolbarTitle) leftToolbarTitle.textContent = 'Mottakere & Utsendelse';
+
             drawer.style.setProperty('display', 'block', 'important');
             drawer.classList.add('open');
             this.closeToolsUi();
@@ -5108,6 +5116,9 @@ class NewsletterBuilder {
             drawer.style.setProperty('display', 'none', 'important');
             drawer.classList.remove('open');
             if (canvasContainer) canvasContainer.style.setProperty('display', 'block', 'important');
+            if (leftSidebar) leftSidebar.style.setProperty('display', 'flex', 'important');
+            if (rightInspector) rightInspector.style.setProperty('display', 'block', 'important');
+            if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
         }
         document.body.classList.toggle('builder-recipients-open', this.isRecipientsDrawerOpen);
 
