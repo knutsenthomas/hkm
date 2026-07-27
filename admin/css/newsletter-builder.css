@@ -3085,7 +3085,9 @@ body.builder-active .builder-workspace > .canvas-container {
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
+    width: 100vw !important;
     overflow: hidden !important;
+    background: #f8fafc !important;
 }
 
 #newsletter-builder-layout .builder-toolbar-header {
@@ -3093,10 +3095,12 @@ body.builder-active .builder-workspace > .canvas-container {
     min-height: 56px !important;
     max-height: 56px !important;
     flex: 0 0 56px !important;
+    width: 100% !important;
     z-index: 1000 !important;
     position: relative !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
+    box-sizing: border-box !important;
 }
 
 #newsletter-builder-layout .builder-body-container {
@@ -3105,20 +3109,23 @@ body.builder-active .builder-workspace > .canvas-container {
     flex-direction: row !important;
     min-height: 0 !important;
     height: calc(100vh - 56px) !important;
+    width: 100% !important;
     overflow: hidden !important;
+    position: relative !important;
 }
 
 /* Recipients View Full-Width Workspace Layout (Under header & flush against left dark sidebar) */
 body.builder-recipients-open #builder-workspace-center,
 body.builder-recipients-open .builder-workspace-center {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 190px) !important;
+    max-width: calc(100% - 190px) !important;
     flex: 1 1 auto !important;
-    padding: 20px 24px 80px 24px !important;
+    padding: 24px 32px 80px 32px !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     background: #f8fafc !important;
+    position: relative !important;
 }
 
 body.builder-recipients-open #recipients-drawer,
@@ -3129,18 +3136,19 @@ body.builder-recipients-open .recipients-drawer {
     margin: 0 !important;
     padding: 0 !important;
     background: transparent !important;
+    position: relative !important;
 }
 
 body.builder-recipients-open .recipient-page-header {
-    margin-bottom: 20px !important;
-    padding-top: 4px !important;
+    margin-bottom: 24px !important;
+    padding-top: 0 !important;
 }
 
 body.builder-recipients-open .recipient-page-header h1 {
     font-size: 24px !important;
     font-weight: 800 !important;
     color: #0f172a !important;
-    margin: 0 0 4px 0 !important;
+    margin: 0 0 6px 0 !important;
     line-height: 1.2 !important;
 }
 
@@ -3153,25 +3161,22 @@ body.builder-recipients-open .recipient-page-header p {
 body.builder-recipients-open .recipient-flow {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important;
     align-items: flex-start !important;
-    gap: 20px !important;
+    gap: 24px !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
 
 body.builder-recipients-open .main-selection {
-    flex: 1 1 520px !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
-    max-width: 100% !important;
     box-sizing: border-box !important;
 }
 
 body.builder-recipients-open .selection-sidebar {
-    flex: 0 0 280px !important;
-    width: 280px !important;
-    min-width: 280px !important;
-    max-width: 100% !important;
+    flex: 0 0 300px !important;
+    width: 300px !important;
+    min-width: 300px !important;
     box-sizing: border-box !important;
 }
 
