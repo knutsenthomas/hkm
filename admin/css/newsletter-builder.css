@@ -3129,11 +3129,34 @@ body.builder-recipients-open .recipients-drawer {
     background: transparent !important;
 }
 
+body.builder-recipients-open .recipient-page-header {
+    margin-bottom: 24px !important;
+    padding-top: 8px !important;
+}
+
+body.builder-recipients-open .recipient-page-header h1 {
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.2 !important;
+}
+
 body.builder-recipients-open .recipient-flow {
     display: grid !important;
-    grid-template-columns: 1fr 360px !important;
+    grid-template-columns: minmax(0, 1fr) 300px !important;
     gap: 24px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.builder-recipients-open .main-selection {
+    min-width: 0 !important;
+}
+
+body.builder-recipients-open .selection-sidebar {
+    width: 300px !important;
+    min-width: 300px !important;
 }
 
 .builder-workspace-center .recipients-drawer.open {
