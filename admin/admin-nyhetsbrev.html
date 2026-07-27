@@ -1008,10 +1008,6 @@
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
-                        <a href="javascript:void(0)" class="btn-back-dashboard-sidebar" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
-                            <span class="material-symbols-outlined">arrow_back</span>
-                            <span>Tilbake til oversikt</span>
-                        </a>
                         <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
                             <span class="material-symbols-outlined">add</span>
                             <span>Ny kampanje</span>
@@ -1039,6 +1035,10 @@
                         <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('settings');" class="nav-item" data-view="settings">
                             <span class="material-symbols-outlined">settings</span>
                             <span>Innstillinger</span>
+                        </a>
+                        <a href="javascript:void(0)" class="nav-item btn-back-dashboard-sidebar" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            <span>Tilbake til oversikt</span>
                         </a>
                     </div>
                 </aside>
