@@ -5002,7 +5002,7 @@ window.addEventListener('load', () => {
             }
         };
 
-        // Immediately render avatar and shortcut from cache if user was logged in previously to avoid UX flicker
+        // Immediately render avatar and shortcut from cache, or show login icon if logged out
         try {
             const cachedUserRaw = localStorage.getItem('hkm_public_user_cache');
             if (cachedUserRaw) {
@@ -5016,10 +5016,15 @@ window.addEventListener('load', () => {
                         mobileDevBtn.classList.remove('hidden');
                         mobileDevBtn.classList.add('flex');
                     }
+                } else {
+                    hideProfileDOM();
                 }
+            } else {
+                hideProfileDOM();
             }
         } catch (e) {
             console.warn('[ProfileCache] Failed to load cached profile:', e);
+            hideProfileDOM();
         }
 
         let count = 0;
