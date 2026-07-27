@@ -1131,6 +1131,22 @@ class NewsletterBuilder {
         this.syncUnifiedBlocks();
     }
 
+    cleanPastedFormatting() {
+        const container = document.getElementById('blocks-container');
+        if (!container) return;
+        const elements = container.querySelectorAll('*');
+        elements.forEach(el => {
+            el.style.backgroundColor = '';
+            el.style.background = '';
+            el.removeAttribute('bgcolor');
+            const col = (el.style.color || '').toLowerCase();
+            if (col.includes('rgb(30') || col.includes('rgb(40') || col.includes('rgb(25') || col.includes('rgb(10') || col.includes('rgb(15') || col.includes('#1') || col.includes('#2') || col.includes('#0')) {
+                el.style.color = '';
+            }
+        });
+        this.syncUnifiedBlocks();
+    }
+
     enforceLayout() {
         const canvas = document.getElementById('newsletter-canvas');
         const container = document.getElementById('blocks-container');
