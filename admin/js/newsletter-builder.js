@@ -3705,14 +3705,6 @@ class NewsletterBuilder {
                     <input type="text" id="hdr-inspector-title" value="${titleText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
                 </div>
 
-                <!-- Issue Subtitle Input -->
-                <div class="inspector-group">
-                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Undertittel / Utgave</label>
-                    <input type="text" id="hdr-inspector-issue" value="${issueText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
-                </div>
-
-                <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 8px; margin-bottom: 2px; border-top: 1px solid #f1f5f9; padding-top: 12px;">Stil &amp; Utseende</div>
-
                 <!-- Title Color -->
                 <div class="inspector-group">
                     <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Tittelfarge</label>
