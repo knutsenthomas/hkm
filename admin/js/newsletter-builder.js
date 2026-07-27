@@ -3587,9 +3587,17 @@ class NewsletterBuilder {
         const titleText = titleEl ? titleEl.innerText.trim() : 'HKM STUDIO MÅNEDSBREV';
         const issueText = issueEl ? issueEl.innerText.trim() : 'Juli utgave';
 
+        // Read current computed styles or inline styles
+        const titleColorHex = (titleEl && titleEl.style.color) ? titleEl.style.color : '#1e293b';
+        const issueColorHex = (issueEl && issueEl.style.color) ? issueEl.style.color : '#64748b';
+        const headerBgHex = (headerNode && headerNode.style.backgroundColor) ? headerNode.style.backgroundColor : '#ffffff';
+
         inspectorView.innerHTML = `
-            <div class="inspector-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
-                <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Rediger E-posthode</h2>
+            <div class="properties-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0;">Rediger E-posthode</h3>
+                <button type="button" class="btn-close-properties" id="hdr-close-inspector" title="Lukk">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
             
             <div class="inspector-body" style="display: flex; flex-direction: column; gap: 16px;">
@@ -3614,14 +3622,61 @@ class NewsletterBuilder {
                     <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Undertittel / Utgave</label>
                     <input type="text" id="hdr-inspector-issue" value="${issueText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
                 </div>
+
+                <div style="font-size: 13px; font-weight: 700; color: #334155; margin-top: 8px; margin-bottom: 2px; border-top: 1px solid #f1f5f9; padding-top: 12px;">Stil & Utseende</div>
+
+                <!-- Title Color -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Tittelfarge</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="color" id="hdr-color-title" value="#1e293b" style="width: 36px; height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; padding: 0; background: transparent;">
+                        <input type="text" id="hdr-color-title-hex" value="#1e293b" class="elements-search-input" style="padding: 0 10px; flex: 1;">
+                    </div>
+                </div>
+
+                <!-- Subtitle Color -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Undertittelfarge</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="color" id="hdr-color-issue" value="#64748b" style="width: 36px; height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; padding: 0; background: transparent;">
+                        <input type="text" id="hdr-color-issue-hex" value="#64748b" class="elements-search-input" style="padding: 0 10px; flex: 1;">
+                    </div>
+                </div>
+
+                <!-- Header Background Color -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Bakgrunnsfarge på hode</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="color" id="hdr-color-bg" value="#ffffff" style="width: 36px; height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; padding: 0; background: transparent;">
+                        <input type="text" id="hdr-color-bg-hex" value="#ffffff" class="elements-search-input" style="padding: 0 10px; flex: 1;">
+                    </div>
+                </div>
+
+                <!-- Text Alignment -->
+                <div class="inspector-group">
+                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Tekstjustering</label>
+                    <div style="display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 8px;">
+                        <button type="button" class="hdr-align-btn btn-secondary-outline" data-align="left" style="flex: 1; height: 32px; padding: 0; border: none; background: transparent; border-radius: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_align_left</span>
+                        </button>
+                        <button type="button" class="hdr-align-btn btn-secondary-outline active" data-align="center" style="flex: 1; height: 32px; padding: 0; border: none; background: #ffffff; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_align_center</span>
+                        </button>
+                        <button type="button" class="hdr-align-btn btn-secondary-outline" data-align="right" style="flex: 1; height: 32px; padding: 0; border: none; background: transparent; border-radius: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">format_align_right</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
 
-        // Wire up live updates
-        document.getElementById('hdr-inspector-badge')?.addEventListener('input', (e) => {
-            if (badgeEl) badgeEl.innerText = e.target.value;
-            this.syncUnifiedBlocks();
+        // Wire up close inspector button
+        document.getElementById('hdr-close-inspector')?.addEventListener('click', () => {
+            if (inspectorView) inspectorView.style.display = 'none';
+            if (defaultView) defaultView.style.display = 'block';
         });
+
+        // Wire up text inputs
         document.getElementById('hdr-inspector-logo')?.addEventListener('input', (e) => {
             if (logoImg) logoImg.src = e.target.value;
             this.syncUnifiedBlocks();
@@ -3635,6 +3690,65 @@ class NewsletterBuilder {
             this.syncUnifiedBlocks();
         });
 
+        // Wire up Title Color
+        const titlePicker = document.getElementById('hdr-color-title');
+        const titleHex = document.getElementById('hdr-color-title-hex');
+        titlePicker?.addEventListener('input', (e) => {
+            if (titleEl) titleEl.style.color = e.target.value;
+            if (titleHex) titleHex.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        titleHex?.addEventListener('input', (e) => {
+            if (titleEl) titleEl.style.color = e.target.value;
+            if (titlePicker) titlePicker.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+
+        // Wire up Subtitle Color
+        const issuePicker = document.getElementById('hdr-color-issue');
+        const issueHex = document.getElementById('hdr-color-issue-hex');
+        issuePicker?.addEventListener('input', (e) => {
+            if (issueEl) issueEl.style.color = e.target.value;
+            if (issueHex) issueHex.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        issueHex?.addEventListener('input', (e) => {
+            if (issueEl) issueEl.style.color = e.target.value;
+            if (issuePicker) issuePicker.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+
+        // Wire up Header Background Color
+        const bgPicker = document.getElementById('hdr-color-bg');
+        const bgHex = document.getElementById('hdr-color-bg-hex');
+        bgPicker?.addEventListener('input', (e) => {
+            if (headerNode) headerNode.style.backgroundColor = e.target.value;
+            if (bgHex) bgHex.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+        bgHex?.addEventListener('input', (e) => {
+            if (headerNode) headerNode.style.backgroundColor = e.target.value;
+            if (bgPicker) bgPicker.value = e.target.value;
+            this.syncUnifiedBlocks();
+        });
+
+        // Wire up Alignment buttons
+        document.querySelectorAll('.hdr-align-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const align = btn.dataset.align;
+                if (headerNode) headerNode.style.textAlign = align;
+                document.querySelectorAll('.hdr-align-btn').forEach(b => {
+                    b.style.background = 'transparent';
+                    b.style.boxShadow = 'none';
+                    b.classList.remove('active');
+                });
+                btn.style.background = '#ffffff';
+                btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.08)';
+                btn.classList.add('active');
+                this.syncUnifiedBlocks();
+            });
+        });
+
         // Logo image picker button integration
         document.getElementById('hdr-btn-change-logo')?.addEventListener('click', () => {
             if (typeof this.openImageManager === 'function') {
@@ -3645,13 +3759,20 @@ class NewsletterBuilder {
                     this.syncUnifiedBlocks();
                 });
             } else {
-                const newUrl = prompt("Lim inn ny logo-URL:", logoSrc);
-                if (newUrl) {
-                    if (logoImg) logoImg.src = newUrl;
-                    const input = document.getElementById('hdr-inspector-logo');
-                    if (input) input.value = newUrl;
-                    this.syncUnifiedBlocks();
-                }
+                this.showPromptModal(
+                    "Ny logo-URL:",
+                    "https://...",
+                    (newUrl) => {
+                        if (logoImg) logoImg.src = newUrl;
+                        const input = document.getElementById('hdr-inspector-logo');
+                        if (input) input.value = newUrl;
+                        this.syncUnifiedBlocks();
+                    },
+                    logoSrc,
+                    "Vennligst oppgi en gyldig bilde-URL.",
+                    "Endre logo",
+                    "Oppdater"
+                );
             }
         });
     }
