@@ -5096,7 +5096,7 @@ class NewsletterBuilder {
         this.isRecipientsDrawerOpen = !this.isRecipientsDrawerOpen;
         const drawer = document.getElementById('recipients-drawer');
         const canvasContainer = document.getElementById('canvas-container');
-        const leftSidebar = document.querySelector('.builder-sidebar.left');
+        const leftSidebar = document.getElementById('elements-panel') || document.querySelector('.builder-elements-panel');
         const rightInspector = document.querySelector('.builder-properties-panel');
         const leftToolbarTitle = document.getElementById('sidebar-title');
 

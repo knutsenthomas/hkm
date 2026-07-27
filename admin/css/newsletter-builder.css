@@ -3101,6 +3101,13 @@ body.builder-active .builder-workspace > .canvas-container {
     display: block !important;
 }
 
+/* Hide left elements panel and right properties panel when recipients page is open */
+body.builder-recipients-open #elements-panel,
+body.builder-recipients-open .builder-elements-panel,
+body.builder-recipients-open .builder-properties-panel {
+    display: none !important;
+}
+
 /* Ensure toolbar buttons on PC stay strictly on a single horizontal line */
 .toolbar-right-cell,
 .toolbar-right-cell .btn-group-publish,
