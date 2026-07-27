@@ -30,6 +30,49 @@
     gap: 10px !important;
 }
 
+.btn-topbar-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px !important;
+    padding: 5px 12px !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-topbar-back:hover {
+    background: rgba(255, 255, 255, 0.22) !important;
+    transform: translateX(-2px) !important;
+}
+
+.btn-sidebar-back {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-sidebar-back:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
 .top-appbar-icon {
     font-size: 22px !important;
     color: #d17d39 !important;

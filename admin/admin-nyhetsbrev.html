@@ -937,6 +937,11 @@
             <!-- Top Dark App Bar -->
             <header class="builder-top-appbar">
                 <div class="top-appbar-left">
+                    <button class="btn-topbar-back" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                        <span>Tilbake</span>
+                    </button>
+                    <div style="width: 1px; height: 18px; background: rgba(255, 255, 255, 0.2); margin: 0 6px;"></div>
                     <span class="material-symbols-outlined top-appbar-icon">mail</span>
                     <span class="top-appbar-title">HKM Studio Branded Builder</span>
                 </div>
@@ -956,6 +961,10 @@
             <div class="builder-body-container">
                 <!-- 1. Dark Left Navigation Sidebar -->
                 <aside class="builder-dark-sidebar">
+                    <button class="btn-sidebar-back" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                        <span>Tilbake til oversikt</span>
+                    </button>
                     <div class="sidebar-top-create">
                         <button class="btn-create-new" id="btn-create-new-campaign" onclick="window.location.href='/admin/admin-nyhetsbrev.html'">
                             <span class="material-symbols-outlined">add</span>
