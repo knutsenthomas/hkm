@@ -932,22 +932,21 @@
         </div> <!-- Close newsletter-dashboard-layout -->
     </main> <!-- Close newsletter-dashboard-wrapper -->
 
-    <!-- Modus-svitsj: Builder -->
         <div id="newsletter-builder-layout" style="display: none;">
-            <!-- Top Dark HKM Brand App Bar -->
+            <!-- Top Dark Header Bar (Dark Navy Theme matching Screenshot 2) -->
             <header class="builder-top-appbar">
                 <div class="top-appbar-left">
                     <button class="btn-topbar-back" id="btn-builder-back-to-dashboard" onclick="if(window.builder){ builder.toggleMode('dashboard'); } else { window.location.href='/admin/admin-nyhetsbrev.html'; }" title="Tilbake til Oversikt">
                         <span class="material-symbols-outlined">arrow_back</span>
-                        <span>Tilbake</span>
+                        <span>Tilbake til oversikt</span>
                     </button>
                     <div class="topbar-divider"></div>
-                    <span class="material-symbols-outlined top-appbar-icon">mail</span>
-                    <span class="top-appbar-title">HKM Studio Branded Builder</span>
+                    <span class="top-appbar-title">Builder</span>
                 </div>
                 <div class="top-appbar-right">
                     <button class="top-appbar-action-btn" title="Varslinger">
                         <span class="material-symbols-outlined">notifications</span>
+                        <span class="notif-badge-dot"></span>
                     </button>
                     <div class="top-appbar-user-badge" id="admin-profile-trigger">
                         <div class="top-appbar-avatar" id="admin-avatar">TK</div>
@@ -957,51 +956,52 @@
                 </div>
             </header>
 
-            <!-- Main Workspace Body (3-Panel Architecture) -->
-            <div class="builder-body-container">
-                <!-- 1. HKM Dark Left Navigation Sidebar -->
-                <aside class="builder-dark-sidebar">
-                    <div class="sidebar-top-create">
-                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleMode('dashboard');">
-                            <span class="material-symbols-outlined">add</span>
-                            <span>Create New</span>
+            <!-- Builder Sub-Header / Toolbar (White bar matching Screenshot 2) -->
+            <div class="builder-toolbar-header">
+                <div class="toolbar-left-title">
+                    <h3>Elements</h3>
+                </div>
+
+                <div class="toolbar-center-controls">
+                    <div class="canvas-top-subject-group">
+                        <span class="material-symbols-outlined subject-icon">edit_note</span>
+                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
+                        <div id="newsletter-autosave-status" class="autosave-pill">
+                            <span class="material-symbols-outlined">cloud_done</span>
+                            <span id="newsletter-autosave-text">Lagret</span>
+                        </div>
+                    </div>
+
+                    <div class="device-switch-pill">
+                        <button type="button" class="device-pill-btn device-btn active" data-view="desktop">
+                            <span class="material-symbols-outlined">desktop_windows</span>
+                            <span>Desktop</span>
+                        </button>
+                        <button type="button" class="device-pill-btn device-btn" data-view="mobile">
+                            <span class="material-symbols-outlined">smartphone</span>
+                            <span>Mobil</span>
                         </button>
                     </div>
-                    <nav class="sidebar-nav-menu">
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.toggleMode('dashboard');" class="nav-item">
-                            <span class="material-symbols-outlined">dashboard</span>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="/admin/admin-nyhetsbrev.html" class="nav-item active">
-                            <span class="material-symbols-outlined">send</span>
-                            <span>Campaigns</span>
-                        </a>
-                        <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
-                            <span class="material-symbols-outlined">article</span>
-                            <span>Templates</span>
-                        </a>
-                        <a href="/admin/admin-kommunikasjon.html" class="nav-item">
-                            <span class="material-symbols-outlined">group</span>
-                            <span>Subscribers</span>
-                        </a>
-                        <a href="/admin/admin-analytics.html" class="nav-item">
-                            <span class="material-symbols-outlined">bar_chart</span>
-                            <span>Analytics</span>
-                        </a>
-                    </nav>
-                    <div class="sidebar-bottom-settings">
-                        <a href="/admin/admin-logger.html" class="nav-item">
-                            <span class="material-symbols-outlined">settings</span>
-                            <span>Settings</span>
-                        </a>
-                    </div>
-                </aside>
+                </div>
 
-                <!-- 2. Elements Panel (Light Panel) -->
-                <aside class="builder-elements-panel" id="elements-panel">
-                    <div class="elements-panel-header">
-                        <h3>Elements</h3>
+                <div class="toolbar-right-actions">
+                    <button id="save-draft-btn" class="btn-secondary-outline">Save Draft</button>
+                    <button id="preview-btn" class="btn-secondary-outline">Preview</button>
+                    <div class="btn-group-publish">
+                        <button id="continue-btn" class="btn-primary-publish">
+                            <span>Publish</span>
+                        </button>
+                        <button id="publish-dropdown-btn" class="btn-primary-publish-arrow">
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Main Workspace Body (Elements Panel | Canvas Workspace | Properties Inspector Panel) -->
+            <div class="builder-body-container">
+                <!-- 1. Elements Panel (Light Left Panel) -->
+                <aside class="builder-elements-panel" id="elements-panel">
                     <div class="elements-search-container">
                         <span class="material-symbols-outlined search-icon">search</span>
                         <input type="text" id="elements-search-input" placeholder="Search..." class="elements-search-input">
@@ -1011,7 +1011,7 @@
                         <!-- Basic Blocks Category -->
                         <div class="elements-category active">
                             <div class="category-header">
-                                <span>Basic Blocks</span>
+                                <span>BASIC BLOCKS</span>
                             </div>
                             <div class="basic-blocks-grid">
                                 <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
@@ -1090,46 +1090,8 @@
                     </div>
                 </aside>
 
-                <!-- 3. Center Canvas Workspace -->
+                <!-- 2. Center Canvas Workspace -->
                 <main class="builder-workspace-center">
-                    <!-- Canvas Top Bar -->
-                    <header class="canvas-top-bar">
-                        <div class="canvas-top-subject-group">
-                            <span class="material-symbols-outlined subject-icon">edit_note</span>
-                            <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
-                            <div id="newsletter-autosave-status" class="autosave-pill">
-                                <span class="material-symbols-outlined">cloud_done</span>
-                                <span id="newsletter-autosave-text">Lagret</span>
-                            </div>
-                        </div>
-
-                        <div class="canvas-top-center">
-                            <div class="device-switch-pill">
-                                <button type="button" class="device-pill-btn device-btn active" data-view="desktop">
-                                    <span class="material-symbols-outlined">desktop_windows</span>
-                                    <span>Desktop</span>
-                                </button>
-                                <button type="button" class="device-pill-btn device-btn" data-view="mobile">
-                                    <span class="material-symbols-outlined">smartphone</span>
-                                    <span>Mobil</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="canvas-top-actions">
-                            <button id="save-draft-btn" class="btn-secondary-outline">Save Draft</button>
-                            <button id="preview-btn" class="btn-secondary-outline">Preview</button>
-                            <div class="btn-group-publish">
-                                <button id="continue-btn" class="btn-primary-publish">
-                                    <span>Publish</span>
-                                </button>
-                                <button id="publish-dropdown-btn" class="btn-primary-publish-arrow">
-                                    <span class="material-symbols-outlined">expand_more</span>
-                                </button>
-                            </div>
-                        </div>
-                    </header>
-
                     <!-- Canvas Viewport -->
                     <div class="canvas-viewport" id="canvas-container">
                         <div class="canvas-paper-frame" id="newsletter-canvas">
@@ -1152,7 +1114,7 @@
                     </div>
                 </main>
 
-                <!-- 4. Right Properties Inspector Panel -->
+                <!-- 3. Right Properties Inspector Panel (Matching Screenshot 3) -->
                 <aside class="builder-properties-panel" id="sidebar-inspector-view">
                     <div class="properties-header">
                         <h3>Properties</h3>
@@ -1174,10 +1136,10 @@
                                 <div class="prop-group">
                                     <label>Font</label>
                                     <select id="prop-font-select" class="prop-select">
-                                        <option value="'Inter', sans-serif">Inter (Modern)</option>
-                                        <option value="Arial, sans-serif">Arial (Standard)</option>
-                                        <option value="'Playfair Display', serif">Playfair Display (Serif)</option>
-                                        <option value="Georgia, serif">Georgia</option>
+                                        <option value="'Inter', sans-serif">Text Block</option>
+                                        <option value="'Playfair Display', serif">Heading 1</option>
+                                        <option value="Arial, sans-serif">Heading 2</option>
+                                        <option value="Georgia, serif">Subheadline</option>
                                     </select>
                                 </div>
 
@@ -1185,7 +1147,7 @@
                                 <div class="prop-group">
                                     <label>Size</label>
                                     <div class="prop-number-stepper">
-                                        <input type="number" id="prop-font-size-input" value="16" min="10" max="72" class="prop-number-input">
+                                        <input type="number" id="prop-font-size-input" value="12" min="10" max="72" class="prop-number-input">
                                     </div>
                                 </div>
 
@@ -1193,12 +1155,12 @@
                                 <div class="prop-group">
                                     <label>Color</label>
                                     <div class="prop-color-wrapper">
-                                        <input type="text" id="prop-color-hex" value="#d17d39" class="prop-hex-input">
-                                        <input type="color" id="prop-color-picker" value="#d17d39" class="prop-color-swatch">
+                                        <input type="text" id="prop-color-hex" value="#D68600" class="prop-hex-input">
+                                        <input type="color" id="prop-color-picker" value="#D68600" class="prop-color-swatch">
                                     </div>
                                 </div>
 
-                                <!-- Alignment Group -->
+                                <!-- Alignment Group (5 icons matching Screenshot 3) -->
                                 <div class="prop-group">
                                     <label>Alignment</label>
                                     <div class="prop-align-btn-group">
@@ -1214,26 +1176,31 @@
                                         <button type="button" class="align-btn" data-align="justify" title="Blokkjuster">
                                             <span class="material-symbols-outlined">format_align_justify</span>
                                         </button>
+                                        <button type="button" class="align-btn" data-align="indent" title="Innrykk">
+                                            <span class="material-symbols-outlined">format_indent_increase</span>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Padding Steppers -->
+                                <!-- Padding Steppers (Matching Screenshot 3) -->
                                 <div class="prop-group">
                                     <label>Padding</label>
                                     <div class="padding-steppers-grid">
                                         <div class="stepper-box">
-                                            <span class="stepper-label">Width</span>
                                             <div class="stepper-controls">
                                                 <button type="button" class="btn-step" data-step="width-minus">-</button>
+                                                <input type="text" class="stepper-val-display" value="" readonly>
                                                 <button type="button" class="btn-step" data-step="width-plus">+</button>
                                             </div>
+                                            <span class="stepper-label">Width</span>
                                         </div>
                                         <div class="stepper-box">
-                                            <span class="stepper-label">Top</span>
                                             <div class="stepper-controls">
                                                 <button type="button" class="btn-step" data-step="top-minus">-</button>
+                                                <input type="text" class="stepper-val-display" value="" readonly>
                                                 <button type="button" class="btn-step" data-step="top-plus">+</button>
                                             </div>
+                                            <span class="stepper-label">Top</span>
                                         </div>
                                     </div>
                                 </div>

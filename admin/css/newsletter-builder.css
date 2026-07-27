@@ -1,11 +1,11 @@
-/* --- PROFESSIONAL 3-PANEL DASHBOARD LAYOUT STYLES --- */
+/* --- EXECUTIVE BUILDER LAYOUT STYLES MATCHING DESIGN SPECIFICATION --- */
 
 #newsletter-builder-layout {
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
     width: 100vw !important;
-    background: #0f172a !important;
+    background: #f8fafc !important;
     overflow: hidden !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     position: fixed !important;
@@ -14,17 +14,17 @@
     z-index: 99999 !important;
 }
 
-/* 1. Top HKM Brand App Bar (Clean Light Theme) */
+/* 1. Dark Top Header Bar (Matching Screenshot 2) */
 .builder-top-appbar {
-    height: 52px !important;
-    min-height: 52px !important;
-    background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    background: #1e293b !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0 20px !important;
-    color: #1e293b !important;
+    padding: 0 16px !important;
+    color: #ffffff !important;
     box-sizing: border-box !important;
     width: 100% !important;
 }
@@ -39,11 +39,11 @@
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    background: #f1f5f9 !important;
-    border: 1px solid #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 6px !important;
     padding: 5px 12px !important;
-    color: #334155 !important;
+    color: #ffffff !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
@@ -51,19 +51,19 @@
 }
 
 .btn-topbar-back:hover {
-    background: #e2e8f0 !important;
-    color: #0f172a !important;
+    background: rgba(255, 255, 255, 0.22) !important;
     transform: translateX(-2px) !important;
 }
 
-.top-appbar-icon {
-    font-size: 22px !important;
-    color: #d17d39 !important;
+.topbar-divider {
+    width: 1px !important;
+    height: 18px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    margin: 0 4px !important;
 }
 
 .top-appbar-title {
     font-size: 14px !important;
-    font-weight: 700 !important;
     color: #1B4965 !important;
     letter-spacing: -0.01em !important;
 }
