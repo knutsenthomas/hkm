@@ -217,8 +217,23 @@ class NewsletterBuilder {
     async init() {
         console.log("Nyhetsbrevbygger Initializing...");
 
-        // Hide builder and show dashboard at the start
-        this.toggleMode('dashboard');
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlDraftId = urlParams.get('draftId');
+        let savedMode = 'dashboard';
+        let savedView = 'builder';
+        try {
+            savedMode = localStorage.getItem('hkm_builder_active_mode') || 'dashboard';
+            savedView = localStorage.getItem('hkm_builder_active_view') || 'builder';
+        } catch(e) {}
+
+        if (urlDraftId || savedMode === 'builder' || savedMode === 'campaigns') {
+            this.toggleMode('builder');
+            if (savedView) {
+                this.switchSidebarView(savedView);
+            }
+        } else {
+            this.toggleMode('dashboard');
+        }
 
         // Wait for Firebase to be ready with a small retry loop
         const waitForFirebase = setInterval(() => {
@@ -6536,6 +6551,10 @@ class NewsletterBuilder {
 
     switchSidebarView(viewName) {
         console.log('[HKM Navigation] Switching sidebar view to:', viewName);
+        try {
+            localStorage.setItem('hkm_builder_active_view', viewName);
+            localStorage.setItem('hkm_builder_active_mode', 'builder');
+        } catch(e) {}
 
         // 1. Update active class on left nav links
         document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
