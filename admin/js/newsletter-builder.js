@@ -3298,6 +3298,146 @@ class NewsletterBuilder {
         return null;
     }
 
+    moveActiveBlock(direction) {
+        let node = this.activeBlockNode;
+        if (!node) {
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                node = this.getCurrentBlock(sel.anchorNode);
+            }
+        }
+        if (!node) {
+            const container = document.getElementById('blocks-container');
+            if (container && container.firstElementChild) {
+                node = container.firstElementChild;
+            }
+        }
+        if (!node) return;
+
+        const parent = node.parentNode;
+        if (!parent) return;
+
+        if (direction === -1) {
+            const prev = node.previousElementSibling;
+            if (prev) {
+                parent.insertBefore(node, prev);
+                node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                this.selectBlock(node);
+                this.syncUnifiedBlocks();
+                this.triggerAutosave();
+                if (typeof showToast === 'function') showToast("Elementet ble flyttet opp.", "info");
+            } else {
+                if (typeof showToast === 'function') showToast("Elementet er allerede øverst.", "info");
+            }
+        } else if (direction === 1) {
+            const next = node.nextElementSibling;
+            if (next) {
+                parent.insertBefore(next, node);
+                node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                this.selectBlock(node);
+                this.syncUnifiedBlocks();
+                this.triggerAutosave();
+                if (typeof showToast === 'function') showToast("Elementet ble flyttet ned.", "info");
+            } else {
+                if (typeof showToast === 'function') showToast("Elementet er allerede nederst.", "info");
+            }
+        }
+    }
+
+    duplicateActiveBlock() {
+        let node = this.activeBlockNode;
+        if (!node) {
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                node = this.getCurrentBlock(sel.anchorNode);
+            }
+        }
+        if (!node) return;
+
+        const clone = node.cloneNode(true);
+        clone.classList.remove('selected-block-active');
+        const qtb = clone.querySelector('#block-quick-toolbar');
+        if (qtb) qtb.remove();
+
+        if (node.nextElementSibling) {
+            node.parentNode.insertBefore(clone, node.nextElementSibling);
+        } else {
+            node.parentNode.appendChild(clone);
+        }
+        this.selectBlock(clone);
+        this.syncUnifiedBlocks();
+        this.triggerAutosave();
+        if (typeof showToast === 'function') showToast("Elementet ble duplisert.", "success");
+    }
+
+    deleteActiveBlock() {
+        let node = this.activeBlockNode;
+        if (!node) {
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                node = this.getCurrentBlock(sel.anchorNode);
+            }
+        }
+        if (!node) return;
+
+        node.remove();
+        this.deselectBlock();
+        this.syncUnifiedBlocks();
+        this.triggerAutosave();
+        if (typeof showToast === 'function') showToast("Elementet ble slettet.", "success");
+    }
+
+    attachBlockQuickToolbar(node) {
+        document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
+        if (!node) return;
+
+        const toolbar = document.createElement('div');
+        toolbar.id = 'block-quick-toolbar';
+        toolbar.className = 'block-quick-toolbar';
+        toolbar.setAttribute('contenteditable', 'false');
+        toolbar.innerHTML = `
+            <button type="button" class="quick-tb-btn" id="qtb-move-up" title="Flytt opp (↑)">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
+            </button>
+            <button type="button" class="quick-tb-btn" id="qtb-move-down" title="Flytt ned (↓)">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
+            </button>
+            <div class="qtb-divider"></div>
+            <button type="button" class="quick-tb-btn" id="qtb-duplicate" title="Dupliser element">
+                <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+            </button>
+            <button type="button" class="quick-tb-btn danger" id="qtb-delete" title="Slett element">
+                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            </button>
+        `;
+
+        if (getComputedStyle(node).position === 'static') {
+            node.style.position = 'relative';
+        }
+        node.appendChild(toolbar);
+
+        toolbar.querySelector('#qtb-move-up')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveActiveBlock(-1);
+        });
+        toolbar.querySelector('#qtb-move-down')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveActiveBlock(1);
+        });
+        toolbar.querySelector('#qtb-duplicate')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.duplicateActiveBlock();
+        });
+        toolbar.querySelector('#qtb-delete')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.deleteActiveBlock();
+        });
+    }
+
     selectBlock(node) {
         if (this.activeBlockNode === node) return;
 
@@ -3308,6 +3448,7 @@ class NewsletterBuilder {
 
         this.activeBlockNode = node;
         this.activeBlockNode.classList.add('selected-block-active');
+        this.attachBlockQuickToolbar(node);
 
         // Hide floating top toolbar to make it look exactly like Wix
         const topToolbar = document.getElementById('desktop-richtools');
@@ -3332,6 +3473,7 @@ class NewsletterBuilder {
     }
 
     deselectBlock() {
+        document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
         if (this.activeBlockNode) {
             console.log('[HKM Inspector] deselectBlock triggered');
             this.activeBlockNode.classList.remove('selected-block-active');

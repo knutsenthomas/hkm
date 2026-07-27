@@ -6349,3 +6349,52 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     z-index: 10 !important;
     pointer-events: none !important;
 }
+
+/* Floating Quick Actions Reorder Toolbar on Active Block */
+#newsletter-builder-layout .block-quick-toolbar {
+    position: absolute !important;
+    top: -42px !important;
+    right: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    background: #0f172a !important;
+    border-radius: 8px !important;
+    padding: 3px 5px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+    user-select: none !important;
+}
+
+#newsletter-builder-layout .block-quick-toolbar .quick-tb-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #cbd5e1 !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    padding: 0 !important;
+}
+
+#newsletter-builder-layout .block-quick-toolbar .quick-tb-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+#newsletter-builder-layout .block-quick-toolbar .quick-tb-btn.danger:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+#newsletter-builder-layout .block-quick-toolbar .qtb-divider {
+    width: 1px !important;
+    height: 16px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    margin: 0 2px !important;
+}
