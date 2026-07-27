@@ -3080,14 +3080,43 @@ body.builder-active .builder-workspace > .canvas-container {
     grid-template-columns: 1fr;
 }
 
-/* Recipients View Full-Width Workspace Layout */
+/* Master Layout: Top Header fixed on top, Workspace under header */
+#newsletter-builder-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+#newsletter-builder-layout .builder-toolbar-header {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    flex: 0 0 56px !important;
+    z-index: 1000 !important;
+    position: relative !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#newsletter-builder-layout .builder-body-container {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 0 !important;
+    height: calc(100vh - 56px) !important;
+    overflow: hidden !important;
+}
+
+/* Recipients View Full-Width Workspace Layout (Under header) */
 body.builder-recipients-open #builder-workspace-center,
 body.builder-recipients-open .builder-workspace-center {
     width: 100% !important;
     max-width: 100% !important;
     flex: 1 1 100% !important;
-    padding: 32px 48px !important;
+    padding: 32px 48px 80px 48px !important;
     box-sizing: border-box !important;
+    overflow-y: auto !important;
 }
 
 body.builder-recipients-open #recipients-drawer,
