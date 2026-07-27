@@ -3568,11 +3568,12 @@ class NewsletterBuilder {
         if (!headerNode) return;
 
         const badgeEl = headerNode.querySelector('.premium-header-badge');
+        if (badgeEl) badgeEl.remove();
+
         const logoImg = headerNode.querySelector('.newsletter-logo');
         const titleEl = headerNode.querySelector('.canvas-brand-name');
         const issueEl = headerNode.querySelector('.canvas-brand-issue');
 
-        const badgeText = badgeEl ? badgeEl.innerText.trim() : 'E-POSTHODE';
         const logoSrc = logoImg ? logoImg.src : '';
         const titleText = titleEl ? titleEl.innerText.trim() : 'HKM STUDIO MÅNEDSBREV';
         const issueText = issueEl ? issueEl.innerText.trim() : 'Juli utgave';
@@ -3583,12 +3584,6 @@ class NewsletterBuilder {
             </div>
             
             <div class="inspector-body" style="display: flex; flex-direction: column; gap: 16px;">
-                <!-- Header Badge Input -->
-                <div class="inspector-group">
-                    <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Top Badge (Merke)</label>
-                    <input type="text" id="hdr-inspector-badge" value="${badgeText.replace(/"/g, '&quot;')}" class="elements-search-input" style="padding: 0 10px;">
-                </div>
-
                 <!-- Logo URL Input -->
                 <div class="inspector-group">
                     <label style="font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; display: block;">Logo Bilde (URL)</label>
