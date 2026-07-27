@@ -918,7 +918,7 @@
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
-    padding: 8px 20px 60px 20px !important;
+    padding: 0 0 80px 0 !important;
     box-sizing: border-box !important;
     overflow-y: visible !important;
     transition: all 0.3s ease !important;
@@ -1062,7 +1062,7 @@
     overflow-y: auto !important;
     display: flex !important;
     justify-content: center !important;
-    padding: 30px 20px !important;
+    padding: 0 !important;
 }
 
 .elements-panel-header h3 {
@@ -1191,7 +1191,7 @@
     min-width: 0 !important;
     height: 100% !important;
     overflow-y: auto !important;
-    padding: 40px 20px !important;
+    padding: 16px 20px 80px 20px !important;
     box-sizing: border-box !important;
 }
 
