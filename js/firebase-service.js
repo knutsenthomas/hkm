@@ -958,9 +958,15 @@ class FirebaseService {
     }
 
     async getGoogleRedirectResult() {
-        if (!this.isInitialized) return null;
+        if (!this.isInitialized || !this.auth) return null;
         try {
             await this.ensureAuthPersistence();
+            const search = window.location.search || '';
+            const hash = window.location.hash || '';
+            const isRedirectReturn = search.includes('apiKey') || search.includes('state=') || hash.includes('state=') || hash.includes('access_token');
+            if (!isRedirectReturn) {
+                return null;
+            }
             return await this.auth.getRedirectResult();
         } catch (err) {
             console.warn("[FirebaseService] getRedirectResult error handled safely:", err);
