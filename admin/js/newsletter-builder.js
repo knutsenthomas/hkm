@@ -652,9 +652,11 @@ class NewsletterBuilder {
             document.addEventListener('click', (e) => {
                 const container = document.getElementById('blocks-container');
                 const sidebar = document.querySelector('.builder-elements-sidebar-v2');
-                const modal = document.querySelector('.hkm-modal, .hkm-prompt-overlay, .hkm-image-modal');
+                const modal = document.querySelector('.hkm-modal, .hkm-prompt-overlay, .hkm-image-modal, #custom-prompt-modal');
                 
                 if (container && !container.contains(e.target) && 
+                    !e.target.closest('.canvas-header') &&
+                    !e.target.closest('.builder-properties-panel') &&
                     sidebar && !sidebar.contains(e.target) && 
                     (!modal || !modal.contains(e.target)) &&
                     !e.target.closest('.cropper-container') &&
@@ -666,10 +668,16 @@ class NewsletterBuilder {
             // Wix-style selection change listener to auto-detect text editing/caret placement
             document.addEventListener('selectionchange', () => {
                 const selection = window.getSelection();
-                if (!selection.rangeCount) return;
+                if (!selection || !selection.rangeCount) return;
                 const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
                 const container = document.getElementById('blocks-container');
-                if (container && container.contains(anchorNode)) {
+                const header = document.querySelector('.canvas-header');
+
+                if (header && header.contains(anchorNode)) {
+                    this.showHeaderInspector();
+                } else if (container && container.contains(anchorNode)) {
                     const blockNode = this.getCurrentBlock(anchorNode);
                     if (blockNode && blockNode !== this.activeBlockNode) {
                         this.selectBlock(blockNode);
@@ -3623,6 +3631,9 @@ class NewsletterBuilder {
     }
 
     showHeaderInspector() {
+        const propertiesPanel = document.querySelector('.builder-properties-panel');
+        if (propertiesPanel) propertiesPanel.style.display = 'flex';
+
         const defaultView = document.getElementById('sidebar-default-view');
         const inspectorView = document.getElementById('sidebar-inspector-view');
         if (!inspectorView) return;
