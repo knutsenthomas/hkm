@@ -433,12 +433,80 @@ class NewsletterBuilder {
             if (!e.target.closest('.element-card')) {
                 this.hideElementHoverPreview();
             }
-        });        const addBtn = document.querySelector('.add-element-dotted-btn');
-        if (addBtn) {
-            addBtn.addEventListener('click', () => {
-                const sidebar = document.querySelector('.builder-sidebar.left');
-                if (sidebar) {
-                    sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+        });        // Accordion headers toggle
+        document.querySelectorAll('.accordion-header-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.accordion;
+                const content = document.getElementById(`accordion-${target}`);
+                const arrow = btn.querySelector('.accordion-arrow');
+                if (content) {
+                    const isOpen = content.style.display !== 'none';
+                    content.style.display = isOpen ? 'none' : 'block';
+                    if (arrow) arrow.textContent = isOpen ? 'expand_more' : 'expand_less';
+                }
+            });
+        });
+
+        // Search input filter for elements
+        const searchInput = document.getElementById('elements-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                document.querySelectorAll('.block-card-item').forEach(card => {
+                    const label = card.textContent.toLowerCase();
+                    card.style.display = label.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        // Close Properties Inspector Panel
+        const closePropBtn = document.getElementById('close-properties-btn');
+        if (closePropBtn) {
+            closePropBtn.addEventListener('click', () => {
+                const panel = document.getElementById('sidebar-inspector-view');
+                if (panel) panel.style.display = 'none';
+            });
+        }
+
+        // Alignment Buttons Handler
+        document.querySelectorAll('.align-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const align = btn.dataset.align;
+                if (this.selectedBlock) {
+                    this.selectedBlock.style.textAlign = align;
+                }
+                document.execCommand(`justify${align.charAt(0).toUpperCase() + align.slice(1)}`, false, null);
+            });
+        });
+
+        // Color Swatch & Hex Input Sync
+        const colorPicker = document.getElementById('prop-color-picker');
+        const colorHex = document.getElementById('prop-color-hex');
+        if (colorPicker && colorHex) {
+            colorPicker.addEventListener('input', (e) => {
+                colorHex.value = e.target.value;
+                if (this.selectedBlock) {
+                    this.selectedBlock.style.color = e.target.value;
+                }
+                document.execCommand('foreColor', false, e.target.value);
+            });
+            colorHex.addEventListener('input', (e) => {
+                colorPicker.value = e.target.value;
+                if (this.selectedBlock) {
+                    this.selectedBlock.style.color = e.target.value;
+                }
+            });
+        }
+
+        // Font Size Input Stepper
+        const fontSizeInput = document.getElementById('prop-font-size-input');
+        if (fontSizeInput) {
+            fontSizeInput.addEventListener('change', (e) => {
+                const size = e.target.value + 'px';
+                if (this.selectedBlock) {
+                    this.selectedBlock.style.fontSize = size;
                 }
             });
         }

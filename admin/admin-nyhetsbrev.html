@@ -933,539 +933,312 @@
     </main> <!-- Close newsletter-dashboard-wrapper -->
 
     <!-- Modus-svitsj: Builder -->
-        <div id="newsletter-builder-layout" style="display: none; width: 100%;">
-            <div class="builder-main-layout">
-            <!-- 1. Wix-style Navigation Rail (Extreme Left) -->
-            <aside class="builder-nav-rail" style="
-                width: 72px;
-                background: #ffffff;
-                border-right: 1px solid #cbd5e1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 24px 0;
-                box-sizing: border-box;
-                font-family: 'Inter', sans-serif;
-            ">
-                <!-- Top section -->
-                <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; margin-bottom: 24px;">
-                    <a href="/admin/index.html" class="rail-logo-link" title="Tilbake til Dashboard" style="
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        width: 48px;
-                        height: 48px;
-                        color: #475569;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        transition: background 0.2s;
-                    ">
-                        <span class="material-symbols-outlined" style="font-size: 24px;">arrow_back</span>
-                    </a>
-                    <div style="font-size: 11px; font-weight: 600; color: #475569; margin-top: -4px;">Lukk</div>
+        <div id="newsletter-builder-layout" style="display: none;">
+            <!-- Top Dark App Bar -->
+            <header class="builder-top-appbar">
+                <div class="top-appbar-left">
+                    <span class="material-symbols-outlined top-appbar-icon">mail</span>
+                    <span class="top-appbar-title">HKM Studio Branded Builder</span>
                 </div>
-
-                <!-- Middle items -->
-                <div class="rail-middle" style="
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-                    width: 100%;
-                    align-items: center;
-                ">
-                    <!-- Option 1: Legg til -->
-                    <div class="rail-item active" id="rail-btn-add" data-tab="add" title="Legg til elementer" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #d17d39;
-                        text-decoration: none;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            background: linear-gradient(135deg, #d17d39, #bd4f2a);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            border: 2px solid #bd4f2a;
-                            box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.3);
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px; color: #ffffff;">add</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 600; margin-top: 6px; color: #d17d39; text-align: center;">Legg til</span>
-                    </div>
-
-                    <!-- Option 2: Temaer -->
-                    <div class="rail-item" id="rail-btn-themes" data-tab="themes" title="Temaer" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #475569;
-                        text-decoration: none;
-                        transition: color 0.2s;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">brush</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Temaer</span>
-                    </div>
-
-                    <!-- Option 3: Bakgrunn -->
-                    <div class="rail-item" id="rail-btn-background" data-tab="background" title="Bakgrunn" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #475569;
-                        text-decoration: none;
-                        transition: color 0.2s;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">texture</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Bakgrunn</span>
-                    </div>
-
-                    <!-- Option 4: AI-e-poster -->
-                    <div class="rail-item" id="rail-btn-ai" data-tab="ai" title="AI-e-poster" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #475569;
-                        text-decoration: none;
-                        transition: color 0.2s;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">auto_awesome</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center; white-space: nowrap;">AI-e-poster</span>
+                <div class="top-appbar-right">
+                    <button class="top-appbar-action-btn" title="Varslinger">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <div class="top-appbar-user-badge" id="admin-profile-trigger">
+                        <div class="top-appbar-avatar" id="admin-avatar">TK</div>
+                        <span class="top-appbar-username" id="admin-name">Thomas K.</span>
+                        <span class="material-symbols-outlined">expand_more</span>
                     </div>
                 </div>
+            </header>
 
-                <!-- Bottom items -->
-                <div style="margin-top: auto; display: flex; flex-direction: column; gap: 24px; width: 100%; align-items: center;">
-                    <!-- Option 5: Høyre til venstre -->
-                    <div class="rail-item" id="rail-btn-rtl" data-tab="rtl" title="Høyre til venstre (RTL)" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #475569;
-                        text-decoration: none;
-                        transition: color 0.2s;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">language</span>
+            <!-- Main Workspace Body (3 Panels) -->
+            <div class="builder-body-container">
+                <!-- 1. Dark Left Navigation Sidebar -->
+                <aside class="builder-dark-sidebar">
+                    <div class="sidebar-top-create">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="window.location.href='/admin/admin-nyhetsbrev.html'">
+                            <span class="material-symbols-outlined">add</span>
+                            <span>Create New</span>
+                        </button>
+                    </div>
+                    <nav class="sidebar-nav-menu">
+                        <a href="/admin/index.html" class="nav-item active">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-item">
+                            <span class="material-symbols-outlined">send</span>
+                            <span>Campaigns</span>
+                        </a>
+                        <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
+                            <span class="material-symbols-outlined">article</span>
+                            <span>Templates</span>
+                        </a>
+                        <a href="/admin/admin-kommunikasjon.html" class="nav-item">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Subscribers</span>
+                        </a>
+                        <a href="/admin/admin-analytics.html" class="nav-item">
+                            <span class="material-symbols-outlined">bar_chart</span>
+                            <span>Analytics</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-bottom-settings">
+                        <a href="/admin/admin-logger.html" class="nav-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- 2. Middle Elements Panel (Light Panel) -->
+                <aside class="builder-elements-panel" id="elements-panel">
+                    <div class="elements-panel-header">
+                        <h3>Elements</h3>
+                    </div>
+                    <div class="elements-search-container">
+                        <span class="material-symbols-outlined search-icon">search</span>
+                        <input type="text" id="elements-search-input" placeholder="Search..." class="elements-search-input">
+                    </div>
+
+                    <div class="elements-panel-body">
+                        <!-- Basic Blocks Category -->
+                        <div class="elements-category active">
+                            <div class="category-header">
+                                <span>Basic Blocks</span>
+                            </div>
+                            <div class="basic-blocks-grid">
+                                <button class="block-card-item element-card" data-type="text" title="Sett inn tekstblokk">
+                                    <div class="block-card-icon-text">T</div>
+                                    <span class="block-card-label">Text</span>
+                                </button>
+                                <button class="block-card-item element-card" data-type="image" title="Sett inn bilde">
+                                    <span class="material-symbols-outlined block-card-icon">image</span>
+                                    <span class="block-card-label">Image</span>
+                                </button>
+                                <button class="block-card-item element-card" data-type="button" title="Sett inn knapp">
+                                    <span class="material-symbols-outlined block-card-icon">crop_7_5</span>
+                                    <span class="block-card-label">Button</span>
+                                </button>
+                                <button class="block-card-item element-card" data-type="divider" title="Sett inn skillelinje">
+                                    <span class="material-symbols-outlined block-card-icon">horizontal_rule</span>
+                                    <span class="block-card-label">Divider</span>
+                                </button>
+                                <button class="block-card-item element-card" data-type="spacer" title="Sett inn avstandshøyde">
+                                    <span class="material-symbols-outlined block-card-icon">height</span>
+                                    <span class="block-card-label">Spacer</span>
+                                </button>
+                                <button class="block-card-item element-card highlight-blue" data-type="product" title="Sett inn produkt fra nettbutikken">
+                                    <span class="material-symbols-outlined block-card-icon" style="color: #3b82f6;">shopping_bag</span>
+                                    <span class="block-card-label" style="color: #3b82f6;">Product</span>
+                                </button>
+                            </div>
                         </div>
-                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center; line-height: 1.2;">Høyre til<br>venstre</span>
-                    </div>
 
-                    <!-- Option 6: Hjelp -->
-                    <div class="rail-item" id="rail-btn-help" data-tab="help" title="Hjelp" style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        cursor: pointer;
-                        color: #475569;
-                        text-decoration: none;
-                        transition: color 0.2s;
-                    ">
-                        <div class="rail-item-circle" style="
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s;
-                        ">
-                            <span class="material-symbols-outlined" style="font-size: 24px;">help_outline</span>
-                        </div>
-                        <span style="font-size: 11px; font-weight: 500; margin-top: 6px; color: inherit; text-align: center;">Hjelp</span>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- 2. Sidebar: High-fidelity elements and templates column -->
-            <aside class="builder-elements-sidebar-v2" style="position: relative; display: flex; flex-direction: column; border-left: none !important;">
-                <div id="sidebar-default-view" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
-                    <!-- Wix-style Drawer Header -->
-                    <div class="sidebar-header-modern" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px; min-height: 52px; display: flex; align-items: center;">
-                        <h2 id="builder-sidebar-title" style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Legge til elementer</h2>
-                    </div>
-
-                    <!-- Panel body containing the scrollable tab contents -->
-                    <div style="flex: 1; overflow-y: auto; padding-right: 4px;" id="builder-sidebar-scroll-content">
-                        
-                        <!-- TAB 1: Legg til -->
-                        <div id="rail-tab-add" class="rail-tab-panel" style="display: block;">
-                            <!-- Elements Section -->
-                            <div class="sidebar-section-container" style="margin-bottom: 24px;">
-                                <div class="elements-grid-modern">
-                                    <button class="element-card-square element-card" data-type="text">
-                                        <span class="element-text-icon">Aa|</span>
-                                        <span class="element-square-label">Tekst</span>
+                        <!-- Accordion Categories -->
+                        <div class="elements-accordion-item">
+                            <button class="accordion-header-btn" data-accordion="media">
+                                <span>Media</span>
+                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                            </button>
+                            <div class="accordion-content" id="accordion-media" style="display: none;">
+                                <div class="basic-blocks-grid">
+                                    <button class="block-card-item element-card" data-type="video">
+                                        <span class="material-symbols-outlined block-card-icon">play_circle</span>
+                                        <span class="block-card-label">Video</span>
                                     </button>
-                                    <button class="element-card-square element-card" data-type="image">
-                                        <span class="material-symbols-outlined element-square-icon">image</span>
-                                        <span class="element-square-label">Bilde</span>
+                                    <button class="block-card-item element-card" data-type="logo">
+                                        <span class="material-symbols-outlined block-card-icon">featured_seasonal_and_gifts</span>
+                                        <span class="block-card-label">Logo</span>
                                     </button>
-                                    <button class="element-card-square element-card" data-type="button">
-                                        <span class="material-symbols-outlined info-badge" title="Knapp med lenke">info</span>
-                                        <span class="material-symbols-outlined element-square-icon">crop_7_5</span>
-                                        <span class="element-square-label">Knapp</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="divider">
-                                        <span class="material-symbols-outlined element-square-icon">horizontal_rule</span>
-                                        <span class="element-square-label">Skillelinje</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="html">
-                                        <span class="element-text-icon">&lt;/&gt;</span>
-                                        <span class="element-square-label">HTML</span>
-                                    </button>
-                                    <button class="element-card-square element-card highlight-blue" data-type="product">
-                                        <span class="material-symbols-outlined info-badge" title="Dynamisk produktblokk fra nettbutikken">info</span>
-                                        <span class="material-symbols-outlined element-square-icon" style="color: #3b82f6 !important;">shopping_bag</span>
-                                        <span class="element-square-label" style="color: #3b82f6 !important;">Produkt</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="columns">
-                                        <span class="material-symbols-outlined element-square-icon">view_column</span>
-                                        <span class="element-square-label">Kolonner</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="logo">
-                                        <span class="material-symbols-outlined element-square-icon">featured_seasonal_and_gifts</span>
-                                        <span class="element-square-label">Logo</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="video">
-                                        <span class="material-symbols-outlined element-square-icon">play_circle</span>
-                                        <span class="element-square-label">Video</span>
-                                    </button>
-                                    <button class="element-card-square element-card" data-type="subscribe">
-                                        <span class="material-symbols-outlined element-square-icon">mail</span>
-                                        <span class="element-square-label">Abonner</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Saved Blocks Section -->
-                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                                <div class="sidebar-section-label">Lagrede Blokker</div>
-                                <div class="sidebar-empty-state">
-                                    <span class="material-symbols-outlined empty-icon">bookmark</span>
-                                    <span>Ingen lagrede blokker ennå...</span>
-                                </div>
-                            </div>
-
-                            <!-- Mine Kladder (Drafts) Section -->
-                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                                <div class="sidebar-section-label" style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span>Mine kladder</span>
-                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">edit_note</span>
-                                </div>
-                                <div id="drafts-list" class="templates-list-container">
-                                    <div class="sidebar-empty-state">
-                                        <span class="material-symbols-outlined empty-icon">edit_document</span>
-                                        <span>Ingen kladder lagret ennå</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mine Maler Section (Fixed templates list) -->
-                            <div class="sidebar-section-container" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                                <div class="sidebar-section-label">Mine maler</div>
-                                <div id="templates-list" class="templates-list-container">
-                                    <div class="sidebar-empty-state">
-                                        <span class="material-symbols-outlined empty-icon">article</span>
-                                        <span>Ingen maler lagret ennå</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- TAB 2: Temaer -->
-                        <div id="rail-tab-themes" class="rail-tab-panel" style="display: none;">
-                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Tilpass globale farger og skrifttyper for hele kampanjen.</p>
-                            
-                            <div class="inspector-group" style="margin-bottom: 20px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Global Skrifttype</label>
-                                <div class="inspector-select-wrapper">
-                                    <select id="theme-global-font" style="width: 100%;">
-                                        <option value="'Inter', sans-serif">Inter (Modern)</option>
-                                        <option value="Arial, sans-serif">Arial (Standard)</option>
-                                        <option value="'Playfair Display', serif">Playfair Display (Klassisk)</option>
-                                        <option value="Georgia, serif">Georgia</option>
+                        <div class="elements-accordion-item">
+                            <button class="accordion-header-btn" data-accordion="layout">
+                                <span>Layout</span>
+                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                            </button>
+                            <div class="accordion-content" id="accordion-layout" style="display: none;">
+                                <div class="basic-blocks-grid">
+                                    <button class="block-card-item element-card" data-type="columns">
+                                        <span class="material-symbols-outlined block-card-icon">view_column</span>
+                                        <span class="block-card-label">Columns</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="elements-accordion-item">
+                            <button class="accordion-header-btn" data-accordion="saved">
+                                <span>Saved Blocks</span>
+                                <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                            </button>
+                            <div class="accordion-content" id="accordion-saved" style="display: none;">
+                                <div class="sidebar-empty-state" style="padding: 12px 0; text-align: center; color: #94a3b8; font-size: 12px;">
+                                    <span>Ingen lagrede blokker</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- 3. Center Canvas Workspace -->
+                <main class="builder-workspace-center">
+                    <!-- Canvas Header Bar -->
+                    <header class="canvas-top-bar">
+                        <div class="canvas-top-subject-group">
+                            <span class="material-symbols-outlined subject-icon" style="color: #64748b; font-size: 20px;">edit_note</span>
+                            <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern" style="border: none; background: transparent; font-size: 13px; font-weight: 600; color: #1e293b; outline: none; width: 100%;">
+                            <div id="newsletter-autosave-status" class="autosave-pill" style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #10b981; margin-left: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 15px;">cloud_done</span>
+                                <span id="newsletter-autosave-text">Lagret</span>
+                            </div>
+                        </div>
+
+                        <div class="canvas-top-center">
+                            <div class="device-switch-pill">
+                                <button class="device-pill-btn device-btn active" data-view="desktop">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">desktop_windows</span>
+                                    <span>Desktop</span>
+                                </button>
+                                <button class="device-pill-btn device-btn" data-view="mobile">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">smartphone</span>
+                                    <span>Mobile</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="canvas-top-actions">
+                            <button id="save-draft-btn" class="btn-secondary-outline">Save Draft</button>
+                            <button id="preview-btn" class="btn-secondary-outline">Preview</button>
+                            <div class="btn-group-publish">
+                                <button id="continue-btn" class="btn-primary-publish">
+                                    <span>Publish</span>
+                                </button>
+                                <button id="publish-dropdown-btn" class="btn-primary-publish-arrow">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">expand_more</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Canvas Viewport -->
+                    <div class="canvas-viewport" id="canvas-container">
+                        <div class="canvas-paper-frame" id="newsletter-canvas">
+                            <div class="canvas-header" style="padding: 24px 32px 16px 32px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+                                <span class="premium-header-badge">PREMIUM HEADER</span>
+                                <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="newsletter-logo" style="max-height: 48px; margin: 8px auto 4px auto; display: block;">
+                                <h2 class="canvas-brand-name" style="margin: 4px 0 0 0; font-size: 18px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">HKM STUDIO MONTHLY</h2>
+                                <span class="canvas-brand-issue">October Issue</span>
+                            </div>
+
+                            <div id="blocks-container" class="blocks-container docs-rte-surface" contenteditable="true" style="outline: none; min-height: 300px; padding: 24px 32px; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #1e293b; flex: 1;" placeholder="Skriv nyhetsbrevet ditt her...">
+                                <p><br></p>
+                            </div>
+
+                            <div class="canvas-footer" contenteditable="false" style="padding: 24px; background: #fafafa; border-top: 1px solid #f1f5f9; text-align: center; font-size: 12px; color: #64748b;">
+                                <p style="margin: 0 0 6px 0;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                                <p style="margin: 0;"><a href="https://www.hiskingdomministry.no/avmeld" style="color: #d17d39; text-decoration: none;">Meld deg av nyhetsbrev</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- 4. Right Properties Inspector Panel -->
+                <aside class="builder-properties-panel" id="sidebar-inspector-view">
+                    <div class="properties-header">
+                        <h3>Properties</h3>
+                        <button class="btn-close-properties" id="close-properties-btn">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div class="properties-body">
+                        <!-- Styling Section -->
+                        <div class="properties-section">
+                            <div class="section-header-collapsible">
+                                <span>Styling</span>
+                                <span class="material-symbols-outlined collapse-icon">remove</span>
+                            </div>
+
+                            <div class="section-content">
+                                <!-- Font Selection -->
+                                <div class="prop-group">
+                                    <label>Font</label>
+                                    <select id="prop-font-select" class="prop-select">
+                                        <option value="Text Block">Text Block</option>
+                                        <option value="Heading 1">Heading 1</option>
+                                        <option value="Heading 2">Heading 2</option>
+                                        <option value="Subheadline">Subheadline</option>
+                                        <option value="Caption">Caption</option>
                                     </select>
                                 </div>
-                            </div>
 
-                            <div class="inspector-group" style="margin-bottom: 20px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Mørkeblå (Hovedfarge)</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="color" id="theme-color-primary" value="#1B4965" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
-                                    <input type="text" id="theme-color-primary-hex" value="#1B4965" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                <!-- Size Input -->
+                                <div class="prop-group">
+                                    <label>Size</label>
+                                    <div class="prop-number-stepper">
+                                        <input type="number" id="prop-font-size-input" value="16" min="10" max="72" class="prop-number-input">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="inspector-group" style="margin-bottom: 20px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Oransje (Accentfarge)</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="color" id="theme-color-accent" value="#d17d39" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
-                                    <input type="text" id="theme-color-accent-hex" value="#d17d39" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
+                                <!-- Color Picker -->
+                                <div class="prop-group">
+                                    <label>Color</label>
+                                    <div class="prop-color-wrapper">
+                                        <input type="text" id="prop-color-hex" value="#d17d39" class="prop-hex-input">
+                                        <input type="color" id="prop-color-picker" value="#d17d39" class="prop-color-swatch">
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="inspector-group" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; display: block;">Fargepalett Maler</label>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div class="theme-preset-card" data-primary="#1B4965" data-accent="#d17d39" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #005bff; border-radius: 8px; cursor: pointer; background: #f0f7ff;">
-                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Mandal Standard</span>
-                                        <div style="display: flex; gap: 4px;">
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #1B4965; display: block;"></span>
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #d17d39; display: block;"></span>
+                                <!-- Alignment Group -->
+                                <div class="prop-group">
+                                    <label>Alignment</label>
+                                    <div class="prop-align-btn-group">
+                                        <button type="button" class="align-btn active" data-align="left" title="Venstrejuster">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">format_align_left</span>
+                                        </button>
+                                        <button type="button" class="align-btn" data-align="center" title="Sentrer">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">format_align_center</span>
+                                        </button>
+                                        <button type="button" class="align-btn" data-align="right" title="Høyrejuster">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">format_align_right</span>
+                                        </button>
+                                        <button type="button" class="align-btn" data-align="justify" title="Blokkjuster">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">format_align_justify</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Padding Steppers -->
+                                <div class="prop-group">
+                                    <label>Padding</label>
+                                    <div class="padding-steppers-grid">
+                                        <div class="stepper-box">
+                                            <span class="stepper-label">Width</span>
+                                            <div class="stepper-controls">
+                                                <button type="button" class="btn-step" data-step="width-minus">-</button>
+                                                <button type="button" class="btn-step" data-step="width-plus">+</button>
+                                            </div>
+                                        </div>
+                                        <div class="stepper-box">
+                                            <span class="stepper-label">Top</span>
+                                            <div class="stepper-controls">
+                                                <button type="button" class="btn-step" data-step="top-minus">-</button>
+                                                <button type="button" class="btn-step" data-step="top-plus">+</button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="theme-preset-card" data-primary="#0f172a" data-accent="#06b6d4" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff;">
-                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Ocean Breeze</span>
-                                        <div style="display: flex; gap: 4px;">
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #0f172a; display: block;"></span>
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #06b6d4; display: block;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="theme-preset-card" data-primary="#123c1d" data-accent="#eab308" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; background: #ffffff;">
-                                        <span style="font-weight: 600; font-size: 13px; color: #1e293b;">Forest Gold</span>
-                                        <div style="display: flex; gap: 4px;">
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #123c1d; display: block;"></span>
-                                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #eab308; display: block;"></span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- TAB 3: Bakgrunn -->
-                        <div id="rail-tab-background" class="rail-tab-panel" style="display: none;">
-                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Tilpass bakgrunnsfargen for hele e-posten.</p>
-                            
-                            <div class="inspector-group" style="margin-bottom: 20px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Kanvas Bakgrunn (Ytre)</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="color" id="theme-bg-outer" value="#f8fafc" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
-                                    <input type="text" id="theme-bg-outer-hex" value="#f8fafc" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
-                                </div>
-                            </div>
-
-                            <div class="inspector-group" style="margin-bottom: 20px;">
-                                <label class="inspector-group-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">Maler-bakgrunn (Indre)</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="color" id="theme-bg-inner" value="#ffffff" style="width: 44px; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer; box-sizing: border-box;">
-                                    <input type="text" id="theme-bg-inner-hex" value="#ffffff" style="flex: 1; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;" readonly>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 4: AI tools -->
-                        <div id="rail-tab-ai" class="rail-tab-panel" style="display: none;">
-                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Bruk kunstig intelligens for å generere tekster, bilder og oppsett automatisk.</p>
-                            
-                            <div class="elements-list-vertical" style="display: flex; flex-direction: column; gap: 12px;">
-                                <button class="element-card-row element-card ai-tool-card purple-gradient" onclick="builder.buildWithAi()" style="padding: 16px; border-radius: 12px;">
-                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">magic_button</span>
-                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">Magisk Oppsett (AI)</span>
-                                </button>
-                                <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_text" style="padding: 16px; border-radius: 12px;">
-                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">history_edu</span>
-                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">Magisk Tekst (AI)</span>
-                                </button>
-                                <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_image" style="padding: 16px; border-radius: 12px;">
-                                    <span class="material-symbols-outlined element-icon" style="font-size: 24px;">photo</span>
-                                    <span class="element-label" style="font-weight: 600; font-size: 14px;">AI Bildegenerator</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- TAB 5: Hjelp -->
-                        <div id="rail-tab-help" class="rail-tab-panel" style="display: none;">
-                            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Hjelp og snarveier for editoren.</p>
-                            
-                            <div class="sidebar-section-container" style="margin-bottom: 24px;">
-                                <div class="sidebar-section-label" style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Tastatursnarveier</div>
-                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #475569;">
-                                    <div style="display: flex; justify-content: space-between;"><span>Angre:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Cmd/Ctrl + Z</kbd></div>
-                                    <div style="display: flex; justify-content: space-between;"><span>Gjenta:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Cmd/Ctrl + Y</kbd></div>
-                                    <div style="display: flex; justify-content: space-between;"><span>Slett blokk:</span><kbd style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">Backspace/Del</kbd></div>
-                                </div>
-                            </div>
-
-                            <!-- Deliverability Check Widget inside Help tab -->
-                            <div class="sidebar-section-container" style="border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                                <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
-                                    <span class="material-symbols-outlined" style="font-size: 14px; color: var(--accent-orange, #d17d39);">verified_user</span>
-                                    <span>Leveringssjekk</span>
-                                </div>
-                                <div class="deliverability-card-modern">
-                                    <div class="chk-item-modern">
-                                        <span class="material-symbols-outlined chk-success">check_circle</span>
-                                        <span>E-postserver i Norge (GDPR)</span>
-                                    </div>
-                                    <div class="chk-item-modern">
-                                        <span class="material-symbols-outlined chk-success">check_circle</span>
-                                        <span>Avsenderdomene godkjent (DKIM)</span>
-                                    </div>
-                                    <div class="chk-item-modern" id="chk-test-email">
-                                        <span class="material-symbols-outlined chk-warning" id="chk-test-icon">pending</span>
-                                        <span id="chk-test-text">Test-epost ikke sendt</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div> <!-- Close scroll content container -->
-                </div> <!-- Close sidebar-default-view -->
-
-                <!-- Inspector View: Customize Selected Element -->
-                <div id="sidebar-inspector-view" style="display: none; flex-direction: column; width: 100%; height: 100%; overflow-y: auto;">
-                    <!-- Will be populated dynamically by JavaScript -->
-                </div>
-            </aside>
-
-            <!-- 3. Main Workspace -->
-            <main class="builder-workspace">
-                <!-- Unified Sleek Control Header -->
-                <header class="builder-unified-header">
-                    <div class="header-left-group">
-                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                            <span class="material-symbols-outlined">menu</span>
-                        </button>
-
-                        <div class="header-subject-container">
-                            <span class="material-symbols-outlined subject-icon">edit_note</span>
-                            <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
-                        </div>
-
-                        <!-- Autolagring statusindikator -->
-                        <div id="newsletter-autosave-status">
-                            <span class="material-symbols-outlined" style="font-size: 17px; color: #10b981;">cloud_done</span>
-                            <span id="newsletter-autosave-text">Lagret</span>
                         </div>
                     </div>
-
-                    <!-- Device & View Toggles (Center) -->
-                    <div class="device-toggles-modern">
-                        <button class="device-btn active" data-view="desktop" title="PC-visning">
-                            <span class="material-symbols-outlined">desktop_windows</span>
-                        </button>
-                        <button class="device-btn" data-view="mobile" title="Mobilvisning">
-                            <span class="material-symbols-outlined">smartphone</span>
-                        </button>
-                        <div class="toggle-divider" style="width: 1px; height: 16px; background: #e2e8f0; display: inline-block;"></div>
-                        <button class="device-btn" id="preview-btn" title="Forhåndsvisning">
-                            <span class="material-symbols-outlined">visibility</span>
-                        </button>
-                        <button class="device-btn" id="email-dark-mode-btn" title="Mørkt tema-simulator">
-                            <span class="material-symbols-outlined">dark_mode</span>
-                        </button>
-                    </div>
-
-                    <!-- Header Actions (Right) -->
-                    <div class="header-actions">
-                        <button id="save-draft-btn" class="header-action-btn secondary-flat" title="Lagre kladd">
-                            <span class="material-symbols-outlined">edit_document</span>
-                            <span>Lagre kladd</span>
-                        </button>
-                        
-                        <button id="save-template-btn" class="header-action-btn secondary-flat" title="Lagre mal">
-                            <span class="material-symbols-outlined">save</span>
-                            <span>Lagre mal</span>
-                        </button>
-                        
-                        <button id="continue-btn" class="header-action-btn primary-action" title="Velg mottakere">
-                            <span>Mottakere</span>
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </button>
-                        
-                        <div class="user-badge-modern" id="admin-profile-trigger">
-                            <div class="user-info-compact">
-                                <span id="admin-name" class="user-name-compact">Laster...</span>
-                                <span class="user-role-compact">Administrator</span>
-                            </div>
-                            <div id="admin-avatar" class="user-avatar-compact">TK</div>
-                        </div>
-                    </div>
-                </header>
-
-
-
-                <div class="canvas-container" id="canvas-container">
-                <div class="canvas-scaler" id="canvas-scaler">
-                    <div class="newsletter-canvas" id="newsletter-canvas" style="display: flex !important; flex-direction: column !important; min-height: 400px !important; height: auto !important; background: #ffffff !important;">
-                        <!-- Header / Logo Placeholder -->
-                        <div class="canvas-header">
-                            <img src="../img/logo-hkm.png" alt="HKM Logo" class="newsletter-logo">
-                            <h2 class="canvas-brand-name">His Kingdom Ministry</h2>
-                        </div>
-
-                        <div id="blocks-container" class="blocks-container docs-rte-surface" contenteditable="true" style="outline: none; min-height: 250px !important; height: auto !important; padding: 32px 40px 32px 40px; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; color: #1e293b; display: block !important; flex: 1 0 auto !important; box-sizing: border-box !important;" placeholder="Skriv nyhetsbrevet ditt her...">
-                            <p><br></p>
-                        </div>
-
-                        <div class="canvas-footer" contenteditable="false" style="margin-top: auto !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; padding: 40px !important; background: #fcfcfc !important; border-top: 1px solid #f8fafc !important;">
-                            <p style="margin: 0 0 8px 0 !important;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
-                            <p style="margin: 0 !important;"><a href="javascript:void(0)" style="color: var(--accent-orange, #d17d39); text-decoration: none;">Meld deg av nyhetsbrev</a></p>
-                        </div>
-                    </div>
-                </div>
+                </aside>
             </div>
-        </main>
+        </div>
 
         <!-- Sidebar: Selection & Recipients (Hidden by default) -->
         <aside class="builder-sidebar right recipients-drawer" id="recipients-drawer">
