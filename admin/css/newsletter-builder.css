@@ -142,7 +142,7 @@
 }
 }
 
-/* 2. Sub-Header Toolbar (White Bar directly under Dark Top Header) */
+/* 2. Sub-Header Toolbar (White Bar directly under Dark Top Header - 4-Column Layout) */
 #newsletter-builder-layout .builder-toolbar-header {
     height: 58px !important;
     min-height: 58px !important;
@@ -153,8 +153,7 @@
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0 24px !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
     width: 100% !important;
     position: relative !important;
@@ -162,29 +161,48 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
-#newsletter-builder-layout .toolbar-left-title {
-    width: 220px !important;
-    min-width: 220px !important;
-    max-width: 220px !important;
-    flex-shrink: 0 !important;
+#newsletter-builder-layout .toolbar-col-menu {
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
+    height: 100% !important;
     display: flex !important;
     align-items: center !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+    border-right: 1px solid #e2e8f0 !important;
+    flex-shrink: 0 !important;
 }
 
-#newsletter-builder-layout .toolbar-left-title h3 {
+#newsletter-builder-layout .toolbar-col-elements {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+    border-right: 1px solid #e2e8f0 !important;
+    flex-shrink: 0 !important;
+}
+
+#newsletter-builder-layout .toolbar-col-elements h3 {
     margin: 0 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
 }
 
-#newsletter-builder-layout .toolbar-center-controls {
+#newsletter-builder-layout .toolbar-col-workspace {
+    flex: 1 !important;
+    height: 100% !important;
     display: flex !important;
     align-items: center !important;
-    gap: 20px !important;
-    flex: 1 !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
+    justify-content: space-between !important;
+    padding: 0 20px !important;
+    box-sizing: border-box !important;
+    gap: 16px !important;
 }
 
 #newsletter-builder-layout .canvas-top-subject-group {
