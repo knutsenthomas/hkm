@@ -2302,72 +2302,12 @@ class BibleReader {
     }
 
     async openTranslationModal() {
-        // Do not open translation modal if devotional modal is active
-        if (document.getElementById('hkm-devotional-modal')) return;
-
         const modal = document.getElementById('translation-selection-modal');
-        const container = document.getElementById('translation-modal-options-list');
-        if (!modal || !container) return;
-
-        if (!this.bibles || this.bibles.length === 0) {
-            await this.loadTranslations();
-        }
-
-        if (!this.bibles || this.bibles.length === 0) {
-            console.warn("No bibles available for translation modal.");
-            modal.style.display = 'none';
+        if (modal) {
             modal.classList.remove('active');
-            return;
+            modal.style.display = 'none';
         }
-
-        container.innerHTML = (this.bibles || []).map(t => {
-            const isSelected = t.id === this.selectedBibleId;
-            return `
-                <button type="button" class="translation-option-btn ${isSelected ? 'active' : ''}" data-id="${t.id}">
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                        <span style="font-weight: 700; font-size: 14.5px; color: var(--text-base);">${t.name}</span>
-                        <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">${t.abbreviation || ''} ${t.languageName ? '• ' + t.languageName : ''}</span>
-                    </div>
-                    <div class="radio-indicator">
-                        ${isSelected ? '<span class="material-symbols-outlined" style="font-size: 14px; color: white; font-weight: bold;">check</span>' : ''}
-                    </div>
-                </button>
-            `;
-        }).join('');
-
-        container.querySelectorAll('.translation-option-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const bibleId = btn.getAttribute('data-id');
-                if (bibleId && bibleId !== this.selectedBibleId) {
-                    this.selectedBibleId = bibleId;
-                    const activeLang = window.HKM_CURRENT_LANG || 'no';
-                    this.safeSetLocalStorage(`hkm_bible_translation_${activeLang}`, this.selectedBibleId);
-                    
-                    const selectedBible = (this.bibles || []).find(t => t.id === this.selectedBibleId);
-                    const activeName = selectedBible ? (selectedBible.abbreviation ? `${selectedBible.name} (${selectedBible.abbreviation})` : selectedBible.name) : 'Bibeloversettelse';
-
-                    const updateTrigger = (el) => {
-                        if (!el) return;
-                        if (el.tagName === 'SELECT') el.value = this.selectedBibleId;
-                        const textSpan = el.querySelector('.selected-translation-name');
-                        if (textSpan) textSpan.textContent = activeName;
-                    };
-
-                    updateTrigger(this.dom.translationSelect);
-                    updateTrigger(document.getElementById('bible-translation-select-mobile'));
-
-                    await this.loadBooks();
-                    await this.loadChapterText();
-                    this.updateUrl();
-                }
-                modal.classList.remove('active');
-                modal.style.display = 'none';
-            });
-        });
-
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => modal.classList.add('active'));
+        return;
     }
 
     async loadTranslations() {
