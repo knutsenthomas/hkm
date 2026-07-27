@@ -832,7 +832,10 @@ class NewsletterBuilder {
         });
 
         // Actions
-        document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
+        const previewBtn = document.getElementById('preview-btn');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', () => this.showPreview());
+        }
 
         // Dark Mode Simulator Toggle
         const darkModeBtn = document.getElementById('email-dark-mode-btn');
@@ -844,7 +847,8 @@ class NewsletterBuilder {
                     darkModeBtn.classList.toggle('active');
                     
                     const isDark = canvas.classList.contains('simulated-dark-mode');
-                    darkModeBtn.querySelector('span').textContent = isDark ? 'light_mode' : 'dark_mode';
+                    const icon = darkModeBtn.querySelector('span');
+                    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
                     darkModeBtn.title = isDark ? 'Lyst tema-simulator' : 'Mørkt tema-simulator';
                 }
             });
@@ -855,9 +859,20 @@ class NewsletterBuilder {
             saveDraftBtn.addEventListener('click', () => this.saveDraft());
         }
         
-        document.getElementById('save-template-btn').addEventListener('click', () => this.saveTemplate());
-        document.getElementById('continue-btn').addEventListener('click', () => this.toggleRecipientsDrawer());
-        document.getElementById('send-test-btn').addEventListener('click', () => this.sendTestEmail());
+        const saveTemplateBtn = document.getElementById('save-template-btn');
+        if (saveTemplateBtn) {
+            saveTemplateBtn.addEventListener('click', () => this.saveTemplate());
+        }
+
+        const continueBtn = document.getElementById('continue-btn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => this.toggleRecipientsDrawer());
+        }
+
+        const sendTestBtn = document.getElementById('send-test-btn');
+        if (sendTestBtn) {
+            sendTestBtn.addEventListener('click', () => this.sendTestEmail());
+        }
 
         const finalSendBtn = document.getElementById('final-send-btn');
         if (finalSendBtn) {
