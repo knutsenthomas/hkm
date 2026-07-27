@@ -961,16 +961,15 @@
     max-width: 375px !important;
     margin: 0 auto !important;
     border-radius: 32px !important;
-    padding-top: 40px !important;
+    padding-top: 0 !important;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15) !important;
     transition: all 0.3s ease !important;
     position: relative !important;
-    overflow: hidden !important;
 }
 
 #newsletter-builder-layout .canvas-viewport.mobile #newsletter-canvas .canvas-header,
 #canvas-container.mobile #newsletter-canvas .canvas-header {
-    padding-top: 20px !important;
+    padding-top: 36px !important;
 }
 
 .builder-workspace-center {
@@ -5490,23 +5489,23 @@ body.builder-active .builder-workspace > .docs-toolbar {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     position: relative !important;
-    padding-top: 36px !important;
+    padding-top: 0 !important;
 }
 
 /* Dynamic island notch for iPhone */
 .preview-frame.mobile::before {
     content: '' !important;
-    position: sticky !important;
-    top: 10px !important;
+    position: absolute !important;
+    top: 8px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 110px !important;
-    height: 28px !important;
+    height: 24px !important;
     background: #000000 !important;
     border-radius: 20px !important;
     z-index: 1000 !important;
     display: block !important;
-    margin-bottom: -28px !important;
+    pointer-events: none !important;
 }
 
 /* Dark Mode Simulator styles for e-mail canvas */
