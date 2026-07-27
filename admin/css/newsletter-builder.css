@@ -188,12 +188,14 @@
     transform: translateX(-50%) !important;
 }
 
-#newsletter-builder-layout .toolbar-right-cell {
+#newsletter-builder-layout .toolbar-right-cell,
+#newsletter-builder-layout .toolbar-right-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    flex: 0 0 auto !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
     margin-left: auto !important;
+    justify-content: flex-end !important;
 }
 
 #newsletter-builder-layout .canvas-top-subject-bar {
