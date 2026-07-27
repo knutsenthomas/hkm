@@ -296,13 +296,86 @@
     align-items: center !important;
 }
 
-/* 3. Main Body Layout (Elements | Canvas | Properties) */
+/* 3. Main Body Layout (Nav Sidebar | Elements | Canvas | Properties) */
 #newsletter-builder-layout .builder-body-container {
     display: flex !important;
     flex-direction: row !important;
     flex: 1 !important;
     height: calc(100vh - 100px) !important;
     overflow: hidden !important;
+}
+
+/* HKM Clean Light Left Navigation Sidebar */
+#newsletter-builder-layout .builder-dark-sidebar {
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px 12px !important;
+    box-sizing: border-box !important;
+    gap: 16px !important;
+    height: 100% !important;
+    flex-shrink: 0 !important;
+}
+
+#newsletter-builder-layout .btn-create-new {
+    width: 100% !important;
+    height: 38px !important;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(209, 125, 57, 0.25) !important;
+    transition: all 0.2s !important;
+}
+
+#newsletter-builder-layout .btn-create-new:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(209, 125, 57, 0.35) !important;
+}
+
+#newsletter-builder-layout .sidebar-nav-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    flex: 1 !important;
+}
+
+#newsletter-builder-layout .sidebar-nav-menu .nav-item,
+#newsletter-builder-layout .sidebar-bottom-settings .nav-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    color: #64748b !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s !important;
+}
+
+#newsletter-builder-layout .sidebar-nav-menu .nav-item:hover,
+#newsletter-builder-layout .sidebar-bottom-settings .nav-item:hover {
+    color: #1e293b !important;
+    background: #f1f5f9 !important;
+}
+
+#newsletter-builder-layout .sidebar-nav-menu .nav-item.active {
+    color: #d17d39 !important;
+    background: rgba(209, 125, 57, 0.08) !important;
+    font-weight: 700 !important;
+    border-left: 3px solid #d17d39 !important;
 }
 
 /* 1. HKM Clean Light Left Navigation Sidebar */

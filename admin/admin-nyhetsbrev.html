@@ -998,9 +998,47 @@
                 </div>
             </div>
 
-            <!-- Main Workspace Body (Elements Panel | Canvas Workspace | Properties Inspector Panel) -->
+            <!-- Main Workspace Body (Navigation Sidebar | Elements Panel | Canvas Workspace | Properties Inspector Panel) -->
             <div class="builder-body-container">
-                <!-- 1. Elements Panel (Light Left Panel) -->
+                <!-- 1. HKM Clean Light Left Navigation Sidebar -->
+                <aside class="builder-dark-sidebar">
+                    <div class="sidebar-top-create">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.toggleMode('dashboard');">
+                            <span class="material-symbols-outlined">add</span>
+                            <span>Create New</span>
+                        </button>
+                    </div>
+                    <nav class="sidebar-nav-menu">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.toggleMode('dashboard');" class="nav-item">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-item active">
+                            <span class="material-symbols-outlined">send</span>
+                            <span>Campaigns</span>
+                        </a>
+                        <a href="javascript:void(0)" class="nav-item" id="nav-templates-btn">
+                            <span class="material-symbols-outlined">article</span>
+                            <span>Templates</span>
+                        </a>
+                        <a href="/admin/admin-kommunikasjon.html" class="nav-item">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Subscribers</span>
+                        </a>
+                        <a href="/admin/admin-analytics.html" class="nav-item">
+                            <span class="material-symbols-outlined">bar_chart</span>
+                            <span>Analytics</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-bottom-settings">
+                        <a href="/admin/admin-logger.html" class="nav-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- 2. Elements Panel (Light Left Panel) -->
                 <aside class="builder-elements-panel" id="elements-panel">
                     <div class="elements-search-container">
                         <span class="material-symbols-outlined search-icon">search</span>
