@@ -5026,6 +5026,116 @@ class NewsletterBuilder {
     }
 
 
+    compileEmailHtml() {
+        const blocksContainer = document.getElementById('blocks-container');
+        if (!blocksContainer) return '';
+
+        const contentClone = blocksContainer.cloneNode(true);
+
+        // Remove editor UI controls
+        contentClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay, .card-delete-btn, [data-tool]').forEach(c => c.remove());
+        contentClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+
+        // Convert relative image URLs to production domain HTTPS
+        contentClone.querySelectorAll('img').forEach(img => {
+            let src = img.getAttribute('src') || '';
+            if (src) {
+                if (!src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:')) {
+                    const cleanSrc = src.replace(/^\.\.\//, '').replace(/^\//, '');
+                    src = `https://www.hiskingdomministry.no/${cleanSrc}`;
+                    img.setAttribute('src', src);
+                }
+            }
+            img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
+        });
+
+        // Convert product cards to bulletproof email tables
+        contentClone.querySelectorAll('.newsletter-product-card').forEach(card => {
+            const img = card.querySelector('img');
+            const imgSrc = img ? img.getAttribute('src') : '';
+            const titleEl = card.querySelector('.product-title');
+            const title = titleEl ? titleEl.innerText.trim() : '';
+            const priceEl = card.querySelector('.product-price');
+            const price = priceEl ? priceEl.innerText.trim() : '';
+            const linkEl = card.querySelector('.product-cta-btn') || card.querySelector('a');
+            const linkHref = linkEl ? linkEl.getAttribute('href') : '#';
+
+            const tableHtml = `
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; width: 100%;">
+              <tr>
+                <td style="padding: 16px;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      ${imgSrc ? `<td width="90" style="vertical-align: top; padding-right: 16px;"><img src="${imgSrc}" width="90" height="90" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; display: block; border: 0;" alt="${title}" /></td>` : ''}
+                      <td style="vertical-align: top;">
+                        <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; font-family: Arial, sans-serif;">${title}</h4>
+                        <p style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: #d17d39; font-family: Arial, sans-serif;">${price}</p>
+                        <a href="${linkHref}" target="_blank" style="display: inline-block; background-color: #d17d39; color: #ffffff !important; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; font-family: Arial, sans-serif;">Se produkt</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>`;
+            card.outerHTML = tableHtml;
+        });
+
+        const bodyHtml = contentClone.innerHTML;
+
+        return `<!DOCTYPE html>
+<html lang="no" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body, html { margin: 0 !important; padding: 0 !important; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; background-color: #f8fafc; font-family: Arial, Helvetica, sans-serif; }
+    img { border: 0; outline: none; text-decoration: none; max-width: 100%; height: auto; }
+    table { border-collapse: collapse !important; }
+    p { margin: 0 0 16px 0; line-height: 1.6; color: #1e293b; font-family: Arial, Helvetica, sans-serif; font-size: 16px; }
+    h1, h2, h3, h4 { color: #1e293b; margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; }
+    a { color: #d17d39; text-decoration: none; }
+    
+    @media only screen and (max-width: 600px) {
+      .email-wrapper { width: 100% !important; padding: 10px !important; }
+      .email-body { padding: 24px 16px !important; }
+      .email-header { padding: 24px 16px !important; }
+      .email-footer { padding: 24px 16px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f8fafc;">
+    <tr>
+      <td align="center" style="padding: 20px 10px;">
+        <table class="email-wrapper" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+          <!-- Header -->
+          <tr>
+            <td class="email-header" align="center" style="padding: 32px 24px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+              <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" width="140" style="width: 140px; max-width: 140px; height: auto; display: block; margin: 0 auto 12px auto; border: 0;" />
+              <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; font-family: Arial, sans-serif;">His Kingdom Ministry</h2>
+            </td>
+          </tr>
+          <!-- Main Content Body -->
+          <tr>
+            <td class="email-body" style="padding: 32px 32px; color: #1e293b; font-size: 16px; line-height: 1.6; font-family: Arial, Helvetica, sans-serif;">
+              ${bodyHtml}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td class="email-footer" align="center" style="padding: 32px 24px; background-color: #fcfcfc; border-top: 1px solid #f1f5f9; text-align: center; font-size: 13px; color: #64748b; font-family: Arial, sans-serif;">
+              <p style="margin: 0 0 8px 0; color: #64748b; font-size: 13px; font-family: Arial, sans-serif;">© 2026 His Kingdom Ministry. Alle rettigheter reservert.</p>
+              <p style="margin: 0; color: #64748b; font-size: 13px; font-family: Arial, sans-serif;"><a href="https://www.hiskingdomministry.no/avmeld" style="color: #d17d39; text-decoration: none; font-weight: 600;">Meld deg av nyhetsbrev</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+    }
+
     async sendTestEmail() {
         const user = window.firebaseService?.auth?.currentUser;
         if (!user) return showToast("Logg inn først", "warning");
@@ -5061,100 +5171,7 @@ class NewsletterBuilder {
                     // Get user ID Token for verification
                     const idToken = await user.getIdToken();
 
-                    const canvasClone = document.getElementById('newsletter-canvas').cloneNode(true);
-                    canvasClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay, .card-delete-btn').forEach(c => c.remove());
-                    canvasClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
-                    
-                    // Convert all relative image src paths to absolute production URLs for email client compatibility
-                    canvasClone.querySelectorAll('img').forEach(img => {
-                        const src = img.getAttribute('src') || '';
-                        if (src && !src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:')) {
-                            const cleanSrc = src.replace(/^\.\.\//, '').replace(/^\//, '');
-                            img.src = `https://hkm-dusky.vercel.app/${cleanSrc}`;
-                        }
-                    });
-                    
-                    // Build style block for structural elements inside the email
-                    const styleBlock = `
-<style>
-  .newsletter-canvas {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    overflow: hidden;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-  .canvas-header {
-    padding: 24px 32px;
-    text-align: center;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .newsletter-logo {
-    height: 56px;
-    margin-bottom: 16px;
-    display: inline-block;
-  }
-  .canvas-brand-name {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 800;
-    color: #1e293b;
-    letter-spacing: -0.02em;
-    font-family: sans-serif;
-  }
-  .blocks-container {
-    padding: 20px 40px;
-    color: #1e293b;
-    line-height: 1.6;
-  }
-  .canvas-footer {
-    padding: 48px 32px;
-    text-align: center;
-    border-top: 1px solid #f1f5f9;
-    background: #f8fafc;
-    font-size: 13px;
-    color: #64748b;
-  }
-  .canvas-footer p {
-    margin: 0 0 8px 0;
-  }
-  .canvas-footer a {
-    color: #d17d39;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  
-  /* --- Premium Mobile Email Client Responsive Guard --- */
-  @media only screen and (max-width: 600px) {
-    .newsletter-canvas {
-      border: none !important;
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-    .canvas-header {
-      padding: 32px 16px !important;
-    }
-    .blocks-container {
-      padding: 24px 16px !important; /* Reduces large horizontal padding from 40px to 16px */
-    }
-    .canvas-footer {
-      padding: 32px 16px !important;
-    }
-    .email-preview-card {
-      border-radius: 16px !important;
-    }
-    .email-preview-card-body {
-      padding: 20px !important; /* Reduces large horizontal padding from 32px to 20px */
-    }
-    .email-headline {
-      font-size: 24px !important; /* Fits much better on small screens */
-    }
-  }
-</style>
-                    `;
-
-                    const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8">${styleBlock}</head><body>${canvasClone.outerHTML}</body></html>`;
+                    const fullHtml = this.compileEmailHtml();
 
                     const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                         method: 'POST',
