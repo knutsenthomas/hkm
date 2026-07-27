@@ -956,23 +956,13 @@
                 </div>
             </header>
 
-            <!-- Verktøylinje / Sub-Header (4-Kolonner Struktur) -->
+            <!-- Verktøylinje / Sub-Header -->
             <div class="builder-toolbar-header">
-                <!-- Kolonne 1: Venstre Meny Header (190px) -->
-                <div class="toolbar-col-menu">
-                    <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
-                        <span class="material-symbols-outlined">add</span>
-                        <span>Ny kampanje</span>
-                    </button>
-                </div>
-
-                <!-- Kolonne 2: Elementpanel Header (260px) -->
-                <div class="toolbar-col-elements">
+                <div class="toolbar-left-title">
                     <h3>Elementer</h3>
                 </div>
 
-                <!-- Kolonne 3: Kanvas & Verktøy Header (Flex 1) -->
-                <div class="toolbar-col-workspace">
+                <div class="toolbar-center-controls">
                     <div class="canvas-top-subject-group">
                         <span class="material-symbols-outlined subject-icon">edit_note</span>
                         <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
@@ -992,50 +982,50 @@
                             <span>Mobil</span>
                         </button>
                     </div>
+                </div>
 
-                    <div class="toolbar-right-actions">
-                        <button id="save-draft-btn" class="btn-secondary-outline">Lagre utkast</button>
-                        <button id="preview-btn" class="btn-secondary-outline">Forhåndsvisning</button>
-                        <div class="btn-group-publish" style="position: relative;">
-                            <button id="continue-btn" class="btn-primary-publish">
-                                <span>Publiser</span>
-                            </button>
-                            <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg">
-                                <span class="material-symbols-outlined">expand_more</span>
-                            </button>
+                <div class="toolbar-right-actions">
+                    <button id="save-draft-btn" class="btn-secondary-outline">Lagre utkast</button>
+                    <button id="preview-btn" class="btn-secondary-outline">Forhåndsvisning</button>
+                    <div class="btn-group-publish" style="position: relative;">
+                        <button id="continue-btn" class="btn-primary-publish">
+                            <span>Publiser</span>
+                        </button>
+                        <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg">
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </button>
 
-                            <!-- Publiser Meny Dropdown -->
-                            <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none;">
-                                <button type="button" class="publish-dropdown-item" id="opt-send-now">
-                                    <span class="material-symbols-outlined">send</span>
-                                    <div>
-                                        <strong>Send nå</strong>
-                                        <small>Send til alle abonnenter umiddelbart</small>
-                                    </div>
-                                </button>
-                                <button type="button" class="publish-dropdown-item" id="opt-schedule-send">
-                                    <span class="material-symbols-outlined">schedule</span>
-                                    <div>
-                                        <strong>Planlegg utsendelse</strong>
-                                        <small>Velg dato og klokkeslett for utsending</small>
-                                    </div>
-                                </button>
-                                <button type="button" class="publish-dropdown-item" id="opt-send-test">
-                                    <span class="material-symbols-outlined">mark_email_read</span>
-                                    <div>
-                                        <strong>Send test-epost</strong>
-                                        <small>Send prøveutgave til din e-post</small>
-                                    </div>
-                                </button>
-                                <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
-                                <button type="button" class="publish-dropdown-item" id="opt-export-html">
-                                    <span class="material-symbols-outlined">code</span>
-                                    <div>
-                                        <strong>Eksporter HTML</strong>
-                                        <small>Last ned e-post kildekode</small>
-                                    </div>
-                                </button>
-                            </div>
+                        <!-- Publiser Meny Dropdown -->
+                        <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none;">
+                            <button type="button" class="publish-dropdown-item" id="opt-send-now">
+                                <span class="material-symbols-outlined">send</span>
+                                <div>
+                                    <strong>Send nå</strong>
+                                    <small>Send til alle abonnenter umiddelbart</small>
+                                </div>
+                            </button>
+                            <button type="button" class="publish-dropdown-item" id="opt-schedule-send">
+                                <span class="material-symbols-outlined">schedule</span>
+                                <div>
+                                    <strong>Planlegg utsendelse</strong>
+                                    <small>Velg dato og klokkeslett for utsending</small>
+                                </div>
+                            </button>
+                            <button type="button" class="publish-dropdown-item" id="opt-send-test">
+                                <span class="material-symbols-outlined">mark_email_read</span>
+                                <div>
+                                    <strong>Send test-epost</strong>
+                                    <small>Send prøveutgave til din e-post</small>
+                                </div>
+                            </button>
+                            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
+                            <button type="button" class="publish-dropdown-item" id="opt-export-html">
+                                <span class="material-symbols-outlined">code</span>
+                                <div>
+                                    <strong>Eksporter HTML</strong>
+                                    <small>Last ned e-post kildekode</small>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1045,6 +1035,12 @@
             <div class="builder-body-container">
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
+                    <div class="sidebar-top-create">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
+                            <span class="material-symbols-outlined">add</span>
+                            <span>Ny kampanje</span>
+                        </button>
+                    </div>
                     <nav class="sidebar-nav-menu">
                         <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview">
                             <span class="material-symbols-outlined">dashboard</span>
