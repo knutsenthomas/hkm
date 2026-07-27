@@ -7562,9 +7562,24 @@ class MinSideManager {
                 .collection('reading_plans')
                 .doc(planId);
                 
-            await ref.set({
-                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            const docSnap = await ref.get();
+            if (!docSnap.exists || !docSnap.data().startedAt) {
+                await ref.set({
+                    planId: planId,
+                    currentDay: 1,
+                    completedDays: [],
+                    startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    completed: false,
+                    reflections: {}
+                }, { merge: true });
+            } else {
+                await ref.set({
+                    planId: planId,
+                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    completed: false
+                }, { merge: true });
+            }
             
             this.loadView('reading-plans');
         } catch (e) {
@@ -7624,9 +7639,24 @@ class MinSideManager {
                 .collection('reading_plans')
                 .doc(globalPlan.id);
                 
-            await ref.set({
-                lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
+            const docSnap = await ref.get();
+            if (!docSnap.exists || !docSnap.data().startedAt) {
+                await ref.set({
+                    planId: globalPlan.id,
+                    currentDay: dayNum || 1,
+                    completedDays: [],
+                    startedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    completed: false,
+                    reflections: {}
+                }, { merge: true });
+            } else {
+                await ref.set({
+                    planId: globalPlan.id,
+                    lastActiveAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    completed: false
+                }, { merge: true });
+            }
             
             this.openDevotionalWizard(globalPlan, dayNum);
         } catch (e) {
