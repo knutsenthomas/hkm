@@ -2996,17 +2996,24 @@ class NewsletterBuilder {
         });
     }
 
-    showPromptModal(label, placeholder, confirmCallback, defaultValue = '', warningMsg = "Vennligst oppgi en beskrivelse.") {
+    showPromptModal(label, placeholder, confirmCallback, defaultValue = '', warningMsg = "Vennligst oppgi en beskrivelse.", modalTitle = "Lagre kladd", confirmText = "Lagre") {
         const modal = document.getElementById('custom-prompt-modal');
+        const titleEl = document.getElementById('custom-prompt-title');
+        const iconEl = document.getElementById('custom-prompt-icon');
         const labelEl = document.getElementById('custom-prompt-label');
         const inputEl = document.getElementById('custom-prompt-input');
         const cancelBtn = document.getElementById('custom-prompt-cancel');
         const closeBtn = document.getElementById('custom-prompt-close');
         const confirmBtn = document.getElementById('custom-prompt-confirm');
+        const confirmTextEl = document.getElementById('custom-prompt-confirm-text');
 
-        if (!modal || !labelEl || !inputEl) return;
+        if (!modal || !inputEl) return;
 
-        labelEl.innerText = label;
+        if (titleEl) titleEl.innerText = modalTitle;
+        if (iconEl) iconEl.innerText = 'edit_note';
+        if (labelEl) labelEl.innerText = label;
+        if (confirmTextEl) confirmTextEl.innerText = confirmText;
+
         inputEl.placeholder = placeholder;
         inputEl.value = defaultValue;
         modal.style.display = 'flex';
@@ -3039,7 +3046,7 @@ class NewsletterBuilder {
                 confirmCallback(val);
                 closePrompt();
             } else {
-                showToast(warningMsg, "warning");
+                if (typeof showToast === 'function') showToast(warningMsg, "warning");
             }
         });
 
@@ -6471,24 +6478,33 @@ class NewsletterBuilder {
 
     async saveDraft() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
-        const name = prompt("Navn på kladden (f.eks: Ukeavis, Invitasjon...):", "Min Kladd");
-        if (!name) return;
-        try {
-            this.syncUnifiedBlocks();
-            const data = {
-                name,
-                blocks: this.blocks,
-                subject: document.getElementById('newsletter-subject').value,
-                createdAt: new Date().toISOString(),
-                isDraft: true // Marked as draft!
-            };
-            await window.firebaseService.db.collection('newsletter_templates').add(data);
-            showToast("Kladd lagret!", "success");
-            this.loadDrafts();
-        } catch (e) {
-            console.error("Save draft failed:", e);
-            showToast("Kunne ikke lagre kladd.");
-        }
+
+        this.showPromptModal(
+            "Oppgi navnet på kladden din:",
+            "f.eks. Juli Månedsbrev, Konsertinvitasjon...",
+            async (name) => {
+                try {
+                    this.syncUnifiedBlocks();
+                    const data = {
+                        name,
+                        blocks: this.blocks,
+                        subject: document.getElementById('newsletter-subject')?.value || '',
+                        createdAt: new Date().toISOString(),
+                        isDraft: true
+                    };
+                    await window.firebaseService.db.collection('newsletter_templates').add(data);
+                    if (typeof showToast === 'function') showToast("Kladd lagret!", "success");
+                    this.loadDrafts();
+                } catch (e) {
+                    console.error("Save draft failed:", e);
+                    if (typeof showToast === 'function') showToast("Kunne ikke lagre kladd.");
+                }
+            },
+            this.currentDraftName || "Min Kladd",
+            "Vennligst oppgi et navn på kladden.",
+            "Lagre utkast",
+            "Lagre"
+        );
     }
 
     async loadDrafts() {
