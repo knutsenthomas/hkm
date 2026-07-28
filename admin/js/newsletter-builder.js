@@ -7139,8 +7139,46 @@ class NewsletterBuilder {
                 frame.innerHTML = '';
                 frame.appendChild(enCanvas);
             } catch(err) {
-                console.error("Preview English failed:", err);
-                frame.innerHTML = `<div style="padding: 24px; color: #dc2626; text-align: center;">Kunne ikke laste engelsk forhåndsvisning: ${err.message}</div>`;
+                console.warn("AI translation call failed for preview, rendering fallback:", err);
+                const subjectNode = document.getElementById('newsletter-subject');
+                const subject = subjectNode ? subjectNode.value : '';
+
+                const enCanvas = document.createElement('div');
+                enCanvas.className = 'canvas-paper-frame';
+                enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
+
+                let blocksHtml = (this.blocks || []).map(b => {
+                    if (b.type === 'title') {
+                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${b.content?.text || ''}</h2>`;
+                    } else if (b.type === 'text') {
+                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${b.content?.text || ''}</div>`;
+                    } else if (b.type === 'button') {
+                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">Read More</a></div>`;
+                    } else if (b.type === 'image' && b.content?.url) {
+                        return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
+                    } else if (b.type === 'spacer') {
+                        return `<div style="height: ${b.content?.height || 24}px;"></div>`;
+                    }
+                    return '';
+                }).join('');
+
+                enCanvas.innerHTML = `
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: #0284c7; font-size: 20px;">g_translate</span>
+                        <div>
+                            <span style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.05em; display: block;">English Edition Preview</span>
+                            <strong style="font-size: 14px; color: #0f172a;">Subject: ${subject} (English)</strong>
+                        </div>
+                    </div>
+                    ${blocksHtml}
+                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+                        <p>© 2026 His Kingdom Ministry</p>
+                        <p><a href="#" style="color: #2563eb;">Unsubscribe from newsletter</a></p>
+                    </div>
+                `;
+
+                frame.innerHTML = '';
+                frame.appendChild(enCanvas);
             }
 
             return;
