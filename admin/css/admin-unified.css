@@ -5587,19 +5587,23 @@ body.builder-active .main-header [id="admin-avatar"].has-initials {
   body.admin-body .main-header .user-info-text,
   body.minside-body .main-header .user-info-text,
   body.crm-body .main-header .user-info-text,
-  body.builder-active .main-header .user-info-text {
-    display: none !important;
-  }
-
+  body.builder-active .main-header .user-info-text,
   body.admin-body .main-header .user-profile-link,
   body.minside-body .main-header .user-profile-link,
   body.crm-body .main-header .user-profile-link,
-  body.builder-active .main-header .user-profile-link {
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    min-width: auto !important;
-    box-shadow: none !important;
+  body.builder-active .main-header .user-profile-link,
+  .user-profile-link,
+  #admin-profile-trigger,
+  .user-avatar,
+  #admin-avatar,
+  #ph-avatar,
+  .user-avatar-sm,
+  .user-entity-avatar,
+  #header-profile-link,
+  #header-profile-img,
+  .header-profile-avatar,
+  .profile-btn {
+    display: none !important;
   }
 }
 /* Global Search Box Fix for icon overlap */
