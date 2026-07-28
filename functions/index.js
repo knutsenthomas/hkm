@@ -5303,15 +5303,15 @@ exports.unsubscribeNewsletter = onRequest({
  * Manuel utsendelse av e-post fra admin-panelet.
  */
 exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
-  await verifyAdmin(req, res, async () => {
-    if (req.method === 'OPTIONS') {
-      res.set('Access-Control-Allow-Origin', '*');
-      res.set('Access-Control-Allow-Methods', 'POST');
-      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.status(204).send('');
-      return;
-    }
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.status(204).send('');
+    return;
+  }
 
+  await verifyAdmin(req, res, async () => {
     try {
       const { to, subject, message, fromName, html: rawHtml } = req.body;
 
@@ -5538,16 +5538,15 @@ async function verifyAdmin(req, res, next) {
  * Krever admin-autentisering.
  */
 exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
-  // Wrap the core logic in the verifyAdmin middleware
-  await verifyAdmin(req, res, async () => {
-    if (req.method === 'OPTIONS') {
-      res.set('Access-Control-Allow-Origin', '*');
-      res.set('Access-Control-Allow-Methods', 'POST');
-      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.status(204).send('');
-      return;
-    }
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.status(204).send('');
+    return;
+  }
 
+  await verifyAdmin(req, res, async () => {
     try {
       const { targetRole, subject, message, fromName, selectedUserIds } = req.body;
 
