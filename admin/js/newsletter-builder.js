@@ -8358,8 +8358,17 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendTestEmail() {
-        const user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
-        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
+        let user = window.firebaseService?.auth?.currentUser;
+        if (!user && typeof firebase !== 'undefined' && firebase.auth) {
+            user = firebase.auth().currentUser;
+        }
+
+        if (!user) {
+            if (typeof showToast === 'function') {
+                showToast("Logg inn på nytt i adminpanelet for å sende test-e-post.", "warning");
+            }
+            return;
+        }
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
@@ -8390,14 +8399,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
                 let sendSuccess = false;
                 try {
-                    let idToken = '';
-                    if (user && typeof user.getIdToken === 'function') {
-                        try {
-                            idToken = await user.getIdToken();
-                        } catch (tokErr) {
-                            console.warn("Could not get user idToken:", tokErr);
-                        }
-                    }
+                    const idToken = await user.getIdToken(true);
 
                     const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
 
@@ -8405,7 +8407,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
-                            ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
+                            'Authorization': `Bearer ${idToken}`
                         },
                         body: JSON.stringify({
                             to: recipientEmail,
@@ -8415,6 +8417,16 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                             fromName: 'His Kingdom Ministry'
                         })
                     });
+
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        let parsedErr = '';
+                        try {
+                            const errObj = JSON.parse(errText);
+                            parsedErr = errObj.error || errObj.message || '';
+                        } catch(e) {}
+                        throw new Error(parsedErr || `Serverfeil status ${response.status}`);
+                    }
 
                     const result = await response.json();
                     if (result.success) {
@@ -8450,7 +8462,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     );
                 }
             },
-            defaultEmail,
+            user.email || 'post@hiskingdomministry.no',
             "Vennligst oppgi en e-postadresse.",
             "Send test-e-post",
             "Send test-e-post"
