@@ -2166,16 +2166,8 @@ class NewsletterBuilder {
                 this.openImageInsertionFlow();
                 return;
             case 'social':
-                html = `
-                    <div class="newsletter-social-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0; padding: 16px; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff; display: flex; justify-content: center; gap: 16px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
-                        <a href="https://facebook.com/hiskingdomministry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">Facebook</a>
-                        <span style="color: #cbd5e1;">•</span>
-                        <a href="https://instagram.com/hiskingdomministry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">Instagram</a>
-                        <span style="color: #cbd5e1;">•</span>
-                        <a href="https://youtube.com/@HisKingdomMinistry" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">YouTube</a>
-                    </div><p><br></p>`;
-                break;
+                this.openSocialInsertionFlow();
+                return;
             case 'product':
                 this.openProductInsertionFlow();
                 return;
@@ -3112,6 +3104,199 @@ class NewsletterBuilder {
             this.insertHtmlAtCursorOrEndAt(html, afterElement);
             closeModal();
             showToast("Knapp satt inn!", "success");
+        };
+    }
+
+    openSocialInsertionFlow() {
+        this.openSocialInsertionFlowAt(null);
+    }
+
+    openSocialInsertionFlowAt(afterElement) {
+        let modal = document.getElementById('hkm-social-selector-modal');
+        if (modal) modal.remove();
+
+        const defaultPlatforms = [
+            {
+                id: 'facebook',
+                name: 'Facebook',
+                url: 'https://facebook.com/hiskingdomministry',
+                enabled: true,
+                color: '#1877f2',
+                svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`
+            },
+            {
+                id: 'instagram',
+                name: 'Instagram',
+                url: 'https://instagram.com/hiskingdomministry',
+                enabled: true,
+                color: '#e4405f',
+                svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`
+            },
+            {
+                id: 'youtube',
+                name: 'YouTube',
+                url: 'https://youtube.com/@HisKingdomMinistry',
+                enabled: true,
+                color: '#ff0000',
+                svg: `<svg width="22" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`
+            },
+            {
+                id: 'website',
+                name: 'Nettsted',
+                url: 'https://www.hiskingdomministry.no/',
+                enabled: false,
+                color: '#1B4965',
+                svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`
+            }
+        ];
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-social-selector-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = `
+            display: flex;
+            z-index: 11000;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+        `;
+
+        modal.innerHTML = `
+            <div class="profile-modal-content card modern" style="max-width: 520px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 90vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1B4965, #0f172a); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: white;">share</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">Sosiale medier lenker</h3>
+                    </div>
+                    <button id="hkm-social-modal-close" style="background: none; border: none; color: white; opacity: 0.8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 50%; transition: all 0.2s;"><span class="material-symbols-outlined" style="font-size: 22px;">close</span></button>
+                </div>
+
+                <div style="padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; background: white;">
+                    <!-- Display Style Switcher -->
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Visningsstil</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f8fafc; padding: 4px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <button type="button" class="hkm-style-btn active" data-style="both" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: white; color: #1B4965; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                Ikon + Tekst
+                            </button>
+                            <button type="button" class="hkm-style-btn" data-style="icon_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                                Bare ikoner
+                            </button>
+                            <button type="button" class="hkm-style-btn" data-style="text_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                                Bare tekst
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Platforms and URLs -->
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Velg plattformer & lenker</label>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            ${defaultPlatforms.map(p => `
+                                <div style="padding: 14px; border: 1px solid #e2e8f0; border-radius: 14px; background: #f8fafc; display: flex; flex-direction: column; gap: 8px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; font-size: 14px; color: #1e293b;">
+                                            <input type="checkbox" id="social-check-${p.id}" ${p.enabled ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: #1B4965; cursor: pointer;" />
+                                            <span style="display: flex; align-items: center; justify-content: center; color: ${p.color};">${p.svg}</span>
+                                            <span>${p.name}</span>
+                                        </label>
+                                        <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 99px;">HKM Forhåndskoblet</span>
+                                    </div>
+                                    <input type="text" id="social-url-${p.id}" value="${p.url}" placeholder="URL for ${p.name}" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box; background: white;" />
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <button id="hkm-social-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Avbryt</button>
+                    <button id="hkm-social-modal-insert" style="background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.25);">Sett inn i nyhetsbrev</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        let selectedStyle = 'both';
+        const styleBtns = modal.querySelectorAll('.hkm-style-btn');
+        styleBtns.forEach(btn => {
+            btn.onclick = () => {
+                styleBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'transparent';
+                    b.style.color = '#64748b';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = 'none';
+                });
+                btn.classList.add('active');
+                btn.style.background = 'white';
+                btn.style.color = '#1B4965';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                selectedStyle = btn.dataset.style;
+            };
+        });
+
+        const closeModal = () => modal.remove();
+        document.getElementById('hkm-social-modal-close').onclick = closeModal;
+        document.getElementById('hkm-social-modal-cancel').onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        document.getElementById('hkm-social-modal-insert').onclick = () => {
+            const activePlatforms = defaultPlatforms.filter(p => {
+                const chk = document.getElementById(`social-check-${p.id}`);
+                return chk && chk.checked;
+            }).map(p => {
+                const urlInput = document.getElementById(`social-url-${p.id}`);
+                return {
+                    ...p,
+                    url: urlInput ? urlInput.value.trim() || p.url : p.url
+                };
+            });
+
+            if (activePlatforms.length === 0) {
+                showToast("Velg minst én sosial plattform", "warning");
+                return;
+            }
+
+            let linksHtml = '';
+            if (selectedStyle === 'both') {
+                linksHtml = activePlatforms.map(p => `
+                    <a href="${p.url}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #f1f5f9; color: #1B4965; padding: 8px 16px; border-radius: 99px; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13.5px; transition: all 0.2s;">
+                        <span style="display: flex; align-items: center; justify-content: center; color: ${p.color};">${p.svg}</span>
+                        <span>${p.name}</span>
+                    </a>
+                `).join('');
+            } else if (selectedStyle === 'icon_only') {
+                linksHtml = activePlatforms.map(p => `
+                    <a href="${p.url}" target="_blank" title="${p.name}" style="display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #f1f5f9; color: ${p.color}; text-decoration: none; transition: all 0.2s;">
+                        ${p.svg}
+                    </a>
+                `).join('');
+            } else {
+                linksHtml = activePlatforms.map((p, idx) => `
+                    <a href="${p.url}" target="_blank" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;">${p.name}</a>
+                    ${idx < activePlatforms.length - 1 ? '<span style="color: #cbd5e1;">•</span>' : ''}
+                `).join('');
+            }
+
+            const fullBlockHtml = `
+                <div class="newsletter-social-block" contenteditable="false" data-style="${selectedStyle}" style="position: relative; text-align: center; margin: 24px 0; padding: 16px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; display: flex; flex-wrap: wrap; justify-content: center; gap: ${selectedStyle === 'text_only' ? '12px' : '14px'}; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
+                    ${linksHtml}
+                </div><p><br></p>
+            `;
+
+            this.insertHtmlAtCursorOrEndAt(fullBlockHtml, afterElement);
+            closeModal();
+            showToast("Sosiale medier satt inn!", "success");
         };
     }
 
