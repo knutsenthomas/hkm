@@ -6423,14 +6423,25 @@ class NewsletterBuilder {
         this.syncUnifiedBlocks();
     }
 
+    getCleanCanvasHtml() {
+        const container = document.getElementById('blocks-container');
+        if (!container) return '';
+        const clone = container.cloneNode(true);
+        clone.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar').forEach(el => el.remove());
+        return clone.innerHTML;
+    }
+
     normalizeCanvasBlocks(container) {
         if (!container) return;
+
+        // 1. Remove all pre-existing edit/delete buttons to prevent any duplicates
+        container.querySelectorAll('.card-delete-btn, .card-edit-btn').forEach(b => b.remove());
 
         const tileFB = `<svg width="22" height="22" viewBox="0 0 24 24" fill="#1B4965"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
         const tileIG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4965" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
         const tileYT = `<svg width="26" height="24" viewBox="0 0 24 24" fill="#1B4965"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
 
-        // Smart Converter: convert any text element or paragraph containing Facebook/Instagram/YouTube into a proper .newsletter-social-block with "Følg oss" + white brikker without background
+        // 2. Smart Converter: convert any text element or paragraph containing Facebook/Instagram/YouTube into a proper .newsletter-social-block
         container.querySelectorAll('p, div, font, span').forEach(el => {
             if (el.classList && el.classList.contains('newsletter-social-block')) return;
             const textContent = (el.textContent || '').trim();
@@ -6445,8 +6456,6 @@ class NewsletterBuilder {
                 block.setAttribute('data-style', 'tiles');
                 block.style.cssText = "position: relative; text-align: center; margin: 28px 0; padding: 0; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;";
                 block.innerHTML = `
-                    <button class="card-delete-btn" style="position: absolute; top: -10px; right: 0; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
-                    <button class="card-edit-btn" style="position: absolute; top: -10px; right: 30px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker">✏️</button>
                     <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">Følg oss</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
                         <a href="https://facebook.com/hiskingdomministry" target="_blank" title="Facebook" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
@@ -6464,14 +6473,21 @@ class NewsletterBuilder {
             }
         });
 
-        // Upgrade legacy text-only social blocks to "Følg oss" + white brikker layout automatically
+        // 3. Deduplicate multiple adjacent .newsletter-social-block elements
+        const socialBlocks = Array.from(container.querySelectorAll('.newsletter-social-block'));
+        if (socialBlocks.length > 1) {
+            // Keep only the first valid one and remove duplicates
+            for (let i = 1; i < socialBlocks.length; i++) {
+                socialBlocks[i].remove();
+            }
+        }
+
+        // 4. Upgrade legacy text-only social blocks to "Følg oss" + white brikker layout automatically
         container.querySelectorAll('.newsletter-social-block').forEach(socialBlock => {
             if (!socialBlock.querySelector('svg')) {
                 socialBlock.setAttribute('data-style', 'tiles');
                 socialBlock.style.cssText = "position: relative; text-align: center; margin: 28px 0; padding: 0; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;";
                 socialBlock.innerHTML = `
-                    <button class="card-delete-btn" style="position: absolute; top: -10px; right: 0; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
-                    <button class="card-edit-btn" style="position: absolute; top: -10px; right: 30px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker">✏️</button>
                     <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">Følg oss</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
                         <a href="https://facebook.com/hiskingdomministry" target="_blank" title="Facebook" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
@@ -6488,7 +6504,7 @@ class NewsletterBuilder {
             }
         });
 
-        // Ensure all non-text block cards in the container have a delete button and edit controls
+        // 5. Ensure all non-text block cards in the container have exactly ONE delete button and edit control positioned cleanly
         container.querySelectorAll(
             '.newsletter-product-card, .newsletter-event-card, .newsletter-social-block, ' +
             '.newsletter-video-block, .newsletter-divider-block, .newsletter-spacer-block, .newsletter-columns-block'
@@ -6499,7 +6515,7 @@ class NewsletterBuilder {
             if (!card.querySelector('.card-delete-btn')) {
                 const btn = document.createElement('button');
                 btn.className = 'card-delete-btn';
-                btn.setAttribute('style', 'position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
+                btn.setAttribute('style', 'position: absolute; top: -10px; right: 0; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
                 btn.title = 'Slett element';
                 btn.innerHTML = '×';
                 card.appendChild(btn);
@@ -6507,14 +6523,12 @@ class NewsletterBuilder {
             if (card.classList.contains('newsletter-social-block') && !card.querySelector('.card-edit-btn')) {
                 const editBtn = document.createElement('button');
                 editBtn.className = 'card-edit-btn';
-                editBtn.setAttribute('style', 'position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
+                editBtn.setAttribute('style', 'position: absolute; top: -10px; right: 30px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
                 editBtn.title = 'Endre stil & lenker';
                 editBtn.innerHTML = '✏️';
                 card.appendChild(editBtn);
             }
         });
-
-        this.syncUnifiedBlocks();
     }
 
     showPreview() {
@@ -9241,15 +9255,22 @@ ${cleanCanvasHtml}
             this._autosaveInFlight = true;
 
             try {
-                // Get fresh state
+                // Get clean state without edit/delete controls
                 const container = document.getElementById('blocks-container');
                 if (!container) return;
+                const cleanHtml = this.getCleanCanvasHtml();
                 const freshBlocks = [{
                     id: 'unified_content',
                     type: 'text',
-                    content: { text: container.innerHTML }
+                    content: { text: cleanHtml }
                 }];
                 const subject = document.getElementById('newsletter-subject')?.value || '';
+
+                // Also store clean HTML locally
+                try {
+                    localStorage.setItem('hkm_builder_autosave_html', cleanHtml);
+                    localStorage.setItem('hkm_builder_autosave_subject', subject);
+                } catch(e) {}
                 
                 if (!this.currentDraftId) {
                     try {
