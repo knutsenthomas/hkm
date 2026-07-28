@@ -7488,8 +7488,10 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     }
 }
 
-/* Hide mobile element drawer button on Desktop */
-#mobile-add-element-btn {
+/* Hide mobile element drawer button and mobile panel header on Desktop */
+#mobile-add-element-btn,
+.mobile-panel-header,
+.builder-elements-panel .mobile-panel-header {
     display: none !important;
 }
 
@@ -7602,12 +7604,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         overflow-y: auto !important;
     }
 
-/* Mobile side panel header */
-.mobile-panel-header {
-    display: none !important;
-}
-
-@media (max-width: 991px) {
+    /* Mobile side panel header */
     .mobile-panel-header {
         display: flex !important;
         align-items: center !important;
@@ -7640,7 +7637,6 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         color: #334155 !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
     }
-}
 
     /* Elementer Panel converts into a slide-out left side menu on mobile */
     #builder-main-workspace .builder-elements-panel {
