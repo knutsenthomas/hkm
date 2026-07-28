@@ -110,6 +110,13 @@ class NewsletterBuilder {
         this.totalUsers = 0;
         this.subscribersCount = 0;
 
+        // Separate language state prevents English edits from overwriting the
+        // Norwegian newsletter while switching between the two editor views.
+        this.currentEditorLang = 'no';
+        this.subjectNo = '';
+        this.englishPayload = null;
+        this.isSwitchingEditorLanguage = false;
+
         this.currentMode = 'dashboard';
         this.init();
         this.setupDashboardEvents();
@@ -418,6 +425,7 @@ class NewsletterBuilder {
             this.blocks = [];
             this.currentDraftId = null;
             this.currentDraftName = null;
+            this.resetEditorLanguageState();
             const subjectInput = document.getElementById('newsletter-subject');
             if (subjectInput) subjectInput.value = '';
             this.toggleMode('builder');
@@ -583,6 +591,7 @@ class NewsletterBuilder {
                     loadedBlocks = [{ id: 'unified_content', type: 'text', content: { text: fullRichHtml } }];
                 }
                 this.blocks = loadedBlocks;
+                this.resetEditorLanguageState(data);
                 const subjectInput = document.getElementById('newsletter-subject');
                 if (subjectInput) subjectInput.value = data.subject || 'HKM Månedsbrev';
                 
@@ -1960,20 +1969,33 @@ class NewsletterBuilder {
         });
 
         const cleanHtml = this.getCleanCanvasHtml();
-        this.blocks = [{
+        const unifiedBlocks = [{
             id: 'unified_content',
             type: 'text',
             content: { text: cleanHtml }
         }];
+        const currentSubject = document.getElementById('newsletter-subject')?.value || '';
+
+        if (this.currentEditorLang === 'en') {
+            this.englishPayload = {
+                ...(this.englishPayload || {}),
+                subjectEn: currentSubject,
+                blocksEn: unifiedBlocks,
+                translatedAt: this.englishPayload?.translatedAt || new Date().toISOString()
+            };
+        } else {
+            this.blocks = unifiedBlocks;
+            this.subjectNo = currentSubject;
+        }
 
         try {
             const currentHtml = cleanHtml;
-            const currentSubject = document.getElementById('newsletter-subject')?.value || '';
             const headerNode = document.querySelector('.canvas-header');
 
             if (currentHtml && currentHtml !== '<p><br></p>') {
-                localStorage.setItem('hkm_builder_autosave_html', currentHtml);
-                localStorage.setItem('hkm_builder_autosave_subject', currentSubject);
+                const languageSuffix = this.currentEditorLang === 'en' ? '_en' : '';
+                localStorage.setItem(`hkm_builder_autosave_html${languageSuffix}`, currentHtml);
+                localStorage.setItem(`hkm_builder_autosave_subject${languageSuffix}`, currentSubject);
             }
             if (headerNode) {
                 localStorage.setItem('hkm_builder_autosave_header_html', headerNode.outerHTML);
@@ -7571,10 +7593,14 @@ class NewsletterBuilder {
             async (name) => {
                 try {
                     this.syncUnifiedBlocks();
+                    const subject = this.currentEditorLang === 'en'
+                        ? (this.subjectNo || '')
+                        : (document.getElementById('newsletter-subject')?.value || '');
                     const data = {
                         name,
                         blocks: this.blocks,
-                        subject: document.getElementById('newsletter-subject').value,
+                        subject,
+                        englishPayload: this.englishPayload || null,
                         createdAt: new Date().toISOString(),
                         isDraft: false
                     };
@@ -7624,6 +7650,7 @@ class NewsletterBuilder {
                     const confirmed = await this.showConfirm('Last inn mal', `Last inn malen "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
                         this.blocks = data.blocks;
+                        this.resetEditorLanguageState(data);
                         document.getElementById('newsletter-subject').value = data.subject || '';
                         this.renderCanvas();
                         showToast(`Malen "${data.name}" er lastet inn.`, "info");
@@ -7959,6 +7986,202 @@ class NewsletterBuilder {
         });
     }
 
+    updateEditorLanguageButtons(lang = this.currentEditorLang) {
+        const btnNo = document.getElementById('editor-lang-btn-no');
+        const btnEn = document.getElementById('editor-lang-btn-en');
+
+        [
+            [btnNo, lang === 'no'],
+            [btnEn, lang === 'en']
+        ].forEach(([button, isActive]) => {
+            if (!button) return;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.style.background = isActive ? '#ffffff' : 'transparent';
+            button.style.color = isActive ? '#0f172a' : '#64748b';
+            button.style.boxShadow = isActive ? '0 2px 4px rgba(0,0,0,0.06)' : 'none';
+        });
+    }
+
+    resetEditorLanguageState(data = {}) {
+        this.currentEditorLang = 'no';
+        this.subjectNo = data.subject || '';
+        this.englishPayload = data.englishPayload
+            ? JSON.parse(JSON.stringify(data.englishPayload))
+            : null;
+        this.updateEditorLanguageButtons('no');
+    }
+
+    getLanguageBlocksHtml(blocks = []) {
+        if (!Array.isArray(blocks) || blocks.length === 0) return '<p><br></p>';
+
+        if (blocks.length === 1 && blocks[0]?.id === 'unified_content') {
+            return blocks[0]?.content?.text || '<p><br></p>';
+        }
+
+        return blocks.map(block => {
+            const content = block?.content || {};
+            switch (block?.type) {
+                case 'header':
+                case 'title':
+                    return `<h2 class="block-h2">${content.text || ''}</h2>`;
+                case 'text':
+                    return `<p class="block-text">${content.text || ''}</p>`;
+                case 'button':
+                    return `<div style="text-align: center; margin: 24px 0;"><a href="${content.url || '#'}" class="block-btn" contenteditable="false">${content.text || ''}</a></div>`;
+                case 'image':
+                    return content.url
+                        ? `<p><img src="${content.url}" alt="${content.alt || ''}" class="block-img" style="max-width:100%; height:auto; display:block;"></p>`
+                        : '';
+                case 'divider':
+                    return '<hr>';
+                case 'spacer':
+                    return `<div style="height:${Number(content.height) || 20}px;"></div>`;
+                default:
+                    return content.text || '';
+            }
+        }).join('') || '<p><br></p>';
+    }
+
+    renderCanvasForLanguage(lang = 'no') {
+        const container = document.getElementById('blocks-container');
+        const subjectInput = document.getElementById('newsletter-subject');
+        if (!container) return;
+
+        const isEnglish = lang === 'en';
+        const blocks = isEnglish ? this.englishPayload?.blocksEn : this.blocks;
+        container.innerHTML = this.getLanguageBlocksHtml(blocks);
+
+        if (subjectInput) {
+            subjectInput.value = isEnglish
+                ? (this.englishPayload?.subjectEn || '')
+                : (this.subjectNo || '');
+        }
+
+        this.normalizeCanvasBlocks(container);
+    }
+
+    async switchEditorLanguage(lang = 'no') {
+        const targetLanguage = lang === 'en' ? 'en' : 'no';
+        if (this.isSwitchingEditorLanguage) return;
+
+        if (targetLanguage === this.currentEditorLang) {
+            this.updateEditorLanguageButtons(targetLanguage);
+            return;
+        }
+
+        this.isSwitchingEditorLanguage = true;
+        try {
+            // Save the currently visible language before replacing the canvas.
+            this.syncUnifiedBlocks();
+
+            if (targetLanguage === 'en' && !this.englishPayload?.blocksEn?.length) {
+                const translated = await this.translateCurrentNewsletterToEnglish();
+                if (!translated) {
+                    this.updateEditorLanguageButtons(this.currentEditorLang);
+                    return;
+                }
+            }
+
+            this.currentEditorLang = targetLanguage;
+            this.renderCanvasForLanguage(targetLanguage);
+            this.updateEditorLanguageButtons(targetLanguage);
+
+            if (typeof showToast === 'function') {
+                showToast(
+                    targetLanguage === 'en'
+                        ? 'Du redigerer nå den engelske versjonen. 🇬🇧'
+                        : 'Du redigerer nå den norske versjonen. 🇳🇴',
+                    'info'
+                );
+            }
+        } catch (error) {
+            console.error('Kunne ikke bytte språk i nyhetsbreveditoren:', error);
+            this.updateEditorLanguageButtons(this.currentEditorLang);
+            if (typeof showToast === 'function') {
+                showToast(error?.message || 'Kunne ikke bytte språk.', 'error');
+            }
+        } finally {
+            this.isSwitchingEditorLanguage = false;
+        }
+    }
+
+    async translateCurrentNewsletterToEnglish() {
+        const norwegianSubject = this.subjectNo
+            || document.getElementById('newsletter-subject')?.value
+            || 'Nyhetsbrev';
+        const norwegianBlocks = JSON.parse(JSON.stringify(this.blocks || []));
+        const sourceHtml = this.getLanguageBlocksHtml(norwegianBlocks);
+        const plainText = sourceHtml.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+
+        if (!plainText) {
+            if (typeof showToast === 'function') {
+                showToast('Skriv innhold i nyhetsbrevet før du lager engelsk versjon.', 'warning');
+            }
+            return false;
+        }
+
+        const translateButton = document.getElementById('editor-lang-btn-en');
+        const originalButtonHtml = translateButton?.innerHTML || '';
+        if (translateButton) {
+            translateButton.disabled = true;
+            translateButton.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:16px;">sync</span><span class="lang-text">Oversetter…</span>';
+        }
+
+        try {
+            if (!window.firebase?.functions) {
+                throw new Error('AI-oversettelsen er ikke tilgjengelig akkurat nå.');
+            }
+
+            const prompt = `
+Du er en profesjonell oversetter for His Kingdom Ministry.
+Oversett nyhetsbrevet fra norsk til naturlig, varmt og korrekt engelsk.
+Behold all HTML, lenker, bilder, produktdata og formatering uendret.
+Oversett «Basar» til «Raffle» og «Sommerbasar» til «Summer Raffle».
+
+Norsk emnelinje:
+${norwegianSubject}
+
+Nyhetsbrevblokker:
+${JSON.stringify(norwegianBlocks)}
+
+Returner kun gyldig JSON i dette formatet:
+{"subject":"English subject","blocks":[...translated blocks...]}
+            `.trim();
+
+            const callable = window.firebase.functions().httpsCallable('aiProcess');
+            const response = await callable({ prompt });
+            let rawResult = response?.data?.text || response?.data?.result || '';
+            rawResult = String(rawResult)
+                .trim()
+                .replace(/^```(?:json)?\s*/i, '')
+                .replace(/\s*```$/, '');
+
+            const parsed = JSON.parse(rawResult);
+            if (!Array.isArray(parsed.blocks) || parsed.blocks.length === 0) {
+                throw new Error('Oversettelsen manglet nyhetsbrevinnhold.');
+            }
+
+            this.englishPayload = {
+                subjectEn: String(parsed.subject || `${norwegianSubject} – English`).trim(),
+                blocksEn: parsed.blocks,
+                translatedAt: new Date().toISOString()
+            };
+            return true;
+        } catch (error) {
+            console.error('Oversettelse av nyhetsbrev feilet:', error);
+            if (typeof showToast === 'function') {
+                showToast(`Kunne ikke lage engelsk versjon: ${error.message}`, 'error');
+            }
+            return false;
+        } finally {
+            if (translateButton) {
+                translateButton.disabled = false;
+                translateButton.innerHTML = originalButtonHtml;
+            }
+        }
+    }
+
     async sendTestEmail() {
         const user = window.firebaseService?.auth?.currentUser;
         if (!user) return showToast("Logg inn først", "warning");
@@ -7966,9 +8189,9 @@ class NewsletterBuilder {
         const subject = document.getElementById('newsletter-subject').value || 'Test-e-post';
         this.syncUnifiedBlocks();
         
-        const textContent = this.blocks[0]?.content?.text || '';
+        const textContent = document.getElementById('blocks-container')?.innerHTML || '';
         const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
-        if (this.blocks.length === 0 || !textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
+        if (!textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
             return showToast("Legg til innhold før du sender en test.", "error");
         }
 
@@ -9206,6 +9429,7 @@ class NewsletterBuilder {
                 this.currentDraftName = restoredSnapshot.name || resourceLabel;
                 this.hasCustomDraftName = true;
                 this.blocks = JSON.parse(JSON.stringify(restoredSnapshot.blocks || []));
+                this.resetEditorLanguageState(restoredSnapshot);
 
                 const subjectInput = document.getElementById('newsletter-subject');
                 if (subjectInput) subjectInput.value = restoredSnapshot.subject || '';
@@ -9239,11 +9463,15 @@ class NewsletterBuilder {
                 try {
                     this.syncUnifiedBlocks();
                     const headerNode = document.querySelector('.canvas-header');
+                    const canonicalSubject = this.currentEditorLang === 'en'
+                        ? (this.subjectNo || '')
+                        : subjectVal;
                     const data = {
                         name: trimmedName,
                         blocks: this.blocks,
                         headerHtml: headerNode ? headerNode.outerHTML : '',
-                        subject: subjectVal,
+                        subject: canonicalSubject,
+                        englishPayload: this.englishPayload || null,
                         updatedAt: new Date().toISOString(),
                         isDraft: true
                     };
@@ -9342,6 +9570,7 @@ class NewsletterBuilder {
                         this.currentDraftName = data.name;
                         this.hasCustomDraftName = true;
                         this.blocks = data.blocks;
+                        this.resetEditorLanguageState(data);
                         const subjectInput = document.getElementById('newsletter-subject');
                         if (subjectInput) subjectInput.value = data.subject || '';
                         
@@ -10985,6 +11214,7 @@ class NewsletterBuilder {
     createNewStudioItem(type) {
         if (type === 'newsletter') {
             this.blocks = [];
+            this.resetEditorLanguageState();
             document.getElementById('newsletter-subject').value = '';
             
             // Set URL parameter immediately so reload stays in builder
@@ -11012,6 +11242,7 @@ class NewsletterBuilder {
             this.currentDraftId = id;
             this.currentDraftName = draft.name;
             this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
+            this.resetEditorLanguageState(draft);
             document.getElementById('newsletter-subject').value = draft.subject || '';
             
             // Set URL parameter immediately so reload stays in builder
@@ -11085,11 +11316,28 @@ class NewsletterBuilder {
                     content: { text: cleanHtml }
                 }];
                 const subject = document.getElementById('newsletter-subject')?.value || '';
+                const isEnglishEditor = this.currentEditorLang === 'en';
+
+                if (isEnglishEditor) {
+                    this.englishPayload = {
+                        ...(this.englishPayload || {}),
+                        subjectEn: subject,
+                        blocksEn: freshBlocks,
+                        translatedAt: this.englishPayload?.translatedAt || new Date().toISOString()
+                    };
+                } else {
+                    this.blocks = freshBlocks;
+                    this.subjectNo = subject;
+                }
+
+                const canonicalBlocks = isEnglishEditor ? this.blocks : freshBlocks;
+                const canonicalSubject = isEnglishEditor ? (this.subjectNo || '') : subject;
 
                 // Also store clean HTML locally
                 try {
-                    localStorage.setItem('hkm_builder_autosave_html', cleanHtml);
-                    localStorage.setItem('hkm_builder_autosave_subject', subject);
+                    const languageSuffix = isEnglishEditor ? '_en' : '';
+                    localStorage.setItem(`hkm_builder_autosave_html${languageSuffix}`, cleanHtml);
+                    localStorage.setItem(`hkm_builder_autosave_subject${languageSuffix}`, subject);
                 } catch(e) {}
                 
                 if (!this.currentDraftId) {
@@ -11100,16 +11348,17 @@ class NewsletterBuilder {
 
                 let draftName = this.currentDraftName;
                 if (!this.hasCustomDraftName || !draftName) {
-                    draftName = subject ? `Kladd: ${subject}` : `Utkast (${new Date().toLocaleDateString('no')})`;
+                    draftName = canonicalSubject ? `Kladd: ${canonicalSubject}` : `Utkast (${new Date().toLocaleDateString('no')})`;
                     this.currentDraftName = draftName;
                 }
 
                 const headerNode = document.querySelector('.canvas-header');
                 const data = {
                     name: draftName,
-                    blocks: freshBlocks,
+                    blocks: canonicalBlocks,
                     headerHtml: headerNode ? headerNode.outerHTML : '',
-                    subject: subject,
+                    subject: canonicalSubject,
+                    englishPayload: this.englishPayload || null,
                     updatedAt: new Date().toISOString(),
                     isDraft: true
                 };
@@ -11181,6 +11430,7 @@ class NewsletterBuilder {
         );
         if (confirmed) {
             this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
+            this.resetEditorLanguageState(tpl);
             document.getElementById('newsletter-subject').value = tpl.subject || '';
             this.toggleMode('builder');
             this.renderCanvas();
@@ -11198,6 +11448,7 @@ class NewsletterBuilder {
         );
         if (confirmed) {
             this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
+            this.resetEditorLanguageState(tpl);
             document.getElementById('newsletter-subject').value = tpl.subject || '';
             this.toggleMode('builder');
             this.renderCanvas();
@@ -11216,6 +11467,7 @@ class NewsletterBuilder {
                 this.currentDraftId = id;
                 this.currentDraftName = name;
                 this.blocks = JSON.parse(blocksStr);
+                this.resetEditorLanguageState({ subject });
                 document.getElementById('newsletter-subject').value = subject || '';
                 
                 // Update URL parameter immediately so reload stays in builder
@@ -11256,6 +11508,7 @@ class NewsletterBuilder {
         if (confirmed) {
             try {
                 this.blocks = JSON.parse(blocksStr);
+                this.resetEditorLanguageState({ subject });
                 document.getElementById('newsletter-subject').value = subject || '';
                 
                 // Update URL parameter immediately (new unsaved builder state)
@@ -11720,6 +11973,7 @@ class NewsletterBuilder {
             showToast("AI-kladd opprettet!", "success");
             
             this.blocks = data.blocks;
+            this.resetEditorLanguageState(data);
             document.getElementById('newsletter-subject').value = data.subject;
             this.toggleMode('builder');
             this.renderCanvas();
