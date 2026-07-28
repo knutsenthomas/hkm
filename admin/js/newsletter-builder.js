@@ -482,20 +482,34 @@ class NewsletterBuilder {
             btn.addEventListener('mousedown', () => {
                 this.saveSelection();
             });
-            btn.addEventListener('click', () => {
-                const type = btn.dataset.type;
+        });
+
+        // Delegated click listener to catch clicks on any block cards or inner labels/icons
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.element-card, .block-card-item');
+            if (!card) {
                 this.hideElementHoverPreview();
-                if (type === 'ai_text') {
-                    this.showAiTextPrompt();
-                } else if (type === 'ai_image') {
-                    this.showAiImagePrompt();
-                } else {
-                    this.addBlock(type);
-                }
-                if (this.isMobileViewport()) {
-                    this.closeToolsUi();
-                }
-            });
+                return;
+            }
+
+            const type = card.dataset.type || card.getAttribute('data-type');
+            if (!type) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            this.hideElementHoverPreview();
+
+            if (type === 'ai_text') {
+                this.showAiTextPrompt();
+            } else if (type === 'ai_image') {
+                this.showAiImagePrompt();
+            } else {
+                this.addBlock(type);
+            }
+
+            if (this.isMobileViewport()) {
+                this.closeToolsUi();
+            }
         });
 
         // Global listeners to clean up sticky hover previews in all edge cases
@@ -508,11 +522,7 @@ class NewsletterBuilder {
             this.isDragging = false;
             this.hideElementHoverPreview();
         });
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.element-card')) {
-                this.hideElementHoverPreview();
-            }
-        });        // Accordion headers toggle
+        // Accordion headers toggle
         document.querySelectorAll('.accordion-header-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.accordion;
