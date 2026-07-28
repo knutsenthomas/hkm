@@ -918,23 +918,40 @@ class NewsletterBuilder {
 
                     if (isAtStart || isCurrentEmpty) {
                         const prevSibling = parentBlock.previousSibling;
-                        if (!prevSibling) return;
+                        const nextSibling = parentBlock.nextSibling;
 
                         if (isCurrentEmpty && container.children.length > 1) {
                             e.preventDefault();
-                            if (prevSibling.nodeType === Node.ELEMENT_NODE && prevSibling.focus) {
-                                const newRange = document.createRange();
-                                newRange.selectNodeContents(prevSibling);
-                                newRange.collapse(false);
-                                selection.removeAllRanges();
-                                selection.addRange(newRange);
-                                prevSibling.focus();
+                            const target = prevSibling || nextSibling;
+                            if (target && target.nodeType === Node.ELEMENT_NODE) {
+                                const isCard = target.classList.contains('newsletter-social-block') ||
+                                               target.classList.contains('newsletter-product-card') ||
+                                               target.classList.contains('newsletter-event-card') ||
+                                               target.classList.contains('newsletter-video-block') ||
+                                               target.classList.contains('newsletter-divider-block') ||
+                                               target.classList.contains('newsletter-spacer-block');
+                                if (!isCard) {
+                                    try {
+                                        const newRange = document.createRange();
+                                        newRange.selectNodeContents(target);
+                                        newRange.collapse(false);
+                                        selection.removeAllRanges();
+                                        selection.addRange(newRange);
+                                        if (target.focus) target.focus();
+                                    } catch(err) {}
+                                } else if (typeof this.selectBlockCard === 'function') {
+                                    this.selectBlockCard(target);
+                                }
                             }
                             parentBlock.remove();
                             this.syncUnifiedBlocks();
                             this.triggerAutosave();
                             return;
-                        } else if (isAtStart && prevSibling.nodeType === Node.ELEMENT_NODE && !prevSibling.classList.contains('newsletter-event-card') && !prevSibling.classList.contains('newsletter-product-card') && !prevSibling.classList.contains('newsletter-social-block') && !prevSibling.classList.contains('newsletter-video-block')) {
+                        }
+
+                        if (!prevSibling) return;
+
+                        if (isAtStart && prevSibling.nodeType === Node.ELEMENT_NODE && !prevSibling.classList.contains('newsletter-event-card') && !prevSibling.classList.contains('newsletter-product-card') && !prevSibling.classList.contains('newsletter-social-block') && !prevSibling.classList.contains('newsletter-video-block')) {
                             e.preventDefault();
                             const caretMarker = document.createElement('span');
                             caretMarker.id = 'hkm-caret-merge-marker';
@@ -967,15 +984,29 @@ class NewsletterBuilder {
                         !parentBlock.querySelector('img, iframe, table, button, hr, .newsletter-product-card, .newsletter-event-card, .newsletter-video-block, .newsletter-social-block');
 
                     if (isCurrentEmpty && container.children.length > 1) {
-                        const nextSibling = parentBlock.nextSibling;
                         e.preventDefault();
-                        if (nextSibling && nextSibling.nodeType === Node.ELEMENT_NODE && nextSibling.focus) {
-                            const newRange = document.createRange();
-                            newRange.selectNodeContents(nextSibling);
-                            newRange.collapse(true);
-                            selection.removeAllRanges();
-                            selection.addRange(newRange);
-                            nextSibling.focus();
+                        const nextSibling = parentBlock.nextSibling;
+                        const prevSibling = parentBlock.previousSibling;
+                        const target = nextSibling || prevSibling;
+                        if (target && target.nodeType === Node.ELEMENT_NODE) {
+                            const isCard = target.classList.contains('newsletter-social-block') ||
+                                           target.classList.contains('newsletter-product-card') ||
+                                           target.classList.contains('newsletter-event-card') ||
+                                           target.classList.contains('newsletter-video-block') ||
+                                           target.classList.contains('newsletter-divider-block') ||
+                                           target.classList.contains('newsletter-spacer-block');
+                            if (!isCard) {
+                                try {
+                                    const newRange = document.createRange();
+                                    newRange.selectNodeContents(target);
+                                    newRange.collapse(true);
+                                    selection.removeAllRanges();
+                                    selection.addRange(newRange);
+                                    if (target.focus) target.focus();
+                                } catch(err) {}
+                            } else if (typeof this.selectBlockCard === 'function') {
+                                this.selectBlockCard(target);
+                            }
                         }
                         parentBlock.remove();
                         this.syncUnifiedBlocks();
