@@ -6114,66 +6114,74 @@ class NewsletterBuilder {
     }
 
     async sendCampaign() {
-        const estCount = parseInt(document.getElementById('estimated-count').innerText) || 0;
-        const subject = document.getElementById('newsletter-subject').value;
+        const estCountNode = document.getElementById('estimated-count');
+        const estCount = estCountNode ? (parseInt(estCountNode.innerText) || 0) : 0;
+        const subjectNode = document.getElementById('newsletter-subject');
+        const subject = subjectNode ? subjectNode.value : '';
         this.syncUnifiedBlocks();
 
-        const textContent = this.blocks[0]?.content?.text || '';
+        const container = document.getElementById('blocks-container');
+        const textContent = container ? container.innerHTML : '';
         const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+
+        if (!subject || subject.trim() === '') {
+            if (typeof showToast === 'function') showToast("Vennligst skriv inn et emne for nyhetsbrevet øverst.", "warning");
+            return;
+        }
+
         if (this.blocks.length === 0 || !textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
-            return showToast("Du kan ikke sende et tomt nyhetsbrev.", "error");
+            if (typeof showToast === 'function') showToast("Du kan ikke sende et tomt nyhetsbrev. Legg til innhold først.", "error");
+            return;
         }
 
-        if (estCount === 0) { // Changed from `if (!mottakere || mottakere.length === 0)` to match original logic
-            return showToast("Du må velge minst én mottaker eller målgruppe.", "warning");
-        }
-
-        const confirmSend = await this.showConfirm('Send kampanje', `Er du sikker på at du vil sende "${subject}" til ca. ${estCount} mottakere?`, 'Send');
+        const confirmSend = await this.showConfirm('Send kampanje', `Er du sikker på at du vil sende "${subject}" til ca. ${estCount} mottakere?`, 'Send nå');
         if (!confirmSend) return;
 
         try {
-            // Show sending state
             const finalBtn = document.getElementById('final-send-btn');
-            const originalText = finalBtn.innerHTML;
-            finalBtn.disabled = true;
-            finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
+            const originalText = finalBtn ? finalBtn.innerHTML : '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
+            if (finalBtn) {
+                finalBtn.disabled = true;
+                finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
+            }
 
-            // Simulate server delay and save record
             const campaignData = {
                 subject: subject,
                 recipientCount: estCount,
                 blockCount: this.blocks.length,
                 status: 'sent',
                 sentAt: new Date().toISOString(),
-                sentBy: window.firebaseService.auth.currentUser.email
+                sentBy: (window.firebaseService?.auth?.currentUser?.email) || 'admin@hiskingdomministry.no'
             };
 
-            await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
+            if (window.firebaseService && window.firebaseService.db) {
+                await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
+            }
 
-            // Success feedback
-            setTimeout(async () => {
-                showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ${estCount} mottakere.`, "success");
+            if (typeof showToast === 'function') showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse!`, "success");
+            if (finalBtn) {
                 finalBtn.disabled = false;
                 finalBtn.innerHTML = originalText;
+            }
 
-                // Vis en lekker bekreftelse og spør om de vil gå tilbake til dashbordet
-                const confirmedBack = await this.showConfirm(
-                    'Nyhetsbrev sendt!',
-                    `Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ca. ${estCount} mottakere.\n\nVil du gå tilbake til dashbordet?`,
-                    'Ja, gå til dashbordet',
-                    'Nei, bli her'
-                );
-                if (confirmedBack) {
-                    window.location.href = '/admin/index.html';
-                }
-            }, 1500);
+            const confirmedBack = await this.showConfirm(
+                'Nyhetsbrev sendt!',
+                `Suksess! Nyhetsbrevet er lagt i kø for utsendelse til ca. ${estCount} mottakere.\n\nVil du gå tilbake til oversikten?`,
+                'Gå til oversikt',
+                'Bli i editoren'
+            );
+            if (confirmedBack) {
+                this.toggleMode('dashboard');
+            }
 
         } catch (e) {
             console.error("Campaign send failed:", e);
-            showToast("Det oppstod en feil under utsendelsen. Vennligst prøv igjen.");
+            if (typeof showToast === 'function') showToast("Det oppstod en feil under utsendelsen. Vennligst prøv igjen.", "error");
             const finalBtn = document.getElementById('final-send-btn');
-            finalBtn.disabled = false;
-            finalBtn.innerHTML = '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
+            if (finalBtn) {
+                finalBtn.disabled = false;
+                finalBtn.innerHTML = '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
+            }
         }
     }
 

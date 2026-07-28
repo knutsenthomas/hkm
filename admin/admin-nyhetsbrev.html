@@ -1515,7 +1515,7 @@
                                 <button id="send-test-btn" class="btn-v2 btn-v2-outline">
                                     <span class="material-symbols-outlined">send</span> Send test-e-post
                                 </button>
-                                <button id="final-send-btn" class="btn-v2 btn-v2-primary">
+                                <button id="final-send-btn" class="btn-v2 btn-v2-primary" onclick="if(window.builder){ window.builder.sendCampaign(); }">
                                     <span>Send kampanje nå</span>
                                     <span class="material-symbols-outlined">send</span>
                                 </button>
@@ -1874,7 +1874,7 @@
     <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260727_V200_ARCH_FIX"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260728_V1400_FAILSAFEPUBLISH"></script>
 </body>
 
 </html>
