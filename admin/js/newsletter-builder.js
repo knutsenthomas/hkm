@@ -668,11 +668,14 @@ class NewsletterBuilder {
                     this.activateImageResizer(img);
                     return;
                 }
-                const btn = e.target.closest('.block-btn');
-                if (btn) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                const btn = e.target.closest('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button');
+                if (btn && !btn.classList.contains('card-delete-btn') && !btn.classList.contains('inspector-style-btn') && !btn.classList.contains('mobile-nav-toggle')) {
+                    btn.setAttribute('contenteditable', 'true');
                     this.activateButtonManager(btn);
+                    const blockNode = btn.closest('.builder-block') || btn.closest('.newsletter-product-card') || btn.closest('.newsletter-event-card') || btn;
+                    if (blockNode) {
+                        this.selectBlock(blockNode);
+                    }
                     return;
                 }
                 const deleteBtn = e.target.closest('.card-delete-btn');
@@ -3586,7 +3589,8 @@ class NewsletterBuilder {
 
         // Determine block type
         const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
-        const btn = node.querySelector('.block-btn') || (node.classList.contains('block-btn') ? node : null);
+        const btn = node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') || 
+                    ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
         
         if (img) {
             console.log('[HKM Inspector] Loading IMAGE inspector');
@@ -5172,6 +5176,17 @@ class NewsletterBuilder {
                 document.getElementById('inspector-tab-design').style.display = isDesign ? 'flex' : 'none';
             });
         });
+
+        btn.setAttribute('contenteditable', 'true');
+        const handleCanvasBtnInput = () => {
+            if (inputText && document.activeElement === btn) {
+                inputText.value = btn.innerText || btn.textContent || '';
+            }
+            this.syncUnifiedBlocks();
+        };
+        btn.addEventListener('input', handleCanvasBtnInput);
+        btn.addEventListener('keyup', handleCanvasBtnInput);
+        btn.addEventListener('blur', handleCanvasBtnInput);
 
         if (inputText) {
             inputText.addEventListener('input', () => {
