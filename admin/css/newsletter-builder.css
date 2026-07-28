@@ -7712,7 +7712,12 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
    STRICT NON-OVERLAPPING BUILDER TOOLBAR HEADER RULES
    ========================================================================== */
 
-/* Ensure all header buttons have normal 8px spacing between icon and text label */
+/* Default Desktop State (> 991px): Hide mobile element button completely on PC */
+#mobile-add-element-btn {
+    display: none !important;
+}
+
+/* Ensure all header buttons on desktop have normal 8px spacing between icon and text label */
 .builder-toolbar-header #save-draft-btn,
 .builder-toolbar-header #preview-btn {
     display: inline-flex !important;
@@ -7739,12 +7744,6 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 
 .builder-toolbar-header #continue-btn .btn-publish-icon {
     font-size: 18px !important;
-}
-
-@media (max-width: 768px) {
-    .builder-toolbar-header #continue-btn .btn-publish-label {
-        display: none !important;
-    }
 }
 
 .builder-toolbar-header .device-pill-btn {
@@ -7776,7 +7775,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         visibility: hidden !important;
     }
 
-    /* Mobile element drawer button */
+    /* Mobile element drawer button ONLY on mobile */
     #mobile-add-element-btn {
         display: inline-flex !important;
         align-items: center !important;
@@ -7789,6 +7788,10 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         font-size: 13px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
+    }
+
+    .builder-toolbar-header #continue-btn .btn-publish-label {
+        display: none !important;
     }
 }
 
