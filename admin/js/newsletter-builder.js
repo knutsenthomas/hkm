@@ -2181,22 +2181,20 @@ class NewsletterBuilder {
         let html = '';
         switch (type) {
             case 'header':
-                html = `<h1>Overskrift her</h1>`;
+                html = `<h2 style="font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: #1B4965; margin: 24px 0 12px 0;">Overskrift her</h2><p><br></p>`;
                 break;
             case 'text':
-                html = `<p>Skriv din tekst her...</p>`;
+                html = `<p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin: 16px 0;">Skriv din tekst her...</p><p><br></p>`;
                 break;
             case 'divider':
                 html = `
                     <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 12px 0;">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett skillelinje">×</button>
                         <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0;">
                     </div><p><br></p>`;
                 break;
             case 'spacer':
                 html = `
                     <div class="newsletter-spacer-block" contenteditable="false" style="position: relative; margin: 12px 0; padding: 6px; border: 1px dashed #cbd5e1; border-radius: 8px; text-align: center; color: #94a3b8; font-size: 12px;">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett avstand">×</button>
                         <div style="height: 24px; display: flex; align-items: center; justify-content: center;">Avstand (24px)</div>
                     </div><p><br></p>`;
                 break;
@@ -2206,7 +2204,6 @@ class NewsletterBuilder {
             case 'columns':
                 html = `
                     <div class="newsletter-columns-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px;">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett kolonner">×</button>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                             <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Venstre kolonne...</div>
                             <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Høyre kolonne...</div>
@@ -2236,7 +2233,6 @@ class NewsletterBuilder {
                     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
                     html = `
                         <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
-                            <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett video">×</button>
                             <a href="${videoUrl}" target="_blank" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
                                 <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35); transition: all 0.3s ease;">
@@ -2270,14 +2266,14 @@ class NewsletterBuilder {
                 if (!linkText) return;
                 const linkUrl = prompt("Lenke-URL:", "https://");
                 if (!linkUrl) return;
-                html = `<p style="text-align: center; margin: 16px 0; font-family: 'Inter', sans-serif;"><a href="${linkUrl}" style="color: #d17d39; text-decoration: underline; font-weight: 600; font-family: 'Inter', sans-serif;">${linkText}</a></p>`;
+                html = `<p style="text-align: center; margin: 16px 0; font-family: 'Inter', sans-serif;"><a href="${linkUrl}" target="_blank" style="color: #d17d39; text-decoration: underline; font-weight: 600; font-family: 'Inter', sans-serif;">${linkText}</a></p><p><br></p>`;
                 break;
             default:
                 return;
         }
 
         if (html) {
-            this.exec('insertHTML', html);
+            this.insertHtmlAtCursorOrEnd(html);
         }
     }
 
