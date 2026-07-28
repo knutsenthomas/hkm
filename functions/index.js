@@ -5067,33 +5067,48 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
   const db = admin.firestore();
 
   try {
-    const subsSnap = await db.collection("newsletter_subscriptions").get();
-    subsSnap.forEach(doc => {
-      const data = doc.data();
-      const email = (data.email || '').trim().toLowerCase();
-      if (email && !data.newsletterUnsubscribed && data.status !== 'unsubscribed') {
-        recipientsMap.set(email, {
-          email: data.email,
-          tags: data.tags || data.labels || [],
-          segments: data.segments || [data.source || 'Nyhetsbrev']
-        });
-      }
-    });
-
-    const contactsSnap = await db.collection("contacts").get();
-    contactsSnap.forEach(doc => {
-      const data = doc.data();
-      const email = (data.email || '').trim().toLowerCase();
-      if (email && !data.newsletterUnsubscribed && data.newsletterStatus !== 'unsubscribed') {
-        if (!recipientsMap.has(email)) {
+    if (Array.isArray(campaign.recipients) && campaign.recipients.length > 0) {
+      campaign.recipients.forEach(r => {
+        if (r && r.email) {
+          const email = String(r.email).trim().toLowerCase();
           recipientsMap.set(email, {
-            email: data.email,
-            tags: data.tags || [],
-            segments: data.segments || [data.source || 'CRM']
+            email: String(r.email).trim(),
+            tags: Array.isArray(r.tags) ? r.tags : [],
+            segments: Array.isArray(r.segments) ? r.segments : []
           });
         }
-      }
-    });
+      });
+    }
+
+    if (recipientsMap.size === 0) {
+      const subsSnap = await db.collection("newsletter_subscriptions").get();
+      subsSnap.forEach(doc => {
+        const data = doc.data();
+        const email = (data.email || '').trim().toLowerCase();
+        if (email && !data.newsletterUnsubscribed && data.status !== 'unsubscribed') {
+          recipientsMap.set(email, {
+            email: data.email,
+            tags: data.tags || data.labels || [],
+            segments: data.segments || [data.source || 'Nyhetsbrev']
+          });
+        }
+      });
+
+      const contactsSnap = await db.collection("contacts").get();
+      contactsSnap.forEach(doc => {
+        const data = doc.data();
+        const email = (data.email || '').trim().toLowerCase();
+        if (email && !data.newsletterUnsubscribed && data.newsletterStatus !== 'unsubscribed') {
+          if (!recipientsMap.has(email)) {
+            recipientsMap.set(email, {
+              email: data.email,
+              tags: data.tags || [],
+              segments: data.segments || [data.source || 'CRM']
+            });
+          }
+        }
+      });
+    }
 
     let sentCount = 0;
     let englishCount = 0;
