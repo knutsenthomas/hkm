@@ -8464,16 +8464,46 @@ ${cleanCanvasHtml}
                 console.error("Studio Feed - Failed to load campaigns:", e);
             }
 
-            // Load saved newsletter drafts
+            // Load saved newsletter drafts and clean up duplicates
             let draftItems = [];
             try {
                 const draftSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').where('isDraft', '==', true), 8000);
+                
+                const draftsBySubjectMap = new Map();
+                const duplicateDocIdsToDelete = [];
+
                 draftSnap.forEach(doc => {
                     const data = doc.data();
+                    const rawKey = (data.subject || data.name || '').trim().toLowerCase();
+                    const key = rawKey || doc.id;
+                    const timeStamp = data.updatedAt ? new Date(data.updatedAt).getTime() : (data.createdAt ? new Date(data.createdAt).getTime() : 0);
+
+                    if (draftsBySubjectMap.has(key)) {
+                        const existing = draftsBySubjectMap.get(key);
+                        if (timeStamp > existing.timeStamp) {
+                            duplicateDocIdsToDelete.push(existing.docId);
+                            draftsBySubjectMap.set(key, { docId: doc.id, data, timeStamp });
+                        } else {
+                            duplicateDocIdsToDelete.push(doc.id);
+                        }
+                    } else {
+                        draftsBySubjectMap.set(key, { docId: doc.id, data, timeStamp });
+                    }
+                });
+
+                // Asynchronously delete duplicate draft documents from Firestore
+                if (duplicateDocIdsToDelete.length > 0) {
+                    console.log(`[HKM Studio] Cleaning up ${duplicateDocIdsToDelete.length} duplicate draft documents from Firestore...`);
+                    duplicateDocIdsToDelete.forEach(id => {
+                        window.firebaseService.db.collection('newsletter_templates').doc(id).delete().catch(err => console.warn("Failed deleting duplicate draft:", err));
+                    });
+                }
+
+                draftsBySubjectMap.forEach(({ docId, data }) => {
                     draftItems.push({
-                        id: doc.id,
+                        id: docId,
                         title: data.name || 'Uten navn (Kladd)',
-                        date: data.createdAt || '',
+                        date: data.updatedAt || data.createdAt || '',
                         type: 'newsletter_draft',
                         author: 'HKM Studio',
                         excerpt: data.subject ? `Kladd · Emne: ${data.subject}` : 'Kladd under arbeid. Klikk for å fortsette redigeringen.',
@@ -8806,6 +8836,12 @@ ${cleanCanvasHtml}
                 }];
                 const subject = document.getElementById('newsletter-subject')?.value || '';
                 
+                if (!this.currentDraftId) {
+                    try {
+                        this.currentDraftId = sessionStorage.getItem('hkm_active_draft_id') || null;
+                    } catch(e) {}
+                }
+
                 let draftName = this.currentDraftName;
                 if (!this.hasCustomDraftName || !draftName) {
                     draftName = subject ? `Kladd: ${subject}` : `Utkast (${new Date().toLocaleDateString('no')})`;
@@ -8828,9 +8864,17 @@ ${cleanCanvasHtml}
                     this.currentDraftId = docRef.id;
                     data.createdAt = new Date().toISOString();
 
+                    try {
+                        sessionStorage.setItem('hkm_active_draft_id', this.currentDraftId);
+                    } catch(e) {}
+
                     const url = new URL(window.location.href);
                     url.searchParams.set('draftId', this.currentDraftId);
                     window.history.replaceState({}, '', url.toString());
+                } else {
+                    try {
+                        sessionStorage.setItem('hkm_active_draft_id', this.currentDraftId);
+                    } catch(e) {}
                 }
 
                 await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
