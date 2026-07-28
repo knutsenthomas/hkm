@@ -7733,7 +7733,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     position: relative !important;
     z-index: 1000 !important;
     gap: 8px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
 }
 
 .builder-toolbar-header .toolbar-left-cell {
