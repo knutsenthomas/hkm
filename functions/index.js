@@ -5118,24 +5118,24 @@ exports.onNewsletterCampaignCreate = onDocumentCreated({
       const isEnglish = checkIsEnglishRecipient(recipient.tags, recipient.segments);
       const recipientSubject = (isEnglish && subjectEn) ? subjectEn : subject;
       
-      let htmlBody = '';
-      if (isEnglish && englishPayload && englishPayload.blocksEn) {
-        htmlBody = buildBlocksHtml(englishPayload.blocksEn, 'en');
+      let emailHtml = '';
+      if (isEnglish) {
         englishCount++;
+        if (campaign.englishHtml) {
+          emailHtml = campaign.englishHtml;
+        } else {
+          const bodyContent = buildBlocksHtml(englishPayload?.blocksEn || campaign.blocks, 'en');
+          emailHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
+        }
       } else {
-        htmlBody = campaign.html || buildBlocksHtml(campaign.blocks, 'no');
         norwegianCount++;
+        if (campaign.html) {
+          emailHtml = campaign.html;
+        } else {
+          const bodyContent = buildBlocksHtml(campaign.blocks, 'no');
+          emailHtml = `<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: Arial, sans-serif;"><table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; padding: 24px;"><tr><td>${bodyContent}</td></tr></table></body></html>`;
+        }
       }
-
-      const emailHtml = `
-        <div style="font-family: 'Inter', system-ui, sans-serif; max-width: 640px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 16px;">
-          ${htmlBody}
-          <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
-            <p>© His Kingdom Ministry</p>
-            <p><a href="https://www.hiskingdomministry.no/avmeld" style="color: #2563eb; text-decoration: underline;">${isEnglish ? 'Unsubscribe from newsletter' : 'Meld deg av nyhetsbrev'}</a></p>
-          </div>
-        </div>
-      `;
 
       try {
         await sendEmail({
