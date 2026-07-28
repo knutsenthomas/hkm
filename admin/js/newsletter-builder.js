@@ -9072,46 +9072,88 @@ class NewsletterBuilder {
             if (statSub) statSub.textContent = subscribersList.length;
 
             tbody.innerHTML = '';
-            subscribersList.forEach(sub => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${sub.name}</strong></td>
-                    <td>${sub.email}</td>
-                    <td><span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span></td>
-                    <td><span class="badge-status-active">Aktiv</span></td>
-                    <td>${sub.dateStr}</td>
-                    <td>
-                        <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            const searchInput = document.getElementById('subscriber-search-input');
+            const renderRows = (query = '') => {
+                const q = query.trim().toLowerCase();
+                const filtered = q ? subscribersList.filter(s => (s.name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q)) : subscribersList;
 
-            // Bind delete buttons
-            tbody.querySelectorAll('.btn-delete-sub').forEach(btn => {
-                btn.onclick = async () => {
-                    const email = btn.dataset.email;
-                    const docId = btn.dataset.id;
-                    const col = btn.dataset.col;
-                    const confirmDel = await this.showConfirm('Slett abonnent', `Er du sikker på at du vil fjerne ${email} fra e-postlisten?`, 'Slett');
-                    if (confirmDel) {
-                        try {
-                            if (col === 'contacts' && docId) {
-                                await window.firebaseService.db.collection('contacts').doc(docId).delete();
-                            } else if (col === 'newsletter_subscriptions' && docId) {
-                                await window.firebaseService.db.collection('newsletter_subscriptions').doc(docId).delete();
+                tbody.innerHTML = '';
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">Ingen abonnenter samsvarte med søket.</td></tr>`;
+                    return;
+                }
+
+                filtered.forEach(sub => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${sub.name}</strong></td>
+                        <td>${sub.email}</td>
+                        <td><span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span></td>
+                        <td><span class="badge-status-active">Aktiv</span></td>
+                        <td>${sub.dateStr}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <button type="button" class="btn-edit-sub" data-email="${sub.email}" title="Rediger abonnent" style="background: none; border: none; color: #2563eb; cursor: pointer; padding: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                </button>
+                                <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Bind edit buttons
+                tbody.querySelectorAll('.btn-edit-sub').forEach(btn => {
+                    btn.onclick = () => {
+                        const email = btn.dataset.email;
+                        const targetSub = subscribersList.find(s => s.email === email);
+                        if (targetSub) this.editSubscriberPrompt(targetSub);
+                    };
+                });
+
+                // Bind delete buttons
+                tbody.querySelectorAll('.btn-delete-sub').forEach(btn => {
+                    btn.onclick = async () => {
+                        const email = btn.dataset.email;
+                        const docId = btn.dataset.id;
+                        const col = btn.dataset.col;
+                        const confirmDel = await this.showConfirm('Slett abonnent', `Er du sikker på at du vil fjerne/avmelde ${email} fra e-postlisten?`, 'Slett abonnent');
+                        if (confirmDel) {
+                            try {
+                                if (col === 'contacts' && docId) {
+                                    await window.firebaseService.db.collection('contacts').doc(docId).delete();
+                                } else if (col === 'newsletter_subscriptions' && docId) {
+                                    await window.firebaseService.db.collection('newsletter_subscriptions').doc(docId).delete();
+                                }
+                                const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', email).get();
+                                subDocs.forEach(d => d.ref.delete());
+
+                                const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', email).get();
+                                contactDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed', status: 'Inaktiv' }));
+
+                                const userDocs = await window.firebaseService.db.collection('users').where('email', '==', email).get();
+                                userDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed' }));
+
+                                if (typeof showToast === 'function') showToast(`Abonnent ${email} ble fjernet.`, "info");
+                                this.loadSubscribers();
+                            } catch(e) {
+                                console.error('Delete sub failed:', e);
+                                if (typeof showToast === 'function') showToast('Kunne ikke fjerne abonnent.', 'error');
                             }
-                            if (typeof showToast === 'function') showToast(`Abonnent ${email} ble fjernet.`, "info");
-                            this.loadSubscribers();
-                        } catch(e) {
-                            console.error('Delete sub failed:', e);
-                            if (typeof showToast === 'function') showToast('Kunne ikke fjerne abonnent.', 'error');
                         }
-                    }
-                };
-            });
+                    };
+                });
+            };
+
+            renderRows();
+
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.oninput = (e) => renderRows(e.target.value);
+            }
 
         } catch (e) {
             console.error("Load subscribers failed:", e);
@@ -9125,42 +9167,124 @@ class NewsletterBuilder {
         }
     }
 
-    async addNewSubscriberPrompt() {
-        this.showPromptModal(
-            'Oppgi e-postadresse for ny abonnent:',
-            'epost@domene.no',
-            async (email) => {
-                if (!email || !email.includes('@')) {
-                    if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
-                    return;
-                }
-                const cleanEmail = email.trim().toLowerCase();
-                try {
+    async editSubscriberPrompt(sub) {
+        const modal = document.createElement('div');
+        modal.className = 'profile-modal';
+        modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
+        modal.innerHTML = `
+            <div style="background: #ffffff; width: 90%; max-width: 440px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Rediger abonnent</h3>
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Navn</label>
+                    <input type="text" id="edit-sub-name" value="${sub.name || ''}" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">E-postadresse *</label>
+                    <input type="email" id="edit-sub-email" value="${sub.email || ''}" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" id="cancel-edit-sub" style="padding: 9px 18px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 10px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-edit-sub" style="padding: 9px 18px; border: none; background: #1B4965; color: #ffffff; border-radius: 10px; font-weight: 600; cursor: pointer;">Lagre endringer</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#cancel-edit-sub').onclick = () => modal.remove();
+        modal.querySelector('#save-edit-sub').onclick = async () => {
+            const newName = modal.querySelector('#edit-sub-name').value.trim();
+            const newEmail = modal.querySelector('#edit-sub-email').value.trim().toLowerCase();
+            if (!newEmail || !newEmail.includes('@')) {
+                if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
+                return;
+            }
+            modal.remove();
+            try {
+                const oldEmail = sub.email;
+                const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', oldEmail).get();
+                contactDocs.forEach(d => d.ref.update({ name: newName, firstName: newName.split(' ')[0], email: newEmail }));
+
+                const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', oldEmail).get();
+                subDocs.forEach(d => d.ref.update({ name: newName, email: newEmail }));
+
+                if (contactDocs.empty && subDocs.empty) {
                     await window.firebaseService.db.collection('contacts').add({
-                        firstName: cleanEmail.split('@')[0],
-                        email: cleanEmail,
+                        name: newName || newEmail.split('@')[0],
+                        email: newEmail,
                         createdAt: new Date().toISOString(),
-                        source: 'Nyhetsbrev',
+                        source: 'Redigert i Nyhetsbrev',
                         status: 'Aktiv'
                     });
-                    await window.firebaseService.db.collection('newsletter_subscriptions').add({
-                        email: cleanEmail,
-                        subscribedAt: new Date().toISOString(),
-                        source: 'Direkte lagt til',
-                        status: 'Aktiv'
-                    });
-                    if (typeof showToast === 'function') showToast(`Abonnent ${cleanEmail} ble lagt til!`, "success");
-                    this.loadSubscribers();
-                } catch(e) {
-                    console.error("Add subscriber failed:", e);
-                    if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");
                 }
-            },
-            '',
-            'Vennligst oppgi en e-postadresse.',
-            'Legg til abonnent',
-            'Legg til'
-        );
+
+                if (typeof showToast === 'function') showToast(`Abonnent ${newEmail} ble oppdatert!`, "success");
+                this.loadSubscribers();
+            } catch(e) {
+                console.error("Edit sub failed:", e);
+                if (typeof showToast === 'function') showToast("Kunne ikke oppdatere abonnent.", "error");
+            }
+        };
+    }
+
+    async addNewSubscriberPrompt() {
+        const modal = document.createElement('div');
+        modal.className = 'profile-modal';
+        modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
+        modal.innerHTML = `
+            <div style="background: #ffffff; width: 90%; max-width: 440px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Legg til ny abonnent</h3>
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Navn (valgfritt)</label>
+                    <input type="text" id="add-sub-name" placeholder="F.eks. Ola Nordmann" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">E-postadresse *</label>
+                    <input type="email" id="add-sub-email" placeholder="epost@domene.no" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" id="cancel-add-sub" style="padding: 9px 18px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 10px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-add-sub" style="padding: 9px 18px; border: none; background: #1B4965; color: #ffffff; border-radius: 10px; font-weight: 600; cursor: pointer;">Legg til abonnent</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#cancel-add-sub').onclick = () => modal.remove();
+        modal.querySelector('#save-add-sub').onclick = async () => {
+            const name = modal.querySelector('#add-sub-name').value.trim();
+            const email = modal.querySelector('#add-sub-email').value.trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
+                return;
+            }
+            modal.remove();
+            try {
+                await window.firebaseService.db.collection('contacts').add({
+                    name: name || email.split('@')[0],
+                    firstName: name ? name.split(' ')[0] : email.split('@')[0],
+                    lastName: name && name.split(' ').length > 1 ? name.split(' ').slice(1).join(' ') : '',
+                    email: email,
+                    createdAt: new Date().toISOString(),
+                    source: 'Manuelt lagt til i Nyhetsbrev',
+                    status: 'Aktiv',
+                    newsletterUnsubscribed: false,
+                    newsletterStatus: 'subscribed'
+                });
+                await window.firebaseService.db.collection('newsletter_subscriptions').add({
+                    name: name || email.split('@')[0],
+                    email: email,
+                    subscribedAt: new Date().toISOString(),
+                    source: 'Direkte lagt til',
+                    status: 'Aktiv',
+                    isSubscribed: true
+                });
+                if (typeof showToast === 'function') showToast(`Abonnent ${email} ble lagt til!`, "success");
+                this.loadSubscribers();
+            } catch(e) {
+                console.error("Add subscriber failed:", e);
+                if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");
+            }
+        };
     }
 
     loadTemplate(templateKey) {

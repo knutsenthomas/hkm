@@ -1628,7 +1628,12 @@
                     <button class="btn-create-new" onclick="if(window.builder) window.builder.addNewSubscriberPrompt();">
                         <span class="material-symbols-outlined">person_add</span>
                         <span>Legg til abonnent</span>
-                    </button>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; margin-top: 16px;">
+                    <div style="position: relative; flex: 1; max-width: 380px;">
+                        <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
+                        <input type="text" id="subscriber-search-input" placeholder="Søk etter navn eller e-postadresse..." style="width: 100%; padding: 9px 12px 9px 40px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    </div>
                 </div>
                 <div class="subview-table-wrapper">
                     <table class="subview-table">
