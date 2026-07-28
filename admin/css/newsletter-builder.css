@@ -7743,14 +7743,17 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     gap: 8px !important;
     flex: 0 1 auto !important;
     min-width: 0 !important;
+    z-index: 2 !important;
 }
 
 .builder-toolbar-header .toolbar-center-cell {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 1 !important;
 }
 
 .builder-toolbar-header .toolbar-right-cell,
@@ -7762,6 +7765,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     flex: 0 0 auto !important;
     margin-left: auto !important;
     white-space: nowrap !important;
+    z-index: 2 !important;
 }
 
 /* Base button standards: 36px height, 10px radius, 8px grid spacing */
@@ -7879,6 +7883,14 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 /* ==========================================================================
    RESPONSIVE RULES (TABLET & MOBILE)
    ========================================================================== */
+
+@media (max-width: 1300px) {
+    .builder-toolbar-header #sidebar-title,
+    .builder-toolbar-header #newsletter-autosave-status,
+    .builder-toolbar-header .autosave-pill {
+        display: none !important;
+    }
+}
 
 @media (max-width: 1100px) {
     .builder-toolbar-header #newsletter-autosave-text {
