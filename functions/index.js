@@ -4517,14 +4517,16 @@ async function getEmailTemplate(templateId, fallback) {
 /**
  * Helper-funksjon for å sende e-post.
  */
-async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "", attachments = [] }) {
-  const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]);
+async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "post@hiskingdomministry.no", attachments = [] }) {
+  const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]) || "post@hiskingdomministry.no";
   const pass = getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
 
   if (!user || !pass) {
     console.warn("E-postlegitimasjon mangler (EMAIL_USER / EMAIL_PASS). Kan ikke sende e-post.");
     return false;
   }
+
+  const senderEmail = (user && user.includes("@")) ? user : "post@hiskingdomministry.no";
 
   // Default to Gmail SMTP, but allow overriding via env (non-secret).
   // For Google Workspace you can also use smtp-relay.gmail.com, depending on your setup.
@@ -4541,11 +4543,11 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
 
   try {
     await transporter.sendMail({
-      from: `"${fromName}" <${user}>`,
+      from: `"${fromName}" <${senderEmail}>`,
       to,
       cc: cc || undefined,
       bcc: bcc || undefined,
-      replyTo: replyTo || undefined,
+      replyTo: replyTo || senderEmail,
       subject,
       text,
       html,
