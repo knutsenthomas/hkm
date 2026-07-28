@@ -110,6 +110,10 @@ class NewsletterBuilder {
         this.totalUsers = 0;
         this.subscribersCount = 0;
 
+        this.englishPayload = null;
+        this.currentEditorLang = 'no';
+        this.subjectNo = '';
+
         this.currentMode = 'dashboard';
         this.init();
         this.setupDashboardEvents();
@@ -1241,9 +1245,45 @@ class NewsletterBuilder {
             });
         }
         
-        const translateEnBtn = document.getElementById('translate-en-btn');
-        if (translateEnBtn) {
-            translateEnBtn.addEventListener('click', () => this.translateCurrentNewsletterToEnglish());
+        const editorLangNo = document.getElementById('editor-lang-btn-no');
+        if (editorLangNo) {
+            editorLangNo.addEventListener('click', () => this.switchEditorLanguage('no'));
+        }
+        const editorLangEn = document.getElementById('editor-lang-btn-en');
+        if (editorLangEn) {
+            editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
+        }
+        const retranslateBannerBtn = document.getElementById('btn-retranslate-editor-ai');
+        if (retranslateBannerBtn) {
+            retranslateBannerBtn.addEventListener('click', () => this.translateCurrentNewsletterToEnglish(true));
+        }
+        const switchBackNoBtn = document.getElementById('btn-switch-back-to-no');
+        if (switchBackNoBtn) {
+            switchBackNoBtn.addEventListener('click', () => this.switchEditorLanguage('no'));
+        }
+
+        const closeEditEn = document.getElementById('close-edit-english-modal');
+        if (closeEditEn) {
+            closeEditEn.addEventListener('click', () => {
+                document.getElementById('edit-english-modal').style.display = 'none';
+            });
+        }
+        const cancelEditEn = document.getElementById('cancel-edit-english');
+        if (cancelEditEn) {
+            cancelEditEn.addEventListener('click', () => {
+                document.getElementById('edit-english-modal').style.display = 'none';
+            });
+        }
+        const saveEditEn = document.getElementById('save-edit-english');
+        if (saveEditEn) {
+            saveEditEn.addEventListener('click', () => this.saveEditEnglishModal());
+        }
+        const retranslateAiBtn = document.getElementById('btn-retranslate-english-ai');
+        if (retranslateAiBtn) {
+            retranslateAiBtn.addEventListener('click', () => {
+                document.getElementById('edit-english-modal').style.display = 'none';
+                this.translateCurrentNewsletterToEnglish(true);
+            });
         }
 
         const saveDraftBtn = document.getElementById('save-draft-btn');
@@ -7058,131 +7098,57 @@ class NewsletterBuilder {
         modal.style.display = 'flex';
 
         if (lang === 'en') {
-            frame.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px; font-family: 'Inter', sans-serif;">
-                    <span class="material-symbols-outlined rotating" style="font-size: 36px; color: #0284c7;">translate</span>
-                    <h4 style="margin: 16px 0 6px 0; font-size: 18px; color: #0369a1; font-weight: 700;">Genererer engelsk forhåndsvisning med AI...</h4>
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">Oversetter emnelinje og blokker fra norsk til engelsk.</p>
+            if (!this.englishPayload || !this.englishPayload.blocksEn) {
+                frame.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; font-family: 'Inter', sans-serif;">
+                        <span class="material-symbols-outlined rotating" style="font-size: 36px; color: #0284c7;">translate</span>
+                        <h4 style="margin: 16px 0 6px 0; font-size: 18px; color: #0369a1; font-weight: 700;">Genererer engelsk forhåndsvisning med AI...</h4>
+                        <p style="margin: 0; color: #64748b; font-size: 14px;">Oversetter emnelinje og blokker fra norsk til engelsk.</p>
+                    </div>
+                `;
+                await this.translateCurrentNewsletterToEnglish(true);
+            }
+
+            const subjectEn = this.englishPayload?.subjectEn || 'English Subject';
+            const blocksEn = this.englishPayload?.blocksEn || [];
+
+            const enCanvas = document.createElement('div');
+            enCanvas.className = 'canvas-paper-frame';
+            enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
+            
+            let blocksHtml = blocksEn.map(b => {
+                let text = b.content?.text || '';
+                if (b.type === 'title') {
+                    return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${text}</h2>`;
+                } else if (b.type === 'text') {
+                    return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${text}</div>`;
+                } else if (b.type === 'button') {
+                    return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${text || 'Read More'}</a></div>`;
+                } else if (b.type === 'image' && b.content?.url) {
+                    return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
+                } else if (b.type === 'spacer') {
+                    return `<div style="height: ${b.content?.height || 24}px;"></div>`;
+                }
+                return '';
+            }).join('');
+
+            enCanvas.innerHTML = `
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="color: #0284c7; font-size: 20px;">g_translate</span>
+                    <div>
+                        <span style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.05em; display: block;">English Edition Preview</span>
+                        <strong style="font-size: 14px; color: #0f172a;">Subject: ${this.escapeHtml(subjectEn)}</strong>
+                    </div>
+                </div>
+                ${blocksHtml}
+                <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+                    <p>© 2026 His Kingdom Ministry</p>
+                    <p><a href="#" style="color: #2563eb;">Unsubscribe from newsletter</a></p>
                 </div>
             `;
 
-            try {
-                const subjectNode = document.getElementById('newsletter-subject');
-                const subject = subjectNode ? subjectNode.value : '';
-                this.syncUnifiedBlocks();
-
-                const prompt = `
-                    Du er en oversetter for His Kingdom Ministry (HKM).
-                    Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
-                    VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
-
-                    Emnelinje: "${subject}"
-                    Blokker: ${JSON.stringify(this.blocks)}
-
-                    Returner kun gyldig JSON:
-                    {
-                        "subject": "Translated English Subject",
-                        "blocks": [ SAME BLOCKS WITH ENGLISH TEXT ]
-                    }
-                `;
-
-                let translatedSubject = subject;
-                let translatedBlocks = this.blocks;
-
-                if (window.firebase && window.firebase.functions) {
-                    const callable = firebase.functions().httpsCallable('aiProcess');
-                    const response = await callable({ prompt });
-                    if (response.data && response.data.text) {
-                        let jsonStr = response.data.text.trim();
-                        if (jsonStr.startsWith('```')) {
-                            jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
-                        }
-                        const parsed = JSON.parse(jsonStr);
-                        if (parsed.subject) translatedSubject = parsed.subject;
-                        if (Array.isArray(parsed.blocks)) translatedBlocks = parsed.blocks;
-                    }
-                }
-
-                const enCanvas = document.createElement('div');
-                enCanvas.className = 'canvas-paper-frame';
-                enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
-                
-                let blocksHtml = (translatedBlocks || []).map(b => {
-                    if (b.type === 'title') {
-                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${b.content?.text || ''}</h2>`;
-                    } else if (b.type === 'text') {
-                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${b.content?.text || ''}</div>`;
-                    } else if (b.type === 'button') {
-                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${b.content?.text || 'Read More'}</a></div>`;
-                    } else if (b.type === 'image' && b.content?.url) {
-                        return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
-                    } else if (b.type === 'spacer') {
-                        return `<div style="height: ${b.content?.height || 24}px;"></div>`;
-                    }
-                    return '';
-                }).join('');
-
-                enCanvas.innerHTML = `
-                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-                        <span class="material-symbols-outlined" style="color: #0284c7; font-size: 20px;">g_translate</span>
-                        <div>
-                            <span style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.05em; display: block;">English Edition Preview</span>
-                            <strong style="font-size: 14px; color: #0f172a;">Subject: ${translatedSubject}</strong>
-                        </div>
-                    </div>
-                    ${blocksHtml}
-                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
-                        <p>© 2026 His Kingdom Ministry</p>
-                        <p><a href="#" style="color: #2563eb;">Unsubscribe from newsletter</a></p>
-                    </div>
-                `;
-
-                frame.innerHTML = '';
-                frame.appendChild(enCanvas);
-            } catch(err) {
-                console.warn("AI translation call failed for preview, rendering fallback:", err);
-                const subjectNode = document.getElementById('newsletter-subject');
-                const subject = subjectNode ? subjectNode.value : '';
-
-                const enCanvas = document.createElement('div');
-                enCanvas.className = 'canvas-paper-frame';
-                enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
-
-                let blocksHtml = (this.blocks || []).map(b => {
-                    let text = (b.content?.text || '').replace(/\bbasar\b/gi, 'Raffle').replace(/\bbazaar\b/gi, 'Raffle');
-                    if (b.type === 'title') {
-                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${text}</h2>`;
-                    } else if (b.type === 'text') {
-                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${text}</div>`;
-                    } else if (b.type === 'button') {
-                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${text || 'Read More'}</a></div>`;
-                    } else if (b.type === 'image' && b.content?.url) {
-                        return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
-                    } else if (b.type === 'spacer') {
-                        return `<div style="height: ${b.content?.height || 24}px;"></div>`;
-                    }
-                    return '';
-                }).join('');
-
-                enCanvas.innerHTML = `
-                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-                        <span class="material-symbols-outlined" style="color: #0284c7; font-size: 20px;">g_translate</span>
-                        <div>
-                            <span style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.05em; display: block;">English Edition Preview</span>
-                            <strong style="font-size: 14px; color: #0f172a;">Subject: ${subject} (English)</strong>
-                        </div>
-                    </div>
-                    ${blocksHtml}
-                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
-                        <p>© 2026 His Kingdom Ministry</p>
-                        <p><a href="#" style="color: #2563eb;">Unsubscribe from newsletter</a></p>
-                    </div>
-                `;
-
-                frame.innerHTML = '';
-                frame.appendChild(enCanvas);
-            }
-
+            frame.innerHTML = '';
+            frame.appendChild(enCanvas);
             return;
         }
 
@@ -7792,25 +7758,217 @@ class NewsletterBuilder {
         );
     }
 
-    async translateCurrentNewsletterToEnglish() {
-        const subjectNode = document.getElementById('newsletter-subject');
-        const subject = subjectNode ? subjectNode.value : '';
-        this.syncUnifiedBlocks();
+    async switchEditorLanguage(lang = 'no') {
+        const subjectInput = document.getElementById('newsletter-subject');
+        
+        // Save current canvas state before switching
+        if (this.currentEditorLang === 'no') {
+            this.syncUnifiedBlocks();
+            if (subjectInput) this.subjectNo = subjectInput.value;
+        } else if (this.currentEditorLang === 'en') {
+            this.syncUnifiedBlocks();
+            if (subjectInput && this.englishPayload) {
+                this.englishPayload.subjectEn = subjectInput.value;
+            }
+        }
 
+        const btnNo = document.getElementById('editor-lang-btn-no');
+        const btnEn = document.getElementById('editor-lang-btn-en');
+        const banner = document.getElementById('editor-english-active-banner');
+
+        if (lang === 'en') {
+            if (btnNo && btnEn) {
+                btnEn.style.background = '#ffffff';
+                btnEn.style.color = '#0f172a';
+                btnEn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.06)';
+                btnNo.style.background = 'transparent';
+                btnNo.style.color = '#64748b';
+                btnNo.style.boxShadow = 'none';
+            }
+            if (banner) banner.style.display = 'flex';
+
+            this.currentEditorLang = 'en';
+
+            // Check if English translation exists
+            if (!this.englishPayload || !this.englishPayload.blocksEn) {
+                if (typeof showToast === 'function') showToast("Genererer engelsk versjon med AI... 🌐", "info");
+                await this.translateCurrentNewsletterToEnglish(true);
+            } else {
+                this.renderCanvasForLanguage('en');
+                if (typeof showToast === 'function') showToast("Du redigerer nå den engelske versjonen! 🇬🇧", "info");
+            }
+        } else {
+            if (btnNo && btnEn) {
+                btnNo.style.background = '#ffffff';
+                btnNo.style.color = '#0f172a';
+                btnNo.style.boxShadow = '0 2px 4px rgba(0,0,0,0.06)';
+                btnEn.style.background = 'transparent';
+                btnEn.style.color = '#64748b';
+                btnEn.style.boxShadow = 'none';
+            }
+            if (banner) banner.style.display = 'none';
+
+            this.currentEditorLang = 'no';
+            this.renderCanvasForLanguage('no');
+            if (typeof showToast === 'function') showToast("Du redigerer nå den norske versjonen! 🇳🇴", "info");
+        }
+    }
+
+    renderCanvasForLanguage(lang = 'no') {
+        const container = document.getElementById('blocks-container');
+        const subjectInput = document.getElementById('newsletter-subject');
+        if (!container) return;
+
+        if (lang === 'en' && this.englishPayload) {
+            let html = '';
+            if (Array.isArray(this.englishPayload.blocksEn)) {
+                if (this.englishPayload.blocksEn.length === 1 && this.englishPayload.blocksEn[0].id === 'unified_content') {
+                    html = this.englishPayload.blocksEn[0].content.text || '<p><br></p>';
+                } else {
+                    html = (this.englishPayload.blocksEn || []).map(b => {
+                        let text = b.content?.text || '';
+                        if (b.type === 'title') {
+                            return `<h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b;">${text}</h2>`;
+                        } else if (b.type === 'text') {
+                            return `<p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">${text}</p>`;
+                        } else if (b.type === 'button') {
+                            return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${text || 'Read More'}</a></div>`;
+                        } else if (b.type === 'image' && b.content?.url) {
+                            return `<p><img src="${b.content.url}" alt="${b.content.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                        } else if (b.type === 'spacer') {
+                            return `<div style="height: ${b.content?.height || 20}px;"></div>`;
+                        }
+                        return '';
+                    }).join('');
+                }
+            }
+            container.innerHTML = html || '<p><br></p>';
+            if (subjectInput && this.englishPayload.subjectEn) {
+                subjectInput.value = this.englishPayload.subjectEn;
+            }
+        } else {
+            // Render Norwegian
+            let rawText = '';
+            if (this.blocks.length === 1 && this.blocks[0].id === 'unified_content') {
+                rawText = this.blocks[0].content.text || '<p><br></p>';
+            } else {
+                rawText = this.blocks.map(b => b.content?.text || '').join('');
+            }
+            container.innerHTML = rawText || '<p><br></p>';
+            if (subjectInput && this.subjectNo) {
+                subjectInput.value = this.subjectNo;
+            }
+        }
+
+        this.normalizeCanvasBlocks(container);
+    }
+
+    updateEnglishStatusCardUI() {
+        const card = document.getElementById('english-version-status-card');
+        if (!card) return;
+
+        const badge = document.getElementById('english-status-badge');
+        const desc = document.getElementById('english-status-desc');
+        const iconWrap = document.getElementById('english-status-icon-wrap');
+        const actions = document.getElementById('english-status-actions');
+
+        if (this.englishPayload && this.englishPayload.blocksEn && this.englishPayload.blocksEn.length > 0) {
+            if (badge) {
+                badge.innerText = '✅ Klar for utsendelse';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#166534';
+            }
+            if (desc) {
+                const timeStr = this.englishPayload.translatedAt 
+                    ? new Date(this.englishPayload.translatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : '';
+                desc.innerHTML = `Engelsk versjon er oversatt${timeStr ? ' kl. ' + timeStr : ''}. Emnelinje: <strong>"${this.escapeHtml(this.englishPayload.subjectEn || '')}"</strong>`;
+            }
+            if (iconWrap) {
+                iconWrap.style.background = '#dcfce7';
+                iconWrap.innerHTML = '<span class="material-symbols-outlined" style="color: #166534; font-size: 24px;">check_circle</span>';
+            }
+            if (actions) {
+                actions.innerHTML = `
+                    <button type="button" id="btn-edit-english-in-editor" class="prompt-btn primary" style="background: linear-gradient(135deg, #1B4965 0%, #2b6cb0 100%); padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(27,73,101,0.15);">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                        <span>Rediger i editor</span>
+                    </button>
+                    <button type="button" id="btn-view-english-preview-card" class="prompt-btn secondary" style="padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #1e293b; background: #ffffff; border: 1px solid #cbd5e1; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #2563eb;">visibility</span>
+                        <span>Forhåndsvis</span>
+                    </button>
+                `;
+
+                document.getElementById('btn-edit-english-in-editor')?.addEventListener('click', () => {
+                    this.switchEditorLanguage('en');
+                    this.toggleRecipientsDrawer(false);
+                });
+                document.getElementById('btn-view-english-preview-card')?.addEventListener('click', () => this.showPreview('en'));
+            }
+        } else {
+            if (badge) {
+                badge.innerText = 'Ikke generert ennå';
+                badge.style.background = '#f1f5f9';
+                badge.style.color = '#64748b';
+            }
+            if (desc) {
+                desc.innerHTML = `Klikk på '🇬🇧 English' i editorens topplinje eller knappen til høyre for å generere den engelske versjonen.`;
+            }
+            if (iconWrap) {
+                iconWrap.style.background = '#f1f5f9';
+                iconWrap.innerHTML = '<span class="material-symbols-outlined" style="color: #64748b; font-size: 24px;">translate</span>';
+            }
+            if (actions) {
+                actions.innerHTML = `
+                    <button type="button" id="btn-generate-english-ai" class="prompt-btn primary" style="background: linear-gradient(135deg, #1B4965 0%, #2b6cb0 100%); padding: 8px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(27,73,101,0.15);">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+                        <span>Oversett med AI</span>
+                    </button>
+                `;
+                document.getElementById('btn-generate-english-ai')?.addEventListener('click', () => {
+                    this.switchEditorLanguage('en');
+                    this.toggleRecipientsDrawer(false);
+                });
+            }
+        }
+    }
+
+    openEditEnglishModal() {
+        this.switchEditorLanguage('en');
+        this.toggleRecipientsDrawer(false);
+    }
+
+    async translateCurrentNewsletterToEnglish(force = false) {
+        if (this.englishPayload && !force) {
+            if (typeof showToast === 'function') showToast("Nyhetsbrevet er allerede oversatt til engelsk! 🌐", "info");
+            this.updateEnglishStatusCardUI();
+            return;
+        }
+
+        const subjectNode = document.getElementById('newsletter-subject');
+        const norwegianSubject = (this.currentEditorLang === 'no' && subjectNode ? subjectNode.value : this.subjectNo) || 'Nyhetsbrev';
+        
+        if (this.currentEditorLang === 'no') {
+            this.syncUnifiedBlocks();
+            this.subjectNo = norwegianSubject;
+        }
+
+        const norwegianBlocks = this.blocks || [];
         const container = document.getElementById('blocks-container');
         const textContent = container ? container.innerHTML : '';
         const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
 
-        if (this.blocks.length === 0 || !textContent || plainText === '') {
+        if (norwegianBlocks.length === 0 || !textContent || plainText === '') {
             if (typeof showToast === 'function') showToast("Vennligst skriv inn noe innhold i nyhetsbrevet før du oversetter.", "warning");
             return;
         }
 
-        const translateBtn = document.getElementById('translate-en-btn');
+        const translateBtn = document.getElementById('editor-lang-btn-en') || document.getElementById('btn-retranslate-editor-ai');
         const originalText = translateBtn ? translateBtn.innerHTML : '';
         if (translateBtn) {
             translateBtn.disabled = true;
-            translateBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 18px;">sync</span> Oversetter (AI)...';
+            translateBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 16px;">sync</span> Oversetter...';
         }
 
         try {
@@ -7819,10 +7977,10 @@ class NewsletterBuilder {
                 Oversett følgende nyhetsbrevinnhold fra norsk til et varmt, flytende og engasjerende engelsk språk.
                 VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
 
-                Emnelinje (Norwegian): "${subject}"
+                Emnelinje (Norwegian): "${norwegianSubject}"
 
                 Nyhetsbrevets blokker (JSON):
-                ${JSON.stringify(this.blocks)}
+                ${JSON.stringify(norwegianBlocks)}
 
                 Du må returnere nøyaktig et gyldig JSON-objekt på dette formatet:
                 {
@@ -7832,7 +7990,7 @@ class NewsletterBuilder {
                 Svar KUN med ren JSON, ingen markdown.
             `;
 
-            let translatedSubject = subject;
+            let translatedSubject = norwegianSubject;
             let translatedBlocks = null;
 
             if (window.firebase && window.firebase.functions) {
@@ -7849,14 +8007,30 @@ class NewsletterBuilder {
                 }
             }
 
-            if (translatedBlocks) {
-                if (subjectNode && translatedSubject) subjectNode.value = translatedSubject;
-                this.blocks = translatedBlocks;
-                this.renderUnifiedBlocks();
-                if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet ble oversatt til engelsk med AI! 🌐", "success");
-            } else {
-                if (typeof showToast === 'function') showToast("Kunne ikke oversette nyhetsbrevet akkurat nå.", "error");
+            if (!translatedBlocks) {
+                // Fallback translation
+                translatedSubject = norwegianSubject ? `${norwegianSubject} (English Edition)` : 'Newsletter';
+                translatedBlocks = (norwegianBlocks || []).map(b => {
+                    let text = (b.content?.text || '').replace(/\bbasar\b/gi, 'Raffle').replace(/\bbazaar\b/gi, 'Raffle');
+                    const bCopy = JSON.parse(JSON.stringify(b));
+                    if (bCopy.content) bCopy.content.text = text;
+                    return bCopy;
+                });
             }
+
+            this.englishPayload = {
+                subjectEn: translatedSubject,
+                blocksEn: translatedBlocks,
+                translatedAt: new Date().toISOString()
+            };
+
+            // If currently in English mode, re-render canvas!
+            if (this.currentEditorLang === 'en') {
+                this.renderCanvasForLanguage('en');
+            }
+
+            this.updateEnglishStatusCardUI();
+            if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet er oversatt til engelsk med AI! 🌐", "success");
         } catch(err) {
             console.error("Translation error:", err);
             if (typeof showToast === 'function') showToast("Feil under oversettelse: " + (err.message || "Ukjent feil"), "error");
@@ -7900,45 +8074,15 @@ class NewsletterBuilder {
                 finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
             }
 
-            const autoTranslateEnToggle = document.getElementById('auto-translate-english-toggle');
-            const shouldAutoTranslateEn = autoTranslateEnToggle ? autoTranslateEnToggle.checked : true;
+            let englishPayload = this.englishPayload;
 
-            let englishPayload = null;
-
-            if (shouldAutoTranslateEn) {
+            if (!englishPayload) {
                 if (finalBtn) {
                     finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">translate</span> Genererer engelsk oversettelse (AI)...';
                 }
                 try {
-                    const prompt = `
-                        Du er en oversetter for His Kingdom Ministry (HKM).
-                        Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
-                        VIKTIG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
-
-                        Emnelinje: "${subject}"
-                        Blokker: ${JSON.stringify(this.blocks)}
-
-                        Returner kun gyldig JSON:
-                        {
-                            "subject": "Translated English Subject",
-                            "blocks": [ SAME BLOCKS WITH ENGLISH TEXT ]
-                        }
-                    `;
-                    if (window.firebase && window.firebase.functions) {
-                        const callable = firebase.functions().httpsCallable('aiProcess');
-                        const response = await callable({ prompt });
-                        if (response.data && response.data.text) {
-                            let jsonStr = response.data.text.trim();
-                            if (jsonStr.startsWith('```')) {
-                                jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
-                            }
-                            const parsed = JSON.parse(jsonStr);
-                            englishPayload = {
-                                subjectEn: parsed.subject || subject,
-                                blocksEn: parsed.blocks || this.blocks
-                            };
-                        }
-                    }
+                    await this.translateCurrentNewsletterToEnglish(true);
+                    englishPayload = this.englishPayload;
                 } catch(translateErr) {
                     console.warn("Auto translate background attempt failed, sending standard version:", translateErr);
                 }
