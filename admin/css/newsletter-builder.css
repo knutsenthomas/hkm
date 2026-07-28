@@ -7764,7 +7764,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 /* 2. Mobile & Small Screens (max-width: 991px) */
 @media (max-width: 991px) {
     .builder-toolbar-header {
-        padding: 0 12px !important;
+        padding: 0 8px !important;
+        gap: 4px !important;
     }
 
     /* Completely hide static title & autosave pill on mobile header to prevent overlapping */
@@ -7779,8 +7780,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     #mobile-add-element-btn {
         display: inline-flex !important;
         align-items: center !important;
-        gap: 6px !important;
-        padding: 6px 10px !important;
+        gap: 4px !important;
+        padding: 0 10px !important;
         height: 36px !important;
         background: #f1f5f9 !important;
         border: 1px solid #cbd5e1 !important;
@@ -7790,28 +7791,54 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         color: #1e293b !important;
     }
 
-    .builder-toolbar-header #continue-btn .btn-publish-label {
-        display: none !important;
-    }
-}
-
-/* 3. Small Mobile Screens (max-width: 440px) */
-@media (max-width: 440px) {
-    .builder-toolbar-header {
-        padding: 0 6px !important;
-        gap: 4px !important;
-    }
-
+    /* Compact device toggle icons on mobile */
     .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
         display: none !important;
     }
 
-    .builder-toolbar-header #save-draft-btn .btn-label-text {
+    .builder-toolbar-header .device-pill-btn {
+        padding: 0 !important;
+        width: 32px !important;
+        height: 30px !important;
+        min-width: 32px !important;
+        justify-content: center !important;
+    }
+
+    /* Compact action buttons on mobile (save & preview as icon-only) */
+    .builder-toolbar-header .btn-label-text {
         display: none !important;
     }
 
     .builder-toolbar-header #save-draft-btn,
     .builder-toolbar-header #preview-btn {
-        padding: 0 8px !important;
+        padding: 0 !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-radius: 8px !important;
+        justify-content: center !important;
+    }
+
+    .builder-toolbar-header #continue-btn .btn-publish-label {
+        display: none !important;
+    }
+}
+
+/* 3. Extra Small Mobile Screens (max-width: 500px) */
+@media (max-width: 500px) {
+    .builder-toolbar-header {
+        padding: 0 4px !important;
+        gap: 2px !important;
+    }
+
+    #mobile-add-element-btn span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+
+    #mobile-add-element-btn {
+        padding: 0 !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        justify-content: center !important;
     }
 }
