@@ -7607,6 +7607,19 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         overflow-y: auto !important;
     }
 
+    /* Drag handle indicator at top of mobile drawers */
+    #builder-main-workspace .builder-elements-panel::before,
+    #builder-main-workspace .builder-properties-panel::before {
+        content: '' !important;
+        display: block !important;
+        width: 40px !important;
+        height: 5px !important;
+        background: #cbd5e1 !important;
+        border-radius: 3px !important;
+        margin: 0 auto 16px auto !important;
+        flex-shrink: 0 !important;
+    }
+
     /* Elementer Panel converts into a slide-up bottom drawer on mobile */
     #builder-main-workspace .builder-elements-panel {
         position: fixed !important;
@@ -7622,7 +7635,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
         transform: translateY(110%) !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        padding: 24px 20px 32px 20px !important;
+        padding: 16px 20px 32px 20px !important;
         box-sizing: border-box !important;
         overflow-y: auto !important;
     }
@@ -7646,13 +7659,24 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
         transform: translateY(110%) !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        padding: 24px 20px 32px 20px !important;
+        padding: 16px 20px 32px 20px !important;
         box-sizing: border-box !important;
         overflow-y: auto !important;
     }
 
     #builder-main-workspace .builder-properties-panel.mobile-drawer-open {
         transform: translateY(0) !important;
+    }
+
+    #sidebar-inspector-view,
+    #sidebar-default-view {
+        padding-top: 4px !important;
+        margin-top: 0 !important;
+    }
+
+    .inspector-group-label {
+        line-height: 1.4 !important;
+        margin-top: 4px !important;
     }
 }
 
