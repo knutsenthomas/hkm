@@ -1253,14 +1253,6 @@ class NewsletterBuilder {
         if (editorLangEn) {
             editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
         }
-        const retranslateBannerBtn = document.getElementById('btn-retranslate-editor-ai');
-        if (retranslateBannerBtn) {
-            retranslateBannerBtn.addEventListener('click', () => this.translateCurrentNewsletterToEnglish(true));
-        }
-        const switchBackNoBtn = document.getElementById('btn-switch-back-to-no');
-        if (switchBackNoBtn) {
-            switchBackNoBtn.addEventListener('click', () => this.switchEditorLanguage('no'));
-        }
 
         const closeEditEn = document.getElementById('close-edit-english-modal');
         if (closeEditEn) {
@@ -7774,7 +7766,6 @@ class NewsletterBuilder {
 
         const btnNo = document.getElementById('editor-lang-btn-no');
         const btnEn = document.getElementById('editor-lang-btn-en');
-        const banner = document.getElementById('editor-english-active-banner');
 
         if (lang === 'en') {
             if (btnNo && btnEn) {
@@ -7785,7 +7776,6 @@ class NewsletterBuilder {
                 btnNo.style.color = '#64748b';
                 btnNo.style.boxShadow = 'none';
             }
-            if (banner) banner.style.display = 'flex';
 
             this.currentEditorLang = 'en';
 
@@ -7806,7 +7796,6 @@ class NewsletterBuilder {
                 btnEn.style.color = '#64748b';
                 btnEn.style.boxShadow = 'none';
             }
-            if (banner) banner.style.display = 'none';
 
             this.currentEditorLang = 'no';
             this.renderCanvasForLanguage('no');
