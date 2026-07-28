@@ -626,7 +626,14 @@ const initAdminHeader = () => {
         const updateToggleTitle = () => {
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
             mobileNavToggles.forEach(toggle => {
-                toggle.setAttribute('title', isCollapsed ? 'Vis meny' : 'Skjul meny');
+                const isBuilderToggle = Boolean(toggle.closest('#newsletter-builder-layout'));
+                const isOpen = sidebar.classList.contains('active');
+                const title = isBuilderToggle
+                    ? (isOpen ? 'Skjul hovedmeny' : 'Vis hovedmeny')
+                    : (isCollapsed ? 'Vis meny' : 'Skjul meny');
+                toggle.setAttribute('title', title);
+                toggle.setAttribute('aria-label', title);
+                toggle.setAttribute('aria-expanded', String(isBuilderToggle ? isOpen : !isCollapsed));
             });
         };
         updateToggleTitle();
@@ -642,11 +649,18 @@ const initAdminHeader = () => {
         mobileNavToggles.forEach(toggle => {
             toggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (window.innerWidth > 1024) {
+                const isBuilderToggle = document.body.classList.contains('builder-active')
+                    && Boolean(toggle.closest('#newsletter-builder-layout'));
+                if (isBuilderToggle) {
+                    document.body.classList.remove('sidebar-collapsed');
+                    toggleSidebar();
+                    updateToggleTitle();
+                } else if (window.innerWidth > 1024) {
                     document.body.classList.toggle('sidebar-collapsed');
                     updateToggleTitle();
                 } else {
                     toggleSidebar();
+                    updateToggleTitle();
                 }
             });
         });
@@ -654,6 +668,7 @@ const initAdminHeader = () => {
         if (sidebarOverlay) {
             sidebarOverlay.addEventListener('click', () => {
                 toggleSidebar(false);
+                updateToggleTitle();
             });
         }
     }
@@ -752,6 +767,12 @@ const initAdminHeader = () => {
         mobileSidebarClose.onclick = () => {
             sidebar.classList.remove('active');
             if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            const builderToggle = document.querySelector('#newsletter-builder-layout .mobile-nav-toggle');
+            if (builderToggle) {
+                builderToggle.setAttribute('title', 'Vis hovedmeny');
+                builderToggle.setAttribute('aria-label', 'Vis hovedmeny');
+                builderToggle.setAttribute('aria-expanded', 'false');
+            }
         };
     }
 

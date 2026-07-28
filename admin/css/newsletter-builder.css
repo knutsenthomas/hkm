@@ -5151,6 +5151,33 @@ input:checked+.slider:before {
     z-index: 999999 !important; /* Force overlays to sit unconditionally on top of all page elements */
 }
 
+/*
+ * Editor dialogs live in a body-level portal so they cannot be clipped by the
+ * full-screen builder's overflow rules or end up behind its z-index layer.
+ * The portal is deliberately hidden outside editor mode so an open dialog can
+ * never follow the user back to HKM Studio.
+ */
+#newsletter-editor-modal-root {
+    position: relative !important;
+    z-index: 200000 !important;
+}
+
+body:not(.builder-active) #newsletter-editor-modal-root {
+    display: none !important;
+}
+
+body.builder-active #newsletter-editor-modal-root {
+    display: block !important;
+}
+
+#newsletter-editor-modal-root > [role="dialog"],
+#newsletter-editor-modal-root > .modal,
+#newsletter-editor-modal-root > .profile-modal,
+#newsletter-editor-modal-root > .custom-prompt-overlay,
+#newsletter-editor-modal-root > .hkm-version-history-modal {
+    pointer-events: auto !important;
+}
+
 /* --- High-Fidelity Unified Top Header & Modern Vertical Sidebar Styles --- */
 
 .sidebar-header-modern .sidebar-subtitle-modern {
@@ -8740,4 +8767,48 @@ body.builder-recipients-open #newsletter-builder-layout .sidebar-zoom-controls {
         gap: 0 !important;
         font-size: 16px !important;
     }
+}
+
+/* Main HKM Studio navigation as a drawer above the full-screen editor. */
+body.builder-active .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    width: min(300px, 88vw) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    margin: 0 !important;
+    transform: translateX(-105%) !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: 190000 !important;
+    background: #ffffff !important;
+    box-shadow: 18px 0 55px rgba(15, 23, 42, 0.28) !important;
+    transition:
+        transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.2s ease,
+        visibility 0.2s ease !important;
+}
+
+body.builder-active .sidebar.active {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+body.builder-active .sidebar-overlay {
+    z-index: 180000 !important;
+}
+
+body.builder-active .sidebar-overlay.active {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+body.builder-active .sidebar .mobile-sidebar-close-btn {
+    display: inline-flex !important;
 }

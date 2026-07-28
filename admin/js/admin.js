@@ -9502,7 +9502,13 @@ class AdminManager {
                     <div class="card content-editor-card">
                         <div class="card-header flex-between content-editor-toolbar">
                             <h3 id="editing-page-title" class="editing-page-title">Forside</h3>
-                            <button class="btn-primary btn-save-content" id="save-content">Lagre endringer</button>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
+                                <button class="btn-secondary" id="page-version-history" type="button" style="display: inline-flex; align-items: center; gap: 7px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">history</span>
+                                    <span>Versjoner</span>
+                                </button>
+                                <button class="btn-primary btn-save-content" id="save-content">Lagre endringer</button>
+                            </div>
                         </div>
                         <div class="card-body" id="editor-fields">
                             <div class="loader">Laster...</div>
@@ -9529,6 +9535,7 @@ class AdminManager {
         });
 
         document.getElementById('save-content')?.addEventListener('click', () => this.savePageContent());
+        document.getElementById('page-version-history')?.addEventListener('click', () => this.openPageVersionHistory());
         this.loadPageFields('index');
     }
 
@@ -26262,7 +26269,12 @@ class AdminManager {
                             this.showToast('⚠️ Lagret, men oversettelse feilet: ' + transErr.message, 'warning', 8000);
                         }
                     }
-                    await firebaseService.savePageContent(pageId, sanitized);
+                    await firebaseService.savePageContent(pageId, sanitized, {
+                        versionLabel: document.getElementById('editing-page-title')?.textContent?.trim() || pageId,
+                        versionReason: 'Manuell lagring',
+                        versionSource: 'website-page-editor',
+                        versionMinIntervalMs: 0
+                    });
                     this.showToast('✅ Innholdet er lagret!', 'success', 5000);
                 } catch (err) {
                     this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
@@ -26270,6 +26282,36 @@ class AdminManager {
             }, {
                 loadingText: 'Lagrer...'
             });
+        });
+    }
+
+    async openPageVersionHistory() {
+        const activePageEl = document.querySelector('.page-item.active');
+        if (!activePageEl) {
+            this.showToast('Velg en side før du åpner versjonshistorikken.', 'warning', 4000);
+            return;
+        }
+
+        if (!window.HKMVersionHistory) {
+            this.showToast('Versjonshistorikken er ikke klar ennå. Prøv igjen om et øyeblikk.', 'warning', 4000);
+            return;
+        }
+
+        const pageId = activePageEl.dataset.page;
+        const pageLabel = document.getElementById('editing-page-title')?.textContent?.trim()
+            || activePageEl.textContent?.trim()
+            || pageId;
+
+        await window.HKMVersionHistory.openForResource({
+            scope: 'site',
+            resourceCollection: 'content',
+            resourceId: pageId,
+            resourceLabel: pageLabel,
+            onRestore: async () => {
+                firebaseService.invalidatePageContentCache(pageId);
+                await this.loadPageFields(pageId);
+                this.showToast(`✅ "${pageLabel}" er hentet tilbake fra versjonshistorikken.`, 'success', 5500);
+            }
         });
     }
 

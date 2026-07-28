@@ -873,7 +873,7 @@ class FirebaseService {
      * @param {string} pageId 
      * @param {object} data 
      */
-    async updatePageContent(pageId, data) {
+    async updatePageContent(pageId, data, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         const safePageId = typeof pageId === 'string' ? pageId.trim() : '';
         if (!safePageId) throw new Error("Invalid pageId");
@@ -888,12 +888,36 @@ class FirebaseService {
             throw new Error("Empty content payload");
         }
 
-        await this.db.collection("content").doc(safePageId).set(sanitized, { merge: true });
+        const contentRef = this.db.collection("content").doc(safePageId);
+        await contentRef.set(sanitized, { merge: true });
         this.invalidatePageContentCache(safePageId);
+
+        const isAdminRoute = typeof window !== 'undefined'
+            && String(window.location?.pathname || '').toLowerCase().includes('/admin/');
+        if (isAdminRoute && window.HKMVersionHistory) {
+            try {
+                const savedDoc = await contentRef.get();
+                await window.HKMVersionHistory.recordVersion({
+                    scope: 'site',
+                    resourceCollection: 'content',
+                    resourceId: safePageId,
+                    resourceLabel: options.versionLabel || safePageId,
+                    snapshot: savedDoc.exists ? savedDoc.data() : sanitized,
+                    reason: options.versionReason || 'Automatisk lagring',
+                    source: options.versionSource || 'website-editor',
+                    minIntervalMs: Number.isFinite(options.versionMinIntervalMs)
+                        ? options.versionMinIntervalMs
+                        : undefined,
+                    forceDuplicate: options.versionForceDuplicate === true
+                });
+            } catch (versionError) {
+                console.warn(`[VersionHistory] Innholdet ble lagret, men versjonen for '${safePageId}' kunne ikke opprettes:`, versionError);
+            }
+        }
     }
 
-    async savePageContent(pageId, data) {
-        return this.updatePageContent(pageId, data);
+    async savePageContent(pageId, data, options = {}) {
+        return this.updatePageContent(pageId, data, options);
     }
 
     /**
@@ -1386,7 +1410,7 @@ class FirebaseService {
         }
     }
 
-    async saveSiteContent(docId, data, options = { merge: true }) {
+    async saveSiteContent(docId, data, options = { merge: true }, versionOptions = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         const safeDocId = typeof docId === 'string' ? docId.trim() : '';
         if (!safeDocId) throw new Error("Invalid siteContent docId");
@@ -1399,8 +1423,32 @@ class FirebaseService {
 
         if (!sanitized || typeof sanitized !== 'object') throw new Error("Empty siteContent payload");
 
-        await this.db.collection('siteContent').doc(safeDocId).set(sanitized, options || { merge: true });
+        const contentRef = this.db.collection('siteContent').doc(safeDocId);
+        await contentRef.set(sanitized, options || { merge: true });
         this.invalidatePageContentCache(`siteContent:${safeDocId}`);
+
+        const isAdminRoute = typeof window !== 'undefined'
+            && String(window.location?.pathname || '').toLowerCase().includes('/admin/');
+        if (isAdminRoute && window.HKMVersionHistory) {
+            try {
+                const savedDoc = await contentRef.get();
+                await window.HKMVersionHistory.recordVersion({
+                    scope: 'site',
+                    resourceCollection: 'siteContent',
+                    resourceId: safeDocId,
+                    resourceLabel: versionOptions.versionLabel || safeDocId,
+                    snapshot: savedDoc.exists ? savedDoc.data() : sanitized,
+                    reason: versionOptions.versionReason || 'Automatisk lagring',
+                    source: versionOptions.versionSource || 'website-editor',
+                    minIntervalMs: Number.isFinite(versionOptions.versionMinIntervalMs)
+                        ? versionOptions.versionMinIntervalMs
+                        : undefined,
+                    forceDuplicate: versionOptions.versionForceDuplicate === true
+                });
+            } catch (versionError) {
+                console.warn(`[VersionHistory] Innholdet ble lagret, men versjonen for siteContent/${safeDocId} kunne ikke opprettes:`, versionError);
+            }
+        }
     }
 
     subscribeToSiteContent(docId, callback) {

@@ -1391,6 +1391,11 @@ class NewsletterBuilder {
         if (saveDraftBtn) {
             saveDraftBtn.addEventListener('click', () => this.saveDraft());
         }
+
+        const versionHistoryBtn = document.getElementById('version-history-btn');
+        if (versionHistoryBtn) {
+            versionHistoryBtn.addEventListener('click', () => this.openNewsletterVersionHistory());
+        }
         
         const saveTemplateBtn = document.getElementById('save-template-btn');
         if (saveTemplateBtn) {
@@ -1467,13 +1472,28 @@ class NewsletterBuilder {
         }
     }
 
+    getEditorModalRoot() {
+        let editorRoot = document.getElementById('newsletter-editor-modal-root');
+        if (!editorRoot) {
+            editorRoot = document.createElement('div');
+            editorRoot.id = 'newsletter-editor-modal-root';
+            editorRoot.setAttribute('aria-live', 'polite');
+            document.body.appendChild(editorRoot);
+        } else if (editorRoot.parentElement !== document.body) {
+            document.body.appendChild(editorRoot);
+        }
+        return editorRoot;
+    }
+
     mountEditorModal(modal, ariaLabel) {
         if (!modal) return null;
 
-        if (!this.currentView || this.currentView === 'builder') {
+        // currentView is only the desktop/mobile preview choice. currentMode is
+        // the actual HKM Studio/editor state and must decide which page is shown.
+        if (this.currentMode !== 'builder') {
             this.toggleMode('builder');
-            this.switchSidebarView('builder');
         }
+        this.switchSidebarView('builder');
         this.closeMobileDrawers();
         this.closeToolsUi();
 
@@ -1482,7 +1502,7 @@ class NewsletterBuilder {
         if (ariaLabel) modal.setAttribute('aria-label', ariaLabel);
         modal.style.setProperty('z-index', '200000', 'important');
 
-        const editorRoot = document.getElementById('newsletter-builder-layout') || document.body;
+        const editorRoot = this.getEditorModalRoot();
         editorRoot.appendChild(modal);
         return modal;
     }
@@ -2529,6 +2549,7 @@ class NewsletterBuilder {
                         }
                     }
                 });
+                this.mountEditorModal(window.unsplashManager.modal, 'Velg bilde fra Unsplash');
             } else {
                 if (typeof showToast === 'function') showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
             }
@@ -4931,7 +4952,7 @@ class NewsletterBuilder {
             </div>
         `;
 
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, 'Sett inn dynamisk verdi');
         
         // Trigger reflow for animation
         modal.offsetHeight;
@@ -6501,6 +6522,7 @@ class NewsletterBuilder {
         const centerToolbarCell = document.querySelector('.toolbar-center-cell');
         const rightToolbarCell = document.querySelector('.toolbar-right-cell');
         const saveDraftBtn = document.getElementById('save-draft-btn');
+        const versionHistoryBtn = document.getElementById('version-history-btn');
         const previewBtn = document.getElementById('preview-btn');
 
         if (!drawer) return;
@@ -6517,6 +6539,7 @@ class NewsletterBuilder {
             if (rightInspector) rightInspector.style.setProperty('display', 'none', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'none', 'important');
             if (saveDraftBtn) saveDraftBtn.style.setProperty('display', 'none', 'important');
+            if (versionHistoryBtn) versionHistoryBtn.style.setProperty('display', 'none', 'important');
             if (previewBtn) previewBtn.style.setProperty('display', 'none', 'important');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Mottakere & Utsendelse';
 
@@ -6540,6 +6563,7 @@ class NewsletterBuilder {
             if (rightInspector) rightInspector.style.setProperty('display', 'block', 'important');
             if (centerToolbarCell) centerToolbarCell.style.setProperty('display', 'flex', 'important');
             if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
+            if (versionHistoryBtn) versionHistoryBtn.style.removeProperty('display');
             if (previewBtn) previewBtn.style.removeProperty('display');
             if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
         }
@@ -7357,6 +7381,8 @@ class NewsletterBuilder {
     showPreview() {
         const modal = document.getElementById('preview-modal');
         const frame = document.getElementById('preview-frame');
+        if (!modal || !frame) return;
+        this.mountEditorModal(modal, 'Forhåndsvis nyhetsbrev');
         const canvas = document.getElementById('newsletter-canvas').cloneNode(true);
         canvas.querySelectorAll('.block-controls, input, .col-type-toggle, .card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(c => c.remove());
         canvas.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
@@ -7410,7 +7436,7 @@ class NewsletterBuilder {
                 border: 1px solid #cbd5e1;
                 border-radius: 12px;
                 box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
-                z-index: 10000;
+                z-index: 150000;
                 pointer-events: none;
                 padding: 16px;
                 width: 280px;
@@ -8009,6 +8035,12 @@ class NewsletterBuilder {
                 await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
             }
 
+            await this.recordNewsletterVersion('Kampanje sendt', {
+                minIntervalMs: 0,
+                source: 'newsletter-send',
+                forceDuplicate: true
+            });
+
             if (typeof showToast === 'function') showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse!`, "success");
             if (finalBtn) {
                 finalBtn.disabled = false;
@@ -8049,7 +8081,7 @@ class NewsletterBuilder {
             box-sizing: border-box;
             border: 2px dashed #d17d39;
             border-radius: ${getComputedStyle(btn).borderRadius || '999px'};
-            z-index: 10000;
+            z-index: 150000;
             pointer-events: none;
             box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 4px 15px rgba(209, 125, 57, 0.3);
         `;
@@ -8193,7 +8225,7 @@ class NewsletterBuilder {
             box-sizing: border-box;
             border: 2px solid #d17d39;
             border-radius: ${getComputedStyle(img).borderRadius || '8px'};
-            z-index: 10000;
+            z-index: 150000;
             pointer-events: none;
             box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 4px 15px rgba(209, 125, 57, 0.3);
         `;
@@ -8394,7 +8426,7 @@ class NewsletterBuilder {
             justify-content: center;
             backdrop-filter: blur(8px);
         `;
-        document.body.appendChild(overlay);
+        this.mountEditorModal(overlay, 'Bildeinnstillinger');
 
         // Parse current image styles
         const curWidth = imgElement.style.width || '100%';
@@ -8683,6 +8715,7 @@ class NewsletterBuilder {
                         showToast("Bilde erstattet fra Unsplash!", "success");
                     }
                 });
+                this.mountEditorModal(window.unsplashManager.modal, 'Velg bilde fra Unsplash');
             } else {
                 showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
             }
@@ -8877,7 +8910,7 @@ class NewsletterBuilder {
                 document.head.appendChild(style);
             }
 
-            document.body.appendChild(cropModal);
+            this.mountEditorModal(cropModal, 'Beskjær eller roter bilde');
 
             const targetImg = document.getElementById('hkm-crop-target');
             let cropper = null;
@@ -9031,6 +9064,102 @@ class NewsletterBuilder {
         if (typeof showToast === 'function') showToast("E-post HTML ble eksportert og lastet ned!", "success");
     }
 
+    async recordNewsletterVersion(reason = 'Automatisk lagring', options = {}) {
+        if (!this.currentDraftId || !window.HKMVersionHistory) {
+            return { created: false, reason: 'unavailable' };
+        }
+
+        const minIntervalMs = Number.isFinite(options.minIntervalMs)
+            ? Math.max(0, options.minIntervalMs)
+            : 5 * 60 * 1000;
+
+        if (minIntervalMs > 0) {
+            const now = Date.now();
+            if (
+                this._lastNewsletterVersionAttemptAt
+                && now - this._lastNewsletterVersionAttemptAt < minIntervalMs
+            ) {
+                return { created: false, reason: 'local-throttle' };
+            }
+            this._lastNewsletterVersionAttemptAt = now;
+        }
+
+        try {
+            const draftDoc = await window.firebaseService.db
+                .collection('newsletter_templates')
+                .doc(this.currentDraftId)
+                .get();
+
+            if (!draftDoc.exists) {
+                return { created: false, reason: 'missing-draft' };
+            }
+
+            const draft = draftDoc.data();
+            return await window.HKMVersionHistory.recordVersion({
+                scope: 'newsletter',
+                resourceCollection: 'newsletter_templates',
+                resourceId: this.currentDraftId,
+                resourceLabel: draft.name || this.currentDraftName || draft.subject || 'Nyhetsbrev',
+                snapshot: draft,
+                reason,
+                source: options.source || 'newsletter-builder',
+                minIntervalMs,
+                forceDuplicate: options.forceDuplicate === true
+            });
+        } catch (error) {
+            console.warn('[VersionHistory] Nyhetsbrevet ble lagret, men versjonen kunne ikke opprettes:', error);
+            return { created: false, reason: 'error', error };
+        }
+    }
+
+    async openNewsletterVersionHistory() {
+        if (!window.HKMVersionHistory) {
+            showToast('Versjonshistorikken er ikke klar ennå. Prøv igjen om et øyeblikk.', 'warning');
+            return;
+        }
+
+        if (!this.currentDraftId) {
+            showToast('Lagre nyhetsbrevet som kladd først, så kan versjonshistorikken åpnes.', 'warning');
+            return;
+        }
+
+        const subject = document.getElementById('newsletter-subject')?.value?.trim();
+        const resourceLabel = this.currentDraftName || subject || 'Nyhetsbrev';
+
+        await window.HKMVersionHistory.openForResource({
+            scope: 'newsletter',
+            resourceCollection: 'newsletter_templates',
+            resourceId: this.currentDraftId,
+            resourceLabel,
+            prepareRestoreSnapshot: (snapshot, current) => ({
+                ...snapshot,
+                name: snapshot.name || current?.name || resourceLabel,
+                subject: snapshot.subject || '',
+                isDraft: true,
+                createdAt: snapshot.createdAt || current?.createdAt || new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }),
+            onRestore: async restoredSnapshot => {
+                this.currentDraftName = restoredSnapshot.name || resourceLabel;
+                this.hasCustomDraftName = true;
+                this.blocks = JSON.parse(JSON.stringify(restoredSnapshot.blocks || []));
+
+                const subjectInput = document.getElementById('newsletter-subject');
+                if (subjectInput) subjectInput.value = restoredSnapshot.subject || '';
+
+                if (restoredSnapshot.headerHtml) {
+                    try {
+                        localStorage.setItem('hkm_builder_autosave_header_html', restoredSnapshot.headerHtml);
+                    } catch (_) {}
+                }
+
+                this.renderCanvas();
+                await this.loadDrafts();
+                this.loadDashboardData();
+            }
+        });
+    }
+
     async saveDraft() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
@@ -9070,6 +9199,11 @@ class NewsletterBuilder {
                         url.searchParams.set('draftId', this.currentDraftId);
                         window.history.replaceState({}, '', url.toString());
                     }
+
+                    await this.recordNewsletterVersion('Manuell lagring', {
+                        minIntervalMs: 0,
+                        source: 'newsletter-save-button'
+                    });
 
                     if (typeof showToast === 'function') showToast(`Kladd "${trimmedName}" lagret!`, "success");
                     this.loadDrafts();
@@ -9203,6 +9337,7 @@ class NewsletterBuilder {
         const rightInspector = document.querySelector('.builder-properties-panel');
         const centerToolbarCell = document.querySelector('.toolbar-center-cell');
         const saveDraftBtn = document.getElementById('save-draft-btn');
+        const versionHistoryBtn = document.getElementById('version-history-btn');
         const previewBtn = document.getElementById('preview-btn');
         const leftToolbarTitle = document.getElementById('sidebar-title');
 
@@ -9211,6 +9346,7 @@ class NewsletterBuilder {
         if (rightInspector) rightInspector.style.removeProperty('display');
         if (centerToolbarCell) centerToolbarCell.style.removeProperty('display');
         if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
+        if (versionHistoryBtn) versionHistoryBtn.style.removeProperty('display');
         if (previewBtn) previewBtn.style.removeProperty('display');
         if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
 
@@ -10232,6 +10368,12 @@ class NewsletterBuilder {
             window.history.replaceState({}, '', url.toString());
         } else {
             try { localStorage.removeItem('hkm_builder_active_mode'); } catch(e) {}
+            this.hideElementHoverPreview();
+            ['hkm-btn-manager', 'hkm-img-resizer'].forEach(id => {
+                const transientUi = document.getElementById(id);
+                if (typeof transientUi?.cleanup === 'function') transientUi.cleanup();
+                transientUi?.remove();
+            });
             if (dashboard) dashboard.style.display = 'block';
             if (builder) builder.style.display = 'none';
             if (mainHeader) {
@@ -10929,6 +11071,10 @@ class NewsletterBuilder {
                 }
 
                 await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
+                await this.recordNewsletterVersion('Automatisk lagring', {
+                    minIntervalMs: 5 * 60 * 1000,
+                    source: 'newsletter-autosave'
+                });
 
                 // Update UI status to Success
                 if (statusEl && textEl) {
