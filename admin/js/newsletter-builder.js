@@ -2985,7 +2985,7 @@ class NewsletterBuilder {
             container = container.parentNode;
         }
 
-        const blockquote = container.closest('blockquote');
+        const blockquote = container.closest('blockquote, .block-quote');
         if (blockquote) {
             // Already a quote, unwrap it (change blockquote to p)
             const p = document.createElement('p');
@@ -2994,6 +2994,21 @@ class NewsletterBuilder {
         } else {
             // Convert current paragraph/block to a blockquote
             document.execCommand('formatBlock', false, 'blockquote');
+            const sel = window.getSelection();
+            if (sel && sel.anchorNode) {
+                const node = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentNode : sel.anchorNode;
+                const newBq = node.closest('blockquote');
+                if (newBq) {
+                    newBq.className = 'block-quote';
+                    newBq.style.borderLeft = '4px solid #d17d39';
+                    newBq.style.padding = '10px 16px 10px 20px';
+                    newBq.style.margin = '20px 0';
+                    newBq.style.fontStyle = 'italic';
+                    newBq.style.color = '#334155';
+                    newBq.style.background = '#fffaf5';
+                    newBq.style.borderRadius = '0 10px 10px 0';
+                }
+            }
         }
         this.syncUnifiedBlocks();
     }
@@ -5907,8 +5922,8 @@ class NewsletterBuilder {
                 }
             }
             img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
-        // Convert blockquotes to bulletproof email tables with inline styles for Gmail, Outlook, and Apple Mail
-        contentClone.querySelectorAll('blockquote').forEach(bq => {
+        // Convert blockquotes and quote blocks to bulletproof email tables with inline styles for Gmail, Outlook, and Apple Mail
+        contentClone.querySelectorAll('blockquote, .block-quote, .quote-block, [data-type="quote"], .sitat').forEach(bq => {
             const innerContent = bq.innerHTML;
             const tableQuote = `
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; width: 100%;">
