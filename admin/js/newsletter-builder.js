@@ -4058,11 +4058,16 @@ class NewsletterBuilder {
         }
 
         // Determine block type
+        const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
         const img = node.querySelector('img') || (node.tagName === 'IMG' ? node : null);
         const btn = node.querySelector('.block-btn, .product-cta-btn, .newsletter-btn, .btn, a[href], button') || 
                     ((node.classList && (node.classList.contains('block-btn') || node.classList.contains('product-cta-btn') || node.classList.contains('newsletter-btn') || node.classList.contains('btn'))) || node.tagName === 'A' || node.tagName === 'BUTTON' ? node : null);
         
-        if (img) {
+        if (isSocial) {
+            const socialNode = node.classList && node.classList.contains('newsletter-social-block') ? node : node.closest('.newsletter-social-block');
+            console.log('[HKM Inspector] Loading SOCIAL inspector');
+            this.showSocialInspector(socialNode);
+        } else if (img) {
             console.log('[HKM Inspector] Loading IMAGE inspector');
             this.showImageInspector(img, node);
         } else if (btn) {
@@ -4611,6 +4616,9 @@ class NewsletterBuilder {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
         if (!node) return;
 
+        const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
+        const socialNode = isSocial ? (node.classList && node.classList.contains('newsletter-social-block') ? node : node.closest('.newsletter-social-block')) : null;
+
         const toolbar = document.createElement('div');
         toolbar.id = 'block-quick-toolbar';
         toolbar.className = 'block-quick-toolbar';
@@ -4621,6 +4629,14 @@ class NewsletterBuilder {
             </button>
             <button type="button" class="quick-tb-btn" id="qtb-move-down" title="Flytt ned (↓)">
                 <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
+            </button>
+            ${socialNode ? `
+            <button type="button" class="quick-tb-btn" id="qtb-edit-social" title="Endre stil & lenker (✏️)" style="color: #3b82f6;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
+            </button>
+            ` : ''}
+            <button type="button" class="quick-tb-btn" id="qtb-delete-block" title="Slett element (🗑️)" style="color: #ef4444;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             </button>
         `;
 
@@ -4638,6 +4654,69 @@ class NewsletterBuilder {
             e.preventDefault();
             e.stopPropagation();
             this.moveActiveBlock(1);
+        });
+        toolbar.querySelector('#qtb-edit-social')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.openSocialInsertionFlowAt(socialNode || node);
+        });
+        toolbar.querySelector('#qtb-delete-block')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetNode = socialNode || node;
+            targetNode.remove();
+            toolbar.remove();
+            this.deselectBlock();
+            this.syncUnifiedBlocks();
+            this.triggerAutosave();
+            showToast("Element slettet", "info");
+        });
+    }
+
+    showSocialInspector(socialNode) {
+        const defaultView = document.getElementById('sidebar-default-view');
+        const inspectorView = document.getElementById('sidebar-inspector-view');
+        if (!inspectorView) return;
+
+        if (defaultView) defaultView.style.display = 'none';
+        inspectorView.style.display = 'flex';
+
+        const titleEl = document.getElementById('inspector-title');
+        if (titleEl) titleEl.textContent = 'Sosiale medier';
+
+        const contentEl = document.getElementById('inspector-content');
+        if (!contentEl) return;
+
+        contentEl.innerHTML = `
+            <div style="padding: 16px; display: flex; flex-direction: column; gap: 16px; font-family: 'Inter', sans-serif;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 36px; color: #1B4965; margin-bottom: 8px; display: block;">share</span>
+                    <div style="font-weight: 700; font-size: 15px; color: #0f172a;">Sosiale medier banner</div>
+                    <div style="font-size: 12.5px; color: #64748b; margin-top: 4px; line-height: 1.4;">Velg visningsstil (Ikon + Tekst, Bare ikoner, Bare tekst) eller slett hele banneret.</div>
+                </div>
+
+                <button type="button" id="inspector-edit-social-btn" style="width: 100%; padding: 12px 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%); color: white; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.2); transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">tune</span>
+                    Endre stil & lenker
+                </button>
+
+                <button type="button" id="inspector-delete-social-btn" style="width: 100%; padding: 12px 16px; border: 1px solid #fecaca; border-radius: 12px; background: #fef2f2; color: #dc2626; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                    Slett sosial blokk
+                </button>
+            </div>
+        `;
+
+        contentEl.querySelector('#inspector-edit-social-btn')?.addEventListener('click', () => {
+            this.openSocialInsertionFlowAt(socialNode);
+        });
+
+        contentEl.querySelector('#inspector-delete-social-btn')?.addEventListener('click', () => {
+            socialNode.remove();
+            this.deselectBlock();
+            this.syncUnifiedBlocks();
+            this.triggerAutosave();
+            showToast("Sosiale medier slettet", "info");
         });
     }
 
