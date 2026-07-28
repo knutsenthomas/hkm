@@ -9145,7 +9145,7 @@ class NewsletterBuilder {
                     return;
                 }
 
-                filtered.forEach(sub => {
+                filtered.forEach((sub, idx) => {
                     const tr = document.createElement('tr');
                     const tagsHtml = (sub.tags && sub.tags.length > 0)
                         ? sub.tags.map(t => `<span style="font-size: 11px; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${t}</span>`).join('')
@@ -9167,11 +9167,11 @@ class NewsletterBuilder {
                         <td>${sub.dateStr}</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <button type="button" class="btn-edit-sub" data-email="${sub.email}" title="Rediger abonnent" style="background: none; border: none; color: #2563eb; cursor: pointer; padding: 4px;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                <button type="button" class="btn-edit-sub" data-idx="${idx}" data-email="${sub.email}" title="Rediger abonnent" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #2563eb; cursor: pointer; padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; pointer-events: none;">edit</span>
                                 </button>
-                                <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett/avmeld abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                <button type="button" class="btn-delete-sub" data-idx="${idx}" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett/avmeld abonnent" style="background: #fef2f2; border: 1px solid #fecaca; color: #ef4444; cursor: pointer; padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; pointer-events: none;">delete</span>
                                 </button>
                             </div>
                         </td>
@@ -9179,22 +9179,37 @@ class NewsletterBuilder {
                     tbody.appendChild(tr);
                 });
 
-                // Bind edit buttons
+                // Bind edit buttons using robust delegated lookup
                 tbody.querySelectorAll('.btn-edit-sub').forEach(btn => {
-                    btn.onclick = () => {
-                        const email = btn.dataset.email;
-                        const targetSub = subscribersList.find(s => s.email === email);
-                        if (targetSub) this.editSubscriberPrompt(targetSub);
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const btnEl = e.currentTarget;
+                        const idx = parseInt(btnEl.dataset.idx);
+                        const email = btnEl.dataset.email;
+                        const targetSub = filtered[idx] || subscribersList.find(s => (s.email || '').toLowerCase() === (email || '').toLowerCase());
+                        if (targetSub) {
+                            this.editSubscriberPrompt(targetSub);
+                        } else {
+                            console.warn("Edit subscriber target not found for email:", email);
+                        }
                     };
                 });
 
-                // Bind delete buttons
+                // Bind delete buttons using robust delegated lookup
                 tbody.querySelectorAll('.btn-delete-sub').forEach(btn => {
-                    btn.onclick = async () => {
-                        const email = btn.dataset.email;
-                        const docId = btn.dataset.id;
-                        const col = btn.dataset.col;
-                        const confirmDel = await this.showConfirm('Slett abonnent', `Er du sikker på at du vil fjerne/avmelde ${email} fra e-postlisten?`, 'Slett abonnent');
+                    btn.onclick = async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const btnEl = e.currentTarget;
+                        const idx = parseInt(btnEl.dataset.idx);
+                        const email = btnEl.dataset.email;
+                        const docId = btnEl.dataset.id;
+                        const col = btnEl.dataset.col;
+                        const targetSub = filtered[idx] || subscribersList.find(s => (s.email || '').toLowerCase() === (email || '').toLowerCase());
+                        const displayEmail = targetSub ? targetSub.email : email;
+
+                        const confirmDel = await this.showConfirm('Slett abonnent', `Er du sikker på at du vil fjerne/avmelde ${displayEmail} fra e-postlisten?`, 'Slett abonnent');
                         if (confirmDel) {
                             try {
                                 if (col === 'contacts' && docId) {
@@ -9202,19 +9217,19 @@ class NewsletterBuilder {
                                 } else if (col === 'newsletter_subscriptions' && docId) {
                                     await window.firebaseService.db.collection('newsletter_subscriptions').doc(docId).delete();
                                 }
-                                const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', email).get();
+                                const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', displayEmail).get();
                                 subDocs.forEach(d => d.ref.delete());
 
-                                const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', email).get();
+                                const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', displayEmail).get();
                                 contactDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed', status: 'Inaktiv' }));
 
-                                const userDocs = await window.firebaseService.db.collection('users').where('email', '==', email).get();
+                                const userDocs = await window.firebaseService.db.collection('users').where('email', '==', displayEmail).get();
                                 userDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed' }));
 
-                                if (typeof showToast === 'function') showToast(`Abonnent ${email} ble fjernet.`, "info");
+                                if (typeof showToast === 'function') showToast(`Abonnent ${displayEmail} ble fjernet.`, "info");
                                 this.loadSubscribers();
-                            } catch(e) {
-                                console.error('Delete sub failed:', e);
+                            } catch(err) {
+                                console.error('Delete sub failed:', err);
                                 if (typeof showToast === 'function') showToast('Kunne ikke fjerne abonnent.', 'error');
                             }
                         }
@@ -9241,9 +9256,13 @@ class NewsletterBuilder {
     }
 
     async editSubscriberPrompt(sub) {
-        const modal = document.createElement('div');
+        let modal = document.getElementById('hkm-edit-subscriber-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-edit-subscriber-modal';
         modal.className = 'profile-modal';
-        modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
+        modal.style.cssText = "display: flex !important; z-index: 999999 !important; position: fixed !important; inset: 0 !important; background: rgba(15,23,42,0.7) !important; align-items: center !important; justify-content: center !important; backdrop-filter: blur(8px) !important; font-family: 'Inter', sans-serif !important;";
         
         const currentSegments = sub.segments || [];
         const currentTagsStr = (sub.tags || []).join(', ');
@@ -9370,9 +9389,13 @@ class NewsletterBuilder {
     }
 
     async addNewSubscriberPrompt() {
-        const modal = document.createElement('div');
+        let modal = document.getElementById('hkm-add-subscriber-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-add-subscriber-modal';
         modal.className = 'profile-modal';
-        modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
+        modal.style.cssText = "display: flex !important; z-index: 999999 !important; position: fixed !important; inset: 0 !important; background: rgba(15,23,42,0.7) !important; align-items: center !important; justify-content: center !important; backdrop-filter: blur(8px) !important; font-family: 'Inter', sans-serif !important;";
         modal.innerHTML = `
             <div style="background: #ffffff; width: 90%; max-width: 520px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
