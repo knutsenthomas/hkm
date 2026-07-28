@@ -1344,6 +1344,12 @@
                                                     <p style="color: #0284c7; margin: 4px 0 0 0; font-size: 13px; line-height: 1.4;">
                                                         Mottakere med etikett <strong>'Engelsk'</strong>, <strong>'English'</strong> eller <strong>'en'</strong> mottar automatisk en oversatt versjon av nyhetsbrevet på engelsk.
                                                     </p>
+                                                    <div style="margin-top: 10px;">
+                                                        <button type="button" id="btn-preview-english-edition" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #ffffff; border: 1px solid #93c5fd; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0284c7; cursor: pointer; box-shadow: 0 2px 4px rgba(2,132,199,0.1);">
+                                                            <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span>
+                                                            <span>Dobbelsjekk engelsk utgave</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <label class="toggle-checkbox-v2">
                                                     <input type="checkbox" id="auto-translate-english-toggle" checked>
@@ -1844,10 +1850,28 @@
     </div>
 
     <!-- Modals -->
-    <div id="preview-modal" class="modal">
-        <div class="modal-content preview-content">
-            <button class="close-modal">&times;</button>
-            <div class="preview-frame-wrap">
+    <div id="preview-modal" class="modal" style="z-index: 250000 !important;">
+        <div class="modal-content preview-content" style="display: flex; flex-direction: column; max-width: 900px; width: 90%; height: 85vh;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; border-radius: 20px 20px 0 0;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="color: #2563eb; font-size: 22px;">visibility</span>
+                    <strong style="font-size: 16px; color: #0f172a;">Forhåndsvisning av e-post</strong>
+                </div>
+                
+                <!-- Språkvelger i forhåndsvisning -->
+                <div style="display: flex; align-items: center; background: #e2e8f0; border-radius: 20px; padding: 4px; gap: 4px;">
+                    <button type="button" id="preview-lang-no" class="btn-preview-lang active" style="padding: 6px 16px; border: none; border-radius: 16px; font-size: 13px; font-weight: 700; cursor: pointer; background: #ffffff; color: #1e293b; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;">
+                        🇳🇴 Norsk (Original)
+                    </button>
+                    <button type="button" id="preview-lang-en" class="btn-preview-lang" style="padding: 6px 16px; border: none; border-radius: 16px; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                        🇬🇧 English (AI-oversatt)
+                    </button>
+                </div>
+
+                <button class="close-modal" style="background: none; border: none; font-size: 26px; color: #64748b; cursor: pointer;">&times;</button>
+            </div>
+
+            <div class="preview-frame-wrap" style="flex: 1; overflow-y: auto; background: #f1f5f9; padding: 24px;">
                 <div id="preview-frame" class="preview-frame desktop"></div>
             </div>
         </div>

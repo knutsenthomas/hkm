@@ -1208,7 +1208,20 @@ class NewsletterBuilder {
         // Actions
         const previewBtn = document.getElementById('preview-btn');
         if (previewBtn) {
-            previewBtn.addEventListener('click', () => this.showPreview());
+            previewBtn.addEventListener('click', () => this.showPreview('no'));
+        }
+
+        const previewLangNo = document.getElementById('preview-lang-no');
+        if (previewLangNo) {
+            previewLangNo.addEventListener('click', () => this.showPreview('no'));
+        }
+        const previewLangEn = document.getElementById('preview-lang-en');
+        if (previewLangEn) {
+            previewLangEn.addEventListener('click', () => this.showPreview('en'));
+        }
+        const btnPreviewEnEdition = document.getElementById('btn-preview-english-edition');
+        if (btnPreviewEnEdition) {
+            btnPreviewEnEdition.addEventListener('click', () => this.showPreview('en'));
         }
 
         // Dark Mode Simulator Toggle
@@ -7018,9 +7031,122 @@ class NewsletterBuilder {
         });
     }
 
-    showPreview() {
+    async showPreview(lang = 'no') {
         const modal = document.getElementById('preview-modal');
         const frame = document.getElementById('preview-frame');
+        const btnNo = document.getElementById('preview-lang-no');
+        const btnEn = document.getElementById('preview-lang-en');
+
+        if (btnNo && btnEn) {
+            if (lang === 'en') {
+                btnEn.style.background = '#ffffff';
+                btnEn.style.color = '#1e293b';
+                btnEn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                btnNo.style.background = 'transparent';
+                btnNo.style.color = '#64748b';
+                btnNo.style.boxShadow = 'none';
+            } else {
+                btnNo.style.background = '#ffffff';
+                btnNo.style.color = '#1e293b';
+                btnNo.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                btnEn.style.background = 'transparent';
+                btnEn.style.color = '#64748b';
+                btnEn.style.boxShadow = 'none';
+            }
+        }
+
+        modal.style.display = 'flex';
+
+        if (lang === 'en') {
+            frame.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; font-family: 'Inter', sans-serif;">
+                    <span class="material-symbols-outlined rotating" style="font-size: 36px; color: #0284c7;">translate</span>
+                    <h4 style="margin: 16px 0 6px 0; font-size: 18px; color: #0369a1; font-weight: 700;">Genererer engelsk forhåndsvisning med AI...</h4>
+                    <p style="margin: 0; color: #64748b; font-size: 14px;">Oversetter emnelinje og blokker fra norsk til engelsk.</p>
+                </div>
+            `;
+
+            try {
+                const subjectNode = document.getElementById('newsletter-subject');
+                const subject = subjectNode ? subjectNode.value : '';
+                this.syncUnifiedBlocks();
+
+                const prompt = `
+                    Du er en oversetter for His Kingdom Ministry (HKM).
+                    Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
+
+                    Emnelinje: "${subject}"
+                    Blokker: ${JSON.stringify(this.blocks)}
+
+                    Returner kun gyldig JSON:
+                    {
+                        "subject": "Translated English Subject",
+                        "blocks": [ SAME BLOCKS WITH ENGLISH TEXT ]
+                    }
+                `;
+
+                let translatedSubject = subject;
+                let translatedBlocks = this.blocks;
+
+                if (window.firebase && window.firebase.functions) {
+                    const callable = firebase.functions().httpsCallable('aiProcess');
+                    const response = await callable({ prompt });
+                    if (response.data && response.data.text) {
+                        let jsonStr = response.data.text.trim();
+                        if (jsonStr.startsWith('```')) {
+                            jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+                        }
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.subject) translatedSubject = parsed.subject;
+                        if (Array.isArray(parsed.blocks)) translatedBlocks = parsed.blocks;
+                    }
+                }
+
+                const enCanvas = document.createElement('div');
+                enCanvas.className = 'canvas-paper-frame';
+                enCanvas.style.cssText = 'max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); font-family: "Inter", sans-serif;';
+                
+                let blocksHtml = (translatedBlocks || []).map(b => {
+                    if (b.type === 'title') {
+                        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${b.content?.text || ''}</h2>`;
+                    } else if (b.type === 'text') {
+                        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${b.content?.text || ''}</div>`;
+                    } else if (b.type === 'button') {
+                        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${b.content?.text || 'Read More'}</a></div>`;
+                    } else if (b.type === 'image' && b.content?.url) {
+                        return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Image"></div>`;
+                    } else if (b.type === 'spacer') {
+                        return `<div style="height: ${b.content?.height || 24}px;"></div>`;
+                    }
+                    return '';
+                }).join('');
+
+                enCanvas.innerHTML = `
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: #0284c7; font-size: 20px;">g_translate</span>
+                        <div>
+                            <span style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.05em; display: block;">English Edition Preview</span>
+                            <strong style="font-size: 14px; color: #0f172a;">Subject: ${translatedSubject}</strong>
+                        </div>
+                    </div>
+                    ${blocksHtml}
+                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+                        <p>© 2026 His Kingdom Ministry</p>
+                        <p><a href="#" style="color: #2563eb;">Unsubscribe from newsletter</a></p>
+                    </div>
+                `;
+
+                frame.innerHTML = '';
+                frame.appendChild(enCanvas);
+            } catch(err) {
+                console.error("Preview English failed:", err);
+                frame.innerHTML = `<div style="padding: 24px; color: #dc2626; text-align: center;">Kunne ikke laste engelsk forhåndsvisning: ${err.message}</div>`;
+            }
+
+            return;
+        }
+
+        // Norwegian / Original Canvas Preview
         const canvas = document.getElementById('newsletter-canvas').cloneNode(true);
         canvas.querySelectorAll('.block-controls, input, .col-type-toggle, .card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(c => c.remove());
         canvas.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
@@ -7035,7 +7161,6 @@ class NewsletterBuilder {
             content.style.height = '800px';
         }
 
-        // Style the cloned canvas to match standard email client widths (600px)
         if (this.currentView === 'desktop') {
             canvas.style.maxWidth = '600px';
             canvas.style.width = '100%';
@@ -7053,7 +7178,6 @@ class NewsletterBuilder {
         frame.innerHTML = '';
         frame.appendChild(canvas);
         frame.className = `preview-frame ${this.currentView}`;
-        modal.style.display = 'flex';
     }
 
     showElementHoverPreview(btn) {
