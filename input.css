@@ -189,7 +189,7 @@ th {
     --bg-light: #F8F9FA;
     --bg-white: #FFFFFF;
     --header-bg: #FFFFFF;
-    --footer-bg: #2C3E50;
+    --footer-bg: #0B1928;
     --footer-text: #FFFFFF;
     --newsletter-bg: linear-gradient(135deg, #D17D39, #B54D2B);
     --newsletter-text: #FFFFFF;
@@ -2847,8 +2847,9 @@ body.hero-animate .slide-buttons {
 
 /* Footer */
 .footer {
-  background: var(--footer-bg);
-  color: var(--footer-text);
+  background: var(--footer-bg, #0B1928);
+  background-color: #0B1928;
+  color: var(--footer-text, #FFFFFF);
   padding: 60px 0 20px;
 }
 
