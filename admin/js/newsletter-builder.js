@@ -3495,76 +3495,99 @@ class NewsletterBuilder {
         let html = '';
         switch (type) {
             case 'header':
-                html = `<h1>Overskrift her</h1>`;
+                html = `<h2 style="font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: #1B4965; margin: 24px 0 12px 0;">Overskrift her</h2><p><br></p>`;
                 break;
             case 'text':
-                html = `<p>Skriv din tekst her...</p>`;
+                html = `<p style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin: 16px 0;">Skriv din tekst her...</p><p><br></p>`;
                 break;
             case 'divider':
-                html = `<hr style="border: none; border-top: 2px solid #e2e8f0; margin: 24px 0;">`;
+                html = `
+                    <div class="newsletter-divider-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 12px 0;">
+                        <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0;">
+                    </div><p><br></p>`;
                 break;
             case 'spacer':
-                html = `<div style="height: 24px;"></div>`;
+                html = `
+                    <div class="newsletter-spacer-block" contenteditable="false" style="position: relative; margin: 12px 0; padding: 6px; border: 1px dashed #cbd5e1; border-radius: 8px; text-align: center; color: #94a3b8; font-size: 12px;">
+                        <div style="height: 24px; display: flex; align-items: center; justify-content: center;">Avstand (24px)</div>
+                    </div><p><br></p>`;
                 break;
             case 'button':
                 this.openButtonInsertionFlowAt(afterElement);
                 return;
             case 'columns':
                 html = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
-                        <div style="min-height: 50px;">Venstre kolonne...</div>
-                        <div style="min-height: 50px;">Høyre kolonne...</div>
+                    <div class="newsletter-columns-block" contenteditable="false" style="position: relative; margin: 24px 0; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Venstre kolonne...</div>
+                            <div contenteditable="true" style="min-height: 50px; padding: 12px; border: 1px dashed #e2e8f0; border-radius: 8px; background: white;">Høyre kolonne...</div>
+                        </div>
                     </div><p><br></p>`;
                 break;
             case 'image':
-                this.openImageInsertionFlowAt(afterElement);
-                return;
             case 'logo':
                 this.openImageInsertionFlowAt(afterElement);
                 return;
             case 'social':
-                html = `
-                    <div style="text-align: center; margin: 24px 0; display: flex; justify-content: center; gap: 16px;">
-                        <a href="https://facebook.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Facebook</a>
-                        <a href="https://instagram.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Instagram</a>
-                        <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
-                    </div><p><br></p>`;
-                break;
+                this.openSocialInsertionFlowAt(afterElement);
+                return;
             case 'product':
                 this.openProductInsertionFlowAt(afterElement);
                 return;
             case 'event':
                 this.openEventInsertionFlowAt(afterElement);
                 return;
+            case 'video':
+                const videoUrl = prompt("Angi YouTube video-URL (f.eks. https://www.youtube.com/watch?v=dQw4w9WgXcQ):", "https://www.youtube.com/watch?v=");
+                if (!videoUrl) return;
+                const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const ytMatch = videoUrl.match(ytRegex);
+                if (ytMatch && ytMatch[1]) {
+                    const videoId = ytMatch[1];
+                    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                    html = `
+                        <div class="newsletter-video-block" contenteditable="false" style="position: relative; text-align: center; margin: 24px 0;">
+                            <a href="${videoUrl}" target="_blank" style="display: block; position: relative; max-width: 600px; margin: 0 auto; text-decoration: none;">
+                                <img src="${thumbnailUrl}" style="width: 100%; height: auto; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" alt="Video">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; background: rgba(27, 73, 101, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.35); transition: all 0.3s ease;">
+                                    <span style="color: white; font-size: 28px; margin-left: 6px; font-family: system-ui, sans-serif;">▶</span>
+                                </div>
+                            </a>
+                        </div><p><br></p>`;
+                } else {
+                    alert("Ugyldig YouTube-URL. Vennligst oppgi en gyldig YouTube-lenke.");
+                    return;
+                }
+                break;
+            case 'html':
+                const customHtml = prompt("Lim inn din egendefinerte HTML-kode her:", "<div style='padding: 20px; background: #f8fafc; border-radius: 8px; text-align: center; border: 1px dashed #cbd5e1;'>Egendefinert HTML</div>");
+                if (!customHtml) return;
+                html = `<div class="newsletter-html-block" contenteditable="false" style="margin: 24px 0; font-family: 'Inter', sans-serif;">${customHtml}</div><p><br></p>`;
+                break;
+            case 'subscribe':
+                html = `
+                    <div class="newsletter-subscribe-block" contenteditable="false" style="padding: 32px 24px; background-color: #f8fafc; border-radius: 16px; text-align: center; margin: 24px 0; border: 1px solid #e2e8f0; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: #1B4965; font-family: 'Inter', sans-serif;">Abonner på vårt nyhetsbrev</h3>
+                        <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b; font-family: 'Inter', sans-serif; line-height: 1.5;">Motta ukentlige oppmuntringer og oppdateringer direkte i din innboks.</p>
+                        <div style="display: flex; gap: 8px; justify-content: center; max-width: 400px; margin: 0 auto; flex-wrap: wrap;">
+                            <input type="email" placeholder="Din e-postadresse" style="flex: 1; min-width: 200px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box;" disabled>
+                            <button style="background-color: #d17d39; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: default; font-family: 'Inter', sans-serif;">Meld deg på</button>
+                        </div>
+                    </div><p><br></p>`;
+                break;
+            case 'link':
+                const linkText = prompt("Lenketekst:", "Les mer her");
+                if (!linkText) return;
+                const linkUrl = prompt("Lenke-URL:", "https://");
+                if (!linkUrl) return;
+                html = `<p style="text-align: center; margin: 16px 0; font-family: 'Inter', sans-serif;"><a href="${linkUrl}" target="_blank" style="color: #d17d39; text-decoration: underline; font-weight: 600; font-family: 'Inter', sans-serif;">${linkText}</a></p><p><br></p>`;
+                break;
             default:
                 return;
         }
 
         if (html) {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            
-            // Apply entrance animations to top-level nodes of the block
-            Array.from(temp.children).forEach(child => {
-                child.classList.add('hkm-animated-entry');
-                setTimeout(() => {
-                    child.classList.remove('hkm-animated-entry');
-                }, 600);
-            });
-
-            const container = document.getElementById('blocks-container');
-            if (container) {
-                if (afterElement) {
-                    while (temp.firstChild) {
-                        container.insertBefore(temp.firstChild, afterElement);
-                    }
-                } else {
-                    while (temp.firstChild) {
-                        container.appendChild(temp.firstChild);
-                    }
-                }
-                this.syncUnifiedBlocks();
-            }
+            this.insertHtmlAtCursorOrEndAt(html, afterElement);
         }
     }
 
