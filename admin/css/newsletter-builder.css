@@ -1270,7 +1270,10 @@
 }
 
 .newsletter-logo {
-    max-height: 48px !important;
+    max-height: 52px !important;
+    max-width: 68px !important;
+    height: auto !important;
+    width: auto !important;
     margin: 8px auto 4px auto !important;
     display: block !important;
 }

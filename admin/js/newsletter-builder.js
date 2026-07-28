@@ -5986,9 +5986,9 @@ class NewsletterBuilder {
         <table class="email-wrapper" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
           <!-- Header -->
           <tr>
-            <td class="email-header" align="center" style="padding: 32px 24px; border-bottom: 1px solid #f1f5f9; text-align: center;">
-              <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" width="140" style="width: 140px; max-width: 140px; height: auto; display: block; margin: 0 auto 12px auto; border: 0;" />
-              <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; font-family: Arial, sans-serif;">His Kingdom Ministry</h2>
+            <td class="email-header" align="center" style="padding: 28px 24px 20px 24px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+              <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" width="68" style="width: 68px; max-width: 68px; height: auto; display: block; margin: 0 auto 10px auto; border: 0;" />
+              <h2 style="margin: 0; font-size: 19px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em; font-family: Arial, sans-serif;">His Kingdom Ministry</h2>
             </td>
           </tr>
           <!-- Main Content Body -->
