@@ -6702,38 +6702,26 @@ class NewsletterBuilder {
         }
     }
 
-    calculateEstimated() {
-        const checkedOpt = document.querySelector('input[name="send-to"]:checked');
-        if (!checkedOpt) return;
+    async calculateEstimated() {
+        try {
+            const allSubscribers = await this.fetchSubscribersList();
+            const filtered = this.filterRecipientsBySelection(allSubscribers);
+            const count = filtered.length;
 
-        const sendToAll = checkedOpt.value === 'all';
-        const subElem = document.getElementById('select-subscribers');
-        const subSelected = subElem ? subElem.checked : true;
+            const estEl = document.getElementById('estimated-count');
+            if (estEl) estEl.innerText = count;
 
-        let count = 0;
-        let subVal = 0;
-        if (sendToAll) {
-            count = this.totalUsers || 60;
-            subVal = this.subscribersCount || 48;
-        } else {
-            if (subSelected) {
-                count += this.subscribersCount || 48;
-                subVal = this.subscribersCount || 48;
+            const statSub = document.getElementById('stat-subscribers-val');
+            if (statSub) statSub.innerText = count;
+
+            const progressFill = document.getElementById('estimated-progress-fill');
+            if (progressFill) {
+                const maxVal = Math.max(allSubscribers.length, 1);
+                const pct = Math.min(Math.round((count / maxVal) * 100), 100);
+                progressFill.style.width = `${pct}%`;
             }
-            count += (this.selectedUserEmails ? this.selectedUserEmails.size : 0);
-        }
-
-        const estEl = document.getElementById('estimated-count');
-        if (estEl) estEl.innerText = count;
-
-        const statSub = document.getElementById('stat-subscribers-val');
-        if (statSub) statSub.innerText = subVal;
-
-        const progressFill = document.getElementById('estimated-progress-fill');
-        if (progressFill) {
-            const maxVal = Math.max(this.totalUsers || 60, 1);
-            const pct = Math.min(Math.round((count / maxVal) * 100), 100);
-            progressFill.style.width = `${pct}%`;
+        } catch (e) {
+            console.warn("Could not calculate estimated count:", e);
         }
     }
 
@@ -8427,9 +8415,56 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         );
     }
 
+    filterRecipientsBySelection(allRecipients) {
+        if (!Array.isArray(allRecipients)) return [];
+
+        const hasSelectedLabels = this.selectedLabels && this.selectedLabels.size > 0;
+        const hasSelectedSegments = this.selectedSegments && this.selectedSegments.size > 0;
+        const hasSelectedUsers = this.selectedUserEmails && this.selectedUserEmails.size > 0;
+
+        // If no specific filters are checked, return all active recipients
+        if (!hasSelectedLabels && !hasSelectedSegments && !hasSelectedUsers) {
+            return allRecipients;
+        }
+
+        const normSelectedLabels = Array.from(this.selectedLabels || []).map(l => String(l).toLowerCase().trim());
+        const normSelectedSegments = Array.from(this.selectedSegments || []).map(s => String(s).toLowerCase().trim());
+        const normSelectedUsers = Array.from(this.selectedUserEmails || []).map(u => String(u).toLowerCase().trim());
+
+        return allRecipients.filter(rec => {
+            if (!rec || !rec.email) return false;
+            const recEmail = String(rec.email).toLowerCase().trim();
+
+            // 1. Explicitly selected manual contact email
+            if (normSelectedUsers.includes(recEmail)) {
+                return true;
+            }
+
+            // 2. Check label/tag matches
+            const tags = Array.isArray(rec.tags) ? rec.tags : (typeof rec.tags === 'string' ? rec.tags.split(',') : []);
+            const segments = Array.isArray(rec.segments) ? rec.segments : (typeof rec.segments === 'string' ? rec.segments.split(',') : []);
+            const allRecTags = [...tags, ...segments, rec.source || ''].map(t => String(t).toLowerCase().trim());
+
+            if (hasSelectedLabels) {
+                const matchesLabel = normSelectedLabels.some(sel => allRecTags.some(t => t.includes(sel) || sel.includes(t)));
+                if (matchesLabel) return true;
+            }
+
+            if (hasSelectedSegments) {
+                const matchesSegment = normSelectedSegments.some(sel => allRecTags.some(t => t.includes(sel) || sel.includes(t)));
+                if (matchesSegment) return true;
+            }
+
+            return false;
+        });
+    }
+
     async sendCampaign() {
-        const user = window.firebaseService?.auth?.currentUser;
-        if (!user) return showToast("Logg inn først", "warning");
+        const user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+        if (!user) {
+            showToast("Logg inn først for å sende nyhetsbrev.", "warning");
+            return;
+        }
 
         const subject = document.getElementById('newsletter-subject')?.value?.trim();
         this.syncUnifiedBlocks();
@@ -8456,13 +8491,17 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
 
             // 1. Fetch active newsletter subscribers from database
-            const recipients = await this.fetchSubscribersList();
+            const allSubscribers = await this.fetchSubscribersList();
+
+            // 2. Filter recipients based on selected labels, segments, or manual users
+            const recipients = this.filterRecipientsBySelection(allSubscribers);
+
             if (!Array.isArray(recipients) || recipients.length === 0) {
                 if (finalBtn) {
                     finalBtn.disabled = false;
                     finalBtn.innerHTML = originalText;
                 }
-                showToast("Fant ingen aktive abonnenter i databasen å sende til.", "warning");
+                showToast("Ingen mottakere matchet de valgte etikettene / segmentene.", "warning");
                 return;
             }
 
