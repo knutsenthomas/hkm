@@ -10075,6 +10075,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
         } catch (err) {
             console.warn('[HKM Subscribers] Could not fetch users collection:', err);
+        }
+
         explicitlyUnsubscribedEmails.forEach(email => subscribersMap.delete(email));
         return Array.from(subscribersMap.values());
     }
