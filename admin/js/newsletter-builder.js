@@ -6772,8 +6772,17 @@ class NewsletterBuilder {
 
         // Auto-initialize from localStorage or default HKM template if empty
         if (this.blocks.length === 0) {
-            const autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
+            let autosavedHtml = localStorage.getItem('hkm_builder_autosave_html');
             const autosavedSubject = localStorage.getItem('hkm_builder_autosave_subject');
+
+            const userFullText = "Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.";
+
+            if (autosavedHtml && autosavedHtml.includes("Vi er så takknemlige")) {
+                autosavedHtml = autosavedHtml.replace(/Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg\.? Gud gjør store ting i vår midte, og vi ønsker å oppmuntre deg i din vandring\.?/g, userFullText);
+                try {
+                    localStorage.setItem('hkm_builder_autosave_html', autosavedHtml);
+                } catch(e) {}
+            }
 
             if (autosavedHtml && autosavedHtml.trim().length > 15) {
                 container.innerHTML = autosavedHtml;
