@@ -2578,7 +2578,7 @@ class ContentManager {
             pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
                 || (sectionLink?.getAttribute('href') || '').trim(),
             feedUrl: (typeof feedContent.feedUrl === 'string' ? feedContent.feedUrl.trim() : ''),
-            feedSource: typeof feedContent.feedSource === 'string' && feedContent.feedSource.trim() !== 'meta' ? feedContent.feedSource.trim() : 'juicer',
+            feedSource: (typeof feedContent.feedSource === 'string' && feedContent.feedSource.trim()) ? feedContent.feedSource.trim() : 'meta',
             juicerFeedId: typeof feedContent.juicerFeedId === 'string' ? feedContent.juicerFeedId.trim() : 'hiskingdomministry777'
         };
     }

@@ -119,12 +119,21 @@ function getFallbackImageByContent(text) {
 
 function normalizeFacebookPost(post, index, fallbackPageUrl) {
     const message = typeof post.message === "string" ? post.message.trim() : "";
-    const lines = message.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-    const rawTitle = lines[0] || message || "Nytt innlegg fra Facebook";
+    
+    // Extract attachment title or description if message text is empty (e.g. photo uploads)
+    let attachmentText = "";
+    if (post.attachments && Array.isArray(post.attachments.data) && post.attachments.data[0]) {
+        const att = post.attachments.data[0];
+        attachmentText = att.title || att.description || "";
+    }
+
+    const effectiveText = message || attachmentText || "";
+    const lines = effectiveText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+    const rawTitle = lines[0] || "Nytt bilde / oppdatering fra Facebook";
     const title = trimText(rawTitle, 78);
-    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : message;
+    const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : effectiveText;
     const excerpt = trimText(
-        excerptSource || "Se siste oppdatering, bilder og meldinger fra Facebook-siden vår.",
+        excerptSource || "Se nyeste bilde og oppdatering direkte på Facebook-siden vår.",
         180
     );
 
@@ -267,8 +276,8 @@ export default async function handler(req, res) {
         }));
         const filteredItems = items.filter(item => item && (item.link || item.title || item.excerpt));
 
-        // Cache-Control header: Cache at the Edge for 10 minutes, serve stale up to 5 mins while revalidating
-        res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=300');
+        // Cache-Control header: Cache at the Edge for 60 seconds, serve stale up to 30s while revalidating
+        res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
         res.status(200).json({
             ok: true,
             pageUrl: pageUrl,
