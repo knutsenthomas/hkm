@@ -6173,7 +6173,7 @@ class NewsletterBuilder {
             showToast("Det oppstod en feil under utsendelsen. Vennligst prøv igjen.");
             const finalBtn = document.getElementById('final-send-btn');
             finalBtn.disabled = false;
-            finalBtn.innerHTML = 'Gå til utsendelse';
+            finalBtn.innerHTML = '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
         }
     }
 
