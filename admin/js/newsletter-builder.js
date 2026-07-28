@@ -6858,24 +6858,43 @@ class NewsletterBuilder {
         }
     }
 
-    loadLabels() {
+    async loadLabels() {
         const container = document.getElementById('labels-list');
         if (!container) return;
 
-        const baseLabels = ['Medlem', 'Frivillig', 'Lovsang', 'Giver', 'Abonnent', 'Leder', 'Ny'];
-        const labels = [...baseLabels, ...(this.customLabels || [])];
-
-        let html = `
-            <div style="padding: 10px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 8px;">
-                <input type="text" id="new-label-name" placeholder="Ny etikett..." style="flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
-                <button onclick="builder.addNewLabel()" style="padding: 6px 10px; background: var(--accent-orange); color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
+        container.innerHTML = `
+            <div style="padding: 12px; text-align: center; color: #64748b; font-size: 13px;">
+                <span class="material-symbols-outlined rotating" style="font-size: 16px;">sync</span> Henter etiketter fra databasen...
             </div>
         `;
 
-        html += labels.map(label => `
-            <div class="manual-user-item" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #f1f5f9;">
+        const subscribers = await this.fetchSubscribersList({ onlyNewsletterSubscribers: false });
+        const dbTags = new Set();
+        subscribers.forEach(sub => {
+            if (Array.isArray(sub.tags)) {
+                sub.tags.forEach(t => { if (t) dbTags.add(String(t).trim()); });
+            }
+        });
+
+        const defaultLabels = ['Engelsk', 'Norsk', 'Medlem', 'Frivillig', 'Lovsang', 'Giver', 'Abonnent', 'Leder', 'Ny'];
+        defaultLabels.forEach(l => dbTags.add(l));
+        if (Array.isArray(this.customLabels)) {
+            this.customLabels.forEach(l => dbTags.add(l));
+        }
+
+        const labelsList = Array.from(dbTags).sort();
+
+        let html = `
+            <div style="padding: 10px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 8px;">
+                <input type="text" id="new-label-name" placeholder="Ny etikett..." style="flex: 1; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+                <button onclick="builder.addNewLabel()" style="padding: 6px 12px; background: var(--accent-orange, #1B4965); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">+</button>
+            </div>
+        `;
+
+        html += labelsList.map(label => `
+            <div class="manual-user-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 1px solid #f1f5f9;">
                 <input type="checkbox" value="${label}" ${this.selectedLabels.has(label) ? 'checked' : ''} onchange="builder.handleLabelToggle('${label}', this.checked)">
-                <div style="font-size: 13px; font-weight: 700;">${label}</div>
+                <div style="font-size: 13px; font-weight: 600; color: #1e293b;">${label}</div>
             </div>
         `).join('');
 
