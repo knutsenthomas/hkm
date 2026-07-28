@@ -22,6 +22,7 @@
   ],
   "rewrites": [
     { "source": "/__/auth/:path*", "destination": "https://his-kingdom-ministry.firebaseapp.com/__/auth/:path*" },
+    { "source": "/api/newsletter-unsubscribe", "destination": "https://us-central1-his-kingdom-ministry.cloudfunctions.net/unsubscribeNewsletter" },
     { "source": "/api/bible/:path*", "destination": "/api/bible" },
     { "source": "/kurs", "destination": "/api/share-preview?type=course&lang=no" },
     { "source": "/kurs.html", "destination": "/api/share-preview?type=course&lang=no" },
@@ -48,7 +49,8 @@
     { "source": "/es/detalles-evento", "destination": "/api/share-preview?type=event&lang=es" },
     { "source": "/es/detalles-evento.html", "destination": "/api/share-preview?type=event&lang=es" },
     { "source": "/en/blog", "destination": "/en/blog.html" },
-    { "source": "/es/blog", "destination": "/es/blog.html" }
+    { "source": "/es/blog", "destination": "/es/blog.html" },
+    { "source": "/avmeld", "destination": "/avmeld.html" }
   ],
   "functions": {
     "api/share-preview.js": {
@@ -56,4 +58,3 @@
     }
   }
 }
-
