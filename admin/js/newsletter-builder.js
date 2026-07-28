@@ -467,8 +467,13 @@ class NewsletterBuilder {
 
         // Block Tool Clicks, Drag and Drop, & Hover Previews Setup
         document.querySelectorAll('.element-card, .block-card-item').forEach(btn => {
-            btn.setAttribute('draggable', 'true');
+            const canDrag = !this.isMobileViewport() && window.matchMedia('(pointer: fine)').matches;
+            btn.setAttribute('draggable', String(canDrag));
             btn.addEventListener('dragstart', (e) => {
+                if (!canDrag) {
+                    e.preventDefault();
+                    return;
+                }
                 this.isDragging = true;
                 e.dataTransfer.setData('hkm-block-type', btn.dataset.type);
                 btn.style.opacity = '0.5';
@@ -482,22 +487,7 @@ class NewsletterBuilder {
             btn.addEventListener('mousedown', () => {
                 this.saveSelection();
             });
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const type = btn.dataset.type || btn.getAttribute('data-type');
-                this.hideElementHoverPreview();
-                if (type === 'ai_text') {
-                    this.showAiTextPrompt();
-                } else if (type === 'ai_image') {
-                    this.showAiImagePrompt();
-                } else if (type) {
-                    this.addBlock(type);
-                }
-                if (this.isMobileViewport()) {
-                    this.closeToolsUi();
-                }
-            });
+            btn.onclick = (e) => this.handleElementCardActivation(e, btn);
         });
 
         // Global listeners to clean up sticky hover previews in all edge cases
@@ -1200,6 +1190,52 @@ class NewsletterBuilder {
                 this.savedRange = range;
             }
         }
+    }
+
+    handleElementCardActivation(event, card) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const type = card?.dataset?.type || card?.getAttribute?.('data-type');
+        if (!type) return;
+
+        this.hideElementHoverPreview();
+
+        // The mobile element drawer sits above both the canvas and insertion
+        // dialogs. Close it before inserting so the result is immediately
+        // visible and modal-based blocks do not open behind the drawer.
+        if (this.isMobileViewport()) {
+            this.closeMobileDrawers();
+            this.closeToolsUi();
+        }
+
+        if (type === 'ai_text') {
+            this.showAiTextPrompt();
+        } else if (type === 'ai_image') {
+            this.showAiImagePrompt();
+        } else {
+            this.addBlock(type);
+        }
+    }
+
+    mountEditorModal(modal, ariaLabel) {
+        if (!modal) return null;
+
+        this.toggleMode('builder');
+        this.switchSidebarView('builder');
+        this.closeMobileDrawers();
+        this.closeToolsUi();
+
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        if (ariaLabel) modal.setAttribute('aria-label', ariaLabel);
+        modal.style.setProperty('z-index', '200000', 'important');
+
+        const editorRoot = document.getElementById('newsletter-builder-layout') || document.body;
+        editorRoot.appendChild(modal);
+        return modal;
     }
 
     restoreSelection() {
@@ -2093,7 +2129,7 @@ class NewsletterBuilder {
         `;
         
         modal.appendChild(card);
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, 'Sett inn bilde');
         
         // Trigger scale animation
         setTimeout(() => { card.style.transform = 'scale(1)'; }, 10);
@@ -2286,9 +2322,12 @@ class NewsletterBuilder {
         modal = document.createElement('div');
         modal.id = 'hkm-product-selector-modal';
         modal.className = 'profile-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Sett inn butikkprodukt');
         modal.style.cssText = `
             display: flex;
-            z-index: 11000;
+            z-index: 200000;
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.6);
@@ -2365,7 +2404,7 @@ class NewsletterBuilder {
             </div>
         `;
 
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, 'Sett inn butikkprodukt');
 
         const closeBtn = document.getElementById('hkm-product-modal-close');
         const cancelBtn = document.getElementById('hkm-product-modal-cancel');
@@ -2383,6 +2422,7 @@ class NewsletterBuilder {
         modal.onclick = (e) => {
             if (e.target === modal) closeModal();
         };
+        searchInput?.focus();
 
         const escapeHtml = (str) => {
             if (!str) return '';
@@ -2603,13 +2643,21 @@ class NewsletterBuilder {
             }
 
             try {
-                const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products');
-                const data = await res.json();
-                if (data.success && Array.isArray(data.products) && data.products.length > 0) {
-                    window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
-                    productsList = window.hkmWixProductsCache;
-                    renderProducts();
-                    return;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                try {
+                    const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-products', {
+                        signal: controller.signal
+                    });
+                    const data = await res.json();
+                    if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+                        window.hkmWixProductsCache = data.products.sort((a, b) => a.name.localeCompare(b.name));
+                        productsList = window.hkmWixProductsCache;
+                        renderProducts();
+                        return;
+                    }
+                } finally {
+                    clearTimeout(timeoutId);
                 }
             } catch (err) {
                 console.warn("Could not fetch live Wix products, trying Firestore fallback...", err);
@@ -2732,7 +2780,7 @@ class NewsletterBuilder {
             </div>
         `;
 
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, 'Sett inn arrangement');
 
         const closeBtn = document.getElementById('hkm-event-modal-close');
         const cancelBtn = document.getElementById('hkm-event-modal-cancel');
@@ -3133,7 +3181,7 @@ class NewsletterBuilder {
             </div>
         `;
 
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, 'Sett inn knapp');
 
         const closeBtn = document.getElementById('hkm-btn-modal-close');
         const cancelBtn = document.getElementById('hkm-btn-modal-cancel');
@@ -3320,7 +3368,7 @@ class NewsletterBuilder {
             </div>
         `;
 
-        document.body.appendChild(modal);
+        this.mountEditorModal(modal, isEditing ? 'Endre sosiale medier' : 'Sett inn sosiale medier');
 
         let selectedStyle = initialStyle;
         const styleBtns = modal.querySelectorAll('.hkm-style-btn');
