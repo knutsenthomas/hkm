@@ -7777,7 +7777,8 @@ class NewsletterBuilder {
             }).join('');
         }
 
-        const followUsText = this.currentEditorLang === 'en' ? 'Follow us' : 'Følg oss';
+        const isEng = lang === 'en' || this.currentEditorLang === 'en';
+        const followUsText = isEng ? 'Follow us' : 'Følg oss';
         const headingMarkup = selectedStyle === 'tiles'
             ? `<p style="margin: 0 0 14px 0; color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 20px; line-height: 1.3; font-weight: 800; text-align: center;">${followUsText}</p>`
             : '';
@@ -7796,12 +7797,28 @@ class NewsletterBuilder {
         `;
     }
 
-    compileEmailHtml() {
-        const blocksContainer = document.getElementById('blocks-container');
-        if (!blocksContainer) return '';
+    compileEmailHtml(lang = 'no') {
+        const isEnglish = lang === 'en';
+        let contentClone;
 
-        const contentClone = blocksContainer.cloneNode(true);
-        this.inlineHeadingStylesForEmail(blocksContainer, contentClone);
+        if (isEnglish) {
+            const tempDiv = document.createElement('div');
+            const englishBlocks = this.englishPayload?.blocksEn;
+            if (englishBlocks && englishBlocks.length) {
+                tempDiv.innerHTML = this.getLanguageBlocksHtml(englishBlocks);
+            } else if (this.englishPayload?.htmlEn) {
+                tempDiv.innerHTML = this.englishPayload.htmlEn;
+            } else {
+                const mainContainer = document.getElementById('blocks-container');
+                tempDiv.innerHTML = mainContainer ? mainContainer.innerHTML : '';
+            }
+            contentClone = tempDiv;
+        } else {
+            const blocksContainer = document.getElementById('blocks-container');
+            if (!blocksContainer) return '';
+            contentClone = blocksContainer.cloneNode(true);
+            this.inlineHeadingStylesForEmail(blocksContainer, contentClone);
+        }
 
         // Remove editor UI controls, quick toolbars, buttons, overlays, and drag handles
         contentClone.querySelectorAll(`
@@ -7843,7 +7860,7 @@ class NewsletterBuilder {
             img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
         });
 
-        // Convert blockquotes and quote blocks to bulletproof email tables with inline styles for Gmail, Outlook, and Apple Mail
+        // Convert blockquotes and quote blocks to bulletproof email tables
         contentClone.querySelectorAll('blockquote, .block-quote, .quote-block, [data-type="quote"], .sitat').forEach(bq => {
             const innerContent = bq.innerHTML;
             const tableQuote = `
@@ -7889,7 +7906,7 @@ class NewsletterBuilder {
                       <td style="vertical-align: top;">
                         <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; font-family: Arial, sans-serif;"><a href="${linkHref}" target="_blank" style="color: #1B4965; text-decoration: none;">${title}</a></h4>
                         <p style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: #d17d39; font-family: Arial, sans-serif;">${price}</p>
-                        <a href="${linkHref}" target="_blank" style="display: inline-block; background-color: #d17d39; color: #ffffff !important; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; font-family: Arial, sans-serif;">Se produkt</a>
+                        <a href="${linkHref}" target="_blank" style="display: inline-block; background-color: #d17d39; color: #ffffff !important; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; font-family: Arial, sans-serif;">${isEnglish ? 'View Product' : 'Se produkt'}</a>
                       </td>
                     </tr>
                   </table>
@@ -7900,12 +7917,20 @@ class NewsletterBuilder {
         });
 
         // Inline SVG and flexbox are removed or rearranged by several email
-        // clients. Convert social banners to table-based, text-icon markup.
+        // clients. Convert social banners to table-based text-icon markup.
         contentClone.querySelectorAll('.newsletter-social-block').forEach(block => {
-            block.outerHTML = this.compileSocialBlockForEmail(block);
+            block.outerHTML = this.compileSocialBlockForEmail(block, lang);
         });
 
-        const bodyHtml = contentClone.innerHTML;
+        let bodyHtml = contentClone.innerHTML;
+
+        if (isEnglish) {
+            bodyHtml = bodyHtml
+                .replace(/>\s*Følg oss\s*</gi, '>Follow us<')
+                .replace(/Følg oss/g, 'Follow us')
+                .replace(/Meld deg av nyhetsbrev/g, 'Unsubscribe from newsletter')
+                .replace(/Abonner på vårt nyhetsbrev/g, 'Subscribe to our newsletter');
+        }
 
         return `<!DOCTYPE html>
 <html lang="no" xmlns="http://www.w3.org/1999/xhtml">
@@ -8535,15 +8560,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
 
             // 2. Prepare Norwegian & English HTML compiled bodies
-            const norwegianHtml = this.currentEditorLang === 'no'
-                ? this.compileEmailHtml()
-                : this.getLanguageBlocksHtml(this.blocks);
-
-            let englishHtml = '';
-            let subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
-            if (this.englishPayload?.blocksEn?.length) {
-                englishHtml = this.getLanguageBlocksHtml(this.englishPayload.blocksEn);
-            }
+            const norwegianHtml = this.compileEmailHtml('no');
+            const englishHtml = this.compileEmailHtml('en');
+            const subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
 
             // 3. Get Auth token for Cloud Function endpoint call
             const idToken = await user.getIdToken();
