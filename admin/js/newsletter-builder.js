@@ -8953,14 +8953,21 @@ class NewsletterBuilder {
                             dateStr = d.toLocaleDateString('no');
                         } catch(e) {}
                     }
+                    const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (Array.isArray(data.labels) ? data.labels : []));
+                    const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : (data.segment ? [data.segment] : ['Kontaktliste (CRM)']));
+                    const phone = data.phone || data.mobile || data.tlf || '';
+
                     subscribersMap.set(email, {
                         id: doc.id,
                         collection: 'contacts',
                         name,
                         email,
+                        phone,
                         source: 'Kontaktliste (CRM)',
                         status: data.status || 'Aktiv',
-                        dateStr
+                        dateStr,
+                        tags,
+                        segments
                     });
                 });
             } catch (err) {
@@ -8987,14 +8994,21 @@ class NewsletterBuilder {
                                 dateStr = d.toLocaleDateString('no');
                             } catch(e) {}
                         }
+                        const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+                        const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : [data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Nyhetsbrev')]);
+                        const phone = data.phone || data.mobile || '';
+
                         subscribersMap.set(email, {
                             id: doc.id,
                             collection: 'newsletter_subscriptions',
                             name,
                             email,
+                            phone,
                             source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
                             status: data.status || 'Aktiv',
-                            dateStr
+                            dateStr,
+                            tags,
+                            segments
                         });
                     }
                 });
@@ -9022,14 +9036,21 @@ class NewsletterBuilder {
                                 dateStr = d.toLocaleDateString('no');
                             } catch(e) {}
                         }
+                        const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+                        const segments = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : ['Brukerkonto']);
+                        const phone = data.phone || data.phoneNumber || '';
+
                         subscribersMap.set(email, {
                             id: doc.id,
                             collection: 'users',
                             name,
                             email,
+                            phone,
                             source: 'Brukerkonto',
                             status: 'Aktiv',
-                            dateStr
+                            dateStr,
+                            tags,
+                            segments
                         });
                     }
                 });
@@ -9043,9 +9064,12 @@ class NewsletterBuilder {
                     id: 'admin_thomas',
                     name: 'Thomas Knutsen',
                     email: 'thomas@hiskingdomministry.no',
+                    phone: '',
                     source: 'Administrator',
                     status: 'Aktiv',
-                    dateStr: new Date().toLocaleDateString('no')
+                    dateStr: new Date().toLocaleDateString('no'),
+                    tags: ['Leder', 'Admin'],
+                    segments: ['Nyhetsbrev', 'Administrator']
                 });
             }
             if (!subscribersMap.has('post@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('post@hiskingdomministry.no')) {
@@ -9053,9 +9077,12 @@ class NewsletterBuilder {
                     id: 'admin_hkm',
                     name: 'HKM Medlem',
                     email: 'post@hiskingdomministry.no',
+                    phone: '',
                     source: 'Administrator',
                     status: 'Aktiv',
-                    dateStr: new Date().toLocaleDateString('no')
+                    dateStr: new Date().toLocaleDateString('no'),
+                    tags: ['Admin'],
+                    segments: ['Nyhetsbrev', 'Administrator']
                 });
             }
 
@@ -9071,32 +9098,79 @@ class NewsletterBuilder {
             const statSub = document.getElementById('stat-subscribers-val');
             if (statSub) statSub.textContent = subscribersList.length;
 
+            // Populate unique tags dropdown
+            const allUniqueTags = new Set();
+            subscribersList.forEach(s => (s.tags || []).forEach(t => allUniqueTags.add(t)));
+            const tagFilterSelect = document.getElementById('subscriber-tag-filter');
+            if (tagFilterSelect) {
+                const curVal = tagFilterSelect.value;
+                tagFilterSelect.innerHTML = `<option value="">Alle etiketter / tags</option>`;
+                Array.from(allUniqueTags).sort().forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    tagFilterSelect.appendChild(opt);
+                });
+                if (curVal) tagFilterSelect.value = curVal;
+            }
+
             tbody.innerHTML = '';
             const searchInput = document.getElementById('subscriber-search-input');
-            const renderRows = (query = '') => {
-                const q = query.trim().toLowerCase();
-                const filtered = q ? subscribersList.filter(s => (s.name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q)) : subscribersList;
+            const segmentFilterSelect = document.getElementById('subscriber-segment-filter');
+
+            const renderRows = () => {
+                const q = (searchInput?.value || '').trim().toLowerCase();
+                const seg = (segmentFilterSelect?.value || '').trim().toLowerCase();
+                const tag = (tagFilterSelect?.value || '').trim().toLowerCase();
+
+                const filtered = subscribersList.filter(s => {
+                    const matchesQ = !q
+                        || (s.name || '').toLowerCase().includes(q)
+                        || (s.email || '').toLowerCase().includes(q)
+                        || (s.phone || '').toLowerCase().includes(q)
+                        || (s.tags || []).some(t => t.toLowerCase().includes(q))
+                        || (s.segments || []).some(sg => sg.toLowerCase().includes(q));
+                    const matchesSeg = !seg
+                        || (s.source || '').toLowerCase().includes(seg)
+                        || (s.segments || []).some(sg => sg.toLowerCase().includes(seg));
+                    const matchesTag = !tag
+                        || (s.tags || []).some(t => t.toLowerCase() === tag);
+
+                    return matchesQ && matchesSeg && matchesTag;
+                });
 
                 tbody.innerHTML = '';
                 if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">Ingen abonnenter samsvarte med søket.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">Ingen abonnenter samsvarte med de valgte filtrene.</td></tr>`;
                     return;
                 }
 
                 filtered.forEach(sub => {
                     const tr = document.createElement('tr');
+                    const tagsHtml = (sub.tags && sub.tags.length > 0)
+                        ? sub.tags.map(t => `<span style="font-size: 11px; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${t}</span>`).join('')
+                        : `<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Ingen</span>`;
+                    
+                    const segmentsHtml = (sub.segments && sub.segments.length > 0)
+                        ? sub.segments.map(sg => `<span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${sg}</span>`).join('')
+                        : `<span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span>`;
+
                     tr.innerHTML = `
-                        <td><strong>${sub.name}</strong></td>
+                        <td>
+                            <strong>${sub.name}</strong>
+                            ${sub.phone ? `<div style="font-size: 11px; color: #64748b;">📞 ${sub.phone}</div>` : ''}
+                        </td>
                         <td>${sub.email}</td>
-                        <td><span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span></td>
-                        <td><span class="badge-status-active">Aktiv</span></td>
+                        <td>${segmentsHtml}</td>
+                        <td>${tagsHtml}</td>
+                        <td><span class="${sub.status === 'Avmeldt' || sub.status === 'Inaktiv' ? 'badge-status-inactive' : 'badge-status-active'}">${sub.status || 'Aktiv'}</span></td>
                         <td>${sub.dateStr}</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 4px;">
                                 <button type="button" class="btn-edit-sub" data-email="${sub.email}" title="Rediger abonnent" style="background: none; border: none; color: #2563eb; cursor: pointer; padding: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
                                 </button>
-                                <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
+                                <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett/avmeld abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
                                     <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
                                 </button>
                             </div>
@@ -9150,16 +9224,15 @@ class NewsletterBuilder {
 
             renderRows();
 
-            if (searchInput) {
-                searchInput.value = '';
-                searchInput.oninput = (e) => renderRows(e.target.value);
-            }
+            if (searchInput) searchInput.oninput = () => renderRows();
+            if (segmentFilterSelect) segmentFilterSelect.onchange = () => renderRows();
+            if (tagFilterSelect) tagFilterSelect.onchange = () => renderRows();
 
         } catch (e) {
             console.error("Load subscribers failed:", e);
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 24px; color: #ef4444;">
+                    <td colspan="7" style="text-align: center; padding: 24px; color: #ef4444;">
                         Kunne ikke laste abonnenter.
                     </td>
                 </tr>
@@ -9171,46 +9244,116 @@ class NewsletterBuilder {
         const modal = document.createElement('div');
         modal.className = 'profile-modal';
         modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
+        
+        const currentSegments = sub.segments || [];
+        const currentTagsStr = (sub.tags || []).join(', ');
+
         modal.innerHTML = `
-            <div style="background: #ffffff; width: 90%; max-width: 440px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Rediger abonnent</h3>
-                <div style="margin-bottom: 14px;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Navn</label>
-                    <input type="text" id="edit-sub-name" value="${sub.name || ''}" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            <div style="background: #ffffff; width: 90%; max-width: 520px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Rediger abonnent</h3>
+                    <button type="button" id="close-edit-sub" style="background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
                 </div>
-                <div style="margin-bottom: 20px;">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Fullt navn</label>
+                        <input type="text" id="edit-sub-name" value="${sub.name || ''}" placeholder="Ola Nordmann" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Telefonnummer</label>
+                        <input type="tel" id="edit-sub-phone" value="${sub.phone || ''}" placeholder="+47 900 00 000" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">E-postadresse *</label>
                     <input type="email" id="edit-sub-email" value="${sub.email || ''}" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
                 </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" id="cancel-edit-sub" style="padding: 9px 18px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 10px; font-weight: 600; cursor: pointer;">Avbryt</button>
-                    <button type="button" id="save-edit-sub" style="padding: 9px 18px; border: none; background: #1B4965; color: #ffffff; border-radius: 10px; font-weight: 600; cursor: pointer;">Lagre endringer</button>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
+                            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" class="edit-sub-seg-cb" value="${seg}" ${currentSegments.includes(seg) ? 'checked' : ''}>
+                                ${seg}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Etiketter / Tags (kommaseparert)</label>
+                    <input type="text" id="edit-sub-tags" value="${currentTagsStr}" placeholder="F.eks. Lovsang, Bibelstudium, VIP" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-size: 11px; color: #64748b;">Hurtigvalg:</span>
+                        ${['Lovsang', 'Fastgiver', 'Frivillig', 'Bibelstudium', 'VIP'].map(tag => `
+                            <button type="button" class="btn-quick-tag" data-tag="${tag}" style="font-size: 11px; background: #e0e7ff; color: #3730a3; border: none; padding: 3px 8px; border-radius: 12px; cursor: pointer;">+ ${tag}</button>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <button type="button" id="cancel-edit-sub" style="padding: 10px 20px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 12px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-edit-sub" style="padding: 10px 22px; border: none; background: #1B4965; color: #ffffff; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">Lagre endringer</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
 
+        modal.querySelectorAll('.btn-quick-tag').forEach(btn => {
+            btn.onclick = () => {
+                const tag = btn.dataset.tag;
+                const input = modal.querySelector('#edit-sub-tags');
+                const curTags = input.value.split(',').map(t => t.trim()).filter(Boolean);
+                if (!curTags.includes(tag)) {
+                    curTags.push(tag);
+                    input.value = curTags.join(', ');
+                }
+            };
+        });
+
+        modal.querySelector('#close-edit-sub').onclick = () => modal.remove();
         modal.querySelector('#cancel-edit-sub').onclick = () => modal.remove();
+
         modal.querySelector('#save-edit-sub').onclick = async () => {
             const newName = modal.querySelector('#edit-sub-name').value.trim();
             const newEmail = modal.querySelector('#edit-sub-email').value.trim().toLowerCase();
+            const newPhone = modal.querySelector('#edit-sub-phone').value.trim();
+            const newTags = modal.querySelector('#edit-sub-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+            const newSegments = Array.from(modal.querySelectorAll('.edit-sub-seg-cb:checked')).map(cb => cb.value);
+
             if (!newEmail || !newEmail.includes('@')) {
                 if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
                 return;
             }
             modal.remove();
+
             try {
                 const oldEmail = sub.email;
+                const updatePayload = {
+                    name: newName,
+                    firstName: newName ? newName.split(' ')[0] : newEmail.split('@')[0],
+                    lastName: newName && newName.split(' ').length > 1 ? newName.split(' ').slice(1).join(' ') : '',
+                    email: newEmail,
+                    phone: newPhone,
+                    tags: newTags,
+                    segments: newSegments
+                };
+
                 const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', oldEmail).get();
-                contactDocs.forEach(d => d.ref.update({ name: newName, firstName: newName.split(' ')[0], email: newEmail }));
+                contactDocs.forEach(d => d.ref.update(updatePayload));
 
                 const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', oldEmail).get();
-                subDocs.forEach(d => d.ref.update({ name: newName, email: newEmail }));
+                subDocs.forEach(d => d.ref.update(updatePayload));
 
-                if (contactDocs.empty && subDocs.empty) {
+                const userDocs = await window.firebaseService.db.collection('users').where('email', '==', oldEmail).get();
+                userDocs.forEach(d => d.ref.update(updatePayload));
+
+                if (contactDocs.empty && subDocs.empty && userDocs.empty) {
                     await window.firebaseService.db.collection('contacts').add({
-                        name: newName || newEmail.split('@')[0],
-                        email: newEmail,
+                        ...updatePayload,
                         createdAt: new Date().toISOString(),
                         source: 'Redigert i Nyhetsbrev',
                         status: 'Aktiv'
@@ -9231,53 +9374,109 @@ class NewsletterBuilder {
         modal.className = 'profile-modal';
         modal.style.cssText = "display: flex; z-index: 11000; position: fixed; inset: 0; background: rgba(15,23,42,0.6); align-items: center; justify-content: center; backdrop-filter: blur(8px); font-family: 'Inter', sans-serif;";
         modal.innerHTML = `
-            <div style="background: #ffffff; width: 90%; max-width: 440px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
-                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #0f172a;">Legg til ny abonnent</h3>
-                <div style="margin-bottom: 14px;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Navn (valgfritt)</label>
-                    <input type="text" id="add-sub-name" placeholder="F.eks. Ola Nordmann" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            <div style="background: #ffffff; width: 90%; max-width: 520px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Legg til ny abonnent</h3>
+                    <button type="button" id="close-add-sub" style="background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
                 </div>
-                <div style="margin-bottom: 20px;">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Fullt navn (valgfritt)</label>
+                        <input type="text" id="add-sub-name" placeholder="F.eks. Ola Nordmann" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Telefonnummer (valgfritt)</label>
+                        <input type="tel" id="add-sub-phone" placeholder="+47 900 00 000" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">E-postadresse *</label>
                     <input type="email" id="add-sub-email" placeholder="epost@domene.no" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
                 </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" id="cancel-add-sub" style="padding: 9px 18px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 10px; font-weight: 600; cursor: pointer;">Avbryt</button>
-                    <button type="button" id="save-add-sub" style="padding: 9px 18px; border: none; background: #1B4965; color: #ffffff; border-radius: 10px; font-weight: 600; cursor: pointer;">Legg til abonnent</button>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Segmenter</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
+                            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" class="add-sub-seg-cb" value="${seg}" ${seg === 'Nyhetsbrev' ? 'checked' : ''}>
+                                ${seg}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Etiketter / Tags (kommaseparert)</label>
+                    <input type="text" id="add-sub-tags" placeholder="F.eks. Lovsang, Bibelstudium, VIP" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-size: 11px; color: #64748b;">Hurtigvalg:</span>
+                        ${['Lovsang', 'Fastgiver', 'Frivillig', 'Bibelstudium', 'VIP'].map(tag => `
+                            <button type="button" class="btn-add-quick-tag" data-tag="${tag}" style="font-size: 11px; background: #e0e7ff; color: #3730a3; border: none; padding: 3px 8px; border-radius: 12px; cursor: pointer;">+ ${tag}</button>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <button type="button" id="cancel-add-sub" style="padding: 10px 20px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 12px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-add-sub" style="padding: 10px 22px; border: none; background: #1B4965; color: #ffffff; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">Legg til abonnent</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
 
+        modal.querySelectorAll('.btn-add-quick-tag').forEach(btn => {
+            btn.onclick = () => {
+                const tag = btn.dataset.tag;
+                const input = modal.querySelector('#add-sub-tags');
+                const curTags = input.value.split(',').map(t => t.trim()).filter(Boolean);
+                if (!curTags.includes(tag)) {
+                    curTags.push(tag);
+                    input.value = curTags.join(', ');
+                }
+            };
+        });
+
+        modal.querySelector('#close-add-sub').onclick = () => modal.remove();
         modal.querySelector('#cancel-add-sub').onclick = () => modal.remove();
         modal.querySelector('#save-add-sub').onclick = async () => {
             const name = modal.querySelector('#add-sub-name').value.trim();
             const email = modal.querySelector('#add-sub-email').value.trim().toLowerCase();
+            const phone = modal.querySelector('#add-sub-phone').value.trim();
+            const tags = modal.querySelector('#add-sub-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+            const segments = Array.from(modal.querySelectorAll('.add-sub-seg-cb:checked')).map(cb => cb.value);
+
             if (!email || !email.includes('@')) {
                 if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
                 return;
             }
             modal.remove();
+
             try {
-                await window.firebaseService.db.collection('contacts').add({
+                const payload = {
                     name: name || email.split('@')[0],
                     firstName: name ? name.split(' ')[0] : email.split('@')[0],
                     lastName: name && name.split(' ').length > 1 ? name.split(' ').slice(1).join(' ') : '',
                     email: email,
+                    phone: phone,
+                    tags: tags,
+                    segments: segments,
                     createdAt: new Date().toISOString(),
                     source: 'Manuelt lagt til i Nyhetsbrev',
                     status: 'Aktiv',
                     newsletterUnsubscribed: false,
                     newsletterStatus: 'subscribed'
-                });
+                };
+
+                await window.firebaseService.db.collection('contacts').add(payload);
                 await window.firebaseService.db.collection('newsletter_subscriptions').add({
-                    name: name || email.split('@')[0],
-                    email: email,
+                    ...payload,
                     subscribedAt: new Date().toISOString(),
-                    source: 'Direkte lagt til',
-                    status: 'Aktiv',
                     isSubscribed: true
                 });
+
                 if (typeof showToast === 'function') showToast(`Abonnent ${email} ble lagt til!`, "success");
                 this.loadSubscribers();
             } catch(e) {

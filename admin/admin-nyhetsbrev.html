@@ -1629,11 +1629,26 @@
                         <span class="material-symbols-outlined">person_add</span>
                         <span>Legg til abonnent</span>
                 </div>
-                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; margin-top: 16px;">
-                    <div style="position: relative; flex: 1; max-width: 380px;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; margin-top: 16px;">
+                    <div style="position: relative; flex: 1; min-width: 240px; max-width: 340px;">
                         <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px;">search</span>
-                        <input type="text" id="subscriber-search-input" placeholder="Søk etter navn eller e-postadresse..." style="width: 100%; padding: 9px 12px 9px 40px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                        <input type="text" id="subscriber-search-input" placeholder="Søk etter navn eller e-post..." style="width: 100%; padding: 9px 12px 9px 40px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; box-sizing: border-box; font-family: 'Inter', sans-serif;">
                     </div>
+                    
+                    <select id="subscriber-segment-filter" style="padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; color: #334155; background: #ffffff; outline: none; font-family: 'Inter', sans-serif; cursor: pointer;">
+                        <option value="">Alle segmenter</option>
+                        <option value="Nyhetsbrev">Nyhetsbrev</option>
+                        <option value="Kontaktliste (CRM)">Kontaktliste (CRM)</option>
+                        <option value="Nettsted">Nettsted</option>
+                        <option value="Brukerkonto">Brukerkontoer</option>
+                        <option value="Fastgiver">Fastgivere</option>
+                        <option value="Frivillig">Frivillige</option>
+                        <option value="Leder">Ledere</option>
+                    </select>
+
+                    <select id="subscriber-tag-filter" style="padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; color: #334155; background: #ffffff; outline: none; font-family: 'Inter', sans-serif; cursor: pointer;">
+                        <option value="">Alle etiketter / tags</option>
+                    </select>
                 </div>
                 <div class="subview-table-wrapper">
                     <table class="subview-table">
@@ -1641,9 +1656,10 @@
                             <tr>
                                 <th>Navn</th>
                                 <th>E-postadresse</th>
-                                <th>Kilde</th>
+                                <th>Kilde / Segmenter</th>
+                                <th>Etiketter (Tags)</th>
                                 <th>Status</th>
-                                <th>Dato lagt til</th>
+                                <th>Dato</th>
                                 <th>Handling</th>
                             </tr>
                         </thead>
