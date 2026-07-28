@@ -24,20 +24,21 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Skjul profilbilde / ikon på mobil og små skjermer */
+/* Skjul profilbilde / ikon i topplinjen på mobil og små skjermer (<1025px) */
 @media (max-width: 1024px) {
     .profile-btn,
-    .user-profile-link,
-    #admin-profile-trigger,
-    .user-avatar,
-    #admin-avatar,
-    #ph-avatar,
-    .user-avatar-sm,
-    .user-entity-avatar,
-    #header-profile-link,
-    #header-profile-img,
-    .header-profile-avatar {
+    #header #header-profile-link,
+    .site-header #header-profile-link,
+    .site-header .user-profile-link,
+    .main-header .user-profile-link,
+    #header-profile-link {
         display: none !important;
+    }
+
+    /* Bevar profilbilde / ikon inne i megamenyen på mobil */
+    #mega-menu #mobile-menu-profile-link,
+    .mega-menu-header #mobile-menu-profile-link {
+        display: flex !important;
     }
 }
 

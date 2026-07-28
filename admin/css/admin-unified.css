@@ -5592,18 +5592,17 @@ body.builder-active .main-header [id="admin-avatar"].has-initials {
   body.minside-body .main-header .user-profile-link,
   body.crm-body .main-header .user-profile-link,
   body.builder-active .main-header .user-profile-link,
-  .user-profile-link,
-  #admin-profile-trigger,
-  .user-avatar,
-  #admin-avatar,
-  #ph-avatar,
-  .user-avatar-sm,
-  .user-entity-avatar,
+  #header #header-profile-link,
+  .site-header #header-profile-link,
   #header-profile-link,
-  #header-profile-img,
-  .header-profile-avatar,
   .profile-btn {
     display: none !important;
+  }
+
+  /* Tillat profil-lenken inne i megamenyen på mobil */
+  #mega-menu #mobile-menu-profile-link,
+  .mega-menu-header #mobile-menu-profile-link {
+    display: flex !important;
   }
 }
 /* Global Search Box Fix for icon overlap */
