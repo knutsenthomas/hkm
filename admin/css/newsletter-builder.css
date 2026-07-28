@@ -7604,7 +7604,7 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 
 /* Mobile side panel header */
 .mobile-panel-header {
-    display: none;
+    display: none !important;
 }
 
 @media (max-width: 991px) {
@@ -7624,18 +7624,23 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         color: #1e293b !important;
     }
 
+    .btn-close-mobile-panel,
     .mobile-panel-header .btn-close-mobile-panel {
-        border: none !important;
-        background: #f1f5f9 !important;
-        border-radius: 8px !important;
-        width: 32px !important;
-        height: 32px !important;
-        display: flex !important;
+        display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        border-radius: 10px !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
         cursor: pointer !important;
-        color: #475569 !important;
+        color: #334155 !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
     }
+}
 
     /* Elementer Panel converts into a slide-out left side menu on mobile */
     #builder-main-workspace .builder-elements-panel {
