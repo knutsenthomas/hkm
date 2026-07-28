@@ -377,6 +377,17 @@ class NewsletterBuilder {
     setupEventListeners() {
         this.setupToolsFab();
 
+        // Left Dark Sidebar Nav Item Click Handlers
+        document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const view = item.dataset.view;
+                if (view) {
+                    e.preventDefault();
+                    this.switchSidebarView(view);
+                }
+            });
+        });
+
         // Selection listener for Notion-style bubble
         document.addEventListener('selectionchange', () => {
             this.handleTextSelection();
@@ -7220,6 +7231,40 @@ ${cleanCanvasHtml}
             localStorage.setItem('hkm_builder_active_view', viewName);
             localStorage.setItem('hkm_builder_active_mode', 'builder');
         } catch(e) {}
+
+        // Hide recipients drawer if open
+        if (this.isRecipientsDrawerOpen) {
+            this.isRecipientsDrawerOpen = false;
+            document.body.classList.remove('builder-recipients-open');
+            const drawer = document.getElementById('recipients-drawer');
+            if (drawer) {
+                drawer.style.setProperty('display', 'none', 'important');
+                drawer.classList.remove('open');
+            }
+            const continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Velg mottakere</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
+            }
+        }
+        const recipientsDrawer = document.getElementById('recipients-drawer');
+        if (recipientsDrawer) recipientsDrawer.style.setProperty('display', 'none', 'important');
+
+        // Restore canvas and inspector elements if they were hidden
+        const canvasContainer = document.getElementById('canvas-container');
+        const leftSidebar = document.getElementById('elements-panel') || document.querySelector('.builder-elements-panel');
+        const rightInspector = document.querySelector('.builder-properties-panel');
+        const centerToolbarCell = document.querySelector('.toolbar-center-cell');
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        const previewBtn = document.getElementById('preview-btn');
+        const leftToolbarTitle = document.getElementById('sidebar-title');
+
+        if (canvasContainer) canvasContainer.style.removeProperty('display');
+        if (leftSidebar) leftSidebar.style.removeProperty('display');
+        if (rightInspector) rightInspector.style.removeProperty('display');
+        if (centerToolbarCell) centerToolbarCell.style.removeProperty('display');
+        if (saveDraftBtn) saveDraftBtn.style.removeProperty('display');
+        if (previewBtn) previewBtn.style.removeProperty('display');
+        if (leftToolbarTitle) leftToolbarTitle.textContent = 'Elementer';
 
         // 1. Update active class on left nav links
         document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
