@@ -1910,6 +1910,7 @@ class NewsletterBuilder {
         `;
         
         card.innerHTML = `
+            <input type="file" id="hkm-modal-file-input" accept="image/*" style="display:none;" />
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h3 style="margin:0; font-size:18px; font-weight:800; color:#1e293b;">Sett inn bilde</h3>
                 <button type="button" id="hkm-close-img-modal" class="material-symbols-outlined" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; padding:4px; border-radius:50%; transition:background 0.2s;">close</button>
@@ -1975,6 +1976,7 @@ class NewsletterBuilder {
         const uploadBtn = modal.querySelector('#hkm-img-source-upload');
         const unsplashBtn = modal.querySelector('#hkm-img-source-unsplash');
         const urlBtn = modal.querySelector('#hkm-img-source-url');
+        const fileInput = modal.querySelector('#hkm-modal-file-input');
         
         uploadBtn.onmouseenter = () => { uploadBtn.style.borderColor = '#d17d39'; uploadBtn.style.background = '#fffbeb'; };
         uploadBtn.onmouseleave = () => { uploadBtn.style.borderColor = '#cbd5e1'; uploadBtn.style.background = '#f8fafc'; };
@@ -1987,27 +1989,18 @@ class NewsletterBuilder {
         
         // Handle device upload click
         uploadBtn.addEventListener('click', () => {
-            closeModal();
-            let fileInput = document.getElementById('block-image-upload');
-            if (!fileInput) {
-                fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.id = 'block-image-upload';
-                fileInput.accept = 'image/*';
-                fileInput.style.display = 'none';
-                document.body.appendChild(fileInput);
-            }
-            const newFileInput = fileInput.cloneNode(true);
-            fileInput.parentNode.replaceChild(newFileInput, fileInput);
-            
-            newFileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
+            if (fileInput) fileInput.click();
+        });
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
                 if (file) {
+                    closeModal();
                     this.uploadAndInsertImageFileAt(file, afterElement);
                 }
             });
-            newFileInput.click();
-        });
+        }
         
         // Handle Unsplash search option click
         unsplashBtn.addEventListener('click', () => {
@@ -2015,24 +2008,9 @@ class NewsletterBuilder {
             if (window.unsplashManager) {
                 window.unsplashManager.open((selection) => {
                     if (selection && selection.url) {
-                        const imgHtml = `<p><img src="${selection.url}" alt="${selection.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
-                        const temp = document.createElement('div');
-                        temp.innerHTML = imgHtml;
-                        const container = document.getElementById('blocks-container');
-                        if (container) {
-                            if (afterElement) {
-                                while (temp.firstChild) {
-                                    container.insertBefore(temp.firstChild, afterElement);
-                                }
-                            } else {
-                                while (temp.firstChild) {
-                                    container.appendChild(temp.firstChild);
-                                }
-                            }
-                            this.syncUnifiedBlocks();
-                            this.triggerAutosave();
-                            showToast("Bilde satt inn fra Unsplash!", "success");
-                        }
+                        const imgHtml = `<p><img src="${selection.url}" alt="${escapeHtml(selection.alt || '')}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
+                        this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
+                        showToast("Bilde satt inn fra Unsplash!", "success");
                     }
                 });
             } else {
@@ -2055,23 +2033,8 @@ class NewsletterBuilder {
                 return;
             }
             
-            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
-            const temp = document.createElement('div');
-            temp.innerHTML = imgHtml;
-            const container = document.getElementById('blocks-container');
-            if (container) {
-                if (afterElement) {
-                    while (temp.firstChild) {
-                        container.insertBefore(temp.firstChild, afterElement);
-                    }
-                } else {
-                    while (temp.firstChild) {
-                        container.appendChild(temp.firstChild);
-                    }
-                }
-                this.syncUnifiedBlocks();
-                this.triggerAutosave();
-            }
+            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
+            this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
             closeModal();
             showToast("Bilde satt inn!", "success");
         });
@@ -3086,37 +3049,40 @@ class NewsletterBuilder {
     }
 
     async uploadAndInsertImageFileAt(file, afterElement) {
-        if (!window.firebaseService || !window.firebaseService.isInitialized) {
-            showToast("Firebase er ikke initialisert.", "error");
-            return;
-        }
-        try {
-            showToast("Laster opp bilde...", "info");
-            const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
-            const url = await window.firebaseService.uploadImage(file, uploadPath);
-            const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+        if (!file) return;
+
+        showToast("Leser inn bilde...", "info");
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const localDataUrl = e.target.result;
+            const tempId = 'img-' + Date.now();
+            const imgHtml = `<p><img id="${tempId}" src="${localDataUrl}" alt="${escapeHtml(file.name)}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p><p><br></p>`;
             
-            const temp = document.createElement('div');
-            temp.innerHTML = imgHtml;
-            const container = document.getElementById('blocks-container');
-            if (container) {
-                if (afterElement) {
-                    while (temp.firstChild) {
-                        container.insertBefore(temp.firstChild, afterElement);
+            this.insertHtmlAtCursorOrEndAt(imgHtml, afterElement);
+            showToast("Bilde satt inn!", "success");
+
+            if (window.firebaseService && window.firebaseService.uploadImage) {
+                try {
+                    const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                    const remoteUrl = await window.firebaseService.uploadImage(file, uploadPath);
+                    const insertedImg = document.getElementById(tempId);
+                    if (insertedImg && remoteUrl) {
+                        insertedImg.src = remoteUrl;
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
                     }
-                } else {
-                    while (temp.firstChild) {
-                        container.appendChild(temp.firstChild);
-                    }
+                } catch(err) {
+                    console.warn("Firebase image upload failed, keeping local base64 version:", err);
                 }
-                this.syncUnifiedBlocks();
-                this.triggerAutosave();
             }
-            showToast("Bilde lastet opp!", "success");
-        } catch (err) {
-            console.error("Upload failed:", err);
-            showToast("Opplasting feilet.", "error");
-        }
+        };
+
+        reader.onerror = () => {
+            showToast("Feil ved lesing av bilde.", "error");
+        };
+
+        reader.readAsDataURL(file);
     }
 
     insertBlockAt(type, afterElement) {
