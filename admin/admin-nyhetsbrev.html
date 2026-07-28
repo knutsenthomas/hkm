@@ -944,9 +944,12 @@
 
             <!-- Verktøylinje / Sub-Header -->
             <div class="builder-toolbar-header" style="height: 56px !important; min-height: 56px !important; max-height: 56px !important; background: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: space-between !important; padding: 0 24px !important; box-sizing: border-box !important; width: 100% !important; position: relative !important; z-index: 1000 !important; overflow: visible !important;">
-                <div class="toolbar-left-cell" style="display: flex !important; align-items: center !important; justify-content: flex-start !important; height: 100% !important; flex: 0 0 auto !important; gap: 10px !important;">
-                    <button type="button" id="mobile-elements-toggle-btn" class="btn-mobile-elements-toggle" onclick="if(window.builder) builder.toggleMobileElementsDrawer();">
+                <div class="toolbar-left-cell" style="display: flex !important; align-items: center !important; justify-content: flex-start !important; height: 100% !important; flex: 0 0 auto !important; gap: 8px !important;">
+                    <button type="button" class="mobile-nav-toggle" aria-label="Vis meny" title="Vis meny">
                         <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <button type="button" id="mobile-add-element-btn" class="btn-add-element-mobile" onclick="if(window.builder) builder.toggleMobileElementsDrawer();" title="Legg til elementer">
+                        <span class="material-symbols-outlined">add</span>
                         <span>Elementer</span>
                     </button>
                     <h3 id="sidebar-title" style="margin: 0 !important; font-size: 18px !important; font-weight: 700 !important; color: #1e293b !important; line-height: 1 !important; white-space: nowrap !important; display: flex !important; align-items: center !important;">Elementer</h3>

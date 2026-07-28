@@ -7493,8 +7493,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     }
 }
 
-/* Hide mobile hamburger toggle button on Desktop */
-#mobile-elements-toggle-btn {
+/* Hide mobile element drawer button on Desktop */
+#mobile-add-element-btn {
     display: none !important;
 }
 
@@ -7502,20 +7502,45 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     display: none !important;
 }
 
+/* Hide builder toolbar mobile nav toggle on desktop */
+@media (min-width: 1025px) {
+    .builder-toolbar-header .mobile-nav-toggle {
+        display: none !important;
+    }
+}
+
 /* ==========================================================================
    MOBILE HAMBURGER DRAWER SYSTEM FOR BUILDER (<= 991px)
    ========================================================================== */
 
 @media (max-width: 991px) {
-    /* Hide main admin sidebar & secondary dark sidebar in builder mode on mobile */
-    body.builder-active .sidebar,
-    body.builder-active .sidebar.active,
+    /* Hide secondary dark sidebar in builder mode on mobile, but allow main admin .sidebar.active to slide out when hamburger is tapped */
     #newsletter-builder-layout .builder-dark-sidebar {
         display: none !important;
         visibility: hidden !important;
         pointer-events: none !important;
         width: 0 !important;
         opacity: 0 !important;
+    }
+
+    body.builder-active .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100vh !important;
+        width: 280px !important;
+        z-index: 100005 !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    body.builder-active .sidebar.active {
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        opacity: 1 !important;
     }
 
     #newsletter-builder-layout {
@@ -7679,8 +7704,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         visibility: hidden !important;
     }
 
-    /* Mobile hamburger toggle button: show icon + label on >500px, icon only on <=500px */
-    #mobile-elements-toggle-btn {
+    /* Mobile element drawer button */
+    #mobile-add-element-btn {
         display: inline-flex !important;
         align-items: center !important;
         gap: 4px !important;
@@ -7702,11 +7727,11 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         gap: 2px !important;
     }
 
-    #mobile-elements-toggle-btn span:not(.material-symbols-outlined) {
+    #mobile-add-element-btn span:not(.material-symbols-outlined) {
         display: none !important;
     }
 
-    #mobile-elements-toggle-btn {
+    #mobile-add-element-btn {
         padding: 0 !important;
         width: 34px !important;
         height: 34px !important;
