@@ -7439,18 +7439,12 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     }
 
     #newsletter-builder-layout .builder-toolbar-header {
-        height: auto !important;
-        min-height: 52px !important;
-        padding: 8px 12px !important;
-        flex-wrap: wrap !important;
-        gap: 8px !important;
-    }
-
-    #newsletter-builder-layout .toolbar-left-cell,
-    #newsletter-builder-layout .toolbar-center-cell,
-    #newsletter-builder-layout .toolbar-right-cell {
-        flex: 1 1 auto !important;
-        justify-content: center !important;
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+        padding: 0 12px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
     }
 
     #newsletter-builder-layout .canvas-top-subject-bar {
