@@ -626,6 +626,10 @@ class NewsletterBuilder {
         if (editorLangEn) {
             editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
         }
+        const editorRetranslate = document.getElementById('editor-retranslate-btn');
+        if (editorRetranslate) {
+            editorRetranslate.addEventListener('click', () => this.switchEditorLanguage('en', true));
+        }
 
         // Left Dark Sidebar Nav Item Click Handlers
         document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
@@ -7986,9 +7990,53 @@ class NewsletterBuilder {
         });
     }
 
+    saveEnglishPayloadToLocalStorage() {
+        try {
+            if (this.englishPayload) {
+                localStorage.setItem('hkm_builder_autosave_english_payload', JSON.stringify(this.englishPayload));
+                if (this.englishPayload.subjectEn) {
+                    localStorage.setItem('hkm_builder_autosave_subject_en', this.englishPayload.subjectEn);
+                }
+                if (this.englishPayload.blocksEn) {
+                    const htmlEn = this.getLanguageBlocksHtml(this.englishPayload.blocksEn);
+                    localStorage.setItem('hkm_builder_autosave_html_en', htmlEn);
+                }
+            }
+        } catch (e) {
+            console.warn('Kunne ikke lagre engelsk oversettelse til localStorage:', e);
+        }
+    }
+
+    loadEnglishPayloadFromLocalStorage() {
+        try {
+            const payloadStr = localStorage.getItem('hkm_builder_autosave_english_payload');
+            if (payloadStr) {
+                const parsed = JSON.parse(payloadStr);
+                if (parsed && parsed.blocksEn && parsed.blocksEn.length) {
+                    this.englishPayload = parsed;
+                    return true;
+                }
+            }
+            const htmlEn = localStorage.getItem('hkm_builder_autosave_html_en');
+            const subjectEn = localStorage.getItem('hkm_builder_autosave_subject_en');
+            if (htmlEn && htmlEn.trim().length > 10) {
+                this.englishPayload = {
+                    subjectEn: subjectEn || '',
+                    blocksEn: [{ id: 'unified_content', type: 'text', content: { text: htmlEn } }],
+                    translatedAt: new Date().toISOString()
+                };
+                return true;
+            }
+        } catch (e) {
+            console.warn('Kunne ikke laste engelsk oversettelse fra localStorage:', e);
+        }
+        return false;
+    }
+
     updateEditorLanguageButtons(lang = this.currentEditorLang) {
         const btnNo = document.getElementById('editor-lang-btn-no');
         const btnEn = document.getElementById('editor-lang-btn-en');
+        const btnRetranslate = document.getElementById('editor-retranslate-btn');
 
         [
             [btnNo, lang === 'no'],
@@ -8001,14 +8049,21 @@ class NewsletterBuilder {
             button.style.color = isActive ? '#0f172a' : '#64748b';
             button.style.boxShadow = isActive ? '0 2px 4px rgba(0,0,0,0.06)' : 'none';
         });
+
+        if (btnRetranslate) {
+            btnRetranslate.style.display = lang === 'en' ? 'inline-flex' : 'none';
+        }
     }
 
     resetEditorLanguageState(data = {}) {
         this.currentEditorLang = 'no';
-        this.subjectNo = data.subject || '';
-        this.englishPayload = data.englishPayload
-            ? JSON.parse(JSON.stringify(data.englishPayload))
-            : null;
+        this.subjectNo = data.subject || this.subjectNo || '';
+        if (data.englishPayload && data.englishPayload.blocksEn && data.englishPayload.blocksEn.length) {
+            this.englishPayload = JSON.parse(JSON.stringify(data.englishPayload));
+            this.saveEnglishPayloadToLocalStorage();
+        } else {
+            this.loadEnglishPayloadFromLocalStorage();
+        }
         this.updateEditorLanguageButtons('no');
     }
 
@@ -8061,11 +8116,11 @@ class NewsletterBuilder {
         this.normalizeCanvasBlocks(container);
     }
 
-    async switchEditorLanguage(lang = 'no') {
+    async switchEditorLanguage(lang = 'no', forceTranslate = false) {
         const targetLanguage = lang === 'en' ? 'en' : 'no';
         if (this.isSwitchingEditorLanguage) return;
 
-        if (targetLanguage === this.currentEditorLang) {
+        if (!forceTranslate && targetLanguage === this.currentEditorLang) {
             this.updateEditorLanguageButtons(targetLanguage);
             return;
         }
@@ -8075,9 +8130,9 @@ class NewsletterBuilder {
             // Save the currently visible language before replacing the canvas.
             this.syncUnifiedBlocks();
 
-            if (targetLanguage === 'en' && !this.englishPayload?.blocksEn?.length) {
+            if (targetLanguage === 'en' && (forceTranslate || !this.englishPayload?.blocksEn?.length)) {
                 const translated = await this.translateCurrentNewsletterToEnglish();
-                if (!translated) {
+                if (!translated && !this.englishPayload?.blocksEn?.length) {
                     this.updateEditorLanguageButtons(this.currentEditorLang);
                     return;
                 }
@@ -8107,6 +8162,7 @@ class NewsletterBuilder {
     }
 
     async translateCurrentNewsletterToEnglish() {
+        this.syncUnifiedBlocks();
         const norwegianSubject = this.subjectNo
             || document.getElementById('newsletter-subject')?.value
             || 'Nyhetsbrev';
@@ -8122,51 +8178,104 @@ class NewsletterBuilder {
         }
 
         const translateButton = document.getElementById('editor-lang-btn-en');
+        const retranslateButton = document.getElementById('editor-retranslate-btn');
         const originalButtonHtml = translateButton?.innerHTML || '';
         if (translateButton) {
             translateButton.disabled = true;
             translateButton.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size:16px;">sync</span><span class="lang-text">Oversetter…</span>';
         }
+        if (retranslateButton) {
+            retranslateButton.disabled = true;
+        }
 
         try {
-            if (!window.firebase?.functions) {
-                throw new Error('AI-oversettelsen er ikke tilgjengelig akkurat nå.');
+            const functionsObj = (typeof firebase !== 'undefined' && firebase.functions)
+                ? firebase.functions()
+                : (window.firebase && window.firebase.functions ? window.firebase.functions() : null);
+
+            if (!functionsObj) {
+                throw new Error('AI-oversettelsen er ikke tilgjengelig akkurat nå. Sjekk at Firebase er tilkoblet.');
             }
 
             const prompt = `
 Du er en profesjonell oversetter for His Kingdom Ministry.
-Oversett nyhetsbrevet fra norsk til naturlig, varmt og korrekt engelsk.
-Behold all HTML, lenker, bilder, produktdata og formatering uendret.
+Oversett følgende e-post nyhetsbrev fra norsk til naturlig, varmt, engasjerende og korrekt engelsk.
+Behold all HTML-struktur, ID-er, klasser, style-attributter, lenker (href), og bilder (src/alt) 100% uendret.
 Oversett «Basar» til «Raffle» og «Sommerbasar» til «Summer Raffle».
+Oversett «Kjøp lodd» til «Buy raffle tickets».
 
-Norsk emnelinje:
+NORSK EMNELINJE:
 ${norwegianSubject}
 
-Nyhetsbrevblokker:
-${JSON.stringify(norwegianBlocks)}
+NORSK INNHOLD (HTML):
+${sourceHtml}
 
-Returner kun gyldig JSON i dette formatet:
-{"subject":"English subject","blocks":[...translated blocks...]}
+Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, svar kun med ren tekst/JSON) i dette formatet:
+{
+  "subject": "Oversatt engelsk emnelinje",
+  "html": "Oversatt engelsk HTML-innhold"
+}
             `.trim();
 
-            const callable = window.firebase.functions().httpsCallable('aiProcess');
+            const callable = functionsObj.httpsCallable('aiProcess');
             const response = await callable({ prompt });
-            let rawResult = response?.data?.text || response?.data?.result || '';
+            let rawResult = response?.data?.text || response?.data?.result || response?.data || '';
+            if (typeof rawResult === 'object' && rawResult !== null) {
+                rawResult = JSON.stringify(rawResult);
+            }
             rawResult = String(rawResult)
                 .trim()
                 .replace(/^```(?:json)?\s*/i, '')
-                .replace(/\s*```$/, '');
+                .replace(/\s*```$/, '')
+                .trim();
 
-            const parsed = JSON.parse(rawResult);
-            if (!Array.isArray(parsed.blocks) || parsed.blocks.length === 0) {
-                throw new Error('Oversettelsen manglet nyhetsbrevinnhold.');
+            let parsed = null;
+            try {
+                parsed = JSON.parse(rawResult);
+            } catch (e) {
+                const jsonMatch = rawResult.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    try {
+                        parsed = JSON.parse(jsonMatch[0]);
+                    } catch (e2) {
+                        console.warn('Fant JSON-lignende streng, men kunne ikke parse den:', e2);
+                    }
+                }
             }
 
+            let translatedSubject = parsed?.subject || `${norwegianSubject} – English`;
+            let translatedHtml = parsed?.html || parsed?.blocks?.[0]?.content?.text || '';
+
+            if (!translatedHtml && Array.isArray(parsed?.blocks)) {
+                translatedHtml = this.getLanguageBlocksHtml(parsed.blocks);
+            }
+
+            if (!translatedHtml) {
+                if (rawResult && (rawResult.includes('<') || rawResult.length > 50)) {
+                    translatedHtml = rawResult;
+                } else {
+                    throw new Error('AI-oversettelsen returnerte ikke gyldig innhold.');
+                }
+            }
+
+            const translatedBlocks = [{
+                id: 'unified_content',
+                type: 'text',
+                content: { text: translatedHtml }
+            }];
+
             this.englishPayload = {
-                subjectEn: String(parsed.subject || `${norwegianSubject} – English`).trim(),
-                blocksEn: parsed.blocks,
+                subjectEn: String(translatedSubject).trim(),
+                blocksEn: translatedBlocks,
                 translatedAt: new Date().toISOString()
             };
+
+            this.saveEnglishPayloadToLocalStorage();
+            this.triggerAutosave();
+
+            if (typeof showToast === 'function') {
+                showToast('Engelsk versjon er opprettet og lagret! 🇬🇧', 'success');
+            }
             return true;
         } catch (error) {
             console.error('Oversettelse av nyhetsbrev feilet:', error);
@@ -8178,6 +8287,9 @@ Returner kun gyldig JSON i dette formatet:
             if (translateButton) {
                 translateButton.disabled = false;
                 translateButton.innerHTML = originalButtonHtml;
+            }
+            if (retranslateButton) {
+                retranslateButton.disabled = false;
             }
         }
     }
