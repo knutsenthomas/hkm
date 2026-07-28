@@ -1017,35 +1017,35 @@
 
                         <!-- Publiser Meny Dropdown -->
                         <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none !important;">
-                            <div class="publish-dropdown-item" style="cursor: pointer;" onclick="if(window.builder){ window.builder.toggleRecipientsDrawer(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
+                            <button type="button" class="publish-dropdown-item" id="opt-send-now" onclick="if(window.builder){ window.builder.sendCampaign(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
                                 <span class="material-symbols-outlined" style="pointer-events: none;">send</span>
                                 <div style="pointer-events: none;">
                                     <strong>Send nå</strong>
                                     <small>Send til alle abonnenter umiddelbart</small>
                                 </div>
-                            </div>
-                            <div class="publish-dropdown-item" style="cursor: pointer;" onclick="if(window.builder){ window.builder.showPromptModal('Velg dato og klokkeslett for automatisk utsendelse:', 'f.eks. 2026-08-01 kl. 10:00', function(val) { if(typeof showToast === 'function') showToast('Kampanjen er planlagt for utsending: ' + val, 'success'); }, '2026-08-01 kl. 10:00', 'Vennligst oppgi et tidspunkt.', 'Planlegg utsendelse', 'Lagre planlegging'); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
+                            </button>
+                            <button type="button" class="publish-dropdown-item" id="opt-schedule-send" onclick="if(window.builder){ window.builder.openScheduleModal(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
                                 <span class="material-symbols-outlined" style="pointer-events: none;">schedule</span>
                                 <div style="pointer-events: none;">
                                     <strong>Planlegg utsendelse</strong>
                                     <small>Velg dato og klokkeslett for utsending</small>
                                 </div>
-                            </div>
-                            <div class="publish-dropdown-item" style="cursor: pointer;" onclick="if(window.builder){ window.builder.sendTestEmail(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
+                            </button>
+                            <button type="button" class="publish-dropdown-item" id="opt-send-test" onclick="if(window.builder){ window.builder.sendTestEmail(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
                                 <span class="material-symbols-outlined" style="pointer-events: none;">mark_email_read</span>
                                 <div style="pointer-events: none;">
                                     <strong>Send test-epost</strong>
                                     <small>Send prøveutgave til din e-post</small>
                                 </div>
-                            </div>
+                            </button>
                             <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
-                            <div class="publish-dropdown-item" style="cursor: pointer;" onclick="if(window.builder){ window.builder.exportHtmlFile(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
+                            <button type="button" class="publish-dropdown-item" id="opt-export-html" onclick="if(window.builder){ window.builder.exportHtmlFile(); } document.getElementById('publish-options-dropdown').style.setProperty('display', 'none', 'important');">
                                 <span class="material-symbols-outlined" style="pointer-events: none;">code</span>
                                 <div style="pointer-events: none;">
                                     <strong>Eksporter HTML</strong>
                                     <small>Last ned e-post kildekode</small>
                                 </div>
-                            </div>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1541,10 +1541,10 @@
 
                             <!-- Action Buttons Card -->
                             <div class="actions-card-v2">
-                                <button id="send-test-btn" class="btn-v2 btn-v2-outline" onclick="if(window.builder){ window.builder.sendTestEmail(); }">
+                                <button id="send-test-btn" class="btn-v2 btn-v2-outline">
                                     <span class="material-symbols-outlined">send</span> Send test-e-post
                                 </button>
-                                <button id="final-send-btn" class="btn-v2 btn-v2-primary" onclick="if(window.builder){ window.builder.sendCampaign(); }">
+                                <button id="final-send-btn" class="btn-v2 btn-v2-primary">
                                     <span>Send kampanje nå</span>
                                     <span class="material-symbols-outlined">send</span>
                                 </button>
@@ -1954,7 +1954,7 @@
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/version-history.js?v=20260728_V1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260728_V2315_NYHETSBREV_FIX"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260728_V2325_FIXED_BUTTONS"></script>
 </body>
 
 </html>

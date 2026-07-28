@@ -7839,6 +7839,12 @@ class NewsletterBuilder {
                 tempDiv.innerHTML = mainContainer ? mainContainer.innerHTML : '';
             }
             contentClone = tempDiv;
+        } else if (this.currentEditorLang === 'en') {
+            // The visible canvas contains English while editing that language.
+            // Build the Norwegian email from its preserved canonical blocks.
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = this.getLanguageBlocksHtml(this.blocks || []);
+            contentClone = tempDiv;
         } else {
             const blocksContainer = document.getElementById('blocks-container');
             if (!blocksContainer) return '';
@@ -8550,17 +8556,22 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     async sendCampaign() {
         const user = await this.getAuthUser();
 
-        const subject = document.getElementById('newsletter-subject')?.value?.trim();
+        const visibleSubject = document.getElementById('newsletter-subject')?.value?.trim() || '';
         this.syncUnifiedBlocks();
-        const textContent = document.getElementById('blocks-container')?.innerHTML || '';
-        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+        const subject = this.currentEditorLang === 'en'
+            ? (this.subjectNo || '').trim()
+            : visibleSubject;
+        const norwegianSource = this.getLanguageBlocksHtml(this.blocks || []);
+        const plainText = norwegianSource.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
 
         if (!subject || subject === '') {
-            if (typeof showToast === 'function') showToast("Vennligst skriv inn et emne for nyhetsbrevet øverst.", "warning");
+            if (typeof showToast === 'function') {
+                showToast("Vennligst skriv inn et norsk emne for nyhetsbrevet.", "warning");
+            }
             return;
         }
 
-        if (this.blocks.length === 0 || !textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
+        if (this.blocks.length === 0 || plainText === '') {
             if (typeof showToast === 'function') showToast("Du kan ikke sende et tomt nyhetsbrev. Legg til innhold først.", "error");
             return;
         }
@@ -8604,94 +8615,51 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
             if (finalBtn) {
                 finalBtn.disabled = true;
-                finalBtn.innerHTML = `<span class="material-symbols-outlined rotating">sync</span> Sender til ${recipients.length} mottakere...`;
+                finalBtn.innerHTML = `<span class="material-symbols-outlined rotating">sync</span> Legger ${recipients.length} mottakere i utsendingskø...`;
             }
 
-            // 2. Prepare Norwegian & English HTML compiled bodies
+            // Compile both language variants before handing the campaign to the
+            // server. The server continues even if the browser is closed.
             const norwegianHtml = this.compileEmailHtml('no');
             const englishHtml = this.compileEmailHtml('en');
             const subjectEn = this.englishPayload?.subjectEn || `${subject} – English`;
 
-            // 3. Get Auth token for Cloud Function endpoint call
-            const idToken = await this.getAuthIdToken();
-
-            let sentCount = 0;
-            let englishCount = 0;
-            let norwegianCount = 0;
-
-            // 4. Batch send emails via sendManualEmail endpoint
-            for (let i = 0; i < recipients.length; i++) {
-                const rec = recipients[i];
-                if (!rec.email) continue;
-
-                const tags = Array.isArray(rec.tags) ? rec.tags : [];
-                const segments = Array.isArray(rec.segments) ? rec.segments : [];
-                const allKeywords = [...tags, ...segments].map(k => String(k).toLowerCase());
-                const isEnglish = ['engelsk', 'english', 'en'].some(kw => allKeywords.includes(kw));
-
-                const recipientSubject = (isEnglish && subjectEn) ? subjectEn : subject;
-                const recipientBody = (isEnglish && englishHtml) ? englishHtml : norwegianHtml;
-
-                if (isEnglish && englishHtml) englishCount++; else norwegianCount++;
-
-                if (finalBtn && (i % 3 === 0 || i === recipients.length - 1)) {
-                    finalBtn.innerHTML = `<span class="material-symbols-outlined rotating">sync</span> Sender (${i + 1}/${recipients.length})...`;
-                }
-
-                try {
-                    const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
-                        },
-                        body: JSON.stringify({
-                            to: rec.email,
-                            subject: recipientSubject,
-                            html: recipientBody,
-                            fromName: "His Kingdom Ministry"
-                        })
-                    });
-
-                    if (response.ok) {
-                        sentCount++;
-                    } else {
-                        console.warn(`[Campaign] Failed sending to ${rec.email}: ${response.status}`);
-                    }
-                } catch (sendErr) {
-                    console.error(`[Campaign] Error sending to ${rec.email}:`, sendErr);
-                }
+            if (!window.firebaseService?.db) {
+                throw new Error('Databasen for utsendingskøen er ikke tilgjengelig.');
             }
 
-            // 5. Store sent campaign in Firestore newsletter_campaigns collection
             const campaignData = {
                 subject: subject,
+                subjectEn,
                 recipientCount: recipients.length,
-                sentCount: sentCount,
-                norwegianCount: norwegianCount,
-                englishCount: englishCount,
                 blockCount: this.blocks.length,
                 blocks: this.blocks,
                 html: norwegianHtml,
-                status: 'completed',
-                processedByServer: true,
+                englishHtml,
                 englishPayload: this.englishPayload || null,
-                sentAt: new Date().toISOString(),
-                sentBy: user.email || 'admin@hiskingdomministry.no'
+                recipients: recipients
+                    .filter(recipient => recipient?.email)
+                    .map(recipient => ({
+                        email: String(recipient.email).trim().toLowerCase(),
+                        tags: Array.isArray(recipient.tags) ? recipient.tags : [],
+                        segments: Array.isArray(recipient.segments) ? recipient.segments : []
+                    })),
+                status: 'queued',
+                processedByServer: false,
+                queuedAt: new Date().toISOString(),
+                sentBy: user?.email || 'admin@hiskingdomministry.no'
             };
 
-            if (window.firebaseService && window.firebaseService.db) {
-                await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
-            }
+            await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
 
-            await this.recordNewsletterVersion('Kampanje sendt', {
+            await this.recordNewsletterVersion('Kampanje lagt i utsendingskø', {
                 minIntervalMs: 0,
                 source: 'newsletter-send',
                 forceDuplicate: true
             });
 
             if (typeof showToast === 'function') {
-                showToast(`Suksess! Kampanjen ble sendt til ${sentCount} av ${recipients.length} mottakere!`, "success");
+                showToast(`Kampanjen er lagt i kø for ${recipients.length} mottakere. Serveren sender den nå.`, "success");
             }
             if (finalBtn) {
                 finalBtn.disabled = false;
@@ -8699,8 +8667,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             }
 
             const confirmedBack = await this.showConfirm(
-                'Nyhetsbrev sendt!',
-                `Utsendelse fullført! Nyhetsbrevet ble sendt til ${sentCount} av ${recipients.length} abonnenter.\n\nVil du gå tilbake til oversikten?`,
+                'Utsending startet!',
+                `Nyhetsbrevet er lagt trygt i utsendingskøen for ${recipients.length} abonnenter. Utsendingen fortsetter på serveren selv om du lukker editoren.\n\nVil du gå tilbake til oversikten?`,
                 'Gå til oversikt',
                 'Bli i editoren'
             );
@@ -8711,10 +8679,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
         } catch (e) {
             console.error("Campaign send failed:", e);
+            if (typeof showToast === 'function') {
+                showToast(`Kunne ikke starte kampanjen: ${e.message}`, "error");
+            }
             const finalBtn = document.getElementById('final-send-btn');
             if (finalBtn) {
                 finalBtn.disabled = false;
-                finalBtn.innerHTML = '<span>Send kampanje nå</span><span class="material-symbols-outlined">send</span>';
+                finalBtn.innerHTML = originalText;
             }
         }
     }
