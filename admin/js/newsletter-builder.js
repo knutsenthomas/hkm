@@ -930,11 +930,20 @@ class NewsletterBuilder {
         // Customize Inner Background
         const innerBtn = document.getElementById('customize-inner-bg');
         if (innerBtn) {
+            let innerPicker = document.getElementById('input-inner-bg-picker');
+            if (!innerPicker) {
+                innerPicker = document.createElement('input');
+                innerPicker.type = 'color';
+                innerPicker.id = 'input-inner-bg-picker';
+                innerPicker.style.display = 'none';
+                document.body.appendChild(innerPicker);
+                innerPicker.addEventListener('input', (e) => {
+                    this.updateBackground('inner', 'color', e.target.value);
+                });
+            }
             innerBtn.addEventListener('click', () => {
-                const color = prompt("Velg farge for indre bakgrunn (hex):", this.backgrounds.inner.color);
-                if (color) {
-                    this.updateBackground('inner', 'color', color);
-                }
+                innerPicker.value = this.backgrounds?.inner?.color || '#ffffff';
+                innerPicker.click();
             });
         }
 
@@ -4166,13 +4175,15 @@ class NewsletterBuilder {
                         <button class="inspector-style-btn ${isUnderline ? 'active' : ''}" id="text-btn-underline" title="Understreket" style="font-family: 'Inter', sans-serif; text-decoration: underline; font-weight: 700; font-size: 18px;">
                             U
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-color" title="Tekstfarge" style="position: relative;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">format_color_text</span>
-                            <span style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #3b82f6; border-radius: 1px;"></span>
+                        <button class="inspector-style-btn" id="text-btn-color" title="Tekstfarge" style="position: relative; overflow: hidden;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; pointer-events: none;">format_color_text</span>
+                            <span id="text-btn-color-indicator" style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #1b4965; border-radius: 1px; pointer-events: none;"></span>
+                            <input type="color" id="input-text-forecolor" value="#1b4965" title="Velg tekstfarge" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0;">
                         </button>
-                        <button class="inspector-style-btn" id="text-btn-bg" title="Tekstbakgrunn / Utheving" style="position: relative;">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">border_color</span>
-                            <span style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #ffff00; border-radius: 1px;"></span>
+                        <button class="inspector-style-btn" id="text-btn-bg" title="Tekstbakgrunn / utheving" style="position: relative; overflow: hidden;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; pointer-events: none;">border_color</span>
+                            <span id="text-btn-bg-indicator" style="position: absolute; bottom: 6px; left: 10px; right: 10px; height: 3px; background: #ffff00; border-radius: 1px; pointer-events: none;"></span>
+                            <input type="color" id="input-text-backcolor" value="#ffff00" title="Velg bakgrunnsfarge" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0;">
                         </button>
                         <button class="inspector-style-btn" id="text-btn-align-cycle" title="Justering">
                             ${this.getAlignSVG(currentAlign)}
@@ -4390,36 +4401,43 @@ class NewsletterBuilder {
             });
         }
 
-        const btnColor = document.getElementById('text-btn-color');
-        if (btnColor) {
-            btnColor.addEventListener('click', (e) => {
-                e.preventDefault();
-                const color = prompt("Velg tekstfarge (HEX eller navn):", "#1B4965");
-                if (color) {
-                    this.exec('foreColor', color);
-                }
+        const foreColorInput = document.getElementById('input-text-forecolor');
+        if (foreColorInput) {
+            foreColorInput.addEventListener('input', (e) => {
+                const color = e.target.value;
+                this.exec('foreColor', color);
+                const indicator = document.getElementById('text-btn-color-indicator');
+                if (indicator) indicator.style.background = color;
             });
+            foreColorInput.addEventListener('change', () => this.syncUnifiedBlocks());
         }
 
-        const btnBg = document.getElementById('text-btn-bg');
-        if (btnBg) {
-            btnBg.addEventListener('click', (e) => {
-                e.preventDefault();
-                const color = prompt("Velg bakgrunnsfarge for tekst (HEX):", "#ffff00");
-                if (color) {
-                    this.exec('backColor', color);
-                }
+        const backColorInput = document.getElementById('input-text-backcolor');
+        if (backColorInput) {
+            backColorInput.addEventListener('input', (e) => {
+                const color = e.target.value;
+                this.exec('backColor', color);
+                const indicator = document.getElementById('text-btn-bg-indicator');
+                if (indicator) indicator.style.background = color;
             });
+            backColorInput.addEventListener('change', () => this.syncUnifiedBlocks());
         }
 
         const btnLink = document.getElementById('text-btn-link');
         if (btnLink) {
             btnLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                const url = prompt("Tast inn nettadresse (URL):", "https://");
-                if (url) {
-                    this.exec('createLink', url);
-                }
+                this.showPromptModal(
+                    "Sett inn lenke",
+                    "Tast inn nettadresse (https://...)",
+                    (url) => {
+                        if (url) this.exec('createLink', url);
+                    },
+                    "https://",
+                    "Vennligst oppgi en gyldig URL.",
+                    "Sett inn lenke",
+                    "Sett inn"
+                );
             });
         }
 
