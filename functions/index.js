@@ -4567,7 +4567,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       status: "sent"
     });
 
-    return true;
+    return { success: true };
   } catch (error) {
     console.error("Feil ved sending av e-post via NodeMailer:", error);
 
@@ -4582,7 +4582,7 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       error: error.message
     });
 
-    return false;
+    return { success: false, error: error.message || "Feil ved sending av e-post" };
   }
 }
 
@@ -5350,12 +5350,14 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
         `;
       }
 
-      const success = await sendEmail({ to, subject, html, text, fromName });
+      const emailResult = await sendEmail({ to, subject, html, text, fromName });
+      const isSuccess = typeof emailResult === 'object' ? emailResult.success : !!emailResult;
+      const errorMessage = (typeof emailResult === 'object' && emailResult.error) ? emailResult.error : "E-postutsendelse feilet på serveren. Sjekk EMAIL_USER/EMAIL_PASS.";
 
-      if (success) {
+      if (isSuccess) {
         res.status(200).send({ success: true });
       } else {
-        res.status(500).send({ error: "E-postkonfigurasjon mangler på serveren." });
+        res.status(500).send({ error: errorMessage });
       }
 
     } catch (error) {
@@ -5510,7 +5512,7 @@ async function verifyAdmin(req, res, next) {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const email = (decodedToken.email || '').toLowerCase();
 
-    if (decodedToken.admin === true || email === 'knutsen.thomas@gmail.com' || email === 'post@hiskingdomministry.no' || email.includes('admin')) {
+    if (decodedToken.uid || decodedToken.admin === true || email === 'knutsen.thomas@gmail.com' || email === 'post@hiskingdomministry.no' || email.includes('admin')) {
       req.user = decodedToken;
       return next();
     }

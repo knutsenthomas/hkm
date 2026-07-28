@@ -8374,11 +8374,46 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
+    async getAuthUser() {
+        if (window.firebaseService?.auth?.currentUser) return window.firebaseService.auth.currentUser;
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) return firebase.auth().currentUser;
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            return new Promise(resolve => {
+                const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+                    unsubscribe();
+                    resolve(user);
+                });
+                setTimeout(() => resolve(firebase.auth().currentUser), 2000);
+            });
+        }
+        return null;
+    }
+
+    async getAuthIdToken() {
+        const user = await this.getAuthUser();
+        if (user && typeof user.getIdToken === 'function') {
+            try {
+                return await user.getIdToken();
+            } catch (e) {
+                console.warn("getIdToken failed:", e);
+            }
+        }
+        return '';
+    }
+
     async sendTestEmail() {
         const publishDropdown = document.getElementById('publish-options-dropdown');
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
-        let user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+        const user = await this.getAuthUser();
+        const idToken = await this.getAuthIdToken();
+
+        if (!idToken) {
+            if (typeof showToast === 'function') {
+                showToast("Du må være innlogget for å sende test-e-post. Vennligst logg inn på nytt.", "warning");
+            }
+            return;
+        }
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
