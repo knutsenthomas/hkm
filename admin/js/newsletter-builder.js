@@ -9910,38 +9910,28 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         }
     }
 
-    async loadSubscribers() {
-        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
-        const tbody = document.getElementById('subscribers-table-body') || document.querySelector('#view-subscribers-panel tbody');
-        if (!tbody) return;
+    async fetchSubscribersList() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return [];
 
+        const subscribersMap = new Map();
+        const explicitlyUnsubscribedEmails = new Set();
+        const isNewsletterUnsubscribed = (data, isSubscription = false) => {
+            const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
+            const subscriptionStatus = String(data.status || '').trim().toLowerCase();
+            const unsubscribed = data.newsletterUnsubscribed === true
+                || newsletterStatus === 'unsubscribed'
+                || newsletterStatus === 'avmeldt';
+
+            if (!isSubscription) return unsubscribed;
+            return unsubscribed
+                || data.isSubscribed === false
+                || ['unsubscribed', 'avmeldt', 'inactive', 'inaktiv'].includes(subscriptionStatus);
+        };
+
+        // 1. Primary CRM contact list: collection('contacts')
         try {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
-                        <span class="material-symbols-outlined rotating" style="font-size: 24px;">sync</span> Henter abonnenter fra databasen...
-                    </td>
-                </tr>
-            `;
-
-            const subscribersMap = new Map();
-            const explicitlyUnsubscribedEmails = new Set();
-            const isNewsletterUnsubscribed = (data, isSubscription = false) => {
-                const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
-                const subscriptionStatus = String(data.status || '').trim().toLowerCase();
-                const unsubscribed = data.newsletterUnsubscribed === true
-                    || newsletterStatus === 'unsubscribed'
-                    || newsletterStatus === 'avmeldt';
-
-                if (!isSubscription) return unsubscribed;
-                return unsubscribed
-                    || data.isSubscribed === false
-                    || ['unsubscribed', 'avmeldt', 'inactive', 'inaktiv'].includes(subscriptionStatus);
-            };
-
-            // 1. Primary CRM contact list: collection('contacts')
-            try {
-                const contactsSnap = await this.safeGet(window.firebaseService.db.collection('contacts'), 8000);
+            const contactsSnap = await this.safeGet(window.firebaseService.db.collection('contacts'), 8000);
+            if (contactsSnap) {
                 contactsSnap.forEach(doc => {
                     const data = doc.data();
                     if (!data.email) return;
@@ -9975,13 +9965,15 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         segments
                     });
                 });
-            } catch (err) {
-                console.warn('[HKM Subscribers] Could not fetch contacts collection:', err);
             }
+        } catch (err) {
+            console.warn('[HKM Subscribers] Could not fetch contacts collection:', err);
+        }
 
-            // 2. Secondary subscriber list: newsletter_subscriptions
-            try {
-                const subSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_subscriptions').orderBy('subscribedAt', 'desc'), 8000);
+        // 2. Secondary subscriber list: newsletter_subscriptions
+        try {
+            const subSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_subscriptions'), 8000);
+            if (subSnap) {
                 subSnap.forEach(doc => {
                     const data = doc.data();
                     if (!data.email) return;
@@ -10017,13 +10009,15 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         });
                     }
                 });
-            } catch (err) {
-                console.warn('[HKM Subscribers] Could not fetch newsletter_subscriptions:', err);
             }
+        } catch (err) {
+            console.warn('[HKM Subscribers] Could not fetch newsletter_subscriptions:', err);
+        }
 
-            // 3. Tertiary list: registered users
-            try {
-                const usersSnap = await this.safeGet(window.firebaseService.db.collection('users'), 8000);
+        // 3. Tertiary list: registered users
+        try {
+            const usersSnap = await this.safeGet(window.firebaseService.db.collection('users'), 8000);
+            if (usersSnap) {
                 usersSnap.forEach(doc => {
                     const data = doc.data();
                     if (!data.email) return;
@@ -10059,39 +10053,58 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         });
                     }
                 });
-            } catch (err) {
-                console.warn('[HKM Subscribers] Could not fetch users collection:', err);
             }
+        } catch (err) {
+            console.warn('[HKM Subscribers] Could not fetch users collection:', err);
+        }
 
-            // 3. Fallback default admins if database is empty
-            if (!subscribersMap.has('thomas@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('thomas@hiskingdomministry.no')) {
-                subscribersMap.set('thomas@hiskingdomministry.no', {
-                    id: 'admin_thomas',
-                    name: 'Thomas Knutsen',
-                    email: 'thomas@hiskingdomministry.no',
-                    phone: '',
-                    source: 'Administrator',
-                    status: 'Aktiv',
-                    dateStr: new Date().toLocaleDateString('no'),
-                    tags: ['Leder', 'Admin'],
-                    segments: ['Nyhetsbrev', 'Administrator']
-                });
-            }
-            if (!subscribersMap.has('post@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('post@hiskingdomministry.no')) {
-                subscribersMap.set('post@hiskingdomministry.no', {
-                    id: 'admin_hkm',
-                    name: 'HKM Medlem',
-                    email: 'post@hiskingdomministry.no',
-                    phone: '',
-                    source: 'Administrator',
-                    status: 'Aktiv',
-                    dateStr: new Date().toLocaleDateString('no'),
-                    tags: ['Admin'],
-                    segments: ['Nyhetsbrev', 'Administrator']
-                });
-            }
+        // 4. Default fallback admin subscribers if list is empty
+        if (!subscribersMap.has('thomas@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('thomas@hiskingdomministry.no')) {
+            subscribersMap.set('thomas@hiskingdomministry.no', {
+                id: 'admin_thomas',
+                name: 'Thomas Knutsen',
+                email: 'thomas@hiskingdomministry.no',
+                phone: '',
+                source: 'Administrator',
+                status: 'Aktiv',
+                dateStr: new Date().toLocaleDateString('no'),
+                tags: ['Leder', 'Admin'],
+                segments: ['Nyhetsbrev', 'Administrator']
+            });
+        }
+        if (!subscribersMap.has('post@hiskingdomministry.no') && !explicitlyUnsubscribedEmails.has('post@hiskingdomministry.no')) {
+            subscribersMap.set('post@hiskingdomministry.no', {
+                id: 'admin_hkm',
+                name: 'HKM Medlem',
+                email: 'post@hiskingdomministry.no',
+                phone: '',
+                source: 'Administrator',
+                status: 'Aktiv',
+                dateStr: new Date().toLocaleDateString('no'),
+                tags: ['Admin'],
+                segments: ['Nyhetsbrev', 'Administrator']
+            });
+        }
 
-            const subscribersList = Array.from(subscribersMap.values());
+        explicitlyUnsubscribedEmails.forEach(email => subscribersMap.delete(email));
+        return Array.from(subscribersMap.values());
+    }
+
+    async loadSubscribers() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        const tbody = document.getElementById('subscribers-table-body') || document.querySelector('#view-subscribers-panel tbody');
+        if (!tbody) return;
+
+        try {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
+                        <span class="material-symbols-outlined rotating" style="font-size: 24px;">sync</span> Henter abonnenter fra databasen...
+                    </td>
+                </tr>
+            `;
+
+            const subscribersList = await this.fetchSubscribersList();
             this.subscribersCount = subscribersList.length;
 
             const countBadge = document.getElementById('subscribers-list-total-count');
