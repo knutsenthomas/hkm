@@ -469,6 +469,15 @@ class NewsletterBuilder {
     setupEventListeners() {
         this.setupToolsFab();
 
+        const editorLangNo = document.getElementById('editor-lang-btn-no');
+        if (editorLangNo) {
+            editorLangNo.addEventListener('click', () => this.switchEditorLanguage('no'));
+        }
+        const editorLangEn = document.getElementById('editor-lang-btn-en');
+        if (editorLangEn) {
+            editorLangEn.addEventListener('click', () => this.switchEditorLanguage('en'));
+        }
+
         // Left Dark Sidebar Nav Item Click Handlers
         document.querySelectorAll('.sidebar-nav-menu .nav-item, .sidebar-bottom-settings .nav-item').forEach(item => {
             item.addEventListener('click', (e) => {

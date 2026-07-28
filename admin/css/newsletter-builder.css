@@ -8729,3 +8729,15 @@ body.builder-recipients-open #newsletter-builder-layout .sidebar-zoom-controls {
     resize: none !important;
     line-height: 1.5 !important;
 }
+
+@media (max-width: 768px) {
+    #editor-language-switcher .lang-text,
+    #editor-language-switcher .lang-translate-icon {
+        display: none !important;
+    }
+    #editor-language-switcher button {
+        padding: 5px 8px !important;
+        gap: 0 !important;
+        font-size: 16px !important;
+    }
+}
