@@ -1625,9 +1625,9 @@
                 <div class="subview-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h2 class="subview-title">Abonnenter</h2>
-                        <p class="subview-subtitle">Administrer e-postlisten for His Kingdom Ministry</p>
+                        <p class="subview-subtitle">Administrer e-postlisten for His Kingdom Ministry (<span id="subscribers-list-total-count">0</span> kontakter)</p>
                     </div>
-                    <button class="btn-create-new" onclick="if(window.builder) window.builder.showPromptModal('Oppgi e-postadresse for ny abonnent:', 'epost@domene.no', (email)=>{ if(typeof showToast==='function') showToast('Abonnent ' + email + ' ble lagt til!', 'success'); }, '', 'Vennligst oppgi en e-postadresse.', 'Legg til abonnent', 'Legg til');">
+                    <button class="btn-create-new" onclick="if(window.builder) window.builder.addNewSubscriberPrompt();">
                         <span class="material-symbols-outlined">person_add</span>
                         <span>Legg til abonnent</span>
                     </button>
@@ -1637,23 +1637,18 @@
                         <thead>
                             <tr>
                                 <th>Navn</th>
-                                <th>E-post</th>
+                                <th>E-postadresse</th>
+                                <th>Kilde</th>
                                 <th>Status</th>
                                 <th>Dato lagt til</th>
+                                <th>Handling</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="subscribers-table-body">
                             <tr>
-                                <td><strong>Thomas Knutsen</strong></td>
-                                <td>thomas@hiskingdomministry.no</td>
-                                <td><span class="badge-status-active">Aktiv</span></td>
-                                <td>24. juli 2026</td>
-                            </tr>
-                            <tr>
-                                <td><strong>HKM Medlem</strong></td>
-                                <td>post@hiskingdomministry.no</td>
-                                <td><span class="badge-status-active">Aktiv</span></td>
-                                <td>15. juni 2026</td>
+                                <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
+                                    Henter abonnenter fra databasen...
+                                </td>
                             </tr>
                         </tbody>
                     </table>

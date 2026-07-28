@@ -7366,11 +7366,204 @@ ${cleanCanvasHtml}
             if (templatesPanel) templatesPanel.style.display = 'block';
         } else if (viewName === 'subscribers') {
             if (subscribersPanel) subscribersPanel.style.display = 'block';
+            this.loadSubscribers();
         } else if (viewName === 'analytics') {
             if (analyticsPanel) analyticsPanel.style.display = 'block';
         } else if (viewName === 'settings') {
             if (settingsPanel) settingsPanel.style.display = 'block';
         }
+    }
+
+    async loadSubscribers() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        const tbody = document.getElementById('subscribers-table-body') || document.querySelector('#view-subscribers-panel tbody');
+        if (!tbody) return;
+
+        try {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: #64748b;">
+                        <span class="material-symbols-outlined rotating" style="font-size: 24px;">sync</span> Henter abonnenter fra databasen...
+                    </td>
+                </tr>
+            `;
+
+            const subscribersMap = new Map();
+
+            // 1. Primary subscriber list: newsletter_subscriptions
+            try {
+                const subSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_subscriptions').orderBy('subscribedAt', 'desc'), 8000);
+                subSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.email) return;
+                    const email = data.email.toLowerCase().trim();
+                    const name = data.name || data.displayName || email.split('@')[0];
+                    let dateStr = 'Nylig';
+                    if (data.subscribedAt) {
+                        try {
+                            const d = data.subscribedAt.toDate ? data.subscribedAt.toDate() : new Date(data.subscribedAt);
+                            dateStr = d.toLocaleDateString('no');
+                        } catch(e) {}
+                    }
+                    subscribersMap.set(email, {
+                        id: doc.id,
+                        collection: 'newsletter_subscriptions',
+                        name,
+                        email,
+                        source: data.source === 'website_footer' ? 'Nettsted' : (data.source || 'Direkte påmeldt'),
+                        status: data.status || 'Aktiv',
+                        dateStr
+                    });
+                });
+            } catch (err) {
+                console.warn('[HKM Subscribers] Could not fetch newsletter_subscriptions:', err);
+            }
+
+            // 2. Secondary list: registered users
+            try {
+                const usersSnap = await this.safeGet(window.firebaseService.db.collection('users'), 8000);
+                usersSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.email) return;
+                    const email = data.email.toLowerCase().trim();
+                    if (!subscribersMap.has(email)) {
+                        const name = data.displayName || data.name || (data.firstName ? `${data.firstName} ${data.lastName || ''}`.trim() : email.split('@')[0]);
+                        let dateStr = 'Medlem';
+                        if (data.createdAt) {
+                            try {
+                                const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+                                dateStr = d.toLocaleDateString('no');
+                            } catch(e) {}
+                        }
+                        subscribersMap.set(email, {
+                            id: doc.id,
+                            collection: 'users',
+                            name,
+                            email,
+                            source: 'Brukerkonto',
+                            status: 'Aktiv',
+                            dateStr
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('[HKM Subscribers] Could not fetch users collection:', err);
+            }
+
+            // 3. Fallback default admins if database is empty
+            if (!subscribersMap.has('thomas@hiskingdomministry.no')) {
+                subscribersMap.set('thomas@hiskingdomministry.no', {
+                    id: 'admin_thomas',
+                    name: 'Thomas Knutsen',
+                    email: 'thomas@hiskingdomministry.no',
+                    source: 'Administrator',
+                    status: 'Aktiv',
+                    dateStr: new Date().toLocaleDateString('no')
+                });
+            }
+            if (!subscribersMap.has('post@hiskingdomministry.no')) {
+                subscribersMap.set('post@hiskingdomministry.no', {
+                    id: 'admin_hkm',
+                    name: 'HKM Medlem',
+                    email: 'post@hiskingdomministry.no',
+                    source: 'Administrator',
+                    status: 'Aktiv',
+                    dateStr: new Date().toLocaleDateString('no')
+                });
+            }
+
+            const subscribersList = Array.from(subscribersMap.values());
+            this.subscribersCount = subscribersList.length;
+
+            const countBadge = document.getElementById('subscribers-list-total-count');
+            if (countBadge) countBadge.textContent = subscribersList.length;
+
+            const badgeCount = document.getElementById('subscribers-count-badge');
+            if (badgeCount) badgeCount.textContent = `${subscribersList.length} kontakter`;
+
+            const statSub = document.getElementById('stat-subscribers-val');
+            if (statSub) statSub.textContent = subscribersList.length;
+
+            tbody.innerHTML = '';
+            subscribersList.forEach(sub => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${sub.name}</strong></td>
+                    <td>${sub.email}</td>
+                    <td><span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span></td>
+                    <td><span class="badge-status-active">Aktiv</span></td>
+                    <td>${sub.dateStr}</td>
+                    <td>
+                        <button type="button" class="btn-delete-sub" data-email="${sub.email}" data-id="${sub.id}" data-col="${sub.collection || ''}" title="Slett abonnent" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Bind delete buttons
+            tbody.querySelectorAll('.btn-delete-sub').forEach(btn => {
+                btn.onclick = async () => {
+                    const email = btn.dataset.email;
+                    const docId = btn.dataset.id;
+                    const col = btn.dataset.col;
+                    const confirmDel = await this.showConfirm('Slett abonnent', `Er du sikker på at du vil fjerne ${email} fra e-postlisten?`, 'Slett');
+                    if (confirmDel) {
+                        try {
+                            if (col === 'newsletter_subscriptions' && docId) {
+                                await window.firebaseService.db.collection('newsletter_subscriptions').doc(docId).delete();
+                            }
+                            if (typeof showToast === 'function') showToast(`Abonnent ${email} ble fjernet.`, "info");
+                            this.loadSubscribers();
+                        } catch(e) {
+                            console.error('Delete sub failed:', e);
+                            if (typeof showToast === 'function') showToast('Kunne ikke fjerne abonnent.', 'error');
+                        }
+                    }
+                };
+            });
+
+        } catch (e) {
+            console.error("Load subscribers failed:", e);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: #ef4444;">
+                        Kunne ikke laste abonnenter.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    async addNewSubscriberPrompt() {
+        this.showPromptModal(
+            'Oppgi e-postadresse for ny abonnent:',
+            'epost@domene.no',
+            async (email) => {
+                if (!email || !email.includes('@')) {
+                    if (typeof showToast === 'function') showToast("Vennligst oppgi en gyldig e-postadresse.", "warning");
+                    return;
+                }
+                try {
+                    await window.firebaseService.db.collection('newsletter_subscriptions').add({
+                        email: email.trim().toLowerCase(),
+                        subscribedAt: new Date().toISOString(),
+                        source: 'Manuelt lagt til av admin',
+                        status: 'Aktiv'
+                    });
+                    if (typeof showToast === 'function') showToast(`Abonnent ${email} ble lagt til!`, "success");
+                    this.loadSubscribers();
+                } catch(e) {
+                    console.error("Add subscriber failed:", e);
+                    if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");
+                }
+            },
+            '',
+            'Vennligst oppgi en e-postadresse.',
+            'Legg til abonnent',
+            'Legg til'
+        );
     }
 
     loadTemplate(templateKey) {
