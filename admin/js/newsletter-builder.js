@@ -8403,14 +8403,14 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         return '';
     }
 
-    async sendTestEmail() {
+    async sendTestEmail(targetEmail) {
         const publishDropdown = document.getElementById('publish-options-dropdown');
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
         const user = await this.getAuthUser();
-        const defaultEmail = user?.email || 'knutsenthomas@gmail.com';
+        const recipientEmail = targetEmail || user?.email || 'knutsenthomas@gmail.com';
 
-        const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
+        const subject = document.getElementById('newsletter-subject')?.value || 'Nyhetsbrev';
         this.syncUnifiedBlocks();
         
         let textContent = document.getElementById('blocks-container')?.innerHTML || '';
@@ -8420,96 +8420,78 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             plainText = "Dette er en test-e-post fra His Kingdom Ministry.";
         }
 
-        this.showPromptModal(
-            "Hvem vil du sende test-e-posten til?",
-            "Skriv inn e-postadresse...",
-            async (recipientEmail) => {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(recipientEmail)) {
-                    return showToast("Vennligst oppgi en gyldig e-postadresse.", "error");
+        const testBtn = document.getElementById('send-test-btn');
+        const originalHtml = testBtn ? testBtn.innerHTML : '';
+        if (testBtn) {
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Sender...';
+        }
+
+        if (typeof showToast === 'function') {
+            showToast(`Sender test-e-post til ${recipientEmail}...`, "info");
+        }
+
+        let sendSuccess = false;
+        try {
+            const idToken = await this.getAuthIdToken();
+            const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
+
+            const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
+                },
+                body: JSON.stringify({
+                    to: recipientEmail,
+                    subject: subject ? `${subject} (Prøveutgave)` : 'Prøveutgave av nyhetsbrev',
+                    html: fullHtml,
+                    message: plainText.substring(0, 500),
+                    fromName: 'His Kingdom Ministry'
+                })
+            });
+
+            const resText = await response.text();
+            let result = {};
+            try {
+                result = JSON.parse(resText);
+            } catch(e) {}
+
+            if (response.ok && result.success) {
+                if (typeof showToast === 'function') {
+                    showToast(`Test-e-post er sendt til ${recipientEmail}! 🚀`, "success");
                 }
-
-                const testBtn = document.getElementById('send-test-btn');
-                const originalHtml = testBtn ? testBtn.innerHTML : '';
-                if (testBtn) {
-                    testBtn.disabled = true;
-                    testBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Sender...';
+                sendSuccess = true;
+                
+                const testIcon = document.getElementById('chk-test-icon');
+                const testText = document.getElementById('chk-test-text');
+                if (testIcon && testText) {
+                    testIcon.innerText = 'check_circle';
+                    testIcon.className = 'material-symbols-outlined chk-success';
+                    testText.innerText = 'Test-epost bekreftet sendt';
                 }
+            } else {
+                throw new Error(result.error || result.message || `Serverfeil (status ${response.status})`);
+            }
+        } catch (error) {
+            console.error('Feil ved sending av test-e-post:', error);
+            if (typeof showToast === 'function') {
+                showToast(`Kunne ikke sende test-e-post: ${error.message}`, "error");
+            }
+        } finally {
+            if (testBtn) {
+                testBtn.disabled = false;
+                testBtn.innerHTML = originalHtml || '<span class="material-symbols-outlined">send</span> Send test-e-post';
+            }
+        }
 
-                showToast(`Sender test-e-post til ${recipientEmail}...`, "info");
-
-                let sendSuccess = false;
-                try {
-                    let idToken = '';
-                    if (user && typeof user.getIdToken === 'function') {
-                        try {
-                            idToken = await user.getIdToken();
-                        } catch (tokErr) {
-                            console.warn("Could not get fresh idToken:", tokErr);
-                        }
-                    }
-
-                    const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
-
-                    const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
-                        },
-                        body: JSON.stringify({
-                            to: recipientEmail,
-                            subject: subject ? `${subject} (Prøveutgave)` : 'Prøveutgave av nyhetsbrev',
-                            html: fullHtml,
-                            message: plainText.substring(0, 500),
-                            fromName: 'His Kingdom Ministry'
-                        })
-                    });
-
-                    const resText = await response.text();
-                    let result = {};
-                    try {
-                        result = JSON.parse(resText);
-                    } catch(e) {}
-
-                    if (response.ok && result.success) {
-                        showToast("Test-e-post er sendt!", "success");
-                        sendSuccess = true;
-                        
-                        // Update checklist item in sidebar
-                        const testIcon = document.getElementById('chk-test-icon');
-                        const testText = document.getElementById('chk-test-text');
-                        if (testIcon && testText) {
-                            testIcon.innerText = 'check_circle';
-                            testIcon.className = 'material-symbols-outlined chk-success';
-                            testText.innerText = 'Test-epost bekreftet sendt';
-                        }
-                    } else {
-                        throw new Error(result.error || result.message || `Serverfeil (status ${response.status})`);
-                    }
-                } catch (error) {
-                    console.error('Feil ved sending av test-e-post:', error);
-                    showToast(`Kunne ikke sende test-e-post: ${error.message}`, "error");
-                } finally {
-                    if (testBtn) {
-                        testBtn.disabled = false;
-                        testBtn.innerHTML = originalHtml || '<span class="material-symbols-outlined">send</span> Send test-e-post';
-                    }
-                }
-
-                if (sendSuccess) {
-                    await this.showSuccessModal(
-                        "Test-e-post er sendt! 🚀",
-                        `Vellykket utsending! Test-e-posten ble sendt til <strong style="color: #0f172a;">${recipientEmail}</strong>.<br><br>Sjekk innboksen din nå (husk å sjekke søppelpost/spam dersom den ikke dukker opp innen et minutt).`,
-                        "Flott, skjønner!"
-                    );
-                }
-            },
-            defaultEmail,
-            "Vennligst oppgi en e-postadresse.",
-            "Send test-e-post",
-            "Send test-e-post"
-        );
+        if (sendSuccess) {
+            await this.showSuccessModal(
+                "Test-e-post er sendt! 🚀",
+                `Vellykket utsending! Test-e-posten ble sendt til <strong style="color: #0f172a;">${recipientEmail}</strong>.<br><br>Sjekk innboksen din nå.`,
+                "Flott, skjønner!"
+            );
+        }
     }
 
     filterRecipientsBySelection(allRecipients) {
