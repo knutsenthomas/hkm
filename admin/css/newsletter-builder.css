@@ -7631,31 +7631,46 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     }
 }
 
+/* Responsive Header Icon Buttons Transformation */
+@media (max-width: 1100px) {
+    .builder-toolbar-header .btn-label-text,
+    .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+
+    .builder-toolbar-header #save-draft-btn,
+    .builder-toolbar-header #preview-btn {
+        padding: 0 !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-radius: 8px !important;
+        justify-content: center !important;
+    }
+
+    .builder-toolbar-header .device-pill-btn {
+        padding: 0 !important;
+        width: 32px !important;
+        height: 28px !important;
+        min-width: 32px !important;
+        justify-content: center !important;
+    }
+
+    .builder-toolbar-header .autosave-pill {
+        margin-left: 2px !important;
+        padding: 2px 6px !important;
+    }
+
+    .builder-toolbar-header #newsletter-autosave-text {
+        display: none !important;
+    }
+}
+
 /* Header Action Buttons Mobile Clean Up */
 @media (max-width: 600px) {
     .builder-toolbar-header {
         padding: 4px 8px !important;
         gap: 4px !important;
-    }
-
-    .builder-toolbar-header .autosave-pill {
-        display: none !important;
-    }
-
-    .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-
-    .builder-toolbar-header .device-pill-btn {
-        padding: 0 6px !important;
-        min-width: 32px !important;
-    }
-
-    .builder-toolbar-header #save-draft-btn,
-    .builder-toolbar-header #preview-btn {
-        padding: 0 8px !important;
-        height: 34px !important;
-        font-size: 12px !important;
     }
 
     .builder-toolbar-header .btn-primary-publish {
