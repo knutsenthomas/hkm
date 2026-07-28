@@ -783,10 +783,14 @@ class NewsletterBuilder {
                 );
             });
 
-            document.getElementById('opt-send-test')?.addEventListener('click', () => {
-                publishDropdownMenu.style.setProperty('display', 'none', 'important');
-                this.sendTestEmail();
-            });
+            const optSendTestBtn = document.getElementById('opt-send-test');
+            if (optSendTestBtn) {
+                optSendTestBtn.onclick = (e) => {
+                    if (e) e.stopPropagation();
+                    publishDropdownMenu.style.setProperty('display', 'none', 'important');
+                    this.sendTestEmail();
+                };
+            }
 
             document.getElementById('opt-export-html')?.addEventListener('click', () => {
                 publishDropdownMenu.style.setProperty('display', 'none', 'important');
@@ -8379,15 +8383,6 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     async getAuthUser() {
         if (window.firebaseService?.auth?.currentUser) return window.firebaseService.auth.currentUser;
         if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) return firebase.auth().currentUser;
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            return new Promise(resolve => {
-                const unsubscribe = firebase.auth().onAuthStateChanged(user => {
-                    unsubscribe();
-                    resolve(user);
-                });
-                setTimeout(() => resolve(firebase.auth().currentUser), 2000);
-            });
-        }
         return null;
     }
 
