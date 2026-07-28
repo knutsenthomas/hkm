@@ -9936,20 +9936,19 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         const subscribersMap = new Map();
         const explicitlyUnsubscribedEmails = new Set();
 
-        const isNewsletterUnsubscribed = (data, isSubscription = false) => {
+        const isNewsletterUnsubscribed = (data) => {
+            if (!data) return false;
             const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
             const subscriptionStatus = String(data.status || '').trim().toLowerCase();
-            const unsubscribed = data.newsletterUnsubscribed === true
+            return data.newsletterUnsubscribed === true
                 || newsletterStatus === 'unsubscribed'
-                || newsletterStatus === 'avmeldt';
-
-            if (!isSubscription) return unsubscribed;
-            return unsubscribed
-                || data.isSubscribed === false
-                || ['unsubscribed', 'avmeldt', 'inactive', 'inaktiv'].includes(subscriptionStatus);
+                || newsletterStatus === 'avmeldt'
+                || subscriptionStatus === 'unsubscribed'
+                || subscriptionStatus === 'avmeldt';
         };
 
         const isExplicitNewsletterSubscriber = (data) => {
+            if (!data) return false;
             const newsletterStatus = String(data.newsletterStatus || '').trim().toLowerCase();
             const subscriptionStatus = String(data.status || '').trim().toLowerCase();
             const tags = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' ? data.tags.split(',') : []);
@@ -9962,6 +9961,8 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 || newsletterStatus === 'aktiv'
                 || newsletterStatus === 'active'
                 || subscriptionStatus === 'subscribed'
+                || subscriptionStatus === 'aktiv'
+                || subscriptionStatus === 'active'
                 || allTags.includes('nyhetsbrev')
                 || allTags.includes('newsletter');
         };
@@ -9974,7 +9975,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     const data = doc.data();
                     if (!data.email) return;
                     const email = data.email.toLowerCase().trim();
-                    if (isNewsletterUnsubscribed(data, true)) {
+                    if (isNewsletterUnsubscribed(data)) {
                         explicitlyUnsubscribedEmails.add(email);
                         return;
                     }
@@ -10022,7 +10023,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     }
 
                     if (onlyNewsletterSubscribers && !isExplicitNewsletterSubscriber(data)) {
-                        return; // Skip general CRM contacts who didn't opt into newsletter
+                        return;
                     }
 
                     if (!subscribersMap.has(email)) {
