@@ -3,6 +3,18 @@
 // JavaScript Functionality (v2.1.0)
 // ===================================
 
+import { mountSiteShell } from './js/site-shell.js';
+
+mountSiteShell();
+
+function onDOMReady(callback) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', callback, { once: true });
+    } else {
+        callback();
+    }
+}
+
 // biblicalCharacters database is loaded dynamically inside performSiteSearch to optimize bundle size
 
 const BIBLE_BOOKS = {
@@ -257,154 +269,9 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ===================================
-// Mega Menu Toggle
-// ===================================
-document.addEventListener('DOMContentLoaded', () => {
-    const header = document.getElementById('header');
-    const menuToggle = document.getElementById('menu-toggle');
-    const megaMenu = document.getElementById('mega-menu');
-
-    const openIcon = menuToggle?.querySelector('.open-icon');
-    const closeIcon = menuToggle?.querySelector('.close-icon');
-    let injectedCloseBtn = null;
-
-    function isMenuOpen() {
-        return !!megaMenu && (megaMenu.classList.contains('opacity-100') || megaMenu.classList.contains('active'));
-    }
-
-    function ensureCloseButton() {
-        if (!megaMenu) return null;
-        // When the header toggle is visible, it also acts as the close button.
-        // Avoid rendering a second floating close button behind it.
-        if (menuToggle) {
-            const existing = megaMenu.querySelector('.mega-menu-close-btn');
-            if (existing) existing.remove();
-            return null;
-        }
-        const existing = megaMenu.querySelector('.mega-menu-close-btn');
-        if (existing) return existing;
-
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'mega-menu-close-btn';
-        closeBtn.setAttribute('aria-label', 'Lukk meny');
-        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeMenu();
-        });
-        megaMenu.appendChild(closeBtn);
-        return closeBtn;
-    }
-
-    function setMenuState(open) {
-        if (!megaMenu || !header) return;
-        const headerActions = header.querySelector('.header-actions');
-        const headerActionsRightBefore = open && headerActions
-            ? headerActions.getBoundingClientRect().right
-            : null;
-
-        if (open) {
-            megaMenu.style.display = 'flex';
-        } else {
-            megaMenu.style.display = 'none';
-        }
-
-        megaMenu.classList.toggle('invisible', !open);
-        megaMenu.classList.toggle('opacity-0', !open);
-        megaMenu.classList.toggle('visible', open);
-        megaMenu.classList.toggle('opacity-100', open);
-        megaMenu.classList.toggle('active', open);
-        megaMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
-
-        header.classList.toggle('menu-open', open);
-        menuToggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
-
-        if (open) {
-            lockBodyScroll('mega-menu');
-        } else {
-            unlockBodyScroll('mega-menu');
-            if (!document.body.classList.contains('body-locked')) {
-                document.documentElement.style.removeProperty('--hkm-header-actions-lock-shift');
-            }
-        }
-
-        openIcon?.classList.toggle('hidden', open);
-        closeIcon?.classList.toggle('hidden', !open);
-
-        if (open && headerActions && Number.isFinite(headerActionsRightBefore)) {
-            const headerActionsRightAfter = headerActions.getBoundingClientRect().right;
-            const deltaX = headerActionsRightBefore - headerActionsRightAfter;
-            const safeDelta = Math.abs(deltaX) < 0.5 ? 0 : Math.round(deltaX * 100) / 100;
-            document.documentElement.style.setProperty('--hkm-header-actions-lock-shift', `${safeDelta}px`);
-        }
-
-        injectedCloseBtn = injectedCloseBtn || ensureCloseButton();
-        injectedCloseBtn?.classList.toggle('active', open);
-    }
-
-    function openMenu() {
-        setMenuState(true);
-        document.dispatchEvent(new CustomEvent('hkm:mega-menu-change', { detail: { open: true } }));
-    }
-
-    function closeMenu() {
-        setMenuState(false);
-        document.dispatchEvent(new CustomEvent('hkm:mega-menu-change', { detail: { open: false } }));
-    }
-
-    function toggleMenu() {
-        if (isMenuOpen()) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-    }
-
-    if (menuToggle) {
-        menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMenu();
-        });
-    }
-
-    if (megaMenu) {
-        megaMenu.setAttribute('aria-hidden', 'true');
-    }
-
-    injectedCloseBtn = ensureCloseButton();
-
-    // Close menu on link click and on backdrop click
-    megaMenu?.addEventListener('click', (e) => {
-        if (e.target === megaMenu) {
-            closeMenu();
-            return;
-        }
-
-        if (e.target.closest('a')) {
-            closeMenu();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isMenuOpen()) {
-            closeMenu();
-        }
-    });
-
-    window.HKM_UI = {
-        ...(window.HKM_UI || {}),
-        openMegaMenu: openMenu,
-        closeMegaMenu: closeMenu,
-        isMegaMenuOpen: isMenuOpen
-    };
-});
-
-// ===================================
 // Expandable Dock State Manager & Language Selector Click Toggle (Safari & Touch support)
 // ===================================
-document.addEventListener('DOMContentLoaded', () => {
+onDOMReady(() => {
     const dock = document.querySelector('.header-actions-dock');
     if (!dock) return;
 
@@ -458,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===================================
 // Global Site Search (Premium Edition)
 // ===================================
-document.addEventListener('DOMContentLoaded', () => {
+onDOMReady(() => {
     const searchTrigger = document.getElementById('global-search-opener');
     const searchModal = document.getElementById('site-search-modal');
     const closeSearch = document.getElementById('close-site-search');
@@ -5087,4 +4954,3 @@ window.addEventListener('load', () => {
         initHeaderProfile();
     }
 })();
-

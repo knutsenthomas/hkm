@@ -3,6 +3,70 @@ import { resolve } from 'path';
 import fs from 'fs';
 import react from '@vitejs/plugin-react';
 
+function shouldUseSharedSiteShell(pathname, html) {
+    const normalizedPath = (pathname || '').replace(/\\/g, '/');
+    const filename = normalizedPath.split('/').pop() || '';
+    const excludedDirectory = /\/(?:admin|minside|public)\//.test(normalizedPath);
+    const excludedUtilityPage = /^(?:seed|test|verify|restore)[-_]/.test(filename);
+    const optedOut = /data-site-shell=(?:"off"|'off')/.test(html);
+
+    return !excludedDirectory && !excludedUtilityPage && !optedOut;
+}
+
+const sharedSiteShellPlugin = {
+    name: 'hkm-shared-site-shell',
+    transformIndexHtml: {
+        order: 'pre',
+        handler(html, context) {
+            if (!shouldUseSharedSiteShell(context.path, html)) return html;
+
+            const tags = [{
+                tag: 'script',
+                attrs: {
+                    type: 'module',
+                    src: '/js/site-shell.js'
+                },
+                injectTo: 'head-prepend'
+            }];
+
+            if (!/href=(?:"[^"]*styles\.css(?:\?[^"]*)?"|'[^']*styles\.css(?:\?[^']*)?')/.test(html)) {
+                tags.push({
+                    tag: 'link',
+                    attrs: {
+                        rel: 'stylesheet',
+                        href: '/styles.css'
+                    },
+                    injectTo: 'head-prepend'
+                });
+            }
+
+            if (!html.includes('font-awesome')) {
+                tags.push({
+                    tag: 'link',
+                    attrs: {
+                        rel: 'stylesheet',
+                        href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+                    },
+                    injectTo: 'head-prepend'
+                });
+            }
+
+            if (!html.includes('Material+Symbols+Outlined')) {
+                tags.push({
+                    tag: 'link',
+                    attrs: {
+                        rel: 'stylesheet',
+                        href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block'
+                    },
+                    injectTo: 'head-prepend'
+                });
+            }
+
+            return tags;
+        }
+    }
+};
+
 function getHtmlEntries(dir, entries = {}) {
     const files = fs.readdirSync(dir);
     files.forEach(file => {
@@ -22,7 +86,7 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [sharedSiteShellPlugin, react()],
     resolve: {
         alias: {
             '@': resolve(__dirname, 'admin/js')
