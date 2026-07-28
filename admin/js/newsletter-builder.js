@@ -7713,7 +7713,7 @@ class NewsletterBuilder {
     }
 
 
-    compileSocialBlockForEmail(block) {
+    compileSocialBlockForEmail(block, lang = 'no') {
         const socialLinks = Array.from(block.querySelectorAll('a[href]'));
         if (!socialLinks.length) return '';
 
