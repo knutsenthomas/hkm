@@ -8408,7 +8408,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
         const user = await this.getAuthUser();
-        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
+        const defaultEmail = user?.email || 'knutsenthomas@gmail.com';
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
