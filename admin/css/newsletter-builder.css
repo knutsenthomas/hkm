@@ -7917,31 +7917,31 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         color: #1e293b !important;
     }
 
-    /* Ensure full action buttons with labels remain visible */
+    /* Compact icon-only action buttons on mobile & tablet (< 991px) to prevent overlap */
     .builder-toolbar-header .btn-label-text,
     .builder-toolbar-header #continue-btn .btn-publish-label {
-        display: inline-block !important;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        white-space: nowrap !important;
+        display: none !important;
     }
 
     .builder-toolbar-header #save-draft-btn,
     .builder-toolbar-header #preview-btn {
-        padding: 0 12px !important;
+        padding: 0 !important;
+        width: 36px !important;
         height: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
         border-radius: 10px !important;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 6px !important;
+        justify-content: center !important;
     }
 
     .builder-toolbar-header #continue-btn {
-        padding: 0 14px !important;
+        padding: 0 10px !important;
         height: 36px !important;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 6px !important;
+        justify-content: center !important;
     }
 }
 
@@ -7959,21 +7959,6 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         padding: 0 !important;
         width: 36px !important;
         min-width: 36px !important;
-        justify-content: center !important;
-    }
-
-    .builder-toolbar-header .btn-label-text,
-    .builder-toolbar-header #continue-btn .btn-publish-label {
-        display: none !important;
-    }
-
-    .builder-toolbar-header #save-draft-btn,
-    .builder-toolbar-header #preview-btn {
-        padding: 0 !important;
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        border-radius: 10px !important;
         justify-content: center !important;
     }
 }
