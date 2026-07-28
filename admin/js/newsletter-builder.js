@@ -9156,6 +9156,9 @@ class NewsletterBuilder {
                         : `<span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span>`;
 
                     tr.innerHTML = `
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="sub-row-cb" data-email="${sub.email}" style="width: 17px; height: 17px; cursor: pointer;">
+                        </td>
                         <td>
                             <strong>${sub.name}</strong>
                             ${sub.phone ? `<div style="font-size: 11px; color: #64748b;">📞 ${sub.phone}</div>` : ''}
@@ -9178,6 +9181,9 @@ class NewsletterBuilder {
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Update bulk selection UI state
+                updateBulkUI();
 
                 // Bind edit buttons using robust delegated lookup
                 tbody.querySelectorAll('.btn-edit-sub').forEach(btn => {
@@ -9236,6 +9242,101 @@ class NewsletterBuilder {
                     };
                 });
             };
+
+            // Bulk UI logic setup
+            const bulkBar = document.getElementById('subscribers-bulk-bar');
+            const bulkCountEl = document.getElementById('subscribers-selected-count');
+            const selectAllCb = document.getElementById('subscribers-select-all');
+
+            const getSelectedEmails = () => {
+                const checked = tbody.querySelectorAll('.sub-row-cb:checked');
+                return Array.from(checked).map(cb => cb.dataset.email);
+            };
+
+            const updateBulkUI = () => {
+                const selected = getSelectedEmails();
+                if (bulkCountEl) bulkCountEl.textContent = selected.length;
+                if (bulkBar) bulkBar.style.display = selected.length > 0 ? 'flex' : 'none';
+                if (selectAllCb) {
+                    const allCbs = tbody.querySelectorAll('.sub-row-cb');
+                    selectAllCb.checked = allCbs.length > 0 && selected.length === allCbs.length;
+                }
+            };
+
+            if (selectAllCb) {
+                selectAllCb.checked = false;
+                selectAllCb.onclick = () => {
+                    const isChecked = selectAllCb.checked;
+                    tbody.querySelectorAll('.sub-row-cb').forEach(cb => cb.checked = isChecked);
+                    updateBulkUI();
+                };
+            }
+
+            tbody.onchange = (e) => {
+                if (e.target.classList.contains('sub-row-cb')) updateBulkUI();
+            };
+
+            // Bulk Clear
+            const btnBulkClear = document.getElementById('btn-bulk-clear');
+            if (btnBulkClear) {
+                btnBulkClear.onclick = () => {
+                    tbody.querySelectorAll('.sub-row-cb').forEach(cb => cb.checked = false);
+                    updateBulkUI();
+                };
+            }
+
+            // Bulk Edit Tags
+            const btnBulkTags = document.getElementById('btn-bulk-tags');
+            if (btnBulkTags) {
+                btnBulkTags.onclick = () => {
+                    const selectedEmails = getSelectedEmails();
+                    if (selectedEmails.length === 0) return;
+                    this.openBulkTagsModal(selectedEmails);
+                };
+            }
+
+            // Bulk Edit Segments
+            const btnBulkSegments = document.getElementById('btn-bulk-segments');
+            if (btnBulkSegments) {
+                btnBulkSegments.onclick = () => {
+                    const selectedEmails = getSelectedEmails();
+                    if (selectedEmails.length === 0) return;
+                    this.openBulkSegmentsModal(selectedEmails);
+                };
+            }
+
+            // Bulk Delete
+            const btnBulkDelete = document.getElementById('btn-bulk-delete');
+            if (btnBulkDelete) {
+                btnBulkDelete.onclick = async () => {
+                    const selectedEmails = getSelectedEmails();
+                    if (selectedEmails.length === 0) return;
+                    const confirmDel = await this.showConfirm(
+                        'Masse-slett abonnenter',
+                        `Er du sikker på at du vil fjerne/avmelde alle ${selectedEmails.length} valgte abonnenter fra e-postlisten?`,
+                        'Slett alle valgte'
+                    );
+                    if (confirmDel) {
+                        try {
+                            for (const email of selectedEmails) {
+                                const subDocs = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', email).get();
+                                subDocs.forEach(d => d.ref.delete());
+
+                                const contactDocs = await window.firebaseService.db.collection('contacts').where('email', '==', email).get();
+                                contactDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed', status: 'Inaktiv' }));
+
+                                const userDocs = await window.firebaseService.db.collection('users').where('email', '==', email).get();
+                                userDocs.forEach(d => d.ref.update({ newsletterUnsubscribed: true, newsletterStatus: 'unsubscribed' }));
+                            }
+                            if (typeof showToast === 'function') showToast(`${selectedEmails.length} abonnenter ble fjernet.`, "success");
+                            this.loadSubscribers();
+                        } catch(err) {
+                            console.error("Bulk delete failed:", err);
+                            if (typeof showToast === 'function') showToast("Feil ved sletting av valgte abonnenter.", "error");
+                        }
+                    }
+                };
+            }
 
             renderRows();
 
@@ -9505,6 +9606,207 @@ class NewsletterBuilder {
             } catch(e) {
                 console.error("Add subscriber failed:", e);
                 if (typeof showToast === 'function') showToast("Kunne ikke legge til abonnent.", "error");
+            }
+        };
+    }
+
+    async openBulkTagsModal(selectedEmails) {
+        let modal = document.getElementById('hkm-bulk-tags-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-bulk-tags-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = "display: flex !important; z-index: 999999 !important; position: fixed !important; inset: 0 !important; background: rgba(15,23,42,0.7) !important; align-items: center !important; justify-content: center !important; backdrop-filter: blur(8px) !important; font-family: 'Inter', sans-serif !important;";
+
+        modal.innerHTML = `
+            <div style="background: #ffffff; width: 90%; max-width: 500px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Endre etiketter (${selectedEmails.length} kontakter)</h3>
+                    <button type="button" id="close-bulk-tags" style="background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Handlingsmodus</label>
+                    <select id="bulk-tags-mode" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px;">
+                        <option value="add">Legg til etiketter (behold eksisterende)</option>
+                        <option value="replace">Erstatt alle etiketter med de nye</option>
+                        <option value="remove">Fjern spesifiserte etiketter</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">Etiketter (kommaseparert)</label>
+                    <input type="text" id="bulk-tags-input" placeholder="F.eks. Lovsang, Fastgiver, VIP" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    <div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-size: 11px; color: #64748b;">Hurtigvalg:</span>
+                        ${['Lovsang', 'Fastgiver', 'Frivillig', 'Bibelstudium', 'VIP'].map(tag => `
+                            <button type="button" class="btn-bulk-quick-tag" data-tag="${tag}" style="font-size: 11px; background: #e0e7ff; color: #3730a3; border: none; padding: 3px 8px; border-radius: 12px; cursor: pointer;">+ ${tag}</button>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <button type="button" id="cancel-bulk-tags" style="padding: 10px 20px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 12px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-bulk-tags" style="padding: 10px 22px; border: none; background: #1B4965; color: #ffffff; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">Oppdater etiketter</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelectorAll('.btn-bulk-quick-tag').forEach(btn => {
+            btn.onclick = () => {
+                const tag = btn.dataset.tag;
+                const input = modal.querySelector('#bulk-tags-input');
+                const curTags = input.value.split(',').map(t => t.trim()).filter(Boolean);
+                if (!curTags.includes(tag)) {
+                    curTags.push(tag);
+                    input.value = curTags.join(', ');
+                }
+            };
+        });
+
+        modal.querySelector('#close-bulk-tags').onclick = () => modal.remove();
+        modal.querySelector('#cancel-bulk-tags').onclick = () => modal.remove();
+
+        modal.querySelector('#save-bulk-tags').onclick = async () => {
+            const mode = modal.querySelector('#bulk-tags-mode').value;
+            const inputTags = modal.querySelector('#bulk-tags-input').value.split(',').map(t => t.trim()).filter(Boolean);
+
+            if (inputTags.length === 0 && mode !== 'replace') {
+                if (typeof showToast === 'function') showToast("Skriv inn minst én etikett.", "warning");
+                return;
+            }
+            modal.remove();
+
+            try {
+                for (const email of selectedEmails) {
+                    const updateDocs = async (snap) => {
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            let existing = Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' && data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+                            let finalTags = [];
+                            if (mode === 'replace') {
+                                finalTags = inputTags;
+                            } else if (mode === 'add') {
+                                finalTags = Array.from(new Set([...existing, ...inputTags]));
+                            } else if (mode === 'remove') {
+                                finalTags = existing.filter(t => !inputTags.includes(t));
+                            }
+                            doc.ref.update({ tags: finalTags });
+                        });
+                    };
+
+                    const contactsSnap = await window.firebaseService.db.collection('contacts').where('email', '==', email).get();
+                    await updateDocs(contactsSnap);
+
+                    const subsSnap = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', email).get();
+                    await updateDocs(subsSnap);
+
+                    const usersSnap = await window.firebaseService.db.collection('users').where('email', '==', email).get();
+                    await updateDocs(usersSnap);
+                }
+
+                if (typeof showToast === 'function') showToast(`Oppdaterte etiketter for ${selectedEmails.length} kontakter!`, "success");
+                this.loadSubscribers();
+            } catch(err) {
+                console.error("Bulk tags update failed:", err);
+                if (typeof showToast === 'function') showToast("Kunne ikke oppdatere etiketter.", "error");
+            }
+        };
+    }
+
+    async openBulkSegmentsModal(selectedEmails) {
+        let modal = document.getElementById('hkm-bulk-segments-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'hkm-bulk-segments-modal';
+        modal.className = 'profile-modal';
+        modal.style.cssText = "display: flex !important; z-index: 999999 !important; position: fixed !important; inset: 0 !important; background: rgba(15,23,42,0.7) !important; align-items: center !important; justify-content: center !important; backdrop-filter: blur(8px) !important; font-family: 'Inter', sans-serif !important;";
+
+        modal.innerHTML = `
+            <div style="background: #ffffff; width: 90%; max-width: 500px; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a;">Endre segmenter (${selectedEmails.length} kontakter)</h3>
+                    <button type="button" id="close-bulk-segments" style="background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer;">&times;</button>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Handlingsmodus</label>
+                    <select id="bulk-seg-mode" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px;">
+                        <option value="add">Legg til valgte segmenter (behold eksisterende)</option>
+                        <option value="replace">Erstatt alle segmenter med de valgte</option>
+                        <option value="remove">Fjern de valgte segmentene</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Velg segmenter</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${['Nyhetsbrev', 'Fastgiver', 'Frivillig', 'Leder', 'Ungdom', 'Bønneteam'].map(seg => `
+                            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" class="bulk-seg-cb" value="${seg}">
+                                ${seg}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <button type="button" id="cancel-bulk-segments" style="padding: 10px 20px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 12px; font-weight: 600; cursor: pointer;">Avbryt</button>
+                    <button type="button" id="save-bulk-segments" style="padding: 10px 22px; border: none; background: #1B4965; color: #ffffff; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(27,73,101,0.25);">Oppdater segmenter</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#close-bulk-segments').onclick = () => modal.remove();
+        modal.querySelector('#cancel-bulk-segments').onclick = () => modal.remove();
+
+        modal.querySelector('#save-bulk-segments').onclick = async () => {
+            const mode = modal.querySelector('#bulk-seg-mode').value;
+            const selectedSegs = Array.from(modal.querySelectorAll('.bulk-seg-cb:checked')).map(cb => cb.value);
+
+            if (selectedSegs.length === 0 && mode !== 'replace') {
+                if (typeof showToast === 'function') showToast("Velg minst ett segment.", "warning");
+                return;
+            }
+            modal.remove();
+
+            try {
+                for (const email of selectedEmails) {
+                    const updateDocs = async (snap) => {
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            let existing = Array.isArray(data.segments) ? data.segments : (typeof data.segments === 'string' && data.segments ? data.segments.split(',').map(s => s.trim()).filter(Boolean) : (data.segment ? [data.segment] : []));
+                            let finalSegs = [];
+                            if (mode === 'replace') {
+                                finalSegs = selectedSegs;
+                            } else if (mode === 'add') {
+                                finalSegs = Array.from(new Set([...existing, ...selectedSegs]));
+                            } else if (mode === 'remove') {
+                                finalSegs = existing.filter(s => !selectedSegs.includes(s));
+                            }
+                            doc.ref.update({ segments: finalSegs });
+                        });
+                    };
+
+                    const contactsSnap = await window.firebaseService.db.collection('contacts').where('email', '==', email).get();
+                    await updateDocs(contactsSnap);
+
+                    const subsSnap = await window.firebaseService.db.collection('newsletter_subscriptions').where('email', '==', email).get();
+                    await updateDocs(subsSnap);
+
+                    const usersSnap = await window.firebaseService.db.collection('users').where('email', '==', email).get();
+                    await updateDocs(usersSnap);
+                }
+
+                if (typeof showToast === 'function') showToast(`Oppdaterte segmenter for ${selectedEmails.length} kontakter!`, "success");
+                this.loadSubscribers();
+            } catch(err) {
+                console.error("Bulk segments update failed:", err);
+                if (typeof showToast === 'function') showToast("Kunne ikke oppdatere segmenter.", "error");
             }
         };
     }
