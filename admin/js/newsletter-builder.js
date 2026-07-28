@@ -8476,6 +8476,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                 if (typeof showToast === 'function') {
                     showToast(`Test-e-post er sendt til ${recipientEmail}! 🚀`, "success");
                 }
+                alert(`✅ Test-e-post er sendt til ${recipientEmail}!\nSjekk innboksen din nå.`);
                 sendSuccess = true;
                 
                 const testIcon = document.getElementById('chk-test-icon');
@@ -8493,6 +8494,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (typeof showToast === 'function') {
                 showToast(`Kunne ikke sende test-e-post: ${error.message}`, "error");
             }
+            alert(`❌ Kunne ikke sende test-epost:\n${error.message}`);
         } finally {
             if (testBtn) {
                 testBtn.disabled = false;
