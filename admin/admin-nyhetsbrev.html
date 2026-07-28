@@ -978,6 +978,10 @@
                 </div>
 
                 <div class="toolbar-right-cell toolbar-right-actions" style="display: flex !important; align-items: center !important; justify-content: flex-end !important; height: 100% !important; gap: 8px !important; flex: 0 0 auto !important; margin-left: auto !important; white-space: nowrap !important;">
+                    <button id="translate-en-btn" class="btn-secondary-outline" title="Oversett e-post til engelsk med AI" style="border-color: #93c5fd; color: #1d4ed8; background: #eff6ff;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #2563eb;">translate</span>
+                        <span class="btn-label-text">Oversett til engelsk</span>
+                    </button>
                     <button id="save-draft-btn" class="btn-secondary-outline" title="Lagre utkast">
                         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
                         <span class="btn-label-text">Lagre utkast</span>
@@ -1324,6 +1328,29 @@
                                             <input type="text" id="newsletter-preheader" placeholder="Kort ingress som vises ved siden av emnelinjen..." maxlength="150">
                                         </div>
                                         <span class="input-hint">Utfyller emnelinjen i Gmail, Outlook og Apple Mail.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card: Språk og automatisk oversettelse (AI) -->
+                            <div class="selection-card-v2" style="border: 1px solid #bfdbfe; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
+                                <div class="card-header-v2" style="margin-bottom: 0;">
+                                    <div class="card-title-group" style="width: 100%;">
+                                        <span class="material-symbols-outlined card-title-icon" style="color: #0284c7; background: #ffffff; padding: 8px; border-radius: 12px;">translate</span>
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                                                <div>
+                                                    <h3 style="color: #0369a1; margin: 0; font-size: 16px; font-weight: 700;">Automatisk engelsk oversettelse (AI)</h3>
+                                                    <p style="color: #0284c7; margin: 4px 0 0 0; font-size: 13px; line-height: 1.4;">
+                                                        Mottakere med etikett <strong>'Engelsk'</strong>, <strong>'English'</strong> eller <strong>'en'</strong> mottar automatisk en oversatt versjon av nyhetsbrevet på engelsk.
+                                                    </p>
+                                                </div>
+                                                <label class="toggle-checkbox-v2">
+                                                    <input type="checkbox" id="auto-translate-english-toggle" checked>
+                                                    <span class="toggle-slider"></span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

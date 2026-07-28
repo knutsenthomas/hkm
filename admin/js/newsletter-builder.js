@@ -1228,6 +1228,11 @@ class NewsletterBuilder {
             });
         }
         
+        const translateEnBtn = document.getElementById('translate-en-btn');
+        if (translateEnBtn) {
+            translateEnBtn.addEventListener('click', () => this.translateCurrentNewsletterToEnglish());
+        }
+
         const saveDraftBtn = document.getElementById('save-draft-btn');
         if (saveDraftBtn) {
             saveDraftBtn.addEventListener('click', () => this.saveDraft());
@@ -7623,6 +7628,81 @@ class NewsletterBuilder {
         );
     }
 
+    async translateCurrentNewsletterToEnglish() {
+        const subjectNode = document.getElementById('newsletter-subject');
+        const subject = subjectNode ? subjectNode.value : '';
+        this.syncUnifiedBlocks();
+
+        const container = document.getElementById('blocks-container');
+        const textContent = container ? container.innerHTML : '';
+        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+
+        if (this.blocks.length === 0 || !textContent || plainText === '') {
+            if (typeof showToast === 'function') showToast("Vennligst skriv inn noe innhold i nyhetsbrevet før du oversetter.", "warning");
+            return;
+        }
+
+        const translateBtn = document.getElementById('translate-en-btn');
+        const originalText = translateBtn ? translateBtn.innerHTML : '';
+        if (translateBtn) {
+            translateBtn.disabled = true;
+            translateBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 18px;">sync</span> Oversetter (AI)...';
+        }
+
+        try {
+            const prompt = `
+                Du er en profesjonell teologisk og inspirerende oversetter for His Kingdom Ministry (HKM).
+                Oversett følgende nyhetsbrevinnhold fra norsk til et varmt, flytende og engasjerende engelsk språk.
+
+                Emnelinje (Norwegian): "${subject}"
+
+                Nyhetsbrevets blokker (JSON):
+                ${JSON.stringify(this.blocks)}
+
+                Du må returnere nøyaktig et gyldig JSON-objekt på dette formatet:
+                {
+                    "subject": "Translated English Subject Line",
+                    "blocks": [ ARRAY MED DE SAMME BLOKKENE, MEN MED ENGELSK TEKST I TEKSTBLOKKER OG KNAPPER ]
+                }
+                Svar KUN med ren JSON, ingen markdown.
+            `;
+
+            let translatedSubject = subject;
+            let translatedBlocks = null;
+
+            if (window.firebase && window.firebase.functions) {
+                const callable = firebase.functions().httpsCallable('aiProcess');
+                const response = await callable({ prompt: prompt });
+                if (response.data && response.data.text) {
+                    let jsonStr = response.data.text.trim();
+                    if (jsonStr.startsWith('```')) {
+                        jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+                    }
+                    const parsed = JSON.parse(jsonStr);
+                    if (parsed.subject) translatedSubject = parsed.subject;
+                    if (Array.isArray(parsed.blocks)) translatedBlocks = parsed.blocks;
+                }
+            }
+
+            if (translatedBlocks) {
+                if (subjectNode && translatedSubject) subjectNode.value = translatedSubject;
+                this.blocks = translatedBlocks;
+                this.renderUnifiedBlocks();
+                if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet ble oversatt til engelsk med AI! 🌐", "success");
+            } else {
+                if (typeof showToast === 'function') showToast("Kunne ikke oversette nyhetsbrevet akkurat nå.", "error");
+            }
+        } catch(err) {
+            console.error("Translation error:", err);
+            if (typeof showToast === 'function') showToast("Feil under oversettelse: " + (err.message || "Ukjent feil"), "error");
+        } finally {
+            if (translateBtn) {
+                translateBtn.disabled = false;
+                translateBtn.innerHTML = originalText;
+            }
+        }
+    }
+
     async sendCampaign() {
         const estCountNode = document.getElementById('estimated-count');
         const estCount = estCountNode ? (parseInt(estCountNode.innerText) || 0) : 0;
@@ -7655,20 +7735,70 @@ class NewsletterBuilder {
                 finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
             }
 
+            const autoTranslateEnToggle = document.getElementById('auto-translate-english-toggle');
+            const shouldAutoTranslateEn = autoTranslateEnToggle ? autoTranslateEnToggle.checked : true;
+
+            let englishPayload = null;
+
+            if (shouldAutoTranslateEn) {
+                if (finalBtn) {
+                    finalBtn.innerHTML = '<span class="material-symbols-outlined rotating">translate</span> Genererer engelsk oversettelse (AI)...';
+                }
+                try {
+                    const prompt = `
+                        Du er en oversetter for His Kingdom Ministry (HKM).
+                        Oversett emnelinje og nyhetsbrevblokker fra norsk til engelsk for engelskspråklige abonnenter.
+
+                        Emnelinje: "${subject}"
+                        Blokker: ${JSON.stringify(this.blocks)}
+
+                        Returner kun gyldig JSON:
+                        {
+                            "subject": "Translated English Subject",
+                            "blocks": [ SAME BLOCKS WITH ENGLISH TEXT ]
+                        }
+                    `;
+                    if (window.firebase && window.firebase.functions) {
+                        const callable = firebase.functions().httpsCallable('aiProcess');
+                        const response = await callable({ prompt });
+                        if (response.data && response.data.text) {
+                            let jsonStr = response.data.text.trim();
+                            if (jsonStr.startsWith('```')) {
+                                jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+                            }
+                            const parsed = JSON.parse(jsonStr);
+                            englishPayload = {
+                                subjectEn: parsed.subject || subject,
+                                blocksEn: parsed.blocks || this.blocks
+                            };
+                        }
+                    }
+                } catch(translateErr) {
+                    console.warn("Auto translate background attempt failed, sending standard version:", translateErr);
+                }
+            }
+
             const campaignData = {
                 subject: subject,
                 recipientCount: estCount,
                 blockCount: this.blocks.length,
                 status: 'sent',
                 sentAt: new Date().toISOString(),
-                sentBy: (window.firebaseService?.auth?.currentUser?.email) || 'admin@hiskingdomministry.no'
+                sentBy: (window.firebaseService?.auth?.currentUser?.email) || 'admin@hiskingdomministry.no',
+                autoTranslateEnglish: shouldAutoTranslateEn,
+                englishPayload: englishPayload || null,
+                englishTargetTags: ['Engelsk', 'English', 'en']
             };
 
             if (window.firebaseService && window.firebaseService.db) {
                 await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
             }
 
-            if (typeof showToast === 'function') showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse!`, "success");
+            const toastMsg = englishPayload 
+                ? `Suksess! Nyhetsbrevet sendes på norsk, og automatisk oversatt til engelsk for engelskspråklige mottakere! 🌐`
+                : `Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse!`;
+
+            if (typeof showToast === 'function') showToast(toastMsg, "success");
             if (finalBtn) {
                 finalBtn.disabled = false;
                 finalBtn.innerHTML = originalText;
@@ -7676,7 +7806,7 @@ class NewsletterBuilder {
 
             const confirmedBack = await this.showConfirm(
                 'Nyhetsbrev sendt!',
-                `Suksess! Nyhetsbrevet er lagt i kø for utsendelse til ca. ${estCount} mottakere.\n\nVil du gå tilbake til oversikten?`,
+                `Suksess! Nyhetsbrevet er lagt i kø for utsendelse til ca. ${estCount} mottakere.${englishPayload ? '\n(Inkluderer automatisk AI-oversettelse til engelsk for engelskspråklige mottakere).' : ''}\n\nVil du gå tilbake til oversikten?`,
                 'Gå til oversikt',
                 'Bli i editoren'
             );
