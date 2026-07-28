@@ -76,6 +76,10 @@
             }
 
             window.onerror = function(message, source, lineno, colno, error) {
+                var msgStr = String(message || '');
+                if (msgStr.includes('ResizeObserver') || msgStr.includes('Script error.')) {
+                    return false;
+                }
                 var cleanSource = source ? source.split('/').pop() : 'ukjent';
                 var msg = message || 'Ukjent runtime-feil';
                 var details = 'Fil: ' + source + '\nLinje: ' + lineno + ', Kolonne: ' + colno + 
@@ -88,6 +92,7 @@
             window.addEventListener('unhandledrejection', function(event) {
                 var reason = event.reason;
                 var msg = reason && reason.message ? reason.message : String(reason || 'Uventet Promise-feil');
+                if (typeof msg === 'string' && msg.includes('ResizeObserver')) return;
                 var details = reason && reason.stack ? reason.stack : 'Ingen stack trace tilgjengelig';
                 showVisualErrorBanner('Uventet Promise-feil (Asynkron krasj)', msg, details);
                 console.error('[HKM Global Rejection]', event);

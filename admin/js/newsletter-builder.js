@@ -9147,13 +9147,27 @@ class NewsletterBuilder {
 
                 filtered.forEach((sub, idx) => {
                     const tr = document.createElement('tr');
-                    const tagsHtml = (sub.tags && sub.tags.length > 0)
-                        ? sub.tags.map(t => `<span style="font-size: 11px; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${t}</span>`).join('')
+                    const mappedTags = (sub.tags || []).map(t => t === 'Ny' ? 'Nyhetsbrev' : t);
+                    const tagsHtml = (mappedTags.length > 0)
+                        ? mappedTags.map(t => `<span style="font-size: 11px; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${t}</span>`).join('')
                         : `<span style="font-size: 11px; color: #94a3b8; font-style: italic;">Ingen</span>`;
                     
                     const segmentsHtml = (sub.segments && sub.segments.length > 0)
                         ? sub.segments.map(sg => `<span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 2px;">${sg}</span>`).join('')
                         : `<span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${sub.source}</span>`;
+
+                    let statusLabel = 'Aktiv';
+                    let statusClass = 'badge-status-active';
+                    if (sub.status === 'Avmeldt' || sub.status === 'Inaktiv') {
+                        statusLabel = 'Avmeldt';
+                        statusClass = 'badge-status-inactive';
+                    } else if (sub.status === 'Medlem') {
+                        statusLabel = 'Medlem';
+                        statusClass = 'badge-status-active';
+                    } else {
+                        statusLabel = 'Aktiv';
+                        statusClass = 'badge-status-active';
+                    }
 
                     tr.innerHTML = `
                         <td style="text-align: center;">
@@ -9166,7 +9180,7 @@ class NewsletterBuilder {
                         <td>${sub.email}</td>
                         <td>${segmentsHtml}</td>
                         <td>${tagsHtml}</td>
-                        <td><span class="${sub.status === 'Avmeldt' || sub.status === 'Inaktiv' ? 'badge-status-inactive' : 'badge-status-active'}">${sub.status || 'Aktiv'}</span></td>
+                        <td><span class="${statusClass}">${statusLabel}</span></td>
                         <td>${sub.dateStr}</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 4px;">
