@@ -384,6 +384,7 @@ class NewsletterBuilder {
                 const data = doc.data();
                 this.currentDraftId = doc.id;
                 this.currentDraftName = data.name || 'Uten navn';
+                this.hasCustomDraftName = true;
                 this.blocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
                 const subjectInput = document.getElementById('newsletter-subject');
                 if (subjectInput) subjectInput.value = data.subject || '';
@@ -7216,30 +7217,51 @@ ${cleanCanvasHtml}
     async saveDraft() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
+        const subjectVal = document.getElementById('newsletter-subject')?.value || '';
+        const defaultName = this.currentDraftName || (subjectVal ? `Kladd: ${subjectVal}` : "Min Kladd");
+
         this.showPromptModal(
             "Oppgi navnet på kladden din:",
             "f.eks. Juli Månedsbrev, Konsertinvitasjon...",
             async (name) => {
+                const trimmedName = (name || '').trim();
+                if (!trimmedName) return;
+
                 try {
                     this.syncUnifiedBlocks();
                     const headerNode = document.querySelector('.canvas-header');
                     const data = {
-                        name,
+                        name: trimmedName,
                         blocks: this.blocks,
                         headerHtml: headerNode ? headerNode.outerHTML : '',
-                        subject: document.getElementById('newsletter-subject')?.value || '',
-                        createdAt: new Date().toISOString(),
+                        subject: subjectVal,
+                        updatedAt: new Date().toISOString(),
                         isDraft: true
                     };
-                    await window.firebaseService.db.collection('newsletter_templates').add(data);
-                    if (typeof showToast === 'function') showToast("Kladd lagret!", "success");
+
+                    this.currentDraftName = trimmedName;
+                    this.hasCustomDraftName = true;
+
+                    if (this.currentDraftId) {
+                        await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
+                    } else {
+                        data.createdAt = new Date().toISOString();
+                        const docRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
+                        this.currentDraftId = docRef.id;
+
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('draftId', this.currentDraftId);
+                        window.history.replaceState({}, '', url.toString());
+                    }
+
+                    if (typeof showToast === 'function') showToast(`Kladd "${trimmedName}" lagret!`, "success");
                     this.loadDrafts();
                 } catch (e) {
                     console.error("Save draft failed:", e);
                     if (typeof showToast === 'function') showToast("Kunne ikke lagre kladd.");
                 }
             },
-            this.currentDraftName || "Min Kladd",
+            defaultName,
             "Vennligst oppgi et navn på kladden.",
             "Lagre utkast",
             "Lagre"
@@ -7304,6 +7326,7 @@ ${cleanCanvasHtml}
                     if (confirmed) {
                         this.currentDraftId = id;
                         this.currentDraftName = data.name;
+                        this.hasCustomDraftName = true;
                         this.blocks = data.blocks;
                         const subjectInput = document.getElementById('newsletter-subject');
                         if (subjectInput) subjectInput.value = data.subject || '';
@@ -8324,10 +8347,10 @@ ${cleanCanvasHtml}
                 const subject = document.getElementById('newsletter-subject')?.value || '';
                 
                 let draftName = this.currentDraftName;
-                if (!draftName || draftName.startsWith('Autolagret kladd')) {
+                if (!this.hasCustomDraftName || !draftName) {
                     draftName = subject ? `Kladd: ${subject}` : `Utkast (${new Date().toLocaleDateString('no')})`;
+                    this.currentDraftName = draftName;
                 }
-                this.currentDraftName = draftName;
 
                 const headerNode = document.querySelector('.canvas-header');
                 const data = {
