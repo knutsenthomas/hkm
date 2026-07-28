@@ -7608,66 +7608,93 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         overflow-y: auto !important;
     }
 
-    /* Drag handle indicator at top of mobile drawers */
-    #builder-main-workspace .builder-elements-panel::before,
-    #builder-main-workspace .builder-properties-panel::before {
-        content: '' !important;
-        display: block !important;
-        width: 40px !important;
-        height: 5px !important;
-        background: #cbd5e1 !important;
-        border-radius: 3px !important;
-        margin: 0 auto 16px auto !important;
-        flex-shrink: 0 !important;
+/* Mobile side panel header */
+.mobile-panel-header {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .mobile-panel-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding-bottom: 12px !important;
+        margin-bottom: 12px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
     }
 
-    /* Elementer Panel converts into a slide-up bottom drawer on mobile */
+    .mobile-panel-header h3 {
+        margin: 0 !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+
+    .mobile-panel-header .btn-close-mobile-panel {
+        border: none !important;
+        background: #f1f5f9 !important;
+        border-radius: 8px !important;
+        width: 32px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        color: #475569 !important;
+    }
+
+    /* Elementer Panel converts into a slide-out left side menu on mobile */
     #builder-main-workspace .builder-elements-panel {
         position: fixed !important;
-        bottom: 0 !important;
+        top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        width: 100vw !important;
-        max-height: 80vh !important;
-        height: auto !important;
+        bottom: 0 !important;
+        right: auto !important;
+        width: 320px !important;
+        max-width: 85vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
         background: #ffffff !important;
         z-index: 99999 !important;
-        border-radius: 24px 24px 0 0 !important;
-        box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
-        transform: translateY(110%) !important;
+        border-radius: 0 20px 20px 0 !important;
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.25) !important;
+        transform: translateX(-110%) !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        padding: 16px 20px 32px 20px !important;
+        padding: 16px 16px 32px 16px !important;
         box-sizing: border-box !important;
         overflow-y: auto !important;
     }
 
     #builder-main-workspace .builder-elements-panel.mobile-drawer-open {
-        transform: translateY(0) !important;
+        transform: translateX(0) !important;
     }
 
-    /* Egenskaper Panel converts into a slide-up bottom drawer on mobile */
+    /* Egenskaper Panel converts into a slide-out right side menu on mobile */
     #builder-main-workspace .builder-properties-panel {
         position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
+        top: 0 !important;
         right: 0 !important;
-        width: 100vw !important;
-        max-height: 85vh !important;
-        height: auto !important;
+        bottom: 0 !important;
+        left: auto !important;
+        width: 330px !important;
+        max-width: 88vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
         background: #ffffff !important;
         z-index: 99999 !important;
-        border-radius: 24px 24px 0 0 !important;
-        box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
-        transform: translateY(110%) !important;
+        border-radius: 20px 0 0 20px !important;
+        box-shadow: -10px 0 40px rgba(0, 0, 0, 0.25) !important;
+        transform: translateX(110%) !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        padding: 16px 20px 32px 20px !important;
+        padding: 16px 16px 32px 16px !important;
         box-sizing: border-box !important;
         overflow-y: auto !important;
     }
 
     #builder-main-workspace .builder-properties-panel.mobile-drawer-open {
-        transform: translateY(0) !important;
+        transform: translateX(0) !important;
     }
+}
 
     #sidebar-inspector-view,
     #sidebar-default-view {

@@ -1069,10 +1069,16 @@
                 <div id="builder-main-workspace" style="display: flex; flex: 1; min-width: 0; height: 100%;">
                     <!-- 2. Elementpanel (Lys profil) -->
                     <aside class="builder-elements-panel" id="elements-panel">
-                    <div class="elements-search-container">
-                        <span class="material-symbols-outlined search-icon">search</span>
-                        <input type="text" id="elements-search-input" placeholder="Søk etter elementer..." class="elements-search-input">
-                    </div>
+                        <div class="mobile-panel-header">
+                            <h3>Elementer</h3>
+                            <button type="button" class="btn-close-mobile-panel" onclick="if(window.builder) builder.closeMobileDrawers();" title="Lukk meny">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="elements-search-container">
+                            <span class="material-symbols-outlined search-icon">search</span>
+                            <input type="text" id="elements-search-input" placeholder="Søk etter elementer..." class="elements-search-input">
+                        </div>
 
                     <div class="elements-panel-body">
                         <!-- Basisblokker -->
