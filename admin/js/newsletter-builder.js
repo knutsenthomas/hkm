@@ -432,7 +432,17 @@ class NewsletterBuilder {
                 this.currentDraftId = doc.id;
                 this.currentDraftName = data.name || 'Uten navn';
                 this.hasCustomDraftName = true;
-                this.blocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
+                let loadedBlocks = typeof data.blocks === 'string' ? JSON.parse(data.blocks) : (data.blocks || []);
+                
+                const placeholderStr = "Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg";
+                const userFullText = "Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.";
+
+                let str = JSON.stringify(loadedBlocks);
+                if (str.includes("Vi er så takknemlige")) {
+                    str = str.replace(/Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg\.? Gud gjør store ting i vår midte, og vi ønsker å oppmuntre deg i din vandring\.?/g, userFullText);
+                    try { loadedBlocks = JSON.parse(str); } catch(e) {}
+                }
+                this.blocks = loadedBlocks;
                 const subjectInput = document.getElementById('newsletter-subject');
                 if (subjectInput) subjectInput.value = data.subject || '';
                 
@@ -6792,7 +6802,10 @@ class NewsletterBuilder {
         
         if (isUnified) {
             let rawText = this.blocks[0].content.text || '';
-            // If it is the old legacy hardcoded placeholder, clean it up
+            const userFullText = "Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.";
+            if (rawText.includes("Vi er så takknemlige")) {
+                rawText = rawText.replace(/Vi er så takknemlige for å dele månedens oppdateringer og inspirerende ord med deg\.? Gud gjør store ting i vår midte, og vi ønsker å oppmuntre deg i din vandring\.?/g, userFullText);
+            }
             if (rawText === '<p>Skriv nyhetsbrevet ditt her...</p>') {
                 rawText = '<p><br></p>';
             }
