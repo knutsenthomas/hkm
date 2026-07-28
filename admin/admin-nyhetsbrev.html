@@ -965,7 +965,7 @@
                     </div>
                 </div>
 
-                <div class="toolbar-center-cell" style="display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; flex: 0 1 auto !important; min-width: 0 !important;">
+                <div class="toolbar-center-cell" style="display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; flex: 0 1 auto !important; min-width: 0 !important; gap: 12px !important;">
                     <div class="device-switch-pill">
                         <button type="button" class="device-pill-btn device-btn active" data-view="desktop" title="Skrivebord">
                             <span class="material-symbols-outlined">desktop_windows</span>
@@ -976,11 +976,9 @@
                             <span>Mobil</span>
                         </button>
                     </div>
-                </div>
 
-                <div class="toolbar-right-cell toolbar-right-actions" style="display: flex !important; align-items: center !important; justify-content: flex-end !important; height: 100% !important; gap: 8px !important; flex: 0 0 auto !important; margin-left: auto !important; white-space: nowrap !important;">
                     <!-- TOSPRÅKLIG SPRÅKVELGER -->
-                    <div id="editor-language-switcher" style="display: flex; align-items: center; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 2px;">
+                    <div id="editor-language-switcher" style="display: flex; align-items: center; background: #e2e8f0; border-radius: 12px; padding: 3px; gap: 2px; flex-shrink: 0;">
                         <button type="button" id="editor-lang-btn-no" class="editor-lang-btn active" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: all 0.2s;">
                             <span>🇳🇴</span><span class="lang-text">Norsk</span>
                         </button>
@@ -989,7 +987,9 @@
                             <span>🇬🇧</span><span class="lang-text">English</span>
                         </button>
                     </div>
+                </div>
 
+                <div class="toolbar-right-cell toolbar-right-actions" style="display: flex !important; align-items: center !important; justify-content: flex-end !important; height: 100% !important; gap: 8px !important; flex: 0 0 auto !important; margin-left: auto !important; white-space: nowrap !important;">
                     <button id="save-draft-btn" class="btn-secondary-outline" title="Lagre utkast">
                         <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
                         <span class="btn-label-text">Lagre utkast</span>
