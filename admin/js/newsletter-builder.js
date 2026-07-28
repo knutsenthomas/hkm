@@ -6026,6 +6026,7 @@ class NewsletterBuilder {
 
                 showToast(`Sender test-e-post til ${recipientEmail}...`, "info");
 
+                let sendSuccess = false;
                 try {
                     // Get user ID Token for verification
                     const idToken = await user.getIdToken();
@@ -6050,6 +6051,7 @@ class NewsletterBuilder {
                     const result = await response.json();
                     if (result.success) {
                         showToast("Test-e-post er sendt!", "success");
+                        sendSuccess = true;
                         
                         // Update checklist item in sidebar
                         const testIcon = document.getElementById('chk-test-icon');
@@ -6059,14 +6061,6 @@ class NewsletterBuilder {
                             testIcon.className = 'material-symbols-outlined chk-success';
                             testText.innerText = 'Test-epost bekreftet sendt';
                         }
-
-                        // Vis en tydelig og lekker bekreftelsesmelding til brukeren i systemet
-                        await this.showConfirm(
-                            "E-post sendt!",
-                            `Test-e-posten ble sendt til ${recipientEmail}. Sjekk innboksen din (og søppelpost hvis den ikke dukker opp).`,
-                            "OK",
-                            ""
-                        );
                     } else {
                         throw new Error(result.error || 'Serveren returnerte en feil.');
                     }
@@ -6076,8 +6070,17 @@ class NewsletterBuilder {
                 } finally {
                     if (testBtn) {
                         testBtn.disabled = false;
-                        testBtn.innerHTML = originalHtml;
+                        testBtn.innerHTML = originalHtml || '<span class="material-symbols-outlined">send</span> Send test-e-post';
                     }
+                }
+
+                if (sendSuccess) {
+                    this.showConfirm(
+                        "E-post sendt!",
+                        `Test-e-posten ble sendt til ${recipientEmail}. Sjekk innboksen din (og søppelpost hvis den ikke dukker opp).`,
+                        "OK",
+                        ""
+                    );
                 }
             },
             user.email,
