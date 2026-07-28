@@ -3151,6 +3151,61 @@ class NewsletterBuilder {
         });
     }
 
+    showSuccessModal(title, message, buttonText = 'Flott, skjønner!') {
+        return new Promise((resolve) => {
+            let modal = document.getElementById('hkm-success-modal');
+            if (modal) modal.remove();
+
+            modal = document.createElement('div');
+            modal.id = 'hkm-success-modal';
+            modal.className = 'profile-modal';
+            modal.style.cssText = `
+                display: flex;
+                z-index: 22000;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.6);
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(8px);
+                font-family: 'Inter', sans-serif;
+            `;
+            modal.innerHTML = `
+                <div class="profile-modal-content card modern" style="max-width: 460px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; transform: translateZ(0); display: flex; flex-direction: column;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
+                        <div style="background: rgba(255,255,255,0.2); width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 26px; color: white;">mark_email_read</span>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.01em;">${title}</h3>
+                            <span style="font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">Test-e-post bekreftelse</span>
+                        </div>
+                    </div>
+                    <div class="modal-body" style="padding: 28px 32px; font-size: 15px; line-height: 1.6; color: #334155;">
+                        <p style="margin: 0; font-weight: 500;">${message}</p>
+                    </div>
+                    <div class="modal-footer" style="padding: 20px 32px; background: #f8fafc; display: flex; justify-content: flex-end; border-top: 1px solid #f1f5f9;">
+                        <button id="success-modal-ok-btn" class="btn-primary" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);">
+                            ${buttonText}
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const okBtn = modal.querySelector('#success-modal-ok-btn');
+            const close = () => {
+                modal.remove();
+                resolve(true);
+            };
+
+            if (okBtn) okBtn.onclick = close;
+            modal.onclick = (e) => {
+                if (e.target === modal) close();
+            };
+        });
+    }
+
     showPromptModal(label, placeholder, confirmCallback, defaultValue = '', warningMsg = "Vennligst oppgi en beskrivelse.", modalTitle = "Lagre kladd", confirmText = "Lagre") {
         const modal = document.getElementById('custom-prompt-modal');
         const titleEl = document.getElementById('custom-prompt-title');
@@ -6139,11 +6194,10 @@ class NewsletterBuilder {
                 }
 
                 if (sendSuccess) {
-                    this.showConfirm(
-                        "E-post sendt!",
-                        `Test-e-posten ble sendt til ${recipientEmail}. Sjekk innboksen din (og søppelpost hvis den ikke dukker opp).`,
-                        "OK",
-                        ""
+                    await this.showSuccessModal(
+                        "Test-e-post er sendt! 🚀",
+                        `Vellykket utsending! Test-e-posten ble sendt til <strong style="color: #0f172a;">${recipientEmail}</strong>.<br><br>Sjekk innboksen din nå (husk å sjekke søppelpost/spam dersom den ikke dukker opp innen et minutt).`,
+                        "Flott, skjønner!"
                     );
                 }
             },
