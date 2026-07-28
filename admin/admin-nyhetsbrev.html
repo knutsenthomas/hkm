@@ -1541,7 +1541,7 @@
 
                             <!-- Action Buttons Card -->
                             <div class="actions-card-v2">
-                                <button id="send-test-btn" class="btn-v2 btn-v2-outline">
+                                <button id="send-test-btn" class="btn-v2 btn-v2-outline" onclick="if(window.builder){ window.builder.sendTestEmail(); }">
                                     <span class="material-symbols-outlined">send</span> Send test-e-post
                                 </button>
                                 <button id="final-send-btn" class="btn-v2 btn-v2-primary" onclick="if(window.builder){ window.builder.sendCampaign(); }">
