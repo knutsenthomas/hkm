@@ -7,6 +7,39 @@ function escapeHtml(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+const HKD_STORE_ORIGIN = 'https://www.hiskingdomdesigns.no';
+
+function resolveHkdProductUrl(product = {}) {
+    const productId = String(product.id || product._id || product.productId || '').trim();
+    if (productId) {
+        return `${HKD_STORE_ORIGIN}/produkt/${encodeURIComponent(productId)}`;
+    }
+
+    const urlCandidates = [
+        product.productUrl,
+        product.productPageUrl,
+        product.url,
+        product.href
+    ].filter(Boolean);
+
+    for (const candidate of urlCandidates) {
+        try {
+            const parsed = new URL(candidate, HKD_STORE_ORIGIN);
+            const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+            const isStoreDomain = hostname === 'hiskingdomdesigns.no';
+            const isCurrentProductRoute = /^\/(?:produkt|product|producto)\/[^/]+\/?$/i.test(parsed.pathname);
+            if (isStoreDomain && isCurrentProductRoute) {
+                return `${HKD_STORE_ORIGIN}${parsed.pathname}${parsed.search}${parsed.hash}`;
+            }
+        } catch (error) {
+            console.warn('Ugyldig produktlenke ignorert:', candidate, error);
+        }
+    }
+
+    return `${HKD_STORE_ORIGIN}/produkter`;
+}
+
 if (typeof window !== 'undefined') {
     window.escapeHtml = escapeHtml;
 }
@@ -2545,35 +2578,11 @@ class NewsletterBuilder {
             let combinedHtml = '';
             selectedProductsMap.forEach((p) => {
                 const productId = p.id || p._id || '';
-                const rawUrl = p.productPageUrl || p.url || '';
-                let slug = p.slug || '';
-                if (!slug && rawUrl) {
-                    if (rawUrl.includes('/product-page/')) {
-                        slug = rawUrl.split('/product-page/')[1].split('?')[0].split('#')[0];
-                    } else if (rawUrl.includes('/product/')) {
-                        slug = rawUrl.split('/product/')[1].split('?')[0].split('#')[0];
-                    }
-                }
-                if (!slug && p.name) {
-                    slug = p.name.toLowerCase()
-                        .replace(/æ/g, 'ae').replace(/ø/g, 'o').replace(/å/g, 'a')
-                        .replace(/[^a-z0-9]+/g, '-')
-                        .replace(/(^-|-$)/g, '');
-                }
-
-                // If rawUrl is already a specific product page, use it; otherwise build the direct /product-page/slug URL
-                let productUrl = '';
-                if (rawUrl && rawUrl.startsWith('http') && (rawUrl.includes('/product-page/') || rawUrl.includes('/product/'))) {
-                    productUrl = rawUrl;
-                } else if (slug) {
-                    productUrl = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
-                } else {
-                    productUrl = 'https://www.hiskingdomdesigns.no/produkter';
-                }
+                const productUrl = resolveHkdProductUrl(p);
 
                 const image = p.imageUrl || '';
                 combinedHtml += `
-                    <div class="newsletter-product-card" contenteditable="false" data-product-id="${productId}" data-product-slug="${slug}">
+                    <div class="newsletter-product-card" contenteditable="false" data-product-id="${escapeHtml(productId)}" data-product-url="${escapeHtml(productUrl)}">
                         <button class="card-delete-btn" title="Slett produkt">×</button>
                         <div class="product-img-wrap">
                             <a href="${productUrl}" target="_blank" style="text-decoration: none; display: block;">
@@ -2604,36 +2613,36 @@ class NewsletterBuilder {
         const loadProducts = async () => {
             const fallbackProducts = [
                 {
+                    id: "e8def42a-7ad8-4faf-acc0-6588fe3bfbd4",
                     name: "Norgeskoppen - White 12oz Enamel Mug",
                     price: "249",
                     imageUrl: "https://static.wixstatic.com/media/db4f96_2e012335b82e4405ba0e4ca09cb6f915~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
                     description: "En slitesterk og lett emaljekopp som passer perfekt til tur, camping eller morgenkaffen.",
-                    slug: "norgeskoppen-white-12oz-enamel-mug",
-                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/norgeskoppen-white-12oz-enamel-mug"
+                    productUrl: "https://www.hiskingdomdesigns.no/produkt/e8def42a-7ad8-4faf-acc0-6588fe3bfbd4"
                 },
                 {
+                    id: "bd1199a0-eeb8-4760-8997-aaca8ba85c51",
                     name: "NORGE Brodert på Økologisk bøttehatt | Beechfield B90N",
                     price: "365",
                     imageUrl: "https://static.wixstatic.com/media/db4f96_6fc1d0d498e2415aae57aff3d5de5c99~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
                     description: "Klassisk økologisk bøttehatt brodert med Norge-motiv. Gir god solbeskyttelse med stil.",
-                    slug: "norge-brodert-pa-okologisk-bottehatt-beechfield-b90n",
-                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/norge-brodert-pa-okologisk-bottehatt-beechfield-b90n"
+                    productUrl: "https://www.hiskingdomdesigns.no/produkt/bd1199a0-eeb8-4760-8997-aaca8ba85c51"
                 },
                 {
+                    id: "0d5de5f7-f765-4616-aefb-91edcbc87ff6",
                     name: "FAITH OVER FEAR - Classic Matte Paper Poster",
                     price: "139",
                     imageUrl: "https://static.wixstatic.com/media/db4f96_74c605681f6c413d929793be3d51d2f3~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
                     description: "En moderne kunstplakat med et sterkt budskap trykket på matt papir av høy kvalitet.",
-                    slug: "faith-over-fear-classic-matte-paper-poster",
-                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/faith-over-fear-classic-matte-paper-poster"
+                    productUrl: "https://www.hiskingdomdesigns.no/produkt/0d5de5f7-f765-4616-aefb-91edcbc87ff6"
                 },
                 {
-                    name: "JESUS IS KING - Unisex Hettegenser",
-                    price: "499",
-                    imageUrl: "https://static.wixstatic.com/media/db4f96_2e012335b82e4405ba0e4ca09cb6f915~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
-                    description: "Myk og varm hettegenser med høykvalitets trykk.",
-                    slug: "jesus-is-king-unisex-hettegenser",
-                    productPageUrl: "https://www.hiskingdomdesigns.no/product-page/jesus-is-king-unisex-hettegenser"
+                    id: "95140892-0665-4664-8e2b-0621e6f7fe26",
+                    name: "QUEEN BEE 11oz Ceramic Mug",
+                    price: "199",
+                    imageUrl: "https://static.wixstatic.com/media/db4f96_949de42b3a0d4645985f6e40c82d8b82~mv2.png/v1/fit/w_1000,h_1000,q_90/file.png",
+                    description: "En blank, hvit keramikkopp som tåler både oppvaskmaskin og mikrobølgeovn.",
+                    productUrl: "https://www.hiskingdomdesigns.no/produkt/95140892-0665-4664-8e2b-0621e6f7fe26"
                 }
             ];
 
@@ -6629,30 +6638,29 @@ class NewsletterBuilder {
             }
         });
 
-        // 5. Upgrade product card links so they always point directly to /product-page/slug instead of generic front page
+        // 5. Keep product cards on the store's real ID-based product routes.
         container.querySelectorAll('.newsletter-product-card').forEach(card => {
-            let slug = card.dataset.productSlug || '';
+            let productId = card.dataset.productId || '';
             const titleEl = card.querySelector('.product-title, h4');
             const titleText = titleEl ? titleEl.textContent.trim() : '';
 
-            if (!slug && titleText) {
-                slug = titleText.toLowerCase()
-                    .replace(/æ/g, 'ae').replace(/ø/g, 'o').replace(/å/g, 'a')
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/(^-|-$)/g, '');
-                card.setAttribute('data-product-slug', slug);
+            if (!productId && titleText) {
+                const cachedProduct = (window.hkmWixProductsCache || []).find(
+                    p => (p.name || '').trim().toLowerCase() === titleText.toLowerCase()
+                );
+                productId = cachedProduct?.id || cachedProduct?._id || '';
+                if (productId) {
+                    card.setAttribute('data-product-id', productId);
+                }
             }
 
-            if (slug) {
-                const targetUrl = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
-                card.querySelectorAll('a[href]').forEach(a => {
-                    const href = a.getAttribute('href') || '';
-                    if (!href.includes('/product-page/') || href.endsWith('/produkter') || href === 'https://www.hiskingdomdesigns.no/' || href === 'https://hiskingdomdesigns.no/' || href === 'https://www.hiskingdomdesigns.no/produkter') {
-                        a.setAttribute('href', targetUrl);
-                        a.setAttribute('target', '_blank');
-                    }
-                });
-            }
+            const existingUrl = card.dataset.productUrl || card.querySelector('a[href]')?.getAttribute('href') || '';
+            const targetUrl = resolveHkdProductUrl({ id: productId, productUrl: existingUrl });
+            card.setAttribute('data-product-url', targetUrl);
+            card.querySelectorAll('a[href]').forEach(a => {
+                a.setAttribute('href', targetUrl);
+                a.setAttribute('target', '_blank');
+            });
         });
 
         // 6. Ensure all non-text block cards in the container have exactly ONE delete button and edit control positioned cleanly
@@ -6997,32 +7005,19 @@ class NewsletterBuilder {
             const title = titleEl ? titleEl.innerText.trim() : '';
             const priceEl = card.querySelector('.product-price');
             const price = priceEl ? priceEl.innerText.trim() : '';
-            const productId = card.dataset.productId || '';
-            let slug = card.dataset.productSlug || '';
+            let productId = card.dataset.productId || '';
             const linkEl = card.querySelector('.product-cta-btn') || card.querySelector('a');
-            let linkHref = linkEl ? linkEl.getAttribute('href') : '';
+            const existingUrl = card.dataset.productUrl || (linkEl ? linkEl.getAttribute('href') : '');
 
-            // Ensure linkHref points to specific product page https://www.hiskingdomdesigns.no/product-page/{slug}
-            if (!linkHref || linkHref === '#' || linkHref.includes('/product/') || linkHref.endsWith('/produkter')) {
-                if (!slug && title) {
-                    const found = (window.hkmWixProductsCache || []).find(p => (p.name || '').trim().toLowerCase() === title.toLowerCase());
-                    if (found) {
-                        slug = found.slug || (found.productPageUrl ? found.productPageUrl.split('/product-page/').pop().split('?')[0] : '');
-                    }
-                    if (!slug) {
-                        slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                    }
-                }
-                if (slug) {
-                    linkHref = `https://www.hiskingdomdesigns.no/product-page/${slug}`;
-                } else {
-                    linkHref = `https://www.hiskingdomdesigns.no/produkter`;
-                }
-            } else if (linkHref.includes('/product-page/')) {
-                if (!linkHref.startsWith('http')) {
-                    linkHref = `https://www.hiskingdomdesigns.no${linkHref.startsWith('/') ? '' : '/'}${linkHref}`;
+            if (!productId && title) {
+                const cachedProduct = (window.hkmWixProductsCache || []).find(
+                    p => (p.name || '').trim().toLowerCase() === title.toLowerCase()
+                );
+                if (cachedProduct) {
+                    productId = cachedProduct.id || cachedProduct._id || '';
                 }
             }
+            const linkHref = resolveHkdProductUrl({ id: productId, productUrl: existingUrl });
 
             const tableHtml = `
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; width: 100%;">
