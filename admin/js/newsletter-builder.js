@@ -8684,6 +8684,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
             if (typeof showToast === 'function') {
                 showToast(`Kunne ikke starte kampanjen: ${e.message}`, "error");
             }
+            alert(`❌ Kunne ikke starte kampanjen:\n${e.message}`);
             const finalBtn = document.getElementById('final-send-btn');
             if (finalBtn) {
                 finalBtn.disabled = false;
