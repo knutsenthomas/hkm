@@ -5015,6 +5015,139 @@ exports.onNewsletterSubscribe = onDocumentCreated({
 });
 
 /**
+ * Cloud Function trigger for automated dispatch of newsletter campaigns.
+ * Reads target recipients and checks tags for 'Engelsk' / 'English' / 'en'.
+ * Sends English translated version to English recipients and Norwegian to all others.
+ */
+exports.onNewsletterCampaignCreate = onDocumentCreated({
+  document: "newsletter_campaigns/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const campaign = snapshot.data();
+  if (!campaign || campaign.processedByServer) return;
+
+  const campaignRef = snapshot.ref;
+  await campaignRef.update({ processedByServer: true, dispatchStartedAt: new Date().toISOString() });
+
+  const subject = campaign.subject || "Nyhetsbrev fra His Kingdom Ministry";
+  const englishPayload = campaign.englishPayload;
+  const subjectEn = (englishPayload && englishPayload.subjectEn) ? englishPayload.subjectEn : subject;
+
+  const buildBlocksHtml = (blocks, lang = 'no') => {
+    if (!Array.isArray(blocks) || blocks.length === 0) return '';
+    return blocks.map(b => {
+      if (b.type === 'title') {
+        return `<h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 700; color: #0f172a; margin: 24px 0 12px 0;">${b.content?.text || ''}</h2>`;
+      } else if (b.type === 'text') {
+        return `<div style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">${b.content?.text || ''}</div>`;
+      } else if (b.type === 'button') {
+        return `<div style="text-align: center; margin: 24px 0;"><a href="${b.content?.url || '#'}" style="background: #1B4965; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-block;">${b.content?.text || (lang === 'en' ? 'Read More' : 'Les mer')}</a></div>`;
+      } else if (b.type === 'image' && b.content?.url) {
+        return `<div style="margin: 20px 0; text-align: center;"><img src="${b.content.url}" style="max-width: 100%; border-radius: 12px;" alt="Bilde"></div>`;
+      } else if (b.type === 'spacer') {
+        return `<div style="height: ${b.content?.height || 24}px;"></div>`;
+      }
+      return '';
+    }).join('');
+  };
+
+  const englishTagKeywords = ['engelsk', 'english', 'en'];
+  const checkIsEnglishRecipient = (tags = [], segments = []) => {
+    const tagArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim().toLowerCase()) : []);
+    const segArray = Array.isArray(segments) ? segments : (typeof segments === 'string' ? segments.split(',').map(s => s.trim().toLowerCase()) : []);
+    const allKeywords = [...tagArray, ...segArray];
+    return englishTagKeywords.some(kw => allKeywords.includes(kw));
+  };
+
+  const recipientsMap = new Map();
+  const db = admin.firestore();
+
+  try {
+    const subsSnap = await db.collection("newsletter_subscriptions").get();
+    subsSnap.forEach(doc => {
+      const data = doc.data();
+      const email = (data.email || '').trim().toLowerCase();
+      if (email && !data.newsletterUnsubscribed && data.status !== 'unsubscribed') {
+        recipientsMap.set(email, {
+          email: data.email,
+          tags: data.tags || data.labels || [],
+          segments: data.segments || [data.source || 'Nyhetsbrev']
+        });
+      }
+    });
+
+    const contactsSnap = await db.collection("contacts").get();
+    contactsSnap.forEach(doc => {
+      const data = doc.data();
+      const email = (data.email || '').trim().toLowerCase();
+      if (email && !data.newsletterUnsubscribed && data.newsletterStatus !== 'unsubscribed') {
+        if (!recipientsMap.has(email)) {
+          recipientsMap.set(email, {
+            email: data.email,
+            tags: data.tags || [],
+            segments: data.segments || [data.source || 'CRM']
+          });
+        }
+      }
+    });
+
+    let sentCount = 0;
+    let englishCount = 0;
+    let norwegianCount = 0;
+
+    for (const [emailKey, recipient] of recipientsMap.entries()) {
+      const isEnglish = checkIsEnglishRecipient(recipient.tags, recipient.segments);
+      const recipientSubject = (isEnglish && subjectEn) ? subjectEn : subject;
+      
+      let htmlBody = '';
+      if (isEnglish && englishPayload && englishPayload.blocksEn) {
+        htmlBody = buildBlocksHtml(englishPayload.blocksEn, 'en');
+        englishCount++;
+      } else {
+        htmlBody = campaign.html || buildBlocksHtml(campaign.blocks, 'no');
+        norwegianCount++;
+      }
+
+      const emailHtml = `
+        <div style="font-family: 'Inter', system-ui, sans-serif; max-width: 640px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 16px;">
+          ${htmlBody}
+          <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+            <p>© His Kingdom Ministry</p>
+            <p><a href="https://www.hiskingdomministry.no/avmeld" style="color: #2563eb; text-decoration: underline;">${isEnglish ? 'Unsubscribe from newsletter' : 'Meld deg av nyhetsbrev'}</a></p>
+          </div>
+        </div>
+      `;
+
+      try {
+        await sendEmail({
+          to: recipient.email,
+          subject: recipientSubject,
+          html: emailHtml,
+          text: recipientSubject
+        });
+        sentCount++;
+      } catch (err) {
+        console.error(`[onNewsletterCampaignCreate] Failed to send email to ${recipient.email}:`, err);
+      }
+    }
+
+    await campaignRef.update({
+      dispatchCompletedAt: new Date().toISOString(),
+      sentCount,
+      norwegianCount,
+      englishCount,
+      status: 'completed'
+    });
+
+    console.log(`[onNewsletterCampaignCreate] Campaign ${event.params.id} completed. Total: ${sentCount} (NO: ${norwegianCount}, EN: ${englishCount})`);
+  } catch (err) {
+    console.error("[onNewsletterCampaignCreate] Dispatch error:", err);
+  }
+});
+
+/**
  * Public endpoint for secure newsletter unsubscribe confirmation.
  *
  * A bare email request sends a signed confirmation link. The signed request
