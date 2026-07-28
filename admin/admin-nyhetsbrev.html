@@ -982,8 +982,9 @@
                         <span class="btn-label-text">Forhåndsvisning</span>
                     </button>
                     <div class="btn-group-publish" style="position: relative;">
-                        <button id="continue-btn" class="btn-primary-publish">
-                            <span>Publiser</span>
+                        <button id="continue-btn" class="btn-primary-publish" title="Publiser">
+                            <span class="material-symbols-outlined btn-publish-icon">send</span>
+                            <span class="btn-publish-label">Publiser</span>
                         </button>
                         <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg" onclick="event.preventDefault(); event.stopPropagation(); const m=document.getElementById('publish-options-dropdown'); if(m){ const isHidden = window.getComputedStyle(m).display==='none'; m.style.setProperty('display', isHidden ? 'flex' : 'none', 'important'); }">
                             <span class="material-symbols-outlined">expand_more</span>

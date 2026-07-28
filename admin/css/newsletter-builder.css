@@ -7730,6 +7730,23 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     white-space: nowrap !important;
 }
 
+.builder-toolbar-header #continue-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+}
+
+.builder-toolbar-header #continue-btn .btn-publish-icon {
+    font-size: 18px !important;
+}
+
+@media (max-width: 768px) {
+    .builder-toolbar-header #continue-btn .btn-publish-label {
+        display: none !important;
+    }
+}
+
 .builder-toolbar-header .device-pill-btn {
     display: inline-flex !important;
     align-items: center !important;
