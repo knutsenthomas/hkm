@@ -107,7 +107,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20260727_V1">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260728_V1500_UNCLIPPUBLISH">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V1506_EDITOR_AUDIT">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V1520_PREMIUM_EDITOR">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1031,31 +1031,31 @@
                 <!-- 1. HKM Venstre Navigasjonsmeny (Lys profil) -->
                 <aside class="builder-dark-sidebar">
                     <div class="sidebar-top-create">
-                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');">
+                        <button class="btn-create-new" id="btn-create-new-campaign" onclick="if(window.builder) builder.switchSidebarView('builder');" title="Ny kampanje" aria-label="Ny kampanje">
                             <span class="material-symbols-outlined">add</span>
                             <span>Ny kampanje</span>
                         </button>
                     </div>
                     <nav class="sidebar-nav-menu">
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('overview');" class="nav-item" data-view="overview" title="Oversikt" aria-label="Oversikt">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span>Oversikt</span>
                         </a>
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('builder');" class="nav-item active" data-view="builder">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('builder');" class="nav-item active" data-view="builder" title="Kampanjer" aria-label="Kampanjer">
                             <span class="material-symbols-outlined">send</span>
                             <span>Kampanjer</span>
                         </a>
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('templates');" class="nav-item" data-view="templates">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('templates');" class="nav-item" data-view="templates" title="Maler" aria-label="Maler">
                             <span class="material-symbols-outlined">article</span>
                             <span>Maler</span>
                         </a>
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('subscribers');" class="nav-item" data-view="subscribers">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('subscribers');" class="nav-item" data-view="subscribers" title="Abonnenter" aria-label="Abonnenter">
                             <span class="material-symbols-outlined">group</span>
                             <span>Abonnenter</span>
                         </a>
                     </nav>
                     <div class="sidebar-bottom-settings">
-                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('settings');" class="nav-item" data-view="settings">
+                        <a href="javascript:void(0)" onclick="if(window.builder) builder.switchSidebarView('settings');" class="nav-item" data-view="settings" title="Innstillinger" aria-label="Innstillinger">
                             <span class="material-symbols-outlined">settings</span>
                             <span>Innstillinger</span>
                         </a>
@@ -1075,6 +1075,11 @@
                             <button type="button" class="btn-close-mobile-panel" onclick="if(window.builder) builder.closeMobileDrawers();" title="Lukk meny">
                                 <span class="material-symbols-outlined">close</span>
                             </button>
+                        </div>
+                        <div class="premium-panel-heading">
+                            <span class="premium-panel-eyebrow">Innhold</span>
+                            <h3>Legg til element</h3>
+                            <p>Klikk eller dra en blokk inn i nyhetsbrevet.</p>
                         </div>
                         <div class="elements-search-container">
                             <span class="material-symbols-outlined search-icon">search</span>
@@ -1130,6 +1135,74 @@
                 <!-- 2. Midtre E-postkanvas & Mottakerside -->
                 <main class="builder-workspace-center" id="builder-workspace-center">
                     <!-- Visning A: E-postkanvas -->
+                    <div id="desktop-richtools" class="desktop-richtools premium-command-bar" role="toolbar" aria-label="Redigeringsverktøy">
+                        <div class="premium-command-group premium-command-history" aria-label="Historikk">
+                            <button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre">
+                                <span class="material-symbols-outlined">undo</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om">
+                                <span class="material-symbols-outlined">redo</span>
+                            </button>
+                        </div>
+                        <span class="premium-command-separator" aria-hidden="true"></span>
+                        <div class="premium-command-group" aria-label="Tekststil">
+                            <button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet">
+                                <span class="material-symbols-outlined">format_bold</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv">
+                                <span class="material-symbols-outlined">format_italic</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understreket">
+                                <span class="material-symbols-outlined">format_underlined</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="strike" title="Gjennomstreket">
+                                <span class="material-symbols-outlined">format_strikethrough</span>
+                            </button>
+                            <label class="premium-color-control" title="Tekstfarge">
+                                <span class="material-symbols-outlined">format_color_text</span>
+                                <input type="color" data-color-input="text" value="#1e293b" aria-label="Velg tekstfarge">
+                            </label>
+                            <label class="premium-color-control" title="Fremhevingsfarge">
+                                <span class="material-symbols-outlined">format_color_fill</span>
+                                <input type="color" data-color-input="highlight" value="#fff2a8" aria-label="Velg fremhevingsfarge">
+                            </label>
+                        </div>
+                        <span class="premium-command-separator" aria-hidden="true"></span>
+                        <div class="premium-command-group" aria-label="Avsnitt">
+                            <button type="button" class="desktop-richtools-btn" data-tool="justifyLeft" title="Venstrejuster">
+                                <span class="material-symbols-outlined">format_align_left</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="justifyCenter" title="Sentrer">
+                                <span class="material-symbols-outlined">format_align_center</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="justifyRight" title="Høyrejuster">
+                                <span class="material-symbols-outlined">format_align_right</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste">
+                                <span class="material-symbols-outlined">format_list_bulleted</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="orderedList" title="Nummerert liste">
+                                <span class="material-symbols-outlined">format_list_numbered</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="link" title="Sett inn lenke">
+                                <span class="material-symbols-outlined">link</span>
+                            </button>
+                            <button type="button" class="desktop-richtools-btn" data-tool="removeFormat" title="Fjern formatering">
+                                <span class="material-symbols-outlined">format_clear</span>
+                            </button>
+                        </div>
+                        <div class="premium-canvas-controls" aria-label="Zoom">
+                            <button type="button" id="canvas-zoom-out" class="premium-zoom-btn" title="Zoom ut">
+                                <span class="material-symbols-outlined">remove</span>
+                            </button>
+                            <button type="button" id="canvas-zoom-reset" class="premium-zoom-value" title="Tilbakestill zoom">
+                                <span id="canvas-zoom-value">100%</span>
+                            </button>
+                            <button type="button" id="canvas-zoom-in" class="premium-zoom-btn" title="Zoom inn">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="canvas-viewport" id="canvas-container">
                         <div class="canvas-paper-frame" id="newsletter-canvas">
                             <div class="canvas-header" id="canvas-header-block" title="Klikk for å redigere e-posthode">
@@ -1859,7 +1932,7 @@
     <script type="module" src="js/admin-header.js?v=20260602_V3"></script>
     <script type="module" src="js/todo-drawer.js?v=20260602_V3"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260728_V1506_EDITOR_AUDIT"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260728_V1520_PREMIUM_EDITOR"></script>
 </body>
 
 </html>

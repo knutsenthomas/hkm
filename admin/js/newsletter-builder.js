@@ -101,6 +101,7 @@ class NewsletterBuilder {
         this.activeColumnIndex = null;
         this.savedRange = null;
         this.activeBlockNode = null;
+        this.canvasZoom = 100;
 
         // Recipient Selection State
         this.selectedSegments = new Set();
@@ -289,6 +290,7 @@ class NewsletterBuilder {
 
         this.setupEventListeners();
         this.setupRichTextToolbar();
+        this.setupCanvasControls();
         this.setupThemePanelEvents();
         this.setupBubbleMenu();
         this.applyBackgrounds();
@@ -889,7 +891,65 @@ class NewsletterBuilder {
                 }
 
                 if (e.key === 'Enter') {
-                    if (/^H[1-6]$/i.test(parentBlock.tagName) || isBlockCard) {
+                    const isHeading = /^H[1-6]$/i.test(parentBlock.tagName);
+
+                    // Keep the browser's normal soft line break inside headings.
+                    if (isHeading && e.shiftKey) {
+                        setTimeout(() => {
+                            this.syncUnifiedBlocks();
+                            this.triggerAutosave();
+                        }, 0);
+                        return;
+                    }
+
+                    if (isHeading) {
+                        e.preventDefault();
+                        range.deleteContents();
+
+                        const beforeCaret = document.createRange();
+                        beforeCaret.selectNodeContents(parentBlock);
+                        beforeCaret.setEnd(range.startContainer, range.startOffset);
+                        const isAtStart = !beforeCaret.toString() &&
+                            !beforeCaret.cloneContents().querySelector?.('img, br, hr');
+
+                        const newP = document.createElement('p');
+
+                        if (isAtStart) {
+                            // Enter at the beginning inserts a blank line above,
+                            // preserving the heading and moving it one line down.
+                            newP.innerHTML = '<br>';
+                            container.insertBefore(newP, parentBlock);
+                        } else {
+                            // Enter at the end creates an empty paragraph. In the
+                            // middle, the text after the caret moves to that paragraph.
+                            const afterCaret = document.createRange();
+                            afterCaret.selectNodeContents(parentBlock);
+                            afterCaret.setStart(range.startContainer, range.startOffset);
+                            const trailingContent = afterCaret.extractContents();
+                            newP.appendChild(trailingContent);
+
+                            if (!newP.textContent.trim() && !newP.querySelector('img, br, hr')) {
+                                newP.innerHTML = '<br>';
+                            }
+
+                            if (parentBlock.nextSibling) {
+                                container.insertBefore(newP, parentBlock.nextSibling);
+                            } else {
+                                container.appendChild(newP);
+                            }
+                        }
+
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(newP);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                        this.syncUnifiedBlocks();
+                        this.triggerAutosave();
+                        return;
+                    }
+
+                    if (isBlockCard) {
                         e.preventDefault();
                         const newP = document.createElement('p');
                         newP.innerHTML = '<br>';
@@ -903,7 +963,6 @@ class NewsletterBuilder {
                         newRange.collapse(true);
                         selection.removeAllRanges();
                         selection.addRange(newRange);
-                        newP.focus();
                         this.syncUnifiedBlocks();
                         this.triggerAutosave();
                         return;
@@ -1967,6 +2026,31 @@ class NewsletterBuilder {
             highlightColorInput.addEventListener('input', (e) => {
                 this.exec('backColor', e.target.value);
             });
+        }
+    }
+
+    setupCanvasControls() {
+        const zoomOutBtn = document.getElementById('canvas-zoom-out');
+        const zoomResetBtn = document.getElementById('canvas-zoom-reset');
+        const zoomInBtn = document.getElementById('canvas-zoom-in');
+
+        zoomOutBtn?.addEventListener('click', () => this.setCanvasZoom(this.canvasZoom - 10));
+        zoomResetBtn?.addEventListener('click', () => this.setCanvasZoom(100));
+        zoomInBtn?.addEventListener('click', () => this.setCanvasZoom(this.canvasZoom + 10));
+        this.setCanvasZoom(this.canvasZoom);
+    }
+
+    setCanvasZoom(value) {
+        const canvas = document.getElementById('newsletter-canvas');
+        const zoomValue = document.getElementById('canvas-zoom-value');
+        const nextZoom = Math.max(60, Math.min(130, Number(value) || 100));
+
+        this.canvasZoom = nextZoom;
+        if (canvas) {
+            canvas.style.zoom = String(nextZoom / 100);
+        }
+        if (zoomValue) {
+            zoomValue.textContent = `${nextZoom}%`;
         }
     }
 
@@ -4054,8 +4138,8 @@ class NewsletterBuilder {
                 font-family: 'Inter', sans-serif;
             `;
             modal.innerHTML = `
-                <div class="profile-modal-content card modern" style="max-width: 460px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; transform: translateZ(0); display: flex; flex-direction: column;">
-                    <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none;">
+                <div class="profile-modal-content card modern" style="max-width: 460px; width: 90%; height: auto !important; min-height: 0 !important; max-height: calc(100dvh - 40px); padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateZ(0); display: flex; flex-direction: column;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 24px 32px; display: flex; align-items: center; gap: 16px; border-bottom: none; flex-shrink: 0;">
                         <div style="background: rgba(255,255,255,0.2); width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <span class="material-symbols-outlined" style="font-size: 26px; color: white;">mark_email_read</span>
                         </div>
@@ -4064,10 +4148,10 @@ class NewsletterBuilder {
                             <span style="font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">Test-e-post bekreftelse</span>
                         </div>
                     </div>
-                    <div class="modal-body" style="padding: 28px 32px; font-size: 15px; line-height: 1.6; color: #334155;">
+                    <div class="modal-body" style="padding: 28px 32px; font-size: 15px; line-height: 1.6; color: #334155; min-height: 0; overflow-y: auto;">
                         <p style="margin: 0; font-weight: 500;">${message}</p>
                     </div>
-                    <div class="modal-footer" style="padding: 20px 32px; background: #f8fafc; display: flex; justify-content: flex-end; border-top: 1px solid #f1f5f9;">
+                    <div class="modal-footer" style="padding: 20px 32px; background: #f8fafc; display: flex; justify-content: flex-end; border-top: 1px solid #f1f5f9; flex-shrink: 0;">
                         <button id="success-modal-ok-btn" class="btn-primary" style="padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);">
                             ${buttonText}
                         </button>
@@ -4406,12 +4490,7 @@ class NewsletterBuilder {
 
         this.activeBlockNode = node;
         this.activeBlockNode.classList.add('selected-block-active');
-
-        // Hide floating top toolbar to make it look exactly like Wix
-        const topToolbar = document.getElementById('desktop-richtools');
-        if (topToolbar) {
-            topToolbar.style.setProperty('display', 'none', 'important');
-        }
+        this.activeBlockNode.setAttribute('data-editor-label', this.getEditorBlockLabel(node));
 
         // Determine block type
         const isSocial = (node.classList && node.classList.contains('newsletter-social-block')) || (node.closest && node.closest('.newsletter-social-block'));
@@ -4444,11 +4523,29 @@ class NewsletterBuilder {
         }
     }
 
+    getEditorBlockLabel(node) {
+        if (!node) return 'Element';
+        const tagName = String(node.tagName || '').toUpperCase();
+        const classList = node.classList;
+
+        if (/^H[1-6]$/.test(tagName)) return 'Overskrift';
+        if (classList?.contains('newsletter-social-block') || node.querySelector?.('.newsletter-social-block')) return 'Sosialt';
+        if (classList?.contains('newsletter-product-block') || node.querySelector?.('.newsletter-product-block, .product-card')) return 'Produkt';
+        if (classList?.contains('newsletter-event-block') || node.querySelector?.('.newsletter-event-block, .event-card')) return 'Arrangement';
+        if (node.querySelector?.('img') || tagName === 'IMG') return 'Bilde';
+        if (node.querySelector?.('video, iframe') || tagName === 'VIDEO' || tagName === 'IFRAME') return 'Video';
+        if (node.querySelector?.('.block-btn, .product-cta-btn, .newsletter-btn, a[href], button') || tagName === 'A' || tagName === 'BUTTON') return 'Knapp';
+        if (tagName === 'HR' || classList?.contains('newsletter-divider')) return 'Skillelinje';
+        if (classList?.contains('newsletter-spacer')) return 'Avstand';
+        return 'Tekst';
+    }
+
     deselectBlock() {
         document.querySelectorAll('#block-quick-toolbar').forEach(el => el.remove());
         if (this.activeBlockNode) {
             console.log('[HKM Inspector] deselectBlock triggered');
             this.activeBlockNode.classList.remove('selected-block-active');
+            this.activeBlockNode.removeAttribute('data-editor-label');
             this.activeBlockNode = null;
         }
 
@@ -4460,10 +4557,10 @@ class NewsletterBuilder {
             inspectorView.style.display = 'none';
         }
 
-        // Restore floating top toolbar
+        // Keep the persistent formatting toolbar available between selections.
         const topToolbar = document.getElementById('desktop-richtools');
         if (topToolbar) {
-            topToolbar.style.display = '';
+            topToolbar.style.removeProperty('display');
         }
     }
 
@@ -4996,14 +5093,14 @@ class NewsletterBuilder {
                 <span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
             </button>
             ` : ''}
+            <button type="button" class="quick-tb-btn" id="qtb-duplicate-block" title="Dupliser element">
+                <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+            </button>
             <button type="button" class="quick-tb-btn" id="qtb-delete-block" title="Slett element (🗑️)" style="color: #ef4444;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             </button>
         `;
 
-        if (getComputedStyle(node).position === 'static') {
-            node.style.position = 'relative';
-        }
         node.appendChild(toolbar);
 
         toolbar.querySelector('#qtb-move-up')?.addEventListener('click', (e) => {
@@ -5020,6 +5117,11 @@ class NewsletterBuilder {
             e.preventDefault();
             e.stopPropagation();
             this.openSocialInsertionFlowAt(socialNode || node);
+        });
+        toolbar.querySelector('#qtb-duplicate-block')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.duplicateActiveBlock();
         });
         toolbar.querySelector('#qtb-delete-block')?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -6744,7 +6846,10 @@ class NewsletterBuilder {
         if (!container) return '';
         const clone = container.cloneNode(true);
         clone.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn, button.quick-tb-btn').forEach(el => el.remove());
-        clone.querySelectorAll('.selected-block-active').forEach(el => el.classList.remove('selected-block-active'));
+        clone.querySelectorAll('.selected-block-active, [data-editor-label]').forEach(el => {
+            el.classList.remove('selected-block-active');
+            el.removeAttribute('data-editor-label');
+        });
         return clone.innerHTML;
     }
 
@@ -6753,7 +6858,10 @@ class NewsletterBuilder {
 
         // 1. Remove all pre-existing edit/delete buttons AND quick toolbar controls to prevent duplicates or leaked editor UI
         container.querySelectorAll('.card-delete-btn, .card-edit-btn, #block-quick-toolbar, .block-quick-toolbar, .quick-tb-btn').forEach(b => b.remove());
-        container.querySelectorAll('.selected-block-active').forEach(el => el.classList.remove('selected-block-active'));
+        container.querySelectorAll('.selected-block-active, [data-editor-label]').forEach(el => {
+            el.classList.remove('selected-block-active');
+            el.removeAttribute('data-editor-label');
+        });
 
         const tileFB = `<svg width="22" height="22" viewBox="0 0 24 24" fill="#1B4965" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: block !important;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
         const tileIG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4965" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; max-width: 24px !important; max-height: 24px !important; display: block !important;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
@@ -7138,6 +7246,97 @@ class NewsletterBuilder {
     }
 
 
+    compileSocialBlockForEmail(block) {
+        const socialLinks = Array.from(block.querySelectorAll('a[href]'));
+        if (!socialLinks.length) return '';
+
+        const platformDefinitions = {
+            facebook: {
+                label: 'Facebook',
+                color: '#1877f2',
+                image: 'https://www.hiskingdomministry.no/img/social-facebook-email.png'
+            },
+            instagram: {
+                label: 'Instagram',
+                color: '#e4405f',
+                image: 'https://www.hiskingdomministry.no/img/social-instagram-email.png'
+            },
+            youtube: {
+                label: 'YouTube',
+                color: '#ff0000',
+                image: 'https://www.hiskingdomministry.no/img/social-youtube-email.png'
+            },
+            website: {
+                label: 'Nettsted',
+                color: '#1B4965',
+                image: 'https://www.hiskingdomministry.no/img/social-website-email.png'
+            }
+        };
+
+        const platforms = socialLinks.map((link, index) => {
+            const href = link.getAttribute('href') || '#';
+            const hint = `${href} ${link.getAttribute('title') || ''} ${link.textContent || ''}`.toLowerCase();
+            let id = 'website';
+            if (hint.includes('facebook')) id = 'facebook';
+            else if (hint.includes('instagram')) id = 'instagram';
+            else if (hint.includes('youtube') || hint.includes('youtu.be')) id = 'youtube';
+
+            const definition = platformDefinitions[id] || platformDefinitions.website;
+            return {
+                ...definition,
+                id,
+                href: escapeHtml(href),
+                label: escapeHtml((link.textContent || '').trim() || definition.label || `Lenke ${index + 1}`)
+            };
+        });
+
+        const selectedStyle = block.dataset.style || 'tiles';
+        let linksMarkup = '';
+
+        if (selectedStyle === 'text_only') {
+            linksMarkup = platforms.map((platform, index) => `
+                <td align="center" style="padding: 4px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700;">
+                    <a href="${platform.href}" target="_blank" style="color: #1B4965; text-decoration: none;">${platform.label}</a>
+                </td>
+                ${index < platforms.length - 1 ? '<td aria-hidden="true" style="color: #cbd5e1; font-size: 14px;">&#8226;</td>' : ''}
+            `).join('');
+        } else if (selectedStyle === 'both') {
+            linksMarkup = platforms.map(platform => `
+                <td align="center" style="padding: 4px;">
+                    <a href="${platform.href}" target="_blank" title="${platform.label}" style="display: inline-block; padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 999px; background-color: #f8fafc; color: #1B4965; text-decoration: none; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; white-space: nowrap;">
+                        <img src="${platform.image}" width="18" height="18" alt="" style="display: inline-block; width: 18px; height: 18px; border: 0; vertical-align: middle;">
+                        <span style="padding-left: 6px; vertical-align: middle;">${platform.label}</span>
+                    </a>
+                </td>
+            `).join('');
+        } else {
+            linksMarkup = platforms.map(platform => `
+                <td align="center" valign="middle" style="padding: 4px 7px;">
+                    <a href="${platform.href}" target="_blank" title="${platform.label}" aria-label="${platform.label}" style="display: inline-block; width: 50px; height: 50px; line-height: 50px; border: 1px solid #e2e8f0; border-radius: ${selectedStyle === 'icon_only' ? '50%' : '15px'}; background-color: #ffffff; color: ${platform.color}; text-align: center; text-decoration: none; font-family: Arial, Helvetica, sans-serif; font-size: ${platform.id === 'instagram' ? '14px' : '23px'}; font-weight: 900;">
+                        <img src="${platform.image}" width="24" height="24" alt="${platform.label}" style="display: inline-block; width: 24px; height: 24px; border: 0; vertical-align: middle;">
+                    </a>
+                </td>
+            `).join('');
+        }
+
+        const headingMarkup = selectedStyle === 'tiles'
+            ? '<p style="margin: 0 0 14px 0; color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 20px; line-height: 1.3; font-weight: 800; text-align: center;">Følg oss</p>'
+            : '';
+
+        return `
+            <table class="email-social-block" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="width: 100%; margin: 24px 0;">
+                <tr>
+                    <td align="center" style="padding: ${selectedStyle === 'tiles' ? '8px 0 12px 0' : '12px 0'}; text-align: center;">
+                        ${headingMarkup}
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+                            <tr>${linksMarkup}</tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        `;
+    }
+
     compileEmailHtml() {
         const blocksContainer = document.getElementById('blocks-container');
         if (!blocksContainer) return '';
@@ -7238,6 +7437,12 @@ class NewsletterBuilder {
               </tr>
             </table>`;
             card.outerHTML = tableHtml;
+        });
+
+        // Inline SVG and flexbox are removed or rearranged by several email
+        // clients. Convert social banners to table-based, text-icon markup.
+        contentClone.querySelectorAll('.newsletter-social-block').forEach(block => {
+            block.outerHTML = this.compileSocialBlockForEmail(block);
         });
 
         const bodyHtml = contentClone.innerHTML;
