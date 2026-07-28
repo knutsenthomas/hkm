@@ -2732,87 +2732,98 @@ class NewsletterBuilder {
         };
 
         insertBtn.onclick = () => {
-            let combinedHtml = '';
-            selectedEventsMap.forEach((e) => {
-                const title = e.title || 'Uten tittel';
-                const key = e.id || `${title}|${e.start || e.date || ''}`;
-                const image = e.imageUrl || e.image || e.dashboardImage || e.imageLink || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
-                
-                const rawDateStr = e.date || e.start || e.startDate || e.createdAt;
-                let startDate = null;
-                if (rawDateStr) {
-                    const parsed = new Date(rawDateStr);
-                    if (!isNaN(parsed.getTime())) startDate = parsed;
+            try {
+                if (!selectedEventsMap || selectedEventsMap.size === 0) {
+                    showToast("Velg minst ett arrangement", "warning");
+                    return;
                 }
 
-                const day = startDate ? startDate.getDate() : '--';
-                let monthStr = '--';
-                if (startDate) {
-                    try {
-                        monthStr = startDate.toLocaleString('nb-NO', { month: 'short' }).replace('.', '').toUpperCase();
-                    } catch(err) {
-                        monthStr = '--';
+                let combinedHtml = '';
+                selectedEventsMap.forEach((e) => {
+                    if (!e) return;
+                    const title = e.title || 'Uten tittel';
+                    const key = e.id || `${title}|${e.start || e.date || ''}`;
+                    const image = e.imageUrl || e.image || e.dashboardImage || e.imageLink || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+                    
+                    const rawDateStr = e.date || e.start || e.startDate || e.createdAt;
+                    let startDate = null;
+                    if (rawDateStr) {
+                        const parsed = new Date(rawDateStr);
+                        if (!isNaN(parsed.getTime())) startDate = parsed;
                     }
-                }
-                const dateBadge = `${day}. ${monthStr}`;
 
-                let formattedDate = '';
-                if (startDate) {
-                    try {
-                        formattedDate = startDate.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    } catch(err) {
-                        formattedDate = '';
+                    const day = startDate ? startDate.getDate() : '--';
+                    let monthStr = '--';
+                    if (startDate) {
+                        try {
+                            monthStr = startDate.toLocaleString('nb-NO', { month: 'short' }).replace('.', '').toUpperCase();
+                        } catch(err) {
+                            monthStr = '--';
+                        }
                     }
-                }
+                    const dateBadge = `${day}. ${monthStr}`;
 
-                let timeStr = e.time || '';
-                if (!timeStr && startDate && typeof e.start === 'string' && e.start.includes('T')) {
-                    try {
-                        timeStr = startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
-                    } catch(err) {
-                        timeStr = '';
+                    let formattedDate = '';
+                    if (startDate) {
+                        try {
+                            formattedDate = startDate.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                        } catch(err) {
+                            formattedDate = '';
+                        }
                     }
-                }
-                const timeLabel = (formattedDate ? formattedDate : '') + (timeStr ? ` kl. ${timeStr}` : '');
-                
-                const location = e.location || e.place || '';
-                const detailsUrl = `https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(key)}`;
 
-                combinedHtml += `
-                    <div class="newsletter-event-card" contenteditable="false" style="position: relative; display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 16px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
-                        <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett arrangement">×</button>
-                        <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9; position: relative;">
-                            <img src="${image}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
-                            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(27, 73, 101, 0.95); color: white; text-align: center; padding: 4px 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                                ${dateBadge}
+                    let timeStr = e.time || '';
+                    if (!timeStr && startDate && typeof e.start === 'string' && e.start.includes('T')) {
+                        try {
+                            timeStr = startDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' });
+                        } catch(err) {
+                            timeStr = '';
+                        }
+                    }
+                    const timeLabel = (formattedDate ? formattedDate : '') + (timeStr ? ` kl. ${timeStr}` : '');
+                    
+                    const location = e.location || e.place || '';
+                    const detailsUrl = `https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(key)}`;
+
+                    combinedHtml += `
+                        <div class="newsletter-event-card" contenteditable="false" style="position: relative; display: flex; flex-direction: row; gap: 20px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; margin: 16px auto; max-width: 560px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); align-items: center; text-align: left; font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; width: 100%;">
+                            <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett arrangement">×</button>
+                            <div style="flex: 0 0 100px; width: 100px; height: 100px; border-radius: 12px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center; border: 1px solid #f1f5f9; position: relative;">
+                                <img src="${image}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(27, 73, 101, 0.95); color: white; text-align: center; padding: 4px 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    ${dateBadge}
+                                </div>
+                            </div>
+                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(title)}</h4>
+                                <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">schedule</span>
+                                    <span>${timeLabel || 'Tidspunkt kommer'}</span>
+                                </div>
+                                ${location ? `
+                                <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">location_on</span>
+                                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(location)}</span>
+                                </div>
+                                ` : ''}
+                                <div style="margin-top: 6px;">
+                                    <a href="${detailsUrl}" target="_blank" style="display: inline-block; background: #1B4965; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(27, 73, 101, 0.2);">Les mer & Påmelding</a>
+                                </div>
                             </div>
                         </div>
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
-                            <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(title)}</h4>
-                            <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">schedule</span>
-                                <span>${timeLabel || 'Tidspunkt kommer'}</span>
-                            </div>
-                            ${location ? `
-                            <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 13px; font-weight: 500;">
-                                <span class="material-symbols-outlined" style="font-size: 16px; color: #d17d39;">location_on</span>
-                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(location)}</span>
-                            </div>
-                            ` : ''}
-                            <div style="margin-top: 6px;">
-                                <a href="${detailsUrl}" target="_blank" style="display: inline-block; background: #1B4965; color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(27, 73, 101, 0.2);">Les mer & Påmelding</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            if (combinedHtml) {
-                combinedHtml += '<p><br></p>';
+                    `;
+                });
+
+                if (combinedHtml) {
+                    combinedHtml += '<p><br></p>';
+                    this.insertHtmlAtCursorOrEndAt(combinedHtml, afterElement);
+                    closeModal();
+                    showToast(`${selectedEventsMap.size} ${selectedEventsMap.size === 1 ? 'arrangement' : 'arrangementer'} satt inn!`, "success");
+                }
+            } catch (err) {
+                console.error("Error inserting events:", err);
+                showToast("Kunne ikke sette inn arrangement. Prøv igjen.", "error");
             }
-
-            this.insertHtmlAtCursorOrEndAt(combinedHtml, afterElement);
-            closeModal();
-            showToast(`${selectedEventsMap.size} ${selectedEventsMap.size === 1 ? 'arrangement' : 'arrangementer'} satt inn!`, "success");
         };
 
         const extractEventsArray = (doc) => {
@@ -3076,64 +3087,50 @@ class NewsletterBuilder {
 
         this.restoreSelection();
         const selection = window.getSelection();
-        
-        if (selection.rangeCount && container.contains(selection.anchorNode)) {
-            const range = selection.getRangeAt(0);
+
+        // Check if we are inserting block-level cards or structured components
+        const isBlockHtml = html.includes('newsletter-product-card') || 
+                            html.includes('newsletter-event-card') || 
+                            html.includes('newsletter-video-block') || 
+                            html.includes('block-btn') || 
+                            html.includes('display: grid') || 
+                            html.includes('display: flex');
+
+        if (isBlockHtml) {
+            let parentBlock = (selection && selection.anchorNode && container.contains(selection.anchorNode)) 
+                ? selection.anchorNode 
+                : null;
             
-            // Check if we are inserting block-level elements
-            const isBlockHtml = html.includes('newsletter-product-card') || html.includes('newsletter-event-card') || html.includes('block-btn') || html.includes('display: grid');
-            
-            if (isBlockHtml) {
-                // Find closest direct child of the blocks-container containing selection
-                let parentBlock = selection.anchorNode;
-                while (parentBlock && parentBlock.parentNode !== container) {
-                    parentBlock = parentBlock.parentNode;
-                }
-                
-                if (parentBlock) {
-                    const fragment = document.createDocumentFragment();
-                    while (temp.firstChild) {
-                        fragment.appendChild(temp.firstChild);
-                    }
-                    
-                    const lastInsertedNode = fragment.lastChild;
-                    
-                    if (parentBlock.nextSibling) {
-                        container.insertBefore(fragment, parentBlock.nextSibling);
-                    } else {
-                        container.appendChild(fragment);
-                    }
-                    
-                    // Focus cursor in the newly inserted paragraph below the block element
-                    if (lastInsertedNode && lastInsertedNode.tagName === 'P') {
-                        const newRange = document.createRange();
-                        newRange.selectNodeContents(lastInsertedNode);
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                        lastInsertedNode.focus();
-                    }
-                    
-                    this.syncUnifiedBlocks();
-                    return;
-                }
+            while (parentBlock && parentBlock.parentNode !== container) {
+                parentBlock = parentBlock.parentNode;
             }
-            
+
+            const fragment = document.createDocumentFragment();
+            while (temp.firstChild) {
+                fragment.appendChild(temp.firstChild);
+            }
+
+            const lastInsertedNode = fragment.lastChild;
+
+            if (parentBlock && parentBlock.nextSibling) {
+                container.insertBefore(fragment, parentBlock.nextSibling);
+            } else {
+                container.appendChild(fragment);
+            }
+
+            if (lastInsertedNode && typeof lastInsertedNode.scrollIntoView === 'function') {
+                lastInsertedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            this.syncUnifiedBlocks();
+            return;
+        }
+
+        if (selection.rangeCount && container.contains(selection.anchorNode)) {
             this.exec('insertHTML', html);
         } else {
-            const lastInsertedNode = temp.lastChild;
             while (temp.firstChild) {
                 container.appendChild(temp.firstChild);
-            }
-            
-            if (lastInsertedNode && lastInsertedNode.tagName === 'P') {
-                const newRange = document.createRange();
-                newRange.selectNodeContents(lastInsertedNode);
-                newRange.collapse(true);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(newRange);
-                lastInsertedNode.focus();
             }
             this.syncUnifiedBlocks();
         }
