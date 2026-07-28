@@ -442,10 +442,11 @@
     outline: none !important;
     box-shadow: none !important;
     border-radius: 10px 0 0 10px !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     height: 100% !important;
+    box-sizing: border-box !important;
 }
 
 #newsletter-builder-layout .btn-primary-publish-arrow {
@@ -453,9 +454,12 @@
     color: #ffffff !important;
     border: none !important;
     border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
-    padding: 0 12px !important;
+    padding: 0 !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
     cursor: pointer !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     outline: none !important;
@@ -463,6 +467,7 @@
     border-radius: 0 10px 10px 0 !important;
     height: 100% !important;
     transition: background 0.2s ease !important;
+    box-sizing: border-box !important;
 }
 
 #newsletter-builder-layout .btn-primary-publish-arrow:hover {
@@ -7948,7 +7953,8 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         justify-content: center !important;
     }
 
-    .builder-toolbar-header #continue-btn {
+    #newsletter-builder-layout #continue-btn,
+    #newsletter-builder-layout .btn-primary-publish {
         padding: 0 !important;
         width: 36px !important;
         height: 36px !important;
@@ -7958,9 +7964,11 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         align-items: center !important;
         justify-content: center !important;
         gap: 0 !important;
+        box-sizing: border-box !important;
     }
 
-    .builder-toolbar-header #publish-dropdown-btn {
+    #newsletter-builder-layout #publish-dropdown-btn,
+    #newsletter-builder-layout .btn-primary-publish-arrow {
         padding: 0 !important;
         width: 36px !important;
         height: 36px !important;
@@ -7969,26 +7977,24 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
+        box-sizing: border-box !important;
     }
 
-    .builder-toolbar-header #continue-btn .btn-publish-icon,
-    .builder-toolbar-header #publish-dropdown-btn .material-symbols-outlined,
-    .builder-toolbar-header #save-draft-btn .material-symbols-outlined,
-    .builder-toolbar-header #preview-btn .material-symbols-outlined {
+    #newsletter-builder-layout .btn-publish-icon,
+    #newsletter-builder-layout #publish-dropdown-btn .material-symbols-outlined,
+    #newsletter-builder-layout #save-draft-btn .material-symbols-outlined,
+    #newsletter-builder-layout #preview-btn .material-symbols-outlined {
         margin: 0 !important;
         padding: 0 !important;
-        display: flex !important;
+        display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
         font-size: 18px !important;
         width: 18px !important;
         height: 18px !important;
-        line-height: 1 !important;
-    }
-
-    .builder-toolbar-header #continue-btn .btn-publish-icon {
-        transform: translateY(1px) !important;
+        line-height: 18px !important;
+        transform: none !important;
     }
 }
 
