@@ -7252,3 +7252,243 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVENESS FOR NEWSLETTER BUILDER & DASHBOARD
+   ========================================================================== */
+
+/* 1. Dashboard Layout Mobile Adaptation (<= 991px) */
+@media (max-width: 991px) {
+    #newsletter-dashboard-layout {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+        position: relative !important;
+    }
+
+    #newsletter-dashboard-layout .builder-sidebar,
+    #newsletter-dashboard-layout .dashboard-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        height: auto !important;
+        flex: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    #newsletter-dashboard-layout .sidebar-nav-menu {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 8px !important;
+        padding-bottom: 8px !important;
+    }
+
+    #newsletter-dashboard-layout .sidebar-nav-menu .nav-item {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        font-size: 13px !important;
+        padding: 8px 14px !important;
+        border-radius: 999px !important;
+        min-height: 40px !important;
+    }
+
+    #newsletter-dashboard-layout .btn-create-campaign-wrapper {
+        width: 100% !important;
+        margin: 8px 0 !important;
+    }
+
+    #newsletter-dashboard-layout .btn-create-campaign {
+        width: 100% !important;
+        justify-content: center !important;
+        height: 44px !important;
+        font-size: 14px !important;
+    }
+
+    /* Subviews mobile padding & container */
+    #newsletter-builder-layout .subview-panel,
+    #newsletter-dashboard-layout .subview-panel {
+        padding: 20px 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Advanced Editor Workspace Layout (Column orientation on mobile) */
+    #builder-main-workspace {
+        flex-direction: column !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        position: relative !important;
+    }
+
+    #builder-main-workspace .builder-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        height: auto !important;
+        max-height: 320px !important;
+        overflow-y: auto !important;
+        flex: none !important;
+        order: 2 !important;
+        border-right: none !important;
+        border-top: 1px solid #e2e8f0 !important;
+        padding: 16px !important;
+    }
+
+    #builder-main-workspace .builder-canvas-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 0 auto !important;
+        order: 1 !important;
+        padding: 12px 8px !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        min-height: 450px !important;
+    }
+
+    #builder-main-workspace .builder-properties-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        height: auto !important;
+        max-height: 400px !important;
+        overflow-y: auto !important;
+        order: 3 !important;
+        border-left: none !important;
+        border-top: 1px solid #e2e8f0 !important;
+        padding: 16px !important;
+    }
+}
+
+/* 2. Mobile Phone Screen Adaptation (<= 768px) */
+@media (max-width: 768px) {
+    /* Subview Header */
+    #newsletter-builder-layout .subview-header,
+    #newsletter-dashboard-layout .subview-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    #newsletter-builder-layout .subview-header .btn-create-new,
+    #newsletter-dashboard-layout .subview-header .btn-create-new {
+        width: 100% !important;
+        justify-content: center !important;
+        height: 44px !important;
+    }
+
+    #newsletter-builder-layout .subview-title,
+    #newsletter-dashboard-layout .subview-title {
+        font-size: 20px !important;
+    }
+
+    /* Grids & Cards */
+    #newsletter-builder-layout .subview-grid-4,
+    #newsletter-dashboard-layout .subview-grid-4 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    #newsletter-builder-layout .templates-gallery-grid,
+    #newsletter-dashboard-layout .templates-gallery-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    /* Tables Mobile Swipe Wrapper */
+    #newsletter-builder-layout .subview-table-wrapper,
+    #newsletter-dashboard-layout .subview-table-wrapper {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-top: 12px !important;
+    }
+
+    #newsletter-builder-layout .subview-table,
+    #newsletter-dashboard-layout .subview-table {
+        min-width: 580px !important; /* Ensures smooth horizontal scroll without shrinking table text */
+    }
+
+    #newsletter-builder-layout .subview-table th,
+    #newsletter-dashboard-layout .subview-table th,
+    #newsletter-builder-layout .subview-table td,
+    #newsletter-dashboard-layout .subview-table td {
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+    }
+
+    /* Top Appbar & Toolbars */
+    #newsletter-builder-layout .builder-top-appbar {
+        padding: 0 12px !important;
+        height: auto !important;
+        min-height: 48px !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    #newsletter-builder-layout .builder-toolbar-header {
+        height: auto !important;
+        min-height: 52px !important;
+        padding: 8px 12px !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    #newsletter-builder-layout .toolbar-left-cell,
+    #newsletter-builder-layout .toolbar-center-cell,
+    #newsletter-builder-layout .toolbar-right-cell {
+        flex: 1 1 auto !important;
+        justify-content: center !important;
+    }
+
+    #newsletter-builder-layout .canvas-top-subject-bar {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 8px 12px !important;
+        margin: 8px 0 !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    #newsletter-builder-layout .canvas-top-subject-group {
+        width: 100% !important;
+    }
+
+    /* Touch target enforcement */
+    .btn-create-new,
+    .btn-group-publish,
+    #publish-dropdown-btn,
+    #final-send-btn,
+    .nav-item {
+        min-height: 44px !important;
+    }
+}
+
+/* 3. Small Mobile Phones (<= 480px) */
+@media (max-width: 480px) {
+    #newsletter-builder-layout .subview-panel,
+    #newsletter-dashboard-layout .subview-panel {
+        padding: 16px 10px !important;
+    }
+
+    #newsletter-builder-layout .subview-card,
+    #newsletter-dashboard-layout .subview-card {
+        padding: 16px !important;
+    }
+
+    #newsletter-builder-layout .card-num {
+        font-size: 24px !important;
+    }
+}
