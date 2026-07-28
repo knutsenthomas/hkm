@@ -2368,10 +2368,11 @@ class NewsletterBuilder {
         insertBtn.onclick = () => {
             let combinedHtml = '';
             selectedProductsMap.forEach((p) => {
-                const slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const productId = p.id || p._id || '';
+                const productUrl = p.productPageUrl || p.url || (productId ? `https://hiskingdomdesigns.no/product/${productId}` : 'https://hiskingdomdesigns.no/produkter');
                 const image = p.imageUrl || '';
                 combinedHtml += `
-                    <div class="newsletter-product-card" contenteditable="false">
+                    <div class="newsletter-product-card" contenteditable="false" data-product-id="${productId}">
                         <button class="card-delete-btn" title="Slett produkt">×</button>
                         <div class="product-img-wrap">
                             <img src="${image || 'https://hiskingdomdesigns.no/placeholder.png'}" alt="${escapeHtml(p.name)}" />
@@ -2380,7 +2381,7 @@ class NewsletterBuilder {
                             <h4 class="product-title">${escapeHtml(p.name)}</h4>
                             <span class="product-price">kr ${p.price || 'N/A'},-</span>
                             <div style="margin-top: 4px;">
-                                <a href="https://www.hiskingdomdesigns.no/product-page/${slug}" target="_blank" class="product-cta-btn">Se produkt</a>
+                                <a href="${productUrl}" target="_blank" class="product-cta-btn">Se produkt</a>
                             </div>
                         </div>
                     </div>
@@ -5916,8 +5917,24 @@ class NewsletterBuilder {
             const title = titleEl ? titleEl.innerText.trim() : '';
             const priceEl = card.querySelector('.product-price');
             const price = priceEl ? priceEl.innerText.trim() : '';
+            const productId = card.dataset.productId || '';
             const linkEl = card.querySelector('.product-cta-btn') || card.querySelector('a');
-            const linkHref = linkEl ? linkEl.getAttribute('href') : '#';
+            let linkHref = linkEl ? linkEl.getAttribute('href') : '';
+
+            // Clean up legacy/broken product links (e.g. /product-page/generated-slug)
+            if (!linkHref || linkHref === '#' || linkHref.includes('/product-page/')) {
+                if (productId) {
+                    linkHref = `https://hiskingdomdesigns.no/product/${productId}`;
+                } else {
+                    // Search product cache by title match
+                    const found = (window.hkmWixProductsCache || []).find(p => (p.name || '').trim().toLowerCase() === title.toLowerCase());
+                    if (found && found.id) {
+                        linkHref = `https://hiskingdomdesigns.no/product/${found.id}`;
+                    } else {
+                        linkHref = `https://hiskingdomdesigns.no/produkter`;
+                    }
+                }
+            }
 
             const tableHtml = `
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; width: 100%;">
