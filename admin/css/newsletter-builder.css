@@ -7220,15 +7220,35 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
 
 /* Inspector Reorder Card & Buttons Strict Clamping Guard */
 .inspector-reorder-card {
-    margin-bottom: 16px !important;
-    background: #f8fafc !important;
-    padding: 12px !important;
-    border-radius: 12px !important;
-    border: 1px solid #e2e8f0 !important;
+    margin: 0 0 18px 0 !important;
+    background: transparent !important;
+    padding: 0 0 18px 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
     box-sizing: border-box !important;
     width: 100% !important;
     max-width: 100% !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    gap: 10px !important;
+}
+
+.inspector-reorder-card > .inspector-group-label {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #64748b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: none !important;
 }
 
 .inspector-reorder-grid {
@@ -7240,26 +7260,55 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     box-sizing: border-box !important;
 }
 
-.inspector-reorder-btn {
+#newsletter-builder-layout .inspector-reorder-card .inspector-reorder-btn {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    height: 36px !important;
+    height: 38px !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
-    padding: 0 6px !important;
+    padding: 0 10px !important;
     box-sizing: border-box !important;
     font-size: 12px !important;
     font-weight: 600 !important;
+    color: #334155 !important;
+    background: #ffffff !important;
+    border: 1px solid #dbe3ee !important;
+    border-radius: 9px !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
     overflow: hidden !important;
     white-space: nowrap !important;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease !important;
 }
 
-.inspector-reorder-btn span {
+#newsletter-builder-layout .inspector-reorder-card .inspector-reorder-btn:hover {
+    color: #1d4ed8 !important;
+    background: #f8fbff !important;
+    border-color: #93b4ee !important;
+}
+
+#newsletter-builder-layout .inspector-reorder-card .inspector-reorder-btn[data-block-action="delete"],
+#newsletter-builder-layout #btn-img-delete.inspector-reorder-btn,
+#newsletter-builder-layout #btn-btn-delete.inspector-reorder-btn {
+    color: #dc2626 !important;
+    background: #fffafa !important;
+    border-color: #fecaca !important;
+}
+
+#newsletter-builder-layout .inspector-reorder-card .inspector-reorder-btn[data-block-action="delete"]:hover,
+#newsletter-builder-layout #btn-img-delete.inspector-reorder-btn:hover,
+#newsletter-builder-layout #btn-btn-delete.inspector-reorder-btn:hover {
+    color: #b91c1c !important;
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+}
+
+#newsletter-builder-layout .inspector-reorder-card .inspector-reorder-btn span {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+    color: inherit !important;
 }
 
 /* ==========================================================================
@@ -8619,4 +8668,64 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         min-height: 520px !important;
         border-radius: 10px !important;
     }
+}
+
+/* Persistent zoom controls in the compact left editor rail. */
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    width: 48px !important;
+    margin: 4px auto !important;
+    padding: 3px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 13px !important;
+    background: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06) !important;
+    box-sizing: border-box !important;
+}
+
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls .premium-zoom-btn,
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls .premium-zoom-value {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 30px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+}
+
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls .premium-zoom-btn:hover,
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls .premium-zoom-value:hover {
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+}
+
+body.builder-active:not(.builder-recipients-open) #newsletter-builder-layout .sidebar-zoom-controls .premium-zoom-value {
+    color: #475569 !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+}
+
+body.builder-recipients-open #newsletter-builder-layout .sidebar-zoom-controls {
+    display: none !important;
+}
+
+/* A test address is a single value, not a long-form prompt. */
+.custom-prompt-overlay[data-prompt-kind="test-email"] .custom-prompt-container {
+    max-width: 440px !important;
+}
+
+.custom-prompt-overlay[data-prompt-kind="test-email"] .custom-prompt-body textarea {
+    height: 50px !important;
+    min-height: 50px !important;
+    max-height: 50px !important;
+    padding: 13px 14px !important;
+    border-radius: 10px !important;
+    resize: none !important;
+    line-height: 1.5 !important;
 }

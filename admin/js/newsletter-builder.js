@@ -4186,11 +4186,13 @@ class NewsletterBuilder {
 
         if (!modal || !inputEl) return;
 
+        const isTestEmailPrompt = modalTitle === 'Send test-e-post';
+        modal.dataset.promptKind = isTestEmailPrompt ? 'test-email' : 'default';
         this.mountEditorModal(modal, modalTitle);
-        if (titleEl) titleEl.innerText = modalTitle;
-        if (iconEl) iconEl.innerText = 'edit_note';
-        if (labelEl) labelEl.innerText = label;
-        if (confirmTextEl) confirmTextEl.innerText = confirmText;
+        if (titleEl) titleEl.textContent = modalTitle;
+        if (iconEl) iconEl.textContent = isTestEmailPrompt ? 'send' : 'edit_note';
+        if (labelEl) labelEl.textContent = label;
+        if (confirmTextEl) confirmTextEl.textContent = confirmText;
 
         inputEl.placeholder = placeholder;
         inputEl.value = defaultValue;
@@ -4210,6 +4212,8 @@ class NewsletterBuilder {
         const newCancelBtn = cancelBtn.cloneNode(true);
         const newCloseBtn = closeBtn.cloneNode(true);
         const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newConfirmIcon = newConfirmBtn.querySelector('.material-symbols-outlined');
+        if (newConfirmIcon) newConfirmIcon.textContent = isTestEmailPrompt ? 'send' : 'check';
 
         cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
         closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
@@ -7589,7 +7593,9 @@ class NewsletterBuilder {
                 }
             },
             user.email,
-            "Vennligst oppgi en e-postadresse."
+            "Vennligst oppgi en e-postadresse.",
+            "Send test-e-post",
+            "Send test-e-post"
         );
     }
 
