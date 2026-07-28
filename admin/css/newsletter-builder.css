@@ -7493,12 +7493,21 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     }
 }
 
+/* Hide mobile hamburger toggle button on Desktop */
+#mobile-elements-toggle-btn {
+    display: none !important;
+}
+
+.mobile-drawer-backdrop {
+    display: none !important;
+}
+
 /* ==========================================================================
-   STRICT MOBILE BUILDER LAYOUT ALIGNED WITH HKM ADMIN STANDARDS
+   MOBILE HAMBURGER DRAWER SYSTEM FOR BUILDER (<= 991px)
    ========================================================================== */
 
-/* Always hide main admin sidebar & secondary dark sidebar in builder mode on mobile (<= 991px) */
 @media (max-width: 991px) {
+    /* Hide main admin sidebar & secondary dark sidebar in builder mode on mobile */
     body.builder-active .sidebar,
     body.builder-active .sidebar.active,
     #newsletter-builder-layout .builder-dark-sidebar {
@@ -7515,49 +7524,110 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         margin-left: 0 !important;
     }
 
-    /* Mobile Workspace Column Layout */
+    /* Show Mobile Hamburger Toggle Button in Header */
+    #mobile-elements-toggle-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        cursor: pointer !important;
+    }
+
+    .builder-toolbar-header #sidebar-title {
+        display: none !important; /* Hide redundant static title on mobile header */
+    }
+
+    /* Backdrop for drawers */
+    .mobile-drawer-backdrop {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(15, 23, 42, 0.5) !important;
+        backdrop-filter: blur(4px) !important;
+        z-index: 99998 !important;
+        opacity: 0 !important;
+        transition: opacity 0.25s ease !important;
+    }
+
+    .mobile-drawer-backdrop.active {
+        display: block !important;
+        opacity: 1 !important;
+    }
+
+    /* Canvas is full screen on mobile */
     #builder-main-workspace {
         flex-direction: column !important;
-        height: auto !important;
-        min-height: calc(100vh - 56px) !important;
-        overflow-y: auto !important;
+        height: calc(100vh - 56px) !important;
+        overflow: hidden !important;
+        position: relative !important;
     }
 
     #builder-main-workspace .builder-canvas-wrapper {
         display: flex !important;
         width: 100% !important;
         max-width: 100% !important;
-        flex: 1 0 auto !important;
-        order: 1 !important;
+        flex: 1 !important;
+        margin: 0 !important;
         padding: 16px 12px !important;
         box-sizing: border-box !important;
-        min-height: 480px !important;
+        overflow-y: auto !important;
     }
 
+    /* Elementer Panel converts into a slide-up bottom drawer on mobile */
     #builder-main-workspace .builder-elements-panel {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: none !important;
-        order: 2 !important;
-        border-top: 1px solid #e2e8f0 !important;
-        padding: 16px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-height: 80vh !important;
         height: auto !important;
-        max-height: 380px !important;
+        background: #ffffff !important;
+        z-index: 99999 !important;
+        border-radius: 24px 24px 0 0 !important;
+        box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
+        transform: translateY(110%) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding: 24px 20px 32px 20px !important;
+        box-sizing: border-box !important;
         overflow-y: auto !important;
     }
 
+    #builder-main-workspace .builder-elements-panel.mobile-drawer-open {
+        transform: translateY(0) !important;
+    }
+
+    /* Egenskaper Panel converts into a slide-up bottom drawer on mobile */
     #builder-main-workspace .builder-properties-panel {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: none !important;
-        order: 3 !important;
-        border-top: 1px solid #e2e8f0 !important;
-        padding: 16px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-height: 85vh !important;
         height: auto !important;
-        max-height: 380px !important;
+        background: #ffffff !important;
+        z-index: 99999 !important;
+        border-radius: 24px 24px 0 0 !important;
+        box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.25) !important;
+        transform: translateY(110%) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding: 24px 20px 32px 20px !important;
+        box-sizing: border-box !important;
         overflow-y: auto !important;
+    }
+
+    #builder-main-workspace .builder-properties-panel.mobile-drawer-open {
+        transform: translateY(0) !important;
     }
 }
 
@@ -7568,16 +7638,12 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         gap: 4px !important;
     }
 
-    .builder-toolbar-header #sidebar-title {
-        font-size: 14px !important;
-    }
-
     .builder-toolbar-header .autosave-pill {
-        display: none !important; /* Hide autosave badge on mobile header to prevent overlapping button text */
+        display: none !important;
     }
 
     .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
-        display: none !important; /* Keep icons only for device toggle */
+        display: none !important;
     }
 
     .builder-toolbar-header .device-pill-btn {

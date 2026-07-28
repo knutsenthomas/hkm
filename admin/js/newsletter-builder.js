@@ -254,6 +254,41 @@ class NewsletterBuilder {
         return window.matchMedia('(max-width: 991px)').matches;
     }
 
+    toggleMobileElementsDrawer() {
+        const elementsPanel = document.getElementById('elements-panel');
+        const backdrop = document.getElementById('mobile-elements-backdrop');
+        if (!elementsPanel) return;
+
+        const isOpen = elementsPanel.classList.contains('mobile-drawer-open');
+        this.closeMobileDrawers();
+
+        if (!isOpen) {
+            elementsPanel.classList.add('mobile-drawer-open');
+            if (backdrop) backdrop.classList.add('active');
+        }
+    }
+
+    openMobilePropertiesDrawer() {
+        if (!this.isMobileViewport()) return;
+        const propsPanel = document.querySelector('.builder-properties-panel');
+        const backdrop = document.getElementById('mobile-elements-backdrop');
+        if (!propsPanel) return;
+
+        this.closeMobileDrawers();
+        propsPanel.classList.add('mobile-drawer-open');
+        if (backdrop) backdrop.classList.add('active');
+    }
+
+    closeMobileDrawers() {
+        const elementsPanel = document.getElementById('elements-panel');
+        const propsPanel = document.querySelector('.builder-properties-panel');
+        const backdrop = document.getElementById('mobile-elements-backdrop');
+
+        if (elementsPanel) elementsPanel.classList.remove('mobile-drawer-open');
+        if (propsPanel) propsPanel.classList.remove('mobile-drawer-open');
+        if (backdrop) backdrop.classList.remove('active');
+    }
+
     openToolsPanel(tab = null) {
         if (!this.isMobileViewport()) return;
         if (tab) this.switchTab(tab);
@@ -3452,6 +3487,10 @@ class NewsletterBuilder {
         } else {
             console.log('[HKM Inspector] Loading TEXT inspector');
             this.showTextInspector(node);
+        }
+
+        if (this.isMobileViewport()) {
+            this.openMobilePropertiesDrawer();
         }
     }
 
