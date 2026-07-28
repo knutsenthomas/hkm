@@ -1806,6 +1806,11 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         if (!container) return;
 
+        // Never sync if currently translating or showing translation overlay
+        if (container.innerHTML.includes('editor-translation-overlay') || container.innerHTML.includes('Oversetter til engelsk')) {
+            return;
+        }
+
         this.enforceLayout();
 
         // Force browser layout reflow to ensure the flex footer position recalculates dynamically
@@ -7750,44 +7755,63 @@ class NewsletterBuilder {
         );
     }
 
+    showTranslationOverlay() {
+        this.hideTranslationOverlay();
+        const canvas = document.getElementById('newsletter-canvas');
+        if (!canvas) return;
+
+        canvas.style.position = 'relative';
+        const overlay = document.createElement('div');
+        overlay.id = 'editor-translation-overlay';
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        `;
+        overlay.innerHTML = `
+            <span class="material-symbols-outlined rotating" style="font-size: 44px; color: #0284c7; margin-bottom: 16px;">translate</span>
+            <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #0369a1; font-weight: 700;">Oversetter til engelsk med AI...</h3>
+            <p style="margin: 0; color: #64748b; font-size: 14px;">Vennligst vent et øyeblikk mens teksten oversettes. Endringene vil vises direkte her på kanvaset.</p>
+        `;
+        canvas.appendChild(overlay);
+    }
+
+    hideTranslationOverlay() {
+        const existing = document.getElementById('editor-translation-overlay');
+        if (existing) existing.remove();
+    }
+
     async switchEditorLanguage(lang = 'no') {
         const subjectInput = document.getElementById('newsletter-subject');
-        
-        // Save current canvas state before switching
-        if (this.currentEditorLang === 'no') {
-            this.syncUnifiedBlocks();
-            if (subjectInput) this.subjectNo = subjectInput.value;
-        } else if (this.currentEditorLang === 'en') {
-            this.syncUnifiedBlocks();
-            if (subjectInput && this.englishPayload) {
-                this.englishPayload.subjectEn = subjectInput.value;
-            }
-        }
-
         const btnNo = document.getElementById('editor-lang-btn-no');
         const btnEn = document.getElementById('editor-lang-btn-en');
 
-        if (lang === 'en') {
-            if (btnNo && btnEn) {
-                btnEn.style.background = '#ffffff';
-                btnEn.style.color = '#0f172a';
-                btnEn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.06)';
-                btnNo.style.background = 'transparent';
-                btnNo.style.color = '#64748b';
-                btnNo.style.boxShadow = 'none';
+        if (lang === 'no') {
+            this.hideTranslationOverlay();
+
+            // Save English edits if we were in English mode
+            if (this.currentEditorLang === 'en' && subjectInput && this.englishPayload) {
+                this.englishPayload.subjectEn = subjectInput.value;
+                const container = document.getElementById('blocks-container');
+                if (container && !container.innerHTML.includes('editor-translation-overlay')) {
+                    this.englishPayload.htmlEn = this.getCleanCanvasHtml();
+                }
             }
 
-            this.currentEditorLang = 'en';
-
-            // Check if English translation exists
-            if (!this.englishPayload || !this.englishPayload.blocksEn) {
-                if (typeof showToast === 'function') showToast("Genererer engelsk versjon med AI... 🌐", "info");
-                await this.translateCurrentNewsletterToEnglish(true);
-            } else {
-                this.renderCanvasForLanguage('en');
-                if (typeof showToast === 'function') showToast("Du redigerer nå den engelske versjonen! 🇬🇧", "info");
-            }
-        } else {
             if (btnNo && btnEn) {
                 btnNo.style.background = '#ffffff';
                 btnNo.style.color = '#0f172a';
@@ -7800,6 +7824,32 @@ class NewsletterBuilder {
             this.currentEditorLang = 'no';
             this.renderCanvasForLanguage('no');
             if (typeof showToast === 'function') showToast("Du redigerer nå den norske versjonen! 🇳🇴", "info");
+            return;
+        }
+
+        // Switching to English
+        if (this.currentEditorLang === 'no') {
+            this.syncUnifiedBlocks();
+            if (subjectInput) this.subjectNo = subjectInput.value;
+        }
+
+        if (btnNo && btnEn) {
+            btnEn.style.background = '#ffffff';
+            btnEn.style.color = '#0f172a';
+            btnEn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.06)';
+            btnNo.style.background = 'transparent';
+            btnNo.style.color = '#64748b';
+            btnNo.style.boxShadow = 'none';
+        }
+
+        this.currentEditorLang = 'en';
+
+        if (!this.englishPayload || !this.englishPayload.htmlEn) {
+            if (typeof showToast === 'function') showToast("Genererer engelsk versjon med AI... 🌐", "info");
+            await this.translateCurrentNewsletterToEnglish(true);
+        } else {
+            this.renderCanvasForLanguage('en');
+            if (typeof showToast === 'function') showToast("Du redigerer nå den engelske versjonen! 🇬🇧", "info");
         }
     }
 
@@ -7807,6 +7857,8 @@ class NewsletterBuilder {
         const container = document.getElementById('blocks-container');
         const subjectInput = document.getElementById('newsletter-subject');
         if (!container) return;
+
+        this.hideTranslationOverlay();
 
         if (lang === 'en' && this.englishPayload) {
             const html = this.englishPayload.htmlEn 
@@ -7911,6 +7963,7 @@ class NewsletterBuilder {
 
     async translateCurrentNewsletterToEnglish(force = false) {
         if (this.englishPayload && !force) {
+            this.hideTranslationOverlay();
             this.renderCanvasForLanguage('en');
             this.updateEnglishStatusCardUI();
             return;
@@ -7924,7 +7977,6 @@ class NewsletterBuilder {
             this.subjectNo = norwegianSubject;
         }
 
-        const container = document.getElementById('blocks-container');
         const norwegianHtml = this.getCleanCanvasHtml();
         const plainText = norwegianHtml.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
 
@@ -7940,15 +7992,8 @@ class NewsletterBuilder {
             btnEn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 16px; color: #2563eb;">sync</span> <span>Oversetter...</span>`;
         }
 
-        // Show instant skeleton / spinner on canvas if in English mode
-        if (this.currentEditorLang === 'en' && container) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px; font-family: 'Inter', sans-serif;">
-                    <span class="material-symbols-outlined rotating" style="font-size: 40px; color: #0284c7; margin-bottom: 16px;">translate</span>
-                    <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #0369a1; font-weight: 700;">Oversetter til engelsk med AI...</h3>
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">Vennligst vent et øyeblikk mens teksten oversettes. Endringene vil vises direkte her på kanvaset.</p>
-                </div>
-            `;
+        if (this.currentEditorLang === 'en') {
+            this.showTranslationOverlay();
         }
 
         try {
@@ -8021,6 +8066,8 @@ class NewsletterBuilder {
                 translatedAt: new Date().toISOString()
             };
 
+            this.hideTranslationOverlay();
+
             // If we are currently editing English, re-render canvas with translated HTML!
             if (this.currentEditorLang === 'en') {
                 this.renderCanvasForLanguage('en');
@@ -8030,11 +8077,10 @@ class NewsletterBuilder {
             if (typeof showToast === 'function') showToast("Suksess! Nyhetsbrevet er oversatt til engelsk! 🌐", "success");
         } catch(err) {
             console.error("Translation error:", err);
+            this.hideTranslationOverlay();
             if (typeof showToast === 'function') showToast("Feil under oversettelse: " + (err.message || "Ukjent feil"), "error");
-            if (this.currentEditorLang === 'en' && container && !this.englishPayload) {
-                container.innerHTML = norwegianHtml;
-            }
         } finally {
+            this.hideTranslationOverlay();
             if (btnEn) {
                 btnEn.disabled = false;
                 btnEn.innerHTML = originalBtnHtml || `<span class="material-symbols-outlined" style="font-size: 16px; color: #2563eb;">translate</span> <span>🇬🇧 English</span>`;
