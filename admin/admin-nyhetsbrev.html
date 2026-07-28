@@ -106,8 +106,8 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/dashboard.css?v=20260727_V1">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260728_V1200_PUBLISHDROPDOWN">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V1200_PUBLISHDROPDOWN">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260728_V1300_FAILSAFEPUBLISH">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260728_V1300_FAILSAFEPUBLISH">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -963,12 +963,12 @@
                         <button id="continue-btn" class="btn-primary-publish">
                             <span>Publiser</span>
                         </button>
-                        <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg">
+                        <button id="publish-dropdown-btn" class="btn-primary-publish-arrow" title="Flere utsendelsesvalg" onclick="event.preventDefault(); event.stopPropagation(); const m=document.getElementById('publish-options-dropdown'); if(m){ const isHidden = window.getComputedStyle(m).display==='none'; m.style.setProperty('display', isHidden ? 'flex' : 'none', 'important'); }">
                             <span class="material-symbols-outlined">expand_more</span>
                         </button>
 
                         <!-- Publiser Meny Dropdown -->
-                        <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none;">
+                        <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none !important;">
                             <button type="button" class="publish-dropdown-item" id="opt-send-now">
                                 <span class="material-symbols-outlined">send</span>
                                 <div>

@@ -507,22 +507,27 @@ class NewsletterBuilder {
             publishDropdownBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                publishDropdownMenu.classList.toggle('show');
+                const isHidden = publishDropdownMenu.style.display === 'none' || window.getComputedStyle(publishDropdownMenu).display === 'none';
+                if (isHidden) {
+                    publishDropdownMenu.style.setProperty('display', 'flex', 'important');
+                } else {
+                    publishDropdownMenu.style.setProperty('display', 'none', 'important');
+                }
             });
 
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.btn-group-publish')) {
-                    publishDropdownMenu.classList.remove('show');
+                    publishDropdownMenu.style.setProperty('display', 'none', 'important');
                 }
             });
 
             document.getElementById('opt-send-now')?.addEventListener('click', () => {
-                publishDropdownMenu.classList.remove('show');
+                publishDropdownMenu.style.setProperty('display', 'none', 'important');
                 this.toggleRecipientsDrawer();
             });
 
             document.getElementById('opt-schedule-send')?.addEventListener('click', () => {
-                publishDropdownMenu.classList.remove('show');
+                publishDropdownMenu.style.setProperty('display', 'none', 'important');
                 this.showPromptModal(
                     "Velg dato og klokkeslett for automatisk utsendelse:",
                     "f.eks. 2026-08-01 kl. 10:00",
@@ -537,12 +542,12 @@ class NewsletterBuilder {
             });
 
             document.getElementById('opt-send-test')?.addEventListener('click', () => {
-                publishDropdownMenu.classList.remove('show');
+                publishDropdownMenu.style.setProperty('display', 'none', 'important');
                 this.sendTestEmail();
             });
 
             document.getElementById('opt-export-html')?.addEventListener('click', () => {
-                publishDropdownMenu.classList.remove('show');
+                publishDropdownMenu.style.setProperty('display', 'none', 'important');
                 this.exportHtmlFile();
             });
         }
