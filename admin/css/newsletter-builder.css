@@ -957,8 +957,8 @@
     flex: 1 !important;
     width: 100% !important;
     display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
+    flex-direction: column !important;
+    align-items: center !important;
     padding: 0 0 80px 0 !important;
     box-sizing: border-box !important;
     overflow-y: visible !important;

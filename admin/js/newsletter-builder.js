@@ -7970,17 +7970,15 @@ class NewsletterBuilder {
                 STRENG REGEL: Oversett det norske ordet 'Basar' / 'Sommerbasar' til 'Raffle' / 'Summer Raffle' (ALDRI 'Bazaar').
                 FORMAT-REGEL: Bevar alle HTML-elementer (som <p>, <h2>, <strong>, <a>, <img>, style-attributter) nøyaktig som de er. Oversett KUN teksten inne i elementene.
 
-                Emnelinje (Norsk): "${norwegianSubject}"
+                EMNELINJE (NORSK): "${norwegianSubject}"
 
-                E-post HTML-innhold (Norsk):
+                HTML-INNHOLD (NORSK):
                 ${norwegianHtml}
 
-                Svar KUN med et gyldig JSON-objekt på dette formatet:
-                {
-                    "subject": "Translated English Subject Line",
-                    "html": "Translated English HTML Content"
-                }
-                Ingen markdown-kodelister, kun ren JSON.
+                Svar NØYAKTIG på dette formatet (uten JSON eller markdown-blokker):
+                SUBJECT: [Engelsk emnelinje]
+                BODY:
+                [Engelsk HTML-innhold]
             `;
 
             let translatedSubject = norwegianSubject;
@@ -7990,18 +7988,25 @@ class NewsletterBuilder {
                 const callable = firebase.functions().httpsCallable('aiProcess');
                 const response = await callable({ prompt: prompt });
                 if (response.data && response.data.text) {
-                    let jsonStr = response.data.text.trim();
-                    if (jsonStr.startsWith('```')) {
-                        jsonStr = jsonStr.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+                    let rawOutput = response.data.text.trim();
+                    if (rawOutput.startsWith('```')) {
+                        rawOutput = rawOutput.replace(/^```(html|text|json)?\n?/, '').replace(/\n?```$/, '').trim();
                     }
-                    try {
-                        const parsed = JSON.parse(jsonStr);
-                        if (parsed.subject) translatedSubject = parsed.subject;
-                        if (parsed.html) translatedHtml = parsed.html;
-                    } catch(jsonErr) {
-                        console.warn("JSON parse warning, using raw output or regex match:", jsonErr);
-                        const matchHtml = jsonStr.match(/"html"\s*:\s*"([\s\S]*)"/);
-                        if (matchHtml) translatedHtml = matchHtml[1];
+
+                    const bodyIndex = rawOutput.indexOf('BODY:');
+                    if (bodyIndex !== -1) {
+                        const subjectPart = rawOutput.substring(0, bodyIndex);
+                        const bodyPart = rawOutput.substring(bodyIndex + 5).trim();
+                        
+                        const subjectMatch = subjectPart.match(/SUBJECT:\s*(.*)/i);
+                        if (subjectMatch && subjectMatch[1]) {
+                            translatedSubject = subjectMatch[1].trim();
+                        }
+                        if (bodyPart && bodyPart.length > 10) {
+                            translatedHtml = bodyPart;
+                        }
+                    } else if (rawOutput.includes('<p>') || rawOutput.includes('<div') || rawOutput.includes('<h')) {
+                        translatedHtml = rawOutput;
                     }
                 }
             }
