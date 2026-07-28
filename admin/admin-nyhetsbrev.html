@@ -1017,21 +1017,21 @@
 
                         <!-- Publiser Meny Dropdown -->
                         <div id="publish-options-dropdown" class="publish-dropdown-menu" style="display: none !important;">
-                            <button type="button" class="publish-dropdown-item" id="opt-send-now">
+                            <button type="button" class="publish-dropdown-item" id="opt-send-now" onclick="if(window.builder){ window.builder.sendCampaign(); }">
                                 <span class="material-symbols-outlined">send</span>
                                 <div>
                                     <strong>Send nå</strong>
                                     <small>Send til alle abonnenter umiddelbart</small>
                                 </div>
                             </button>
-                            <button type="button" class="publish-dropdown-item" id="opt-schedule-send">
+                            <button type="button" class="publish-dropdown-item" id="opt-schedule-send" onclick="if(window.builder){ window.builder.openScheduleModal(); }">
                                 <span class="material-symbols-outlined">schedule</span>
                                 <div>
                                     <strong>Planlegg utsendelse</strong>
                                     <small>Velg dato og klokkeslett for utsending</small>
                                 </div>
                             </button>
-                            <button type="button" class="publish-dropdown-item" id="opt-send-test">
+                            <button type="button" class="publish-dropdown-item" id="opt-send-test" onclick="if(window.builder){ window.builder.sendTestEmail(); }">
                                 <span class="material-symbols-outlined">mark_email_read</span>
                                 <div>
                                     <strong>Send test-epost</strong>
@@ -1039,7 +1039,7 @@
                                 </div>
                             </button>
                             <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
-                            <button type="button" class="publish-dropdown-item" id="opt-export-html">
+                            <button type="button" class="publish-dropdown-item" id="opt-export-html" onclick="if(window.builder){ window.builder.exportHtmlFile(); }">
                                 <span class="material-symbols-outlined">code</span>
                                 <div>
                                     <strong>Eksporter HTML</strong>

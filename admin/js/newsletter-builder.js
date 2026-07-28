@@ -8358,6 +8358,9 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendTestEmail() {
+        const publishDropdown = document.getElementById('publish-options-dropdown');
+        if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
+
         let user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
