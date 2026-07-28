@@ -3802,7 +3802,7 @@ class NewsletterBuilder {
                 id: 'website',
                 name: 'Nettsted',
                 url: 'https://www.hiskingdomministry.no/',
-                enabled: false,
+                enabled: true,
                 color: '#1B4965',
                 svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4965" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`
             }
@@ -7353,7 +7353,21 @@ class NewsletterBuilder {
 
         // 4. Upgrade legacy text-only social blocks to "Følg oss" / "Follow us" + white brikker layout automatically
         container.querySelectorAll('.newsletter-social-block').forEach(socialBlock => {
-            if (!socialBlock.querySelector('svg')) {
+            const existingLinks = Array.from(socialBlock.querySelectorAll('a[href]'));
+            if (existingLinks.length > 0) {
+                existingLinks.forEach(link => {
+                    const href = link.getAttribute('href') || '#';
+                    const hint = `${href} ${link.getAttribute('title') || ''} ${link.textContent || ''}`.toLowerCase();
+                    let id = 'website';
+                    if (hint.includes('facebook')) id = 'facebook';
+                    else if (hint.includes('instagram')) id = 'instagram';
+                    else if (hint.includes('youtube') || hint.includes('youtu.be')) id = 'youtube';
+
+                    if (!link.querySelector('svg') && !link.querySelector('img')) {
+                        link.innerHTML = tileSvgMap[id] || tileWebsite;
+                    }
+                });
+            } else {
                 socialBlock.setAttribute('data-style', 'tiles');
                 socialBlock.style.cssText = "position: relative; text-align: center; margin: 28px 0; padding: 0; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;";
                 socialBlock.innerHTML = `
@@ -7367,6 +7381,9 @@ class NewsletterBuilder {
                         </a>
                         <a href="https://youtube.com/@HisKingdomMinistry" target="_blank" title="YouTube" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
                             ${tileYT}
+                        </a>
+                        <a href="https://www.hiskingdomministry.no/" target="_blank" title="Nettsted" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
+                            ${tileWebsite}
                         </a>
                     </div>
                 `;
