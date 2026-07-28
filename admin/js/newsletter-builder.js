@@ -6804,8 +6804,38 @@ class NewsletterBuilder {
                     <p><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" alt="HKM Månedsbrev" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin: 16px 0; display: block;"></p>
                     <h2 class="block-h2" style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; margin-top: 20px;">His Kingdom Ministry</h2>
                     <p class="block-text" style="font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: #334155;">Kjære venn av His Kingdom Ministry, vi håper du har hatt en flott sommerferie med mye åndelig påfyll. Vi har hatt gode feriedager på Østlandet og Sørlandet sammen med familie og venner. Vi har solgt huset vårt og har en spennende tid sammen med Gud i møte. Han kaller oss videre i arbeidet i hans rike. Det kommer snart spennende oppdateringer som er under planlegging. Dette er konkrete planer som Gud har talt til oss om og vi ønsker å invitere deg med på reisen.</p>
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Les mer på nettsiden</a>
+
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+
+                    <div style="background: #fff8f0; border: 1px solid #fed7aa; border-radius: 16px; padding: 24px; margin: 24px 0; text-align: center;">
+                        <p><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80" alt="HKM Sommerbasar" class="block-img" style="max-width: 100%; height: auto; border-radius: 12px; margin-bottom: 16px; display: block;"></p>
+                        <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #9a3412; font-size: 20px; margin: 0 0 10px 0;">Velkommen til HKM Sommerbasar! 🎟️</h3>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #7c2d12; margin: 0 0 16px 0;">Bli med på vår sommerbasar! Flotte gevinster, inspirasjon og fellesskap der overskuddet går direkte til misjonsarbeidet og hjelpeprosjekter.</p>
+                        <a href="https://www.hiskingdomministry.no/donasjoner.html" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">Kjøp basarlodder her</a>
+                    </div>
+
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+
+                    <div style="margin: 24px 0;">
+                        <h3 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #1e293b; font-size: 18px; text-align: center; margin-bottom: 16px;">Utvalgte produkter fra His Kingdom Designs 🎨</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; background: #ffffff;">
+                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80" alt="Bibelvers Plakat" style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: block;">
+                                <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Inspirerende Plakater</h4>
+                                <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b;">Unike kristne kunstplakater med bibelvers.</p>
+                                <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #1B4965; color: white; padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 700;">Se i nettbutikken</a>
+                            </div>
+                            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; background: #ffffff;">
+                                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80" alt="HKM Kort" style="max-width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; display: block;">
+                                <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">Gavekort & Evangeliene</h4>
+                                <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b;">Vakre oppmuntringskort for gaver og vitnesbyrd.</p>
+                                <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #1B4965; color: white; padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 12px; font-weight: 700;">Se i nettbutikken</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 32px 0;">
+                        <a href="https://www.hiskingdomministry.no" class="block-btn" contenteditable="false" style="display: inline-block; background-color: #d17d39; color: white; padding: 14px 36px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 16px;">Besøk nettsiden vår</a>
                     </div>
                 `;
             }
