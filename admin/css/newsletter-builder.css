@@ -5962,13 +5962,29 @@ body.builder-active.sidebar-collapsed .sidebar {
 .blocks-container h2,
 .blocks-container h3,
 .blocks-container h4,
-.blocks-container h5,
-.blocks-container h6,
-.blocks-container li,
-.blocks-container section,
-.blocks-container blockquote {
-    background-color: transparent !important;
-    background: transparent !important;
+/* --- BULLETPROOF NEWSLETTER BLOCKQUOTES & SITATER --- */
+.blocks-container blockquote,
+#blocks-container blockquote,
+.docs-rte-surface blockquote,
+blockquote {
+    border-left: 4px solid #d17d39 !important;
+    padding: 10px 16px 10px 20px !important;
+    margin: 20px 0 !important;
+    font-style: italic !important;
+    color: #334155 !important;
+    font-family: Georgia, 'Times New Roman', serif, Arial !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    background: #fffaf5 !important;
+    border-radius: 0 10px 10px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.blocks-container blockquote p,
+#blocks-container blockquote p {
+    margin: 0 0 8px 0 !important;
+    font-style: italic !important;
+    color: #334155 !important;
 }
 
 /* --- BULLETPROOF NEWSLETTER PRODUCT CARDS --- */

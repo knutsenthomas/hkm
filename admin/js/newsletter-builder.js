@@ -5907,6 +5907,18 @@ class NewsletterBuilder {
                 }
             }
             img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
+        // Convert blockquotes to bulletproof email tables with inline styles for Gmail, Outlook, and Apple Mail
+        contentClone.querySelectorAll('blockquote').forEach(bq => {
+            const innerContent = bq.innerHTML;
+            const tableQuote = `
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; width: 100%;">
+              <tr>
+                <td style="border-left: 4px solid #d17d39; padding: 12px 18px 12px 22px; background-color: #fffaf5; border-radius: 0 8px 8px 0; font-style: italic; color: #334155; font-family: Georgia, 'Times New Roman', serif, Arial; font-size: 16px; line-height: 1.6;">
+                  ${innerContent}
+                </td>
+              </tr>
+            </table>`;
+            bq.outerHTML = tableQuote;
         });
 
         // Convert product cards to bulletproof email tables
