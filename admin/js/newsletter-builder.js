@@ -1311,8 +1311,10 @@ class NewsletterBuilder {
     mountEditorModal(modal, ariaLabel) {
         if (!modal) return null;
 
-        this.toggleMode('builder');
-        this.switchSidebarView('builder');
+        if (!this.currentView || this.currentView === 'builder') {
+            this.toggleMode('builder');
+            this.switchSidebarView('builder');
+        }
         this.closeMobileDrawers();
         this.closeToolsUi();
 
@@ -4059,7 +4061,12 @@ class NewsletterBuilder {
                 `;
             }
 
-            this.mountEditorModal(modal, title);
+            if (!document.body.contains(modal)) {
+                document.body.appendChild(modal);
+            }
+            modal.style.setProperty('z-index', '999999', 'important');
+            modal.style.display = 'flex';
+
             const titleEl = modal.querySelector('#confirm-modal-title') || document.getElementById('confirm-modal-title');
             const messageEl = modal.querySelector('#confirm-modal-message') || document.getElementById('confirm-modal-message');
             const confirmBtn = modal.querySelector('#confirm-modal-confirm') || document.getElementById('confirm-modal-confirm');
