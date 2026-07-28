@@ -7204,20 +7204,45 @@ ${cleanCanvasHtml}
             
             let count = 0;
             container.innerHTML = '';
+
+            const seenDraftsMap = new Map();
+            const docsToDelete = [];
+
             snap.forEach(doc => {
                 const data = doc.data();
                 if (data.isDraft !== true) return; // Only load drafts!
+
+                const key = (data.subject || data.name || '').trim().toLowerCase();
+
+                if (key && seenDraftsMap.has(key)) {
+                    // Duplicate draft found! Keep the newest one, queue older ones for cleanup
+                    docsToDelete.push(doc.id);
+                } else {
+                    seenDraftsMap.set(key || doc.id, { id: doc.id, data });
+                }
+            });
+
+            // Clean up accumulated duplicate draft documents from Firestore
+            if (docsToDelete.length > 0) {
+                console.log(`[HKM Autosave] Cleaning up ${docsToDelete.length} duplicate draft documents from Firestore...`);
+                docsToDelete.forEach(id => {
+                    window.firebaseService.db.collection('newsletter_templates').doc(id).delete().catch(err => console.warn('Failed to delete duplicate draft:', err));
+                });
+            }
+
+            seenDraftsMap.forEach(({ id, data }) => {
                 count++;
                 
                 const div = document.createElement('div');
                 div.className = 'sidebar-item-card';
+                const dateStr = data.updatedAt ? new Date(data.updatedAt).toLocaleDateString('no') : (data.createdAt ? new Date(data.createdAt).toLocaleDateString('no') : '');
                 div.innerHTML = `
                     <div class="card-icon-container">
                         <span class="material-symbols-outlined">edit_document</span>
                     </div>
                     <div class="card-content">
                         <div class="card-title">${data.name}</div>
-                        <div class="card-subtitle">${new Date(data.createdAt).toLocaleDateString()}</div>
+                        <div class="card-subtitle">${dateStr ? dateStr + ' · ' : ''}Emne: ${data.subject || 'Uten emne'}</div>
                     </div>
                     <div class="card-action">
                         <span class="material-symbols-outlined">edit</span>
@@ -7226,8 +7251,17 @@ ${cleanCanvasHtml}
                 div.onclick = async () => {
                     const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${data.name}"? Dette vil erstatte innholdet i editoren.`, 'Last inn');
                     if (confirmed) {
+                        this.currentDraftId = id;
+                        this.currentDraftName = data.name;
                         this.blocks = data.blocks;
-                        document.getElementById('newsletter-subject').value = data.subject || '';
+                        const subjectInput = document.getElementById('newsletter-subject');
+                        if (subjectInput) subjectInput.value = data.subject || '';
+                        
+                        // Update URL
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('draftId', id);
+                        window.history.replaceState({}, '', url.toString());
+
                         this.renderCanvas();
                         showToast(`Kladden "${data.name}" er lastet inn.`, "info");
                     }
@@ -7988,6 +8022,9 @@ ${cleanCanvasHtml}
         if (this.autosaveTimer) clearTimeout(this.autosaveTimer);
         
         this.autosaveTimer = setTimeout(async () => {
+            if (this._autosaveInFlight) return;
+            this._autosaveInFlight = true;
+
             try {
                 // Get fresh state
                 const container = document.getElementById('blocks-container');
@@ -7997,28 +8034,36 @@ ${cleanCanvasHtml}
                     type: 'text',
                     content: { text: container.innerHTML }
                 }];
-                const subject = document.getElementById('newsletter-subject').value;
+                const subject = document.getElementById('newsletter-subject')?.value || '';
                 
+                let draftName = this.currentDraftName;
+                if (!draftName || draftName.startsWith('Autolagret kladd')) {
+                    draftName = subject ? `Kladd: ${subject}` : `Utkast (${new Date().toLocaleDateString('no')})`;
+                }
+                this.currentDraftName = draftName;
+
+                const headerNode = document.querySelector('.canvas-header');
                 const data = {
-                    name: this.currentDraftName || `Autolagret kladd (${new Date().toLocaleDateString('no')})`,
+                    name: draftName,
                     blocks: freshBlocks,
+                    headerHtml: headerNode ? headerNode.outerHTML : '',
                     subject: subject,
-                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
                     isDraft: true
                 };
 
-                if (this.currentDraftId) {
-                    await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
-                } else {
-                    const docRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
+                // Ensure we ALWAYS reuse a single document ID for this newsletter session
+                if (!this.currentDraftId) {
+                    const docRef = window.firebaseService.db.collection('newsletter_templates').doc();
                     this.currentDraftId = docRef.id;
-                    this.currentDraftName = data.name;
-                    
-                    // Update URL on first save
+                    data.createdAt = new Date().toISOString();
+
                     const url = new URL(window.location.href);
                     url.searchParams.set('draftId', this.currentDraftId);
                     window.history.replaceState({}, '', url.toString());
                 }
+
+                await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
 
                 // Update UI status to Success
                 if (statusEl && textEl) {
@@ -8046,6 +8091,8 @@ ${cleanCanvasHtml}
                         icon.style.animation = 'none';
                     }
                 }
+            } finally {
+                this._autosaveInFlight = false;
             }
         }, 2000);
     }
