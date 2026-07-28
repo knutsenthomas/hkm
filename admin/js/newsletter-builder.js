@@ -1,9 +1,21 @@
-/**
- * Nyhetsbrevbygger Logic - HKM Admin
- * Handles block-based email design, previews, and integrations.
- */
+function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+if (typeof window !== 'undefined') {
+    window.escapeHtml = escapeHtml;
+}
 
 class NewsletterBuilder {
+    escapeHtml(str) {
+        return escapeHtml(str);
+    }
+
     constructor() {
         this.blocks = [];
         this.currentView = 'desktop';
