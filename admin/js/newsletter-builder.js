@@ -3942,8 +3942,9 @@ class NewsletterBuilder {
             let linksHtml = '';
             if (selectedStyle === 'tiles') {
                 const tileSvgMap = { facebook: tileFB, instagram: tileIG, youtube: tileYT, website: tileWebsite };
+                const followUsTitle = this.currentEditorLang === 'en' ? 'Follow us' : 'Følg oss';
                 linksHtml = `
-                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">Følg oss</div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">${followUsTitle}</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
                         ${activePlatforms.map(p => `
                             <a href="${p.url}" target="_blank" title="${p.name}" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
@@ -7300,6 +7301,8 @@ class NewsletterBuilder {
             });
         });
 
+        const followUsText = this.currentEditorLang === 'en' ? 'Follow us' : 'Følg oss';
+
         // 2. Smart Converter: convert any text element or paragraph containing Facebook/Instagram/YouTube into a proper .newsletter-social-block
         container.querySelectorAll('p, div, font, span').forEach(el => {
             if (el.classList && el.classList.contains('newsletter-social-block')) return;
@@ -7315,7 +7318,7 @@ class NewsletterBuilder {
                 block.setAttribute('data-style', 'tiles');
                 block.style.cssText = "position: relative; text-align: center; margin: 28px 0; padding: 0; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;";
                 block.innerHTML = `
-                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">Følg oss</div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">${followUsText}</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
                         <a href="https://facebook.com/hiskingdomministry" target="_blank" title="Facebook" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
                             ${tileFB}
@@ -7341,13 +7344,13 @@ class NewsletterBuilder {
             }
         }
 
-        // 4. Upgrade legacy text-only social blocks to "Følg oss" + white brikker layout automatically
+        // 4. Upgrade legacy text-only social blocks to "Følg oss" / "Follow us" + white brikker layout automatically
         container.querySelectorAll('.newsletter-social-block').forEach(socialBlock => {
             if (!socialBlock.querySelector('svg')) {
                 socialBlock.setAttribute('data-style', 'tiles');
                 socialBlock.style.cssText = "position: relative; text-align: center; margin: 28px 0; padding: 0; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;";
                 socialBlock.innerHTML = `
-                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">Følg oss</div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; text-align: center; width: 100%;">${followUsText}</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
                         <a href="https://facebook.com/hiskingdomministry" target="_blank" title="Facebook" style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: #ffffff; color: #1B4965; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s ease;">
                             ${tileFB}
@@ -7756,8 +7759,9 @@ class NewsletterBuilder {
             `).join('');
         }
 
+        const followUsText = this.currentEditorLang === 'en' ? 'Follow us' : 'Følg oss';
         const headingMarkup = selectedStyle === 'tiles'
-            ? '<p style="margin: 0 0 14px 0; color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 20px; line-height: 1.3; font-weight: 800; text-align: center;">Følg oss</p>'
+            ? `<p style="margin: 0 0 14px 0; color: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 20px; line-height: 1.3; font-weight: 800; text-align: center;">${followUsText}</p>`
             : '';
 
         return `
@@ -8105,7 +8109,17 @@ class NewsletterBuilder {
 
         const isEnglish = lang === 'en';
         const blocks = isEnglish ? this.englishPayload?.blocksEn : this.blocks;
-        container.innerHTML = this.getLanguageBlocksHtml(blocks);
+        let html = this.getLanguageBlocksHtml(blocks);
+
+        if (isEnglish && html) {
+            html = html
+                .replace(/>\s*Følg oss\s*</gi, '>Follow us<')
+                .replace(/Følg oss/g, 'Follow us')
+                .replace(/Abonner på vårt nyhetsbrev/gi, 'Subscribe to our newsletter')
+                .replace(/Meld deg av nyhetsbrev/gi, 'Unsubscribe from newsletter');
+        }
+
+        container.innerHTML = html;
 
         if (subjectInput) {
             subjectInput.value = isEnglish
@@ -8257,6 +8271,12 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     throw new Error('AI-oversettelsen returnerte ikke gyldig innhold.');
                 }
             }
+
+            translatedHtml = translatedHtml
+                .replace(/>\s*Følg oss\s*</gi, '>Follow us<')
+                .replace(/Følg oss/g, 'Follow us')
+                .replace(/Abonner på vårt nyhetsbrev/gi, 'Subscribe to our newsletter')
+                .replace(/Meld deg av nyhetsbrev/gi, 'Unsubscribe from newsletter');
 
             const translatedBlocks = [{
                 id: 'unified_content',
