@@ -769,7 +769,7 @@ class NewsletterBuilder {
                 }
             });
 
-            // Click handler for delete buttons (×) and block card selection
+            // Click handler for delete buttons (×), edit buttons (✏️), and block card selection
             container.addEventListener('click', (e) => {
                 const deleteBtn = e.target.closest('.card-delete-btn, .block-delete-btn');
                 if (deleteBtn) {
@@ -789,6 +789,17 @@ class NewsletterBuilder {
                     }
                 }
 
+                const editBtn = e.target.closest('.card-edit-btn');
+                if (editBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const socialBlock = editBtn.closest('.newsletter-social-block');
+                    if (socialBlock) {
+                        this.openSocialInsertionFlowAt(socialBlock);
+                        return;
+                    }
+                }
+
                 const blockCard = e.target.closest(
                     '.newsletter-event-card, .newsletter-product-card, .newsletter-social-block, ' +
                     '.newsletter-video-block, .newsletter-divider-block, .newsletter-spacer-block, .newsletter-columns-block'
@@ -797,9 +808,19 @@ class NewsletterBuilder {
                     this.selectedBlockCard = blockCard;
                     document.querySelectorAll('.hkm-selected-block').forEach(el => el.classList.remove('hkm-selected-block'));
                     blockCard.classList.add('hkm-selected-block');
-                } else if (!e.target.closest('.card-delete-btn')) {
+                } else if (!e.target.closest('.card-delete-btn, .card-edit-btn')) {
                     this.selectedBlockCard = null;
                     document.querySelectorAll('.hkm-selected-block').forEach(el => el.classList.remove('hkm-selected-block'));
+                }
+            });
+
+            // Double click handler on social blocks to open editor modal immediately
+            container.addEventListener('dblclick', (e) => {
+                const socialBlockCard = e.target.closest('.newsletter-social-block');
+                if (socialBlockCard) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.openSocialInsertionFlowAt(socialBlockCard);
                 }
             });
 
@@ -3165,6 +3186,13 @@ class NewsletterBuilder {
             font-family: 'Inter', sans-serif;
         `;
 
+        let initialStyle = 'both';
+        if (afterElement && afterElement.dataset && afterElement.dataset.style) {
+            initialStyle = afterElement.dataset.style;
+        }
+
+        const isEditing = afterElement && afterElement.classList && afterElement.classList.contains('newsletter-social-block');
+
         modal.innerHTML = `
             <div class="profile-modal-content card modern" style="max-width: 520px; padding: 0; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); width: 90%; max-height: 90vh; display: flex; flex-direction: column;">
                 <div class="modal-header" style="background: linear-gradient(135deg, #1B4965, #0f172a); color: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: none;">
@@ -3172,7 +3200,7 @@ class NewsletterBuilder {
                         <div style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
                             <span class="material-symbols-outlined" style="font-size: 20px; color: white;">share</span>
                         </div>
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">Sosiale medier lenker</h3>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em;">${isEditing ? 'Endre sosiale medier' : 'Sosiale medier lenker'}</h3>
                     </div>
                     <button id="hkm-social-modal-close" style="background: none; border: none; color: white; opacity: 0.8; cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 50%; transition: all 0.2s;"><span class="material-symbols-outlined" style="font-size: 22px;">close</span></button>
                 </div>
@@ -3182,13 +3210,13 @@ class NewsletterBuilder {
                     <div>
                         <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Visningsstil</label>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #f8fafc; padding: 4px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                            <button type="button" class="hkm-style-btn active" data-style="both" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: white; color: #1B4965; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s;">
+                            <button type="button" class="hkm-style-btn ${initialStyle === 'both' ? 'active' : ''}" data-style="both" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: ${initialStyle === 'both' ? 'white' : 'transparent'}; color: ${initialStyle === 'both' ? '#1B4965' : '#64748b'}; box-shadow: ${initialStyle === 'both' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'}; transition: all 0.2s;">
                                 Ikon + Tekst
                             </button>
-                            <button type="button" class="hkm-style-btn" data-style="icon_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                            <button type="button" class="hkm-style-btn ${initialStyle === 'icon_only' ? 'active' : ''}" data-style="icon_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${initialStyle === 'icon_only' ? 'white' : 'transparent'}; color: ${initialStyle === 'icon_only' ? '#1B4965' : '#64748b'}; box-shadow: ${initialStyle === 'icon_only' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'}; transition: all 0.2s;">
                                 Bare ikoner
                             </button>
-                            <button type="button" class="hkm-style-btn" data-style="text_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                            <button type="button" class="hkm-style-btn ${initialStyle === 'text_only' ? 'active' : ''}" data-style="text_only" style="padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: ${initialStyle === 'text_only' ? 'white' : 'transparent'}; color: ${initialStyle === 'text_only' ? '#1B4965' : '#64748b'}; box-shadow: ${initialStyle === 'text_only' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'}; transition: all 0.2s;">
                                 Bare tekst
                             </button>
                         </div>
@@ -3217,14 +3245,14 @@ class NewsletterBuilder {
 
                 <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
                     <button id="hkm-social-modal-cancel" style="background: white; border: 1px solid #cbd5e1; color: #334155; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Avbryt</button>
-                    <button id="hkm-social-modal-insert" style="background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.25);">Sett inn i nyhetsbrev</button>
+                    <button id="hkm-social-modal-insert" style="background: linear-gradient(135deg, #1B4965 0%, #0f172a 100%); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(27, 73, 101, 0.25);">${isEditing ? 'Oppdater blokk' : 'Sett inn i nyhetsbrev'}</button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
 
-        let selectedStyle = 'both';
+        let selectedStyle = initialStyle;
         const styleBtns = modal.querySelectorAll('.hkm-style-btn');
         styleBtns.forEach(btn => {
             btn.onclick = () => {
@@ -3290,11 +3318,25 @@ class NewsletterBuilder {
             const fullBlockHtml = `
                 <div class="newsletter-social-block" contenteditable="false" data-style="${selectedStyle}" style="position: relative; text-align: center; margin: 24px 0; padding: 16px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff; display: flex; flex-wrap: wrap; justify-content: center; gap: ${selectedStyle === 'text_only' ? '12px' : '14px'}; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <button class="card-delete-btn" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Slett sosial blokk">×</button>
+                    <button class="card-edit-btn" style="position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;" title="Endre stil & lenker">✏️</button>
                     ${linksHtml}
-                </div><p><br></p>
+                </div>
             `;
 
-            this.insertHtmlAtCursorOrEndAt(fullBlockHtml, afterElement);
+            const container = document.getElementById('blocks-container');
+            if (isEditing && container && container.contains(afterElement)) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = fullBlockHtml;
+                const newBlock = tempDiv.firstElementChild;
+                afterElement.replaceWith(newBlock);
+                this.syncUnifiedBlocks();
+                this.triggerAutosave();
+                closeModal();
+                showToast("Sosiale medier oppdatert!", "success");
+                return;
+            }
+
+            this.insertHtmlAtCursorOrEndAt(fullBlockHtml + '<p><br></p>', afterElement);
             closeModal();
             showToast("Sosiale medier satt inn!", "success");
         };
@@ -6268,19 +6310,29 @@ class NewsletterBuilder {
             nestedFooters.forEach(footer => footer.remove());
         }
 
-        // Ensure all product and event cards in the container have a delete button
-        container.querySelectorAll('.newsletter-product-card, .newsletter-event-card').forEach(card => {
+        // Ensure all non-text block cards in the container have a delete button and edit controls
+        container.querySelectorAll(
+            '.newsletter-product-card, .newsletter-event-card, .newsletter-social-block, ' +
+            '.newsletter-video-block, .newsletter-divider-block, .newsletter-spacer-block, .newsletter-columns-block'
+        ).forEach(card => {
             if (card.style.position !== 'relative') {
                 card.style.position = 'relative';
             }
             if (!card.querySelector('.card-delete-btn')) {
-                const isProduct = card.classList.contains('newsletter-product-card');
                 const btn = document.createElement('button');
                 btn.className = 'card-delete-btn';
                 btn.setAttribute('style', 'position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; border: 2px solid white; color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
-                btn.title = isProduct ? 'Slett produkt' : 'Slett arrangement';
+                btn.title = 'Slett element';
                 btn.innerHTML = '×';
                 card.appendChild(btn);
+            }
+            if (card.classList.contains('newsletter-social-block') && !card.querySelector('.card-edit-btn')) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'card-edit-btn';
+                editBtn.setAttribute('style', 'position: absolute; top: -10px; right: 20px; width: 24px; height: 24px; border-radius: 50%; background: #1B4965; border: 2px solid white; color: white; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 100;');
+                editBtn.title = 'Endre stil & lenker';
+                editBtn.innerHTML = '✏️';
+                card.appendChild(editBtn);
             }
         });
 
@@ -6291,7 +6343,7 @@ class NewsletterBuilder {
         const modal = document.getElementById('preview-modal');
         const frame = document.getElementById('preview-frame');
         const canvas = document.getElementById('newsletter-canvas').cloneNode(true);
-        canvas.querySelectorAll('.block-controls, input, .col-type-toggle, .card-delete-btn').forEach(c => c.remove());
+        canvas.querySelectorAll('.block-controls, input, .col-type-toggle, .card-delete-btn, .card-edit-btn').forEach(c => c.remove());
         canvas.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
         canvas.querySelectorAll('.image-overlay').forEach(o => o.remove());
 
