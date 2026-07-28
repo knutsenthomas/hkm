@@ -788,7 +788,10 @@ class NewsletterBuilder {
                 optSendTestBtn.onclick = (e) => {
                     if (e) e.stopPropagation();
                     publishDropdownMenu.style.setProperty('display', 'none', 'important');
-                    this.sendTestEmail();
+                    this.sendTestEmail().catch(err => {
+                        console.error("sendTestEmail failed:", err);
+                        alert("Kritisk asynkron feil ved utsending: " + err.message);
+                    });
                 };
             }
 
@@ -8381,8 +8384,12 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async getAuthUser() {
-        if (window.firebaseService?.auth?.currentUser) return window.firebaseService.auth.currentUser;
-        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) return firebase.auth().currentUser;
+        try {
+            if (window.firebaseService?.auth?.currentUser) return window.firebaseService.auth.currentUser;
+            if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) return firebase.auth().currentUser;
+        } catch (e) {
+            console.warn("getAuthUser feilet:", e);
+        }
         return null;
     }
 
@@ -8399,6 +8406,10 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendTestEmail(targetEmail) {
+        if (typeof showToast === 'function') {
+            showToast("Starter test-utsendelse...", "info");
+        }
+        
         const publishDropdown = document.getElementById('publish-options-dropdown');
         if (publishDropdown) publishDropdown.style.setProperty('display', 'none', 'important');
 
