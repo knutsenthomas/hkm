@@ -8358,26 +8358,19 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
     }
 
     async sendTestEmail() {
-        let user = window.firebaseService?.auth?.currentUser;
-        if (!user && typeof firebase !== 'undefined' && firebase.auth) {
-            user = firebase.auth().currentUser;
-        }
-
-        if (!user) {
-            if (typeof showToast === 'function') {
-                showToast("Logg inn på nytt i adminpanelet for å sende test-e-post.", "warning");
-            }
-            return;
-        }
+        let user = window.firebaseService?.auth?.currentUser || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
 
         const subject = document.getElementById('newsletter-subject')?.value || 'Test-e-post';
         this.syncUnifiedBlocks();
         
-        const textContent = document.getElementById('blocks-container')?.innerHTML || '';
-        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+        let textContent = document.getElementById('blocks-container')?.innerHTML || '';
+        let plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+
         if (!textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
-            return showToast("Legg til innhold før du sender en test.", "error");
+            plainText = "Dette er en test-e-post fra His Kingdom Ministry.";
         }
+
+        const defaultEmail = user?.email || 'post@hiskingdomministry.no';
 
         this.showPromptModal(
             "Hvem vil du sende test-e-posten til?",
@@ -8399,7 +8392,14 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
 
                 let sendSuccess = false;
                 try {
-                    const idToken = await user.getIdToken(true);
+                    let idToken = '';
+                    if (user && typeof user.getIdToken === 'function') {
+                        try {
+                            idToken = await user.getIdToken();
+                        } catch (tokErr) {
+                            console.warn("Could not get fresh idToken:", tokErr);
+                        }
+                    }
 
                     const fullHtml = this.compileEmailHtml(this.currentEditorLang || 'no');
 
@@ -8407,7 +8407,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
+                            ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {})
                         },
                         body: JSON.stringify({
                             to: recipientEmail,
@@ -8418,18 +8418,13 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                         })
                     });
 
-                    if (!response.ok) {
-                        const errText = await response.text();
-                        let parsedErr = '';
-                        try {
-                            const errObj = JSON.parse(errText);
-                            parsedErr = errObj.error || errObj.message || '';
-                        } catch(e) {}
-                        throw new Error(parsedErr || `Serverfeil status ${response.status}`);
-                    }
+                    const resText = await response.text();
+                    let result = {};
+                    try {
+                        result = JSON.parse(resText);
+                    } catch(e) {}
 
-                    const result = await response.json();
-                    if (result.success) {
+                    if (response.ok && result.success) {
                         showToast("Test-e-post er sendt!", "success");
                         sendSuccess = true;
                         
@@ -8442,7 +8437,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                             testText.innerText = 'Test-epost bekreftet sendt';
                         }
                     } else {
-                        throw new Error(result.error || 'Serveren returnerte en feil.');
+                        throw new Error(result.error || result.message || `Serverfeil (status ${response.status})`);
                     }
                 } catch (error) {
                     console.error('Feil ved sending av test-e-post:', error);
@@ -8462,7 +8457,7 @@ Svar KUN med et gyldig JSON-objekt (ingen markdown kodelister som \`\`\`json, sv
                     );
                 }
             },
-            user.email || 'post@hiskingdomministry.no',
+            defaultEmail,
             "Vennligst oppgi en e-postadresse.",
             "Send test-e-post",
             "Send test-e-post"
