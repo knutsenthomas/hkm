@@ -5150,7 +5150,7 @@ class NewsletterBuilder {
         const continueBtn = document.getElementById('continue-btn');
         if (continueBtn) {
             if (this.isRecipientsDrawerOpen) {
-                continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Tilbake til design</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_back</span>';
+                continueBtn.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 6px;">arrow_back</span><span class="btn-label" style="white-space: nowrap !important;">Tilbake til design</span>';
             } else {
                 continueBtn.innerHTML = '<span class="btn-label" style="white-space: nowrap !important;">Velg mottakere</span><span class="material-symbols-outlined" style="margin-left: 6px;">arrow_forward</span>';
             }
