@@ -5940,6 +5940,8 @@ class NewsletterBuilder {
                 }
             }
             img.setAttribute('style', 'max-width: 100% !important; height: auto !important; border: 0 !important; display: block !important;');
+        });
+
         // Convert blockquotes and quote blocks to bulletproof email tables with inline styles for Gmail, Outlook, and Apple Mail
         contentClone.querySelectorAll('blockquote, .block-quote, .quote-block, [data-type="quote"], .sitat').forEach(bq => {
             const innerContent = bq.innerHTML;
