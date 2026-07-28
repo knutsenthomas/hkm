@@ -7888,11 +7888,13 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
     .builder-toolbar-header {
         padding: 0 12px !important;
         gap: 8px !important;
+        flex-wrap: nowrap !important;
     }
 
     .builder-toolbar-header #sidebar-title,
     .builder-toolbar-header #newsletter-autosave-status,
-    .builder-toolbar-header .autosave-pill {
+    .builder-toolbar-header .autosave-pill,
+    .builder-toolbar-header .toolbar-center-cell {
         display: none !important;
         visibility: hidden !important;
     }
@@ -7911,19 +7913,6 @@ html[data-theme="dark"] .inspector-footer-btn.cancel {
         font-size: 13px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
-    }
-
-    /* Compact device toggle icons on mobile (32px x 28px) */
-    .builder-toolbar-header .device-pill-btn span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-
-    .builder-toolbar-header .device-pill-btn {
-        padding: 0 !important;
-        width: 32px !important;
-        height: 28px !important;
-        min-width: 32px !important;
-        justify-content: center !important;
     }
 
     /* Compact action buttons on mobile (36px x 36px square icon buttons with 10px radius) */
