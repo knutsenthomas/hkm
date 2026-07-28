@@ -5980,9 +5980,32 @@ class NewsletterBuilder {
 
         const contentClone = blocksContainer.cloneNode(true);
 
-        // Remove editor UI controls
-        contentClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay, .card-delete-btn, [data-tool]').forEach(c => c.remove());
+        // Remove editor UI controls, quick toolbars, buttons, overlays, and drag handles
+        contentClone.querySelectorAll(`
+            .block-quick-toolbar,
+            #block-quick-toolbar,
+            .quick-tb-btn,
+            .quick-tb-group,
+            .block-controls,
+            .col-type-toggle,
+            .image-overlay,
+            .add-block-btn-canvas,
+            .block-actions-overlay,
+            .card-delete-btn,
+            .block-toolbar,
+            .btn-block-action,
+            .editor-only,
+            [data-tool],
+            button
+        `).forEach(c => c.remove());
+
+        // Remove editor-specific attributes and active selection styles
         contentClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+        contentClone.querySelectorAll('*').forEach(el => {
+            el.classList.remove('selected', 'active', 'focused', 'editing');
+            if (el.style.outline) el.style.outline = '';
+            if (el.style.boxShadow) el.style.boxShadow = '';
+        });
 
         // Convert relative image URLs to production domain HTTPS
         contentClone.querySelectorAll('img').forEach(img => {
